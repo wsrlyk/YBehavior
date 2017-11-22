@@ -1,0 +1,15 @@
+#ifndef _YBEHAVIOR_SEQUENCE_H_
+#define _YBEHAVIOR_SEQUENCE_H_
+#endif
+
+#include "YBehavior/behaviortree.h"
+
+namespace YBehavior
+{
+	class Sequence : public BehaviorNode
+	{
+	public:
+		Sequence();
+		~Sequence();
+	};
+}

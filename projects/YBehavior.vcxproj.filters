@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\3rd">
+      <UniqueIdentifier>{e5b74255-ab00-4546-b8ca-4f4828b65225}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\3rd\pugixml">
+      <UniqueIdentifier>{60e65d36-0a32-4711-a52c-a4df008c16e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\3rd">
+      <UniqueIdentifier>{e12add74-511e-4987-88b1-f243c30b6e0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\3rd\pugixml">
+      <UniqueIdentifier>{a7a05bb4-5f01-42c5-b090-42ad878c13d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\nodes">
+      <UniqueIdentifier>{8220f174-f8f5-49c1-922f-039e6953960f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\nodes">
+      <UniqueIdentifier>{43c6c8f7-34cf-411e-8a8a-1711ea20bdfd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\YBehavior\agent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\define.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugiconfig.hpp">
+      <Filter>头文件\3rd\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugixml.hpp">
+      <Filter>头文件\3rd\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\behaviortree.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\behaviortreemgr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\shareddata.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\types.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\nodes\sequence.h">
+      <Filter>头文件\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\factory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\logger.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\utility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\YBehavior\agent.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\3rd\pugixml\pugixml.cpp">
+      <Filter>源文件\3rd\pugixml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\behaviortree.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\behaviortreemgr.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\shareddata.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\nodes\sequence.cpp">
+      <Filter>源文件\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\factory.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\utility.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

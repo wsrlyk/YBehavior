@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Monster_BlackCrystal>
+  <EntryTask T_target="" F_heartrate="3" FF_fftest="1.0|2.0|3.0" BB_bbtest="true|false|true|false" B_btest="true">
+  </EntryTask>
+</Monster_BlackCrystal>

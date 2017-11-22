@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+/projects/Debug
+/projects/ipch
+/projects/obj
+*.opensdf
+*.pdb
+*.ilk
+*.exp
+*.sdf
