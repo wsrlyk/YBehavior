@@ -49,7 +49,7 @@ namespace YBehavior
 				T t = opr2.GetValue(agent->GetSharedData());
 				if (t == 0)
 				{
-					LOG_BEGIN << "Divided by zero: " << pNode->GetNodeInfoForPrint() << LOG_END;
+					ERROR_BEGIN << "Divided by zero: " << pNode->GetNodeInfoForPrint() << ERROR_END;
 					return NS_FAILED;
 				}
 				opl.SetValue(agent->GetSharedData(), opr1.GetValue(agent->GetSharedData()) / t );
@@ -57,6 +57,7 @@ namespace YBehavior
 			break;
 		}
 
+		LOG_BEGIN << opl.GetValue(agent->GetSharedData()) << "<=" << opr1.GetValue(agent->GetSharedData()) << " " << opType << " " << opr2.GetValue(agent->GetSharedData()) << LOG_END;
 		return NS_SUCCESS;
 	}
 
@@ -65,14 +66,14 @@ namespace YBehavior
 		std::vector<STRING> buffer;
 		if (attrOptr.empty())
 		{
-			LOG_BEGIN << "Cant Find Calculator Opl: " << data.name() << LOG_END;
+			ERROR_BEGIN << "Cant Find Calculator Opl: " << data.name() << ERROR_END;
 			return Types::NoneAB;
 		}
 		auto tempChar = attrOptr.value();
 		Utility::SplitString(tempChar, buffer, Utility::SpaceSpliter);
 		if (buffer.size() != 2 || buffer[0].length() != 3)
 		{
-			LOG_BEGIN << "Format Error, Opl in" << data.name() << ": " << tempChar << LOG_END;
+			ERROR_BEGIN << "Format Error, Opl in" << data.name() << ": " << tempChar << ERROR_END;
 			return Types::NoneAB;
 		}
 
@@ -102,7 +103,7 @@ namespace YBehavior
 			break;
 		default:
 			{
-				LOG_BEGIN << "This type cant be supported by Calculator " << data.name() << ": " << tempChar << LOG_END;
+				ERROR_BEGIN << "This type cant be supported by Calculator " << data.name() << ": " << tempChar << ERROR_END;
 				return Types::NoneAB;
 			}
 			break;
@@ -115,7 +116,7 @@ namespace YBehavior
 		auto attrOptr = data.attribute("operator");
 		if (attrOptr.empty())
 		{
-			LOG_BEGIN << "Cant Find Calculator Operator: " << data.name() << LOG_END;
+			ERROR_BEGIN << "Cant Find Calculator Operator: " << data.name() << ERROR_END;
 			return;
 		}
 		auto tempChar = attrOptr.value();
@@ -157,6 +158,8 @@ namespace YBehavior
 		case Types::FloatAB:
 			return DoOperation<Float>(*(SharedVariable<Float>*)m_Opl, *(SharedVariable<Float>*)m_Opr1, *(SharedVariable<Float>*)m_Opr2, m_Operator, pAgent, this);
 			break;
+		default:
+			return NS_FAILED;
 		}
 	}
 

@@ -102,6 +102,8 @@ namespace YBehavior
 		}
 
 		FOR_EACH_TYPE(DEFINE_TYPES_FUNC);
+
+		void Clone(const SharedData& other);
 	};
 
 //////////////////////////////////////////////////////////////////////////

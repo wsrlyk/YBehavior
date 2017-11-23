@@ -39,3 +39,4 @@
 *.exp
 *.sdf
 *.suo
+/projects/*.suo

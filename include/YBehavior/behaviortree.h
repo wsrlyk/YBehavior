@@ -22,7 +22,6 @@ namespace YBehavior
 	protected:
 		typedef BehaviorNode* BehaviorNodePtr;
 		BehaviorNodePtr m_Parent;
-		std::vector<BehaviorNodePtr>* m_Childs;
 		NodeState m_State;
 		INT m_UID;
 	public:
@@ -30,30 +29,63 @@ namespace YBehavior
 		virtual ~BehaviorNode();
 
 		inline BehaviorNodePtr GetParent() { return m_Parent;}
+		inline void SetParent(BehaviorNodePtr parent) { m_Parent = parent;}
 		inline INT GetUID() { return m_UID; }
-		BehaviorNodePtr GetChild(UINT index);
-		void AddChild(BehaviorNode* child);
+
 		void Load(const pugi::xml_node& data);
 		NodeState Execute(AgentPtr pAgent);
 		static BehaviorNode* CreateNodeByName(const STRING& name);
+		virtual void AddChild(BehaviorNode* child);
 
 		virtual STRING GetNodeInfoForPrint() { return "";}
 	protected:
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
 		virtual void OnLoaded(const pugi::xml_node& data) {}
+		virtual void OnAddChild(BehaviorNode* child) {}
+	};
+
+	class YBEHAVIOR_API BranchNode: public BehaviorNode
+	{
+	public:
+		BranchNode();
+		~BranchNode();
+		BehaviorNodePtr GetChild(UINT index);
+	protected:
+		std::vector<BehaviorNodePtr>* m_Childs;
+
+		virtual void AddChild(BehaviorNode* child);
 		void _DestroyChilds();
 	};
 
-	class YBEHAVIOR_API BehaviorTree : public BehaviorNode
+	class YBEHAVIOR_API LeafNode: public BehaviorNode
+	{
+
+	};
+	class YBEHAVIOR_API SingleChildNode: public BranchNode
+	{
+	public:
+		SingleChildNode();
+		~SingleChildNode(){}
+	protected:
+		BehaviorNode* m_Child;
+		virtual void OnAddChild(BehaviorNode* child);
+		virtual NodeState Update(AgentPtr pAgent);
+	};
+
+	class YBEHAVIOR_API CompositeNode: public BranchNode
+	{
+
+	};
+	class YBEHAVIOR_API BehaviorTree : public SingleChildNode
 	{
 	private:
 		SharedData* m_SharedData;	///> 原始数据，每个使用此树的Agent都从这拷数据作为初始化
 	public:
 		BehaviorTree();
 		~BehaviorTree();
+		void CloneData(SharedData& destination);
 	protected:
 		virtual void OnLoaded(const pugi::xml_node& data);
-		virtual NodeState Update(AgentPtr pAgent);
 	};
 }
 

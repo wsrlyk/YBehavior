@@ -17,32 +17,30 @@ namespace YBehavior
 		return s_Instance;
 	}
 
-	void TreeMgr::LoadOneTree(const STRING& name)
+	BehaviorTree* TreeMgr::_LoadOneTree(const STRING& name)
 	{
 		pugi::xml_document doc;
 
 		pugi::xml_parse_result result = doc.load_file((name + ".xml").c_str());
 		if (!result)
 		{
-			LOG_BEGIN << "Load result: " << result.description() << LOG_END;
-			return;
+			ERROR_BEGIN << "Load result: " << result.description() << ERROR_END;
+			return nullptr;
 		}
 
 		auto rootData = doc.first_child();
 		if (rootData == nullptr)
-			return;
+			return nullptr;
 
 		NodeFactory::Instance()->SetActiveTree(name);
 		BehaviorTree* tree = new BehaviorTree();
 		if (!_LoadOneNode(tree, rootData.first_child()))
 		{
-			LOG_BEGIN << "Load xml failed: " << name << LOG_END;
-		}
-		else
-		{
-
+			ERROR_BEGIN << "Load xml failed: " << name << ERROR_END;
+			return nullptr;
 		}
 
+		return tree;
 	}
 
 	bool TreeMgr::_LoadOneNode(BehaviorNode* node, const pugi::xml_node& data)
@@ -56,7 +54,7 @@ namespace YBehavior
 			BehaviorNode* childNode = BehaviorNode::CreateNodeByName(it->name());
 			if (childNode == nullptr)
 			{
-				LOG_BEGIN << "Cant create node " << it->name() << " cause its not registered;" << LOG_END;
+				ERROR_BEGIN << "Cant create node " << it->name() << " cause its not registered;" << ERROR_END;
 				continue;
 			}
 
@@ -67,6 +65,33 @@ namespace YBehavior
 		return true;
 	}
 
+	BehaviorTree* TreeMgr::GetTree(const STRING& name)
+	{
+		auto it = m_Trees.find(name);
+		if (it != m_Trees.end())
+			return it->second->m_OriginalTree;
+
+		BehaviorTree* tree = _LoadOneTree(name);
+		TreeInfo* info = new TreeInfo();
+		info->m_OriginalTree = tree;
+		m_Trees[name] = info;
+		return tree;
+	}
+
+	TreeMgr::~TreeMgr()
+	{
+		for(auto it = m_Trees.begin(); it != m_Trees.end(); ++it)
+			delete it->second;
+		m_Trees.clear();
+	}
+
 	TreeMgr* TreeMgr::s_Instance;
+
+
+	TreeInfo::~TreeInfo()
+	{
+		if (m_OriginalTree)
+			delete m_OriginalTree;
+	}
 
 }

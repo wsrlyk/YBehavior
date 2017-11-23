@@ -3,6 +3,7 @@
 
 #include "YBehavior/define.h"
 #include "YBehavior/shareddata.h"
+#include <unordered_map>
 
 namespace pugi
 {
@@ -12,18 +13,33 @@ namespace pugi
 namespace YBehavior
 {
 	class BehaviorNode;
+	class BehaviorTree;
+	class TreeInfo
+	{
+	public:
+		TreeInfo()
+			: m_OriginalTree(nullptr)
+		{
+
+		}
+		~TreeInfo();
+		BehaviorTree* m_OriginalTree;
+	};
 
 	class YBEHAVIOR_API TreeMgr
 	{
 	public:
-		void LoadOneTree(const STRING& name);
+		BehaviorTree* GetTree(const STRING& name);
 		static TreeMgr* Instance();
 	protected:
+		BehaviorTree* _LoadOneTree(const STRING& name);
 		bool _LoadOneNode(BehaviorNode* node, const pugi::xml_node& data);
 	private:
 		static TreeMgr* s_Instance;
 		TreeMgr(){}
+		~TreeMgr();
 
+		std::unordered_map<STRING, TreeInfo*> m_Trees;
 	};
 }
 

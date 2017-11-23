@@ -41,4 +41,19 @@ namespace YBehavior
 	}
 
 	FOR_EACH_TYPE(DEFINE_SHARED_TYPES);
+
+	void SharedData::Clone(const SharedData& other)
+	{
+#define CLONE_VARIABLES(T)\
+	if (m_##T##s)\
+		m_##T##s->clear();\
+	if (other.m_##T##s)\
+	{\
+		if (!m_##T##s)\
+			m_##T##s = new std::vector<T>(other.m_##T##s->size());\
+		*m_##T##s = (*other.m_##T##s);\
+	}
+
+	FOR_EACH_TYPE(CLONE_VARIABLES);
+	}
 }

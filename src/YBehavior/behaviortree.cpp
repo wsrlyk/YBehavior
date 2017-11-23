@@ -14,46 +14,13 @@ namespace YBehavior
 	BehaviorNode::BehaviorNode()
 	{
 		m_Parent = nullptr;
-		m_Childs = nullptr;
 	}
 
 
 	BehaviorNode::~BehaviorNode()
 	{
-		_DestroyChilds();
 	}
 
-	BehaviorNode::BehaviorNodePtr BehaviorNode::GetChild(UINT index)
-	{
-		if (m_Childs && index < m_Childs->size())
-			return (*m_Childs)[index];
-
-		return nullptr;
-	}
-
-
-	void BehaviorNode::AddChild(BehaviorNode* child)
-	{
-		if (child == nullptr)
-			return;
-
-		if (!m_Childs)
-			m_Childs = new std::vector<BehaviorNodePtr>();
-
-		m_Childs->push_back(child);
-	}
-
-	void BehaviorNode::_DestroyChilds()
-	{
-		if (m_Childs)
-		{
-			for(auto it = m_Childs->begin(); it != m_Childs->end(); ++it)
-			{
-				delete (*it);
-			}
-			delete m_Childs;
-		}
-	}
 
 	BehaviorNode* BehaviorNode::CreateNodeByName(const STRING& name)
 	{
@@ -67,7 +34,7 @@ namespace YBehavior
 
 
 		NodeState state = this->Update(pAgent);
-
+		m_State = state;
 
 		///> 更新后处理
 
@@ -79,6 +46,16 @@ namespace YBehavior
 		OnLoaded(data);
 	}
 
+	void BehaviorNode::AddChild(BehaviorNode* child)
+	{
+		ERROR_BEGIN << "Cant add child to this node: " << ERROR_END;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+
+
 	BehaviorTree::BehaviorTree()
 	{
 		m_SharedData = new SharedData();
@@ -87,11 +64,6 @@ namespace YBehavior
 	BehaviorTree::~BehaviorTree()
 	{
 		delete m_SharedData;
-	}
-
-	YBehavior::NodeState BehaviorTree::Update(AgentPtr pAgent)
-	{
-		return NS_SUCCESS;
 	}
 
 	void BehaviorTree::OnLoaded(const pugi::xml_node& data)
@@ -195,6 +167,86 @@ namespace YBehavior
 					}
 				}
 			}
+		}
+	}
+
+	void BehaviorTree::CloneData(SharedData& destination)
+	{
+		destination.Clone(*m_SharedData);
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+
+	SingleChildNode::SingleChildNode()
+		: m_Child(nullptr)
+	{
+
+	}
+
+	void SingleChildNode::OnAddChild(BehaviorNode* child)
+	{
+		if (m_Child == nullptr)
+			m_Child = child;
+		else
+		{
+			ERROR_BEGIN << "There're more than 1 children for this sinlgechild node: " << GetNodeInfoForPrint() << ERROR_END;
+			return;
+		}
+	}
+
+	YBehavior::NodeState SingleChildNode::Update(AgentPtr pAgent)
+	{
+		if (m_Child)
+			return m_Child->Execute(pAgent);
+
+		return NS_FAILED;
+	}
+
+
+	BranchNode::BranchNode()
+	{
+		m_Childs = nullptr;
+	}
+
+	BranchNode::~BranchNode()
+	{
+		_DestroyChilds();
+	}
+
+	BehaviorNode::BehaviorNodePtr BranchNode::GetChild(UINT index)
+	{
+		if (m_Childs && index < m_Childs->size())
+			return (*m_Childs)[index];
+
+		return nullptr;
+	}
+
+
+	void BranchNode::AddChild(BehaviorNode* child)
+	{
+		if (child == nullptr)
+			return;
+
+		if (!m_Childs)
+			m_Childs = new std::vector<BehaviorNodePtr>();
+
+		m_Childs->push_back(child);
+		child->SetParent(this);
+
+		OnAddChild(child);
+	}
+
+	void BranchNode::_DestroyChilds()
+	{
+		if (m_Childs)
+		{
+			for(auto it = m_Childs->begin(); it != m_Childs->end(); ++it)
+			{
+				delete (*it);
+			}
+			delete m_Childs;
 		}
 	}
 

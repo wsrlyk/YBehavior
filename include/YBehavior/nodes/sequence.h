@@ -6,7 +6,7 @@
 
 namespace YBehavior
 {
-	class Sequence : public BehaviorNode
+	class Sequence : public CompositeNode
 	{
 	public:
 		Sequence();

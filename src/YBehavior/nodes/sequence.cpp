@@ -13,14 +13,15 @@ namespace YBehavior
 
 	YBehavior::NodeState Sequence::Update(AgentPtr pAgent)
 	{
+		NodeState ns = NS_SUCCESS;
 		for (auto it = m_Childs->begin(); it != m_Childs->end(); ++it)
 		{
-			m_State = (*it)->Execute(pAgent);
-			if (m_State == NS_FAILED)
+			ns = (*it)->Execute(pAgent);
+			if (ns == NS_FAILED)
 				break;
 		}
 
-		return m_State;
+		return ns;
 	}
 
 }
