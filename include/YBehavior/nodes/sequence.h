@@ -11,5 +11,7 @@ namespace YBehavior
 	public:
 		Sequence();
 		~Sequence();
+	protected:
+		virtual NodeState Update(AgentPtr pAgent);
 	};
 }

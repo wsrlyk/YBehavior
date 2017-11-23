@@ -1,8 +1,6 @@
 #ifndef _YBEHAVIOR_DEFINE_H_
 #define _YBEHAVIOR_DEFINE_H_
 
-#include "types.h"
-
 namespace YBehavior
 {
 	//#ifdef YBEHAVIOR_DLL

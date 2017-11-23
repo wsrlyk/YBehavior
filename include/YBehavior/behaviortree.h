@@ -3,7 +3,6 @@
 
 #include "YBehavior/define.h"
 #include "YBehavior/shareddata.h"
-#include "YBehavior/factory.h"
 #include <unordered_map>
 namespace pugi
 {
@@ -12,55 +11,37 @@ namespace pugi
 
 namespace YBehavior
 {
-	class NodeFactory;
+	enum NodeState
+	{
+		NS_SUCCESS,
+		NS_FAILED
+	};
+
 	class YBEHAVIOR_API BehaviorNode
 	{
 	protected:
 		typedef BehaviorNode* BehaviorNodePtr;
 		BehaviorNodePtr m_Parent;
 		std::vector<BehaviorNodePtr>* m_Childs;
-
+		NodeState m_State;
+		INT m_UID;
 	public:
 		BehaviorNode();
 		virtual ~BehaviorNode();
 
 		inline BehaviorNodePtr GetParent() { return m_Parent;}
+		inline INT GetUID() { return m_UID; }
 		BehaviorNodePtr GetChild(UINT index);
 		void AddChild(BehaviorNode* child);
-		virtual void OnLoaded(const pugi::xml_node& data) {}
-
+		void Load(const pugi::xml_node& data);
+		NodeState Execute(AgentPtr pAgent);
 		static BehaviorNode* CreateNodeByName(const STRING& name);
-		static NodeFactory* GetNodeFactory() { return s_NodeFactory; }
+
+		virtual STRING GetNodeInfoForPrint() { return "";}
 	protected:
+		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
+		virtual void OnLoaded(const pugi::xml_node& data) {}
 		void _DestroyChilds();
-
-		static NodeFactory* s_NodeFactory;
-	};
-
-	class YBEHAVIOR_API NodeFactory: public Factory<BehaviorNode>
-	{
-	public:
-		NodeFactory();
-		void SetActiveTree(const STRING& tree);
-		INT CreateIndexByName(const STRING& name);
-	public:
-		struct NameIndexInfo
-		{
-			std::unordered_map<STRING, INT> mNameHash;
-			INT mNameIndex;
-
-			void Reset()
-			{
-				mNameHash.clear();
-				mNameIndex = 0;
-			}
-		};
-	private:
-		//static std::map<std::string, NameIndexInfo> mNameIndexInfos;
-		NameIndexInfo mCommonNameIndexInfo;
-		NameIndexInfo mTempNameIndexInfo;
-		NameIndexInfo* mpCurActiveNameIndexInfo;
-		STRING mCurActiveTreeName;
 	};
 
 	class YBEHAVIOR_API BehaviorTree : public BehaviorNode
@@ -70,7 +51,9 @@ namespace YBehavior
 	public:
 		BehaviorTree();
 		~BehaviorTree();
+	protected:
 		virtual void OnLoaded(const pugi::xml_node& data);
+		virtual NodeState Update(AgentPtr pAgent);
 	};
 }
 

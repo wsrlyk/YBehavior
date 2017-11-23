@@ -1,67 +1,12 @@
 #include "YBehavior/behaviortree.h"
-#include "YBehavior/nodes/Sequence.h"
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include <sstream>
+#include "YBehavior/nodefactory.h"
 
 namespace YBehavior
 {
-	INT NodeFactory::CreateIndexByName(const STRING& name)
-	{
-		auto it = mCommonNameIndexInfo.mNameHash.find(name);
-		if (it != mCommonNameIndexInfo.mNameHash.end())
-			return it->second;
-
-		if (mpCurActiveNameIndexInfo == NULL)
-			return -1;
-
-		///> common已经找过，不用再找一遍
-		if (mpCurActiveNameIndexInfo == &mCommonNameIndexInfo || mpCurActiveNameIndexInfo->mNameHash.find(name) == mpCurActiveNameIndexInfo->mNameHash.end())
-		{
-			LOG_BEGIN << "ADD node: " << name << "index: " << mpCurActiveNameIndexInfo->mNameIndex << LOG_END;
-			mpCurActiveNameIndexInfo->mNameHash[name] = mpCurActiveNameIndexInfo->mNameIndex;
-			mpCurActiveNameIndexInfo->mNameIndex ++;
-		}
-
-		return mpCurActiveNameIndexInfo->mNameHash[name];
-	}
-	void NodeFactory::SetActiveTree(const STRING& tree)
-	{
-		LOG_BEGIN << "SetActiveTree: " << tree.c_str() << LOG_END;
-
-		mCurActiveTreeName = tree;
-
-		if (tree.empty())
-		{
-			mpCurActiveNameIndexInfo = &mCommonNameIndexInfo;
-			return;
-		}
-		else
-		{
-			mpCurActiveNameIndexInfo = &mTempNameIndexInfo;
-		}
-
-		mpCurActiveNameIndexInfo->Reset();
-		mpCurActiveNameIndexInfo->mNameIndex = mCommonNameIndexInfo.mNameIndex;
-	}
-
-	NodeFactory::NodeFactory()
-		: Factory<BehaviorNode>()
-	{
-		mCommonNameIndexInfo.Reset();
-		mTempNameIndexInfo.Reset();
-	}
-
-	NodeFactory* CreateNodeFactory()
-	{
-		NodeFactory* factory = new NodeFactory();
-		REGISTER_TYPE(factory, Sequence);
-
-		return factory;
-	}
-
-	NodeFactory* BehaviorNode::s_NodeFactory = CreateNodeFactory();
 
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
@@ -112,9 +57,27 @@ namespace YBehavior
 
 	BehaviorNode* BehaviorNode::CreateNodeByName(const STRING& name)
 	{
-		return s_NodeFactory->Get(name);
+		return NodeFactory::Instance()->Get(name);
 	}
 
+	YBehavior::NodeState BehaviorNode::Execute(AgentPtr pAgent)
+	{
+		///> 检查各种条件 或者 断点
+		//////////////////////////////////////////////////////////////////////////
+
+
+		NodeState state = this->Update(pAgent);
+
+
+		///> 更新后处理
+
+		return state;
+	}
+
+	void BehaviorNode::Load(const pugi::xml_node& data)
+	{
+		OnLoaded(data);
+	}
 
 	BehaviorTree::BehaviorTree()
 	{
@@ -124,6 +87,11 @@ namespace YBehavior
 	BehaviorTree::~BehaviorTree()
 	{
 		delete m_SharedData;
+	}
+
+	YBehavior::NodeState BehaviorTree::Update(AgentPtr pAgent)
+	{
+		return NS_SUCCESS;
 	}
 
 	void BehaviorTree::OnLoaded(const pugi::xml_node& data)
@@ -136,62 +104,94 @@ namespace YBehavior
 			if(name.size() >= 4)
 			{
 				STRING truename(name.begin() + 3, name.end());
-				INT index = BehaviorNode::GetNodeFactory()->CreateIndexByName(truename);
 
 				STRING prefix(name.begin(), name.begin() + 2);	///> 两个字符
 				
-				if (prefix == "_F")
+				if (prefix[0] == '_')
 				{
-					m_SharedData->SetFloat(index, it->as_float());
-				}
-				else if (prefix == "_B")
-				{
-					m_SharedData->SetBool(index, it->as_bool());
-				}
-				else if (prefix == "_I")
-				{
-					m_SharedData->SetInt(index, it->as_int());
-				}
-				else if (prefix == "_S")
-				{
-					m_SharedData->SetString(index, it->value());
-				}
-				else if (prefix == "_V")
-				{
-					Vector3 tempVec;
-					Utility::SplitString(it->value(), buffer, Utility::SequenceSpliter);
-					Utility::CreateVector3(buffer, tempVec);
-					m_SharedData->SetVector3(index, std::move(tempVec));
+					switch(prefix[1])
+					{
+					case 'F':
+						{
+							INT index = NodeFactory::Instance()->CreateIndexByName<Float>(truename);
+							m_SharedData->SetFloat(index, it->as_float());
+						}
+						break;
+					case 'B':
+						{
+							INT index = NodeFactory::Instance()->CreateIndexByName<Bool>(truename);
+							m_SharedData->SetBool(index, it->as_bool());
+						}
+						break;
+					case 'I':
+						{
+							INT index = NodeFactory::Instance()->CreateIndexByName<Int>(truename);
+							m_SharedData->SetInt(index, it->as_int());
+						}
+						break;
+					case 'L':
+						{
+							INT index = NodeFactory::Instance()->CreateIndexByName<Uint64>(truename);
+							m_SharedData->SetUint64(index, it->as_ullong());
+						}
+						break;
+					case 'S':
+						{
+							INT index = NodeFactory::Instance()->CreateIndexByName<String>(truename);
+							m_SharedData->SetString(index, it->value());
+						}
+						break;
+					case 'V':
+						{
+							Vector3 tempVec;
+							Utility::SplitString(it->value(), buffer, Utility::SequenceSpliter);
+							Utility::CreateVector3(buffer, tempVec);
+							INT index = NodeFactory::Instance()->CreateIndexByName<Vector3>(truename);
+							m_SharedData->SetVector3(index, std::move(tempVec));
+						}
+						break;
+					default:
+						break;
+					}
 				}
 				else
 				{
 					std::vector<STRING> buffer2;
 					Utility::SplitString(it->value(), buffer2, Utility::ListSpliter);
 					std::stringstream ss;
-					if (prefix == "FF")
+					switch(prefix[1])
 					{
-						std::vector<float> ffs;
-						for (auto it = buffer2.begin(); it != buffer2.end(); ++it)
+					case 'F':
 						{
-							float temp;
-							ss.clear();
-							ss << *it;
-							ss >> temp;
-							ffs.push_back(temp);
+							std::vector<float> ffs;
+							for (auto it = buffer2.begin(); it != buffer2.end(); ++it)
+							{
+								float temp;
+								ss.clear();
+								ss << *it;
+								ss >> temp;
+								ffs.push_back(temp);
+							}
+							INT index = NodeFactory::Instance()->CreateIndexByName<VecFloat>(truename);
+							m_SharedData->SetVecFloat(index, std::move(ffs));
 						}
-						m_SharedData->SetVecFloat(index, std::move(ffs));
-					}
-					else if (prefix == "BB")
-					{
-						std::vector<bool> bbs;
-						for (auto it = buffer2.begin(); it != buffer2.end(); ++it)
+						break;
+					case 'B':
 						{
-							float temp;
-							ss << *it;
-							ss >> temp;
-							bbs.push_back(temp);
+							std::vector<bool> bbs;
+							for (auto it = buffer2.begin(); it != buffer2.end(); ++it)
+							{
+								bool temp;
+								ss << *it;
+								ss >> temp;
+								bbs.push_back(temp);
+							}
+							INT index = NodeFactory::Instance()->CreateIndexByName<VecBool>(truename);
+							m_SharedData->SetVecBool(index, std::move(bbs));
 						}
-						m_SharedData->SetVecBool(index, std::move(bbs));
+						break;
+					default:
+						break;
 					}
 				}
 			}

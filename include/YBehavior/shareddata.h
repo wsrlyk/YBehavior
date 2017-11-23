@@ -1,28 +1,12 @@
 #ifndef _YBEHAVIOR_SHAREDDATA_H_
 #define _YBEHAVIOR_SHAREDDATA_H_
 
-#include "YBehavior/define.h"
-#include <string>
-#include <vector>
+#include "YBehavior/types.h"
 
 namespace YBehavior
 {
-	class Agent;
-	typedef Agent* AgentPtr;
-	typedef STRING				String;
-	typedef INT					Int;
-	typedef UINT				Uint;
-	typedef BYTE				Byte;
-	typedef BOOL				Bool;
-	typedef FLOAT				Float;
-	typedef std::vector<STRING>	VecString;
-	typedef std::vector<INT>	VecInt;
-	typedef std::vector<UINT>	VecUint;
-	typedef std::vector<BYTE>	VecByte;
-	typedef std::vector<BOOL>	VecBool;
-	typedef std::vector<FLOAT>	VecFloat;
-	typedef std::vector<AgentPtr>	VecAgentPtr;
-	typedef std::vector<Vector3>	VecVector3;
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
 	class YBEHAVIOR_API SharedData
 	{
@@ -70,12 +54,14 @@ namespace YBehavior
 
 #define FOR_EACH_TYPE(func)	\
 	func(Int);	\
+	func(Uint64);	\
 	func(Bool);	\
 	func(Float);	\
 	func(String);	\
 	func(AgentPtr);	\
 	func(Vector3);\
 	func(VecInt);\
+	func(VecUint64);\
 	func(VecBool);\
 	func(VecFloat);\
 	func(VecString);\
@@ -83,12 +69,14 @@ namespace YBehavior
 	func(VecVector3);
 #define FOR_EACH_TYPE_WITH_VALUE(func)	\
 	func(Int, 0);	\
+	func(Uint64, 0);	\
 	func(Bool, false);	\
 	func(Float, 0.0f);	\
 	func(String, "");	\
 	func(AgentPtr, nullptr);	\
 	func(Vector3, Vector3::zero);\
 	func(VecInt, 1);\
+	func(VecUint64, 1);\
 	func(VecBool, 1);	\
 	func(VecFloat, 1);	\
 	func(VecString, 1);	\
@@ -119,16 +107,32 @@ namespace YBehavior
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
+	class YBEHAVIOR_API ISharedVariable
+	{
+	public:
+		virtual ~ISharedVariable() {}
+		inline void SetIndex(INT index) { m_Index = index; }
+		virtual ISharedVariable operator+(ISharedVariable& other) { return *this;}
+		virtual ISharedVariable& operator=(ISharedVariable& other) { return *this;}
+		virtual ISharedVariable& operator=(ISharedVariable&& other) { return *this;}
+	protected:
+		INT m_Index;
+	};
 
 	template<typename T>
-	class YBEHAVIOR_API SharedVariable
+	class YBEHAVIOR_API SharedVariable: public ISharedVariable
 	{
 	protected:
 		T m_Value;
-		INT m_Index;
+	public:
+		virtual const T& GetValue(SharedData* data) = 0;
+		virtual bool SetValue(SharedData* data, const T& v) = 0;
+		virtual bool SetValue(SharedData* data, T&& v) = 0;
 
-		//const T& GetValue(SharedData* data) = 0;
-		//bool SetValue(SharedData* data, const T& v) = 0;
+		void SetValueFromString(const STRING& str)
+		{
+			m_Value = std::move(Utility::ToType<T>(str));
+		}
 	};
 
 	

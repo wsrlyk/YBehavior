@@ -3,6 +3,7 @@
 #include <iostream>
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/logger.h"
+#include "YBehavior/nodefactory.h"
 
 namespace YBehavior
 {
@@ -31,7 +32,7 @@ namespace YBehavior
 		if (rootData == nullptr)
 			return;
 
-		BehaviorNode::GetNodeFactory()->SetActiveTree(name);
+		NodeFactory::Instance()->SetActiveTree(name);
 		BehaviorTree* tree = new BehaviorTree();
 		if (!_LoadOneNode(tree, rootData.first_child()))
 		{
@@ -49,7 +50,7 @@ namespace YBehavior
 		if (node == nullptr)
 			return false;
 
-		node->OnLoaded(data);
+		node->Load(data);
 		for (auto it = data.begin(); it != data.end(); ++it)
 		{
 			BehaviorNode* childNode = BehaviorNode::CreateNodeByName(it->name());
@@ -60,7 +61,7 @@ namespace YBehavior
 			}
 
 			node->AddChild(childNode);
-			_LoadOneNode(childNode, data);
+			_LoadOneNode(childNode, *it);
 		}
 
 		return true;

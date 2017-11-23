@@ -19,6 +19,8 @@
     <ClInclude Include="..\include\YBehavior\define.h" />
     <ClInclude Include="..\include\YBehavior\factory.h" />
     <ClInclude Include="..\include\YBehavior\logger.h" />
+    <ClInclude Include="..\include\YBehavior\nodefactory.h" />
+    <ClInclude Include="..\include\YBehavior\nodes\calculator.h" />
     <ClInclude Include="..\include\YBehavior\nodes\sequence.h" />
     <ClInclude Include="..\include\YBehavior\shareddata.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
@@ -30,6 +32,8 @@
     <ClCompile Include="..\src\YBehavior\behaviortree.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviortreemgr.cpp" />
     <ClCompile Include="..\src\YBehavior\factory.cpp" />
+    <ClCompile Include="..\src\YBehavior\nodefactory.cpp" />
+    <ClCompile Include="..\src\YBehavior\nodes\calculator.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\sequence.cpp" />
     <ClCompile Include="..\src\YBehavior\shareddata.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />

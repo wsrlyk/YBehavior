@@ -1,5 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Monster_BlackCrystal>
-  <EntryTask T_target="" F_heartrate="3" FF_fftest="1.0|2.0|3.0" BB_bbtest="true|false|true|false" B_btest="true">
+  <EntryTask _A_target="" _F_add0="3" _F_add1="4" FF_fftest="1.0|2.0|3.0" BB_bbtest="true|false|true|false" _B_btest="true" _V_pos="100=200=300">
+    <Sequence>
+      <Calculator operator="Add" Opl="_FS add0" Opr1="_FS add1" Opr2="_FC 1.0">
+      </Calculator>
+      <Calculator operator="Add" Opl="_FS add0" Opr1="_FS add1" Opr2="_FC 1.0">
+      </Calculator>
+    </Sequence>
   </EntryTask>
 </Monster_BlackCrystal>
