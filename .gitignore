@@ -40,3 +40,9 @@
 *.sdf
 *.suo
 /projects/*.suo
+/projects/YBehaviorEditor/obj
+/projects/YBehaviorEditor/YBehaviorEditorCore/obj
+/projects/YBehaviorEditor/YBehaviorEditorCore/bin
+/projects/YBehaviorEditor/bin/Debug
+/projects/YBehaviorEditor/bin/Release
+/projects/YBehaviorEditor/.vs

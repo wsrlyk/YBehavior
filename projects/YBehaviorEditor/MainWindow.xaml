@@ -1,0 +1,21 @@
+﻿<Window x:Class="YBehavior.Editor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:YBehavior.Editor"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="1024" Width="1280">
+    <Grid>
+        <Menu  Width="300" Margin="10,10,1162,965">
+            <MenuItem Header="Operations" Height="30" Width="200">
+                <MenuItem Header="Open" Height="30" Width="200"/>
+                <MenuItem Header="Close" Height="30" Width="200"/>
+            </MenuItem>
+        </Menu>
+
+        <TreeView Name="Nodes" Margin="10,426,1031,210"/>
+        <local:WorkingSpaceFrame BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="387" Margin="10,34,0,0" VerticalAlignment="Top" Width="231"/>
+
+    </Grid>
+</Window>
