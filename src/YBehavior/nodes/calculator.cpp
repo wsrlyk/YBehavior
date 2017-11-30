@@ -113,26 +113,26 @@ namespace YBehavior
 	void Calculator::OnLoaded(const pugi::xml_node& data)
 	{
 		///> ÔËËã·û
-		auto attrOptr = data.attribute("operator");
+		auto attrOptr = data.attribute("Operator");
 		if (attrOptr.empty())
 		{
 			ERROR_BEGIN << "Cant Find Calculator Operator: " << data.name() << ERROR_END;
 			return;
 		}
 		auto tempChar = attrOptr.value();
-		if (strcmp(tempChar, "ADD"))
+		if (strcmp(tempChar, "ADD") == 0)
 		{
 			m_Operator = CO_ADD;
 		}
-		else if (strcmp(tempChar, "SUB"))
+		else if (strcmp(tempChar, "SUB") == 0)
 		{
 			m_Operator = CO_SUB;
 		}
-		else if (strcmp(tempChar, "MUL"))
+		else if (strcmp(tempChar, "MUL") == 0)
 		{
 			m_Operator = CO_MUL;
 		}
-		else if (strcmp(tempChar, "DIV"))
+		else if (strcmp(tempChar, "DIV") == 0)
 		{
 			m_Operator = CO_DIV;
 		}

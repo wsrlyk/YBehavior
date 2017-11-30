@@ -30,6 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -37,12 +39,19 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="LogMgr.cs" />
+    <Compile Include="RenderersMgr.cs" />
     <Compile Include="NodeMgr.cs" />
-    <Compile Include="TreeMgr.cs" />
+    <Compile Include="Nodes\Renderers.cs" />
+    <Compile Include="Nodes\Nodes.cs" />
+    <Compile Include="TreeFileMgr.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WorkBenchMgr.cs" />
+    <Compile Include="WorkBench.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

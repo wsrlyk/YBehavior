@@ -25,30 +25,31 @@ namespace YBehavior.Editor
         public class FileInfo
         {
             private List<FileInfo> m_children = new List<FileInfo>();
-            public List<FileInfo> children { get { return m_children; } }
-            public string name { get; set; }
-            public string icon { get; set; }
-            TreeMgr.TreeFileInfo source;
+            public List<FileInfo> Children { get { return m_children; } }
+            public string Name { get; set; }
+            public string Icon { get; set; }
+            TreeFileMgr.TreeFileInfo source;
+            public TreeFileMgr.TreeFileInfo Source { get { return source; } }
 
-            public void Build(TreeMgr.TreeFileInfo data)
+            public void Build(TreeFileMgr.TreeFileInfo data)
             {
-                children.Clear();
+                Children.Clear();
 
                 if (data == null)
                     return;
 
                 source = data;
-                name = data.name;
-                icon = !data.bIsFolder ? "Resources/ICON__0000_46.png"
+                Name = data.Name;
+                Icon = !data.bIsFolder ? "Resources/ICON__0000_46.png"
                                         : "Resources/ICON__0009_37.png";
 
-                if (data.children == null)
+                if (data.Children == null)
                     return;
 
-                foreach(TreeMgr.TreeFileInfo child in data.children)
+                foreach(TreeFileMgr.TreeFileInfo child in data.Children)
                 {
                     FileInfo info = new FileInfo();
-                    this.children.Add(info);
+                    this.Children.Add(info);
                     info.Build(child);
                 }
             }
@@ -57,11 +58,11 @@ namespace YBehavior.Editor
         public WorkingSpaceFrame()
         {
             InitializeComponent();
-            m_FileInfos.Build(TreeMgr.Instance.GetAllTrees());
-            this.Files.ItemsSource = m_FileInfos.children;
+            m_FileInfos.Build(TreeFileMgr.Instance.GetAllTrees());
+            this.Files.ItemsSource = m_FileInfos.Children;
         }
 
-        private void onFilesItemDoubleClick(object sender, MouseButtonEventArgs e)
+        private void OnFilesItemDoubleClick(object sender, MouseButtonEventArgs e)
         {
             DependencyObject obj = (DependencyObject)e.OriginalSource;
             while (obj != null && obj != this.Files)
@@ -69,9 +70,15 @@ namespace YBehavior.Editor
                 if (obj.GetType() == typeof(TreeViewItem))
                 {
                     FileInfo item = this.Files.SelectedItem as FileInfo;
-                    string nodeText = item.name;
+                    string nodeText = item.Name;
 
-                    MessageBox.Show(nodeText);
+                    WorkBench bench = null;
+                    if ((bench = WorkBenchMgr.Instance.OpenWorkBench(item.Source)) != null)
+                    {
+                        WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
+                        arg.Bench = bench;
+                        EventMgr.Instance.Send(arg);
+                    }
 
                     break;
                 }

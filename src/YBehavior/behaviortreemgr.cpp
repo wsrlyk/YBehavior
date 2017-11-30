@@ -51,15 +51,28 @@ namespace YBehavior
 		node->Load(data);
 		for (auto it = data.begin(); it != data.end(); ++it)
 		{
-			BehaviorNode* childNode = BehaviorNode::CreateNodeByName(it->name());
-			if (childNode == nullptr)
+			if (strcmp(it->name(), "Node") == 0)
 			{
-				ERROR_BEGIN << "Cant create node " << it->name() << " cause its not registered;" << ERROR_END;
-				continue;
-			}
+				auto className = it->attribute("Class");
+				if (className.empty())
+				{
+					ERROR_BEGIN << "Cant Find Class Name in: " << data.name() << ERROR_END;
+					continue;
+				}
+				BehaviorNode* childNode = BehaviorNode::CreateNodeByName(className.value());
+				if (childNode == nullptr)
+				{
+					ERROR_BEGIN << "Cant create node " << it->name() << " cause its not registered;" << ERROR_END;
+					continue;
+				}
 
-			node->AddChild(childNode);
-			_LoadOneNode(childNode, *it);
+				node->AddChild(childNode);
+				_LoadOneNode(childNode, *it);
+			}
+			else
+			{
+
+			}
 		}
 
 		return true;
