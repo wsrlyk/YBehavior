@@ -41,7 +41,7 @@ namespace YBehavior.Editor
             }
 
             ///> Node
-            public NodeInfo(NodeBase data)
+            public NodeInfo(Node data)
             {
                 m_Source = data;
                 m_Hierachy = NodeHierachy.NH_None;
@@ -49,7 +49,7 @@ namespace YBehavior.Editor
                 Icon = "Resources/ICON__0000_46.png";
             }
 
-            public void Build(NodeBase data)
+            public void Build(Node data)
             {
                 if (data == null)
                     return;

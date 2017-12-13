@@ -11,19 +11,19 @@ namespace YBehavior.Editor.Core
     {
         public static NodeMgr Instance { get { return s_Instance; } }
         static NodeMgr s_Instance = new NodeMgr();
-        List<NodeBase> m_NodeList = new List<NodeBase>();
-        public List<NodeBase> NodeList { get { return m_NodeList; } }
+        List<Node> m_NodeList = new List<Node>();
+        public List<Node> NodeList { get { return m_NodeList; } }
         private Dictionary<string, Type> m_TypeDic = new Dictionary<string, Type>();
 
         public NodeMgr()
         {
             var subTypeQuery = from t in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
-                               where IsSubClassOf(t, typeof(NodeBase))
+                               where IsSubClassOf(t, typeof(Node))
                                select t;
 
             foreach (var type in subTypeQuery)
             {
-                NodeBase node = Activator.CreateInstance(type) as NodeBase;
+                Node node = Activator.CreateInstance(type) as Node;
                 if (node.Type == NodeType.NT_Invalid)
                     continue;
                 m_NodeList.Add(node);
@@ -32,12 +32,12 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        public NodeBase CreateNodeByName(string name)
+        public Node CreateNodeByName(string name)
         {
             if (m_TypeDic.TryGetValue(name, out Type type))
             {
-                NodeBase node = Activator.CreateInstance(type) as NodeBase;
-                node.Renderer = RenderersMgr.Instance.CreateRenderer(node.Type);
+                Node node = Activator.CreateInstance(type) as Node;
+                node.CreateRenderer();
                 return node;
             }
             return null;
@@ -82,55 +82,122 @@ namespace YBehavior.Editor.Core
 
     public class NodeBase
     {
+        protected Connections m_Connections = new Connections();
+        public Connections Conns { get { return m_Connections; } }
+
+        protected Connection m_ParentConnection;
+        public Connection ParentConn
+        {
+            get { return m_ParentConnection; }
+            set
+            {
+                m_ParentConnection = value;
+                if (value != null)
+                    m_Parent = m_ParentConnection.Owner;
+                else
+                    m_Parent = null;
+            }
+        }
+
+        public NodeBase Parent { get { return m_Parent; } }
+        protected NodeBase m_Parent;
+    }
+
+    public class Node : NodeBase
+    {
         protected string m_Name;
         public string Name { get { return m_Name; }}
         protected NodeType m_Type = NodeType.NT_Invalid;
         public NodeType Type { get { return m_Type; }}
         protected NodeHierachy m_Hierachy = NodeHierachy.NH_None;
         public NodeHierachy Hierachy { get { return m_Hierachy; } }
-        public RendererBase Renderer { get; set; }
-        private Point m_Pos;
-        public Point Pos { get { return m_Pos; } }
-        public NodeBase Parent { get; set; }
+
+        public Renderer Renderer { get { return m_Renderer; } }
+        protected Renderer m_Renderer;
+
+        private Geometry m_Geo = new Geometry();
+        public Geometry Geo { get { return m_Geo; } }
+
+        public class Geometry
+        {
+            Rect m_Rect;
+            public Rect Rec { get { return m_Rect; } }
+
+            public Geometry()
+            {
+                m_Rect = new Rect(0, 0, 80, 60);
+            }
+            public Point CenterPoint
+            {
+                get
+                {
+                    return new Point((m_Rect.Left + m_Rect.Right) / 2, (m_Rect.Top + m_Rect.Bottom) / 2);
+                }
+            }
+            public Point TopPoint
+            {
+                get
+                {
+                    return new Point((m_Rect.Left + m_Rect.Right) / 2, m_Rect.Top);
+                }
+            }
+            public Point BottomPoint
+            {
+                get
+                {
+                    return new Point((m_Rect.Left + m_Rect.Right) / 2, m_Rect.Bottom);
+                }
+            }
+            public Point Pos
+            {
+                get { return m_Rect.Location; }
+                set { m_Rect.Location = value; }
+            }
+        }
 
         public virtual void Load(System.Xml.XmlNode data)
         {
             foreach (System.Xml.XmlAttribute attr in data.Attributes)
             {
                 if (attr.Name == "Pos")
-                    m_Pos = Point.Parse(attr.Value);
+                    m_Geo.Pos = Point.Parse(attr.Value);
             }
         }
-        public virtual void AddChild(NodeBase node) { }
-    }
 
-    public class BranchNode : NodeBase
-    {
-        private List<NodeBase> m_Children = new List<NodeBase>();
-        public List<NodeBase> Children { get { return m_Children; } }
-
-        public override void AddChild(NodeBase node)
+        public virtual Renderer CreateRenderer()
         {
-            if (node == null)
-                return;
-
-            node.Parent = this;
-            m_Children.Add(node);
+            m_Renderer = new Renderer(this);
+            return m_Renderer;
         }
     }
 
-    public class LeafNode : NodeBase
+    public class BranchNode : Node
     {
+        protected Connection m_ChildConn;
+        public Connection ChildConn { get { return m_ChildConn; } }
+    }
 
+    public class LeafNode : Node
+    {
+        public LeafNode()
+        {
+            new ConnectionNone(this, Connection.IdentifierChildren);
+        }
     }
 
     public class SingleChildNode : BranchNode
     {
-
+        public SingleChildNode()
+        {
+            m_ChildConn = new ConnectionSingle(this, Connection.IdentifierChildren);
+        }
     }
 
     public class CompositeNode : BranchNode
     {
-
+        public CompositeNode()
+        {
+            m_ChildConn = new ConnectionMultiple(this, Connection.IdentifierChildren);
+        }
     }
 }

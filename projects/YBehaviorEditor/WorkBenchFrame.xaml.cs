@@ -47,9 +47,9 @@ namespace YBehavior.Editor
             }
         }
 
-        void _RenderNode(NodeBase node)
+        void _RenderNode(Node node)
         {
-            node.Renderer.Render(node, this.Canvas);
+            node.Renderer.Render(this.Canvas);
         }
     }
 

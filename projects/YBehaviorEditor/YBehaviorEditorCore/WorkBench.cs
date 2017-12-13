@@ -8,8 +8,8 @@ namespace YBehavior.Editor.Core
 {
     public class WorkBench
     {
-        List<NodeBase> m_Forest = new List<NodeBase>();
-        public List<NodeBase> Forest { get { return m_Forest; } }
+        List<Node> m_Forest = new List<Node>();
+        public List<Node> Forest { get { return m_Forest; } }
         Tree m_Tree;
         public Tree MainTree { get { return m_Tree; } }
 
@@ -31,7 +31,7 @@ namespace YBehavior.Editor.Core
                     }
                     else
                     {
-                        NodeBase node = NodeMgr.Instance.CreateNodeByName(chi.Name);
+                        Node node = NodeMgr.Instance.CreateNodeByName(chi.Name);
                         if (node == null)
                         {
                             LogMgr.Instance.Error("Cant create node: " + chi.Name);
@@ -49,7 +49,7 @@ namespace YBehavior.Editor.Core
             return _LoadOneNode(tree, data);
         }
 
-        private bool _LoadOneNode(NodeBase node, XmlNode data)
+        private bool _LoadOneNode(Node node, XmlNode data)
         {
             if (node == null)
                 return false;
@@ -62,14 +62,19 @@ namespace YBehavior.Editor.Core
                     var attr = chi.Attributes.GetNamedItem("Class");
                     if (attr == null)
                         continue;
-                    NodeBase childNode = NodeMgr.Instance.CreateNodeByName(attr.Value);
+                    Node childNode = NodeMgr.Instance.CreateNodeByName(attr.Value);
                     if (childNode == null)
                     {
                         LogMgr.Instance.Error("Cant create node: " + chi.Name);
                         return false;
                     }
 
-                    node.AddChild(childNode);
+                    string connectionIdentifier = null;
+                    attr = chi.Attributes.GetNamedItem("Connection");
+                    if (attr != null)
+                        connectionIdentifier = attr.Value;
+
+                    node.Conns.AddNode(childNode, connectionIdentifier);
                     _LoadOneNode(childNode, chi);
                 }
             }
