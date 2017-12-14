@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Monster_BlackCrystal>
   <Node Class="EntryTask" Pos="10 10" _A_target="" _I_add0="1" _I_add1="1" FF_fftest="1.0|2.0|3.0" BB_bbtest="true|false|true|false" _B_btest="true" _V_pos="100=200=300">
-    <Node Class="Sequence" Pos="100 100">
+    <Node Class="Sequence" Pos="100 100" NickName="Hehequence12345678">
       <Node Class="Calculator" Pos="10 200" Operator="ADD" Opl="_IS add0" Opr1="_IS add0" Opr2="_IS add1">
       </Node>
-      <Node Class="Calculator" Pos="200 200" Operator="ADD" Opl="_IS add1" Opr1="_IS add0" Opr2="_IS add1">
+      <Node Class="Calculator" NickName="Calculator12345678" Pos="200 200" Operator="ADD" Opl="_IS add1" Opr1="_IS add0" Opr2="_IS add1">
       </Node>
     </Node>
   </Node>

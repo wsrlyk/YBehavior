@@ -106,7 +106,10 @@ namespace YBehavior.Editor.Core
     public class Node : NodeBase
     {
         protected string m_Name;
+        protected string m_NickName;
         public string Name { get { return m_Name; }}
+        public string NickName { get { return m_NickName == null ? m_Name : m_NickName; } }
+
         protected NodeType m_Type = NodeType.NT_Invalid;
         public NodeType Type { get { return m_Type; }}
         protected NodeHierachy m_Hierachy = NodeHierachy.NH_None;
@@ -118,10 +121,13 @@ namespace YBehavior.Editor.Core
         private Geometry m_Geo = new Geometry();
         public Geometry Geo { get { return m_Geo; } }
 
-        public class Geometry
+        public class Geometry : System.ComponentModel.INotifyPropertyChanged
         {
             Rect m_Rect;
             public Rect Rec { get { return m_Rect; } }
+            public Thickness Thick { get { return new Thickness(m_Rect.Left, m_Rect.Top, m_Rect.Right, m_Rect.Bottom); } }
+
+            public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
             public Geometry()
             {
@@ -153,14 +159,47 @@ namespace YBehavior.Editor.Core
                 get { return m_Rect.Location; }
                 set { m_Rect.Location = value; }
             }
+
+            public double Width
+            {
+                get { return Rec.Width; }
+                set
+                {
+                    m_Rect.Width = Math.Max(60, value);
+                    if (PropertyChanged != null)
+                    {
+                        this.PropertyChanged.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs("Width"));
+                    }
+                }
+            }
+
+            public double Height
+            {
+                get { return Rec.Height; }
+                set
+                {
+                    m_Rect.Height = Math.Max(80, value);
+                    if (PropertyChanged != null)
+                    {
+                        this.PropertyChanged.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs("Height"));
+                    }
+                }
+            }
         }
 
         public virtual void Load(System.Xml.XmlNode data)
         {
             foreach (System.Xml.XmlAttribute attr in data.Attributes)
             {
-                if (attr.Name == "Pos")
-                    m_Geo.Pos = Point.Parse(attr.Value);
+                switch (attr.Name)
+                {
+                    case "Pos":
+                        m_Geo.Pos = Point.Parse(attr.Value);
+                        break;
+                    case "NickName":
+                        m_NickName = attr.Value;
+                        break;
+                }
             }
         }
 

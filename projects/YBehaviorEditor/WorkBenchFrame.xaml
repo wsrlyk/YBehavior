@@ -6,6 +6,6 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Name="Canvas" Background="Gray">
-    </Grid>
+    <Canvas Name="Canvas" Background="Gray">
+    </Canvas>
 </UserControl>
