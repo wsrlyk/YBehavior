@@ -48,12 +48,28 @@
     <Compile Include="LogMgr.cs" />
     <Compile Include="RenderersMgr.cs" />
     <Compile Include="NodeMgr.cs" />
-    <Compile Include="Nodes\Renderers.cs" />
+    <Compile Include="Render\UIConnector.xaml.cs">
+      <DependentUpon>UIConnector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Render\UINode.xaml.cs">
+      <DependentUpon>UINode.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Render\Renderers.cs" />
     <Compile Include="Nodes\Nodes.cs" />
     <Compile Include="TreeFileMgr.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorkBenchMgr.cs" />
     <Compile Include="WorkBench.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Render\UIConnector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Render\UINode.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

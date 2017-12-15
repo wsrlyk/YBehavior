@@ -18,22 +18,37 @@ namespace YBehavior.Editor.Core
             m_Owner = node;
         }
 
-        Border m_uiFrame = new Border();
+        Panel m_Panel;
+        UINode m_uiFrame = new UINode();
+        public UINode Frame { get { return m_uiFrame; } }
+
         Dictionary<Node, Path> m_uiConns = new Dictionary<Node, Path>();
-        Dictionary<Connection, Border> m_uiConnectors = new Dictionary<Connection, Border>();
-        Label m_uiName = new Label();
+
+        Dictionary<string, UIConnector> m_uiConnectors = new Dictionary<string, UIConnector>();
+        public UIConnector GetConnector(string identifier)
+        {
+            UIConnector conn;
+            m_uiConnectors.TryGetValue(identifier, out conn);
+            return conn;
+        }
 
         public void Render(Panel panel)
         {
-            _RenderSelf(panel);
-            _RenderChildren(panel);
+            _Render(panel);
         }
 
-        protected void _ClearConns(Panel panel)
+        private void _Render(Panel panel)
+        {
+            m_Panel = panel;
+            _RenderSelf();
+            _RenderChildren();
+        }
+
+        protected void _ClearConns()
         {
             foreach (var pair in m_uiConns)
             {
-                panel.Children.Remove(pair.Value);
+                m_Panel.Children.Remove(pair.Value);
             }
             m_uiConns.Clear();
         }
@@ -43,7 +58,7 @@ namespace YBehavior.Editor.Core
             double miny = double.MaxValue;
             foreach (Node child in conn)
             {
-                double top = child.Geo.Rec.Top;
+                double top = Canvas.GetTop(child.Renderer.Frame);
                 y += top;
                 miny = Math.Min(miny, top);
             }
@@ -51,22 +66,37 @@ namespace YBehavior.Editor.Core
             y -= 10;
             miny -= 10;
             y = Math.Min(miny, y);
-            y = Math.Max(y, m_Owner.Geo.Rec.Bottom + 10);
+            y = Math.Max(y, Canvas.GetTop(Frame) + Frame.ActualHeight + 10);
             return y;
         }
-        protected void _RenderChildren(Panel panel)
+        protected void _RenderChildren()
         {
-            _ClearConns(panel);
+            _ClearConns();
             foreach (Connection conn in m_Owner.Conns.ConnectionsList)
             {
                 double y = _CalcHorizontalPos(conn);
                 foreach (Node child in conn)
                 {
-                    child.Renderer.Render(panel);
-                    _RenderConn(panel, child, y);
+                    child.Renderer.Render(m_Panel);
+                    //_RenderConn(child, y);
                 }
             }
         }
+
+        public void RenderConnections()
+        {
+            _ClearConns();
+            foreach (Connection conn in m_Owner.Conns.ConnectionsList)
+            {
+                double y = _CalcHorizontalPos(conn);
+                foreach (Node child in conn)
+                {
+                    child.Renderer.RenderConnections();
+                    _RenderConn(child, y);
+                }
+            }
+        }
+
         protected void _RerenderConn()
         {
             foreach (Connection conn in m_Owner.Conns.ConnectionsList)
@@ -78,11 +108,11 @@ namespace YBehavior.Editor.Core
                     if (!m_uiConns.TryGetValue(child, out path))
                         continue;
 
-                    _DrawConnLine(path.Data as StreamGeometry, m_Owner.Geo, child.Geo, y);
+                    _DrawConnLine(path.Data as StreamGeometry, child, y);
                 }
             }
         }
-        protected void _RenderConn(Panel panel, Node child, double horizontalPos)
+        protected void _RenderConn(Node child, double horizontalPos)
         {
             Path path = new Path();
             path.Stroke = Brushes.Black;
@@ -91,56 +121,53 @@ namespace YBehavior.Editor.Core
             StreamGeometry geometry = new StreamGeometry();
             geometry.FillRule = FillRule.EvenOdd;
 
-            _DrawConnLine(geometry, m_Owner.Geo, child.Geo, horizontalPos);
+            _DrawConnLine(geometry, child, horizontalPos);
 
             path.Data = geometry;
-            panel.Children.Add(path);
+            m_Panel.Children.Add(path);
             Panel.SetZIndex(path, -999);
             m_uiConns.Add(child, path);
         }
 
-        protected void _DrawConnLine(StreamGeometry geometry, Node.Geometry parent, Node.Geometry child, double horizontalPos)
+        protected void _DrawConnLine(StreamGeometry geometry, Node child, double horizontalPos)
         {
+            if (child.ParentConn == null)
+                return;
+            UIConnector uiConn = GetConnector(child.ParentConn.Identifier);
+            if (uiConn == null)
+                return;
+            UIConnector childConn = child.Renderer.GetConnector(Connection.IdentifierParent);
+            if (childConn == null)
+                return;
+
+            Point parentPoint = uiConn.TransformToAncestor(m_Panel).Transform(new Point(uiConn.ActualWidth / 2, uiConn.ActualHeight / 2));
+            Point childPoint = childConn.TransformToAncestor(m_Panel).Transform(new Point(childConn.ActualWidth / 2, childConn.ActualHeight / 2));
+
             using (StreamGeometryContext ctx = geometry.Open())
             {
-                ctx.BeginFigure(parent.BottomPoint, false, false);
+                ctx.BeginFigure(parentPoint, false, false);
 
-                ctx.LineTo(new Point(parent.BottomPoint.X, horizontalPos), true, false);
+                ctx.LineTo(new Point(parentPoint.X, horizontalPos), true, false);
 
-                ctx.LineTo(new Point(child.TopPoint.X, horizontalPos), true, false);
+                ctx.LineTo(new Point(childPoint.X, horizontalPos), true, false);
 
-                ctx.LineTo(child.TopPoint, true, false);
+                ctx.LineTo(childPoint, true, false);
             }
         }
 
-        protected virtual void _RenderSelf(Panel panel)
+        protected virtual void _RenderSelf()
         {
-            _DrawFrame(m_Owner, panel);
+            _DrawFrame(m_Owner);
             _DrawName();
+            _DrawSelfConnectors();
         }
 
-        private void _DrawFrame(Node node, Panel panel)
+        private void _DrawFrame(Node node)
         {
-            panel.Children.Add(m_uiFrame);
-            m_uiFrame.SetBinding(Border.WidthProperty, new System.Windows.Data.Binding("Width") { Source = node.Geo });// = node.Geo.Rec.Width;
-            m_uiFrame.SetBinding(Border.HeightProperty, new System.Windows.Data.Binding("Height") { Source = node.Geo });// = node.Geo.Rec.Width;
-            //m_uiFrame.Height = node.Geo.Rec.Height;
-            m_uiFrame.BorderBrush = Brushes.Honeydew;
-            m_uiFrame.BorderThickness = new Thickness(3);
-            m_uiFrame.Background = Brushes.Gray;
-            StackPanel stackPanel = new StackPanel();
-            m_uiFrame.Child = stackPanel;
-            stackPanel.HorizontalAlignment = HorizontalAlignment.Center;
+            m_Panel.Children.Add(m_uiFrame);
 
             Canvas.SetLeft(m_uiFrame, node.Geo.Pos.X);
             Canvas.SetTop(m_uiFrame, node.Geo.Pos.Y);
-
-            //Path path = new Path();
-            //path.Fill = Brushes.LemonChiffon;
-            //path.Stroke = Brushes.Black;
-            //path.StrokeThickness = 1;
-            //path.Data = m_uiFrame;
-            //panel.Children.Add(path);
 
             m_uiFrame.MouseLeftButtonDown += MouseLeftButtonDown;
             m_uiFrame.MouseMove += MouseMove;
@@ -149,25 +176,24 @@ namespace YBehavior.Editor.Core
 
         private void _DrawName()
         {
-            m_uiName.Content = m_Owner.NickName;
-            StackPanel p = m_uiFrame.Child as StackPanel;
-            p.Children.Add(m_uiName);
+            m_uiFrame.name.SetBinding(TextBlock.TextProperty, new System.Windows.Data.Binding("NickName") { Source = m_Owner });
         }
 
         private void _DrawSelfConnectors()
         {
-            //foreach (Connection conn in m_Owner.Conns.ConnectionsList)
-            //{
-            //    if (conn is ConnectionNone)
-            //        continue;
-            //    if (conn.Identifier == Connection.IdentifierChildren)
-            //    {
+            m_uiConnectors.Add(Connection.IdentifierParent, m_uiFrame.parentConnector);
+            foreach (Connection conn in m_Owner.Conns.ConnectionsList)
+            {
+                if (conn is ConnectionNone)
+                    continue;
 
-            //    }
+                UIConnector uiConnector = new UIConnector();
+                uiConnector.Title = conn.Identifier;
 
-            //    Border border = new Border();
-            //    m_uiFrame.
-            //}
+                m_uiFrame.bottomConnectors.Children.Add(uiConnector);
+
+                m_uiConnectors.Add(conn.Identifier, uiConnector);
+            }
         }
 
         Point pos = new Point();
@@ -199,7 +225,6 @@ namespace YBehavior.Editor.Core
         {
             FrameworkElement tmp = (FrameworkElement)sender;
             tmp.ReleaseMouseCapture();
-            m_Owner.Geo.Width = 20 + (GetTextDisplayWidthHelper.GetTextDisplayWidth(m_uiName, m_Owner.NickName));
         }
 
         void _Move(Vector delta)
@@ -214,31 +239,6 @@ namespace YBehavior.Editor.Core
             }
 
             m_Owner.Renderer._RerenderConn();
-        }
-    }
-
-    static class GetTextDisplayWidthHelper
-    {
-
-
-        public static Double GetTextDisplayWidth(Label label, string content)
-        {
-            return GetTextDisplayWidth(content, label.FontFamily, label.FontStyle, label.FontWeight, label.FontStretch, label.FontSize);
-        }
-
-
-        public static Double GetTextDisplayWidth(string str, FontFamily fontFamily, FontStyle fontStyle, FontWeight fontWeight, FontStretch fontStretch, double FontSize)
-        {
-            var formattedText = new FormattedText(
-                                str,
-                                System.Globalization.CultureInfo.CurrentUICulture,
-                                FlowDirection.LeftToRight,
-                                new Typeface(fontFamily, fontStyle, fontWeight, fontStretch),
-                                FontSize,
-                                Brushes.Black
-                                );
-            Size size = new Size(formattedText.Width, formattedText.Height);
-            return size.Width;
         }
     }
 }

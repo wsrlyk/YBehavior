@@ -45,11 +45,28 @@ namespace YBehavior.Editor
             {
                 _RenderNode(node);
             }
+
+            this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(_ThreadRenderConnections));
         }
 
+        private void _ThreadRenderConnections()
+        {
+            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
+            bench.MainTree.Renderer.RenderConnections();
+
+            foreach (var node in bench.Forest)
+            {
+                node.Renderer.RenderConnections();
+            }
+        }
         void _RenderNode(Node node)
         {
             node.Renderer.Render(this.Canvas);
+        }
+
+        private void Operation0_Click(object sender, RoutedEventArgs e)
+        {
+            _ThreadRenderConnections();
         }
     }
 

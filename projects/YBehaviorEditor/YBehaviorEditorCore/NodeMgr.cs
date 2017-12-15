@@ -121,7 +121,7 @@ namespace YBehavior.Editor.Core
         private Geometry m_Geo = new Geometry();
         public Geometry Geo { get { return m_Geo; } }
 
-        public class Geometry : System.ComponentModel.INotifyPropertyChanged
+        public class Geometry
         {
             Rect m_Rect;
             public Rect Rec { get { return m_Rect; } }
@@ -158,32 +158,6 @@ namespace YBehavior.Editor.Core
             {
                 get { return m_Rect.Location; }
                 set { m_Rect.Location = value; }
-            }
-
-            public double Width
-            {
-                get { return Rec.Width; }
-                set
-                {
-                    m_Rect.Width = Math.Max(60, value);
-                    if (PropertyChanged != null)
-                    {
-                        this.PropertyChanged.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs("Width"));
-                    }
-                }
-            }
-
-            public double Height
-            {
-                get { return Rec.Height; }
-                set
-                {
-                    m_Rect.Height = Math.Max(80, value);
-                    if (PropertyChanged != null)
-                    {
-                        this.PropertyChanged.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs("Height"));
-                    }
-                }
             }
         }
 

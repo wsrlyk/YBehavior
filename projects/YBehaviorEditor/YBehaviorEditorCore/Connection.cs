@@ -8,6 +8,7 @@ namespace YBehavior.Editor.Core
     public class Connection : System.Collections.IEnumerable
     {
         public static readonly string IdentifierChildren = "children";
+        public static readonly string IdentifierParent = "parent";
 
         protected NodeBase m_Owner;
         public NodeBase Owner { get { return m_Owner; } }
@@ -49,6 +50,8 @@ namespace YBehavior.Editor.Core
         public System.Collections.IEnumerable ConnectionsList { get { return m_Connections; } }
 
         List<NodeBase> m_Nodes = new List<NodeBase>();
+        public int NodeCount { get { _ProcessDirty(); return m_Nodes.Count; } }
+
         bool m_bDirty = true;
         public void MarkDirty()
         {

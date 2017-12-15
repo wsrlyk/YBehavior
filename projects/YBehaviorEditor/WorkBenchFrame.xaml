@@ -6,6 +6,20 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Canvas Name="Canvas" Background="Gray">
-    </Canvas>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="20"/>
+            </Grid.ColumnDefinitions>
+            <Button Name="Operation0" Grid.Row="0" Grid.Column="0" Width="20" HorizontalAlignment="Left" Click="Operation0_Click"></Button>
+            <Button Name="Operation1" Grid.Row="0" Grid.Column="1" Width="20" HorizontalAlignment="Left"></Button>
+        </Grid>
+        <Canvas Grid.Row="1" Name="Canvas" Background="Gray">
+        </Canvas>
+    </Grid>
 </UserControl>
