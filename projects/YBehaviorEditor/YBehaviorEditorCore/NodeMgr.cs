@@ -7,10 +7,8 @@ using System.Windows;
 
 namespace YBehavior.Editor.Core
 {
-    public class NodeMgr
+    public class NodeMgr : Singleton<NodeMgr>
     {
-        public static NodeMgr Instance { get { return s_Instance; } }
-        static NodeMgr s_Instance = new NodeMgr();
         List<Node> m_NodeList = new List<Node>();
         public List<Node> NodeList { get { return m_NodeList; } }
         private Dictionary<string, Type> m_TypeDic = new Dictionary<string, Type>();

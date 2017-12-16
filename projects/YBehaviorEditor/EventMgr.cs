@@ -12,11 +12,8 @@ namespace YBehavior.Editor
         WorkBenchLoaded,
     }
 
-    public class EventMgr
+    public class EventMgr : Singleton<EventMgr>
     {
-        public static EventMgr Instance { get { return s_Instance; } }
-        static EventMgr s_Instance = new EventMgr();
-
         public delegate void EventHandler(EventArg arg);
         Dictionary<EventType, EventHandler> m_EventDic = new Dictionary<EventType, EventHandler>();
 

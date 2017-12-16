@@ -17,11 +17,37 @@ namespace YBehavior.Editor.Core
     /// <summary>
     /// BehaviorNode.xaml 的交互逻辑
     /// </summary>
-    public partial class UINode : UserControl
+    public partial class UINode : UserControl, ISelectable
     {
+        static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
+
+        Brush normalBorderBrush;
+        SelectionStateChangeHandler SelectHandler { get; set; }
+        Operation m_Operation;
+
         public UINode()
         {
             InitializeComponent();
+            normalBorderBrush = this.border.BorderBrush;
+
+            m_Operation = new Operation(this);
+            m_Operation.RegisterClick(_OnClick);
+        }
+
+        void _OnClick()
+        {
+            if (SelectHandler != null)
+                SelectHandler(this, true);
+            else
+                defaultSelectHandler(this, true);
+        }
+
+        public void SetSelect(bool bSelect)
+        {
+            if (bSelect)
+                this.border.BorderBrush = new SolidColorBrush(Colors.DarkBlue);
+            else
+                this.border.BorderBrush = normalBorderBrush;
         }
     }
 }

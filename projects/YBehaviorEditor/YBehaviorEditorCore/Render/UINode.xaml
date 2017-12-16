@@ -15,7 +15,7 @@
         <StackPanel Grid.Row="0" Name="topConnectors" Orientation="Horizontal" HorizontalAlignment="Center">
             <local:UIConnector x:Name="parentConnector" Title="Parent"/>
         </StackPanel>
-        <Border Grid.Row="1" BorderThickness="3" BorderBrush="LightBlue" Background="DarkGray">
+        <Border Name="border" Grid.Row="1" BorderThickness="3" BorderBrush="LightBlue" Background="DarkGray">
             <StackPanel Name="mainPanel">
                 <TextBlock Name="name" Text="{Binding Path=NickName }"></TextBlock>
                 <TextBlock Name="note" Text="lalalallffds"></TextBlock>

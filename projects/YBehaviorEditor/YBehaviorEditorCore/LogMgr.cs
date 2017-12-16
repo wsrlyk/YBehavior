@@ -5,11 +5,8 @@ using System.Text;
 
 namespace YBehavior.Editor.Core
 {
-    class LogMgr
+    class LogMgr : Singleton<LogMgr>
     {
-        public static LogMgr Instance { get { return s_Instance; } }
-        static LogMgr s_Instance = new LogMgr();
-
         public void Log(string content)
         {
 

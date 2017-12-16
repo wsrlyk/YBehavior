@@ -12,17 +12,19 @@ namespace YBehavior.Editor.Core
     public class Renderer : NodeBase
     {
         Node m_Owner;
-
+        Operation m_operation;
         public Renderer(Node node)
         {
             m_Owner = node;
+            m_operation = new Operation(m_uiFrame);
+            m_operation.RegisterDrag(_Drag);
         }
 
         Panel m_Panel;
         UINode m_uiFrame = new UINode();
         public UINode Frame { get { return m_uiFrame; } }
 
-        Dictionary<Node, Path> m_uiConns = new Dictionary<Node, Path>();
+        Dictionary<Node, UIConnection> m_uiConns = new Dictionary<Node, UIConnection>();
 
         Dictionary<string, UIConnector> m_uiConnectors = new Dictionary<string, UIConnector>();
         public UIConnector GetConnector(string identifier)
@@ -104,32 +106,26 @@ namespace YBehavior.Editor.Core
                 double y = _CalcHorizontalPos(conn);
                 foreach (Node child in conn)
                 {
-                    Path path;
+                    UIConnection path;
                     if (!m_uiConns.TryGetValue(child, out path))
                         continue;
 
-                    _DrawConnLine(path.Data as StreamGeometry, child, y);
+                    _DrawConnLine(path, child, y);
                 }
             }
         }
         protected void _RenderConn(Node child, double horizontalPos)
         {
-            Path path = new Path();
-            path.Stroke = Brushes.Black;
-            path.StrokeThickness = 1;
+            UIConnection path = new UIConnection();
 
-            StreamGeometry geometry = new StreamGeometry();
-            geometry.FillRule = FillRule.EvenOdd;
+            _DrawConnLine(path, child, horizontalPos);
 
-            _DrawConnLine(geometry, child, horizontalPos);
-
-            path.Data = geometry;
             m_Panel.Children.Add(path);
             Panel.SetZIndex(path, -999);
             m_uiConns.Add(child, path);
         }
 
-        protected void _DrawConnLine(StreamGeometry geometry, Node child, double horizontalPos)
+        protected void _DrawConnLine(UIConnection path, Node child, double horizontalPos)
         {
             if (child.ParentConn == null)
                 return;
@@ -143,16 +139,7 @@ namespace YBehavior.Editor.Core
             Point parentPoint = uiConn.TransformToAncestor(m_Panel).Transform(new Point(uiConn.ActualWidth / 2, uiConn.ActualHeight / 2));
             Point childPoint = childConn.TransformToAncestor(m_Panel).Transform(new Point(childConn.ActualWidth / 2, childConn.ActualHeight / 2));
 
-            using (StreamGeometryContext ctx = geometry.Open())
-            {
-                ctx.BeginFigure(parentPoint, false, false);
-
-                ctx.LineTo(new Point(parentPoint.X, horizontalPos), true, false);
-
-                ctx.LineTo(new Point(childPoint.X, horizontalPos), true, false);
-
-                ctx.LineTo(childPoint, true, false);
-            }
+            path.SetWithMidY(parentPoint, childPoint, horizontalPos);
         }
 
         protected virtual void _RenderSelf()
@@ -169,9 +156,7 @@ namespace YBehavior.Editor.Core
             Canvas.SetLeft(m_uiFrame, node.Geo.Pos.X);
             Canvas.SetTop(m_uiFrame, node.Geo.Pos.Y);
 
-            m_uiFrame.MouseLeftButtonDown += MouseLeftButtonDown;
-            m_uiFrame.MouseMove += MouseMove;
-            m_uiFrame.MouseLeftButtonUp += MouseLeftButtonUp;
+            m_uiFrame.DataContext = node;
         }
 
         private void _DrawName()
@@ -196,37 +181,16 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        Point pos = new Point();
-        void MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        void _Drag(Vector delta, Point pos)
         {
-            FrameworkElement tmp = (FrameworkElement)sender;
-            pos = e.GetPosition(null);
-            tmp.CaptureMouse();
-            tmp.Cursor = Cursors.Hand;
-        }
-        void MouseMove(object sender, MouseEventArgs e)
-        {
-            FrameworkElement tmp = (FrameworkElement)sender;
-            if (!tmp.IsMouseCaptured)
-                return;
-            if (e.LeftButton == MouseButtonState.Pressed)
+            _Move(delta);
+            Node parent = m_Owner.Parent as Node;
+            if (parent != null)
             {
-                _Move(e.GetPosition(null) - pos);
-
-                Node parent = m_Owner.Parent as Node;
-                if (parent != null)
-                {
-                    parent.Renderer._RerenderConn();
-                }
-                pos = e.GetPosition(null);
+                parent.Renderer._RerenderConn();
             }
-        }
-        void MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            FrameworkElement tmp = (FrameworkElement)sender;
-            tmp.ReleaseMouseCapture();
-        }
 
+        }
         void _Move(Vector delta)
         {
             m_Owner.Geo.Pos = m_Owner.Geo.Pos + delta;

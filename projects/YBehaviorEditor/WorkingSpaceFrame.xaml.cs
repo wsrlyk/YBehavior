@@ -70,16 +70,18 @@ namespace YBehavior.Editor
                 if (obj.GetType() == typeof(TreeViewItem))
                 {
                     FileInfo item = this.Files.SelectedItem as FileInfo;
-                    string nodeText = item.Name;
-
-                    WorkBench bench = null;
-                    if ((bench = WorkBenchMgr.Instance.OpenWorkBench(item.Source)) != null)
+                    if (item != null)
                     {
-                        WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
-                        arg.Bench = bench;
-                        EventMgr.Instance.Send(arg);
-                    }
+                        string nodeText = item.Name;
 
+                        WorkBench bench = null;
+                        if ((bench = WorkBenchMgr.Instance.OpenWorkBench(item.Source)) != null)
+                        {
+                            WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
+                            arg.Bench = bench;
+                            EventMgr.Instance.Send(arg);
+                        }
+                    }
                     break;
                 }
                 obj = VisualTreeHelper.GetParent(obj);

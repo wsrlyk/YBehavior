@@ -6,11 +6,8 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core
 {
-    public class WorkBenchMgr
+    public class WorkBenchMgr : Singleton<WorkBenchMgr>
     {
-        public static WorkBenchMgr Instance { get { return s_Instance; } }
-        static WorkBenchMgr s_Instance = new WorkBenchMgr();
-
         List<WorkBench> m_OpenedWorkBenchs = new List<WorkBench>();
         WorkBench m_ActiveWorkBench;
         public WorkBench ActiveWorkBench { get { return m_ActiveWorkBench; } }

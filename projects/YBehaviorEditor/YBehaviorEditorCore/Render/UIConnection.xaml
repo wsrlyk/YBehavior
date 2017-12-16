@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="YBehavior.Editor.Core.UIConnection"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:YBehavior.Editor.Core"
+             mc:Ignorable="d" 
+             >
+    <Path Name="path" Stroke="Red" StrokeThickness="3" Fill="#CCCCFF">
+        <Path.Data>
+            <PathGeometry>
+                <PathFigure IsFilled="False" StartPoint="10,50" IsClosed="False">
+                    <LineSegment Point="200,70" />
+                    <LineSegment Point="100,30" />
+                </PathFigure>
+            </PathGeometry>
+        </Path.Data>
+    </Path>
+</UserControl>

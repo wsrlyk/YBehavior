@@ -5,11 +5,8 @@ using System.Text;
 
 namespace YBehavior.Editor.Core
 {
-    public class TreeFileMgr
+    public class TreeFileMgr : Singleton<TreeFileMgr>
     {
-        public static TreeFileMgr Instance { get { return s_Instance; } }
-        static TreeFileMgr s_Instance = new TreeFileMgr();
-
         public void Load()
         {
             if (m_TreeFileInfos.Children != null)

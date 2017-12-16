@@ -6,11 +6,8 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core
 {
-    class Config
+    class Config : Singleton<Config>
     {
-        public static Config Instance { get { return s_Instance; } }
-        static Config s_Instance = new Config();
-
         public string WorkingDir { get; set; }
 
         public Config()

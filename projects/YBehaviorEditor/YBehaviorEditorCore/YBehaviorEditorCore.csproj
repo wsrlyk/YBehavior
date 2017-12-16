@@ -46,8 +46,12 @@
     <Compile Include="Config.cs" />
     <Compile Include="Connection.cs" />
     <Compile Include="LogMgr.cs" />
+    <Compile Include="Operation.cs" />
     <Compile Include="RenderersMgr.cs" />
     <Compile Include="NodeMgr.cs" />
+    <Compile Include="Render\UIConnection.xaml.cs">
+      <DependentUpon>UIConnection.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Render\UIConnector.xaml.cs">
       <DependentUpon>UIConnector.xaml</DependentUpon>
     </Compile>
@@ -56,12 +60,18 @@
     </Compile>
     <Compile Include="Render\Renderers.cs" />
     <Compile Include="Nodes\Nodes.cs" />
+    <Compile Include="SelectionMgr.cs" />
+    <Compile Include="Singleton.cs" />
     <Compile Include="TreeFileMgr.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorkBenchMgr.cs" />
     <Compile Include="WorkBench.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Render\UIConnection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Render\UIConnector.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
