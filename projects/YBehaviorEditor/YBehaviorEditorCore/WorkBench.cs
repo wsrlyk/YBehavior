@@ -15,6 +15,58 @@ namespace YBehavior.Editor.Core
 
         public TreeFileMgr.TreeFileInfo FileInfo { get; set; }
 
+        public WorkBench()
+        {
+            EventMgr.Instance.Register(EventType.NodesConnected, _OnNodesConnected);
+            EventMgr.Instance.Register(EventType.NodesDisconnected, _OnNodesDisconnected);
+        }
+
+        private void _OnNodesConnected(EventArg arg)
+        {
+            NodesConnectedArg oArg = arg as NodesConnectedArg;
+
+            ConnectionHolder parent;
+            ConnectionHolder child;
+
+            if (ConnectionHolder.TryConnect(oArg.Holder0, oArg.Holder1, out parent, out child))
+            {
+                ///> refresh parent connections
+                Node parentNode = parent.Owner as Node;
+                parentNode.Renderer.RenderConnections();
+
+                Node childNode = child.Owner as Node;
+                _OnSubTreeRemoved(childNode);
+            }
+            else
+            {
+                ///> errorcode
+            }
+
+        }
+
+        private void _OnNodesDisconnected(EventArg arg)
+        {
+            NodesDisconnectedArg oArg = arg as NodesDisconnectedArg;
+
+            Connection conn = oArg.ChildHolder.Conn;
+            if (conn == null)
+                return;
+
+            if (conn.RemoveNode(oArg.ChildHolder.Owner))
+            {
+                Node parentNode = conn.Owner as Node;
+                parentNode.Renderer.RenderConnections();
+
+                Node childNode = conn.Owner as Node;
+                _OnSubTreeAdded(childNode);
+
+            }
+            else
+            {
+                ///> errorcode
+            }
+        }
+
         public bool Load(XmlElement data)
         {
             foreach (XmlNode chi in data.ChildNodes)
@@ -74,7 +126,7 @@ namespace YBehavior.Editor.Core
                     if (attr != null)
                         connectionIdentifier = attr.Value;
 
-                    node.Conns.AddNode(childNode, connectionIdentifier);
+                    node.Conns.Connect(childNode, connectionIdentifier);
                     _LoadOneNode(childNode, chi);
                 }
             }
@@ -82,5 +134,25 @@ namespace YBehavior.Editor.Core
             return true;
         }
 
+        private void _OnSubTreeRemoved(Node root)
+        {
+            if (root == null)
+                return;
+            for (int i = 0; i < m_Forest.Count; ++i)
+            {
+                if (m_Forest[i] == root)
+                {
+                    m_Forest.RemoveAt(i);
+                    break;
+                }
+            }
+        }
+
+        private void _OnSubTreeAdded(Node root)
+        {
+            if (root == null)
+                return;
+            m_Forest.Add(root);
+        }
     }
 }

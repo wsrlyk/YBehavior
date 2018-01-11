@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using YBehavior.Editor.Core;
 
-namespace YBehavior.Editor
+namespace YBehavior.Editor.Core
 {
     public enum EventType
     {
         None,
         WorkBenchLoaded,
+        NodesConnected,
+        NodesDisconnected,
     }
 
     public class EventMgr : Singleton<EventMgr>
@@ -45,9 +47,22 @@ namespace YBehavior.Editor
         public virtual EventType Type { get { return EventType.None; } }
     }
 
-    public class WorkBenchLoadedArg:EventArg
+    public class WorkBenchLoadedArg : EventArg
     {
         public WorkBench Bench { get; set; }
         public override EventType Type => EventType.WorkBenchLoaded;
+    }
+
+    public class NodesConnectedArg : EventArg
+    {
+        public ConnectionHolder Holder0 { get; set; }
+        public ConnectionHolder Holder1 { get; set; }
+        public override EventType Type => EventType.NodesConnected;
+    }
+
+    public class NodesDisconnectedArg : EventArg
+    {
+        public ConnectionHolder ChildHolder { get; set; }
+        public override EventType Type => EventType.NodesDisconnected;
     }
 }

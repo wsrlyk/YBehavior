@@ -22,17 +22,25 @@ namespace YBehavior.Editor.Core
         static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
 
         Brush normalBorderBrush;
-        SelectionStateChangeHandler SelectHandler { get; set; }
+        public SelectionStateChangeHandler SelectHandler { get; set; }
+        
+        public Node Node { get; set; }
+
         Operation m_Operation;
 
         public UINode()
         {
             InitializeComponent();
             normalBorderBrush = this.border.BorderBrush;
-
-            m_Operation = new Operation(this);
-            m_Operation.RegisterClick(_OnClick);
         }
+
+        public void SetCanvas(Panel panel)
+        {
+            m_Operation = new Operation(this.border, panel);
+            m_Operation.RegisterClick(_OnClick);
+            m_Operation.RegisterDrag(_OnDrag);
+        }
+
 
         void _OnClick()
         {
@@ -40,6 +48,12 @@ namespace YBehavior.Editor.Core
                 SelectHandler(this, true);
             else
                 defaultSelectHandler(this, true);
+        }
+
+        void _OnDrag(Vector delta, Point pos)
+        {
+            if (Node != null)
+                Node.Renderer.DragMain(delta, pos);
         }
 
         public void SetSelect(bool bSelect)

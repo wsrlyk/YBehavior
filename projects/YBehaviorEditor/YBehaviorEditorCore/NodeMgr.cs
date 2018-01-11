@@ -83,21 +83,26 @@ namespace YBehavior.Editor.Core
         protected Connections m_Connections = new Connections();
         public Connections Conns { get { return m_Connections; } }
 
-        protected Connection m_ParentConnection;
         public Connection ParentConn
         {
-            get { return m_ParentConnection; }
-            set
+            get
             {
-                m_ParentConnection = value;
-                if (value != null)
-                    m_Parent = m_ParentConnection.Owner;
-                else
-                    m_Parent = null;
+                if (m_Connections.ParentHolder == null)
+                    return null;
+                return m_Connections.ParentHolder.Conn;
             }
         }
 
-        public NodeBase Parent { get { return m_Parent; } }
+        public NodeBase Parent
+        {
+            get
+            {
+                Connection parentConn = ParentConn;
+                if (parentConn == null)
+                    return null;
+                return parentConn.Owner;
+            }
+        }
         protected NodeBase m_Parent;
     }
 
@@ -124,8 +129,6 @@ namespace YBehavior.Editor.Core
             Rect m_Rect;
             public Rect Rec { get { return m_Rect; } }
             public Thickness Thick { get { return new Thickness(m_Rect.Left, m_Rect.Top, m_Rect.Right, m_Rect.Bottom); } }
-
-            public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
             public Geometry()
             {
@@ -159,6 +162,12 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        public Node()
+        {
+            if (_HasParentHolder())
+                m_Connections.CreateParentHolder(this);
+        }
+
         public virtual void Load(System.Xml.XmlNode data)
         {
             foreach (System.Xml.XmlAttribute attr in data.Attributes)
@@ -179,6 +188,11 @@ namespace YBehavior.Editor.Core
         {
             m_Renderer = new Renderer(this);
             return m_Renderer;
+        }
+
+        protected virtual bool _HasParentHolder()
+        {
+            return true;
         }
     }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace YBehavior.Editor.Core
@@ -14,12 +15,18 @@ namespace YBehavior.Editor.Core
 
         ClickHandler m_ClickHandler;
         DragHandler m_DragHandler;
-
-        public Operation(System.Windows.Controls.UserControl userControl)
+        Panel m_Panel;
+        public Operation(UIElement target, Panel panel)
         {
-            userControl.MouseLeftButtonDown += _MouseLeftButtonDown;
-            userControl.MouseMove += _MouseMove;
-            userControl.MouseLeftButtonUp += _MouseLeftButtonUp;
+            m_Panel = panel;
+            target.MouseLeftButtonDown += _MouseLeftButtonDown;
+            target.MouseMove += _MouseMove;
+            target.MouseLeftButtonUp += _MouseLeftButtonUp;
+        }
+
+        public void SetPanel(Panel panel)
+        {
+            m_Panel = panel;
         }
 
         public void RegisterClick(ClickHandler handler)
@@ -42,7 +49,7 @@ namespace YBehavior.Editor.Core
             tmp.CaptureMouse();
             m_bStartClick = true;
             m_bStartDrag = true;
-            m_Pos = e.GetPosition(null);
+            m_Pos = e.GetPosition(m_Panel);
         }
         void _MouseMove(object sender, MouseEventArgs e)
         {
@@ -53,7 +60,7 @@ namespace YBehavior.Editor.Core
             {
                 m_bStartClick = false;
 
-                Point newPos = e.GetPosition(null);
+                Point newPos = e.GetPosition(m_Panel);
                 if (m_DragHandler != null)
                     m_DragHandler(newPos - m_Pos, newPos);
                 m_Pos = newPos;
@@ -72,7 +79,13 @@ namespace YBehavior.Editor.Core
                     m_ClickHandler();
             }
 
-            m_bStartDrag = false;
+            if (m_bStartDrag)
+            {
+                m_bStartDrag = false;
+
+                if (m_DragHandler != null)
+                    m_DragHandler(new Vector(0, 0), new Point(0, 0));
+            }
         }
 
     }

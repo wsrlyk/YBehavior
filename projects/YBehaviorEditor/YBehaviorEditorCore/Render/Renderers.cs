@@ -12,17 +12,19 @@ namespace YBehavior.Editor.Core
     public class Renderer : NodeBase
     {
         Node m_Owner;
-        Operation m_operation;
+
+        Panel m_Panel;
+        UINode m_uiFrame;
+        public UINode Frame { get { return m_uiFrame; } }
+
         public Renderer(Node node)
         {
             m_Owner = node;
-            m_operation = new Operation(m_uiFrame);
-            m_operation.RegisterDrag(_Drag);
+            m_uiFrame = new UINode
+            {
+                Node = node
+            };
         }
-
-        Panel m_Panel;
-        UINode m_uiFrame = new UINode();
-        public UINode Frame { get { return m_uiFrame; } }
 
         Dictionary<Node, UIConnection> m_uiConns = new Dictionary<Node, UIConnection>();
 
@@ -74,10 +76,10 @@ namespace YBehavior.Editor.Core
         protected void _RenderChildren()
         {
             _ClearConns();
-            foreach (Connection conn in m_Owner.Conns.ConnectionsList)
+            foreach (ConnectionHolder conn in m_Owner.Conns.ConnectionsList)
             {
-                double y = _CalcHorizontalPos(conn);
-                foreach (Node child in conn)
+                double y = _CalcHorizontalPos(conn.Conn);
+                foreach (Node child in conn.Conn)
                 {
                     child.Renderer.Render(m_Panel);
                     //_RenderConn(child, y);
@@ -88,10 +90,10 @@ namespace YBehavior.Editor.Core
         public void RenderConnections()
         {
             _ClearConns();
-            foreach (Connection conn in m_Owner.Conns.ConnectionsList)
+            foreach (ConnectionHolder conn in m_Owner.Conns.ConnectionsList)
             {
-                double y = _CalcHorizontalPos(conn);
-                foreach (Node child in conn)
+                double y = _CalcHorizontalPos(conn.Conn);
+                foreach (Node child in conn.Conn)
                 {
                     child.Renderer.RenderConnections();
                     _RenderConn(child, y);
@@ -101,10 +103,10 @@ namespace YBehavior.Editor.Core
 
         protected void _RerenderConn()
         {
-            foreach (Connection conn in m_Owner.Conns.ConnectionsList)
+            foreach (ConnectionHolder conn in m_Owner.Conns.ConnectionsList)
             {
-                double y = _CalcHorizontalPos(conn);
-                foreach (Node child in conn)
+                double y = _CalcHorizontalPos(conn.Conn);
+                foreach (Node child in conn.Conn)
                 {
                     UIConnection path;
                     if (!m_uiConns.TryGetValue(child, out path))
@@ -117,6 +119,7 @@ namespace YBehavior.Editor.Core
         protected void _RenderConn(Node child, double horizontalPos)
         {
             UIConnection path = new UIConnection();
+            path.SetCanvas(m_Panel);
 
             _DrawConnLine(path, child, horizontalPos);
 
@@ -136,8 +139,12 @@ namespace YBehavior.Editor.Core
             if (childConn == null)
                 return;
 
-            Point parentPoint = uiConn.TransformToAncestor(m_Panel).Transform(new Point(uiConn.ActualWidth / 2, uiConn.ActualHeight / 2));
-            Point childPoint = childConn.TransformToAncestor(m_Panel).Transform(new Point(childConn.ActualWidth / 2, childConn.ActualHeight / 2));
+            path.ChildHolder = child.Conns.ParentHolder;
+
+            //Point parentPoint = uiConn.TransformToAncestor(m_Panel).Transform(new Point(uiConn.ActualWidth / 2, uiConn.ActualHeight / 2));
+            //Point childPoint = childConn.TransformToAncestor(m_Panel).Transform(new Point(childConn.ActualWidth / 2, childConn.ActualHeight / 2));
+            Point parentPoint = uiConn.GetPos(m_Panel);
+            Point childPoint = childConn.GetPos(m_Panel);
 
             path.SetWithMidY(parentPoint, childPoint, horizontalPos);
         }
@@ -151,6 +158,7 @@ namespace YBehavior.Editor.Core
 
         private void _DrawFrame(Node node)
         {
+            m_uiFrame.SetCanvas(m_Panel);
             m_Panel.Children.Add(m_uiFrame);
 
             Canvas.SetLeft(m_uiFrame, node.Geo.Pos.X);
@@ -166,22 +174,39 @@ namespace YBehavior.Editor.Core
 
         private void _DrawSelfConnectors()
         {
-            m_uiConnectors.Add(Connection.IdentifierParent, m_uiFrame.parentConnector);
-            foreach (Connection conn in m_Owner.Conns.ConnectionsList)
+            if (m_Owner.Conns.ParentHolder != null)
             {
-                if (conn is ConnectionNone)
+                UIConnector uiConnector = new UIConnector
+                {
+                    Title = Connection.IdentifierParent,
+                    ConnHolder = m_Owner.Conns.ParentHolder
+                };
+                uiConnector.SetCanvas(m_Panel);
+
+                m_uiFrame.topConnectors.Children.Add(uiConnector);
+
+                m_uiConnectors.Add(Connection.IdentifierParent, uiConnector);
+            }
+
+            foreach (ConnectionHolder conn in m_Owner.Conns.ConnectionsList)
+            {
+                if (conn.Conn is ConnectionNone)
                     continue;
 
-                UIConnector uiConnector = new UIConnector();
-                uiConnector.Title = conn.Identifier;
+                UIConnector uiConnector = new UIConnector
+                {
+                    Title = conn.Conn.Identifier,
+                    ConnHolder = conn
+                };
+                uiConnector.SetCanvas(m_Panel);
 
                 m_uiFrame.bottomConnectors.Children.Add(uiConnector);
 
-                m_uiConnectors.Add(conn.Identifier, uiConnector);
+                m_uiConnectors.Add(conn.Conn.Identifier, uiConnector);
             }
         }
 
-        void _Drag(Vector delta, Point pos)
+        public void DragMain(Vector delta, Point pos)
         {
             _Move(delta);
             Node parent = m_Owner.Parent as Node;

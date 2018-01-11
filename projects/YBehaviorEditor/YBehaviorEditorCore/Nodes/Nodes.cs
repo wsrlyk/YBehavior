@@ -12,6 +12,11 @@ namespace YBehavior.Editor.Core
             m_Type = NodeType.NT_Root;
             m_Hierachy = NodeHierachy.NH_None;
         }
+
+        protected override bool _HasParentHolder()
+        {
+            return false;
+        }
     }
 
     class SequenceNode : CompositeNode

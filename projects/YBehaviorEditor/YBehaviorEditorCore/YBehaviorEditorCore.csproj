@@ -45,10 +45,12 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="Connection.cs" />
+    <Compile Include="EventMgr.cs" />
     <Compile Include="LogMgr.cs" />
     <Compile Include="Operation.cs" />
     <Compile Include="RenderersMgr.cs" />
     <Compile Include="NodeMgr.cs" />
+    <Compile Include="Render\DraggingConnection.cs" />
     <Compile Include="Render\UIConnection.xaml.cs">
       <DependentUpon>UIConnection.xaml</DependentUpon>
     </Compile>
@@ -60,6 +62,7 @@
     </Compile>
     <Compile Include="Render\Renderers.cs" />
     <Compile Include="Nodes\Nodes.cs" />
+    <Compile Include="DragDropMgr.cs" />
     <Compile Include="SelectionMgr.cs" />
     <Compile Include="Singleton.cs" />
     <Compile Include="TreeFileMgr.cs" />

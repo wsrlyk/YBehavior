@@ -25,6 +25,9 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             EventMgr.Instance.Register(EventType.WorkBenchLoaded, _OnWorkBenchLoaded);
+            Focus();
+
+            DraggingConnection.Instance.SetCanvas(this.Canvas);
         }
 
         private void _OnWorkBenchLoaded(EventArg arg)
@@ -67,6 +70,16 @@ namespace YBehavior.Editor
         private void Operation0_Click(object sender, RoutedEventArgs e)
         {
             _ThreadRenderConnections();
+        }
+
+        private void _KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Delete:
+                    Core.SelectionMgr.Instance.TryDeleteSelection();
+                    break;
+            }
         }
     }
 

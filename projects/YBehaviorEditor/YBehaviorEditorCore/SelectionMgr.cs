@@ -11,9 +11,15 @@ namespace YBehavior.Editor.Core
         void SetSelect(bool bSelect);
     }
 
-    public delegate void SelectionStateChangeHandler(ISelectable obj, bool bState);
+    public interface IDeletable
+    {
+        void OnDelete();
+    }
 
-    class SelectionMgr : Singleton<SelectionMgr>
+    public delegate void SelectionStateChangeHandler(ISelectable obj, bool bState);
+    public delegate void DeleteHandler(IDeletable obj);
+
+    public class SelectionMgr : Singleton<SelectionMgr>
     {
         List<ISelectable> m_Selections = new List<ISelectable>();
         ISelectable m_SingleSelection;
@@ -79,5 +85,25 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        public void TryDeleteSelection()
+        {
+            if (m_SingleSelection == null)
+                return;
+
+            IDeletable deletable = m_SingleSelection as IDeletable;
+            if (deletable != null)
+            {
+                deletable.OnDelete();
+                m_SingleSelection = null;
+            }
+        }
+
+        public void OnDelete(IDeletable obj)
+        {
+            if (obj == null)
+                return;
+
+            obj.OnDelete();
+        }
     }
 }

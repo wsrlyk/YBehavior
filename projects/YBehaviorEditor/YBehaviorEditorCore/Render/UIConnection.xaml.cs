@@ -17,14 +17,18 @@ namespace YBehavior.Editor.Core
     /// <summary>
     /// UIConnection.xaml 的交互逻辑
     /// </summary>
-    public partial class UIConnection : UserControl, ISelectable
+    public partial class UIConnection : UserControl, ISelectable, IDeletable
     {
         static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
+        //static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
 
         PathFigure figure;
         Brush normalStrokeBrush;
+
         SelectionStateChangeHandler SelectHandler { get; set; }
         Operation m_Operation;
+
+        public ConnectionHolder ChildHolder { get; set; }
 
         public UIConnection()
         {
@@ -33,7 +37,11 @@ namespace YBehavior.Editor.Core
             Clear();
             normalStrokeBrush = this.path.Stroke;
 
-            m_Operation = new Operation(this);
+        }
+
+        public void SetCanvas(Panel panel)
+        {
+            m_Operation = new Operation(this, panel);
             m_Operation.RegisterClick(_OnClick);
         }
 
@@ -49,12 +57,18 @@ namespace YBehavior.Editor.Core
         {
             Clear();
             figure.StartPoint = start;
-            LineSegment fstLine = new LineSegment();
-            fstLine.Point = new Point(start.X, midY);
-            LineSegment secLine = new LineSegment();
-            secLine.Point = new Point(end.X, midY);
-            LineSegment trdLine = new LineSegment();
-            trdLine.Point = end;
+            LineSegment fstLine = new LineSegment
+            {
+                Point = new Point(start.X, midY)
+            };
+            LineSegment secLine = new LineSegment
+            {
+                Point = new Point(end.X, midY)
+            };
+            LineSegment trdLine = new LineSegment
+            {
+                Point = end
+            };
             figure.Segments.Add(fstLine);
             figure.Segments.Add(secLine);
             figure.Segments.Add(trdLine);
@@ -74,6 +88,13 @@ namespace YBehavior.Editor.Core
                 this.path.Stroke = new SolidColorBrush(Colors.DarkBlue);
             else
                 this.path.Stroke = normalStrokeBrush;
+        }
+
+        public void OnDelete()
+        {
+            NodesDisconnectedArg arg = new NodesDisconnectedArg();
+            arg.ChildHolder = this.ChildHolder;
+            EventMgr.Instance.Send(arg);
         }
     }
 }
