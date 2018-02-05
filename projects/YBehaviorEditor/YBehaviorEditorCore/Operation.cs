@@ -15,12 +15,14 @@ namespace YBehavior.Editor.Core
 
         ClickHandler m_ClickHandler;
         DragHandler m_DragHandler;
+        DragHandler m_StartDragHandler;
         Panel m_Panel;
         public Operation(UIElement target, Panel panel)
         {
             m_Panel = panel;
             target.MouseLeftButtonDown += _MouseLeftButtonDown;
             target.MouseMove += _MouseMove;
+            target.PreviewMouseMove += _PreviewMouseMove;
             target.MouseLeftButtonUp += _MouseLeftButtonUp;
         }
 
@@ -32,6 +34,12 @@ namespace YBehavior.Editor.Core
         public void RegisterClick(ClickHandler handler)
         {
             m_ClickHandler = handler;
+        }
+
+        public void RegisterDragDrop(DragHandler handler, DragHandler starthandler)
+        {
+            m_DragHandler = handler;
+            m_StartDragHandler = starthandler;
         }
 
         public void RegisterDrag(DragHandler handler)
@@ -51,15 +59,30 @@ namespace YBehavior.Editor.Core
             m_bStartDrag = true;
             m_Pos = e.GetPosition(m_Panel);
         }
-        void _MouseMove(object sender, MouseEventArgs e)
+        void _PreviewMouseMove(object sender, MouseEventArgs e)
         {
             FrameworkElement tmp = (FrameworkElement)sender;
-            if (!tmp.IsMouseCaptured || !m_bStartDrag)
+            if (!tmp.IsMouseCaptured)
+                return;
+            if (!m_bStartDrag)
                 return;
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 m_bStartClick = false;
+                if (m_StartDragHandler != null)
+                    m_StartDragHandler(new Vector(), m_Pos);
+            }
+        }
 
+        void _MouseMove(object sender, MouseEventArgs e)
+        {
+            FrameworkElement tmp = (FrameworkElement)sender;
+            if (!tmp.IsMouseCaptured)
+                return;
+            if (!m_bStartDrag)
+                return;
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
                 Point newPos = e.GetPosition(m_Panel);
                 if (m_DragHandler != null)
                     m_DragHandler(newPos - m_Pos, newPos);
@@ -84,9 +107,13 @@ namespace YBehavior.Editor.Core
                 m_bStartDrag = false;
 
                 if (m_DragHandler != null)
-                    m_DragHandler(new Vector(0, 0), new Point(0, 0));
+                    m_DragHandler(new Vector(0, 0), m_Pos);
             }
         }
 
+        public DependencyObject HitTesting(Point pos)
+        {
+            return m_Panel.InputHitTest(pos) as DependencyObject;
+        }
     }
 }

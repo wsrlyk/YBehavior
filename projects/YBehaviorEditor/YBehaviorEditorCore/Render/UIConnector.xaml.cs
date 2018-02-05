@@ -32,15 +32,14 @@ namespace YBehavior.Editor.Core
         public UIConnector()
         {
             InitializeComponent();
-            //this.DragLeave += _OnDragged;
-            this.DragEnter += _OnDropped;
+
             normalBorderBrush = this.BorderBrush;
         }
 
         public void SetCanvas(Panel panel)
         {
             m_Operation = new Operation(this, panel);
-            m_Operation.RegisterDrag(_OnDragged);
+            m_Operation.RegisterDragDrop(_OnDragged, _OnStartDragged);
         }
 
         public string Title
@@ -56,14 +55,14 @@ namespace YBehavior.Editor.Core
             return TransformToAncestor(visual).Transform(new Point(ActualWidth / 2, ActualHeight / 2));
         }
 
-        void _OnDragged(object sender, DragEventArgs e)
+        void _OnDragged()
         {
             if (DragHandler != null)
                 DragHandler(this, true);
             else
                 defaultDragHandler(this, true);
         }
-        void _OnDropped(object sender, DragEventArgs e)
+        void _OnDropped()
         {
             if (DropHandler != null)
                 DropHandler(this);
@@ -71,23 +70,42 @@ namespace YBehavior.Editor.Core
                 defaultDropHandler(this);
         }
 
+        void _OnStartDragged(Vector delta, Point absPos)
+        {
+            _OnDragged();
+        }
+
         void _OnDragged(Vector delta, Point absPos)
         {
             ///> DragFinish
-            if (delta.LengthSquared == 0 && absPos.X == 0 && absPos.Y == 0)
+            if (delta.LengthSquared == 0)
             {
                 DraggingConnection.Instance.FinishDrag();
+
+                _OnDropped();
             }
             else
             {
+                //_HitTesting(absPos);
+
                 Point from = GetPos(DraggingConnection.Instance.Canvas);
                 Point to = absPos;
                 DraggingConnection.Instance.Drag(from, to);
-
-                DataObject data = new DataObject();
-                data.SetData(DataFormats.StringFormat, this.ToString());
-                DragDrop.DoDragDrop(this, data, DragDropEffects.None);
             }
+        }
+
+        IDropable _HitTesting(Point pos)
+        {
+            DependencyObject obj = m_Operation.HitTesting(pos);
+            while (obj != null && obj.GetType() != typeof(Canvas))
+            {
+                if (obj is IDropable && obj != this)
+                    return obj as IDropable;
+
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+
+            return null;
         }
 
         public void SetDragged(bool bDragged)
