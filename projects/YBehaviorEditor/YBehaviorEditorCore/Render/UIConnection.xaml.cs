@@ -37,6 +37,7 @@ namespace YBehavior.Editor.Core
             Clear();
             normalStrokeBrush = this.path.Stroke;
 
+            SelectHandler = new SelectionStateChangeHandler(defaultSelectHandler);
         }
 
         public void SetCanvas(Panel panel)
@@ -76,10 +77,8 @@ namespace YBehavior.Editor.Core
 
         void _OnClick()
         {
-            if (SelectHandler != null)
-                SelectHandler(this, true);
-            else
-                defaultSelectHandler(this, true);
+            SelectHandler(this, true);
+            m_Operation.MakeCanvasFocused();
         }
 
         public void SetSelect(bool bSelect)

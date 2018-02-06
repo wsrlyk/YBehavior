@@ -21,7 +21,7 @@
             <Button Name="Operation0" Grid.Row="0" Grid.Column="0" Width="20" HorizontalAlignment="Left" Click="Operation0_Click"></Button>
             <Button Name="Operation1" Grid.Row="0" Grid.Column="1" Width="20" HorizontalAlignment="Left"></Button>
         </Grid>
-        <Canvas Grid.Row="1" Name="Canvas" Background="Gray">
+        <Canvas Focusable="True" Grid.Row="1" Name="Canvas" Background="Gray">
         </Canvas>
     </Grid>
 </UserControl>

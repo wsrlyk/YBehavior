@@ -32,6 +32,11 @@ namespace YBehavior.Editor.Core
             m_Panel = panel;
         }
 
+        public void MakeCanvasFocused()
+        {
+            m_Panel.Focus();
+        }
+
         public void RegisterClick(ClickHandler handler)
         {
             m_ClickHandler = handler;
