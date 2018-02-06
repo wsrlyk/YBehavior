@@ -43,5 +43,21 @@ namespace YBehavior.Editor.Core
 
             return workBench;
         }
+
+        public Node AddNodeToBench(Node template, WorkBench bench = null)
+        {
+            if (bench == null)
+                bench = ActiveWorkBench;
+            if (bench == null)
+            {
+                LogMgr.Instance.Error("AddNodeToBench Failed: bench == null");
+                return null;
+            }
+
+            Node node = NodeMgr.Instance.CreateNodeByName(template.Name);
+            bench.AddSubTree(node);
+
+            return node;
+        }
     }
 }

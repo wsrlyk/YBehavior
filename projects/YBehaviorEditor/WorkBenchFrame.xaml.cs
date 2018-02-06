@@ -25,6 +25,7 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             EventMgr.Instance.Register(EventType.WorkBenchLoaded, _OnWorkBenchLoaded);
+            EventMgr.Instance.Register(EventType.NewNodeAdded, _OnNewNodeAdded);
             Focus();
 
             DraggingConnection.Instance.SetCanvas(this.Canvas);
@@ -37,6 +38,17 @@ namespace YBehavior.Editor
                 return;
 
             _RenderActiveWorkBench();
+        }
+
+        private void _OnNewNodeAdded(EventArg arg)
+        {
+            NewNodeAddedArg oArg = arg as NewNodeAddedArg;
+            if (oArg.Node == null)
+                return;
+
+            ///> TODO: move the node to the center of the canvas
+            
+            _RenderNode(oArg.Node);
         }
 
         void _RenderActiveWorkBench()

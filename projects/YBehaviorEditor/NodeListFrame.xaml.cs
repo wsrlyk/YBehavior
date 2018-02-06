@@ -26,10 +26,12 @@ namespace YBehavior.Editor
             public List<NodeInfo> Children { get { return m_children; } }
             public string Name { get; set; }
             public string Icon { get; set; }
-            NodeBase m_Source;
+            public Node Source { get { return m_Source; } }
+            Node m_Source;
             NodeHierachy m_Hierachy;
             int m_Level;
 
+            public bool bIsFolder { get { return m_Hierachy != NodeHierachy.NH_None; } }
             ///> Folder
             public NodeInfo(NodeHierachy hierachy, int level)
             {
@@ -97,7 +99,31 @@ namespace YBehavior.Editor
 
         private void OnNodesItemDoubleClick(object sender, MouseButtonEventArgs e)
         {
-        }
+            DependencyObject obj = (DependencyObject)e.OriginalSource;
+            while (obj != null && obj != this.Nodes)
+            {
+                if (obj.GetType() == typeof(TreeViewItem))
+                {
+                    NodeInfo item = this.Nodes.SelectedItem as NodeInfo;
+                    if (item != null && !item.bIsFolder)
+                    {
+                        string nodeText = item.Name;
 
+                        Node node = null;
+                        if ((node = WorkBenchMgr.Instance.AddNodeToBench(item.Source)) != null)
+                        {
+                            NewNodeAddedArg arg = new NewNodeAddedArg();
+                            arg.Node = node;
+                            EventMgr.Instance.Send(arg);
+                        }
+                    }
+                    break;
+                }
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+
+
+        }
     }
+
 }

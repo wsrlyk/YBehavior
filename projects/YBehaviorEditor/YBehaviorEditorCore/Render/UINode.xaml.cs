@@ -17,7 +17,7 @@ namespace YBehavior.Editor.Core
     /// <summary>
     /// BehaviorNode.xaml 的交互逻辑
     /// </summary>
-    public partial class UINode : UserControl, ISelectable
+    public partial class UINode : UserControl, ISelectable, IDeletable
     {
         static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
 
@@ -27,15 +27,19 @@ namespace YBehavior.Editor.Core
         public Node Node { get; set; }
 
         Operation m_Operation;
+        Panel m_Panel;
 
         public UINode()
         {
             InitializeComponent();
             normalBorderBrush = this.border.BorderBrush;
+
+            SelectHandler = new SelectionStateChangeHandler(defaultSelectHandler);
         }
 
         public void SetCanvas(Panel panel)
         {
+            m_Panel = panel;
             m_Operation = new Operation(this.border, panel);
             m_Operation.RegisterClick(_OnClick);
             m_Operation.RegisterDrag(_OnDrag);
@@ -44,10 +48,9 @@ namespace YBehavior.Editor.Core
 
         void _OnClick()
         {
-            if (SelectHandler != null)
-                SelectHandler(this, true);
-            else
-                defaultSelectHandler(this, true);
+            SelectHandler(this, true);
+
+            m_Operation.MakeCanvasFocused();
         }
 
         void _OnDrag(Vector delta, Point pos)
@@ -62,6 +65,33 @@ namespace YBehavior.Editor.Core
                 this.border.BorderBrush = new SolidColorBrush(Colors.DarkBlue);
             else
                 this.border.BorderBrush = normalBorderBrush;
+        }
+
+        public void OnDelete()
+        {
+            ///> Check if is root
+            if (Node.Type == NodeType.NT_Root)
+                return;
+
+            ///> Disconnect all the connection
+            NodesDisconnectedArg arg = new NodesDisconnectedArg();
+            arg.ChildHolder = Node.Conns.ParentHolder;
+            EventMgr.Instance.Send(arg);
+
+            foreach (var child in Node.Conns)
+            {
+                Node chi = child as Node;
+                if (chi == null)
+                    continue;
+                arg.ChildHolder = chi.Conns.ParentHolder;
+                EventMgr.Instance.Send(arg);
+            }
+
+            m_Panel.Children.Remove(this);
+
+            RemoveNodeArg removeArg = new RemoveNodeArg();
+            removeArg.Node = Node;
+            EventMgr.Instance.Send(arg);
         }
     }
 }

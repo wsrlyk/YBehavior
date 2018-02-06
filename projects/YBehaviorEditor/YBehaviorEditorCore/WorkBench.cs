@@ -17,8 +17,10 @@ namespace YBehavior.Editor.Core
 
         public WorkBench()
         {
+            ///> TODO: these events should be removed when the bench is not active;
             EventMgr.Instance.Register(EventType.NodesConnected, _OnNodesConnected);
             EventMgr.Instance.Register(EventType.NodesDisconnected, _OnNodesDisconnected);
+            EventMgr.Instance.Register(EventType.RemoveNode, _RemoveNode);
         }
 
         private void _OnNodesConnected(EventArg arg)
@@ -35,7 +37,7 @@ namespace YBehavior.Editor.Core
                 parentNode.Renderer.RenderConnections();
 
                 Node childNode = child.Owner as Node;
-                _OnSubTreeRemoved(childNode);
+                RemoveSubTree(childNode);
             }
             else
             {
@@ -58,13 +60,20 @@ namespace YBehavior.Editor.Core
                 parentNode.Renderer.RenderConnections();
 
                 Node childNode = conn.Owner as Node;
-                _OnSubTreeAdded(childNode);
+                AddSubTree(childNode);
 
             }
             else
             {
                 ///> errorcode
             }
+        }
+
+        private void _RemoveNode(EventArg arg)
+        {
+            RemoveNodeArg oArg = arg as RemoveNodeArg;
+
+            RemoveSubTree(oArg.Node);
         }
 
         public bool Load(XmlElement data)
@@ -134,7 +143,7 @@ namespace YBehavior.Editor.Core
             return true;
         }
 
-        private void _OnSubTreeRemoved(Node root)
+        public void RemoveSubTree(Node root)
         {
             if (root == null)
                 return;
@@ -148,7 +157,7 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        private void _OnSubTreeAdded(Node root)
+        public void AddSubTree(Node root)
         {
             if (root == null)
                 return;

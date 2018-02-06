@@ -10,6 +10,9 @@ namespace YBehavior.Editor.Core
     {
         None,
         WorkBenchLoaded,
+        NewNodeAdded,
+        RemoveNode,
+        NodeRemoved,
         NodesConnected,
         NodesDisconnected,
     }
@@ -51,6 +54,30 @@ namespace YBehavior.Editor.Core
     {
         public WorkBench Bench { get; set; }
         public override EventType Type => EventType.WorkBenchLoaded;
+    }
+
+    public class NewNodeAddedArg : EventArg
+    {
+        public Node Node { get; set; }
+        public override EventType Type => EventType.NewNodeAdded;
+    }
+
+    /// <summary>
+    /// Do the removing operation
+    /// </summary>
+    public class RemoveNodeArg : EventArg
+    {
+        public Node Node { get; set; }
+        public override EventType Type => EventType.RemoveNode;
+    }
+
+    /// <summary>
+    /// After the node is removed, notify others
+    /// </summary>
+    public class NodeRemovedArg : EventArg
+    {
+        public Node Node { get; set; }
+        public override EventType Type => EventType.NodeRemoved;
     }
 
     public class NodesConnectedArg : EventArg

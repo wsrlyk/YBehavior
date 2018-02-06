@@ -70,7 +70,7 @@ namespace YBehavior.Editor
                 if (obj.GetType() == typeof(TreeViewItem))
                 {
                     FileInfo item = this.Files.SelectedItem as FileInfo;
-                    if (item != null)
+                    if (item != null && item.Source.Path != null)
                     {
                         string nodeText = item.Name;
 
