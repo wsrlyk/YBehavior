@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace YBehavior.Editor.Core
 {
@@ -111,9 +112,27 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        public DependencyObject HitTesting(Point pos)
+        List<DependencyObject> m_HitTestResult = new List<DependencyObject>();
+        public List<DependencyObject> HitTesting(Point pos)
         {
-            return m_Panel.InputHitTest(pos) as DependencyObject;
+            m_HitTestResult.Clear();
+            VisualTreeHelper.HitTest(
+                m_Panel, 
+                null, 
+                new HitTestResultCallback(MyHitTestResult),
+                new PointHitTestParameters(pos));
+
+            return m_HitTestResult;
         }
+
+        public HitTestResultBehavior MyHitTestResult(HitTestResult result)
+        {
+            // Add the hit test result to the list that will be processed after the enumeration.
+            m_HitTestResult.Add(result.VisualHit);
+
+            // Set the behavior to return visuals at all z-order levels.
+            return HitTestResultBehavior.Continue;
+        }
+
     }
 }

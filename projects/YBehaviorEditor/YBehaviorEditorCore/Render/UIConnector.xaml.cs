@@ -21,9 +21,11 @@ namespace YBehavior.Editor.Core
     {
         static DragHandler defaultDragHandler = new DragHandler(DragDropMgr.Instance.OnDragged);
         static DropHandler defaultDropHandler = new DropHandler(DragDropMgr.Instance.OnDropped);
+        static DropHandler defaultHoverHandler = new DropHandler(DragDropMgr.Instance.OnHover);
 
         DragHandler DragHandler { get; set; }
         DropHandler DropHandler { get; set; }
+        DropHandler HoverHandler { get; set; }
 
         Brush normalBorderBrush;
 
@@ -33,7 +35,11 @@ namespace YBehavior.Editor.Core
         {
             InitializeComponent();
 
-            normalBorderBrush = this.BorderBrush;
+            normalBorderBrush = this.Main.BorderBrush;
+
+            DragHandler = new DragHandler(defaultDragHandler);
+            DropHandler = new DropHandler(defaultDropHandler);
+            HoverHandler = new DropHandler(defaultHoverHandler);
         }
 
         public void SetCanvas(Panel panel)
@@ -55,73 +61,68 @@ namespace YBehavior.Editor.Core
             return TransformToAncestor(visual).Transform(new Point(ActualWidth / 2, ActualHeight / 2));
         }
 
-        void _OnDragged()
-        {
-            if (DragHandler != null)
-                DragHandler(this, true);
-            else
-                defaultDragHandler(this, true);
-        }
-        void _OnDropped()
-        {
-            if (DropHandler != null)
-                DropHandler(this);
-            else
-                defaultDropHandler(this);
-        }
-
         void _OnStartDragged(Vector delta, Point absPos)
         {
-            _OnDragged();
+            DragHandler(this, true);
         }
 
         void _OnDragged(Vector delta, Point absPos)
         {
+            IDropable droppable = _HitTesting(absPos);
+
             ///> DragFinish
             if (delta.LengthSquared == 0)
             {
                 DraggingConnection.Instance.FinishDrag();
 
-                _OnDropped();
+                DropHandler(droppable);
             }
             else
             {
-                //_HitTesting(absPos);
-
                 Point from = GetPos(DraggingConnection.Instance.Canvas);
                 Point to = absPos;
                 DraggingConnection.Instance.Drag(from, to);
+
+                HoverHandler(droppable);
             }
         }
 
         IDropable _HitTesting(Point pos)
         {
-            DependencyObject obj = m_Operation.HitTesting(pos);
-            while (obj != null && obj.GetType() != typeof(Canvas))
+            List<DependencyObject> objs = m_Operation.HitTesting(pos);
+            foreach (var o in objs)
             {
-                if (obj is IDropable && obj != this)
-                    return obj as IDropable;
+                var obj = o;
+                LogMgr.Instance.Log("Drag HitTest: " + obj.ToString());
+                while (obj != null && obj.GetType() != typeof(Canvas))
+                {
+                    if (obj is IDropable && obj != this)
+                    {
+                        LogMgr.Instance.Log("Drag FinalHit: " + obj.ToString());
+                        return obj as IDropable;
+                    }
 
-                obj = VisualTreeHelper.GetParent(obj);
+                    obj = VisualTreeHelper.GetParent(obj);
+                }
             }
-
+            LogMgr.Instance.Log("Drag FinalHit: NULL");
             return null;
         }
 
         public void SetDragged(bool bDragged)
         {
             if (bDragged)
-                this.BorderBrush = new SolidColorBrush(Colors.Cyan);
+                this.Main.BorderBrush = new SolidColorBrush(Colors.Magenta);
             else
-                this.BorderBrush = normalBorderBrush;
+                this.Main.BorderBrush = normalBorderBrush;
         }
 
         public void SetDropped(bool bDropped)
         {
             if (bDropped)
-                this.BorderBrush = new SolidColorBrush(Colors.Chocolate);
+                this.Main.BorderBrush = new SolidColorBrush(Colors.Chocolate);
             else
-                this.BorderBrush = normalBorderBrush;
+                this.Main.BorderBrush = normalBorderBrush;
         }
 
         public void OnDropped(IDragable dragable)

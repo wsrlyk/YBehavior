@@ -65,6 +65,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="StateBarFrame.xaml.cs">
+      <DependentUpon>StateBarFrame.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WorkBenchFrame.xaml.cs">
       <DependentUpon>WorkBenchFrame.xaml</DependentUpon>
     </Compile>
@@ -84,6 +87,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="NodeListFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StateBarFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

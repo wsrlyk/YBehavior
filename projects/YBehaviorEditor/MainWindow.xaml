@@ -18,6 +18,6 @@
         <local:WorkingSpaceFrame BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="387" Margin="10,34,0,0" VerticalAlignment="Top" Width="231"/>
         <local:NodeListFrame BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="387" Margin="10,426,0,0" VerticalAlignment="Top" Width="231"/>
         <local:WorkBenchFrame Margin="241,34,241,34"/>
-
+        <local:StateBarFrame Height="34" VerticalAlignment="Bottom" Margin="10,0,0,0"/>
     </Grid>
 </Window>

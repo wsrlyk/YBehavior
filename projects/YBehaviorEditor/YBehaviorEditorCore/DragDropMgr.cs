@@ -22,12 +22,20 @@ namespace YBehavior.Editor.Core
     class DragDropMgr : Singleton<DragDropMgr>
     {
         IDragable m_Dragging;
+        IDropable m_Dropping;
 
         public void Clear()
         {
             if (m_Dragging != null)
+            {
                 m_Dragging.SetDragged(false);
-            m_Dragging = null;
+                m_Dragging = null;
+            }
+            if (m_Dropping != null)
+            {
+                m_Dropping.SetDropped(false);
+                m_Dropping = null;
+            }
         }
 
         public void OnDragged(IDragable dragging, bool bState)
@@ -55,17 +63,28 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        public void OnHover(IDropable dropping)
+        {
+            if (m_Dropping != null && m_Dropping != dropping)
+                m_Dropping.SetDropped(false);
+            m_Dropping = dropping;
+            if (m_Dropping != null)
+                m_Dropping.SetDropped(true);
+        }
+
         public void OnDropped(IDropable dropping)
         {
-            if (dropping == null)
-                return;
-            dropping.SetDropped(false);
+            do
+            {
+                if (m_Dragging == null)
+                    break;
+                if (dropping == null)
+                    break;
 
-            if (m_Dragging == null)
-                return;
+                dropping.SetDropped(false);
 
-            dropping.OnDropped(m_Dragging);
-
+                dropping.OnDropped(m_Dragging);
+            } while (false);
             Clear();
         }
     }
