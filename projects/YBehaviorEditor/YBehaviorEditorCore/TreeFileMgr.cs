@@ -42,7 +42,7 @@ namespace YBehavior.Editor.Core
                     continue;
                 TreeFileInfo thisFile = new TreeFileInfo
                 {
-                    Name = NextFile.Name,
+                    Name = NextFile.Name.TrimEnd(NextFile.Extension.ToCharArray()),
                     Path = NextFile.FullName
                 };
                 thisFolder.Children.Add(thisFile);

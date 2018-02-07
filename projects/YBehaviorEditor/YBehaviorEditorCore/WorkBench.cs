@@ -85,7 +85,7 @@ namespace YBehavior.Editor.Core
                     var attr = chi.Attributes.GetNamedItem("Class");
                     if (attr == null)
                         continue;
-                    if (attr.Value == "EntryTask")
+                    if (attr.Value == "Root")
                     {
                         m_Tree = NodeMgr.Instance.CreateNodeByName("Root") as Tree;
                         _LoadTree(m_Tree, chi);
@@ -141,6 +141,30 @@ namespace YBehavior.Editor.Core
             }
 
             return true;
+        }
+
+        public void Save(XmlElement data, XmlDocument xmlDoc)
+        {
+            _SaveNode(MainTree, data, xmlDoc);
+
+            foreach (var tree in m_Forest)
+            {
+                _SaveNode(tree, data, xmlDoc);
+            }
+        }
+
+        void _SaveNode(Node node, XmlElement data, XmlDocument xmlDoc)
+        {
+            XmlElement nodeEl = xmlDoc.CreateElement("Node");
+            data.AppendChild(nodeEl);
+
+            nodeEl.SetAttribute("Class", node.Name);
+            node.Save(nodeEl);
+
+            foreach (Node chi in node.Conns)
+            {
+                _SaveNode(chi, nodeEl, xmlDoc);
+            }
         }
 
         public void RemoveSubTree(Node root)

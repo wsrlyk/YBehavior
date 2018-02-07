@@ -184,6 +184,19 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        public virtual void Save(System.Xml.XmlElement data)
+        {
+            if (Conns.ParentHolder != null && Conns.ParentHolder.Conn != null)
+            {
+                if (Conns.ParentHolder.Conn.Identifier != Connection.IdentifierChildren)
+                    data.SetAttribute("Connection", Conns.ParentHolder.Conn.Identifier);
+            }
+
+            data.SetAttribute("Pos", m_Geo.Pos.ToString());
+            if (m_NickName != null)
+                data.SetAttribute("NickName", m_NickName);
+        }
+
         public virtual Renderer CreateRenderer()
         {
             m_Renderer = new Renderer(this);

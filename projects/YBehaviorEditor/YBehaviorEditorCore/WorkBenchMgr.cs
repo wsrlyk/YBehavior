@@ -44,6 +44,27 @@ namespace YBehavior.Editor.Core
             return workBench;
         }
 
+        public void SaveWorkBench(WorkBench bench = null)
+        {
+            if (bench == null)
+                bench = ActiveWorkBench;
+            if (bench == null)
+            {
+                LogMgr.Instance.Error("AddNodeToBench Failed: bench == null");
+                return;
+            }
+
+            string path = bench.FileInfo.Path;
+
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.AppendChild(xmlDoc.CreateXmlDeclaration("1.0", "utf-8", null));
+            var el = xmlDoc.CreateElement(bench.FileInfo.Name);
+            xmlDoc.AppendChild(el);
+
+            bench.Save(el, xmlDoc);
+            xmlDoc.Save(path);
+        }
+
         public Node AddNodeToBench(Node template, WorkBench bench = null)
         {
             if (bench == null)

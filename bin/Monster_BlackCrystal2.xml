@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Monster_BlackCrystal2>
+  <Node Class="Root" Pos="10,10">
+    <Node Class="Sequence" Pos="136,124" NickName="Hehequence12345678">
+      <Node Class="Calculator" Pos="46,224" />
+      <Node Class="Calculator" Pos="339,267" NickName="Calculator12345678" />
+      <Node Class="Selector" Pos="263,423">
+        <Node Class="AlwaysSuccess" Pos="242,542" />
+      </Node>
+    </Node>
+  </Node>
+</Monster_BlackCrystal2>

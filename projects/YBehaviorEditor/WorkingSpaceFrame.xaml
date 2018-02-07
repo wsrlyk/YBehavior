@@ -29,7 +29,7 @@
             <Button Grid.Column="0">O</Button>
             <Button Grid.Column="1">C</Button>
             <Button Grid.Column="2">W</Button>
-            <Button Grid.Column="3">S</Button>
+            <Button Name="btnSave" Grid.Column="3" Click="_BtnSaveClick">S</Button>
         </Grid>
     </Grid>
 </UserControl>
