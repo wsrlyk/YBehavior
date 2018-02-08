@@ -35,14 +35,16 @@ namespace YBehavior.Editor.Core
             normalBorderBrush = this.border.BorderBrush;
 
             SelectHandler = new SelectionStateChangeHandler(defaultSelectHandler);
+
+            m_Operation = new Operation(this.border);
+            m_Operation.RegisterClick(_OnClick);
+            m_Operation.RegisterDrag(_OnDrag);
         }
 
         public void SetCanvas(Panel panel)
         {
             m_Panel = panel;
-            m_Operation = new Operation(this.border, panel);
-            m_Operation.RegisterClick(_OnClick);
-            m_Operation.RegisterDrag(_OnDrag);
+            m_Operation.SetPanel(panel);
         }
 
 

@@ -23,12 +23,12 @@ namespace YBehavior.Editor
         public StateBarFrame()
         {
             InitializeComponent();
-            this.log.SetBinding(TextBlock.TextProperty,
-                new Binding() {
-                    Path = new PropertyPath("LatestTwoLog"),
-                    Source = LogMgr.Instance,
-                    Mode = BindingMode.OneWay
-                });
+            //this.log.SetBinding(TextBlock.TextProperty,
+            //    new Binding() {
+            //        Path = new PropertyPath("LatestTwoLog"),
+            //        Source = LogMgr.Instance,
+            //        Mode = BindingMode.OneWay
+            //    });
         }
     }
 }

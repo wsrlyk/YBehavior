@@ -13,14 +13,15 @@
             <RowDefinition Height="20"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid>
+        <!--<Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="20"/>
             </Grid.ColumnDefinitions>
             <Button Name="Operation0" Grid.Row="0" Grid.Column="0" Width="20" HorizontalAlignment="Left" Click="Operation0_Click"></Button>
             <Button Name="Operation1" Grid.Row="0" Grid.Column="1" Width="20" HorizontalAlignment="Left"></Button>
-        </Grid>
+        </Grid>-->
+        <TabControl Name="TabController" Grid.Row="0" Tag="100" SelectionChanged="TabController_SelectionChanged"></TabControl>
         <Canvas Focusable="True" Grid.Row="1" Name="Canvas" Background="Gray">
         </Canvas>
     </Grid>

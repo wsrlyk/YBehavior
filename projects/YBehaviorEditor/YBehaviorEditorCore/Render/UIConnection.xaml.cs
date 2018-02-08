@@ -38,12 +38,14 @@ namespace YBehavior.Editor.Core
             normalStrokeBrush = this.path.Stroke;
 
             SelectHandler = new SelectionStateChangeHandler(defaultSelectHandler);
+
+            m_Operation = new Operation(this);
+            m_Operation.RegisterClick(_OnClick);
         }
 
         public void SetCanvas(Panel panel)
         {
-            m_Operation = new Operation(this, panel);
-            m_Operation.RegisterClick(_OnClick);
+            m_Operation.SetPanel(panel);
         }
 
         public PathGeometry PathGeometry { get { return path.Data as PathGeometry; } }

@@ -94,5 +94,13 @@ namespace YBehavior.Editor
         {
             WorkBenchMgr.Instance.SaveWorkBench();
         }
+
+        private void _BtnNewClick(object sender, RoutedEventArgs e)
+        {
+            if (WorkBenchMgr.Instance.ActiveWorkBench != null)
+            {
+
+            }
+        }
     }
 }

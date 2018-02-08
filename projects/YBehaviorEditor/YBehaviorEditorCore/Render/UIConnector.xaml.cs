@@ -40,12 +40,14 @@ namespace YBehavior.Editor.Core
             DragHandler = new DragHandler(defaultDragHandler);
             DropHandler = new DropHandler(defaultDropHandler);
             HoverHandler = new DropHandler(defaultHoverHandler);
+
+            m_Operation = new Operation(this);
+            m_Operation.RegisterDragDrop(_OnDragged, _OnStartDragged);
         }
 
         public void SetCanvas(Panel panel)
         {
-            m_Operation = new Operation(this, panel);
-            m_Operation.RegisterDragDrop(_OnDragged, _OnStartDragged);
+            m_Operation.SetPanel(panel);
         }
 
         public string Title

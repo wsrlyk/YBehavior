@@ -18,12 +18,15 @@ namespace YBehavior.Editor.Core
         DragHandler m_DragHandler;
         DragHandler m_StartDragHandler;
         Panel m_Panel;
-        public Operation(UIElement target, Panel panel)
+        public Operation(UIElement target)
         {
-            m_Panel = panel;
+            target.MouseLeftButtonDown -= _MouseLeftButtonDown;
             target.MouseLeftButtonDown += _MouseLeftButtonDown;
+            target.MouseMove -= _MouseMove;
             target.MouseMove += _MouseMove;
+            target.PreviewMouseMove -= _PreviewMouseMove;
             target.PreviewMouseMove += _PreviewMouseMove;
+            target.MouseLeftButtonUp -= _MouseLeftButtonUp;
             target.MouseLeftButtonUp += _MouseLeftButtonUp;
         }
 

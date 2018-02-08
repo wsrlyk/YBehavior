@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B147460C-CC1E-4C33-BD28-B98E322F0F14}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>YBehavior.Editor</RootNamespace>
     <AssemblyName>YBehavior.Editor</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
@@ -31,6 +31,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -68,6 +71,9 @@
     <Compile Include="StateBarFrame.xaml.cs">
       <DependentUpon>StateBarFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UCTabItemWithClose.xaml.cs">
+      <DependentUpon>UCTabItemWithClose.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WorkBenchFrame.xaml.cs">
       <DependentUpon>WorkBenchFrame.xaml</DependentUpon>
     </Compile>
@@ -93,6 +99,10 @@
     <Page Include="StateBarFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UCTabItemWithClose.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="WorkBenchFrame.xaml">
       <SubType>Designer</SubType>

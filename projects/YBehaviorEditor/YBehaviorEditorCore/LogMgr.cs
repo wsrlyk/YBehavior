@@ -52,6 +52,9 @@ namespace YBehavior.Editor.Core
 
         public void Log(string content)
         {
+            Console.ResetColor();
+            Console.WriteLine(content);
+            /*
             m_Head = NextIndex;
             logList[m_Head] = content;
 
@@ -64,11 +67,13 @@ namespace YBehavior.Editor.Core
             {
                 this.PropertyChanged.Invoke(this, new PropertyChangedEventArgs("LatestTwoLog"));
             }
+            */
         }
 
         public void Error(string content)
         {
-
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(content);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

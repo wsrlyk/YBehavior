@@ -174,6 +174,10 @@ namespace YBehavior.Editor.Core
 
         private void _DrawSelfConnectors()
         {
+            m_uiConnectors.Clear();
+            m_uiFrame.topConnectors.Children.Clear();
+            m_uiFrame.bottomConnectors.Children.Clear();
+
             if (m_Owner.Conns.ParentHolder != null)
             {
                 UIConnector uiConnector = new UIConnector

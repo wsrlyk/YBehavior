@@ -12,6 +12,24 @@ namespace YBehavior.Editor.Core
         WorkBench m_ActiveWorkBench;
         public WorkBench ActiveWorkBench { get { return m_ActiveWorkBench; } }
 
+        public bool Switch(WorkBench target)
+        {
+            if (m_ActiveWorkBench == target)
+                return true;
+
+            foreach (WorkBench bench in m_OpenedWorkBenchs)
+            {
+                if (bench == target)
+                {
+                    m_ActiveWorkBench = target;
+                    return true;
+                }
+            }
+
+            LogMgr.Instance.Error("Try to switch to a workbench that is not in the mgr: " + target.FileInfo.Name);
+            return false;
+        }
+
         public WorkBench OpenWorkBench(TreeFileMgr.TreeFileInfo file)
         {
             if (file == null)

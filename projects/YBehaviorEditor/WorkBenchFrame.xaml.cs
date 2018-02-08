@@ -37,7 +37,30 @@ namespace YBehavior.Editor
             if (oArg.Bench == null)
                 return;
 
-            _RenderActiveWorkBench();
+            ///> Check if the bench has already been in the tabs
+
+            UCTabItemWithClose activeTab = null;
+            foreach (UCTabItemWithClose tab in this.TabController.Items)
+            {
+                if (tab.Content == oArg.Bench)
+                {
+                    activeTab = tab;
+                    break;
+                }
+            }
+            ///> Create new tab
+            if (activeTab == null)
+            {
+                activeTab = new UCTabItemWithClose();
+                activeTab.Header = oArg.Bench.FileInfo.Name;
+                activeTab.ToolTip = oArg.Bench.FileInfo.Path;
+                activeTab.Content = oArg.Bench;
+                this.TabController.Items.Add(activeTab);
+            }
+
+            activeTab.IsSelected = true;
+
+            //_RenderActiveWorkBench();
         }
 
         private void _OnNewNodeAdded(EventArg arg)
@@ -79,11 +102,7 @@ namespace YBehavior.Editor
             node.Renderer.Render(this.Canvas);
         }
 
-        private void Operation0_Click(object sender, RoutedEventArgs e)
-        {
-            _ThreadRenderConnections();
-        }
-
+        
         private void _KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
@@ -91,6 +110,23 @@ namespace YBehavior.Editor
                 case Key.Delete:
                     Core.SelectionMgr.Instance.TryDeleteSelection();
                     break;
+            }
+        }
+
+        private void TabController_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.Source is TabControl)
+            {
+                this.Canvas.Children.Clear();
+                foreach (UCTabItemWithClose tab in e.AddedItems)
+                {
+                    LogMgr.Instance.Log("Tab selected: " + tab.Header);
+                    if (WorkBenchMgr.Instance.Switch(tab.Content as WorkBench))
+                        _RenderActiveWorkBench();
+                    return;
+                }
+
+                LogMgr.Instance.Error("Tab switch failed.");
             }
         }
     }
