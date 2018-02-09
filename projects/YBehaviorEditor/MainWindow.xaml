@@ -7,17 +7,30 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="1024" Width="1280">
     <Grid>
-        <Menu  Width="300" Margin="10,10,1162,965">
-            <MenuItem Header="Operations" Height="30" Width="200">
-                <MenuItem Header="Open" Height="30" Width="200"/>
-                <MenuItem Header="Close" Height="30" Width="200"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0" Width="400" Margin="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <MenuItem Header="Operations" Height="20" Width="100">
+                <MenuItem Header="Open" Height="20" Width="100"/>
+                <MenuItem Header="Close" Height="30" Width="100"/>
             </MenuItem>
         </Menu>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="250"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <local:WorkingSpaceFrame BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="387" Margin="5,5,0,0" VerticalAlignment="Top" Width="240"/>
+                <local:NodeListFrame BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="387" Margin="5,5,0,0" VerticalAlignment="Top" Width="240"/>
+            </StackPanel>
+            <local:WorkBenchFrame Grid.Column="1" Margin="0,0,0,0"/>
 
-        <TreeView Name="Nodes" Margin="10,426,1031,210"/>
-        <local:WorkingSpaceFrame BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="387" Margin="10,34,0,0" VerticalAlignment="Top" Width="231"/>
-        <local:NodeListFrame BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="387" Margin="10,426,0,0" VerticalAlignment="Top" Width="231"/>
-        <local:WorkBenchFrame Margin="241,34,241,34"/>
-        <local:StateBarFrame Height="34" VerticalAlignment="Bottom" Margin="10,0,0,0"/>
+        </Grid>
+        <local:StateBarFrame Grid.Row="2"  Height="34" VerticalAlignment="Bottom" Margin="10,0,0,0"/>
     </Grid>
 </Window>
