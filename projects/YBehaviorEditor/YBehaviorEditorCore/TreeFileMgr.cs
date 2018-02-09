@@ -51,6 +51,10 @@ namespace YBehavior.Editor.Core
 
         public class TreeFileInfo
         {
+            public string DisplayName { get { return Name == null ? "Untitled" : Name; } }
+            public string DisplayPath { get { return Path == null ? "NULL" : Path; } }
+
+
             public string Name { get; set; }
             public List<TreeFileInfo> Children { get; set; }
             public bool bIsFolder = false;

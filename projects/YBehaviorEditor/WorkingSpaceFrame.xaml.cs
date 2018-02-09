@@ -97,9 +97,12 @@ namespace YBehavior.Editor
 
         private void _BtnNewClick(object sender, RoutedEventArgs e)
         {
-            if (WorkBenchMgr.Instance.ActiveWorkBench != null)
+            WorkBench bench = null;
+            if ((bench = WorkBenchMgr.Instance.CreateNewBench()) != null)
             {
-
+                WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
+                arg.Bench = bench;
+                EventMgr.Instance.Send(arg);
             }
         }
     }

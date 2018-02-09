@@ -54,6 +54,14 @@ namespace YBehavior.Editor
         /// </summary>
         private void btn_Close_Click(object sender, RoutedEventArgs e)
         {
+            if (CloseHandler != null && !CloseHandler(this))
+                return;
+
+            _DoClose();
+        }
+
+        private void _DoClose()
+        {
             if (m_Parent == null)
                 return;
 
@@ -79,6 +87,9 @@ namespace YBehavior.Editor
                 }
             }
         }
+
+        public delegate bool CloseCallback(UCTabItemWithClose tab);
+        public CloseCallback CloseHandler { get; set; }
         #endregion
         #region 父级TabControl尺寸发生变化
         /// <summary>

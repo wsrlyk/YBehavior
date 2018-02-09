@@ -52,15 +52,47 @@ namespace YBehavior.Editor
             if (activeTab == null)
             {
                 activeTab = new UCTabItemWithClose();
-                activeTab.Header = oArg.Bench.FileInfo.Name;
-                activeTab.ToolTip = oArg.Bench.FileInfo.Path;
+                activeTab.Header = oArg.Bench.FileInfo.DisplayName;
+                activeTab.ToolTip = oArg.Bench.FileInfo.DisplayPath;
                 activeTab.Content = oArg.Bench;
+                activeTab.CloseHandler = _TabCloseClicked;
                 this.TabController.Items.Add(activeTab);
             }
 
             activeTab.IsSelected = true;
 
             //_RenderActiveWorkBench();
+        }
+
+        private bool _TabCloseClicked(UCTabItemWithClose tab)
+        {
+            if (tab == null)
+                return false;
+
+            WorkBench bench = tab.Content as WorkBench;
+            if (bench == null)
+                return true;
+
+            // if is dirty
+            {
+                MessageBoxResult dr = MessageBox.Show("This file has been modified. Save it?", "To Save Or Not To Save", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                if (dr == MessageBoxResult.Yes)
+                {
+                    if (WorkBenchMgr.Instance.SaveWorkBench(bench))
+                        return true;
+                }
+                else if (dr == MessageBoxResult.No)
+                {
+                    WorkBenchMgr.Instance.Remove(bench);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void _OnNewNodeAdded(EventArg arg)
@@ -113,20 +145,27 @@ namespace YBehavior.Editor
             }
         }
 
+        public void ClearCanvas()
+        {
+            this.Canvas.Children.Clear();
+        }
         private void TabController_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.Source is TabControl)
             {
-                this.Canvas.Children.Clear();
-                foreach (UCTabItemWithClose tab in e.AddedItems)
+                ClearCanvas();
+                if (e.AddedItems.Count > 0)
                 {
-                    LogMgr.Instance.Log("Tab selected: " + tab.Header);
-                    if (WorkBenchMgr.Instance.Switch(tab.Content as WorkBench))
-                        _RenderActiveWorkBench();
-                    return;
-                }
+                    foreach (UCTabItemWithClose tab in e.AddedItems)
+                    {
+                        LogMgr.Instance.Log("Tab selected: " + tab.Header);
+                        if (WorkBenchMgr.Instance.Switch(tab.Content as WorkBench))
+                            _RenderActiveWorkBench();
+                        return;
+                    }
 
-                LogMgr.Instance.Error("Tab switch failed.");
+                    LogMgr.Instance.Error("Tab switch failed.");
+                }
             }
         }
     }

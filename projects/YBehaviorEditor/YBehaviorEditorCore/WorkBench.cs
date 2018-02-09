@@ -76,6 +76,11 @@ namespace YBehavior.Editor.Core
             RemoveSubTree(oArg.Node);
         }
 
+        public void CreateEmptyRoot()
+        {
+            m_Tree = NodeMgr.Instance.CreateNodeByName("Root") as Tree;
+        }
+
         public bool Load(XmlElement data)
         {
             foreach (XmlNode chi in data.ChildNodes)

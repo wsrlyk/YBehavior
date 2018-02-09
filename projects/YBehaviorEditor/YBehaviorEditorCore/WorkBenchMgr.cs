@@ -12,6 +12,13 @@ namespace YBehavior.Editor.Core
         WorkBench m_ActiveWorkBench;
         public WorkBench ActiveWorkBench { get { return m_ActiveWorkBench; } }
 
+        public void Remove(WorkBench target)
+        {
+            m_OpenedWorkBenchs.Remove(target);
+            if (m_ActiveWorkBench == target)
+                m_ActiveWorkBench = null;
+        }
+
         public bool Switch(WorkBench target)
         {
             if (m_ActiveWorkBench == target)
@@ -62,17 +69,32 @@ namespace YBehavior.Editor.Core
             return workBench;
         }
 
-        public void SaveWorkBench(WorkBench bench = null)
+        public bool SaveWorkBench(WorkBench bench = null)
         {
             if (bench == null)
                 bench = ActiveWorkBench;
             if (bench == null)
             {
                 LogMgr.Instance.Error("AddNodeToBench Failed: bench == null");
-                return;
+                return true;
             }
 
-            string path = bench.FileInfo.Path;
+            if (bench.FileInfo.Path == null)
+            {
+                ///> Pop the save dialog
+                Microsoft.Win32.SaveFileDialog sfd = new Microsoft.Win32.SaveFileDialog();
+                sfd.InitialDirectory = Config.Instance.WorkingDir;
+                sfd.Filter = "XML|*.xml";
+                if (sfd.ShowDialog() == true)
+                {
+                    bench.FileInfo.Path = sfd.FileName;
+                    bench.FileInfo.Name = sfd.SafeFileName.Remove(sfd.SafeFileName.LastIndexOf(".xml"));
+                }
+                else
+                {
+                    return false;
+                }
+            }
 
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.AppendChild(xmlDoc.CreateXmlDeclaration("1.0", "utf-8", null));
@@ -80,7 +102,9 @@ namespace YBehavior.Editor.Core
             xmlDoc.AppendChild(el);
 
             bench.Save(el, xmlDoc);
-            xmlDoc.Save(path);
+            xmlDoc.Save(bench.FileInfo.Path);
+
+            return true;
         }
 
         public Node AddNodeToBench(Node template, WorkBench bench = null)
@@ -97,6 +121,20 @@ namespace YBehavior.Editor.Core
             bench.AddSubTree(node);
 
             return node;
+        }
+
+        public WorkBench CreateNewBench()
+        {
+            WorkBench workBench = new WorkBench
+            {
+                FileInfo = new TreeFileMgr.TreeFileInfo()
+            };
+
+            workBench.CreateEmptyRoot();
+
+            m_OpenedWorkBenchs.Add(workBench);
+            m_ActiveWorkBench = workBench;
+            return workBench;
         }
     }
 }
