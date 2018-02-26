@@ -53,7 +53,7 @@ namespace YBehavior.Editor
 
             public void Build(Node data)
             {
-                if (data == null)
+                if (data == null || data.Type == NodeType.NT_Root)
                     return;
 
                 NodeInfo child;

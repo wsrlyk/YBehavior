@@ -104,6 +104,22 @@ namespace YBehavior.Editor.Core
             }
         }
         protected NodeBase m_Parent;
+
+        public NodeBase Root
+        {
+            get
+            {
+                NodeBase root = this;
+                NodeBase parent = this;
+                while (parent != null)
+                {
+                    root = parent;
+                    parent = parent.Parent;
+                }
+                return root;
+            }
+        }
+
     }
 
     public class Node : NodeBase
@@ -123,6 +139,20 @@ namespace YBehavior.Editor.Core
 
         private Geometry m_Geo = new Geometry();
         public Geometry Geo { get { return m_Geo; } }
+
+        protected SharedData m_Variables = new SharedData();
+        public SharedData Variables { get { return m_Variables; } }
+
+        protected SharedData m_TreeSharedData = null;
+        public SharedData GetTreeSharedData()
+        {
+            if (m_TreeSharedData != null)
+                return m_TreeSharedData;
+            Tree root = Root as Tree;
+            if (root != null)
+                m_TreeSharedData = root.Variables;
+            return m_TreeSharedData;
+        }
 
         public class Geometry
         {
@@ -172,16 +202,25 @@ namespace YBehavior.Editor.Core
         {
             foreach (System.Xml.XmlAttribute attr in data.Attributes)
             {
-                switch (attr.Name)
-                {
-                    case "Pos":
-                        m_Geo.Pos = Point.Parse(attr.Value);
-                        break;
-                    case "NickName":
-                        m_NickName = attr.Value;
-                        break;
-                }
+                ProcessAttrWhenLoad(attr);
             }
+        }
+
+        protected virtual bool ProcessAttrWhenLoad(System.Xml.XmlAttribute attr)
+        {
+            switch (attr.Name)
+            {
+                case "Pos":
+                    m_Geo.Pos = Point.Parse(attr.Value);
+                    break;
+                case "NickName":
+                    m_NickName = attr.Value;
+                    break;
+                default:
+                    return false;
+            }
+
+            return true;
         }
 
         public virtual void Save(System.Xml.XmlElement data)

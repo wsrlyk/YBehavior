@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace YBehavior.Editor.Core
 {
@@ -16,6 +17,14 @@ namespace YBehavior.Editor.Core
         protected override bool _HasParentHolder()
         {
             return false;
+        }
+
+        protected override bool ProcessAttrWhenLoad(XmlAttribute attr)
+        {
+            if (base.ProcessAttrWhenLoad(attr))
+                return true;
+
+            return m_Variables.TryAddData(attr.Name, attr.Value);
         }
     }
 
@@ -45,6 +54,79 @@ namespace YBehavior.Editor.Core
             m_Name = "Calculator";
             m_Type = NodeType.NT_Calculator;
             m_Hierachy = NodeHierachy.NH_Action;
+
+            Variable optr = Variable.CreateVariableInNode(
+                "Operator",
+                "ADD",
+                Variable.CreateParams_Enum,
+                Variable.CreateParams_Single,
+                Variable.VariableType.VBT_Const,
+                "ADD|SUB|MUL|DIV"
+            );
+            Variables.AddVariable(optr);
+
+            Variable opl = Variable.CreateVariableInNode(
+                "Opl",
+                "0",
+                Variable.CreateParams_AllNumbers,
+                Variable.CreateParams_Single,
+                Variable.VariableType.VBT_Const
+            );
+            Variables.AddVariable(opl);
+
+            Variable opr1 = Variable.CreateVariableInNode(
+                "Opr1",
+                "0",
+                Variable.CreateParams_AllNumbers,
+                Variable.CreateParams_Single,
+                Variable.VariableType.VBT_Const
+            );
+            Variables.AddVariable(opr1);
+
+            Variable opr2 = Variable.CreateVariableInNode(
+                "Opr2",
+                "0",
+                Variable.CreateParams_AllNumbers,
+                Variable.CreateParams_Single,
+                Variable.VariableType.VBT_Const
+            );
+            Variables.AddVariable(opr2);
+        }
+
+        protected override bool ProcessAttrWhenLoad(XmlAttribute attr)
+        {
+            if (base.ProcessAttrWhenLoad(attr))
+                return true;
+
+            Variable v = null;
+
+            switch(attr.Name)
+            {
+                case "Operator":
+                    {
+                        v = Variables.GetVariable("Operator");
+                        if (!v.SetVariable(Variable.ENUM, Variable.NONE, Variable.CONST, attr.Value,
+                            "ADD|SUB|MUL|DIV"))
+                            return false;
+                    }
+                    break;
+                default:
+                    {
+                        v = Variables.GetVariable(attr.Name);
+                        if (v != null)
+                        {
+                            if (!v.SetVariableInNode(attr.Value))
+                                return false;
+                        }
+                    }
+                    break;
+            }
+
+            if (v != null && v.CheckValid(GetTreeSharedData()))
+            {
+                return true;
+            }
+            return false;
         }
     }
 
