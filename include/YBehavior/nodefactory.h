@@ -3,6 +3,7 @@
 
 #include "YBehavior/factory.h"
 #include "YBehavior/behaviortree.h"
+#include "YBehavior/logger.h"
 
 namespace YBehavior
 {

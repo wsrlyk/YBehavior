@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "define.h"
+#include <sstream>
 
 namespace YBehavior
 {
@@ -33,9 +34,26 @@ namespace YBehavior
 		{
 		}
 
+		friend std::stringstream & operator<<(std::stringstream &out, Vector3 &obj)
+		{
+			out << obj.x << ' ' << obj.y << ' ' << obj.z;
+			return out;
+		}
+
+		friend std::stringstream & operator >> (std::stringstream &in, Vector3 &obj)
+		{
+			in >> obj.x >> obj.y >> obj.z;
+			return in;
+		}
+
 		const static Vector3 zero;
 	};
 
+	template<typename T>
+	struct YBEHAVIOR_API Vector
+	{
+		std::vector<T> m_Data;
+	};
 	typedef std::string			STRING;
 	typedef int					INT;
 	typedef unsigned int		UINT;

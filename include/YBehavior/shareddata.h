@@ -2,6 +2,7 @@
 #define _YBEHAVIOR_SHAREDDATA_H_
 
 #include "YBehavior/types.h"
+#include "YBehavior/utility.h"
 
 namespace YBehavior
 {
@@ -51,7 +52,6 @@ namespace YBehavior
 		(*m_##T##s)[index] = v;\
 		return true;\
 	}
-
 #define FOR_EACH_TYPE(func)	\
 	func(Int);	\
 	func(Uint64);	\
@@ -82,6 +82,23 @@ namespace YBehavior
 	func(VecString, 1);	\
 	func(VecAgentPtr, 1);	\
 	func(VecVector3, 1);	
+#define FOR_EACH_SINGLE_NORMAL_TYPE(func)	\
+	func(Int);	\
+	func(Uint64);	\
+	func(Bool);	\
+	func(Float);	\
+	func(String);	\
+	func(Vector3);
+#define FOR_EACH_VECTOR_NORMAL_TYPE(func)	\
+	func(VecInt);\
+	func(VecUint64);\
+	func(VecBool);\
+	func(VecFloat);\
+	func(VecString);\
+	func(VecVector3);
+#define FOR_EACH_ABNORMAL_TYPE(func)	\
+	func(AgentPtr);	\
+	func(VecAgentPtr);
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -117,6 +134,8 @@ namespace YBehavior
 		virtual ISharedVariable operator+(ISharedVariable& other) { return *this;}
 		virtual ISharedVariable& operator=(ISharedVariable& other) { return *this;}
 		virtual ISharedVariable& operator=(ISharedVariable&& other) { return *this;}
+		virtual void SetValueFromString(const STRING& str) {}
+
 	protected:
 		INT m_Index;
 	};
@@ -130,15 +149,9 @@ namespace YBehavior
 		virtual const T& GetValue(SharedData* data) = 0;
 		virtual bool SetValue(SharedData* data, const T& v) = 0;
 		virtual bool SetValue(SharedData* data, T&& v) = 0;
-
-		void SetValueFromString(const STRING& str)
-		{
-			m_Value = std::move(Utility::ToType<T>(str));
-		}
 	};
-
 	
-#define DECLARE_SHARED_TYPES(T)\
+#define DECLARE_SHARED_SINGLE_TYPES(T)\
 	class YBEHAVIOR_API Shared##T : public SharedVariable<T>\
 	{\
 	public:\
@@ -146,9 +159,45 @@ namespace YBehavior
 		const T& GetValue(SharedData* data);\
 		bool SetValue(SharedData* data, const T& v);\
 		bool SetValue(SharedData* data, T&& v);\
-	};\
+		void SetValueFromString(const STRING& str)\
+		{\
+			m_Value = std::move(Utility::ToType<T>(str));\
+		}\
+	};
 
-	FOR_EACH_TYPE(DECLARE_SHARED_TYPES);
+#define DECLARE_SHARED_VECTOR_TYPES(T)\
+	class YBEHAVIOR_API SharedVec##T : public SharedVariable<Vec##T>\
+	{\
+	public:\
+		SharedVec##T();\
+		const Vec##T& GetValue(SharedData* data);\
+		bool SetValue(SharedData* data, const Vec##T& v);\
+		bool SetValue(SharedData* data, Vec##T&& v);\
+		void SetValueFromString(const STRING& str)\
+		{\
+			m_Value.clear();\
+			std::vector<STRING> res;\
+			Utility::SplitString(str, res, '|');\
+			for (auto it = res.begin(); it != res.end(); ++it)\
+			{\
+				m_Value.push_back(std::move(Utility::ToType<T>(*it)));\
+			}\
+		}\
+	};
+
+#define DECLARE_SHARED_TYPES_NOT_FROM_STRING(T)\
+	class YBEHAVIOR_API Shared##T : public SharedVariable<T>\
+	{\
+	public:\
+	Shared##T();\
+	const T& GetValue(SharedData* data);\
+	bool SetValue(SharedData* data, const T& v);\
+	bool SetValue(SharedData* data, T&& v);\
+	};
+
+	FOR_EACH_SINGLE_NORMAL_TYPE(DECLARE_SHARED_SINGLE_TYPES);
+	FOR_EACH_SINGLE_NORMAL_TYPE(DECLARE_SHARED_VECTOR_TYPES);
+	FOR_EACH_ABNORMAL_TYPE(DECLARE_SHARED_TYPES_NOT_FROM_STRING);
 }
 
 #endif

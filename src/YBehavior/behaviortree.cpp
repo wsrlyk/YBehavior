@@ -4,6 +4,7 @@
 #include "YBehavior/utility.h"
 #include <sstream>
 #include "YBehavior/nodefactory.h"
+#include "YBehavior/sharedvariablecreatehelper.h"
 
 namespace YBehavior
 {
@@ -49,6 +50,51 @@ namespace YBehavior
 	void BehaviorNode::AddChild(BehaviorNode* child)
 	{
 		ERROR_BEGIN << "Cant add child to this node: " << ERROR_END;
+	}
+
+	TypeAB BehaviorNode::CreateVariable(ISharedVariable*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle)
+	{
+		pugi::xml_attribute& attrOptr = data.attribute("Opl");
+
+		if (attrOptr.empty())
+		{
+			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
+			return Types::NoneAB;
+		}
+		std::vector<STRING> buffer;
+
+		auto tempChar = attrOptr.value();
+		///> Only split the first space
+		Utility::SplitString(tempChar, buffer, Utility::SpaceSpliter, 1);
+		if (buffer.size() != 2 || buffer[0].length() != 3)
+		{
+			ERROR_BEGIN << "Format Error, " << attriName << " in " << data.name() << ": " << tempChar << ERROR_END;
+			return Types::NoneAB;
+		}
+
+		if (!(bSingle ^ (buffer[0][0] == buffer[0][1])))
+		{
+			ERROR_BEGIN << "Single or Vector Error, " << attriName << " in " << data.name() << ": " << tempChar << ERROR_END;
+			return Types::NoneAB;
+		}
+
+		ISharedVariableCreateHelper* helper = Utility::CreateVariableCreateHelper(buffer[0][1], buffer[0][0]);
+		if (helper != NULL)
+		{
+			op = helper->CreateVariable();
+			if (buffer[0][2] == 'S')
+				helper->SetIndex(op, buffer[1]);
+			else
+				op->SetValueFromString(buffer[1]);
+
+			TypeAB type = helper->GetType();
+			delete helper;
+			return type;
+		}
+		else
+		{
+			return Types::NoneAB;
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////

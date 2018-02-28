@@ -42,6 +42,7 @@ namespace YBehavior
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
 		virtual void OnLoaded(const pugi::xml_node& data) {}
 		virtual void OnAddChild(BehaviorNode* child) {}
+		TypeAB BehaviorNode::CreateVariable(ISharedVariable*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle);
 	};
 
 	class YBEHAVIOR_API BranchNode: public BehaviorNode

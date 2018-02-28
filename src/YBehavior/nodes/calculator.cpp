@@ -22,13 +22,7 @@ namespace YBehavior
 	//	return NodeFactory::Instance()->CreateIndexByName<T>(name);
 	//}
 
-	template<typename T>
-	void SetIndex(SharedVariable<T>& variable, const STRING& name)
-	{
-		variable.SetIndex(NodeFactory::Instance()->CreateIndexByName<T>(name));
-	}
-
-	typedef INT (*CreateIndexFunc)(const STRING& name);
+	//typedef INT (*CreateIndexFunc)(const STRING& name);
 
 	template<typename T>
 	NodeState DoOperation(SharedVariable<T>& opl, SharedVariable<T>& opr1, SharedVariable<T>& opr2, CalculatorOperator opType, AgentPtr agent, Calculator* pNode)
@@ -61,55 +55,6 @@ namespace YBehavior
 		return NS_SUCCESS;
 	}
 
-	TypeAB ProcessOp(ISharedVariable*& op, pugi::xml_attribute& attrOptr, const pugi::xml_node& data)
-	{
-		std::vector<STRING> buffer;
-		if (attrOptr.empty())
-		{
-			ERROR_BEGIN << "Cant Find Calculator Opl: " << data.name() << ERROR_END;
-			return Types::NoneAB;
-		}
-		auto tempChar = attrOptr.value();
-		Utility::SplitString(tempChar, buffer, Utility::SpaceSpliter);
-		if (buffer.size() != 2 || buffer[0].length() != 3)
-		{
-			ERROR_BEGIN << "Format Error, Opl in" << data.name() << ": " << tempChar << ERROR_END;
-			return Types::NoneAB;
-		}
-
-		switch (buffer[0][1])
-		{
-		case Types::FloatAB:
-			{
-				auto variable = new SharedFloat();
-				op = variable;
-				if (buffer[0][2] == 'S')
-					SetIndex<Float>(*((SharedVariable<Float>*)op), buffer[1]);
-				else
-					variable->SetValueFromString(buffer[1]);
-				return Types::FloatAB;
-			}
-			break;
-		case Types::IntAB:
-			{
-				auto variable = new SharedInt();
-				op = variable;
-				if (buffer[0][2] == 'S')
-					SetIndex<Int>(*((SharedVariable<Int>*)op), buffer[1]);
-				else
-					variable->SetValueFromString(buffer[1]);
-				return Types::IntAB;
-			}
-			break;
-		default:
-			{
-				ERROR_BEGIN << "This type cant be supported by Calculator " << data.name() << ": " << tempChar << ERROR_END;
-				return Types::NoneAB;
-			}
-			break;
-		}
-	}
-
 	void Calculator::OnLoaded(const pugi::xml_node& data)
 	{
 		///> ‘ÀÀ„∑˚
@@ -138,14 +83,26 @@ namespace YBehavior
 		}
 		//////////////////////////////////////////////////////////////////////////
 		///> µ»∫≈◊Û±ﬂ
-		attrOptr = data.attribute("Opl");
-		m_DataType = ProcessOp(m_Opl, attrOptr, data);
+		m_DataType = CreateVariable(m_Opl, "Opl", data, true);
+		if (m_DataType != Types::IntAB && m_DataType != Types::FloatAB)
+		{
+			ERROR_BEGIN << "Invalid type for Opl in calculator: " << m_DataType << ERROR_END;
+			return;
+		}
 		///> µ»∫≈”“±ﬂ1
-		attrOptr = data.attribute("Opr1");
-		m_DataType = ProcessOp(m_Opr1, attrOptr, data);
+		m_DataType = CreateVariable(m_Opr1, "Opr1", data, true);
+		if (m_DataType != Types::IntAB && m_DataType != Types::FloatAB)
+		{
+			ERROR_BEGIN << "Invalid type for Opr1 in calculator: " << m_DataType << ERROR_END;
+			return;
+		}
 		///> µ»∫≈”“±ﬂ2
-		attrOptr = data.attribute("Opr2");
-		m_DataType = ProcessOp(m_Opr2, attrOptr, data);
+		m_DataType = CreateVariable(m_Opr2, "Opr2", data, true);
+		if (m_DataType != Types::IntAB && m_DataType != Types::FloatAB)
+		{
+			ERROR_BEGIN << "Invalid type for Opr2 in calculator: " << m_DataType << ERROR_END;
+			return;
+		}
 	}
 
 	YBehavior::NodeState Calculator::Update(AgentPtr pAgent)

@@ -126,13 +126,15 @@ namespace YBehavior.Editor.Core
     {
         protected string m_Name;
         protected string m_NickName;
-        public string Name { get { return m_Name; }}
+        public string Name { get { return m_Name; } }
         public string NickName { get { return m_NickName == null ? m_Name : m_NickName; } }
 
         protected NodeType m_Type = NodeType.NT_Invalid;
-        public NodeType Type { get { return m_Type; }}
+        public NodeType Type { get { return m_Type; } }
         protected NodeHierachy m_Hierachy = NodeHierachy.NH_None;
         public NodeHierachy Hierachy { get { return m_Hierachy; } }
+
+        public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class" });
 
         public Renderer Renderer { get { return m_Renderer; } }
         protected Renderer m_Renderer;
@@ -202,6 +204,8 @@ namespace YBehavior.Editor.Core
         {
             foreach (System.Xml.XmlAttribute attr in data.Attributes)
             {
+                if (ReservedAttributes.Contains(attr.Name))
+                    continue;
                 ProcessAttrWhenLoad(attr);
             }
         }

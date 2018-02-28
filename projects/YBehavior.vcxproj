@@ -23,6 +23,7 @@
     <ClInclude Include="..\include\YBehavior\nodes\calculator.h" />
     <ClInclude Include="..\include\YBehavior\nodes\sequence.h" />
     <ClInclude Include="..\include\YBehavior\shareddata.h" />
+    <ClInclude Include="..\include\YBehavior\sharedvariablecreatehelper.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />
   </ItemGroup>

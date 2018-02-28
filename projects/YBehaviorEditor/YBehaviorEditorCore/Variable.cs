@@ -241,14 +241,16 @@ namespace YBehavior.Editor.Core
             return false;
         }
 
-        public bool SetVariableInNode(string s)
+        public bool SetVariableInNode(string s, string newName = null)
         {
             string[] ss = s.Split(SpaceSpliter);
             if (ss.Length > 2 || ss.Length == 0 || ss[0].Length != 3)
             {
-                LogMgr.Instance.Error("Format error when create variable from node: " + s);
+                LogMgr.Instance.Error("Format error when set variable from node: " + s);
                 return false;
             }
+            if (newName != null)
+                m_Name = newName;
 
             return SetVariable(ss[0][1], ss[0][0], ss[0][2], ss.Length == 2 ? ss[1] : string.Empty);
         }
@@ -307,11 +309,8 @@ namespace YBehavior.Editor.Core
         /// <returns></returns>
         public bool TryAddData(string name, string value)
         {
-            if (name.Length <= 3 || name[2] != '_')
-                return false;
-
-            Variable v = Variable.CreateVariable(name[1], name[0], 'C', name.Substring(3), value);
-            if (v == null)
+            Variable v = new Variable();
+            if (!v.SetVariableInNode(value, name))
                 return false;
 
             if (!v.CheckValid(this))
