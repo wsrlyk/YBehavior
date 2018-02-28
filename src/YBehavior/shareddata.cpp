@@ -28,7 +28,7 @@ namespace YBehavior
 			m_Value = v;\
 			return true;\
 		}\
-		return data->Set##T(m_Index, v);\
+		return data->Set(m_Index, v);\
 	}\
 	bool Shared##T::SetValue(SharedData* data, T&& v)\
 	{\
@@ -37,7 +37,7 @@ namespace YBehavior
 			m_Value = v;\
 			return true;\
 		}\
-		return data->Set##T(m_Index, std::move(v));\
+		return data->Set(m_Index, std::move(v));\
 	}
 
 	FOR_EACH_TYPE(DEFINE_SHARED_TYPES);

@@ -25,7 +25,15 @@ namespace YBehavior
 		return (*m_##T##s)[index];\
 	}\
 	\
-	bool Set##T(INT index, const T& v)\
+	bool Get(INT index, T& out)\
+	{\
+		if (m_##T##s == nullptr || index < 0 || index >= m_##T##s->size())\
+			return false;\
+		out = (*m_##T##s)[index];\
+		return true;\
+	}\
+	\
+	bool Set(INT index, const T& v)\
 	{\
 		if (index < 0)\
 			return false;\
@@ -39,7 +47,7 @@ namespace YBehavior
 		return true;\
 	}\
 	\
-	bool Set##T(INT index, T&& v)\
+	bool Set(INT index, T&& v)\
 	{\
 		if (index < 0)\
 			return false;\

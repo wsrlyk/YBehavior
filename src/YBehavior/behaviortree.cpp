@@ -52,6 +52,29 @@ namespace YBehavior
 		ERROR_BEGIN << "Cant add child to this node: " << ERROR_END;
 	}
 
+	bool BehaviorNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single)
+	{
+		auto tempChar = attri.value();
+		///> Only split the first space
+		Utility::SplitString(tempChar, buffer, Utility::SpaceSpliter, 1);
+		if (buffer.size() != 2 || buffer[0].length() != 3)
+		{
+			ERROR_BEGIN << "Format Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
+			return false;
+		}
+
+		if (single >= 0)
+		{
+			if (!((single == 1) ^ (buffer[0][0] == buffer[0][1])))
+			{
+				ERROR_BEGIN << "Single or Vector Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	TypeAB BehaviorNode::CreateVariable(ISharedVariable*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle)
 	{
 		pugi::xml_attribute& attrOptr = data.attribute("Opl");
@@ -62,21 +85,8 @@ namespace YBehavior
 			return Types::NoneAB;
 		}
 		std::vector<STRING> buffer;
-
-		auto tempChar = attrOptr.value();
-		///> Only split the first space
-		Utility::SplitString(tempChar, buffer, Utility::SpaceSpliter, 1);
-		if (buffer.size() != 2 || buffer[0].length() != 3)
-		{
-			ERROR_BEGIN << "Format Error, " << attriName << " in " << data.name() << ": " << tempChar << ERROR_END;
+		if (!ParseVariable(attrOptr, data, buffer, bSingle ? 1 : 0))
 			return Types::NoneAB;
-		}
-
-		if (!(bSingle ^ (buffer[0][0] == buffer[0][1])))
-		{
-			ERROR_BEGIN << "Single or Vector Error, " << attriName << " in " << data.name() << ": " << tempChar << ERROR_END;
-			return Types::NoneAB;
-		}
 
 		ISharedVariableCreateHelper* helper = Utility::CreateVariableCreateHelper(buffer[0][1], buffer[0][0]);
 		if (helper != NULL)
@@ -132,31 +142,31 @@ namespace YBehavior
 					case 'F':
 						{
 							INT index = NodeFactory::Instance()->CreateIndexByName<Float>(truename);
-							m_SharedData->SetFloat(index, it->as_float());
+							m_SharedData->Set(index, it->as_float());
 						}
 						break;
 					case 'B':
 						{
 							INT index = NodeFactory::Instance()->CreateIndexByName<Bool>(truename);
-							m_SharedData->SetBool(index, it->as_bool());
+							m_SharedData->Set(index, it->as_bool());
 						}
 						break;
 					case 'I':
 						{
 							INT index = NodeFactory::Instance()->CreateIndexByName<Int>(truename);
-							m_SharedData->SetInt(index, it->as_int());
+							m_SharedData->Set(index, it->as_int());
 						}
 						break;
 					case 'L':
 						{
 							INT index = NodeFactory::Instance()->CreateIndexByName<Uint64>(truename);
-							m_SharedData->SetUint64(index, it->as_ullong());
+							m_SharedData->Set(index, (UINT64)it->as_ullong());
 						}
 						break;
 					case 'S':
 						{
 							INT index = NodeFactory::Instance()->CreateIndexByName<String>(truename);
-							m_SharedData->SetString(index, it->value());
+							m_SharedData->Set(index, it->value());
 						}
 						break;
 					case 'V':
@@ -165,7 +175,7 @@ namespace YBehavior
 							Utility::SplitString(it->value(), buffer, Utility::SequenceSpliter);
 							Utility::CreateVector3(buffer, tempVec);
 							INT index = NodeFactory::Instance()->CreateIndexByName<Vector3>(truename);
-							m_SharedData->SetVector3(index, std::move(tempVec));
+							m_SharedData->Set(index, std::move(tempVec));
 						}
 						break;
 					default:
@@ -191,7 +201,7 @@ namespace YBehavior
 								ffs.push_back(temp);
 							}
 							INT index = NodeFactory::Instance()->CreateIndexByName<VecFloat>(truename);
-							m_SharedData->SetVecFloat(index, std::move(ffs));
+							m_SharedData->Set(index, std::move(ffs));
 						}
 						break;
 					case 'B':
@@ -205,7 +215,7 @@ namespace YBehavior
 								bbs.push_back(temp);
 							}
 							INT index = NodeFactory::Instance()->CreateIndexByName<VecBool>(truename);
-							m_SharedData->SetVecBool(index, std::move(bbs));
+							m_SharedData->Set(index, std::move(bbs));
 						}
 						break;
 					default:
