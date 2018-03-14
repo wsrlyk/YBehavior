@@ -7,6 +7,8 @@
 
 namespace YBehavior
 {
+	Bimap<CalculatorOperator, STRING> Calculator::s_OperatorMap = { { CO_ADD, "ADD"}, { CO_SUB, "SUB" }, { CO_MUL, "MUL" }, { CO_DIV, "DIV"} };
+
 	Calculator::Calculator()
 	{
 	}
@@ -27,7 +29,9 @@ namespace YBehavior
 	template<typename T>
 	NodeState DoOperation(SharedVariable<T>& opl, SharedVariable<T>& opr1, SharedVariable<T>& opr2, CalculatorOperator opType, AgentPtr agent, Calculator* pNode)
 	{
-		LOG_BEGIN << opr1.GetValue(agent->GetSharedData()) << " " << opType << " " << opr2.GetValue(agent->GetSharedData());
+		STRING strOp;
+		Calculator::s_OperatorMap.TryGetValue(opType, strOp);
+		LOG_BEGIN << opr1.GetValue(agent->GetSharedData()) << " " << strOp << " " << opr2.GetValue(agent->GetSharedData());
 
 		switch(opType)
 		{
@@ -66,23 +70,13 @@ namespace YBehavior
 			ERROR_BEGIN << "Cant Find Calculator Operator: " << data.name() << ERROR_END;
 			return;
 		}
-		auto tempChar = attrOptr.value();
-		if (strcmp(tempChar, "ADD") == 0)
+		STRING tempChar(attrOptr.value());
+		if (!s_OperatorMap.TryGetKey(tempChar, m_Operator))
 		{
-			m_Operator = CO_ADD;
+			ERROR_BEGIN << "Operator Error: " << tempChar << ERROR_END;
+			return;
 		}
-		else if (strcmp(tempChar, "SUB") == 0)
-		{
-			m_Operator = CO_SUB;
-		}
-		else if (strcmp(tempChar, "MUL") == 0)
-		{
-			m_Operator = CO_MUL;
-		}
-		else if (strcmp(tempChar, "DIV") == 0)
-		{
-			m_Operator = CO_DIV;
-		}
+
 		//////////////////////////////////////////////////////////////////////////
 		///> µÈºÅ×ó±ß
 		m_DataType = CreateVariable(m_Opl, "Opl", data, true);

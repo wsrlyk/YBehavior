@@ -31,6 +31,12 @@
     <Filter Include="源文件\nodes">
       <UniqueIdentifier>{43c6c8f7-34cf-411e-8a8a-1711ea20bdfd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\tools">
+      <UniqueIdentifier>{018354f9-4f64-489d-945e-9135337c06aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\bimap">
+      <UniqueIdentifier>{82bdd3ff-c222-40d1-b868-cdd73fdca0e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\YBehavior\agent.h">
@@ -78,6 +84,9 @@
     <ClInclude Include="..\include\YBehavior\sharedvariablecreatehelper.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\tools\bimap.h">
+      <Filter>头文件\tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -109,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodefactory.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\tools\bimap.cpp">
+      <Filter>源文件\bimap</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

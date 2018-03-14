@@ -81,7 +81,7 @@ namespace YBehavior
 
 	TypeAB BehaviorNode::CreateVariable(ISharedVariable*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle)
 	{
-		pugi::xml_attribute& attrOptr = data.attribute("Opl");
+		pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 
 		if (attrOptr.empty())
 		{

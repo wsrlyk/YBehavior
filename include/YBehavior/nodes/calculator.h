@@ -1,8 +1,8 @@
 #ifndef _YBEHAVIOR_CALCULATOR_H_
 #define _YBEHAVIOR_CALCULATOR_H_
-#endif
 
 #include "YBehavior/behaviortree.h"
+#include "YBehavior/tools/bimap.h"
 
 namespace YBehavior
 {
@@ -18,6 +18,9 @@ namespace YBehavior
 	public:
 		Calculator();
 		~Calculator();
+
+		static Bimap<CalculatorOperator, STRING> s_OperatorMap;
+
 	protected:
 		virtual void OnLoaded(const pugi::xml_node& data);
 		virtual NodeState Update(AgentPtr pAgent);
@@ -29,5 +32,8 @@ namespace YBehavior
 		ISharedVariable* m_Opr2;
 
 		TypeAB m_DataType;
+
 	};
 }
+
+#endif

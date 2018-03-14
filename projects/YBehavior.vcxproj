@@ -24,6 +24,7 @@
     <ClInclude Include="..\include\YBehavior\nodes\sequence.h" />
     <ClInclude Include="..\include\YBehavior\shareddata.h" />
     <ClInclude Include="..\include\YBehavior\sharedvariablecreatehelper.h" />
+    <ClInclude Include="..\include\YBehavior\tools\bimap.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />
   </ItemGroup>
@@ -37,6 +38,7 @@
     <ClCompile Include="..\src\YBehavior\nodes\calculator.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\sequence.cpp" />
     <ClCompile Include="..\src\YBehavior\shareddata.cpp" />
+    <ClCompile Include="..\src\YBehavior\tools\bimap.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
