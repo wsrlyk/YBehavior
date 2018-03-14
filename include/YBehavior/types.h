@@ -54,6 +54,32 @@ namespace YBehavior
 	{
 		std::vector<T> m_Data;
 	};
+	class Agent;
+	struct YBEHAVIOR_API AgentWrapper
+	{
+		Agent* m_Data;
+
+		AgentWrapper()
+			: m_Data(nullptr)
+		{
+
+		}
+		AgentWrapper(Agent* pAgent)
+			: m_Data(pAgent)
+		{
+
+		}
+		friend std::stringstream & operator<<(std::stringstream &out, AgentWrapper &obj)
+		{
+			return out;
+		}
+
+		friend std::stringstream & operator >> (std::stringstream &in, AgentWrapper &obj)
+		{
+			return in;
+		}
+	};
+
 	typedef std::string			STRING;
 	typedef int					INT;
 	typedef unsigned int		UINT;
@@ -63,8 +89,7 @@ namespace YBehavior
 	typedef float				FLOAT;
 	typedef char				CHAR;
 
-	class Agent;
-	typedef Agent* AgentPtr;
+	typedef Agent*				AgentPtr;
 	typedef STRING				String;
 	typedef INT					Int;
 	typedef UINT				Uint;
@@ -79,7 +104,7 @@ namespace YBehavior
 	typedef std::vector<BYTE>	VecByte;
 	typedef std::vector<BOOL>	VecBool;
 	typedef std::vector<FLOAT>	VecFloat;
-	typedef std::vector<AgentPtr>	VecAgentPtr;
+	typedef std::vector<AgentWrapper>	VecAgentWrapper;
 	typedef std::vector<Vector3>	VecVector3;
 
 #define YBEHAVIOR_BASICTYPE_NUMBER_ID(type, id)			\
@@ -101,7 +126,7 @@ namespace YBehavior
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Uint64, 3);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Float, 4);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(String, 5);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(AgentPtr, 6);
+	YBEHAVIOR_BASICTYPE_NUMBER_ID(AgentWrapper, 6);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Vector3, 7);
 
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecBool, 101);
@@ -109,7 +134,7 @@ namespace YBehavior
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecUint64, 103);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecFloat, 104);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecString, 105);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecAgentPtr, 106);
+	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecAgentWrapper, 106);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecVector3, 107);
 
 	typedef CHAR TypeAB;

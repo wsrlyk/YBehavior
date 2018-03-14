@@ -22,6 +22,7 @@ namespace YBehavior
 	{
 	}
 
+	std::unordered_set<STRING> BehaviorNode::KEY_WORDS = { "Class", "Pos", "NickName" };
 
 	BehaviorNode* BehaviorNode::CreateNodeByName(const STRING& name)
 	{
@@ -57,7 +58,7 @@ namespace YBehavior
 		auto tempChar = attri.value();
 		///> Only split the first space
 		Utility::SplitString(tempChar, buffer, Utility::SpaceSpliter, 1);
-		if (buffer.size() != 2 || buffer[0].length() != 3)
+		if (buffer.size() == 0 || buffer[0].length() != 3)
 		{
 			ERROR_BEGIN << "Format Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
 			return false;
@@ -71,6 +72,9 @@ namespace YBehavior
 				return false;
 			}
 		}
+
+		if (buffer.size() == 1)
+			buffer.push_back("");
 
 		return true;
 	}
@@ -128,101 +132,15 @@ namespace YBehavior
 
 		for (auto it = data.attributes_begin(); it != data.attributes_end(); ++it)
 		{
-			STRING name(it->name());
-			if(name.size() >= 4)
-			{
-				STRING truename(name.begin() + 3, name.end());
+			if (KEY_WORDS.count(it->name()))
+				continue;
+			if (!ParseVariable(*it, data, buffer, -1))
+				continue;
+			ISharedVariableCreateHelper* helper = Utility::CreateVariableCreateHelper(buffer[0][1], buffer[0][0]);
+			if (helper == nullptr)
+				continue;
 
-				STRING prefix(name.begin(), name.begin() + 2);	///> Á½¸ö×Ö·û
-				
-				if (prefix[0] == '_')
-				{
-					switch(prefix[1])
-					{
-					case 'F':
-						{
-							INT index = NodeFactory::Instance()->CreateIndexByName<Float>(truename);
-							m_SharedData->Set(index, it->as_float());
-						}
-						break;
-					case 'B':
-						{
-							INT index = NodeFactory::Instance()->CreateIndexByName<Bool>(truename);
-							m_SharedData->Set(index, it->as_bool());
-						}
-						break;
-					case 'I':
-						{
-							INT index = NodeFactory::Instance()->CreateIndexByName<Int>(truename);
-							m_SharedData->Set(index, it->as_int());
-						}
-						break;
-					case 'L':
-						{
-							INT index = NodeFactory::Instance()->CreateIndexByName<Uint64>(truename);
-							m_SharedData->Set(index, (UINT64)it->as_ullong());
-						}
-						break;
-					case 'S':
-						{
-							INT index = NodeFactory::Instance()->CreateIndexByName<String>(truename);
-							m_SharedData->Set(index, it->value());
-						}
-						break;
-					case 'V':
-						{
-							Vector3 tempVec;
-							Utility::SplitString(it->value(), buffer, Utility::SequenceSpliter);
-							Utility::CreateVector3(buffer, tempVec);
-							INT index = NodeFactory::Instance()->CreateIndexByName<Vector3>(truename);
-							m_SharedData->Set(index, std::move(tempVec));
-						}
-						break;
-					default:
-						break;
-					}
-				}
-				else
-				{
-					std::vector<STRING> buffer2;
-					Utility::SplitString(it->value(), buffer2, Utility::ListSpliter);
-					std::stringstream ss;
-					switch(prefix[1])
-					{
-					case 'F':
-						{
-							std::vector<float> ffs;
-							for (auto it = buffer2.begin(); it != buffer2.end(); ++it)
-							{
-								float temp;
-								ss.clear();
-								ss << *it;
-								ss >> temp;
-								ffs.push_back(temp);
-							}
-							INT index = NodeFactory::Instance()->CreateIndexByName<VecFloat>(truename);
-							m_SharedData->Set(index, std::move(ffs));
-						}
-						break;
-					case 'B':
-						{
-							std::vector<bool> bbs;
-							for (auto it = buffer2.begin(); it != buffer2.end(); ++it)
-							{
-								bool temp;
-								ss << *it;
-								ss >> temp;
-								bbs.push_back(temp);
-							}
-							INT index = NodeFactory::Instance()->CreateIndexByName<VecBool>(truename);
-							m_SharedData->Set(index, std::move(bbs));
-						}
-						break;
-					default:
-						break;
-					}
-				}
-			}
+			helper->SetSharedData(m_SharedData, it->name(), buffer[1]);
 		}
 	}
 

@@ -4,6 +4,7 @@
 #include "YBehavior/define.h"
 #include "YBehavior/shareddata.h"
 #include <unordered_map>
+#include <unordered_set>
 namespace pugi
 {
 	class xml_node;
@@ -25,6 +26,9 @@ namespace YBehavior
 		BehaviorNodePtr m_Parent;
 		NodeState m_State;
 		INT m_UID;
+
+		static std::unordered_set<STRING> KEY_WORDS;
+
 	public:
 		BehaviorNode();
 		virtual ~BehaviorNode();
@@ -86,6 +90,7 @@ namespace YBehavior
 	{
 	private:
 		SharedData* m_SharedData;	///> 原始数据，每个使用此树的Agent都从这拷数据作为初始化
+
 	public:
 		BehaviorTree();
 		~BehaviorTree();

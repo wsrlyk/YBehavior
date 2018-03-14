@@ -27,6 +27,8 @@ namespace YBehavior
 	template<typename T>
 	NodeState DoOperation(SharedVariable<T>& opl, SharedVariable<T>& opr1, SharedVariable<T>& opr2, CalculatorOperator opType, AgentPtr agent, Calculator* pNode)
 	{
+		LOG_BEGIN << opr1.GetValue(agent->GetSharedData()) << " " << opType << " " << opr2.GetValue(agent->GetSharedData());
+
 		switch(opType)
 		{
 		case CO_ADD:
@@ -51,7 +53,7 @@ namespace YBehavior
 			break;
 		}
 
-		LOG_BEGIN << opl.GetValue(agent->GetSharedData()) << "<=" << opr1.GetValue(agent->GetSharedData()) << " " << opType << " " << opr2.GetValue(agent->GetSharedData()) << LOG_END;
+		LOG_BEGIN << "=>" << opl.GetValue(agent->GetSharedData()) << LOG_END;
 		return NS_SUCCESS;
 	}
 

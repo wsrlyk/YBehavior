@@ -16,7 +16,7 @@ namespace YBehavior
 #define DESTRUCT_VARIABLES(T)				if (m_##T##s != nullptr) delete m_##T##s; ///> 析构变量
 #define DECLARE_DEFAULT_TYPES(T)		const static T s_Default##T;
 #define DEFINE_DEFAULT_TYPES_V(T, V)	const T SharedData::s_Default##T(V);
-///> 各种函数
+		///> 各种函数
 #define DEFINE_TYPES_FUNC(T)\
 	const T& Get##T(INT index)\
 	{\
@@ -41,9 +41,13 @@ namespace YBehavior
 			m_##T##s = new std::vector<T>(4);\
 		if (index >= m_##T##s->size())\
 		{\
-			m_##T##s->reserve(m_##T##s->size() * 2);\
+			m_##T##s->resize(index);\
+			(*m_##T##s).push_back(v);\
 		}\
-		(*m_##T##s)[index] = v;\
+		else\
+		{\
+			(*m_##T##s)[index] = v;\
+		}\
 		return true;\
 	}\
 	\
@@ -55,9 +59,13 @@ namespace YBehavior
 			m_##T##s = new std::vector<T>(4);\
 		if (index >= m_##T##s->size())\
 		{\
-			m_##T##s->reserve(m_##T##s->size() * 2);\
+			m_##T##s->resize(index);\
+			(*m_##T##s).push_back(v);\
 		}\
-		(*m_##T##s)[index] = v;\
+		else\
+		{\
+			(*m_##T##s)[index] = v;\
+		}\
 		return true;\
 	}
 #define FOR_EACH_TYPE(func)	\
@@ -66,14 +74,14 @@ namespace YBehavior
 	func(Bool);	\
 	func(Float);	\
 	func(String);	\
-	func(AgentPtr);	\
+	func(AgentWrapper);	\
 	func(Vector3);\
 	func(VecInt);\
 	func(VecUint64);\
 	func(VecBool);\
 	func(VecFloat);\
 	func(VecString);\
-	func(VecAgentPtr);\
+	func(VecAgentWrapper);\
 	func(VecVector3);
 #define FOR_EACH_TYPE_WITH_VALUE(func)	\
 	func(Int, 0);	\
@@ -81,14 +89,14 @@ namespace YBehavior
 	func(Bool, false);	\
 	func(Float, 0.0f);	\
 	func(String, "");	\
-	func(AgentPtr, nullptr);	\
+	func(AgentWrapper, nullptr);	\
 	func(Vector3, Vector3::zero);\
 	func(VecInt, 1);\
 	func(VecUint64, 1);\
 	func(VecBool, 1);	\
 	func(VecFloat, 1);	\
 	func(VecString, 1);	\
-	func(VecAgentPtr, 1);	\
+	func(VecAgentWrapper, 1);	\
 	func(VecVector3, 1);	
 #define FOR_EACH_SINGLE_NORMAL_TYPE(func)	\
 	func(Int);	\
@@ -96,17 +104,17 @@ namespace YBehavior
 	func(Bool);	\
 	func(Float);	\
 	func(String);	\
-	func(Vector3);
+	func(Vector3);	\
+	func(AgentWrapper);	
 #define FOR_EACH_VECTOR_NORMAL_TYPE(func)	\
 	func(VecInt);\
 	func(VecUint64);\
 	func(VecBool);\
 	func(VecFloat);\
 	func(VecString);\
-	func(VecVector3);
-#define FOR_EACH_ABNORMAL_TYPE(func)	\
-	func(AgentPtr);	\
-	func(VecAgentPtr);
+	func(VecVector3);\
+	func(VecAgentWrapper);
+//#define FOR_EACH_ABNORMAL_TYPE(func)	\
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -205,7 +213,7 @@ namespace YBehavior
 
 	FOR_EACH_SINGLE_NORMAL_TYPE(DECLARE_SHARED_SINGLE_TYPES);
 	FOR_EACH_SINGLE_NORMAL_TYPE(DECLARE_SHARED_VECTOR_TYPES);
-	FOR_EACH_ABNORMAL_TYPE(DECLARE_SHARED_TYPES_NOT_FROM_STRING);
+	//FOR_EACH_ABNORMAL_TYPE(DECLARE_SHARED_TYPES_NOT_FROM_STRING);
 }
 
 #endif
