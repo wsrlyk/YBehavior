@@ -141,7 +141,7 @@ namespace YBehavior
 		inline void SetIndex(INT index) { m_Index = index; }
 		virtual ISharedVariable operator+(ISharedVariable& other) { return *this;}
 		virtual ISharedVariable& operator=(ISharedVariable& other) { return *this;}
-		virtual ISharedVariable& operator=(ISharedVariable&& other) { return *this;}
+		//virtual ISharedVariable& operator=(ISharedVariable&& other) { return *this;}
 		virtual void SetValueFromString(const STRING& str) {}
 
 	protected:
