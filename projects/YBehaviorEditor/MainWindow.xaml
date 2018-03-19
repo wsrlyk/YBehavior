@@ -31,6 +31,7 @@
             <local:WorkBenchFrame Grid.Column="1" Margin="0,0,0,0"/>
             <StackPanel Grid.Column="2">
                 <local:SharedDataFrame BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="387" Margin="5,5,0,0" VerticalAlignment="Top" Width="240"/>
+                <local:VariablesFrame BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="387" Margin="5,5,0,0" Width="240"/>
             </StackPanel>
         </Grid>
         <local:StateBarFrame Grid.Row="2"  Height="34" VerticalAlignment="Bottom" Margin="10,0,0,0"/>

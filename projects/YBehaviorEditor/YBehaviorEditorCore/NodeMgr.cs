@@ -127,7 +127,15 @@ namespace YBehavior.Editor.Core
         protected string m_Name;
         protected string m_NickName;
         public string Name { get { return m_Name; } }
-        public string NickName { get { return m_NickName == null ? m_Name : m_NickName; } }
+        public string FullName
+        {
+            get { return string.IsNullOrEmpty(m_NickName) ? m_Name : m_NickName; }
+        }
+        public string NickName
+        {
+            get { return m_NickName; }
+            set { m_NickName = value; }
+        }
 
         protected NodeType m_Type = NodeType.NT_Invalid;
         public NodeType Type { get { return m_Type; } }
@@ -236,7 +244,7 @@ namespace YBehavior.Editor.Core
             }
 
             data.SetAttribute("Pos", m_Geo.Pos.ToString());
-            if (m_NickName != null)
+            if (!string.IsNullOrEmpty(m_NickName))
                 data.SetAttribute("NickName", m_NickName);
 
             foreach (Variable v in Variables.Datas)

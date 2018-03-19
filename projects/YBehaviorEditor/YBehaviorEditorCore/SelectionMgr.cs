@@ -24,6 +24,13 @@ namespace YBehavior.Editor.Core
         List<ISelectable> m_Selections = new List<ISelectable>();
         ISelectable m_SingleSelection;
 
+        private void _FireSelectionEvent()
+        {
+            SelectionChangedArg arg = new SelectionChangedArg();
+            arg.Target = m_SingleSelection;
+            EventMgr.Instance.Send(arg);
+        }
+
         public void Clear()
         {
             foreach(ISelectable selection in m_Selections)
@@ -36,6 +43,7 @@ namespace YBehavior.Editor.Core
             if (m_SingleSelection != null)
                 m_SingleSelection.SetSelect(false);
             m_SingleSelection = null;
+            _FireSelectionEvent();
         }
 
         public void OnSingleSelectedChange(ISelectable selection, bool bState)
@@ -61,6 +69,8 @@ namespace YBehavior.Editor.Core
                     m_SingleSelection.SetSelect(false);
                 m_SingleSelection = null;
             }
+
+            _FireSelectionEvent();
         }
 
         public void OnMultiSelectedChange(ISelectable selection, bool bState)
@@ -95,6 +105,8 @@ namespace YBehavior.Editor.Core
             {
                 deletable.OnDelete();
                 m_SingleSelection = null;
+
+                _FireSelectionEvent();
             }
         }
 

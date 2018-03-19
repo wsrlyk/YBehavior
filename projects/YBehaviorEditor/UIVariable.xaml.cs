@@ -25,6 +25,12 @@ namespace YBehavior.Editor
             set { VKey.Text = value; }
         }
 
+        public string VariableValue
+        {
+            get { return VValue.Text; }
+            set { VValue.Text = value; }
+        }
+
         public bool ShowSwitcher
         {
             get { return Switcher.Visibility == Visibility.Visible; }

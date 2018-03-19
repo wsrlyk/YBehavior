@@ -6,24 +6,24 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core
 {
-    public class Variable
+    public class Variable : System.ComponentModel.INotifyPropertyChanged
     {
-        public const char ListSpliter = '|';
-        public const char SpaceSpliter = ' ';
+        public static readonly char ListSpliter = '|';
+        public static readonly char SpaceSpliter = ' ';
 
-        public const char NONE = (char)0;
-        public const char INT = 'I';
-        public const char FLOAT = 'F';
-        public const char BOOL = 'B';
-        public const char VECTOR3 = 'V';
-        public const char STRING = 'S';
-        public const char ENUM = 'E';
-        public const char AGENT = 'A';
+        public static readonly char NONE = (char)0;
+        public static readonly char INT = 'I';
+        public static readonly char FLOAT = 'F';
+        public static readonly char BOOL = 'B';
+        public static readonly char VECTOR3 = 'V';
+        public static readonly char STRING = 'S';
+        public static readonly char ENUM = 'E';
+        public static readonly char AGENT = 'A';
 
-        public const char POINTER = 'S';
-        public const char CONST = 'C';
+        public static readonly char POINTER = 'S';
+        public static readonly char CONST = 'C';
 
-        public const char SINGLE = '_';
+        public static readonly char SINGLE = '_';
 
         public static readonly ValueType[] CreateParams_AllNumbers = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT };
         public static readonly ValueType[] CreateParams_Int = new ValueType[] { ValueType.VT_INT };
@@ -142,11 +142,31 @@ namespace YBehavior.Editor.Core
         string m_Params = null;
         bool m_bAlwaysConst = false;
 
+        SharedData m_SharedData = null;
         public string Name { get { return m_Name; } }
-        public string Value { get { return m_Value; } set { m_Value = value; } }
+        public string Value
+        {
+            get { return m_Value; }
+            set
+            {
+                m_Value = value;
+                OnPropertyChanged("Value");
+                OnPropertyChanged("IsValid");
+            }
+        }
 
         public bool AlwaysConst { get { return m_bAlwaysConst; } set { m_bAlwaysConst = value; } }
-        public System.Windows.Visibility CanSwitchConst { get { return AlwaysConst ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible; } }
+        public bool CanSwitchConst { get { return !AlwaysConst; } }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+
+        internal protected void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
 
         public string ValueInXml {
             get
@@ -159,8 +179,17 @@ namespace YBehavior.Editor.Core
                 return sb.ToString();
             }
         }
+
+        public bool IsValid
+        {
+            get { return CheckValid(m_SharedData); }
+        }
+
         public bool CheckValid(SharedData data)
         {
+            m_SharedData = data;
+            if (m_SharedData == null)
+                return false;
             if (vbType == VariableType.VBT_Pointer)
             {
                 if (AlwaysConst)

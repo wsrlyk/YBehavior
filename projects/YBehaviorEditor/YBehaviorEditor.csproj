@@ -60,6 +60,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\VariableHelper.cs" />
     <Compile Include="NodeListFrame.xaml.cs">
       <DependentUpon>NodeListFrame.xaml</DependentUpon>
     </Compile>
@@ -67,6 +68,9 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="VariablesFrame.xaml.cs">
+      <DependentUpon>VariablesFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="SharedDataFrame.xaml.cs">
       <DependentUpon>SharedDataFrame.xaml</DependentUpon>
@@ -101,6 +105,10 @@
     <Page Include="NodeListFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="VariablesFrame.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="SharedDataFrame.xaml">
       <SubType>Designer</SubType>

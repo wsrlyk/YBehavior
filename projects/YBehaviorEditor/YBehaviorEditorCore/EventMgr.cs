@@ -15,6 +15,7 @@ namespace YBehavior.Editor.Core
         NodeRemoved,
         NodesConnected,
         NodesDisconnected,
+        SelectionChanged,
     }
 
     public class EventMgr : Singleton<EventMgr>
@@ -92,5 +93,10 @@ namespace YBehavior.Editor.Core
     {
         public ConnectionHolder ChildHolder { get; set; }
         public override EventType Type => EventType.NodesDisconnected;
+    }
+    public class SelectionChangedArg : EventArg
+    {
+        public ISelectable Target { get; set; }
+        public override EventType Type => EventType.SelectionChanged;
     }
 }
