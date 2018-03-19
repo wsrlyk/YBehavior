@@ -79,6 +79,21 @@ namespace YBehavior
 		return true;
 	}
 
+	STRING BehaviorNode::GetValue(const STRING& attriName, const pugi::xml_node& data)
+	{
+		pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
+
+		if (attrOptr.empty())
+		{
+			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
+			return "";
+		}
+		std::vector<STRING> buffer;
+		if (!ParseVariable(attrOptr, data, buffer, 1))
+			return "";
+
+		return buffer[1];
+	}
 	TypeAB BehaviorNode::CreateVariable(ISharedVariable*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle)
 	{
 		pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());

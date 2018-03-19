@@ -8,10 +8,11 @@ namespace YBehavior
 {
 	enum CalculatorOperator
 	{
+		CO_NONE,
 		CO_ADD = 1,
 		CO_SUB,
 		CO_MUL,
-		CO_DIV
+		CO_DIV,
 	};
 	class Calculator : public BehaviorNode
 	{

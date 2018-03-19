@@ -102,14 +102,14 @@ namespace YBehavior.Editor.Core
 
             switch(attr.Name)
             {
-                case "Operator":
-                    {
-                        v = Variables.GetVariable("Operator");
-                        if (!v.SetVariable(Variable.ENUM, Variable.NONE, Variable.CONST, attr.Value,
-                            "ADD|SUB|MUL|DIV"))
-                            return false;
-                    }
-                    break;
+                //case "Operator":
+                //    {
+                //        v = Variables.GetVariable("Operator");
+                //        if (!v.SetVariable(Variable.ENUM, Variable.NONE, Variable.CONST, attr.Value,
+                //            "ADD|SUB|MUL|DIV"))
+                //            return false;
+                //    }
+                //    break;
                 default:
                     {
                         v = Variables.GetVariable(attr.Name);

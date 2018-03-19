@@ -32,6 +32,7 @@ namespace YBehavior.Editor.Core
             else
             {
                 exist += handler;
+                m_EventDic[type] = exist;
             }
         }
 

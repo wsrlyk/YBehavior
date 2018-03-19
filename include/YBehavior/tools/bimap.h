@@ -39,16 +39,20 @@ namespace YBehavior
 			{
 				map0.erase(t0);
 				map1.erase(t1);
+				return true;
 			}
+			return false;
 		}
 		bool RemoveValue(const T1& t1)
 		{
-			T1 t0;
+			T0 t0;
 			if (TryGetKey(t1, t0))
 			{
 				map0.erase(t0);
 				map1.erase(t1);
+				return true;
 			}
+			return false;
 		}
 		
 		bool TryGetValue(const T0& t0, T1& t1)
@@ -69,6 +73,23 @@ namespace YBehavior
 			t0 = it->second;
 			return true;
 		}
+
+		const T1& GetValue(const T0& t0, const T1& defaultRes)
+		{
+			auto it = map0.find(t0);
+			if (it == map0.end())
+				return defaultRes;
+			return it->second;
+		}
+
+		const T0& GetKey(const T1& t1, const T0& defaultRes)
+		{
+			auto it = map1.find(t1);
+			if (it == map1.end())
+				return defaultRes;
+			return it->second;
+		}
+
 	};
 }
 

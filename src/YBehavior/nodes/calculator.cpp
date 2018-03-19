@@ -70,7 +70,7 @@ namespace YBehavior
 			ERROR_BEGIN << "Cant Find Calculator Operator: " << data.name() << ERROR_END;
 			return;
 		}
-		STRING tempChar(attrOptr.value());
+		STRING tempChar = GetValue("Operator", data);
 		if (!s_OperatorMap.TryGetKey(tempChar, m_Operator))
 		{
 			ERROR_BEGIN << "Operator Error: " << tempChar << ERROR_END;

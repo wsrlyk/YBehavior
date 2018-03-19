@@ -18,9 +18,12 @@ namespace YBehavior.Editor.Core
         public const char VECTOR3 = 'V';
         public const char STRING = 'S';
         public const char ENUM = 'E';
+        public const char AGENT = 'A';
 
         public const char POINTER = 'S';
         public const char CONST = 'C';
+
+        public const char SINGLE = '_';
 
         public static readonly ValueType[] CreateParams_AllNumbers = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT };
         public static readonly ValueType[] CreateParams_Int = new ValueType[] { ValueType.VT_INT };
@@ -42,28 +45,21 @@ namespace YBehavior.Editor.Core
             VT_BOOL,
             VT_VECTOR3,
             VT_STRING,
-            VT_ENUM
+            VT_ENUM,
+            VT_AGENT,
         }
-        public static ValueType GetValueType(char type)
+
+        public static Bimap<ValueType, char> ValueTypeDic = new Bimap<ValueType, char>
         {
-            switch(type)
-            {
-                case INT:
-                    return ValueType.VT_INT;
-                case FLOAT:
-                    return ValueType.VT_FLOAT;
-                case BOOL:
-                    return ValueType.VT_BOOL;
-                case VECTOR3:
-                    return ValueType.VT_VECTOR3;
-                case STRING:
-                    return ValueType.VT_STRING;
-                case ENUM:
-                    return ValueType.VT_ENUM;
-                default:
-                    return ValueType.VT_NONE;
-            }
-        }
+            {ValueType.VT_INT, INT },
+            {ValueType.VT_FLOAT, FLOAT },
+            {ValueType.VT_BOOL, BOOL },
+            {ValueType.VT_VECTOR3, VECTOR3 },
+            {ValueType.VT_STRING, STRING },
+            {ValueType.VT_ENUM, ENUM },
+            {ValueType.VT_AGENT, AGENT }
+        };
+
         public enum CountType
         {
             CT_NONE,
@@ -84,19 +80,15 @@ namespace YBehavior.Editor.Core
             VBT_Const,
             VBT_Pointer,
         }
-
-        public static VariableType GetVariableType(char variableType)
+        public static Bimap<VariableType, char> VariableTypeDic = new Bimap<VariableType, char>
         {
-            switch (variableType)
-            {
-                case POINTER:
-                    return VariableType.VBT_Pointer;
-                case CONST:
-                    return VariableType.VBT_Const;
-                default:
-                    return VariableType.VBT_NONE;
-            }
-        }
+            {VariableType.VBT_Const, CONST },
+            {VariableType.VBT_Pointer, POINTER },
+        };
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         ValueType m_vType = ValueType.VT_NONE;
         CountType m_cType = CountType.CT_NONE;
@@ -148,13 +140,34 @@ namespace YBehavior.Editor.Core
         string m_Value;
         string m_Name;
         string m_Params = null;
-        
+        bool m_bAlwaysConst = false;
+
         public string Name { get { return m_Name; } }
-        public string Value { get { return m_Value; } }
+        public string Value { get { return m_Value; } set { m_Value = value; } }
+
+        public bool AlwaysConst { get { return m_bAlwaysConst; } set { m_bAlwaysConst = value; } }
+        public System.Windows.Visibility CanSwitchConst { get { return AlwaysConst ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible; } }
+
+        public string ValueInXml {
+            get
+            {
+                char _vtype = ValueTypeDic.GetValue(m_vType, INT);
+                char _ctype = m_cType == CountType.CT_LIST ? _vtype : SINGLE;
+                char _vbtype = VariableTypeDic.GetValue(m_vbType, CONST);
+                StringBuilder sb = new StringBuilder();
+                sb.Append(_ctype).Append(_vtype).Append(_vbtype).Append(' ').Append(Value);
+                return sb.ToString();
+            }
+        }
         public bool CheckValid(SharedData data)
         {
             if (vbType == VariableType.VBT_Pointer)
             {
+                if (AlwaysConst)
+                {
+                    LogMgr.Instance.Error(string.Format("This variable cant be pointer: {0}.", Name));
+                    return false;
+                }
                 Variable other = data.GetVariable(Value);
                 if (other == null)
                 {
@@ -234,6 +247,11 @@ namespace YBehavior.Editor.Core
                         }
                     }
                     break;
+                case ValueType.VT_AGENT:
+                    {
+                        /// TODO
+                        return true;
+                    }
                 default:
                     return false;
             }
@@ -257,18 +275,19 @@ namespace YBehavior.Editor.Core
 
         public bool SetVariable(char valueType, char countType, char variableType, string value, string param = null)
         {
-            vType = GetValueType(valueType);
+            vType = ValueTypeDic.GetKey(valueType, ValueType.VT_NONE);
             if (vType == ValueType.VT_NONE)
                 return false;
 
             cType = GetCountType(valueType, countType);
 
-            vbType = GetVariableType(variableType);
+            vbType = VariableTypeDic.GetKey(variableType, VariableType.VBT_NONE);
             if (vbType == VariableType.VBT_NONE)
                 return false;
 
             m_Value = value;
-            m_Params = param;
+            if (param != null)
+                m_Params = param;
 
             return true;
         }
@@ -281,6 +300,7 @@ namespace YBehavior.Editor.Core
             v.vbType = vbType;
             v.m_Name = name;
             v.m_Value = defaultValue;
+            v.m_Params = param;
             return v;
         }
 
@@ -312,6 +332,8 @@ namespace YBehavior.Editor.Core
             Variable v = new Variable();
             if (!v.SetVariableInNode(value, name))
                 return false;
+
+            v.AlwaysConst = true;
 
             if (!v.CheckValid(this))
                 return false;

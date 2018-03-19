@@ -238,6 +238,11 @@ namespace YBehavior.Editor.Core
             data.SetAttribute("Pos", m_Geo.Pos.ToString());
             if (m_NickName != null)
                 data.SetAttribute("NickName", m_NickName);
+
+            foreach (Variable v in Variables.Datas)
+            {
+                data.SetAttribute(v.Name, v.ValueInXml);
+            }
         }
 
         public virtual Renderer CreateRenderer()

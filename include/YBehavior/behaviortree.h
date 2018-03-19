@@ -47,11 +47,12 @@ namespace YBehavior
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
 		virtual void OnLoaded(const pugi::xml_node& data) {}
 		virtual void OnAddChild(BehaviorNode* child) {}
-		TypeAB BehaviorNode::CreateVariable(ISharedVariable*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle);
+		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
+		TypeAB CreateVariable(ISharedVariable*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle);
 
 		///>
 		/// single: 1, single; 0, vector; -1, dont care
-		bool BehaviorNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single = -1);
+		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single = -1);
 	};
 
 	class YBEHAVIOR_API BranchNode: public BehaviorNode
