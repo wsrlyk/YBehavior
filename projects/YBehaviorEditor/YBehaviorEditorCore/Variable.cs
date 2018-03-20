@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Xml;
@@ -143,6 +144,8 @@ namespace YBehavior.Editor.Core
         bool m_bAlwaysConst = false;
 
         SharedData m_SharedData = null;
+        public SharedData SharedData { get { return m_SharedData; } }
+
         public string Name { get { return m_Name; } }
         public string Value
         {
@@ -320,6 +323,27 @@ namespace YBehavior.Editor.Core
 
             return true;
         }
+        public bool SetVariable(ValueType vtype, CountType ctype, VariableType vbtype, string value, string param = null, string newName = null)
+        {
+            if (newName != null)
+                m_Name = newName;
+
+            vType = vtype;
+            if (vType == ValueType.VT_NONE)
+                return false;
+
+            cType = ctype;
+
+            vbType = vbType;
+            if (vbType == VariableType.VBT_NONE)
+                return false;
+
+            m_Value = value;
+            if (param != null)
+                m_Params = param;
+
+            return true;
+        }
 
         public static Variable CreateVariableInNode(string name, string defaultValue, ValueType[] valueType, CountType[] countType, VariableType vbType, string param = null)
         {
@@ -348,10 +372,10 @@ namespace YBehavior.Editor.Core
 
     public class SharedData
     {
-        Dictionary<string, Variable> m_Variables = new Dictionary<string, Variable>();
-
+        ObservableDictionary<string, Variable> m_Variables = new ObservableDictionary<string, Variable>();
         /// <summary>
-        /// This function is only for the variables of the whole tree, not for a node
+        /// This function is only for the variables of the whole tree, not for a node.
+        /// Add From xml
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
@@ -367,25 +391,76 @@ namespace YBehavior.Editor.Core
             if (!v.CheckValid(this))
                 return false;
 
-            AddVariable(v);
+            return AddVariable(v);
+        }
+        /// <summary>
+        /// This function is only for the variables of the whole tree, not for a node
+        /// Create from Editor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="vType"></param>
+        /// <param name="cType"></param>
+        /// <returns></returns>
+        public bool TryCreateVariable(string name, string value, Variable.ValueType vType, Variable.CountType cType)
+        {
+            Variable v = new Variable();
+            if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, value, null, name))
+                return false;
 
+            v.AlwaysConst = true;
+
+            if (!v.CheckValid(this))
+                return false;
+
+            return AddVariable(v);
+        }
+
+        public bool AddVariable(Variable v)
+        {
+            if (v == null)
+                return false;
+
+            if (m_Variables.ContainsKey(v.Name))
+            {
+                LogMgr.Instance.Error("Duplicated variable name: " + v.Name);
+                return false;
+            }
+            if (Node.ReservedAttributesAll.Contains(v.Name))
+            {
+                LogMgr.Instance.Error("Reserved name: " + v.Name);
+                return false;
+            }
+            m_Variables[v.Name] = v;
+
+            ///TODO
+            /// May be should send events
             return true;
         }
 
-        public void AddVariable(Variable v)
+        public bool RemoveVariable(Variable v)
         {
             if (v == null)
-                return;
-            m_Variables[v.Name] = v;
-        }
+                return false;
 
+            if (!m_Variables.ContainsKey(v.Name))
+            {
+                LogMgr.Instance.Error("Variable not exist when try remove: " + v.Name);
+                return false;
+            }
+
+            m_Variables.Remove(v.Name);
+
+            ///TODO
+            /// May be should send events
+            return true;
+        }
         public Variable GetVariable(string name)
         {
-            Variable v;
-            m_Variables.TryGetValue(name, out v);
+            m_Variables.TryGetValue(name, out Variable v);
             return v;
         }
 
-        public System.Collections.IEnumerable Datas { get { return m_Variables.Values; } }
+        public ObservableDictionary<string, Variable> Datas { get { return m_Variables; } }
     }
 }

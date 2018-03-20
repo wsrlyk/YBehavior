@@ -6,24 +6,75 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <DockPanel Background="DarkGray">
-        <StackPanel DockPanel.Dock="Top">
-            <TextBlock Name="Type" Text ="Root" FontSize="14" Height="25"/>
-        </StackPanel>
-        <ScrollViewer VerticalScrollBarVisibility ="Auto">
-            <ItemsControl Name="VariableContainer">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <local:UIVariable/>
-                        <!--TextBlock Text = "{Binding Name}"/-->
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-    </DockPanel>
+    <Grid>
+        <TabControl Name="TabController" Grid.Row="0" Tag="200">
+            <TabItem Header="Datas">
+                <DockPanel Background="DarkGray">
+                    <StackPanel DockPanel.Dock="Top">
+                        <TextBlock Name="Type" Text ="{Binding Path=Datas.Count}" FontSize="14" Height="25"/>
+                    </StackPanel>
+                    <ScrollViewer VerticalScrollBarVisibility ="Auto">
+                        <ItemsControl Name="VariableContainer" ItemsSource="{Binding Datas}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <local:UIVariable DataContext="{Binding Value}"/>
+                                    <!--TextBlock Text = "{Binding Name}"/-->
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Add">
+                <StackPanel>
+                    <Grid>
+                        <TextBlock Text="Name" HorizontalAlignment="Left"/>
+                        <TextBox Name="VName" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0" Width="150"/>
+                    </Grid>
+                    <Grid>
+                        <TextBlock Text="Value" HorizontalAlignment="Left"/>
+                        <TextBox Name="VValue" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0" Width="150"/>
+                    </Grid>
+                    <Grid>
+                        <TextBlock Text="Type" HorizontalAlignment="Left"/>
+                        <!--ComboBox Name="VType" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0" Width="150" SelectedIndex="0">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontSize="10"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </-->
+                        <ComboBox Name="VType" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0" Width="150" SelectedIndex="0">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontSize="10"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                    </Grid>
+                    <Grid>
+                        <TextBlock Text="IsArray" HorizontalAlignment="Left"/>
+                        <ComboBox Name="VIsArray" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0" Width="150" SelectedIndex="0">
+                            <ComboBoxItem>
+                                <TextBlock Text="False" FontSize="10"/>
+                            </ComboBoxItem>
+                            <ComboBoxItem>
+                                <TextBlock Text="True" FontSize="10"/>
+                            </ComboBoxItem>
+                        </ComboBox>
+                    </Grid>
+                    <Button Name="Add" Width="100" Margin="20,20" Click="Add_Click">
+                        <TextBlock Text="Add"/>
+                    </Button>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+        <Button Click="Add_Click" Margin="100,150,100,100"/>
+    </Grid>
 </UserControl>

@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Tools\Bimap.cs" />
+    <Compile Include="Tools\ObservableDictionary.cs" />
     <Compile Include="Variable.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Connection.cs" />

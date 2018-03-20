@@ -41,5 +41,20 @@ namespace YBehavior.Editor
             InitializeComponent();
 
         }
+
+        private void Remover_Click(object sender, RoutedEventArgs e)
+        {
+            Core.Variable v = DataContext as Core.Variable;
+            if (v == null)
+                return;
+
+            MessageBoxResult dr = MessageBox.Show("Remove variable " + v.Name + "?", "Remove Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (dr == MessageBoxResult.Yes)
+            {
+
+                if (v.SharedData != null)
+                    v.SharedData.RemoveVariable(v);
+            }
+        }
     }
 }

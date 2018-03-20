@@ -143,6 +143,7 @@ namespace YBehavior.Editor.Core
         public NodeHierachy Hierachy { get { return m_Hierachy; } }
 
         public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class" });
+        public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName" });
 
         public Renderer Renderer { get { return m_Renderer; } }
         protected Renderer m_Renderer;
@@ -247,7 +248,7 @@ namespace YBehavior.Editor.Core
             if (!string.IsNullOrEmpty(m_NickName))
                 data.SetAttribute("NickName", m_NickName);
 
-            foreach (Variable v in Variables.Datas)
+            foreach (Variable v in Variables.Datas.Values)
             {
                 data.SetAttribute(v.Name, v.ValueInXml);
             }

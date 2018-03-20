@@ -30,6 +30,7 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
         <ToggleButton Width="20" Height="20" Name="Switcher" Background="Orange" DockPanel.Dock="Right" Visibility="{Binding Path = CanSwitchConst, Converter={StaticResource visibilityConvertor}}" />
+        <Button Width="20" Height="20" Name="Remover" Background="Red" DockPanel.Dock="Right" Visibility="{Binding Path = AlwaysConst, Mode=OneWay}" Click="Remover_Click"/>
         <TextBox Name="VValue" MinWidth="110" Text="{Binding Value}" Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}"/>
     </DockPanel>
 </UserControl>
