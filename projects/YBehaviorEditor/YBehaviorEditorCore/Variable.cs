@@ -180,6 +180,15 @@ namespace YBehavior.Editor.Core
         //bool m_bCandidatesDirty = true;
         bool m_bInited = false;
 
+        public string[] Enums
+        {
+            get
+            {
+                if (m_Params == null || vType != ValueType.VT_ENUM)
+                    return null;
+                return m_Params.Split(ListSpliter);
+            }
+        }
         public string Name { get { return m_Name; } }
         public string Value
         {

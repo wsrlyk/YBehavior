@@ -50,5 +50,23 @@ namespace YBehavior.Editor
                     v.SharedData.RemoveVariable(v);
             }
         }
+
+        private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            Core.Variable v = e.NewValue as Core.Variable;
+            if (v == null)
+                return;
+
+            if (v.vType != Core.Variable.ValueType.VT_ENUM)
+            {
+                this.VConst.Visibility = Visibility.Visible;
+                this.VEnum.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                this.VConst.Visibility = Visibility.Collapsed;
+                this.VEnum.Visibility = Visibility.Visible;
+            }
+        }
     }
 }
