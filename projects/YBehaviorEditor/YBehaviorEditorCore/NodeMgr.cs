@@ -120,6 +120,14 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        public virtual void OnChildChanged()
+        {
+
+        }
+        public virtual void OnParentChanged()
+        {
+
+        }
     }
 
     public class Node : NodeBase
@@ -162,6 +170,12 @@ namespace YBehavior.Editor.Core
             Tree root = Root as Tree;
             if (root != null)
                 m_TreeSharedData = root.Variables;
+            else
+            {
+                Tree globalTree = Tree.GlobalTree;
+                if (globalTree != null)
+                    return globalTree.Variables;
+            }
             return m_TreeSharedData;
         }
 
@@ -236,6 +250,30 @@ namespace YBehavior.Editor.Core
             return true;
         }
 
+        public void Init()
+        {
+            OnInit();
+        }
+
+        protected virtual void OnInit()
+        {
+            _InitVariables();
+        }
+
+        public override void OnParentChanged()
+        {
+            base.OnParentChanged();
+            _InitVariables();
+        }
+
+        protected void _InitVariables()
+        {
+            foreach (var v in m_Variables.Datas.Values)
+            {
+                v.SharedData = GetTreeSharedData();
+                v.RefreshCandidates(true);
+            }
+        }
         public virtual void Save(System.Xml.XmlElement data)
         {
             if (Conns.ParentHolder != null && Conns.ParentHolder.Conn != null)

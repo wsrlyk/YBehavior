@@ -16,7 +16,7 @@
         </StackPanel>
         <Border Name="border" Grid.Row="1" BorderThickness="3" BorderBrush="LightBlue" Background="DarkGray">
             <StackPanel Name="mainPanel">
-                <TextBlock Name="name" Text="{Binding Path=NickName }"></TextBlock>
+                <TextBlock Name="name" Text="{Binding FullName}"></TextBlock>
                 <TextBlock Name="note" Text="lalalallffds"></TextBlock>
             </StackPanel>
         </Border>

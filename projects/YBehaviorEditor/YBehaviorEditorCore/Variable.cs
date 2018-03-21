@@ -107,8 +107,11 @@ namespace YBehavior.Editor.Core
                     m_vType = value;
                 else
                     m_vType = ValueType.VT_NONE;
+                RefreshCandidates();
+                _OnConditionChanged();
             }
         }
+
         public CountType cType
         {
             get { return m_cType; }
@@ -122,6 +125,8 @@ namespace YBehavior.Editor.Core
                     m_cType = value;
                 else
                     m_cType = CountType.CT_NONE;
+                RefreshCandidates();
+                _OnConditionChanged();
             }
         }
         public VariableType vbType
@@ -130,6 +135,8 @@ namespace YBehavior.Editor.Core
             set
             {
                 m_vbType = value;
+                RefreshCandidates();
+                _OnConditionChanged();
             }
         }
 
@@ -142,9 +149,36 @@ namespace YBehavior.Editor.Core
         string m_Name;
         string m_Params = null;
         bool m_bAlwaysConst = false;
+        bool m_bCanbeRemoved = false;
+        public SharedData SharedData { get; set; } = null;
 
-        SharedData m_SharedData = null;
-        public SharedData SharedData { get { return m_SharedData; } }
+        public Variable(SharedData sharedData) => SharedData = sharedData;
+
+        public void RefreshCandidates(bool bForce = false)
+        {
+            if (!m_bInited && !bForce)
+                return;
+            m_bInited = true;
+            if (SharedData == null || vbType != VariableType.VBT_Pointer)
+            {
+                Candidates.Clear();
+            }
+            //else if (m_bCandidatesDirty)
+            else
+            {
+                //m_bCandidatesDirty = false;
+                Candidates.Clear();
+                foreach (var v in SharedData.Datas.Values)
+                {
+                    if (v.vType == vType && v.cType == cType)
+                        Candidates.Add(v.Name);
+                }
+            }
+        }
+        public ObservableCollection<string> Candidates { get; } = new ObservableCollection<string>();
+
+        //bool m_bCandidatesDirty = true;
+        bool m_bInited = false;
 
         public string Name { get { return m_Name; } }
         public string Value
@@ -153,12 +187,22 @@ namespace YBehavior.Editor.Core
             set
             {
                 m_Value = value;
-                OnPropertyChanged("Value");
-                OnPropertyChanged("IsValid");
+                _OnValueChanged();
+                _OnConditionChanged();
             }
         }
 
+        private void _OnValueChanged()
+        {
+            OnPropertyChanged("Value");
+        }
+        private void _OnConditionChanged()
+        {
+            OnPropertyChanged("IsValid");
+        }
+
         public bool AlwaysConst { get { return m_bAlwaysConst; } set { m_bAlwaysConst = value; } }
+        public bool CanBeRemoved { get { return m_bCanbeRemoved; } set { m_bCanbeRemoved = value; } }
         public bool CanSwitchConst { get { return !AlwaysConst; } }
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
@@ -185,13 +229,12 @@ namespace YBehavior.Editor.Core
 
         public bool IsValid
         {
-            get { return CheckValid(m_SharedData); }
+            get { return CheckValid(); }
         }
 
-        public bool CheckValid(SharedData data)
+        public bool CheckValid()
         {
-            m_SharedData = data;
-            if (m_SharedData == null)
+            if (SharedData == null)
                 return false;
             if (vbType == VariableType.VBT_Pointer)
             {
@@ -200,7 +243,9 @@ namespace YBehavior.Editor.Core
                     LogMgr.Instance.Error(string.Format("This variable cant be pointer: {0}.", Name));
                     return false;
                 }
-                Variable other = data.GetVariable(Value);
+                if (string.IsNullOrEmpty(Value))
+                    return false;
+                Variable other = SharedData.GetVariable(Value);
                 if (other == null)
                 {
                     LogMgr.Instance.Error(string.Format("Pointer doesnt exist for variable {0}, while the pointer is {1} ", Name, Value));
@@ -307,6 +352,7 @@ namespace YBehavior.Editor.Core
 
         public bool SetVariable(char valueType, char countType, char variableType, string value, string param = null)
         {
+            m_bInited = false;
             vType = ValueTypeDic.GetKey(valueType, ValueType.VT_NONE);
             if (vType == ValueType.VT_NONE)
                 return false;
@@ -321,10 +367,12 @@ namespace YBehavior.Editor.Core
             if (param != null)
                 m_Params = param;
 
+            RefreshCandidates(true);
             return true;
         }
         public bool SetVariable(ValueType vtype, CountType ctype, VariableType vbtype, string value, string param = null, string newName = null)
         {
+            m_bInited = false;
             if (newName != null)
                 m_Name = newName;
 
@@ -342,32 +390,33 @@ namespace YBehavior.Editor.Core
             if (param != null)
                 m_Params = param;
 
+            RefreshCandidates(true);
+
             return true;
         }
 
         public static Variable CreateVariableInNode(string name, string defaultValue, ValueType[] valueType, CountType[] countType, VariableType vbType, string param = null)
         {
-            Variable v = new Variable();
+            Variable v = new Variable(null);
             v.vTypeSet.AddRange(valueType);
             v.cTypeSet.AddRange(countType);
             v.vbType = vbType;
-            v.m_Name = name;
-            v.m_Value = defaultValue;
-            v.m_Params = param;
+
+            v.SetVariable(valueType[0], countType[0], vbType, defaultValue, param, name);
             return v;
         }
 
-        public static Variable CreateVariable(char valueType, char countType, char variableType, string name, string value, string param = null)
-        {
-            Variable v = new Variable();
+        //public static Variable CreateVariable(SharedData sharedData, char valueType, char countType, char variableType, string name, string value, string param = null)
+        //{
+        //    Variable v = new Variable(sharedData);
 
-            if (!v.SetVariable(valueType, countType, variableType, value, param))
-                return null;
+        //    if (!v.SetVariable(valueType, countType, variableType, value, param))
+        //        return null;
 
-            v.m_Name = name;
+        //    v.m_Name = name;
 
-            return v;
-        }
+        //    return v;
+        //}
     }
 
     public class SharedData
@@ -382,13 +431,14 @@ namespace YBehavior.Editor.Core
         /// <returns></returns>
         public bool TryAddData(string name, string value)
         {
-            Variable v = new Variable();
+            Variable v = new Variable(this);
             if (!v.SetVariableInNode(value, name))
                 return false;
 
             v.AlwaysConst = true;
+            v.CanBeRemoved = true;
 
-            if (!v.CheckValid(this))
+            if (!v.CheckValid())
                 return false;
 
             return AddVariable(v);
@@ -404,13 +454,14 @@ namespace YBehavior.Editor.Core
         /// <returns></returns>
         public bool TryCreateVariable(string name, string value, Variable.ValueType vType, Variable.CountType cType)
         {
-            Variable v = new Variable();
+            Variable v = new Variable(this);
             if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, value, null, name))
                 return false;
 
             v.AlwaysConst = true;
+            v.CanBeRemoved = true;
 
-            if (!v.CheckValid(this))
+            if (!v.CheckValid())
                 return false;
 
             return AddVariable(v);

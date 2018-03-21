@@ -121,6 +121,7 @@ namespace YBehavior.Editor.Core
                 return false;
 
             node.Load(data);
+            node.Init();
             foreach (XmlNode chi in data.ChildNodes)
             {
                 if (chi.Name == "Node")

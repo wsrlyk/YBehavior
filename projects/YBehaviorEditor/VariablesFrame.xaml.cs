@@ -43,7 +43,7 @@ namespace YBehavior.Editor
             {
                 this.DataContext = node.Node;
                 this.VariableContainer.ItemsSource = null;
-                this.VariableContainer.ItemsSource = node.Node.Variables.Datas;
+                this.VariableContainer.ItemsSource = node.Node.Variables.Datas.Values;
             }
         }
     }

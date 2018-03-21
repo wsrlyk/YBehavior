@@ -14,6 +14,13 @@ namespace YBehavior.Editor.Core
             m_Hierachy = NodeHierachy.NH_None;
         }
 
+        public static Tree GlobalTree
+        {
+            get
+            {
+                return WorkBenchMgr.Instance.ActiveWorkBench.MainTree;
+            }
+        }
         protected override bool _HasParentHolder()
         {
             return false;
@@ -63,6 +70,7 @@ namespace YBehavior.Editor.Core
                 Variable.VariableType.VBT_Const,
                 "ADD|SUB|MUL|DIV"
             );
+            optr.AlwaysConst = true;
             Variables.AddVariable(optr);
 
             Variable opl = Variable.CreateVariableInNode(
@@ -122,7 +130,7 @@ namespace YBehavior.Editor.Core
                     break;
             }
 
-            if (v != null && v.CheckValid(GetTreeSharedData()))
+            if (v != null && v.CheckValid())
             {
                 return true;
             }

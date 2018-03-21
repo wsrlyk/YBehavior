@@ -74,4 +74,50 @@ namespace YBehavior.Editor
         }
     }
 
+    [ValueConversion(typeof(bool), typeof(bool))]
+    public class InvertBoolConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool booleanValue = (bool)value;
+            return !booleanValue;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool booleanValue = (bool)value;
+            return !booleanValue;
+        }
+    }
+    [ValueConversion(typeof(Variable.VariableType), typeof(bool))]
+    public class VariableVariableTypeConvertor : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!(value is Variable.VariableType))
+                return string.Empty;
+            Variable.VariableType type = (Variable.VariableType)value;
+            return type == Variable.VariableType.VBT_Pointer;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool booleanValue = (bool)value;
+            return booleanValue ? Variable.VariableType.VBT_Pointer : Variable.VariableType.VBT_Const;
+        }
+    }
+
+
+    public class ValueConverterGroup : List<IValueConverter>, IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return this.Aggregate(value, (current, converter) => converter.Convert(current, targetType, parameter, culture));
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value;
+        }
+    }
 }

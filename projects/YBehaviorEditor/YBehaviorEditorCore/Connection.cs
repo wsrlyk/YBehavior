@@ -47,6 +47,8 @@ namespace YBehavior.Editor.Core
 
             target.Conns.ParentHolder.SetConn(this);
 
+            target.OnParentChanged();
+            Owner.OnChildChanged();
             return true;
         }
 
@@ -66,6 +68,10 @@ namespace YBehavior.Editor.Core
                     m_Owner.Conns.MarkDirty();
 
                     target.Conns.ParentHolder.SetConn(null);
+
+                    target.OnParentChanged();
+                    Owner.OnChildChanged();
+
                     return true;
                 }
             }

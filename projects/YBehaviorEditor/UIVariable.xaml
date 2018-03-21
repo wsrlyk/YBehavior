@@ -11,15 +11,21 @@
         <local:VariableValidColorConvertor x:Key="validConvertor"/>
         <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
         <local:VariableValueTypeConvertor x:Key="valueTypeConvertor"/>
+        <local:VariableVariableTypeConvertor x:Key="variableTypeConvertor"/>
         <local:VariableTypeCountConvertor x:Key="typeCountConvertor"/>
+        <local:InvertBoolConverter x:Key="invertBoolConvertor"/>
+        <local:ValueConverterGroup x:Key="invertBoolAndVisibilityConvertor">
+            <local:InvertBoolConverter/>
+            <BooleanToVisibilityConverter/>
+        </local:ValueConverterGroup>
     </UserControl.Resources>
     <DockPanel Background="LightBlue" Margin="2,2,2,2">
         <TextBlock Name="VKey" Text="{Binding Name}" FontSize="13" Width="90" DockPanel.Dock="Left" Background="LightCyan"/>
-        <ComboBox Name="VTypes" Width="50" ItemsSource="{Binding vTypeSet}" SelectedItem="{Binding vType}" 
-                  IsEditable="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}"
-                  IsHitTestVisible="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}"
+        <ComboBox Name="VTypes" Width="50" ItemsSource="{Binding vTypeSet}" SelectedItem="{Binding vType}"
+            IsHitTestVisible="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}">
+            <!--IsEditable="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}"
                   Focusable="False"
-                  >
+                  -->
             <ComboBox.Resources>
                 <sys:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">0</sys:Double>
             </ComboBox.Resources>
@@ -29,8 +35,17 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <ToggleButton Width="20" Height="20" Name="Switcher" Background="Orange" DockPanel.Dock="Right" Visibility="{Binding Path = CanSwitchConst, Converter={StaticResource visibilityConvertor}}" />
-        <Button Width="20" Height="20" Name="Remover" Background="Red" DockPanel.Dock="Right" Visibility="{Binding Path = AlwaysConst, Mode=OneWay}" Click="Remover_Click"/>
-        <TextBox Name="VValue" MinWidth="110" Text="{Binding Value}" Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}"/>
+        <CheckBox Width="20" Height="20" Name="Switcher" Background="Orange" Foreground="GreenYellow" DockPanel.Dock="Right" IsChecked="{Binding vbType, Converter={StaticResource variableTypeConvertor}}" Visibility="{Binding Path = CanSwitchConst, Converter={StaticResource visibilityConvertor}}"/>
+        <Button Width="20" Height="20" Name="Remover" Background="Red" DockPanel.Dock="Right" Visibility="{Binding Path = CanBeRemoved,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="Remover_Click"/>
+        <ComboBox SelectedItem="{Binding Value}" ItemsSource="{Binding Candidates}" x:Name="VPointer" MinWidth="110" MaxDropDownHeight ="150"
+                  Visibility="{Binding Path=IsChecked, ElementName=Switcher, Converter={StaticResource visibilityConvertor}}" 
+                  Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}">
+            <ComboBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ComboBox.ItemsPanel>
+        </ComboBox>
+        <TextBox Name="VConst" Text="{Binding Value}" Visibility="{Binding Path=IsChecked, ElementName=Switcher, Converter={StaticResource invertBoolAndVisibilityConvertor}}" Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}"/>
     </DockPanel>
 </UserControl>

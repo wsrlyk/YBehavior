@@ -75,6 +75,5 @@
                 </StackPanel>
             </TabItem>
         </TabControl>
-        <Button Click="Add_Click" Margin="100,150,100,100"/>
     </Grid>
 </UserControl>

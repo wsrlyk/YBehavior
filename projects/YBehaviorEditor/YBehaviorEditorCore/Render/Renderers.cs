@@ -152,7 +152,7 @@ namespace YBehavior.Editor.Core
         protected virtual void _RenderSelf()
         {
             _DrawFrame(m_Owner);
-            _DrawName();
+            //_DrawName();
             _DrawSelfConnectors();
         }
 
@@ -169,7 +169,7 @@ namespace YBehavior.Editor.Core
 
         private void _DrawName()
         {
-            m_uiFrame.name.SetBinding(TextBlock.TextProperty, new System.Windows.Data.Binding("NickName") { Source = m_Owner });
+            //m_uiFrame.name.SetBinding(TextBlock.TextProperty, new System.Windows.Data.Binding("NickName") { Source = m_Owner });
         }
 
         private void _DrawSelfConnectors()

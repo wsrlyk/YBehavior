@@ -118,6 +118,7 @@ namespace YBehavior.Editor.Core
             }
 
             Node node = NodeMgr.Instance.CreateNodeByName(template.Name);
+            node.Init();
             bench.AddSubTree(node);
 
             return node;
