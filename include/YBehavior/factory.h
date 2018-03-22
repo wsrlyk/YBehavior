@@ -4,10 +4,11 @@
 #include "YBehavior/define.h"
 #include "YBehavior/shareddata.h"
 #include <unordered_map>
+#include <algorithm>
 
 namespace YBehavior
 {
-#define REGISTER_TYPE(factoryPtr, typeName) factoryPtr->Create<typeName>(#typeName)
+#define REGISTER_TYPE(factoryPtr, typeName) factoryPtr->Create<typeName>()
 
 	template<typename T>
 	class Factory
@@ -29,9 +30,13 @@ namespace YBehavior
 		T* Get(const STRING& name);
 
 		template<typename finalType>
-		void Create(const STRING& name)
+		void Create()
 		{
-			m_ConstructorMap[name] = new TypeConstructor<finalType>();
+			std::string name(typeid(finalType).name());
+			int spacepos = (int)(name.find_last_of(" "));
+			int pos = (int)(name.find_last_of("::"));
+
+			m_ConstructorMap[name.substr(std::max(pos, spacepos) + 1)] = new TypeConstructor<finalType>();
 		}
 
 	private:

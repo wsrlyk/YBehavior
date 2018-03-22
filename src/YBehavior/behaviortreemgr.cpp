@@ -62,7 +62,7 @@ namespace YBehavior
 				BehaviorNode* childNode = BehaviorNode::CreateNodeByName(className.value());
 				if (childNode == nullptr)
 				{
-					ERROR_BEGIN << "Cant create node " << it->name() << " cause its not registered;" << ERROR_END;
+					ERROR_BEGIN << "Cant create node " << className.value() << " cause its not registered;" << ERROR_END;
 					continue;
 				}
 
