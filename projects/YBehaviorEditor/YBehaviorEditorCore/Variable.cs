@@ -34,10 +34,6 @@ namespace YBehavior.Editor.Core
         public static readonly ValueType[] CreateParams_Enum = new ValueType[] { ValueType.VT_ENUM };
         public static readonly ValueType[] CreateParams_Vector3 = new ValueType[] { ValueType.VT_VECTOR3 };
 
-        public static readonly CountType[] CreateParams_Single = new CountType[] { CountType.CT_SINGLE };
-        public static readonly CountType[] CreateParams_List = new CountType[] { CountType.CT_LIST };
-        public static readonly CountType[] CreateParams_AllCounts = new CountType[] { CountType.CT_SINGLE, CountType.CT_LIST };
-
         public enum ValueType
         {
             VT_NONE,
@@ -117,14 +113,7 @@ namespace YBehavior.Editor.Core
             get { return m_cType; }
             set
             {
-                if (m_cTypeSet.Count == 0)
-                {
-                    m_cTypeSet.Add(value);
-                }
-                if (m_cTypeSet.Contains(value))
-                    m_cType = value;
-                else
-                    m_cType = CountType.CT_NONE;
+                m_cType = value;
                 RefreshCandidates();
                 _OnConditionChanged();
             }
@@ -141,9 +130,9 @@ namespace YBehavior.Editor.Core
         }
 
         List<ValueType> m_vTypeSet = new List<ValueType>();
-        List<CountType> m_cTypeSet = new List<CountType>();
+        //List<CountType> m_cTypeSet = new List<CountType>();
         public List<ValueType> vTypeSet { get { return m_vTypeSet; } }
-        public List<CountType> cTypeSet { get { return m_cTypeSet; } }
+        //public List<CountType> cTypeSet { get { return m_cTypeSet; } }
 
         string m_Value;
         string m_Name;
@@ -410,14 +399,29 @@ namespace YBehavior.Editor.Core
             return true;
         }
 
-        public static Variable CreateVariableInNode(string name, string defaultValue, ValueType[] valueType, CountType[] countType, VariableType vbType, string param = null)
+        public Variable Clone()
+        {
+            Variable v = new Variable(null);
+            v.vTypeSet.AddRange(vTypeSet.ToArray());
+            v.vType = vType;
+            v.cType = cType;
+            v.vbType = vbType;
+            v.m_Name = m_Name;
+            v.m_Value = m_Value;
+            v.m_bAlwaysConst = m_bAlwaysConst;
+            v.m_bCanbeRemoved = m_bCanbeRemoved;
+            v.m_bInited = m_bInited;
+            v.m_Params = m_Params;
+            return v;
+        }
+        public static Variable CreateVariableInNode(string name, string defaultValue, ValueType[] valueType, CountType countType, VariableType vbType, string param = null)
         {
             Variable v = new Variable(null);
             v.vTypeSet.AddRange(valueType);
-            v.cTypeSet.AddRange(countType);
+            v.cType = countType;
             v.vbType = vbType;
 
-            v.SetVariable(valueType[0], countType[0], vbType, defaultValue, param, name);
+            v.SetVariable(valueType[0], countType, vbType, defaultValue, param, name);
             return v;
         }
 

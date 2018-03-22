@@ -32,13 +32,20 @@ namespace YBehavior.Editor.Core
 
         public Node CreateNodeByName(string name)
         {
+            Node node = null;
             if (m_TypeDic.TryGetValue(name, out Type type))
             {
-                Node node = Activator.CreateInstance(type) as Node;
+                node = Activator.CreateInstance(type) as Node;
                 node.CreateRenderer();
                 return node;
             }
-            return null;
+
+            node = ExternalActionMgr.Instance.GetNode(name);
+            if (node != null)
+            {
+                node.CreateRenderer();
+            }
+            return node;
         }
 
         static bool IsSubClassOf(Type type, Type baseType)
@@ -65,6 +72,7 @@ namespace YBehavior.Editor.Core
         NT_Not,
         NT_AlwaysSuccess,
         NT_Selector,
+        NT_Action,
     }
 
     public enum NodeHierachy
@@ -76,6 +84,9 @@ namespace YBehavior.Editor.Core
 
         NH_Sequence = 13,
         NH_Selector = 23,
+
+        NH_DefaultAction = 11,
+        NH_Custom = 21,
     }
 
     public class NodeBase
@@ -134,10 +145,10 @@ namespace YBehavior.Editor.Core
     {
         protected string m_Name;
         protected string m_NickName;
-        public string Name { get { return m_Name; } }
+        public virtual string Name { get { return m_Name; } }
         public string FullName
         {
-            get { return string.IsNullOrEmpty(m_NickName) ? m_Name : m_NickName; }
+            get { return string.IsNullOrEmpty(m_NickName) ? Name : m_NickName; }
         }
         public string NickName
         {
@@ -152,9 +163,9 @@ namespace YBehavior.Editor.Core
         public virtual string Note => string.Empty;
 
         protected NodeType m_Type = NodeType.NT_Invalid;
-        public NodeType Type { get { return m_Type; } }
+        public NodeType Type { get { return m_Type; } set { m_Type = value; } }
         protected NodeHierachy m_Hierachy = NodeHierachy.NH_None;
-        public NodeHierachy Hierachy { get { return m_Hierachy; } }
+        public NodeHierachy Hierachy { get { return m_Hierachy; } set { m_Hierachy = value; } }
 
         public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class" });
         public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName" });
@@ -241,7 +252,7 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        protected virtual bool ProcessAttrWhenLoad(System.Xml.XmlAttribute attr)
+        protected bool ProcessAttrWhenLoad(System.Xml.XmlAttribute attr)
         {
             switch (attr.Name)
             {
@@ -252,10 +263,29 @@ namespace YBehavior.Editor.Core
                     m_NickName = attr.Value;
                     break;
                 default:
-                    return false;
+                    return LoadOtherAttr(attr);
             }
 
             return true;
+        }
+
+        protected virtual bool LoadOtherAttr(System.Xml.XmlAttribute attr)
+        {
+            return DefaultLoadVariable(attr);
+        }
+        protected bool DefaultLoadVariable(System.Xml.XmlAttribute attr)
+        {
+            Variable v =  Variables.GetVariable(attr.Name);
+            if (v != null)
+            {
+                if (!v.SetVariableInNode(attr.Value))
+                    return false;
+                if (v.CheckValid())
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void Init()

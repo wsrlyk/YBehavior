@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Actions>
+	<Action Class="GetNameAction" Note="{0} has {1} in {2}">
+		<Variable Name="Var0" ValueType="IF" IsArray="False" Value="1"/>
+		<Variable Name="Var1" ValueType="E" IsArray="False" Param="Enum0|Enum1|Enum2"/>
+		<Variable Name="Var2" ValueType="S" IsArray="True" Value="1|2|3|4" />
+	</Action>
+</Actions>

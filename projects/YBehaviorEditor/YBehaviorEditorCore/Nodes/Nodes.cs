@@ -26,11 +26,8 @@ namespace YBehavior.Editor.Core
             return false;
         }
 
-        protected override bool ProcessAttrWhenLoad(XmlAttribute attr)
+        protected override bool LoadOtherAttr(XmlAttribute attr)
         {
-            if (base.ProcessAttrWhenLoad(attr))
-                return true;
-
             return m_Variables.TryAddData(attr.Name, attr.Value);
         }
     }
@@ -54,6 +51,52 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    class ActionNode : LeafNode
+    {
+        public string NoteFormat { get; set; }
+        public string ClassName { get; set; }
+        public override string Name => ClassName;
+
+        public ActionNode()
+        {
+            m_Name = "Action";
+            m_Type = NodeType.NT_Invalid;
+            m_Hierachy = NodeHierachy.NH_Custom;
+        }
+
+        public ActionNode Clone()
+        {
+            ActionNode other = new ActionNode
+            {
+                m_Name = this.m_Name,
+                m_Type = this.m_Type,
+                m_Hierachy = this.m_Hierachy,
+                NoteFormat = this.NoteFormat,
+                ClassName = this.ClassName
+            };
+
+            foreach (var v in m_Variables.Datas.Values)
+            {
+                Variable newv = v.Clone();
+                other.Variables.AddVariable(newv);
+            }
+            return other;
+        }
+        public override string Note
+        {
+            get
+            {
+                string[] values = new string[m_Variables.Datas.Count];
+                int i = 0;
+                foreach (var v in m_Variables.Datas.Values)
+                {
+                    values[i++] = v.Value;
+                }
+                return string.Format(NoteFormat, values);
+            }
+        }
+    }
+
     class CalculatorNode : LeafNode
     {
         static Dictionary<string, string> s_OperatorDic = new Dictionary<string, string>() { { "ADD", "+" }, { "SUB", "-" }, { "MUL", "*" }, { "DIV", "/" } };
@@ -62,13 +105,13 @@ namespace YBehavior.Editor.Core
         {
             m_Name = "Calculator";
             m_Type = NodeType.NT_Calculator;
-            m_Hierachy = NodeHierachy.NH_Action;
+            m_Hierachy = NodeHierachy.NH_DefaultAction;
 
             Variable optr = Variable.CreateVariableInNode(
                 "Operator",
                 "ADD",
                 Variable.CreateParams_Enum,
-                Variable.CreateParams_Single,
+                Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
                 "ADD|SUB|MUL|DIV"
             );
@@ -79,7 +122,7 @@ namespace YBehavior.Editor.Core
                 "Opl",
                 "0",
                 Variable.CreateParams_AllNumbers,
-                Variable.CreateParams_Single,
+                Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const
             );
             Variables.AddVariable(opl);
@@ -88,7 +131,7 @@ namespace YBehavior.Editor.Core
                 "Opr1",
                 "0",
                 Variable.CreateParams_AllNumbers,
-                Variable.CreateParams_Single,
+                Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const
             );
             Variables.AddVariable(opr1);
@@ -97,7 +140,7 @@ namespace YBehavior.Editor.Core
                 "Opr2",
                 "0",
                 Variable.CreateParams_AllNumbers,
-                Variable.CreateParams_Single,
+                Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const
             );
             Variables.AddVariable(opr2);
@@ -115,41 +158,6 @@ namespace YBehavior.Editor.Core
                     Variables.GetVariable("Opr2").Value);
                 return sb.ToString();
             }
-        }
-        protected override bool ProcessAttrWhenLoad(XmlAttribute attr)
-        {
-            if (base.ProcessAttrWhenLoad(attr))
-                return true;
-
-            Variable v = null;
-
-            switch(attr.Name)
-            {
-                //case "Operator":
-                //    {
-                //        v = Variables.GetVariable("Operator");
-                //        if (!v.SetVariable(Variable.ENUM, Variable.NONE, Variable.CONST, attr.Value,
-                //            "ADD|SUB|MUL|DIV"))
-                //            return false;
-                //    }
-                //    break;
-                default:
-                    {
-                        v = Variables.GetVariable(attr.Name);
-                        if (v != null)
-                        {
-                            if (!v.SetVariableInNode(attr.Value))
-                                return false;
-                        }
-                    }
-                    break;
-            }
-
-            if (v != null && v.CheckValid())
-            {
-                return true;
-            }
-            return false;
         }
     }
 

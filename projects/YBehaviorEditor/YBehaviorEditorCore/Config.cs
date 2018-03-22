@@ -21,6 +21,10 @@ namespace YBehavior.Editor.Core
             xmlDoc.Load("config.xml");
             XmlElement root = xmlDoc.DocumentElement;
             WorkingDir = root.GetAttribute("WorkingDir");
+
+            var attr = root.Attributes.GetNamedItem("ExternalAction");
+            if (attr != null)
+                ExternalActionMgr.Instance.Load(attr.Value);
         }
     }
 }

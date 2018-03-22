@@ -43,6 +43,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExternalActionMgr.cs" />
     <Compile Include="SharedData.cs" />
     <Compile Include="Tools\Bimap.cs" />
     <Compile Include="Tools\ObservableCollectionEx.cs" />
