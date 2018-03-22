@@ -56,6 +56,8 @@ namespace YBehavior.Editor.Core
 
     class CalculatorNode : LeafNode
     {
+        static Dictionary<string, string> s_OperatorDic = new Dictionary<string, string>() { { "ADD", "+" }, { "SUB", "-" }, { "MUL", "*" }, { "DIV", "/" } };
+
         public CalculatorNode()
         {
             m_Name = "Calculator";
@@ -101,6 +103,19 @@ namespace YBehavior.Editor.Core
             Variables.AddVariable(opr2);
         }
 
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} <= {1} {2} {3}",
+                    Variables.GetVariable("Opl").Value,
+                    Variables.GetVariable("Opr1").Value,
+                    s_OperatorDic[Variables.GetVariable("Operator").Value],
+                    Variables.GetVariable("Opr2").Value);
+                return sb.ToString();
+            }
+        }
         protected override bool ProcessAttrWhenLoad(XmlAttribute attr)
         {
             if (base.ProcessAttrWhenLoad(attr))

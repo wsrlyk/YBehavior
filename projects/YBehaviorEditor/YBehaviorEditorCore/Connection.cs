@@ -79,6 +79,16 @@ namespace YBehavior.Editor.Core
             return false;
         }
 
+        public void Sort(Comparison<NodeBase> comparer)
+        {
+            m_Nodes.Sort(comparer);
+        }
+
+        static int CompareByPosX(Node a, Node b)
+        {
+            return 0;
+        }
+
         protected virtual bool _CanAdd() { return true; }
     }
 
@@ -219,6 +229,14 @@ namespace YBehavior.Editor.Core
             if (conn == null)
                 return false;
             return conn.AddNode(target);
+        }
+
+        public void Sort(Comparison<NodeBase> comparer)
+        {
+            foreach (var c in m_Connections)
+            {
+                c.Conn.Sort(comparer);
+            }
         }
     }
 

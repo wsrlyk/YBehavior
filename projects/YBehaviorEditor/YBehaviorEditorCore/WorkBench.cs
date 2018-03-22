@@ -145,6 +145,7 @@ namespace YBehavior.Editor.Core
                     _LoadOneNode(childNode, chi);
                 }
             }
+            node.Conns.Sort(Node.SortByPosX);
 
             return true;
         }

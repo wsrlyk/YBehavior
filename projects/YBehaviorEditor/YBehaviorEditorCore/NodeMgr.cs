@@ -130,7 +130,7 @@ namespace YBehavior.Editor.Core
         }
     }
 
-    public class Node : NodeBase
+    public class Node : NodeBase, System.ComponentModel.INotifyPropertyChanged
     {
         protected string m_Name;
         protected string m_NickName;
@@ -142,8 +142,14 @@ namespace YBehavior.Editor.Core
         public string NickName
         {
             get { return m_NickName; }
-            set { m_NickName = value; }
+            set
+            {
+                m_NickName = value;
+                OnPropertyChanged("FullName");
+            }
         }
+
+        public virtual string Note => string.Empty;
 
         protected NodeType m_Type = NodeType.NT_Invalid;
         public NodeType Type { get { return m_Type; } }
@@ -159,7 +165,7 @@ namespace YBehavior.Editor.Core
         private Geometry m_Geo = new Geometry();
         public Geometry Geo { get { return m_Geo; } }
 
-        protected SharedData m_Variables = new SharedData();
+        protected SharedData m_Variables;
         public SharedData Variables { get { return m_Variables; } }
 
         protected SharedData m_TreeSharedData = null;
@@ -221,6 +227,8 @@ namespace YBehavior.Editor.Core
         {
             if (_HasParentHolder())
                 m_Connections.CreateParentHolder(this);
+
+            m_Variables = new SharedData(this);
         }
 
         public virtual void Load(System.Xml.XmlNode data)
@@ -301,6 +309,30 @@ namespace YBehavior.Editor.Core
         protected virtual bool _HasParentHolder()
         {
             return true;
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        internal protected void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public void OnChildPosChanged()
+        {
+            Conns.Sort(SortByPosX);
+        }
+
+        public static int SortByPosX(NodeBase aa, NodeBase bb)
+        {
+            Node a = aa as Node;
+            Node b = bb as Node;
+            if (a == null || b == null)
+                return 0;
+
+            return a.Geo.Pos.X.CompareTo(b.Geo.Pos.X);
         }
     }
 

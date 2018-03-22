@@ -151,9 +151,11 @@ namespace YBehavior.Editor.Core
         bool m_bAlwaysConst = false;
         bool m_bCanbeRemoved = false;
         public SharedData SharedData { get; set; } = null;
+        public SharedData Container { get; set; } = null;
 
         public Variable(SharedData sharedData) => SharedData = sharedData;
 
+        static List<string> candidatesBuffer = new List<string>();
         public void RefreshCandidates(bool bForce = false)
         {
             if (!m_bInited && !bForce)
@@ -167,15 +169,18 @@ namespace YBehavior.Editor.Core
             else
             {
                 //m_bCandidatesDirty = false;
-                Candidates.Clear();
-                foreach (var v in SharedData.Datas.Values)
+                using (var handler = Candidates.Delay())
                 {
-                    if (v.vType == vType && v.cType == cType)
-                        Candidates.Add(v.Name);
+                    Candidates.Clear();
+                    foreach (var v in SharedData.Datas.Values)
+                    {
+                        if (v.vType == vType && v.cType == cType)
+                            Candidates.Add(v.Name);
+                    }
                 }
             }
         }
-        public ObservableCollection<string> Candidates { get; } = new ObservableCollection<string>();
+        public DelayableNotificationCollection<string> Candidates { get; } = new DelayableNotificationCollection<string>();
 
         //bool m_bCandidatesDirty = true;
         bool m_bInited = false;
@@ -204,6 +209,7 @@ namespace YBehavior.Editor.Core
         private void _OnValueChanged()
         {
             OnPropertyChanged("Value");
+            Container.OnVariableValueChanged(this);
         }
         private void _OnConditionChanged()
         {
@@ -428,99 +434,4 @@ namespace YBehavior.Editor.Core
         //}
     }
 
-    public class SharedData
-    {
-        ObservableDictionary<string, Variable> m_Variables = new ObservableDictionary<string, Variable>();
-        /// <summary>
-        /// This function is only for the variables of the whole tree, not for a node.
-        /// Add From xml
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public bool TryAddData(string name, string value)
-        {
-            Variable v = new Variable(this);
-            if (!v.SetVariableInNode(value, name))
-                return false;
-
-            v.AlwaysConst = true;
-            v.CanBeRemoved = true;
-
-            if (!v.CheckValid())
-                return false;
-
-            return AddVariable(v);
-        }
-        /// <summary>
-        /// This function is only for the variables of the whole tree, not for a node
-        /// Create from Editor
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <param name="vType"></param>
-        /// <param name="cType"></param>
-        /// <returns></returns>
-        public bool TryCreateVariable(string name, string value, Variable.ValueType vType, Variable.CountType cType)
-        {
-            Variable v = new Variable(this);
-            if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, value, null, name))
-                return false;
-
-            v.AlwaysConst = true;
-            v.CanBeRemoved = true;
-
-            if (!v.CheckValid())
-                return false;
-
-            return AddVariable(v);
-        }
-
-        public bool AddVariable(Variable v)
-        {
-            if (v == null)
-                return false;
-
-            if (m_Variables.ContainsKey(v.Name))
-            {
-                LogMgr.Instance.Error("Duplicated variable name: " + v.Name);
-                return false;
-            }
-            if (Node.ReservedAttributesAll.Contains(v.Name))
-            {
-                LogMgr.Instance.Error("Reserved name: " + v.Name);
-                return false;
-            }
-            m_Variables[v.Name] = v;
-
-            ///TODO
-            /// May be should send events
-            return true;
-        }
-
-        public bool RemoveVariable(Variable v)
-        {
-            if (v == null)
-                return false;
-
-            if (!m_Variables.ContainsKey(v.Name))
-            {
-                LogMgr.Instance.Error("Variable not exist when try remove: " + v.Name);
-                return false;
-            }
-
-            m_Variables.Remove(v.Name);
-
-            ///TODO
-            /// May be should send events
-            return true;
-        }
-        public Variable GetVariable(string name)
-        {
-            m_Variables.TryGetValue(name, out Variable v);
-            return v;
-        }
-
-        public ObservableDictionary<string, Variable> Datas { get { return m_Variables; } }
-    }
 }

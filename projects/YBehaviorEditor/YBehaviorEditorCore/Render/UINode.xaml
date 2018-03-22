@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:YBehavior.Editor.Core"
              mc:Ignorable="d" 
-             MinWidth="60" MinHeight="80">
+             MinWidth="60" MinHeight="80" HorizontalAlignment="Center">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="10"/>
@@ -17,7 +17,7 @@
         <Border Name="border" Grid.Row="1" BorderThickness="3" BorderBrush="LightBlue" Background="DarkGray">
             <StackPanel Name="mainPanel">
                 <TextBlock Name="name" Text="{Binding FullName}"></TextBlock>
-                <TextBlock Name="note" Text="lalalallffds"></TextBlock>
+                <TextBlock Name="note" Text="{Binding Note}"></TextBlock>
             </StackPanel>
         </Border>
         <StackPanel Grid.Row="2" Name="bottomConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />

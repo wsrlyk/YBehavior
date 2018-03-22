@@ -50,6 +50,8 @@ namespace YBehavior.Editor.Core
 
         void _OnClick()
         {
+            if (Node is Tree)
+                return;
             SelectHandler(this, true);
 
             m_Operation.MakeCanvasFocused();

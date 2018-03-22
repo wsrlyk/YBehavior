@@ -217,6 +217,7 @@ namespace YBehavior.Editor.Core
             if (parent != null)
             {
                 parent.Renderer._RerenderConn();
+                parent.OnChildPosChanged();
             }
 
         }

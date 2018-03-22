@@ -25,6 +25,7 @@ namespace YBehavior.Editor
             InitializeComponent();
 
             EventMgr.Instance.Register(EventType.SelectionChanged, _OnSelectionChanged);
+            EventMgr.Instance.Register(EventType.SharedVariableChanged, _OnSharedVariableChanged);
         }
 
         private void _OnSelectionChanged(EventArg arg)
@@ -45,6 +46,15 @@ namespace YBehavior.Editor
                 this.VariableContainer.ItemsSource = null;
                 this.VariableContainer.ItemsSource = node.Node.Variables.Datas.Values;
             }
+        }
+
+        private void _OnSharedVariableChanged(EventArg arg)
+        {
+            Node node = this.DataContext as Node;
+            if (node == null)
+                return;
+
+            node.Variables.RefreshVariables();
         }
     }
 }

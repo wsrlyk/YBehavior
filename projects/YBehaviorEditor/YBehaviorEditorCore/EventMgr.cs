@@ -16,6 +16,7 @@ namespace YBehavior.Editor.Core
         NodesConnected,
         NodesDisconnected,
         SelectionChanged,
+        SharedVariableChanged,
     }
 
     public class EventMgr : Singleton<EventMgr>
@@ -99,4 +100,9 @@ namespace YBehavior.Editor.Core
         public ISelectable Target { get; set; }
         public override EventType Type => EventType.SelectionChanged;
     }
+    public class SharedVariableChangedArg : EventArg
+    {
+        public override EventType Type => EventType.SharedVariableChanged;
+    }
+
 }
