@@ -34,7 +34,7 @@ namespace YBehavior
 		{
 		}
 
-		friend std::stringstream & operator<<(std::stringstream &out, Vector3 &obj)
+		friend std::stringstream & operator<<(std::stringstream &out, const Vector3 &obj)
 		{
 			out << obj.x << ' ' << obj.y << ' ' << obj.z;
 			return out;
@@ -45,6 +45,45 @@ namespace YBehavior
 			in >> obj.x >> obj.y >> obj.z;
 			return in;
 		}
+
+		friend std::ostream & operator<<(std::ostream &out, const Vector3 &obj)
+		{
+			out << obj.x << ' ' << obj.y << ' ' << obj.z;
+			return out;
+		}
+
+		friend std::istream & operator >> (std::istream &in, Vector3 &obj)
+		{
+			in >> obj.x >> obj.y >> obj.z;
+			return in;
+		}
+
+		bool operator == (const Vector3& other) const
+		{
+			return x == other.x && y == other.y && z == other.z;
+		}
+
+		bool operator != (const Vector3& other) const
+		{
+			return !((*this) == other);
+		}
+		bool operator < (const Vector3& other) const
+		{
+			return true;
+		}
+		bool operator > (const Vector3& other) const
+		{
+			return true;
+		}
+		bool operator <= (const Vector3& other) const
+		{
+			return true;
+		}
+		bool operator >= (const Vector3& other) const
+		{
+			return true;
+		}
+
 
 		const static Vector3 zero;
 	};
@@ -146,6 +185,9 @@ namespace YBehavior
 		DEFINE_TYPEAB(Int, 'I');
 		DEFINE_TYPEAB(Float, 'F');
 		DEFINE_TYPEAB(Bool, 'B');
+		DEFINE_TYPEAB(String, 'S');
+		DEFINE_TYPEAB(Uint64, 'U');
+		DEFINE_TYPEAB(Vector3, 'V');
 	};
 }
 

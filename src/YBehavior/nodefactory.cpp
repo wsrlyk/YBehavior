@@ -2,6 +2,7 @@
 #include "YBehavior/logger.h"
 #include "YBehavior/nodes/calculator.h"
 #include "YBehavior/nodes/Sequence.h"
+#include "YBehavior/nodes/comparer.h"
 
 namespace YBehavior
 {
@@ -36,6 +37,7 @@ namespace YBehavior
 		NodeFactory* factory = new NodeFactory();
 		REGISTER_TYPE(factory, Sequence);
 		REGISTER_TYPE(factory, Calculator);
+		REGISTER_TYPE(factory, Comparer);
 
 		return factory;
 	}

@@ -161,6 +161,61 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    class ComparerNode : LeafNode
+    {
+        //static Dictionary<string, string> s_OperatorDic = new Dictionary<string, string>() { { "ADD", "+" }, { "SUB", "-" }, { "MUL", "*" }, { "DIV", "/" } };
+
+        public ComparerNode()
+        {
+            m_Name = "Comparer";
+            m_Type = NodeType.NT_Comparer;
+            m_Hierachy = NodeHierachy.NH_DefaultAction;
+
+            Variable optr = Variable.CreateVariableInNode(
+                "Operator",
+                "==",
+                Variable.CreateParams_Enum,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                "==|!=|>|<|>=|<="
+            );
+            optr.AlwaysConst = true;
+            Variables.AddVariable(optr);
+
+            Variable opl = Variable.CreateVariableInNode(
+                "Opl",
+                "0",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const
+            );
+            Variables.AddVariable(opl);
+
+            Variable opr = Variable.CreateVariableInNode(
+                "Opr",
+                "0",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const
+            );
+            Variables.AddVariable(opr);
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} {1} {2} ?",
+                    Variables.GetVariable("Opl").Value,
+                    Variables.GetVariable("Operator").Value,
+                    Variables.GetVariable("Opr").Value
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
     class NotNode : SingleChildNode
     {
         public NotNode()

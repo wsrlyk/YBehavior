@@ -9,15 +9,6 @@ namespace YBehavior
 {
 	Bimap<CalculatorOperator, STRING> Calculator::s_OperatorMap = { { CO_ADD, "ADD"}, { CO_SUB, "SUB" }, { CO_MUL, "MUL" }, { CO_DIV, "DIV"} };
 
-	Calculator::Calculator()
-	{
-	}
-
-
-	Calculator::~Calculator()
-	{
-	}
-
 	//template<typename T>
 	//INT CreateIndexByName(const STRING& name)
 	//{

@@ -17,8 +17,6 @@ namespace YBehavior
 	class Calculator : public BehaviorNode
 	{
 	public:
-		Calculator();
-		~Calculator();
 
 		static Bimap<CalculatorOperator, STRING> s_OperatorMap;
 

@@ -69,6 +69,7 @@ namespace YBehavior.Editor.Core
         NT_Root,
         NT_Sequence,
         NT_Calculator,
+        NT_Comparer,
         NT_Not,
         NT_AlwaysSuccess,
         NT_Selector,
@@ -302,6 +303,12 @@ namespace YBehavior.Editor.Core
         {
             base.OnParentChanged();
             _InitVariables();
+        }
+
+        public override void OnChildChanged()
+        {
+            base.OnParentChanged();
+            Conns.Sort(SortByPosX);
         }
 
         protected void _InitVariables()

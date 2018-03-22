@@ -23,6 +23,7 @@
     <ClInclude Include="..\include\YBehavior\nodefactory.h" />
     <ClInclude Include="..\include\YBehavior\nodes\action.h" />
     <ClInclude Include="..\include\YBehavior\nodes\calculator.h" />
+    <ClInclude Include="..\include\YBehavior\nodes\comparer.h" />
     <ClInclude Include="..\include\YBehavior\nodes\sequence.h" />
     <ClInclude Include="..\include\YBehavior\shareddata.h" />
     <ClInclude Include="..\include\YBehavior\sharedvariablecreatehelper.h" />
@@ -40,6 +41,7 @@
     <ClCompile Include="..\src\YBehavior\nodefactory.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\action.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\calculator.cpp" />
+    <ClCompile Include="..\src\YBehavior\nodes\comparer.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\sequence.cpp" />
     <ClCompile Include="..\src\YBehavior\shareddata.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\bimap.cpp" />
