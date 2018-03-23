@@ -61,14 +61,14 @@ namespace YBehavior
 		//////////////////////////////////////////////////////////////////////////
 		///> µÈºÅ×ó±ß
 		m_DataType = CreateVariable(m_Opl, "Opl", data, true);
-		if (m_DataType != Types::IntAB && m_DataType != Types::FloatAB)
+		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
 			return;
 		}
 		///> µÈºÅÓÒ±ß1
 		m_DataType = CreateVariable(m_Opr, "Opr", data, true);
-		if (m_DataType != Types::IntAB && m_DataType != Types::FloatAB)
+		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Opr in Comparer: " << m_DataType << ERROR_END;
 			return;
