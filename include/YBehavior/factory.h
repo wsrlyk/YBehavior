@@ -2,7 +2,7 @@
 #define _YBEHAVIOR_FACTORY_H_
 
 #include "YBehavior/define.h"
-#include "YBehavior/shareddata.h"
+#include "YBehavior/types.h"
 #include <unordered_map>
 #include <algorithm>
 

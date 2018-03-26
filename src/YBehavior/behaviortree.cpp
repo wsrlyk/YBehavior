@@ -5,6 +5,7 @@
 #include <sstream>
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariablecreatehelper.h"
+#include "YBehavior/sharedvariableex.h"
 
 namespace YBehavior
 {
@@ -94,35 +95,33 @@ namespace YBehavior
 
 		return buffer[1];
 	}
-	TypeAB BehaviorNode::CreateVariable(ISharedVariable*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle)
+	int BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle)
 	{
 		pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 
 		if (attrOptr.empty())
 		{
 			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
-			return Types::NoneAB;
+			return -1;
 		}
 		std::vector<STRING> buffer;
 		if (!ParseVariable(attrOptr, data, buffer, bSingle ? 1 : 0))
-			return Types::NoneAB;
+			return -1;
 
-		ISharedVariableCreateHelper* helper = Utility::CreateVariableCreateHelper(buffer[0][1], buffer[0][0]);
-		if (helper != NULL)
+		ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
+		if (helper != nullptr)
 		{
 			op = helper->CreateVariable();
 			if (buffer[0][2] == 'S')
-				helper->SetIndex(op, buffer[1]);
+				op->SetIndexFromString(buffer[1]);
 			else
 				op->SetValueFromString(buffer[1]);
 
-			TypeAB type = helper->GetType();
-			delete helper;
-			return type;
+			return op->GetTypeID();
 		}
 		else
 		{
-			return Types::NoneAB;
+			return -1;
 		}
 	}
 
@@ -133,7 +132,7 @@ namespace YBehavior
 
 	BehaviorTree::BehaviorTree()
 	{
-		m_SharedData = new SharedData();
+		m_SharedData = new SharedDataEx();
 	}
 
 	BehaviorTree::~BehaviorTree()
@@ -151,7 +150,7 @@ namespace YBehavior
 				continue;
 			if (!ParseVariable(*it, data, buffer, -1))
 				continue;
-			ISharedVariableCreateHelper* helper = Utility::CreateVariableCreateHelper(buffer[0][1], buffer[0][0]);
+			ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
 			if (helper == nullptr)
 				continue;
 
@@ -159,7 +158,7 @@ namespace YBehavior
 		}
 	}
 
-	void BehaviorTree::CloneData(SharedData& destination)
+	void BehaviorTree::CloneData(SharedDataEx& destination)
 	{
 		destination.Clone(*m_SharedData);
 	}

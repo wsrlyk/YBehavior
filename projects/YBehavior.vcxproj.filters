@@ -57,9 +57,6 @@
     <ClInclude Include="..\include\YBehavior\behaviortreemgr.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\YBehavior\shareddata.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\YBehavior\types.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -96,6 +93,18 @@
     <ClInclude Include="..\include\YBehavior\nodes\comparer.h">
       <Filter>头文件\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\shareddataex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\tools\meta.h">
+      <Filter>头文件\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\sharedvariableex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\variableoperation.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -108,9 +117,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\behaviortreemgr.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\shareddata.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodes\sequence.cpp">

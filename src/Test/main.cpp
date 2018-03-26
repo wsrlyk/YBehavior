@@ -2,7 +2,7 @@
 #include "YBehavior/launcher.h"
 #include "customactions.h"
 #include <windows.h>
-
+#include "YBehavior/shareddataex.h"
 using namespace YBehavior;
 
 int main(int argc, char* argv)
@@ -14,8 +14,6 @@ int main(int argc, char* argv)
 	pEntity->GetAgent()->SetEntity(pEntity);
 	//pEntity->GetAgent()->GetSharedData()->GetBool(3);
 
-	float b = YBehavior::SharedData::s_DefaultFloat;
-	SharedInt aa;
 	//aa.GetValue(pEntity->GetAgent()->GetSharedData());
 	//TreeMgr::Instance()->LoadOneTree("Monster_BlackCrystal");
 	int i = 0;

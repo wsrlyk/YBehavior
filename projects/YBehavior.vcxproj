@@ -25,11 +25,14 @@
     <ClInclude Include="..\include\YBehavior\nodes\calculator.h" />
     <ClInclude Include="..\include\YBehavior\nodes\comparer.h" />
     <ClInclude Include="..\include\YBehavior\nodes\sequence.h" />
-    <ClInclude Include="..\include\YBehavior\shareddata.h" />
+    <ClInclude Include="..\include\YBehavior\shareddataex.h" />
     <ClInclude Include="..\include\YBehavior\sharedvariablecreatehelper.h" />
+    <ClInclude Include="..\include\YBehavior\sharedvariableex.h" />
     <ClInclude Include="..\include\YBehavior\tools\bimap.h" />
+    <ClInclude Include="..\include\YBehavior\tools\meta.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />
+    <ClInclude Include="..\include\YBehavior\variableoperation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\3rd\pugixml\pugixml.cpp" />
@@ -43,7 +46,6 @@
     <ClCompile Include="..\src\YBehavior\nodes\calculator.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\comparer.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\sequence.cpp" />
-    <ClCompile Include="..\src\YBehavior\shareddata.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\bimap.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />
   </ItemGroup>

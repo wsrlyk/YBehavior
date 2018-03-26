@@ -1,7 +1,7 @@
 #include "YBehavior/utility.h"
 #include <vector>
 #include "YBehavior/types.h"
-#include "YBehavior/sharedvariablecreatehelper.h"
+#include "YBehavior/shareddataex.h"
 
 namespace YBehavior
 {
@@ -58,35 +58,4 @@ namespace YBehavior
 		CreateVector3(data, vec);
 		return vec;
 	}
-
-#define DeclareVariableCreateHelperSingle(T) SharedVariableCreateHelper<T, Shared##T>()
-#define DeclareVariableCreateHelperVector(T) SharedVariableCreateHelper<T, SharedVec##T>()
-#define DecideVariableCreateHelper(helper, T, vType, cType) \
-	if (cType != vType)\
-	helper = new DeclareVariableCreateHelperSingle(T);\
-	else\
-	helper = new DeclareVariableCreateHelperVector(T);
-
-	ISharedVariableCreateHelper* Utility::CreateVariableCreateHelper(TypeAB valueType, TypeAB countType)
-	{
-		ISharedVariableCreateHelper* helper = NULL;
-		switch(valueType)
-		{
-		case Types::FloatAB:
-			DecideVariableCreateHelper(helper, Float, valueType, countType);
-			break;
-		case Types::IntAB:
-			DecideVariableCreateHelper(helper, Int, valueType, countType);
-			break;
-		case Types::BoolAB:
-			DecideVariableCreateHelper(helper, Bool, valueType, countType);
-			break;
-		default:
-			return NULL;
-		}
-
-		helper->SetType(valueType);
-		return helper;
-	}
-
 }

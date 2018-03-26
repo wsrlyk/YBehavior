@@ -2,18 +2,18 @@
 #define _YBEHAVIOR_AGENT_H_
 
 #include "YBehavior/define.h"
-#include "YBehavior/shareddata.h"
+#include "YBehavior/shareddataex.h"
 
 namespace YBehavior
 {
 	class BehaviorTree;
 	class YBEHAVIOR_API Agent
 	{
-		SharedData m_SharedData;
+		SharedDataEx m_SharedData;
 		BehaviorTree* m_Tree;
 	public:
 		Agent();
-		inline SharedData* GetSharedData() { return &m_SharedData; }
+		inline SharedDataEx* GetSharedData() { return &m_SharedData; }
 		void SetTree(const STRING& name);
 		void Tick();
 	};

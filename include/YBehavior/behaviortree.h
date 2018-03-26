@@ -2,7 +2,7 @@
 #define _YBEHAVIOR_BEHAVIORTREE_H_
 
 #include "YBehavior/define.h"
-#include "YBehavior/shareddata.h"
+#include "YBehavior/shareddataex.h"
 #include <unordered_map>
 #include <unordered_set>
 namespace pugi
@@ -48,7 +48,7 @@ namespace YBehavior
 		virtual void OnLoaded(const pugi::xml_node& data) {}
 		virtual void OnAddChild(BehaviorNode* child) {}
 		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
-		TypeAB CreateVariable(ISharedVariable*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle);
+		int CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle);
 
 		///>
 		/// single: 1, single; 0, vector; -1, dont care
@@ -90,12 +90,12 @@ namespace YBehavior
 	class YBEHAVIOR_API BehaviorTree : public SingleChildNode
 	{
 	private:
-		SharedData* m_SharedData;	///> 原始数据，每个使用此树的Agent都从这拷数据作为初始化
+		SharedDataEx* m_SharedData;	///> 原始数据，每个使用此树的Agent都从这拷数据作为初始化
 
 	public:
 		BehaviorTree();
 		~BehaviorTree();
-		void CloneData(SharedData& destination);
+		void CloneData(SharedDataEx& destination);
 	protected:
 		virtual void OnLoaded(const pugi::xml_node& data);
 	};

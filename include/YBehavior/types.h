@@ -67,6 +67,28 @@ namespace YBehavior
 		{
 			return !((*this) == other);
 		}
+
+		Vector3 operator + (const Vector3& other) const
+		{
+			Vector3 res(x + other.x, y + other.y, z + other.z);
+			return res;
+		}
+
+		Vector3 operator - (const Vector3& other) const
+		{
+			Vector3 res(x - other.x, y - other.y, z - other.z);
+			return res;
+		}
+
+		Vector3 operator * (const Vector3& other) const
+		{
+			return *this;
+		}
+		Vector3 operator / (const Vector3& other) const
+		{
+			return *this;
+		}
+
 		bool operator < (const Vector3& other) const
 		{
 			return true;
@@ -88,11 +110,6 @@ namespace YBehavior
 		const static Vector3 zero;
 	};
 
-	template<typename T>
-	struct YBEHAVIOR_API Vector
-	{
-		std::vector<T> m_Data;
-	};
 	class Agent;
 	struct YBEHAVIOR_API AgentWrapper
 	{
@@ -160,6 +177,7 @@ namespace YBehavior
 	inline int GetClassTypeNumberId() {
 		return -1;
 	}
+
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Bool, 1);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Int, 2);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Uint64, 3);
@@ -189,6 +207,32 @@ namespace YBehavior
 		DEFINE_TYPEAB(Uint64, 'U');
 		DEFINE_TYPEAB(Vector3, 'V');
 	};
+
+	template <char c1, char c2>
+	class Char2Type
+	{
+		typedef Int Result;
+	};
+
+#define DEFINE_Char2Type(t, c)\
+	template <>\
+	class Char2Type<c, c>\
+	{\
+		typedef std::vector<t> Result; \
+	};\
+	template <>\
+	class Char2Type<c, '_'>\
+	{\
+		typedef t Result;\
+	};\
+
+	DEFINE_Char2Type(Int, 'I');
+	DEFINE_Char2Type(Float, 'F');
+	DEFINE_Char2Type(Bool, 'B');
+	DEFINE_Char2Type(String, 'S');
+	DEFINE_Char2Type(Uint64, 'U');
+	DEFINE_Char2Type(Vector3, 'V');
+
 }
 
 #endif

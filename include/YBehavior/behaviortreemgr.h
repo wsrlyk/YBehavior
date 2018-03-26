@@ -2,7 +2,7 @@
 #define _YBEHAVIOR_BEHAVIORTREEMGR_H_
 
 #include "YBehavior/define.h"
-#include "YBehavior/shareddata.h"
+#include "YBehavior/types.h"
 #include <unordered_map>
 
 namespace pugi
