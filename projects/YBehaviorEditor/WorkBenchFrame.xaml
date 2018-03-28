@@ -23,7 +23,7 @@
             <Button Name="Operation1" Grid.Row="0" Grid.Column="1" Width="20" HorizontalAlignment="Left"></Button>
         </Grid>-->
         <TabControl Name="TabController" Grid.Row="0" Tag="200" SelectionChanged="TabController_SelectionChanged"></TabControl>
-        <Grid Grid.Row="1" Background="Gray" Name="CanvasBoard">
+        <Grid Grid.Row="1" Background="Gray" Name="CanvasBoard" ClipToBounds ="True">
             <Canvas Focusable="True" Name="Canvas">
             </Canvas>
         </Grid>
