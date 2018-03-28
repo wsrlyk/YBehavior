@@ -16,11 +16,28 @@ using YBehavior.Editor.Core;
 
 namespace YBehavior.Editor
 {
+    class PageData
+    {
+        public TransformGroup TransGroup { get; } = new TransformGroup();
+
+        public ScaleTransform ScaleTransform { get; } = new ScaleTransform(1.0f, 1.0f);
+        public TranslateTransform TranslateTransform { get; } = new TranslateTransform();
+
+        public PageData()
+        {
+            TransGroup.Children.Add(ScaleTransform);
+            TransGroup.Children.Add(TranslateTransform);
+        }
+    }
     /// <summary>
     /// WorkBenchFrame.xaml 的交互逻辑
     /// </summary>
     public partial class WorkBenchFrame : UserControl
     {
+        Dictionary<UCTabItemWithClose, PageData> m_PageDataDic = new Dictionary<UCTabItemWithClose, PageData>();
+
+        PageData m_CurPageData;
+        Core.Operation m_Operation;
         public WorkBenchFrame()
         {
             InitializeComponent();
@@ -29,6 +46,9 @@ namespace YBehavior.Editor
             Focus();
 
             DraggingConnection.Instance.SetCanvas(this.Canvas);
+
+            m_Operation = new Operation(this.CanvasBoard);
+            m_Operation.RegisterDrag(_OnDrag);
         }
 
         private void _OnWorkBenchLoaded(EventArg arg)
@@ -57,6 +77,8 @@ namespace YBehavior.Editor
                 activeTab.Content = oArg.Bench;
                 activeTab.CloseHandler = _TabCloseClicked;
                 this.TabController.Items.Add(activeTab);
+
+                m_PageDataDic[activeTab] = new PageData();
             }
 
             activeTab.IsSelected = true;
@@ -70,21 +92,17 @@ namespace YBehavior.Editor
                 return false;
 
             WorkBench bench = tab.Content as WorkBench;
-            if (bench == null)
-                return true;
-
+            if (bench != null)
             // if is dirty
             {
                 MessageBoxResult dr = MessageBox.Show("This file has been modified. Save it?", "To Save Or Not To Save", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
                 if (dr == MessageBoxResult.Yes)
                 {
-                    if (WorkBenchMgr.Instance.SaveWorkBench(bench))
-                        return true;
+                    WorkBenchMgr.Instance.SaveWorkBench(bench);
                 }
                 else if (dr == MessageBoxResult.No)
                 {
                     WorkBenchMgr.Instance.Remove(bench);
-                    return true;
                 }
                 else
                 {
@@ -92,6 +110,7 @@ namespace YBehavior.Editor
                 }
             }
 
+            m_PageDataDic.Remove(tab);
             return true;
         }
 
@@ -102,7 +121,7 @@ namespace YBehavior.Editor
                 return;
 
             ///> TODO: move the node to the center of the canvas
-            
+
             _RenderNode(oArg.Node);
         }
 
@@ -134,7 +153,7 @@ namespace YBehavior.Editor
             node.Renderer.Render(this.Canvas);
         }
 
-        
+
         private void _KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
@@ -161,6 +180,9 @@ namespace YBehavior.Editor
                         LogMgr.Instance.Log("Tab selected: " + tab.Header);
                         if (WorkBenchMgr.Instance.Switch(tab.Content as WorkBench))
                             _RenderActiveWorkBench();
+
+                        m_CurPageData = m_PageDataDic[tab];
+                        this.Canvas.RenderTransform = m_CurPageData.TransGroup;
                         return;
                     }
 
@@ -168,6 +190,45 @@ namespace YBehavior.Editor
                 }
             }
         }
-    }
 
+        private void _MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            Point pos = e.GetPosition(this.CanvasBoard);
+            Point oldPos = new Point(m_CurPageData.TranslateTransform.X, m_CurPageData.TranslateTransform.Y);
+
+            double width = this.Canvas.ActualWidth;
+            double height = this.Canvas.ActualHeight;
+
+            double oldWidth = width * m_CurPageData.ScaleTransform.ScaleX;
+            double oldHeight = height * m_CurPageData.ScaleTransform.ScaleY;
+
+            double rateX = (pos.X - oldPos.X) / oldWidth;
+            double rateY = (pos.Y - oldPos.Y) / oldHeight;
+
+            double delta = (e.Delta / Math.Abs(e.Delta) * 0.1);
+            m_CurPageData.ScaleTransform.ScaleX *= (1.0 + delta);
+            m_CurPageData.ScaleTransform.ScaleY *= (1.0 + delta);
+
+            double deltaX = (width * m_CurPageData.ScaleTransform.ScaleX - oldWidth) * rateX;
+            double deltaY = (height * m_CurPageData.ScaleTransform.ScaleY - oldHeight) * rateY;
+
+            m_CurPageData.TranslateTransform.X -= deltaX;
+            m_CurPageData.TranslateTransform.Y -= deltaY;
+        }
+
+
+        void _OnDrag(Vector delta, Point pos)
+        {
+            m_CurPageData.TranslateTransform.X += delta.X;
+            m_CurPageData.TranslateTransform.Y += delta.Y;
+        }
+
+        public void ResetTransform()
+        {
+            m_CurPageData.ScaleTransform.ScaleX = 0;
+            m_CurPageData.ScaleTransform.ScaleY = 0;
+            m_CurPageData.TranslateTransform.X = 0;
+            m_CurPageData.TranslateTransform.Y = 0;
+        }
+    }
 }

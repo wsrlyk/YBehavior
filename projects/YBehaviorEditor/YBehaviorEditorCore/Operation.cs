@@ -9,7 +9,7 @@ using System.Windows.Media;
 
 namespace YBehavior.Editor.Core
 {
-    class Operation
+    public class Operation
     {
         public delegate void ClickHandler();
         public delegate void DragHandler(Vector delta, Point absPos);
@@ -67,6 +67,7 @@ namespace YBehavior.Editor.Core
             m_bStartClick = true;
             m_bStartDrag = true;
             m_Pos = e.GetPosition(m_Panel);
+            e.Handled = true;
         }
         void _PreviewMouseMove(object sender, MouseEventArgs e)
         {
@@ -118,6 +119,7 @@ namespace YBehavior.Editor.Core
                 if (m_DragHandler != null)
                     m_DragHandler(new Vector(0, 0), m_Pos);
             }
+            e.Handled = true;
         }
 
         List<DependencyObject> m_HitTestResult = new List<DependencyObject>();
