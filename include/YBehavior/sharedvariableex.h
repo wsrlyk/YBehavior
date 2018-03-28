@@ -12,6 +12,7 @@ namespace YBehavior
 	public:
 		virtual ~ISharedVariableEx() {}
 		inline void SetIndex(INT index) { m_Index = index; }
+		virtual void SetVectorIndex(const STRING& vbType, const STRING& s) { }
 		virtual void SetIndexFromString(const STRING& s) = 0;
 		virtual const void* GetValue(SharedDataEx* pData) = 0;
 		virtual void SetValue(SharedDataEx* pData, const void* src) = 0;
@@ -20,15 +21,26 @@ namespace YBehavior
 		virtual IVariableOperationHelper* GetOperation() = 0;
 	protected:
 		INT m_Index;
-
 	};
+
 	template<typename T>
 	class SharedVariableEx : public ISharedVariableEx
 	{
 	public:
 		typedef typename IsVector<T>::ElementType ElementType;
+		SharedVariableEx()
+		{
+			m_VectorIndex = nullptr;
+			m_Index = SharedDataEx::INVALID_INDEX;
+		}
+		~SharedVariableEx()
+		{
+			if (m_VectorIndex != nullptr)
+				delete m_VectorIndex;
+		}
 	protected:
 		T m_Value;
+		SharedVariableEx<INT>* m_VectorIndex;
 
 		inline void _SetValue(const void* pValue)
 		{
@@ -44,16 +56,11 @@ namespace YBehavior
 
 		const void* GetValue(SharedDataEx* pData)
 		{
-			if (pData == nullptr || m_Index == SharedDataEx::INVALID_INDEX)
-				return (const void*)&m_Value;
-			return pData->Get<T>(m_Index);
+			return GetCastedValue(pData);
 		}
 		void SetValue(SharedDataEx* pData, const void* src)
 		{
-			if (pData == nullptr || m_Index == SharedDataEx::INVALID_INDEX)
-				m_Value = *((T*)src);
-			else
-				pData->Set<T>(m_Index, (const T*)src);
+			SetCastedValue(pData, (const T*)src);
 		}
 
 		void SetValueFromString(const STRING& str)
@@ -81,23 +88,77 @@ namespace YBehavior
 		}
 		void SetIndexFromString(const STRING& s)
 		{
-			SetIndex(NodeFactory::Instance()->CreateIndexByName<T>(s));
+			///> if T is a single type but has vector index, it means this variable is an element of a vector.
+			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
+			{
+				SetIndex(NodeFactory::Instance()->CreateIndexByName<std::vector<T>>(s));
+			}
+			else
+			{
+				SetIndex(NodeFactory::Instance()->CreateIndexByName<T>(s));
+			}
 		}
 
 		const T* GetCastedValue(SharedDataEx* pData)
 		{
-			if (data == nullptr || m_Index == SharedDataEx::INVALID_INDEX)
+			if (pData == nullptr || m_Index == SharedDataEx::INVALID_INDEX)
 				return &m_Value;
+			///> It's an element of a vector
+			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
+			{
+				INT index = *(m_VectorIndex->GetCastedValue(pData));
+				if (index < 0)
+				{
+					ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << ERROR_END;
+					return nullptr;
+				}
+				const std::vector<T>* pVector = (const std::vector<T>*)pData->Get<std::vector<T>>(m_Index);
+				if (pVector && index < pVector->size())
+				{
+					const T& t = (*pVector)[index];
+					return &t;
+				}
+				return nullptr;
+			}
+
 			return (const T*)pData->Get<T>(m_Index);
 		}
 
 		void SetCastedValue(SharedDataEx* pData, const T* src)
 		{
-			if (data == nullptr || m_Index == SharedDataEx::INVALID_INDEX)
+			if (pData == nullptr || m_Index == SharedDataEx::INVALID_INDEX)
+			{
 				m_Value = *((T*)src);
-			else
-				pData->Set<T>(m_Index, src);
+				return;
+			}
+			///> It's an element of a vector
+			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
+			{
+				INT index = *(m_VectorIndex->GetCastedValue(pData));
+				if (index < 0)
+					return;
+				const std::vector<T>* pVector = (const std::vector<T>*)pData->Get<std::vector<T>>(m_Index);
+				if (pVector && index < pVector->size())
+					(*const_cast<std::vector<T>*>(pVector))[index] = *src;
+			}
+			pData->Set<T>(m_Index, src);
 		}
+
+		///> This function must be called BEFORE SetIndexFromString
+		void SetVectorIndex(const STRING& vbType, const STRING& s)
+		{
+			if (vbType == "S")
+			{
+				m_VectorIndex = new SharedVariableEx<INT>();
+				m_VectorIndex->SetIndexFromString(s);
+			}
+			else if (vbType == "C")
+			{
+				m_VectorIndex = new SharedVariableEx<INT>();
+				m_VectorIndex->SetValueFromString(s);
+			}
+		}
+
 	};
 
 

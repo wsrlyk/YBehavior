@@ -161,16 +161,36 @@ namespace YBehavior.Editor.Core
                 using (var handler = Candidates.Delay())
                 {
                     Candidates.Clear();
+                    m_VectorCandidates.Clear();
                     foreach (var v in SharedData.Datas.Values)
                     {
-                        if (v.vType == vType && v.cType == cType)
-                            Candidates.Add(v.Name);
+                        if (v.vType == vType)
+                        {
+                            if (v.cType == cType)
+                                Candidates.Add(v.Name);
+                            ///> List can also be added to the candidates if the target is single
+                            else if (v.cType == CountType.CT_LIST && !IsIndex)
+                            {
+                                Candidates.Add(v.Name);
+                                m_VectorCandidates.Add(v.Name);
+                            }
+                        }
                     }
                 }
             }
         }
         public DelayableNotificationCollection<string> Candidates { get; } = new DelayableNotificationCollection<string>();
+        private HashSet<string> m_VectorCandidates = new HashSet<string>();
 
+        /// <summary>
+        /// Parent is for the vectorindex variable
+        /// </summary>
+        Variable m_Parent;
+        Variable m_VectorIndex = null;
+        public Variable VectorIndex { get { return m_VectorIndex; } }
+
+        public bool IsElement { get { return cType == CountType.CT_SINGLE && m_VectorIndex != null; } }
+        public bool IsIndex { get { return m_Parent != null; } }
         //bool m_bCandidatesDirty = true;
         bool m_bInited = false;
 
@@ -184,12 +204,42 @@ namespace YBehavior.Editor.Core
             }
         }
         public string Name { get { return m_Name; } }
+        public string NoteValue
+        {
+            get
+            {
+                if (IsElement)
+                    return Value + '[' + m_VectorIndex.Value + ']';
+                return Value;
+            }
+        }
         public string Value
         {
             get { return m_Value; }
             set
             {
                 m_Value = value;
+
+                if (!IsIndex)
+                {
+                    if (vbType == VariableType.VBT_Pointer)
+                    {
+                        if (cType == CountType.CT_SINGLE && m_VectorCandidates.Contains(m_Value))
+                        {
+                            m_VectorIndex = new Variable(SharedData);
+                            m_VectorIndex.m_Parent = this;
+                            m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, "0");
+                        }
+                        else
+                        {
+                            m_VectorIndex = null;
+                        }
+                    }
+                    else
+                    {
+                        m_VectorIndex = null;
+                    }
+                }
                 _OnValueChanged();
                 _OnConditionChanged();
             }
@@ -198,7 +248,11 @@ namespace YBehavior.Editor.Core
         private void _OnValueChanged()
         {
             OnPropertyChanged("Value");
-            Container.OnVariableValueChanged(this);
+            OnPropertyChanged("IsElement");
+            if (Container != null)
+                Container.OnVariableValueChanged(this);
+            else if (m_Parent != null)
+                m_Parent.Container.OnVariableValueChanged(m_Parent);
         }
         private void _OnConditionChanged()
         {
@@ -227,6 +281,11 @@ namespace YBehavior.Editor.Core
                 char _vbtype = VariableTypeDic.GetValue(m_vbType, CONST);
                 StringBuilder sb = new StringBuilder();
                 sb.Append(_ctype).Append(_vtype).Append(_vbtype).Append(' ').Append(Value);
+
+                if (m_VectorIndex != null)
+                {
+                    sb.Append(" VI ").Append(VariableTypeDic.GetValue(m_VectorIndex.vbType, CONST)).Append(' ').Append(m_VectorIndex.Value);
+                }
                 return sb.ToString();
             }
         }
@@ -264,7 +323,8 @@ namespace YBehavior.Editor.Core
 
                 if (other.cType != cType)
                 {
-                    LogMgr.Instance.Error(string.Format("Types dont match: {0}.{1} != {2}.{3}", Name, cType, other.Name, other.cType));
+                    if (m_VectorIndex == null)
+                        LogMgr.Instance.Error(string.Format("Types dont match: {0}.{1} != {2}.{3}", Name, cType, other.Name, other.cType));
                     return false;
                 }
                 return true;
@@ -343,7 +403,7 @@ namespace YBehavior.Editor.Core
         public bool SetVariableInNode(string s, string newName = null)
         {
             string[] ss = s.Split(SpaceSpliter);
-            if (ss.Length > 2 || ss.Length == 0 || ss[0].Length != 3)
+            if (ss.Length == 0 || ss[0].Length != 3)
             {
                 LogMgr.Instance.Error("Format error when set variable from node: " + s);
                 return false;
@@ -351,9 +411,23 @@ namespace YBehavior.Editor.Core
             if (newName != null)
                 m_Name = newName;
 
-            return SetVariable(ss[0][1], ss[0][0], ss[0][2], ss.Length == 2 ? ss[1] : string.Empty);
+            if(!SetVariable(ss[0][1], ss[0][0], ss[0][2], ss.Length >= 2 ? ss[1] : string.Empty))
+                return false;
+
+            if (ss.Length >= 5 && ss[2] == "VI")
+            {
+                SetVectorIndex(ss[3], ss[4]);
+            }
+            return true;
         }
 
+        private bool SetVectorIndex(string variableType, string value)
+        {
+            m_VectorIndex = new Variable(SharedData);
+            m_VectorIndex.m_Parent = this;
+            m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableTypeDic.GetKey(variableType[0],VariableType.VBT_NONE), value);
+            return true;
+        }
         public bool SetVariable(char valueType, char countType, char variableType, string value, string param = null)
         {
             m_bInited = false;

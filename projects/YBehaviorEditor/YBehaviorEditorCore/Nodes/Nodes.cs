@@ -90,7 +90,7 @@ namespace YBehavior.Editor.Core
                 int i = 0;
                 foreach (var v in m_Variables.Datas.Values)
                 {
-                    values[i++] = v.Value;
+                    values[i++] = v.NoteValue;
                 }
                 return string.Format(NoteFormat, values);
             }
@@ -152,10 +152,10 @@ namespace YBehavior.Editor.Core
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendFormat("{0} <= {1} {2} {3}",
-                    Variables.GetVariable("Opl").Value,
-                    Variables.GetVariable("Opr1").Value,
+                    Variables.GetVariable("Opl").NoteValue,
+                    Variables.GetVariable("Opr1").NoteValue,
                     s_OperatorDic[Variables.GetVariable("Operator").Value],
-                    Variables.GetVariable("Opr2").Value);
+                    Variables.GetVariable("Opr2").NoteValue);
                 return sb.ToString();
             }
         }
@@ -207,9 +207,9 @@ namespace YBehavior.Editor.Core
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendFormat("{0} {1} {2} ?",
-                    Variables.GetVariable("Opl").Value,
+                    Variables.GetVariable("Opl").NoteValue,
                     Variables.GetVariable("Operator").Value,
-                    Variables.GetVariable("Opr").Value
+                    Variables.GetVariable("Opr").NoteValue
                     );
                 return sb.ToString();
             }

@@ -57,8 +57,8 @@ namespace YBehavior
 	bool BehaviorNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single)
 	{
 		auto tempChar = attri.value();
-		///> Only split the first space
-		Utility::SplitString(tempChar, buffer, Utility::SpaceSpliter, 1);
+		///> split all spaces
+		Utility::SplitString(tempChar, buffer, Utility::SpaceSpliter);
 		if (buffer.size() == 0 || buffer[0].length() != 3)
 		{
 			ERROR_BEGIN << "Format Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
@@ -112,6 +112,13 @@ namespace YBehavior
 		if (helper != nullptr)
 		{
 			op = helper->CreateVariable();
+
+			///> Vector Index
+			if (buffer.size() >= 5 && buffer[2] == "VI")
+			{
+				op->SetVectorIndex(buffer[3], buffer[4]);
+			}
+
 			if (buffer[0][2] == 'S')
 				op->SetIndexFromString(buffer[1]);
 			else

@@ -23,7 +23,7 @@ public:
 	{
 		m_Name = name;
 		pAgent = new XAgent();
-		pAgent->SetTree("Monster_BlackCrystal2");
+		pAgent->SetTree("Monster_BlackCrystal");
 	}
 
 	inline const std::string& GetName() { return m_Name; }

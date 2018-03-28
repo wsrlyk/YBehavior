@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Monster_BlackCrystal>
-  <Node Class="Root" Pos="10,10" target="_AC " add0="_IC 1" add1="_IC 1" fftest="FFC 1.0|2.0|3.0" bbtest="BBC true|false|true|false" btest="_BC true" pos="_VC 100=200=300">
+  <Node Class="Root" Pos="10,10" target="_AC " add0="_IC 1" add1="_IC 1" fftest="FFC 1.0|2.0|3.0" bbtest="BBC true|false|true|false" iitest="IIC 1|2|3|4" btest="_BC true" pos="_VC 100=200=300">
     <Node Class="Sequence" Pos="100,100" NickName="Hehequence12345678">
-      <Node Class="Calculator" Pos="10,200" Operator="_EC ADD" Opl="_IS add0" Opr1="_IS add0" Opr2="_IS add1" />
-      <Node Class="Calculator" Pos="200,200" NickName="Calculator12345678" Operator="_EC ADD" Opl="_IS add1" Opr1="_IS add0" Opr2="_IS add1" />
+      <Node Class="Calculator" Pos="10,200" Operator="_EC ADD" Opl="_IS iitest VI C 0" Opr1="_IS iitest VI C 0" Opr2="_IS iitest VI C 1" />
+      <Node Class="Calculator" Pos="200,200" NickName="Calculator12345678" Operator="_EC ADD" Opl="_IS iitest VI C 1" Opr1="_IS iitest VI C 0" Opr2="_IS iitest VI C 1" />
     </Node>
   </Node>
 </Monster_BlackCrystal>
