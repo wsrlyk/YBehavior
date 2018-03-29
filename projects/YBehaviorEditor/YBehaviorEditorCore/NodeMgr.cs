@@ -171,8 +171,8 @@ namespace YBehavior.Editor.Core
         protected NodeHierachy m_Hierachy = NodeHierachy.NH_None;
         public NodeHierachy Hierachy { get { return m_Hierachy; } set { m_Hierachy = value; } }
 
-        public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class" });
-        public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName" });
+        public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class", "Connection" });
+        public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName", "Connection" });
 
         public Renderer Renderer { get { return m_Renderer; } }
         protected Renderer m_Renderer;
@@ -344,6 +344,20 @@ namespace YBehavior.Editor.Core
             data.SetAttribute("Pos", m_Geo.Pos.ToString());
             if (!string.IsNullOrEmpty(m_NickName))
                 data.SetAttribute("NickName", m_NickName);
+
+            foreach (Variable v in Variables.Datas.Values)
+            {
+                data.SetAttribute(v.Name, v.ValueInXml);
+            }
+        }
+
+        public virtual void Export(System.Xml.XmlElement data)
+        {
+            if (Conns.ParentHolder != null && Conns.ParentHolder.Conn != null)
+            {
+                if (Conns.ParentHolder.Conn.Identifier != Connection.IdentifierChildren)
+                    data.SetAttribute("Connection", Conns.ParentHolder.Conn.Identifier);
+            }
 
             foreach (Variable v in Variables.Datas.Values)
             {

@@ -7,10 +7,22 @@ namespace YBehavior.Editor.Core
 {
     public class TreeFileMgr : Singleton<TreeFileMgr>
     {
+        public string WorkingPath { get; set; }
+        public string ExportingPath { get; set; }
         public void Load()
         {
             if (m_TreeFileInfos.Children != null)
                 m_TreeFileInfos.Children.Clear();
+
+            WorkingPath = null;
+            DirectoryInfo exportDir = new DirectoryInfo(Config.Instance.ExportingDir);
+            if (!exportDir.Exists)
+            {
+                LogMgr.Instance.Error("ExportingPath not exists: " + Config.Instance.ExportingDir);
+                return;
+            }
+            ExportingPath = exportDir.FullName;
+
             LoadDir(Config.Instance.WorkingDir, m_TreeFileInfos);
         }
         public void LoadDir(string dir, TreeFileInfo parent)
@@ -18,6 +30,8 @@ namespace YBehavior.Editor.Core
             DirectoryInfo TheFolder = new DirectoryInfo(dir);
             if (!TheFolder.Exists)
                 return;
+            if (WorkingPath == null)
+                WorkingPath = TheFolder.FullName;
 
             TreeFileInfo thisFolder = new TreeFileInfo
             {
@@ -42,8 +56,8 @@ namespace YBehavior.Editor.Core
                     continue;
                 TreeFileInfo thisFile = new TreeFileInfo
                 {
-                    Name = NextFile.Name.Remove( NextFile.Name.LastIndexOf(NextFile.Extension)),
-                    Path = NextFile.FullName
+                    Name = NextFile.Name.Remove(NextFile.Name.LastIndexOf(NextFile.Extension)),
+                    Path = NextFile.FullName,
                 };
                 thisFolder.Children.Add(thisFile);
             }
@@ -51,14 +65,24 @@ namespace YBehavior.Editor.Core
 
         public class TreeFileInfo
         {
-            public string DisplayName { get { return Name == null ? "Untitled" : Name; } }
-            public string DisplayPath { get { return Path == null ? "NULL" : Path; } }
+            public string DisplayName { get { return Name ?? "Untitled"; } }
+            public string DisplayPath { get { return Path ?? "NULL"; } }
 
 
             public string Name { get; set; }
             public List<TreeFileInfo> Children { get; set; }
             public bool bIsFolder = false;
-            public string Path { get; set; }
+            private string m_Path = null;
+            public string Path
+            {
+                get { return m_Path; }
+                set
+                {
+                    m_Path = value;
+                    ExportingPath = m_Path.Replace(TreeFileMgr.Instance.WorkingPath, TreeFileMgr.Instance.ExportingPath);
+                }
+            }
+            public string ExportingPath { get; set; }
         }
         public TreeFileInfo m_TreeFileInfos = new TreeFileInfo();
 

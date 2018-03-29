@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Xml;
 
 namespace YBehavior.Editor.Core
@@ -126,6 +127,27 @@ namespace YBehavior.Editor.Core
 
             bench.Save(el, xmlDoc);
             xmlDoc.Save(bench.FileInfo.Path);
+
+            return true;
+        }
+
+        public bool ExportWorkBench(WorkBench bench = null)
+        {
+            if (bench == null)
+                bench = ActiveWorkBench;
+            if (bench.FileInfo.Path == null)
+            {
+                MessageBoxResult dr = MessageBox.Show("This file must be saved first.", "Go to save", MessageBoxButton.OK, MessageBoxImage.Error);
+                return true;
+            }
+
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.AppendChild(xmlDoc.CreateXmlDeclaration("1.0", "utf-8", null));
+            var el = xmlDoc.CreateElement(bench.FileInfo.Name);
+            xmlDoc.AppendChild(el);
+
+            bench.Export(el, xmlDoc);
+            xmlDoc.Save(bench.FileInfo.ExportingPath);
 
             return true;
         }

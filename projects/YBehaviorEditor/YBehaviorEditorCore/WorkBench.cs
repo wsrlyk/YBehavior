@@ -174,6 +174,25 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        public void Export(XmlElement data, XmlDocument xmlDoc)
+        {
+            _ExportNode(MainTree, data, xmlDoc);
+        }
+
+        void _ExportNode(Node node, XmlElement data, XmlDocument xmlDoc)
+        {
+            XmlElement nodeEl = xmlDoc.CreateElement("Node");
+            data.AppendChild(nodeEl);
+
+            nodeEl.SetAttribute("Class", node.Name);
+            node.Export(nodeEl);
+
+            foreach (Node chi in node.Conns)
+            {
+                _ExportNode(chi, nodeEl, xmlDoc);
+            }
+        }
+
         public void RemoveSubTree(Node root)
         {
             if (root == null)

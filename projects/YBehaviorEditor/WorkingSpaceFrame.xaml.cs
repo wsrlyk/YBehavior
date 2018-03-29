@@ -93,6 +93,7 @@ namespace YBehavior.Editor
         private void _BtnSaveClick(object sender, RoutedEventArgs e)
         {
             WorkBenchMgr.Instance.SaveWorkBench();
+            WorkBenchMgr.Instance.ExportWorkBench();
         }
 
         private void _BtnNewClick(object sender, RoutedEventArgs e)

@@ -9,6 +9,7 @@ namespace YBehavior.Editor.Core
     class Config : Singleton<Config>
     {
         public string WorkingDir { get; set; }
+        public string ExportingDir { get; set; }
 
         public Config()
         {
@@ -21,6 +22,7 @@ namespace YBehavior.Editor.Core
             xmlDoc.Load("config.xml");
             XmlElement root = xmlDoc.DocumentElement;
             WorkingDir = root.GetAttribute("WorkingDir");
+            ExportingDir = root.GetAttribute("ExportingDir");
 
             var attr = root.Attributes.GetNamedItem("ExternalAction");
             if (attr != null)
