@@ -40,13 +40,13 @@ namespace YBehavior
 		void Load(const pugi::xml_node& data);
 		NodeState Execute(AgentPtr pAgent);
 		static BehaviorNode* CreateNodeByName(const STRING& name);
-		virtual void AddChild(BehaviorNode* child);
+		virtual void AddChild(BehaviorNode* child, const STRING& connection);
 
 		virtual STRING GetNodeInfoForPrint() { return "";}
 	protected:
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
 		virtual void OnLoaded(const pugi::xml_node& data) {}
-		virtual void OnAddChild(BehaviorNode* child) {}
+		virtual void OnAddChild(BehaviorNode* child, const STRING& connection) {}
 		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
 		int CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle);
 
@@ -64,7 +64,7 @@ namespace YBehavior
 	protected:
 		std::vector<BehaviorNodePtr>* m_Childs;
 
-		virtual void AddChild(BehaviorNode* child);
+		void AddChild(BehaviorNode* child, const STRING& connection) override;
 		void _DestroyChilds();
 	};
 
@@ -79,8 +79,8 @@ namespace YBehavior
 		~SingleChildNode(){}
 	protected:
 		BehaviorNode* m_Child;
-		virtual void OnAddChild(BehaviorNode* child);
-		virtual NodeState Update(AgentPtr pAgent);
+		void OnAddChild(BehaviorNode* child, const STRING& connection) override;
+		NodeState Update(AgentPtr pAgent) override;
 	};
 
 	class YBEHAVIOR_API CompositeNode: public BranchNode

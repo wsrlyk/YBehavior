@@ -66,7 +66,9 @@ namespace YBehavior
 					continue;
 				}
 
-				node->AddChild(childNode);
+				auto connectionName = it->attribute("Connection");
+				node->AddChild(childNode, connectionName.value());
+
 				_LoadOneNode(childNode, *it);
 			}
 			else

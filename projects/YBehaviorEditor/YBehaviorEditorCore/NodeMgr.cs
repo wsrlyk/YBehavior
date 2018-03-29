@@ -73,8 +73,10 @@ namespace YBehavior.Editor.Core
         NT_Comparer,
         NT_Not,
         NT_AlwaysSuccess,
+        NT_AlwaysFailed,
         NT_Selector,
         NT_Action,
+        NT_IfThenElse,
     }
 
     public enum NodeHierachy
@@ -86,7 +88,7 @@ namespace YBehavior.Editor.Core
 
         NH_Sequence = 13,
         NH_Selector = 23,
-
+        
         NH_DefaultAction = 11,
         NH_Custom = 21,
     }

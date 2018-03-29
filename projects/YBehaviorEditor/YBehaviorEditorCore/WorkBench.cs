@@ -15,15 +15,15 @@ namespace YBehavior.Editor.Core
 
         public TreeFileMgr.TreeFileInfo FileInfo { get; set; }
 
+        static int g_ID_inc = 0;
+
+        int m_UID;
         public WorkBench()
         {
-            ///> TODO: these events should be removed when the bench is not active;
-            EventMgr.Instance.Register(EventType.NodesConnected, _OnNodesConnected);
-            EventMgr.Instance.Register(EventType.NodesDisconnected, _OnNodesDisconnected);
-            EventMgr.Instance.Register(EventType.RemoveNode, _RemoveNode);
+            m_UID = ++g_ID_inc;
         }
 
-        private void _OnNodesConnected(EventArg arg)
+        public void OnNodesConnected(EventArg arg)
         {
             NodesConnectedArg oArg = arg as NodesConnectedArg;
 
@@ -46,7 +46,7 @@ namespace YBehavior.Editor.Core
 
         }
 
-        private void _OnNodesDisconnected(EventArg arg)
+        public void OnNodesDisconnected(EventArg arg)
         {
             NodesDisconnectedArg oArg = arg as NodesDisconnectedArg;
 
@@ -59,7 +59,7 @@ namespace YBehavior.Editor.Core
                 Node parentNode = conn.Owner as Node;
                 parentNode.Renderer.RenderConnections();
 
-                Node childNode = conn.Owner as Node;
+                Node childNode = oArg.ChildHolder.Owner as Node;
                 AddSubTree(childNode);
 
             }
@@ -69,7 +69,7 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        private void _RemoveNode(EventArg arg)
+        public void RemoveNode(EventArg arg)
         {
             RemoveNodeArg oArg = arg as RemoveNodeArg;
 

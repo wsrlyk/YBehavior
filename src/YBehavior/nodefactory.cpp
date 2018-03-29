@@ -3,7 +3,8 @@
 #include "YBehavior/nodes/calculator.h"
 #include "YBehavior/nodes/Sequence.h"
 #include "YBehavior/nodes/comparer.h"
-
+#include "YBehavior/nodes/ifthenelse.h"
+#include "YBehavior/nodes/decorator.h"
 namespace YBehavior
 {
 	void NodeFactory::SetActiveTree(const STRING& tree)
@@ -38,6 +39,9 @@ namespace YBehavior
 		REGISTER_TYPE(factory, Sequence);
 		REGISTER_TYPE(factory, Calculator);
 		REGISTER_TYPE(factory, Comparer);
+		REGISTER_TYPE(factory, IfThenElse);
+		REGISTER_TYPE(factory, AlwaysSuccess);
+		REGISTER_TYPE(factory, AlwaysFailed);
 
 		return factory;
 	}

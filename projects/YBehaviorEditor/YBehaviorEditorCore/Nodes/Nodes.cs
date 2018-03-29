@@ -234,4 +234,30 @@ namespace YBehavior.Editor.Core
             m_Hierachy = NodeHierachy.NH_Decorator;
         }
     }
+
+    class AlwaysFailedNode : SingleChildNode
+    {
+        public AlwaysFailedNode()
+        {
+            m_Name = "AlwaysFailed";
+            m_Type = NodeType.NT_AlwaysFailed;
+            m_Hierachy = NodeHierachy.NH_Decorator;
+        }
+    }
+
+    class IfThenElseNode : Node
+    {
+        public IfThenElseNode()
+        {
+            m_Name = "IfThenElse";
+            m_Type = NodeType.NT_IfThenElse;
+            m_Hierachy = NodeHierachy.NH_Compositor;
+
+            new ConnectionSingle(this, "if");
+            new ConnectionSingle(this, "then");
+            new ConnectionSingle(this, "else");
+        }
+
+
+    }
 }

@@ -229,6 +229,7 @@ namespace YBehavior.Editor.Core
                             m_VectorIndex = new Variable(SharedData);
                             m_VectorIndex.m_Parent = this;
                             m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, "0");
+                            OnPropertyChanged("VectorIndex");
                         }
                         else
                         {

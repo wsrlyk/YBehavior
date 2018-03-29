@@ -49,7 +49,7 @@ namespace YBehavior
 		OnLoaded(data);
 	}
 
-	void BehaviorNode::AddChild(BehaviorNode* child)
+	void BehaviorNode::AddChild(BehaviorNode* child, const STRING& connection)
 	{
 		ERROR_BEGIN << "Cant add child to this node: " << ERROR_END;
 	}
@@ -180,7 +180,7 @@ namespace YBehavior
 
 	}
 
-	void SingleChildNode::OnAddChild(BehaviorNode* child)
+	void SingleChildNode::OnAddChild(BehaviorNode* child, const STRING& connection)
 	{
 		if (m_Child == nullptr)
 			m_Child = child;
@@ -219,7 +219,7 @@ namespace YBehavior
 	}
 
 
-	void BranchNode::AddChild(BehaviorNode* child)
+	void BranchNode::AddChild(BehaviorNode* child, const STRING& connection)
 	{
 		if (child == nullptr)
 			return;
@@ -230,7 +230,7 @@ namespace YBehavior
 		m_Childs->push_back(child);
 		child->SetParent(this);
 
-		OnAddChild(child);
+		OnAddChild(child, connection);
 	}
 
 	void BranchNode::_DestroyChilds()

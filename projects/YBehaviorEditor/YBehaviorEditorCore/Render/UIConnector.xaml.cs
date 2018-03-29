@@ -95,19 +95,19 @@ namespace YBehavior.Editor.Core
             foreach (var o in objs)
             {
                 var obj = o;
-                LogMgr.Instance.Log("Drag HitTest: " + obj.ToString());
+//                LogMgr.Instance.Log("Drag HitTest: " + obj.ToString());
                 while (obj != null && obj.GetType() != typeof(Canvas))
                 {
                     if (obj is IDropable && obj != this)
                     {
-                        LogMgr.Instance.Log("Drag FinalHit: " + obj.ToString());
+//                        LogMgr.Instance.Log("Drag FinalHit: " + obj.ToString());
                         return obj as IDropable;
                     }
 
                     obj = VisualTreeHelper.GetParent(obj);
                 }
             }
-            LogMgr.Instance.Log("Drag FinalHit: NULL");
+//            LogMgr.Instance.Log("Drag FinalHit: NULL");
             return null;
         }
 

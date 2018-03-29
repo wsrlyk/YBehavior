@@ -39,6 +39,15 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        public void Unregister(EventType type, EventHandler handler)
+        {
+            if (m_EventDic.TryGetValue(type, out EventHandler exist))
+            {
+                exist -= handler;
+                m_EventDic[type] = exist;
+            }
+        }
+
         public void Send(EventArg arg)
         {
             if (m_EventDic.TryGetValue(arg.Type, out EventHandler exist))

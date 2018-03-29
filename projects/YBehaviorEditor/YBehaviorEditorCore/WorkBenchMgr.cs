@@ -12,6 +12,29 @@ namespace YBehavior.Editor.Core
         WorkBench m_ActiveWorkBench;
         public WorkBench ActiveWorkBench { get { return m_ActiveWorkBench; } }
 
+        public WorkBenchMgr()
+        {
+            EventMgr.Instance.Register(EventType.NodesConnected, _OnNodesConnected);
+            EventMgr.Instance.Register(EventType.NodesDisconnected, _OnNodesDisconnected);
+            EventMgr.Instance.Register(EventType.RemoveNode, _RemoveNode);
+        }
+
+        private void _OnNodesConnected(EventArg arg)
+        {
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.OnNodesConnected(arg);
+        }
+        private void _OnNodesDisconnected(EventArg arg)
+        {
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.OnNodesDisconnected(arg);
+        }
+        private void _RemoveNode(EventArg arg)
+        {
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.RemoveNode(arg);
+        }
+
         public void Remove(WorkBench target)
         {
             m_OpenedWorkBenchs.Remove(target);
