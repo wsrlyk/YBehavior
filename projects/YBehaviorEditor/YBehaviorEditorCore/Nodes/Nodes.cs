@@ -64,23 +64,14 @@ namespace YBehavior.Editor.Core
             m_Hierachy = NodeHierachy.NH_Custom;
         }
 
-        public ActionNode Clone()
+        public override Node Clone()
         {
-            ActionNode other = new ActionNode
-            {
-                m_Name = this.m_Name,
-                m_Type = this.m_Type,
-                m_Hierachy = this.m_Hierachy,
-                NoteFormat = this.NoteFormat,
-                ClassName = this.ClassName
-            };
+            ActionNode node = base.Clone() as ActionNode;
+            node.NoteFormat = this.NoteFormat;
+            node.ClassName = this.ClassName;
 
-            foreach (var v in m_Variables.Datas.Values)
-            {
-                Variable newv = v.Clone();
-                other.Variables.AddVariable(newv);
-            }
-            return other;
+
+            return node;
         }
         public override string Note
         {
@@ -107,6 +98,10 @@ namespace YBehavior.Editor.Core
             m_Type = NodeType.NT_Calculator;
             m_Hierachy = NodeHierachy.NH_DefaultAction;
 
+        }
+
+        public override void CreateVariables()
+        {
             Variable optr = Variable.CreateVariableInNode(
                 "Operator",
                 "ADD",
@@ -171,6 +166,10 @@ namespace YBehavior.Editor.Core
             m_Type = NodeType.NT_Comparer;
             m_Hierachy = NodeHierachy.NH_DefaultAction;
 
+        }
+
+        public override void CreateVariables()
+        {
             Variable optr = Variable.CreateVariableInNode(
                 "Operator",
                 "==",

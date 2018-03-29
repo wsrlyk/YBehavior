@@ -48,6 +48,7 @@
     <Compile Include="Tools\Bimap.cs" />
     <Compile Include="Tools\ObservableCollectionEx.cs" />
     <Compile Include="Tools\ObservableDictionary.cs" />
+    <Compile Include="Tools\Utility.cs" />
     <Compile Include="Variable.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Connection.cs" />

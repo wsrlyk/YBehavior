@@ -124,6 +124,22 @@ namespace YBehavior.Editor.Core
             return node;
         }
 
+        public Node CloneNodeToBench(Node template, bool bIncludeChildren, WorkBench bench = null)
+        {
+            if (bench == null)
+                bench = ActiveWorkBench;
+            if (bench == null)
+            {
+                LogMgr.Instance.Error("CloneNodeToBench Failed: bench == null");
+                return null;
+            }
+
+            Node node = Utility.CloneNode(template, bIncludeChildren);
+            bench.AddSubTree(node);
+
+            return node;
+        }
+
         public WorkBench CreateNewBench()
         {
             WorkBench workBench = new WorkBench

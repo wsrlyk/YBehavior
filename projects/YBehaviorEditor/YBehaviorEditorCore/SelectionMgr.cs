@@ -13,7 +13,12 @@ namespace YBehavior.Editor.Core
 
     public interface IDeletable
     {
-        void OnDelete();
+        void OnDelete(int param);
+    }
+
+    public interface IDuplicatable
+    {
+        void OnDuplicated(int param);
     }
 
     public delegate void SelectionStateChangeHandler(ISelectable obj, bool bState);
@@ -95,7 +100,7 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        public void TryDeleteSelection()
+        public void TryDeleteSelection(int param)
         {
             if (m_SingleSelection == null)
                 return;
@@ -103,19 +108,24 @@ namespace YBehavior.Editor.Core
             IDeletable deletable = m_SingleSelection as IDeletable;
             if (deletable != null)
             {
-                deletable.OnDelete();
+                deletable.OnDelete(param);
                 m_SingleSelection = null;
 
                 _FireSelectionEvent();
             }
         }
 
-        public void OnDelete(IDeletable obj)
+        public void TryDuplicateSelection(int param)
         {
-            if (obj == null)
+            if (m_SingleSelection == null)
                 return;
 
-            obj.OnDelete();
+            IDuplicatable duplicatable = m_SingleSelection as IDuplicatable;
+            if (duplicatable != null)
+            {
+                duplicatable.OnDuplicated(param);
+            }
         }
+
     }
 }

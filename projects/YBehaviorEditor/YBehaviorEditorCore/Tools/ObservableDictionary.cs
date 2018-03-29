@@ -662,17 +662,17 @@ namespace YBehavior.Editor.Core
         #region Enumerator
 
         [Serializable, StructLayout(LayoutKind.Sequential)]
-        public struct Enumerator<TKey, TValue> : IEnumerator<KeyValuePair<TKey, TValue>>, IDisposable, IDictionaryEnumerator, IEnumerator
+        public struct Enumerator<TTKey, TTValue> : IEnumerator<KeyValuePair<TTKey, TTValue>>, IDisposable, IDictionaryEnumerator, IEnumerator
         {
             #region constructors
 
-            internal Enumerator(ObservableDictionary<TKey, TValue> dictionary, bool isDictionaryEntryEnumerator)
+            internal Enumerator(ObservableDictionary<TTKey, TTValue> dictionary, bool isDictionaryEntryEnumerator)
             {
                 _dictionary = dictionary;
                 _version = dictionary._version;
                 _index = -1;
                 _isDictionaryEntryEnumerator = isDictionaryEntryEnumerator;
-                _current = new KeyValuePair<TKey, TValue>();
+                _current = new KeyValuePair<TTKey, TTValue>();
             }
 
             #endregion constructors
@@ -681,7 +681,7 @@ namespace YBehavior.Editor.Core
 
             #region public
 
-            public KeyValuePair<TKey, TValue> Current
+            public KeyValuePair<TTKey, TTValue> Current
             {
                 get
                 {
@@ -708,11 +708,11 @@ namespace YBehavior.Editor.Core
                 _index++;
                 if (_index < _dictionary._keyedEntryCollection.Count)
                 {
-                    _current = new KeyValuePair<TKey, TValue>((TKey)_dictionary._keyedEntryCollection[_index].Key, (TValue)_dictionary._keyedEntryCollection[_index].Value);
+                    _current = new KeyValuePair<TTKey, TTValue>((TTKey)_dictionary._keyedEntryCollection[_index].Key, (TTValue)_dictionary._keyedEntryCollection[_index].Value);
                     return true;
                 }
                 _index = -2;
-                _current = new KeyValuePair<TKey, TValue>();
+                _current = new KeyValuePair<TTKey, TTValue>();
                 return false;
             }
 
@@ -755,7 +755,7 @@ namespace YBehavior.Editor.Core
                     {
                         return new DictionaryEntry(_current.Key, _current.Value);
                     }
-                    return new KeyValuePair<TKey, TValue>(_current.Key, _current.Value);
+                    return new KeyValuePair<TTKey, TTValue>(_current.Key, _current.Value);
                 }
             }
 
@@ -763,7 +763,7 @@ namespace YBehavior.Editor.Core
             {
                 ValidateVersion();
                 _index = -1;
-                _current = new KeyValuePair<TKey, TValue>();
+                _current = new KeyValuePair<TTKey, TTValue>();
             }
 
             #endregion IEnumerator implemenation
@@ -799,10 +799,10 @@ namespace YBehavior.Editor.Core
 
             #region fields
 
-            private ObservableDictionary<TKey, TValue> _dictionary;
+            private ObservableDictionary<TTKey, TTValue> _dictionary;
             private int _version;
             private int _index;
-            private KeyValuePair<TKey, TValue> _current;
+            private KeyValuePair<TTKey, TTValue> _current;
             private bool _isDictionaryEntryEnumerator;
 
             #endregion fields

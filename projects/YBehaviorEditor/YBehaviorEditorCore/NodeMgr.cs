@@ -36,6 +36,7 @@ namespace YBehavior.Editor.Core
             if (m_TypeDic.TryGetValue(name, out Type type))
             {
                 node = Activator.CreateInstance(type) as Node;
+                node.CreateVariables();
                 node.CreateRenderer();
                 return node;
             }
@@ -207,6 +208,7 @@ namespace YBehavior.Editor.Core
             {
                 m_Rect = new Rect(0, 0, 80, 60);
             }
+
             public Point CenterPoint
             {
                 get
@@ -232,6 +234,11 @@ namespace YBehavior.Editor.Core
             {
                 get { return m_Rect.Location; }
                 set { m_Rect.Location = value; }
+            }
+
+            public void Copy(Geometry other)
+            {
+                m_Rect = other.m_Rect;
             }
         }
 
@@ -292,6 +299,11 @@ namespace YBehavior.Editor.Core
         public void Init()
         {
             OnInit();
+        }
+
+        public virtual void CreateVariables()
+        {
+
         }
 
         protected virtual void OnInit()
@@ -360,6 +372,25 @@ namespace YBehavior.Editor.Core
         public void OnChildPosChanged()
         {
             Conns.Sort(SortByPosX);
+        }
+
+        public virtual Node Clone()
+        {
+            Node other = Activator.CreateInstance(this.GetType()) as Node;
+            other.m_Name = this.m_Name;
+            other.m_Type = this.m_Type;
+            other.m_Hierachy = this.m_Hierachy;
+            other.m_NickName = this.m_NickName;
+            other.m_Geo.Copy(this.m_Geo);
+            other.m_Geo.Pos = other.m_Geo.Pos + new Vector(5, 5);
+            other.m_TreeSharedData = this.m_TreeSharedData;
+
+            foreach (var v in m_Variables.Datas.Values)
+            {
+                Variable newv = v.Clone();
+                other.Variables.AddVariable(newv);
+            }
+            return other;
         }
 
         public static int SortByPosX(NodeBase aa, NodeBase bb)

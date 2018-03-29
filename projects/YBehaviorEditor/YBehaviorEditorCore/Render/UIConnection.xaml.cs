@@ -91,7 +91,7 @@ namespace YBehavior.Editor.Core
                 this.path.Stroke = normalStrokeBrush;
         }
 
-        public void OnDelete()
+        public void OnDelete(int param)
         {
             NodesDisconnectedArg arg = new NodesDisconnectedArg();
             arg.ChildHolder = this.ChildHolder;

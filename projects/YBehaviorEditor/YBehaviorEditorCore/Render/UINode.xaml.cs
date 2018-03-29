@@ -17,7 +17,7 @@ namespace YBehavior.Editor.Core
     /// <summary>
     /// BehaviorNode.xaml 的交互逻辑
     /// </summary>
-    public partial class UINode : UserControl, ISelectable, IDeletable
+    public partial class UINode : UserControl, ISelectable, IDeletable, IDuplicatable
     {
         static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
 
@@ -71,7 +71,7 @@ namespace YBehavior.Editor.Core
                 this.border.BorderBrush = normalBorderBrush;
         }
 
-        public void OnDelete()
+        public void OnDelete(int param)
         {
             ///> Check if is root
             if (Node.Type == NodeType.NT_Root)
@@ -89,6 +89,9 @@ namespace YBehavior.Editor.Core
                     continue;
                 arg.ChildHolder = chi.Conns.ParentHolder;
                 EventMgr.Instance.Send(arg);
+
+                if (param != 0)
+                    chi.Renderer.Frame.OnDelete(param);
             }
 
             m_Panel.Children.Remove(this);
@@ -96,6 +99,21 @@ namespace YBehavior.Editor.Core
             RemoveNodeArg removeArg = new RemoveNodeArg();
             removeArg.Node = Node;
             EventMgr.Instance.Send(arg);
+        }
+
+        public void OnDuplicated(int param)
+        {
+            ///> Check if is root
+            if (Node.Type == NodeType.NT_Root)
+                return;
+
+            Node node = null;
+            if ((node = WorkBenchMgr.Instance.CloneNodeToBench(Node, param != 0)) != null)
+            {
+                NewNodeAddedArg arg = new NewNodeAddedArg();
+                arg.Node = node;
+                EventMgr.Instance.Send(arg);
+            }
         }
     }
 }

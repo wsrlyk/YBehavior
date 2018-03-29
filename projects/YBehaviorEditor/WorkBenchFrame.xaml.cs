@@ -123,6 +123,7 @@ namespace YBehavior.Editor
             ///> TODO: move the node to the center of the canvas
 
             _RenderNode(oArg.Node);
+            this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new RenderConnectionFunc(_ThreadRenderConnection), oArg.Node);
         }
 
         void _RenderActiveWorkBench()
@@ -148,6 +149,12 @@ namespace YBehavior.Editor
                 node.Renderer.RenderConnections();
             }
         }
+        delegate void RenderConnectionFunc(Node target);
+        private void _ThreadRenderConnection(Node target)
+        {
+            target.Renderer.RenderConnections();
+        }
+
         void _RenderNode(Node node)
         {
             node.Renderer.Render(this.Canvas);
@@ -159,7 +166,31 @@ namespace YBehavior.Editor
             switch (e.Key)
             {
                 case Key.Delete:
-                    Core.SelectionMgr.Instance.TryDeleteSelection();
+                    if ((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.None)
+                    {
+                        ///> Duplicate all children
+                        Core.SelectionMgr.Instance.TryDeleteSelection(1);
+                    }
+                    else
+                    {
+                        ///> Duplicate only one
+                        Core.SelectionMgr.Instance.TryDeleteSelection(0);
+                    }
+                    break;
+                case Key.D:
+                    if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.None)
+                    {
+                        if((Keyboard.Modifiers & ModifierKeys.Shift)!= ModifierKeys.None)
+                        {
+                            ///> Duplicate all children
+                            Core.SelectionMgr.Instance.TryDuplicateSelection(1);
+                        }
+                        else
+                        {
+                            ///> Duplicate only one
+                            Core.SelectionMgr.Instance.TryDuplicateSelection(0);
+                        }
+                    }
                     break;
             }
         }

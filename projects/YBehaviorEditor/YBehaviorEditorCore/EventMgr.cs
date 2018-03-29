@@ -12,6 +12,7 @@ namespace YBehavior.Editor.Core
         WorkBenchLoaded,
         NewNodeAdded,
         RemoveNode,
+        NodeDuplicated,
         NodeRemoved,
         NodesConnected,
         NodesDisconnected,
@@ -82,6 +83,14 @@ namespace YBehavior.Editor.Core
         public Node Node { get; set; }
         public override EventType Type => EventType.NodeRemoved;
     }
+
+    public class NodeDuplicatedArg : EventArg
+    {
+        public Node Node { get; set; }
+        public bool bIncludeChildren { get; set; } = false;
+        public override EventType Type => EventType.NodeDuplicated;
+    }
+
 
     public class NodesConnectedArg : EventArg
     {

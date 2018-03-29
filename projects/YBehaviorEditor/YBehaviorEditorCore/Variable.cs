@@ -475,7 +475,7 @@ namespace YBehavior.Editor.Core
 
         public Variable Clone()
         {
-            Variable v = new Variable(null);
+            Variable v = new Variable(SharedData);
             v.vTypeSet.AddRange(vTypeSet.ToArray());
             v.vType = vType;
             v.cType = cType;
@@ -486,6 +486,11 @@ namespace YBehavior.Editor.Core
             v.m_bCanbeRemoved = m_bCanbeRemoved;
             v.m_bInited = m_bInited;
             v.m_Params = m_Params;
+            if (m_VectorIndex != null)
+            {
+                v.m_VectorIndex = m_VectorIndex.Clone();
+                v.m_VectorIndex.m_Parent = v;
+            }
             return v;
         }
         public static Variable CreateVariableInNode(string name, string defaultValue, ValueType[] valueType, CountType countType, VariableType vbType, string param = null)

@@ -17,7 +17,7 @@ namespace YBehavior.Editor.Core
         {
             if (m_ActionDic.TryGetValue(name, out ActionNode node))
             {
-                return node.Clone();
+                return node.Clone() as ActionNode;
             }
             return null;
         }
