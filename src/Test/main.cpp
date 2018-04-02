@@ -1,11 +1,17 @@
 #include "YBehavior/behaviortreemgr.h"
 #include "YBehavior/launcher.h"
 #include "customactions.h"
-#include <windows.h>
 #include "YBehavior/shareddataex.h"
+
+#if _MSC_VER
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
 using namespace YBehavior;
 
-int main(int argc, char* argv)
+int main(int argc, char** argv)
 {
 	MyLaunchCore core;
 	YBehavior::Launcher::Launch(core);
@@ -20,7 +26,11 @@ int main(int argc, char* argv)
 	while(i < 100)
 	{
 		pEntity->GetAgent()->Tick();
+#if _MSC_VER
 		Sleep(100);
+#else
+		usleep(100000);
+#endif
 	}
 	return 0;
 }

@@ -4,6 +4,7 @@
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/nodefactory.h"
+#include <string.h>
 
 namespace YBehavior
 {

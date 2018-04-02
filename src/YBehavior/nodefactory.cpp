@@ -1,7 +1,7 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/nodes/calculator.h"
-#include "YBehavior/nodes/Sequence.h"
+#include "YBehavior/nodes/sequence.h"
 #include "YBehavior/nodes/comparer.h"
 #include "YBehavior/nodes/ifthenelse.h"
 #include "YBehavior/nodes/decorator.h"

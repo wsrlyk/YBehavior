@@ -82,7 +82,7 @@ namespace YBehavior
 
 	STRING BehaviorNode::GetValue(const STRING& attriName, const pugi::xml_node& data)
 	{
-		pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
+		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 
 		if (attrOptr.empty())
 		{
@@ -97,7 +97,7 @@ namespace YBehavior
 	}
 	int BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle)
 	{
-		pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
+		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 
 		if (attrOptr.empty())
 		{

@@ -64,7 +64,8 @@ namespace YBehavior
 		{
 			if (index < 0 || index >= (INT)m_Datas.size())
 				return nullptr;
-			return &(m_Datas[index]);
+			const T& data = m_Datas[index];
+			return const_cast<T*>(&data);
 		}
 
 		bool Set(INT index, const T& src)

@@ -4,6 +4,7 @@
 #include "YBehavior/interface.h"
 #include "YBehavior/tools/bimap.h"
 #include "YBehavior/types.h"
+#include "YBehavior/logger.h"
 
 namespace YBehavior
 {
@@ -116,10 +117,10 @@ namespace YBehavior
 	bool ValueHandler::Compare<AgentWrapper>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op);
 
 	template<>
-	static void ValueHandler::Calculate<String>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op);
+	void ValueHandler::Calculate<String>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op);
 
 	template<>
-	static void ValueHandler::Calculate<AgentWrapper>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op);
+	void ValueHandler::Calculate<AgentWrapper>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op);
 
 	/////////////////////////////////////
 	/////////////////////////////////////
