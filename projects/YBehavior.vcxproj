@@ -50,6 +50,7 @@
     <ClCompile Include="..\src\YBehavior\nodes\decorator.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\ifthenelse.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\sequence.cpp" />
+    <ClCompile Include="..\src\YBehavior\shareddataex.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\bimap.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />
   </ItemGroup>

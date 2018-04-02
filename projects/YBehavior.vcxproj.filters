@@ -158,5 +158,8 @@
     <ClCompile Include="..\src\YBehavior\nodes\decorator.cpp">
       <Filter>源文件\nodes</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\YBehavior\shareddataex.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

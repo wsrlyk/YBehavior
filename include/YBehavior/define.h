@@ -4,8 +4,13 @@
 namespace YBehavior
 {
 	//#ifdef YBEHAVIOR_DLL
+#if _MSC_VER
 #define YBEHAVIOR_DLL_ENTRY_IMPORT						__declspec(dllimport)
 #define YBEHAVIOR_DLL_ENTRY_EXPORT						__declspec(dllexport)
+#else
+#define YBEHAVIOR_DLL_ENTRY_IMPORT
+#define YBEHAVIOR_DLL_ENTRY_EXPORT
+#endif
 //#else
 //#define YBEHAVIOR_DLL_ENTRY_IMPORT
 //#define YBEHAVIOR_DLL_ENTRY_EXPORT
