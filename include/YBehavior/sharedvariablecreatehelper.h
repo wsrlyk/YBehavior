@@ -5,6 +5,7 @@
 #include "nodefactory.h"
 #include "shareddataex.h"
 #include <unordered_map>
+#include "sharedvariableex.h"
 
 namespace YBehavior
 {

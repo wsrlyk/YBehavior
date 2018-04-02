@@ -9,7 +9,7 @@
 namespace YBehavior
 {
 	///> Too lazy to create a file for just this line. Temporarily put it here
-	Bimap<OperationType, STRING> IVariableOperationHelper::s_OperatorMap = {
+	Bimap<OperationType, STRING, EnumClassHash> IVariableOperationHelper::s_OperatorMap = {
 		{ OT_ADD, "ADD" },{ OT_SUB, "SUB" },{ OT_MUL, "MUL" },{ OT_DIV, "DIV" },
 	{ OT_EQUAL, "==" },{ OT_GREATER, ">" },{ OT_LESS, "<" },{ OT_NOT_EQUAL, "!=" },{ OT_LESS_EQUAL, "<=" },{ OT_GREATER_EQUAL, ">=" }
 	};

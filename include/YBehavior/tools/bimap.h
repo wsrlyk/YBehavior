@@ -5,11 +5,21 @@
 
 namespace YBehavior
 {
-	template<typename T0, typename T1>
+	// without this hasher, it will fail when key is enum
+	struct EnumClassHash
+	{
+		template <typename T>
+		std::size_t operator()(T t) const
+		{
+			return static_cast<std::size_t>(t);
+		}
+	};
+
+	template<typename T0, typename T1, typename Hasher0 = std::hash<T0>, typename Hasher1 = std::hash<T1>>
 	class Bimap
 	{
-		std::unordered_map<T0, T1> map0;
-		std::unordered_map<T1, T0> map1;
+		std::unordered_map<T0, T1, Hasher0> map0;
+		std::unordered_map<T1, T0, Hasher1> map1;
 
 	public:
 		Bimap(std::initializer_list<std::pair<T0, T1> > list)
@@ -30,7 +40,7 @@ namespace YBehavior
 			RemoveKey(t0);
 			RemoveValue(t1);
 			map0[t0] = t1;
-			map1[t1] = t0
+			map1[t1] = t0;
 		}
 		bool RemoveKey(const T0& t0)
 		{
