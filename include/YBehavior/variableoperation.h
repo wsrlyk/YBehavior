@@ -1,8 +1,9 @@
 #ifndef _YBEHAVIOR_VARIABLEOPERATION_H_
 #define _YBEHAVIOR_VARIABLEOPERATION_H_
 
-#include "YBehavior/sharedvariableex.h"
+#include "YBehavior/interface.h"
 #include "YBehavior/tools/bimap.h"
+#include "YBehavior/types.h"
 
 namespace YBehavior
 {

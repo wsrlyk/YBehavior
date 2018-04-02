@@ -3,25 +3,10 @@
 
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/variableoperation.h"
+#include "YBehavior/interface.h"
 
 namespace YBehavior
 {
-	class IVariableOperationHelper;
-	class ISharedVariableEx
-	{
-	public:
-		virtual ~ISharedVariableEx() {}
-		inline void SetIndex(INT index) { m_Index = index; }
-		virtual void SetVectorIndex(const STRING& vbType, const STRING& s) { }
-		virtual void SetIndexFromString(const STRING& s) = 0;
-		virtual const void* GetValue(SharedDataEx* pData) = 0;
-		virtual void SetValue(SharedDataEx* pData, const void* src) = 0;
-		virtual void SetValueFromString(const STRING& str) = 0;
-		virtual INT GetTypeID() = 0;
-		virtual IVariableOperationHelper* GetOperation() = 0;
-	protected:
-		INT m_Index;
-	};
 
 	template<typename T>
 	class SharedVariableEx : public ISharedVariableEx

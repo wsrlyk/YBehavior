@@ -111,6 +111,9 @@
     <ClInclude Include="..\include\YBehavior\nodes\decorator.h">
       <Filter>头文件\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\interface.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">

@@ -18,6 +18,7 @@
     <ClInclude Include="..\include\YBehavior\behaviortreemgr.h" />
     <ClInclude Include="..\include\YBehavior\define.h" />
     <ClInclude Include="..\include\YBehavior\factory.h" />
+    <ClInclude Include="..\include\YBehavior\interface.h" />
     <ClInclude Include="..\include\YBehavior\launcher.h" />
     <ClInclude Include="..\include\YBehavior\logger.h" />
     <ClInclude Include="..\include\YBehavior\nodefactory.h" />

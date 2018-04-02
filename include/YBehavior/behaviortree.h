@@ -19,6 +19,7 @@ namespace YBehavior
 		NS_FAILED
 	};
 
+	class ISharedVariableEx;
 	class YBEHAVIOR_API BehaviorNode
 	{
 	protected:

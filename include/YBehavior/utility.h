@@ -7,8 +7,6 @@
 
 namespace YBehavior
 {
-	class ISharedVariableCreateHelper;
-	class ISharedVariableEx;
 	class Utility
 	{
 	public:

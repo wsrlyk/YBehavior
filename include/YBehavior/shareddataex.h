@@ -4,6 +4,7 @@
 #include "YBehavior/types.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/tools/meta.h"
+#include "YBehavior/interface.h"
 
 #define FOR_EACH_SINGLE_NORMAL_TYPE(func)	\
 	func(Int);	\
@@ -39,14 +40,6 @@
 
 namespace YBehavior
 {
-	class IDataArray
-	{
-	public:
-		virtual ~IDataArray() {}
-		virtual void* Get(INT index) = 0;
-		virtual bool Set(INT index, const void* src) = 0;
-		virtual IDataArray* Clone() const = 0;
-	};
 	template<typename T>
 	class DataArray : public IDataArray
 	{
