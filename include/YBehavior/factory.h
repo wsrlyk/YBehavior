@@ -5,6 +5,9 @@
 #include "YBehavior/types.h"
 #include <unordered_map>
 #include <algorithm>
+#ifndef _MSC_VER
+#include <cxxabi.h>
+#endif
 
 namespace YBehavior
 {
@@ -32,7 +35,12 @@ namespace YBehavior
 		template<typename finalType>
 		void Create()
 		{
+#if _MSC_VER
 			std::string name(typeid(finalType).name());
+#else
+int status;
+std::string name(abi::__cxa_demangle(typeid(finalType).name(), 0, 0, &status));
+#endif
 			int spacepos = (int)(name.find_last_of(" "));
 			int pos = (int)(name.find_last_of("::"));
 

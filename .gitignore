@@ -30,6 +30,7 @@
 *.exe
 *.out
 *.app
+
 /projects/Debug
 /projects/ipch
 /projects/obj
@@ -47,3 +48,4 @@
 /projects/YBehaviorEditor/bin/Release
 /projects/YBehaviorEditor/.vs
 /projects/.vs
+/build
