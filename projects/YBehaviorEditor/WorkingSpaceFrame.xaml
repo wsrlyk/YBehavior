@@ -6,8 +6,15 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="200">
-    <Grid>
-        <TreeView Name="Files" Margin="0,30,0,0" MouseDoubleClick="OnFilesItemDoubleClick">
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" Height="30" HorizontalAlignment="Left" Width="200"  DockPanel.Dock="Top">
+            <Button Name="btnNew" Click="btnNew_Click" Width="30">New</Button>
+            <Button Name="btnSave" Click="btnSave_Click" Width="30">Save</Button>
+            <Button Name="btnStartDebug" Click="btnStartDebug_Click" Width="30">Dbg</Button>
+            <Button Name="btnStopDebug" Click="btnStopDebug_Click" Background="Red" Width="30" Visibility="Collapsed">Dbg</Button>
+            <Button Name="btnDebugThisTree" Click="btnDebugThisTree_Click" Width="30" Visibility="Collapsed">This</Button>
+        </StackPanel>
+        <TreeView Name="Files" MouseDoubleClick="OnFilesItemDoubleClick">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
@@ -17,19 +24,5 @@
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
-        <Grid ShowGridLines="False" Height="30" Margin="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="200">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <Button Name="btnNew" Grid.Column="0" Click="_BtnNewClick">New</Button>
-            <Button Grid.Column="1">C</Button>
-            <Button Grid.Column="2">W</Button>
-            <Button Name="btnSave" Grid.Column="3" Click="_BtnSaveClick">Save</Button>
-        </Grid>
-    </Grid>
+    </DockPanel>
 </UserControl>

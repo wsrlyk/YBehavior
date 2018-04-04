@@ -37,6 +37,12 @@
     <Filter Include="源文件\bimap">
       <UniqueIdentifier>{82bdd3ff-c222-40d1-b868-cdd73fdca0e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\network">
+      <UniqueIdentifier>{6d5183c3-5943-4d86-9585-08b1f2be6860}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\network">
+      <UniqueIdentifier>{d88afcd2-9777-4f04-8920-f68535231901}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\YBehavior\agent.h">
@@ -114,6 +120,9 @@
     <ClInclude Include="..\include\YBehavior\interface.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\network\network.h">
+      <Filter>头文件\network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -166,6 +175,12 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\variableoperation.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\network\network.cpp">
+      <Filter>源文件\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\network\network_msvc.cpp">
+      <Filter>源文件\network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

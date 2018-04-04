@@ -3,7 +3,7 @@
 #include "customactions.h"
 #include "YBehavior/shareddataex.h"
 
-#if _MSC_VER
+#ifdef MSVC
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 	int i = 0;
 	while(i < 100)
 	{
-		pEntity->GetAgent()->Tick();
+		//pEntity->GetAgent()->Tick();
 #if _MSC_VER
 		Sleep(100);
 #else

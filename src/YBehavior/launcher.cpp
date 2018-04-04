@@ -1,4 +1,5 @@
 #include "YBehavior/launcher.h"
+#include "YBehavior/network/network.h"
 
 namespace YBehavior
 {
@@ -8,6 +9,9 @@ namespace YBehavior
 	bool Launcher::Launch(const LaunchCore& core)
 	{
 		core.RegisterActions();
+
+		Network::Instance()->InitAndCreateThread();
+
 		return true;
 	}
 }

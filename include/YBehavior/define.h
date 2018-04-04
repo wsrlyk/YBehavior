@@ -7,9 +7,11 @@ namespace YBehavior
 #if _MSC_VER
 #define YBEHAVIOR_DLL_ENTRY_IMPORT						__declspec(dllimport)
 #define YBEHAVIOR_DLL_ENTRY_EXPORT						__declspec(dllexport)
+#define MSVC
 #else
 #define YBEHAVIOR_DLL_ENTRY_IMPORT
 #define YBEHAVIOR_DLL_ENTRY_EXPORT
+#define GCC
 #endif
 //#else
 //#define YBEHAVIOR_DLL_ENTRY_IMPORT

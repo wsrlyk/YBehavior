@@ -21,6 +21,7 @@
     <ClInclude Include="..\include\YBehavior\interface.h" />
     <ClInclude Include="..\include\YBehavior\launcher.h" />
     <ClInclude Include="..\include\YBehavior\logger.h" />
+    <ClInclude Include="..\include\YBehavior\network\network.h" />
     <ClInclude Include="..\include\YBehavior\nodefactory.h" />
     <ClInclude Include="..\include\YBehavior\nodes\action.h" />
     <ClInclude Include="..\include\YBehavior\nodes\calculator.h" />
@@ -44,6 +45,8 @@
     <ClCompile Include="..\src\YBehavior\behaviortreemgr.cpp" />
     <ClCompile Include="..\src\YBehavior\factory.cpp" />
     <ClCompile Include="..\src\YBehavior\launcher.cpp" />
+    <ClCompile Include="..\src\YBehavior\network\network.cpp" />
+    <ClCompile Include="..\src\YBehavior\network\network_msvc.cpp" />
     <ClCompile Include="..\src\YBehavior\nodefactory.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\action.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\calculator.cpp" />

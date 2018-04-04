@@ -18,6 +18,7 @@ namespace YBehavior.Editor.Core
         NodesDisconnected,
         SelectionChanged,
         SharedVariableChanged,
+        NetworkConnectionChanged,
     }
 
     public class EventMgr : Singleton<EventMgr>
@@ -121,6 +122,11 @@ namespace YBehavior.Editor.Core
     public class SharedVariableChangedArg : EventArg
     {
         public override EventType Type => EventType.SharedVariableChanged;
+    }
+    public class NetworkConnectionChangedArg : EventArg
+    {
+        public bool bConnected { get; set; }
+        public override EventType Type => EventType.NetworkConnectionChanged;
     }
 
 }
