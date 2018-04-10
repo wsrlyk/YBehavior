@@ -125,7 +125,7 @@ namespace YBehavior
 		{
 
 		}
-		friend std::stringstream & operator<<(std::stringstream &out, AgentWrapper &obj)
+		friend std::stringstream & operator<<(std::stringstream &out, const AgentWrapper &obj)
 		{
 			return out;
 		}

@@ -6,10 +6,21 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariablecreatehelper.h"
 #include "YBehavior/sharedvariableex.h"
+#include "YBehavior/debugger.h"
 
 namespace YBehavior
 {
-
+#ifdef DEBUGGER
+#define DEBUG_RETURN(helper, res)\
+	{\
+		NodeState eRes = res;\
+		helper.SetResult(eRes);\
+		return (eRes);\
+	}
+#else
+#define DEBUG_RETURN(helper, res)\
+	return (res)
+#endif
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
@@ -33,6 +44,11 @@ namespace YBehavior
 	YBehavior::NodeState BehaviorNode::Execute(AgentPtr pAgent)
 	{
 		///> 检查各种条件 或者 断点
+#ifdef DEBUGGER
+		DebugHelper dbgHelper(pAgent, this);
+		dbgHelper.TryHitBreakPoint();
+#endif
+
 		//////////////////////////////////////////////////////////////////////////
 
 
@@ -41,7 +57,7 @@ namespace YBehavior
 
 		///> 更新后处理
 
-		return state;
+		DEBUG_RETURN(dbgHelper, state);
 	}
 
 	void BehaviorNode::Load(const pugi::xml_node& data)
@@ -137,8 +153,9 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 
 
-	BehaviorTree::BehaviorTree()
+	BehaviorTree::BehaviorTree(const STRING& name)
 	{
+		m_Name = name;
 		m_SharedData = new SharedDataEx();
 	}
 

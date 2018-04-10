@@ -1,5 +1,6 @@
 #include "YBehavior/network/network.h"
 #include "YBehavior/logger.h"
+#include "YBehavior/network/messageprocessor.h"
 
 namespace YBehavior
 {
@@ -8,15 +9,6 @@ namespace YBehavior
 	const size_t	kSocketBufferSize = 16384;
 	const size_t	kGlobalQueueSize = (1024 * 32);
 	const size_t	kLocalQueueSize = (1024 * 8);
-
-	Network* Network::Instance()
-	{
-		if (s_Instance == nullptr)
-			s_Instance = new Network();
-		return s_Instance;
-	}
-
-	Network* Network::s_Instance = nullptr;
 
 	bool Network::IsConnected() const
 	{
@@ -64,7 +56,7 @@ namespace YBehavior
 					break;
 				}
 
-				Thread::Sleep(100);
+				Thread::SleepMilli(100);
 			}
 
 
@@ -85,19 +77,19 @@ namespace YBehavior
 				{
 
 					++m_isConnected;
-					Thread::Sleep(1);
+					Thread::SleepMilli(1);
 
 					OnConnection();
 
 					//AtomicInc(m_isConnectedFinished);
-					Thread::Sleep(1);
+					Thread::SleepMilli(1);
 
 					//this->OnConnectionFinished();
 				}
 
 				while (!m_bTerminating && this->m_WriteSocket)
 				{
-					Thread::Sleep(1);
+					Thread::SleepMilli(1);
 					SendAllPackets();
 
 					ReceivePackets();
@@ -126,6 +118,22 @@ namespace YBehavior
 		this->ClearAll();
 
 		LOG_BEGIN << "Network Thread Shutdown" << LOG_END;
+	}
+
+	void Network::SendAllPackets()
+	{
+		if (ms_sendBuffer.length() > 0)
+		{
+			ScopedLock lock(m_Mutex);
+
+			size_t len;
+			if (Socket::Write(m_WriteSocket, ms_sendBuffer.c_str(), ms_sendBuffer.length(), len) && len != ms_sendBuffer.length())
+			{
+				LOG_BEGIN << "Network Send Error: " << ms_sendBuffer << LOG_END;
+			}
+
+			ms_sendBuffer = "";
+		}
 	}
 
 	bool Network::ReceivePackets(const char* msgCheck /*= 0*/)
@@ -188,6 +196,21 @@ namespace YBehavior
 		return false;
 	}
 
+	bool Network::SendText(const STRING& text)
+	{
+		if (this->IsConnected())
+		{
+			ScopedLock lock(m_Mutex);
+
+			ms_sendBuffer += text;
+			ms_sendBuffer += '\n';
+
+			return true;
+		}
+
+		return false;
+	}
+
 	void Network::ClearOneConnection()
 	{
 		m_isConnected = 0;
@@ -205,6 +228,7 @@ namespace YBehavior
 	void Network::OnRecieveMessages(const STRING& msg)
 	{
 		LOG_BEGIN << "Receive: " << msg << LOG_END;
+		MessageProcessor::Instance()->ProcessOne(msg);
 	}
 
 }

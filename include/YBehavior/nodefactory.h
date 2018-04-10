@@ -17,6 +17,13 @@ namespace YBehavior
 		void SetActiveTree(const STRING& tree);
 		template<typename T>
 		INT CreateIndexByName(const STRING& name);
+
+#ifdef DEBUGGER
+		template<typename T>
+		const STRING& GetNameByIndex(const STRING& treeName, INT index);
+
+		const STRING& GetNameByIndex(const STRING& treeName, INT index, INT typeNumberId);
+#endif
 	public:
 		struct YBEHAVIOR_API NameIndexInfo
 		{
@@ -34,6 +41,7 @@ namespace YBehavior
 				mNameIndex = 0;
 			}
 		};
+
 		struct YBEHAVIOR_API NameIndexMgr
 		{
 		private:
@@ -64,6 +72,13 @@ namespace YBehavior
 		NameIndexMgr mTempNameIndexInfo;
 		NameIndexMgr* mpCurActiveNameIndexInfo;
 		STRING mCurActiveTreeName;
+
+#ifdef DEBUGGER
+		typedef std::unordered_map<INT, STRING> IndexNameMapType;
+		IndexNameMapType mCommonIndexNameMap;
+		std::unordered_map<STRING, IndexNameMapType> mIndexNameMap;
+		IndexNameMapType* mpCurActiveIndexNameMap;
+#endif
 	};
 
 	template<typename T>
@@ -84,14 +99,25 @@ namespace YBehavior
 		///> common已经找过，不用再找一遍
 		if (mpCurActiveNameIndexInfo == &mCommonNameIndexInfo || curActiveNameIndexInfo.mNameHash.find(name) == curActiveNameIndexInfo.mNameHash.end())
 		{
-			LOG_BEGIN << "ADD node: " << name << "index: " << curActiveNameIndexInfo.mNameIndex << LOG_END;
-			curActiveNameIndexInfo.mNameHash[name] = curActiveNameIndexInfo.mNameIndex;
-			curActiveNameIndexInfo.mNameIndex ++;
+			INT index = curActiveNameIndexInfo.mNameIndex++;
+			LOG_BEGIN << "ADD node: " << name << "index: " << index << LOG_END;
+			curActiveNameIndexInfo.mNameHash[name] = index;
+
+#ifdef DEBUGGER
+			(*mpCurActiveIndexNameMap)[typeNumberId << 16 | index] = name;
+#endif
 		}
 
 		return curActiveNameIndexInfo.mNameHash[name];
 	}
 
+#ifdef DEBUGGER
+	template<typename T>
+	const STRING& NodeFactory::GetNameByIndex(const STRING& treeName, INT index)
+	{
+		return GetNameByIndex(treeName, index, GetClassTypeNumberId<T>());
+	}
+#endif
 }
 
 #endif

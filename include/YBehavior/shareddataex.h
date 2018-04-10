@@ -52,7 +52,9 @@ namespace YBehavior
 			return newArray;
 		}
 
-		bool Get(INT index, T& res)
+		INT Length() const override { return (INT)m_Datas.size(); }
+
+		bool Get(INT index, const T& res) const
 		{
 			if (index < 0 || index >= (INT)m_Datas.size())
 				return false;
@@ -60,12 +62,20 @@ namespace YBehavior
 			return true;
 		}
 
-		virtual void* Get(INT index) override
+		virtual const void* Get(INT index) const override
 		{
 			if (index < 0 || index >= (INT)m_Datas.size())
 				return nullptr;
 			const T& data = m_Datas[index];
-			return const_cast<T*>(&data);
+			return (&data);
+		}
+
+		virtual const STRING GetToString(INT index) const override
+		{
+			if (index < 0 || index >= (INT)m_Datas.size())
+				return nullptr;
+			const T& data = m_Datas[index];
+			return Utility::ToString(data);
 		}
 
 		bool Set(INT index, const T& src)
@@ -120,6 +130,8 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 
+#define MAX_TYPE_INDEX 14
+
 	class SharedDataEx
 	{
 	public:
@@ -130,23 +142,25 @@ namespace YBehavior
 		
 
 	protected:
-		IDataArray* m_Datas[14];
+		IDataArray* m_Datas[MAX_TYPE_INDEX];
 
 	public:
 		SharedDataEx();
 
 		~SharedDataEx()
 		{
-			for (int i = 0; i < 14; ++i)
+			for (int i = 0; i < MAX_TYPE_INDEX; ++i)
 			{
 				if (m_Datas[i] != nullptr)
 					delete m_Datas[i];
 			}
 		}
 
+		inline const IDataArray* GetDataArray(INT typeIndex) { return m_Datas[typeIndex]; }
+
 		void Clone(const SharedDataEx& other)
 		{
-			for (int i = 0; i < 14; ++i)
+			for (int i = 0; i < MAX_TYPE_INDEX; ++i)
 			{
 				if (other.m_Datas[i] == nullptr)
 				{
@@ -164,12 +178,16 @@ namespace YBehavior
 		template<typename T>
 		const T* Get(INT index);
 
-		void* Get(INT index, INT typeIndex)
+		const void* Get(INT index, INT typeIndex)
 		{
 			IDataArray* iarray = m_Datas[typeIndex];
 			return iarray->Get(index);
 		}
-
+		STRING GetToString(INT index, INT typeIndex)
+		{
+			IDataArray* iarray = m_Datas[typeIndex];
+			return iarray->GetToString(index);
+		}
 
 		template<typename T>
 		bool Set(INT index, const T& src);
@@ -186,7 +204,6 @@ namespace YBehavior
 			IDataArray* iarray = m_Datas[typeIndex];
 			return iarray->Set(index, src);
 		}
-
 	};
 
 	template<typename T>

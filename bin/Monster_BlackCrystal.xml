@@ -2,7 +2,7 @@
 <Monster_BlackCrystal>
   <Node Class="Root" Pos="57,34" target="_AC " add0="_IC 1" add1="_IC 1" fftest="FFC 1.0|2.0|3.0" bbtest="BBC true|false|true|false" iitest="IIC 1|2|3|4" btest="_BC true" pos="_VC 100=200=300">
     <Node Class="Sequence" Pos="221,151" NickName="Hehequence12345678">
-      <Node Class="IfThenElse" Pos="83,238">
+      <Node Class="IfThenElse" Pos="83,238" BreakPoint="1">
         <Node Class="Comparer" Connection="if" Pos="51,464" Operator="_EC &lt;" Opl="_IS add0" Opr="_IC 0" />
         <Node Class="Calculator" Connection="then" Pos="114,621" Operator="_EC ADD" Opl="_IS add1" Opr1="_IC 0" Opr2="_IC 1" />
         <Node Class="IfThenElse" Connection="else" Pos="351,406">

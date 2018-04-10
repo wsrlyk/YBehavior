@@ -112,7 +112,11 @@ namespace YBehavior.Editor.Core
 
         private bool _LoadTree(Tree tree, XmlNode data)
         {
-            return _LoadOneNode(tree, data);
+            bool bRes = _LoadOneNode(tree, data);
+
+            RefreshNodeUID();
+
+            return bRes;
         }
 
         private bool _LoadOneNode(Node node, XmlNode data)
@@ -158,6 +162,8 @@ namespace YBehavior.Editor.Core
             {
                 _SaveNode(tree, data, xmlDoc);
             }
+
+            RefreshNodeUID();
         }
 
         void _SaveNode(Node node, XmlElement data, XmlDocument xmlDoc)
@@ -177,6 +183,8 @@ namespace YBehavior.Editor.Core
         public void Export(XmlElement data, XmlDocument xmlDoc)
         {
             _ExportNode(MainTree, data, xmlDoc);
+
+            RefreshNodeUID();
         }
 
         void _ExportNode(Node node, XmlElement data, XmlDocument xmlDoc)
@@ -190,6 +198,21 @@ namespace YBehavior.Editor.Core
             foreach (Node chi in node.Conns)
             {
                 _ExportNode(chi, nodeEl, xmlDoc);
+            }
+        }
+
+        public void RefreshNodeUID()
+        {
+            uint uid = 0;
+            _RefreshNodeUID(MainTree, ref uid);
+        }
+        void _RefreshNodeUID(Node node, ref uint uid)
+        {
+            node.UID = ++uid;
+
+            foreach (Node chi in node.Conns)
+            {
+                _RefreshNodeUID(chi, ref uid);
             }
         }
 

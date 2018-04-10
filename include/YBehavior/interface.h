@@ -27,9 +27,12 @@ namespace YBehavior
 	{
 	public:
 		virtual ~IDataArray() {}
-		virtual void* Get(INT index) = 0;
+		virtual const void* Get(INT index) const = 0;
+		virtual const STRING GetToString(INT index) const = 0;
 		virtual bool Set(INT index, const void* src) = 0;
 		virtual IDataArray* Clone() const = 0;
+		virtual INT Length() const = 0;
+
 	};
 
 }

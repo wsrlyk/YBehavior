@@ -16,16 +16,42 @@ namespace YBehavior
 		if (tree.empty())
 		{
 			mpCurActiveNameIndexInfo = &mCommonNameIndexInfo;
+#ifdef DEBUGGER
+			mpCurActiveIndexNameMap = &mCommonIndexNameMap;
+#endif
 			return;
 		}
 		else
 		{
 			mpCurActiveNameIndexInfo = &mTempNameIndexInfo;
+#ifdef DEBUGGER
+			IndexNameMapType newMap;
+			mIndexNameMap[tree] = newMap;
+			mpCurActiveIndexNameMap = &mIndexNameMap[tree];
+#endif
+
 		}
 
 		mpCurActiveNameIndexInfo->Reset();
 		mpCurActiveNameIndexInfo->AssignIndex(mCommonNameIndexInfo);
 	}
+
+#ifdef DEBUGGER
+	const STRING& NodeFactory::GetNameByIndex(const STRING& treeName, INT index, INT typeNumberId)
+	{
+		auto it = mIndexNameMap.find(treeName);
+		if (it != mIndexNameMap.end())
+		{
+			IndexNameMapType& indexnamemap = it->second;
+			auto it2 = indexnamemap.find(typeNumberId << 16 | index);
+			if (it2 != indexnamemap.end())
+				return it2->second;
+			return Utility::StringEmpty;
+		}
+
+		return Utility::StringEmpty;
+	}
+#endif
 
 	NodeFactory::NodeFactory()
 	{

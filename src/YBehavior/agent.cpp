@@ -2,6 +2,7 @@
 #include "YBehavior/behaviortreemgr.h"
 #include "YBehavior/behaviortree.h"
 
+YBehavior::UINT YBehavior::Agent::s_UID = 0;
 
 void YBehavior::Agent::SetTree(const STRING& name)
 {
@@ -17,6 +18,7 @@ void YBehavior::Agent::Tick()
 
 YBehavior::Agent::Agent()
 	: m_Tree(nullptr)
+	, m_UID(++s_UID)
 {
 
 }

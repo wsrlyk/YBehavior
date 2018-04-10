@@ -43,7 +43,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DebugMgr.cs" />
     <Compile Include="ExternalActionMgr.cs" />
+    <Compile Include="MessageProcessor.cs" />
     <Compile Include="NetworkMgr.cs" />
     <Compile Include="SharedData.cs" />
     <Compile Include="Tools\Bimap.cs" />

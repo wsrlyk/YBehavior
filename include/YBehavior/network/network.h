@@ -4,6 +4,7 @@
 #include "YBehavior/types.h"
 #include <vector>
 #include <sstream>
+#include "YBehavior/singleton.h"
 
 namespace YBehavior
 {
@@ -34,7 +35,7 @@ namespace YBehavior
 	namespace Thread
 	{
 		ThreadHandle CreateThread(ThreadFunction* function, void* arg);
-		void Sleep(int millisec);
+		void SleepMilli(int millisec);
 	}
 
 	class Mutex
@@ -68,10 +69,9 @@ namespace YBehavior
 		}
 	};
 
-	class Network
+	class Network : public Singleton<Network>
 	{
-		static Network* s_Instance;
-		
+	
 		ThreadHandle m_ThreadHandle;
 		Handle m_ListeningHandle;
 		Handle	m_WriteSocket;
@@ -80,10 +80,10 @@ namespace YBehavior
 		bool m_bTerminating = false;
 
 		String ms_texts;
+		String ms_sendBuffer;
 
 		Mutex m_Mutex;
 	public:
-		static Network* Instance();
 		bool IsConnected() const;
 
 		void InitAndCreateThread();
@@ -93,9 +93,10 @@ namespace YBehavior
 
 		void OnConnection() {} // used once after the connection is established, make some initialization between server and client;
 
-		void SendAllPackets(){;}
+		void SendAllPackets();
 		bool ReceivePackets(const char* msgCheck = 0);
 		bool ReadText(STRING& text);
+		bool SendText(const STRING& text);
 		void ClearOneConnection();
 		void ClearAll();
 		void OnRecieveMessages(const STRING& msg);

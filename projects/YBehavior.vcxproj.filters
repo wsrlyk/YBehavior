@@ -123,6 +123,18 @@
     <ClInclude Include="..\include\YBehavior\network\network.h">
       <Filter>头文件\network</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\debugger.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\singleton.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\tools\objectpool.h">
+      <Filter>头文件\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\network\messageprocessor.h">
+      <Filter>头文件\network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -180,6 +192,12 @@
       <Filter>源文件\network</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\network\network_msvc.cpp">
+      <Filter>源文件\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\debugger.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\network\messageprocessor.cpp">
       <Filter>源文件\network</Filter>
     </ClCompile>
   </ItemGroup>

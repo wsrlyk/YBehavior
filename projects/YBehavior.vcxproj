@@ -16,11 +16,13 @@
     <ClInclude Include="..\include\YBehavior\agent.h" />
     <ClInclude Include="..\include\YBehavior\behaviortree.h" />
     <ClInclude Include="..\include\YBehavior\behaviortreemgr.h" />
+    <ClInclude Include="..\include\YBehavior\debugger.h" />
     <ClInclude Include="..\include\YBehavior\define.h" />
     <ClInclude Include="..\include\YBehavior\factory.h" />
     <ClInclude Include="..\include\YBehavior\interface.h" />
     <ClInclude Include="..\include\YBehavior\launcher.h" />
     <ClInclude Include="..\include\YBehavior\logger.h" />
+    <ClInclude Include="..\include\YBehavior\network\messageprocessor.h" />
     <ClInclude Include="..\include\YBehavior\network\network.h" />
     <ClInclude Include="..\include\YBehavior\nodefactory.h" />
     <ClInclude Include="..\include\YBehavior\nodes\action.h" />
@@ -32,8 +34,10 @@
     <ClInclude Include="..\include\YBehavior\shareddataex.h" />
     <ClInclude Include="..\include\YBehavior\sharedvariablecreatehelper.h" />
     <ClInclude Include="..\include\YBehavior\sharedvariableex.h" />
+    <ClInclude Include="..\include\YBehavior\singleton.h" />
     <ClInclude Include="..\include\YBehavior\tools\bimap.h" />
     <ClInclude Include="..\include\YBehavior\tools\meta.h" />
+    <ClInclude Include="..\include\YBehavior\tools\objectpool.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />
     <ClInclude Include="..\include\YBehavior\variableoperation.h" />
@@ -43,8 +47,10 @@
     <ClCompile Include="..\src\YBehavior\agent.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviortree.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviortreemgr.cpp" />
+    <ClCompile Include="..\src\YBehavior\debugger.cpp" />
     <ClCompile Include="..\src\YBehavior\factory.cpp" />
     <ClCompile Include="..\src\YBehavior\launcher.cpp" />
+    <ClCompile Include="..\src\YBehavior\network\messageprocessor.cpp" />
     <ClCompile Include="..\src\YBehavior\network\network.cpp" />
     <ClCompile Include="..\src\YBehavior\network\network_msvc.cpp" />
     <ClCompile Include="..\src\YBehavior\nodefactory.cpp" />
@@ -95,7 +101,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>YBEHAVIOR_DLL;YBEHAVIOR_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>YBEHAVIOR_DLL;YBEHAVIOR_EXPORTS;DEBUGGER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>E:\Develop\YBehavior\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

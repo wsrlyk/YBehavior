@@ -16,7 +16,9 @@ namespace YBehavior
 	enum NodeState
 	{
 		NS_SUCCESS,
-		NS_FAILED
+		NS_FAILED,
+		NS_BREAK,
+		NS_RUNNING,
 	};
 
 	class ISharedVariableEx;
@@ -26,7 +28,7 @@ namespace YBehavior
 		typedef BehaviorNode* BehaviorNodePtr;
 		BehaviorNodePtr m_Parent;
 		NodeState m_State;
-		INT m_UID;
+		UINT m_UID;	// Unique in a tree
 
 		static std::unordered_set<STRING> KEY_WORDS;
 
@@ -36,7 +38,9 @@ namespace YBehavior
 
 		inline BehaviorNodePtr GetParent() { return m_Parent;}
 		inline void SetParent(BehaviorNodePtr parent) { m_Parent = parent;}
-		inline INT GetUID() { return m_UID; }
+
+		inline UINT GetUID() { return m_UID; }
+		inline void SetUID(UINT uid) { m_UID = uid; }
 
 		void Load(const pugi::xml_node& data);
 		NodeState Execute(AgentPtr pAgent);
@@ -92,10 +96,13 @@ namespace YBehavior
 	{
 	private:
 		SharedDataEx* m_SharedData;	///> 原始数据，每个使用此树的Agent都从这拷数据作为初始化
-
+		STRING m_Name;
 	public:
-		BehaviorTree();
+		BehaviorTree(const STRING& name);
 		~BehaviorTree();
+		inline const STRING& GetName() { return m_Name; }
+		inline SharedDataEx* GetSharedData() { return m_SharedData; }
+
 		void CloneData(SharedDataEx& destination);
 	protected:
 		virtual void OnLoaded(const pugi::xml_node& data);

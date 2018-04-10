@@ -219,7 +219,7 @@ namespace YBehavior
 			uintptr_t hThread = ::_beginthreadex(NULL, (unsigned)300, function, arg, creationFlags, NULL);
 			return (ThreadHandle)hThread;
 		}
-		void Sleep(int millisec)
+		void SleepMilli (int millisec)
 		{
 			Sleep(millisec);
 		}

@@ -34,8 +34,9 @@ namespace YBehavior
 			return nullptr;
 
 		NodeFactory::Instance()->SetActiveTree(name);
-		BehaviorTree* tree = new BehaviorTree();
-		if (!_LoadOneNode(tree, rootData.first_child()))
+		BehaviorTree* tree = new BehaviorTree(name);
+		UINT uid = 0;
+		if (!_LoadOneNode(tree, rootData.first_child(), uid))
 		{
 			ERROR_BEGIN << "Load xml failed: " << name << ERROR_END;
 			return nullptr;
@@ -44,12 +45,13 @@ namespace YBehavior
 		return tree;
 	}
 
-	bool TreeMgr::_LoadOneNode(BehaviorNode* node, const pugi::xml_node& data)
+	bool TreeMgr::_LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID)
 	{
 		if (node == nullptr)
 			return false;
 
 		node->Load(data);
+		node->SetUID(++parentUID);
 		for (auto it = data.begin(); it != data.end(); ++it)
 		{
 			if (strcmp(it->name(), "Node") == 0)
@@ -70,7 +72,7 @@ namespace YBehavior
 				auto connectionName = it->attribute("Connection");
 				node->AddChild(childNode, connectionName.value());
 
-				_LoadOneNode(childNode, *it);
+				_LoadOneNode(childNode, *it, parentUID);
 			}
 			else
 			{

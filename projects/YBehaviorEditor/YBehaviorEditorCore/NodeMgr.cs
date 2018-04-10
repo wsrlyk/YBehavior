@@ -172,13 +172,17 @@ namespace YBehavior.Editor.Core
         public NodeHierachy Hierachy { get { return m_Hierachy; } set { m_Hierachy = value; } }
 
         public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class", "Connection" });
-        public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName", "Connection" });
+        public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName", "Connection", "BreakPoint" });
 
         public Renderer Renderer { get { return m_Renderer; } }
         protected Renderer m_Renderer;
 
+        public uint UID { get; set; }
+
         private Geometry m_Geo = new Geometry();
         public Geometry Geo { get { return m_Geo; } }
+
+        public BreakPointInfo BreakPointInfo { get; } = new BreakPointInfo();
 
         protected SharedData m_Variables;
         public SharedData Variables { get { return m_Variables; } }
@@ -272,6 +276,9 @@ namespace YBehavior.Editor.Core
                 case "NickName":
                     m_NickName = attr.Value;
                     break;
+                case "BreakPoint":
+                    BreakPointInfo.HitCount = 1;
+                    break;
                 default:
                     return LoadOtherAttr(attr);
             }
@@ -344,6 +351,9 @@ namespace YBehavior.Editor.Core
             data.SetAttribute("Pos", m_Geo.Pos.ToString());
             if (!string.IsNullOrEmpty(m_NickName))
                 data.SetAttribute("NickName", m_NickName);
+
+            if (BreakPointInfo.HasBreakPoint)
+                data.SetAttribute("BreakPoint", BreakPointInfo.HitCount.ToString());
 
             foreach (Variable v in Variables.Datas.Values)
             {

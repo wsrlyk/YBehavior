@@ -33,7 +33,7 @@ namespace YBehavior
 		static TreeMgr* Instance();
 	protected:
 		BehaviorTree* _LoadOneTree(const STRING& name);
-		bool _LoadOneNode(BehaviorNode* node, const pugi::xml_node& data);
+		bool _LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID);
 	private:
 		static TreeMgr* s_Instance;
 		TreeMgr(){}

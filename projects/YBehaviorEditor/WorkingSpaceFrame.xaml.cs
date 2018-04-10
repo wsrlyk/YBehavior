@@ -99,13 +99,13 @@ namespace YBehavior.Editor
             {
                 this.btnStartDebug.Visibility = Visibility.Collapsed;
                 this.btnStopDebug.Visibility = Visibility.Visible;
-                this.btnDebugThisTree.Visibility = Visibility.Visible;
+                this.DebugThisTree.Visibility = Visibility.Visible;
             }
             else
             {
                 this.btnStartDebug.Visibility = Visibility.Visible;
                 this.btnStopDebug.Visibility = Visibility.Collapsed;
-                this.btnDebugThisTree.Visibility = Visibility.Collapsed;
+                this.DebugThisTree.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -141,7 +141,11 @@ namespace YBehavior.Editor
 
         private void btnDebugThisTree_Click(object sender, RoutedEventArgs e)
         {
+            if (WorkBenchMgr.Instance.ActiveWorkBench == null || WorkBenchMgr.Instance.ActiveWorkBench.MainTree == null)
+                return;
 
+            uint.TryParse(this.debugAgentUID.Text, out uint uid);
+            MessageProcessor.Instance.DebugTreeWithAgent(WorkBenchMgr.Instance.ActiveWorkBench.FileInfo.Name, uid);
         }
     }
 }

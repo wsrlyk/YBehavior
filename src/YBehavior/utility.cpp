@@ -5,6 +5,9 @@
 
 namespace YBehavior
 {
+
+	const YBehavior::STRING Utility::StringEmpty("");
+
 	void Utility::SplitString(const STRING& s, std::vector<STRING>& output, CHAR c, int count)
 	{
 		int counter = 0;

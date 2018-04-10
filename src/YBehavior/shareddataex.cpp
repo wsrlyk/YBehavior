@@ -9,5 +9,4 @@ namespace YBehavior
 
 		FOR_EACH_TYPE(YBEHAVIOR_CREATE_SHAREDDATA_ARRAY);
 	}
-
 }

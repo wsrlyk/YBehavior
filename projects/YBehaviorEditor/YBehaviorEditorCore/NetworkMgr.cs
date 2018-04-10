@@ -333,31 +333,31 @@ namespace YBehavior.Editor.Core
             {
                 if (msgData.Length > 0)
                 {
-                    SocketPacket.CommandID commandId = (SocketPacket.CommandID)(msgData[0]);
+                    //SocketPacket.CommandID commandId = (SocketPacket.CommandID)(msgData[0]);
 
-                    m_packets[(int)commandId]++;
+                    //m_packets[(int)commandId]++;
 
-                    switch (commandId)
-                    {
-                        case SocketPacket.CommandID.INITIAL_SETTINGS:
-                            {
-                                int platform = (int)msgData[1];
-                                int processId = (int)GetInt(msgData, 2);
-                                break;
-                            }
+                    //switch (commandId)
+                    //{
+                    //    case SocketPacket.CommandID.INITIAL_SETTINGS:
+                    //        {
+                    //            int platform = (int)msgData[1];
+                    //            int processId = (int)GetInt(msgData, 2);
+                    //            break;
+                    //        }
 
-                        case SocketPacket.CommandID.TEXT:
-                            {
+                    //    case SocketPacket.CommandID.TEXT:
+                    //        {
                                 handleText(msgData);
-                                break;
-                            }
+                    //            break;
+                    //        }
 
-                        default:
-                            {
-                                System.Diagnostics.Debug.Fail("Unknown command ID: " + commandId);
-                                break;
-                            }
-                    }
+                    //    default:
+                    //        {
+                    //            System.Diagnostics.Debug.Fail("Unknown command ID: " + commandId);
+                    //            break;
+                    //        }
+                    //}
                 }
 
             }
@@ -372,7 +372,8 @@ namespace YBehavior.Editor.Core
 
         private void handleText(byte[] msgData)
         {
-            string text = GetStringFromBuffer(msgData, 1, kMaxTextLength, true);
+            string text = GetStringFromBuffer(msgData, 0, kMaxTextLength, true);
+            LogMgr.Instance.Log(text);
             //MessageQueue.PostMessageBuffer(text);
         }
 
