@@ -38,6 +38,22 @@ namespace YBehavior
 		void SleepMilli(int millisec);
 	}
 
+	struct HalfWord
+	{
+		CHAR bytes[2];
+		HalfWord(INT value)
+		{
+			value &= 0xffff;
+			bytes[0] = (value >> 8);
+			bytes[1] = (value & 0xff);
+		}
+		const STRING ToString() const
+		{
+			STRING s(bytes, 2);
+			return s;
+		}
+	};
+
 	class Mutex
 	{
 	public:

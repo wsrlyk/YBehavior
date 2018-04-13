@@ -152,7 +152,7 @@ namespace YBehavior
 				}
 				DebugMgr::Instance()->AppendSendContent(buffer);
 
-				DebugMgr::Instance()->AppendSendContent("RunInfos ");
+				DebugMgr::Instance()->AppendSendContent(" RunInfos ");
 
 				buffer = "";
 				const std::list<NodeRunInfo*>& runInfos = DebugMgr::Instance()->GetRunInfos();

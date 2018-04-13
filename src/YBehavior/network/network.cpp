@@ -202,8 +202,9 @@ namespace YBehavior
 		{
 			ScopedLock lock(m_Mutex);
 
+			HalfWord halfword(text.size());
+			ms_sendBuffer += halfword.ToString();
 			ms_sendBuffer += text;
-			ms_sendBuffer += '\n';
 
 			return true;
 		}

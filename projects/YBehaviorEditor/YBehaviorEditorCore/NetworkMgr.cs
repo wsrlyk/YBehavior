@@ -8,6 +8,21 @@ using System.Windows;
 
 namespace YBehavior.Editor.Core
 {
+    struct HalfWord
+    {
+        private byte byte0;
+        private byte byte1;
+        public HalfWord(byte[] data, int startIndex)
+        {
+            byte0 = data[startIndex];
+            byte1 = data[startIndex + 1];
+        }
+
+        public int ToInt()
+        {
+            return (int)(byte0 << 4 | byte1);
+        }
+    }
     public class MsgReceiver
     {
         // Assumes the following message format:
@@ -37,22 +52,23 @@ namespace YBehavior.Editor.Core
                 while (dataIndex < receivedBytes)
                 {
                     // We only got message size, maybe not even that. Save & continue next time.
-                    if (receivedBytes - dataIndex <= 1)
+                    if (receivedBytes - dataIndex <= 2)
                     {
                         SavePendingData(dataBuffer, dataIndex, receivedBytes);
                         break;
                     }
 
-                    int messageSize = dataBuffer[dataIndex];
+                    HalfWord msgSize = new HalfWord(dataBuffer, dataIndex);
+                    int messageSize = msgSize.ToInt();
 
                     // Incomplete message.
-                    if (receivedBytes - (dataIndex + 1) < messageSize)
+                    if (receivedBytes - (dataIndex + 2) < messageSize)
                     {
                         SavePendingData(dataBuffer, dataIndex, receivedBytes);
                         break;
                     }
 
-                    dataIndex += 1;
+                    dataIndex += 2;
                     byte[] fullMessage = new byte[messageSize];
                     Array.Copy(dataBuffer, dataIndex, fullMessage, 0, messageSize);
                     dataIndex += messageSize;
@@ -314,7 +330,7 @@ namespace YBehavior.Editor.Core
 
             if (data.Length <= maxLen)
             {
-                maxLen = data.Length - 1;
+                maxLen = data.Length;
 
                 string ret = ecode.GetString(data, dataIdx, maxLen);
                 char[] zeroChars = { '\0', '?' };
