@@ -27,6 +27,8 @@ namespace YBehavior.Editor
             InitializeComponent();
 
             EventMgr.Instance.Register(EventType.WorkBenchLoaded, _OnWorkBenchLoaded);
+            EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);
+            EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
 
             foreach (KeyValuePair<Variable.ValueType, string> pair in VariableHelper.ValueTypeDic)
             {
@@ -44,7 +46,24 @@ namespace YBehavior.Editor
 
             m_CurTree = oArg.Bench.MainTree;
             //this.VariableContainer.SetBinding(ComboBox.ItemsSourceProperty, new Binding("Datas"));
-            this.DataContext = m_CurTree.Variables;
+            if (DebugMgr.Instance.IsDebugging())
+                this.DataContext = DebugMgr.Instance.DebugSharedData;
+            else
+                this.DataContext = m_CurTree.Variables;
+        }
+
+        private void _OnNetworkConnectionChanged(EventArg arg)
+        {
+            NetworkConnectionChangedArg oArg = arg as NetworkConnectionChangedArg;
+            if (oArg.bConnected)
+            {
+                ///> make Add Button unable to click
+            }
+        }
+
+        private void _OnDebugTargetChanged(EventArg arg)
+        {
+            this.DataContext = DebugMgr.Instance.DebugSharedData;
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)

@@ -12,7 +12,15 @@ namespace YBehavior.Editor.Core
         List<WorkBench> m_OpenedWorkBenchs = new List<WorkBench>();
         WorkBench m_ActiveWorkBench;
         public WorkBench ActiveWorkBench { get { return m_ActiveWorkBench; } }
-
+        public string ActiveTreeName
+        {
+            get
+            {
+                if (m_ActiveWorkBench == null || m_ActiveWorkBench.FileInfo == null)
+                    return string.Empty;
+                return m_ActiveWorkBench.FileInfo.Name;
+            }
+        }
         public WorkBenchMgr()
         {
             EventMgr.Instance.Register(EventType.NodesConnected, _OnNodesConnected);

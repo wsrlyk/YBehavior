@@ -31,9 +31,12 @@ namespace YBehavior
 
 		template<typename T>
 		static STRING ToString(const T& t);
+		template<>
+		static STRING Utility::ToString(const BOOL& t);
 		template<typename T>
 		static STRING ToString(const std::vector<T>& t);
-
+		template<>
+		static STRING ToString(const std::vector<BOOL>& t);
 	};
 
 	template<typename T>
@@ -42,6 +45,16 @@ namespace YBehavior
 		STRING str;
 		std::stringstream ss;
 		ss << t;
+		ss >> str;
+		return str;
+	}
+
+	template<>
+	static STRING Utility::ToString(const BOOL& t)
+	{
+		STRING str;
+		std::stringstream ss;
+		ss << std::boolalpha << t;
 		ss >> str;
 		return str;
 	}
@@ -56,6 +69,21 @@ namespace YBehavior
 			if (i != 0)
 				ss << '|';
 			ss << t[i];
+		}
+		ss >> str;
+		return str;
+	}
+
+	template<>
+	static STRING Utility::ToString(const std::vector<BOOL>& t)
+	{
+		STRING str;
+		std::stringstream ss;
+		for (int i = 0; i < t.size(); ++i)
+		{
+			if (i != 0)
+				ss << '|';
+			ss << std::boolalpha << t[i];
 		}
 		ss >> str;
 		return str;

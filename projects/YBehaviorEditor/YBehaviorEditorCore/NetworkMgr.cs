@@ -111,9 +111,14 @@ namespace YBehavior.Editor.Core
         private Socket m_clientSocket = null;
         private AsyncCallback m_pfnCallBack = null;
 
-        public bool IsConnected()
+        public MessageProcessor MessageProcessor { get; } = new MessageProcessor();
+
+        public bool IsConnected
         {
-            return m_clientSocket != null && m_clientSocket.Connected;
+            get
+            {
+                return m_clientSocket != null && m_clientSocket.Connected;
+            }
         }
 
         public bool Connect(string strIP, int iPort)
@@ -155,7 +160,7 @@ namespace YBehavior.Editor.Core
         private void onConnect()
         {
             this.m_packetsReceived = 0;
-
+            MessageProcessor.OnNetworkConnectionChanged(true);
             NetworkConnectionChangedArg arg = new NetworkConnectionChangedArg()
             {
                 bConnected = true
@@ -196,7 +201,7 @@ namespace YBehavior.Editor.Core
                 bConnected = false
             };
             EventMgr.Instance.Send(arg);
-
+            MessageProcessor.OnNetworkConnectionChanged(false);
         }
 
         SocketPacket _theSocPkt = null;
@@ -390,7 +395,7 @@ namespace YBehavior.Editor.Core
         {
             string text = GetStringFromBuffer(msgData, 0, kMaxTextLength, true);
             LogMgr.Instance.Log(text);
-            //MessageQueue.PostMessageBuffer(text);
+            MessageProcessor.Receive(text);
         }
 
     }

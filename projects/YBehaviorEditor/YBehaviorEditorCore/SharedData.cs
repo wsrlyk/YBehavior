@@ -115,7 +115,8 @@ namespace YBehavior.Editor.Core
 
         public void OnVariableValueChanged(Variable v)
         {
-            m_Owner.OnPropertyChanged("Note");
+            if (m_Owner != null)
+                m_Owner.OnPropertyChanged("Note");
         }
 
         public void RefreshVariables()
@@ -124,6 +125,19 @@ namespace YBehavior.Editor.Core
             {
                 v.RefreshCandidates(true);
             }
+        }
+
+        public SharedData Clone()
+        {
+            SharedData sharedData = new SharedData(m_Owner);
+
+            foreach (KeyValuePair<string, Variable> v in m_Variables)
+            {
+                Variable vv = v.Value.Clone();
+                sharedData.AddVariable(vv);
+            }
+
+            return sharedData;
         }
     }
 }

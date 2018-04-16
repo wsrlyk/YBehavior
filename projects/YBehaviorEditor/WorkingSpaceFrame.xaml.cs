@@ -141,11 +141,11 @@ namespace YBehavior.Editor
 
         private void btnDebugThisTree_Click(object sender, RoutedEventArgs e)
         {
-            if (WorkBenchMgr.Instance.ActiveWorkBench == null || WorkBenchMgr.Instance.ActiveWorkBench.MainTree == null)
+            if (WorkBenchMgr.Instance.ActiveWorkBench == null || WorkBenchMgr.Instance.ActiveWorkBench.FileInfo == null)
                 return;
 
             uint.TryParse(this.debugAgentUID.Text, out uint uid);
-            MessageProcessor.Instance.DebugTreeWithAgent(WorkBenchMgr.Instance.ActiveWorkBench.FileInfo.Name, uid);
+            DebugMgr.Instance.StartDebugTreeWithAgent(WorkBenchMgr.Instance.ActiveWorkBench.FileInfo.Name, uid);
         }
     }
 }

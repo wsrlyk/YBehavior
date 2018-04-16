@@ -129,9 +129,7 @@ namespace YBehavior
 			{
 				DebugMgr::Instance()->AppendSendContent("[TickResult] ");
 
-
-				DebugMgr::Instance()->AppendSendContent("SharedDatas ");
-
+				///> SharedDatas:
 				STRING buffer;
 				SharedDataEx* pSharedData = m_Target->GetSharedData();
 
@@ -152,7 +150,9 @@ namespace YBehavior
 				}
 				DebugMgr::Instance()->AppendSendContent(buffer);
 
-				DebugMgr::Instance()->AppendSendContent(" RunInfos ");
+				DebugMgr::Instance()->AppendSendContent(" ");
+
+				///> Run Info:
 
 				buffer = "";
 				const std::list<NodeRunInfo*>& runInfos = DebugMgr::Instance()->GetRunInfos();
