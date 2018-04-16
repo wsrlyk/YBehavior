@@ -52,6 +52,11 @@ namespace YBehavior
 			return newArray;
 		}
 
+		INT GetTypeID() const override
+		{
+			return GetClassTypeNumberId<T>();
+		}
+
 		INT Length() const override { return (INT)m_Datas.size(); }
 
 		bool Get(INT index, const T& res) const

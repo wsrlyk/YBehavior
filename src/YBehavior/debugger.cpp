@@ -133,7 +133,7 @@ namespace YBehavior
 				DebugMgr::Instance()->AppendSendContent("SharedDatas ");
 
 				STRING buffer;
-				SharedDataEx* pSharedData = tree->GetSharedData();
+				SharedDataEx* pSharedData = m_Target->GetSharedData();
 
 				for (int i = 0; i < MAX_TYPE_INDEX; ++i)
 				{
@@ -141,7 +141,7 @@ namespace YBehavior
 					int length = iarray->Length();
 					for (int j = 0; j < length; ++j)
 					{
-						const STRING& name = NodeFactory::Instance()->GetNameByIndex(tree->GetName(), j, i);
+						const STRING& name = NodeFactory::Instance()->GetNameByIndex(tree->GetName(), j, iarray->GetTypeID());
 						if (name == Utility::StringEmpty)
 							continue;
 						STRING content(name + "," + iarray->GetToString(j));

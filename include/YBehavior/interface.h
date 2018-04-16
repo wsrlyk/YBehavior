@@ -32,7 +32,7 @@ namespace YBehavior
 		virtual bool Set(INT index, const void* src) = 0;
 		virtual IDataArray* Clone() const = 0;
 		virtual INT Length() const = 0;
-
+		virtual INT GetTypeID() const = 0;
 	};
 
 }

@@ -36,25 +36,27 @@ namespace YBehavior
 
 		friend std::stringstream & operator<<(std::stringstream &out, const Vector3 &obj)
 		{
-			out << obj.x << ' ' << obj.y << ' ' << obj.z;
+			out << obj.x << '=' << obj.y << '=' << obj.z;
 			return out;
 		}
 
 		friend std::stringstream & operator >> (std::stringstream &in, Vector3 &obj)
 		{
-			in >> obj.x >> obj.y >> obj.z;
+			char c;
+			in >> obj.x >> c >> obj.y >> c >> obj.z;
 			return in;
 		}
 
 		friend std::ostream & operator<<(std::ostream &out, const Vector3 &obj)
 		{
-			out << obj.x << ' ' << obj.y << ' ' << obj.z;
+			out << obj.x << '=' << obj.y << '=' << obj.z;
 			return out;
 		}
 
 		friend std::istream & operator >> (std::istream &in, Vector3 &obj)
 		{
-			in >> obj.x >> obj.y >> obj.z;
+			char c;
+			in >> obj.x >> c >> obj.y >> c >> obj.z;
 			return in;
 		}
 
