@@ -94,7 +94,7 @@ namespace YBehavior
 
 					ReceivePackets();
 
-					LOG_BEGIN << "Socket::Send & Receive" << LOG_END;
+					// LOG_BEGIN << "Socket::Send & Receive" << LOG_END;
 
 				}
 
@@ -126,10 +126,11 @@ namespace YBehavior
 		{
 			ScopedLock lock(m_Mutex);
 
+			LOG_BEGIN << "Try Send: " << ms_sendBuffer << LOG_END;
 			size_t len;
 			if (Socket::Write(m_WriteSocket, ms_sendBuffer.c_str(), ms_sendBuffer.length(), len) && len != ms_sendBuffer.length())
 			{
-				LOG_BEGIN << "Network Send Error: " << ms_sendBuffer << LOG_END;
+				ERROR_BEGIN << "Network Send Error: " << ms_sendBuffer << ERROR_END;
 			}
 
 			ms_sendBuffer = "";

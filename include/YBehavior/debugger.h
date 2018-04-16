@@ -67,6 +67,9 @@ namespace YBehavior
 		Agent* m_Target;
 		BehaviorNode* m_pNode;
 		NodeRunInfo* m_pRunInfo;
+
+		void _SendInfos(const STRING& treeName);
+		void _SendCurrentInfos();
 	public:
 		DebugHelper(Agent* pAgent, BehaviorNode* pNode);
 		~DebugHelper();

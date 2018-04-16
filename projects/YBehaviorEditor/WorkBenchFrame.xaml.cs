@@ -43,6 +43,7 @@ namespace YBehavior.Editor
             InitializeComponent();
             EventMgr.Instance.Register(EventType.WorkBenchLoaded, _OnWorkBenchLoaded);
             EventMgr.Instance.Register(EventType.NewNodeAdded, _OnNewNodeAdded);
+            EventMgr.Instance.Register(EventType.TickResult, _OnTickResult);
             Focus();
 
             DraggingConnection.Instance.SetCanvas(this.Canvas);
@@ -84,6 +85,21 @@ namespace YBehavior.Editor
             activeTab.IsSelected = true;
 
             //_RenderActiveWorkBench();
+        }
+
+        private void _OnTickResult(EventArg arg)
+        {
+            if (DebugMgr.Instance.IsDebugging())
+            {
+                Action renderMainTreeFunc = new Action(_RefreshMainTree);
+                this.Canvas.Dispatcher.BeginInvoke(renderMainTreeFunc, null);
+            }
+        }
+
+        void _RefreshMainTree()
+        {
+            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
+            bench.MainTree.Renderer.Refresh();
         }
 
         private bool _TabCloseClicked(UCTabItemWithClose tab)

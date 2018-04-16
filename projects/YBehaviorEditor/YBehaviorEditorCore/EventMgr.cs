@@ -20,6 +20,7 @@ namespace YBehavior.Editor.Core
         SharedVariableChanged,
         NetworkConnectionChanged,
         DebugTargetChanged,
+        TickResult,
     }
 
     public class EventMgr : Singleton<EventMgr>
@@ -133,6 +134,10 @@ namespace YBehavior.Editor.Core
     {
         public string Treename { get; set; }
         public override EventType Type => EventType.DebugTargetChanged;
+    }
+    public class TickResultArg : EventArg
+    {
+        public override EventType Type => EventType.TickResult;
     }
 
 }

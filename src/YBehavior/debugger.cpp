@@ -126,47 +126,65 @@ namespace YBehavior
 		{
 			BehaviorTree* tree = dynamic_cast<BehaviorTree*>(m_pNode);
 			if (tree)
+				_SendInfos(tree->GetName());
+		}
+	}
+
+	void DebugHelper::_SendCurrentInfos()
+	{
+		if (!IsValid())
+			return;
+
+		BehaviorNode* pRoot = m_pNode->GetRoot();
+		if (pRoot)
+		{
+			BehaviorTree* tree = dynamic_cast<BehaviorTree*>(pRoot);
+			if (tree)
+				_SendInfos(tree->GetName());
+		}
+
+	}
+
+	void DebugHelper::_SendInfos(const STRING& treeName)
+	{
+		DebugMgr::Instance()->AppendSendContent("[TickResult] ");
+
+		///> SharedDatas:
+		STRING buffer;
+		SharedDataEx* pSharedData = m_Target->GetSharedData();
+
+		for (int i = 0; i < MAX_TYPE_INDEX; ++i)
+		{
+			auto iarray = pSharedData->GetDataArray(i);
+			int length = iarray->Length();
+			for (int j = 0; j < length; ++j)
 			{
-				DebugMgr::Instance()->AppendSendContent("[TickResult] ");
-
-				///> SharedDatas:
-				STRING buffer;
-				SharedDataEx* pSharedData = m_Target->GetSharedData();
-
-				for (int i = 0; i < MAX_TYPE_INDEX; ++i)
-				{
-					auto iarray = pSharedData->GetDataArray(i);
-					int length = iarray->Length();
-					for (int j = 0; j < length; ++j)
-					{
-						const STRING& name = NodeFactory::Instance()->GetNameByIndex(tree->GetName(), j, iarray->GetTypeID());
-						if (name == Utility::StringEmpty)
-							continue;
-						STRING content(name + "," + iarray->GetToString(j));
-						if (buffer.length() > 0)
-							buffer += ";";
-						buffer += content;
-					}
-				}
-				DebugMgr::Instance()->AppendSendContent(buffer);
-
-				DebugMgr::Instance()->AppendSendContent(" ");
-
-				///> Run Info:
-
-				buffer = "";
-				const std::list<NodeRunInfo*>& runInfos = DebugMgr::Instance()->GetRunInfos();
-				for (auto it = runInfos.begin(); it != runInfos.end(); ++it)
-				{
-					if (buffer.length() > 0)
-						buffer += ";";
-					buffer += (*it)->ToString();
-				}
-				DebugMgr::Instance()->AppendSendContent(buffer);
-
-				DebugMgr::Instance()->Send();
+				const STRING& name = NodeFactory::Instance()->GetNameByIndex(treeName, j, iarray->GetTypeID());
+				if (name == Utility::StringEmpty)
+					continue;
+				STRING content(name + "," + iarray->GetToString(j));
+				if (buffer.length() > 0)
+					buffer += ";";
+				buffer += content;
 			}
 		}
+		DebugMgr::Instance()->AppendSendContent(buffer);
+
+		DebugMgr::Instance()->AppendSendContent(" ");
+
+		///> Run Info:
+
+		buffer = "";
+		const std::list<NodeRunInfo*>& runInfos = DebugMgr::Instance()->GetRunInfos();
+		for (auto it = runInfos.begin(); it != runInfos.end(); ++it)
+		{
+			if (buffer.length() > 0)
+				buffer += ";";
+			buffer += (*it)->ToString();
+		}
+		DebugMgr::Instance()->AppendSendContent(buffer);
+
+		DebugMgr::Instance()->Send();
 	}
 
 	void DebugHelper::CreateRunInfo()
@@ -195,12 +213,15 @@ namespace YBehavior
 
 		///> Send runInfos to editor
 		DebugMgr::Instance()->TogglePause(true);
+
+		SetResult(NS_BREAK);
+		_SendCurrentInfos();
 		///> Sleep and wait for removing break
 		int i = 0;
 		while (DebugMgr::Instance()->IsPaused())
 		{
 			Thread::SleepMilli(100);
-			if (++i > 50)
+			if (++i > 10)
 				DebugMgr::Instance()->TogglePause(false);
 		}
 

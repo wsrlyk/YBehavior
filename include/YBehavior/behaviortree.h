@@ -15,6 +15,7 @@ namespace YBehavior
 {
 	enum NodeState
 	{
+		NS_INVALID = -1,
 		NS_SUCCESS,
 		NS_FAILED,
 		NS_BREAK,
@@ -48,6 +49,8 @@ namespace YBehavior
 		virtual void AddChild(BehaviorNode* child, const STRING& connection);
 
 		virtual STRING GetNodeInfoForPrint() { return "";}
+
+		BehaviorNodePtr GetRoot();
 	protected:
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
 		virtual void OnLoaded(const pugi::xml_node& data) {}

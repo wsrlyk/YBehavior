@@ -47,6 +47,38 @@ namespace YBehavior.Editor.Core
             m_Operation.SetPanel(panel);
         }
 
+        public void SetDebug(NodeState state = NodeState.NS_INVALID)
+        {
+            if (state == NodeState.NS_INVALID)
+            {
+                this.debugCover.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                this.debugCover.Visibility = Visibility.Visible;
+
+                Brush bgBrush;
+                switch(state)
+                {
+                    case NodeState.NS_SUCCESS:
+                        bgBrush = new SolidColorBrush(Colors.LightGreen);
+                        break;
+                    case NodeState.NS_FAILED:
+                        bgBrush = new SolidColorBrush(Colors.DarkGreen);
+                        break;
+                    case NodeState.NS_RUNNING:
+                        bgBrush = new SolidColorBrush(Colors.LightPink);
+                        break;
+                    case NodeState.NS_BREAK:
+                        bgBrush = new SolidColorBrush(Colors.DarkRed);
+                        break;
+                    default:
+                        bgBrush = new SolidColorBrush(Colors.Red);
+                        break;
+                }
+                this.debugCover.Background = bgBrush;
+            }
+        }
 
         void _OnClick()
         {

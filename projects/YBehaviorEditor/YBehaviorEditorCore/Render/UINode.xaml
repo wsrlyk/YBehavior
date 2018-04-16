@@ -6,20 +6,17 @@
              xmlns:local="clr-namespace:YBehavior.Editor.Core"
              mc:Ignorable="d" 
              MinWidth="60" MinHeight="80" HorizontalAlignment="Center">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="10"/>
-            <RowDefinition/>
-            <RowDefinition Height="10"/>
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Name="topConnectors" Orientation="Horizontal" HorizontalAlignment="Center">
-        </StackPanel>
-        <Border Name="border" Grid.Row="1" BorderThickness="3" BorderBrush="LightBlue" Background="DarkGray">
-            <StackPanel Name="mainPanel">
-                <TextBlock Name="name" Text="{Binding FullName}"></TextBlock>
-                <TextBlock Name="note" Text="{Binding Note}"></TextBlock>
-            </StackPanel>
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Height="10"  Name="topConnectors" Orientation="Horizontal"/>
+        <StackPanel DockPanel.Dock="Bottom" Height="10" Name="bottomConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
+        <Border Name="border" BorderThickness="3" BorderBrush="LightBlue" Background="#FF6CB2B6">
+            <Grid>
+                <Border Name="debugCover" BorderThickness="0" Background="#FFDA3F1C"/>
+                <StackPanel Name="mainPanel">
+                    <TextBlock Name="name" Text="{Binding FullName}"></TextBlock>
+                    <TextBlock Name="note" Text="{Binding Note}"></TextBlock>
+                </StackPanel>
+            </Grid>
         </Border>
-        <StackPanel Grid.Row="2" Name="bottomConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
-    </Grid>
+    </DockPanel>
 </UserControl>

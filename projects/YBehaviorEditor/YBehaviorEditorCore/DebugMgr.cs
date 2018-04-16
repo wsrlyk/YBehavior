@@ -12,6 +12,15 @@ namespace YBehavior.Editor.Core
         public bool HasBreakPoint { get { return HitCount > 0; } }
     }
 
+    public enum NodeState
+    {
+        NS_INVALID = -1,
+        NS_SUCCESS,
+        NS_FAILED,
+        NS_BREAK,
+        NS_RUNNING,
+    };
+
     public class DebugMgr : Singleton<DebugMgr>
     {
         string m_TargetTreeName;
@@ -21,6 +30,16 @@ namespace YBehavior.Editor.Core
 
         SharedData m_SharedData;
         public SharedData DebugSharedData { get { return m_SharedData; } }
+        Dictionary<uint, int> m_RunInfo = new Dictionary<uint, int>();
+        public Dictionary<uint, int> RunInfo { get { return m_RunInfo; } }
+        public NodeState GetRunState(uint uid)
+        {
+            if (m_RunInfo.TryGetValue(uid, out int state))
+            {
+                return (NodeState)state;
+            }
+            return NodeState.NS_INVALID;
+        }
 
         public bool IsDebugging(string treeName = null)
         {

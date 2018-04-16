@@ -129,6 +129,19 @@ namespace YBehavior.Editor.Core
 
                     v.Value = strV[1];
                 }
+
+                DebugMgr.Instance.RunInfo.Clear();
+                string[] runInfos = data[2].Split(';');
+                foreach (string s in runInfos)
+                {
+                    string[] strR = s.Split('=');
+                    if (strR.Length != 2)
+                        continue;
+
+                    DebugMgr.Instance.RunInfo[uint.Parse(strR[0])] = int.Parse(strR[1]);
+                }
+
+                EventMgr.Instance.Send(new TickResultArg());
             }
         }
     }

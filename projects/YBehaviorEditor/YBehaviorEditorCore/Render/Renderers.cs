@@ -36,6 +36,28 @@ namespace YBehavior.Editor.Core
             return conn;
         }
 
+        public void Refresh()
+        {
+            _Refresh();
+        }
+
+        private void _Refresh()
+        {
+            _RefreshSelf();
+
+            foreach (Node child in m_Owner.Conns)
+            {
+                child.Renderer.Refresh();
+            }
+        }
+
+        private void _RefreshSelf()
+        {
+            m_uiFrame.SetDebug(DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(m_Owner.UID) : NodeState.NS_INVALID);
+            Canvas.SetLeft(m_uiFrame, m_Owner.Geo.Pos.X);
+            Canvas.SetTop(m_uiFrame, m_Owner.Geo.Pos.Y);
+        }
+
         public void Render(Panel panel)
         {
             _Render(panel);
@@ -161,9 +183,7 @@ namespace YBehavior.Editor.Core
             m_uiFrame.SetCanvas(m_Panel);
             m_Panel.Children.Add(m_uiFrame);
 
-            Canvas.SetLeft(m_uiFrame, node.Geo.Pos.X);
-            Canvas.SetTop(m_uiFrame, node.Geo.Pos.Y);
-
+            _RefreshSelf();
             m_uiFrame.DataContext = node;
         }
 
