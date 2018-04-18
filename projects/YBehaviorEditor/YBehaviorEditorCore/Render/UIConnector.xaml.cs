@@ -45,9 +45,9 @@ namespace YBehavior.Editor.Core
             m_Operation.RegisterDragDrop(_OnDragged, _OnStartDragged);
         }
 
-        public void SetCanvas(Panel panel)
+        public void SetCanvas(RenderCanvas canvas)
         {
-            m_Operation.SetPanel(panel);
+            m_Operation.SetCanvas(canvas);
         }
 
         public string Title

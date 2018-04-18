@@ -43,9 +43,9 @@ namespace YBehavior.Editor.Core
             m_Operation.RegisterClick(_OnClick);
         }
 
-        public void SetCanvas(Panel panel)
+        public void SetCanvas(RenderCanvas canvas)
         {
-            m_Operation.SetPanel(panel);
+            m_Operation.SetCanvas(canvas);
         }
 
         public PathGeometry PathGeometry { get { return path.Data as PathGeometry; } }

@@ -88,15 +88,20 @@ namespace YBehavior.Editor.Core
                 FileInfo = file
             };
 
+            WorkBench oldBench = m_ActiveWorkBench;
+            m_ActiveWorkBench = workBench;
+
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(file.Path);
 
             XmlElement root = xmlDoc.DocumentElement;
             if (!workBench.Load(root))
+            {
+                m_ActiveWorkBench = oldBench;
                 return null;
+            }
 
             m_OpenedWorkBenchs.Add(workBench);
-            m_ActiveWorkBench = workBench;
 
             return workBench;
         }

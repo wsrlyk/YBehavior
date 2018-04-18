@@ -38,6 +38,7 @@ namespace YBehavior.Editor
 
         PageData m_CurPageData;
         Core.Operation m_Operation;
+
         public WorkBenchFrame()
         {
             InitializeComponent();
@@ -138,42 +139,27 @@ namespace YBehavior.Editor
 
             ///> TODO: move the node to the center of the canvas
 
-            _RenderNode(oArg.Node);
-            this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new RenderConnectionFunc(_ThreadRenderConnection), oArg.Node);
+            _CreateNode(oArg.Node);
+            //this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<Node>(_ThreadRefreshConnection), oArg.Node);
         }
 
-        void _RenderActiveWorkBench()
+        void _CreateActiveWorkBench()
         {
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            _RenderNode(bench.MainTree);
+            _CreateNode(bench.MainTree);
 
             foreach (var node in bench.Forest)
             {
-                _RenderNode(node);
+                _CreateNode(node);
             }
 
-            this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(_ThreadRenderConnections));
+            //this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(_ThreadRefreshConnections));
         }
 
-        private void _ThreadRenderConnections()
+        void _CreateNode(Node node)
         {
-            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            bench.MainTree.Renderer.RenderConnections();
-
-            foreach (var node in bench.Forest)
-            {
-                node.Renderer.RenderConnections();
-            }
-        }
-        delegate void RenderConnectionFunc(Node target);
-        private void _ThreadRenderConnection(Node target)
-        {
-            target.Renderer.RenderConnections();
-        }
-
-        void _RenderNode(Node node)
-        {
-            node.Renderer.Render(this.Canvas);
+            node.Renderer.AddedToPanel(this.Canvas);
+            //node.Renderer.CreateConnections();
         }
 
 
@@ -226,7 +212,7 @@ namespace YBehavior.Editor
                     {
                         LogMgr.Instance.Log("Tab selected: " + tab.Header);
                         if (WorkBenchMgr.Instance.Switch(tab.Content as WorkBench))
-                            _RenderActiveWorkBench();
+                            _CreateActiveWorkBench();
 
                         m_CurPageData = m_PageDataDic[tab];
                         this.Canvas.RenderTransform = m_CurPageData.TransGroup;

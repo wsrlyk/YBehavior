@@ -17,7 +17,18 @@ namespace YBehavior.Editor.Core
         ClickHandler m_ClickHandler;
         DragHandler m_DragHandler;
         DragHandler m_StartDragHandler;
-        Panel m_Panel;
+
+        RenderCanvas m_Canvas;
+        RenderCanvas RenderCanvas
+        {
+            get
+            {
+                if (m_Canvas == null)
+                    m_Canvas = new RenderCanvas();
+                return m_Canvas;
+            }
+        }
+
         public Operation(UIElement target)
         {
             target.MouseLeftButtonDown -= _MouseLeftButtonDown;
@@ -30,14 +41,14 @@ namespace YBehavior.Editor.Core
             target.MouseLeftButtonUp += _MouseLeftButtonUp;
         }
 
-        public void SetPanel(Panel panel)
+        public void SetCanvas(RenderCanvas canvas)
         {
-            m_Panel = panel;
+            m_Canvas = canvas;
         }
 
         public void MakeCanvasFocused()
         {
-            m_Panel.Focus();
+            RenderCanvas.Panel.Focus();
         }
 
         public void RegisterClick(ClickHandler handler)
@@ -66,7 +77,7 @@ namespace YBehavior.Editor.Core
             tmp.CaptureMouse();
             m_bStartClick = true;
             m_bStartDrag = true;
-            m_Pos = e.GetPosition(m_Panel);
+            m_Pos = e.GetPosition(RenderCanvas.Panel);
             e.Handled = true;
         }
         void _PreviewMouseMove(object sender, MouseEventArgs e)
@@ -93,7 +104,7 @@ namespace YBehavior.Editor.Core
                 return;
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                Point newPos = e.GetPosition(m_Panel);
+                Point newPos = e.GetPosition(RenderCanvas.Panel);
                 if (m_DragHandler != null)
                     m_DragHandler(newPos - m_Pos, newPos);
                 m_Pos = newPos;
@@ -127,7 +138,7 @@ namespace YBehavior.Editor.Core
         {
             m_HitTestResult.Clear();
             VisualTreeHelper.HitTest(
-                m_Panel, 
+                RenderCanvas.Panel, 
                 null, 
                 new HitTestResultCallback(MyHitTestResult),
                 new PointHitTestParameters(pos));

@@ -9,11 +9,16 @@ using System.Windows.Shapes;
 
 namespace YBehavior.Editor.Core
 {
+    public class RenderCanvas
+    {
+        public Panel Panel { get; set; }
+    }
     public class Renderer : NodeBase
     {
         Node m_Owner;
 
-        Panel m_Panel;
+        RenderCanvas m_Canvas = new RenderCanvas();
+
         UINode m_uiFrame;
         public UINode Frame { get { return m_uiFrame; } }
 
@@ -24,6 +29,8 @@ namespace YBehavior.Editor.Core
             {
                 Node = node
             };
+
+            _CreateSelf();
         }
 
         Dictionary<Node, UIConnection> m_uiConns = new Dictionary<Node, UIConnection>();
@@ -37,11 +44,6 @@ namespace YBehavior.Editor.Core
         }
 
         public void Refresh()
-        {
-            _Refresh();
-        }
-
-        private void _Refresh()
         {
             _RefreshSelf();
 
@@ -58,23 +60,30 @@ namespace YBehavior.Editor.Core
             Canvas.SetTop(m_uiFrame, m_Owner.Geo.Pos.Y);
         }
 
-        public void Render(Panel panel)
+        public void AddedToPanel(Panel panel)
         {
-            _Render(panel);
-        }
+            m_Canvas.Panel = panel;
 
-        private void _Render(Panel panel)
-        {
-            m_Panel = panel;
-            _RenderSelf();
-            _RenderChildren();
+            panel.Children.Add(m_uiFrame);
+            _RefreshSelf();
+            foreach (Node child in m_Owner.Conns)
+            {
+                child.Renderer.AddedToPanel(panel);
+            }
+
+            foreach (UIConnection uiconn in m_uiConns.Values)
+            {
+                panel.Children.Add(uiconn);
+            }
+
+            panel.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(RefreshConn));
         }
 
         protected void _ClearConns()
         {
             foreach (var pair in m_uiConns)
             {
-                m_Panel.Children.Remove(pair.Value);
+                m_Canvas.Panel.Children.Remove(pair.Value);
             }
             m_uiConns.Clear();
         }
@@ -95,7 +104,8 @@ namespace YBehavior.Editor.Core
             y = Math.Max(y, Canvas.GetTop(Frame) + Frame.ActualHeight + 10);
             return y;
         }
-        protected void _RenderChildren()
+
+        public void CreateConnections()
         {
             _ClearConns();
             foreach (ConnectionHolder conn in m_Owner.Conns.ConnectionsList)
@@ -103,27 +113,25 @@ namespace YBehavior.Editor.Core
                 double y = _CalcHorizontalPos(conn.Conn);
                 foreach (Node child in conn.Conn)
                 {
-                    child.Renderer.Render(m_Panel);
-                    //_RenderConn(child, y);
+                    child.Renderer.CreateConnections();
+                    _CreateConn(child, y);
                 }
             }
+
+            if (m_Canvas.Panel != null)
+                m_Canvas.Panel.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(RefreshConn));
         }
 
-        public void RenderConnections()
+        public void RefreshConns()
         {
-            _ClearConns();
-            foreach (ConnectionHolder conn in m_Owner.Conns.ConnectionsList)
+            RefreshConn();
+            foreach (Node child in m_Owner.Conns)
             {
-                double y = _CalcHorizontalPos(conn.Conn);
-                foreach (Node child in conn.Conn)
-                {
-                    child.Renderer.RenderConnections();
-                    _RenderConn(child, y);
-                }
+                child.Renderer.RefreshConns();
             }
         }
 
-        protected void _RerenderConn()
+        public void RefreshConn()
         {
             foreach (ConnectionHolder conn in m_Owner.Conns.ConnectionsList)
             {
@@ -138,14 +146,15 @@ namespace YBehavior.Editor.Core
                 }
             }
         }
-        protected void _RenderConn(Node child, double horizontalPos)
+        protected void _CreateConn(Node child, double horizontalPos)
         {
             UIConnection path = new UIConnection();
-            path.SetCanvas(m_Panel);
+            path.SetCanvas(m_Canvas);
+            path.ChildHolder = child.Conns.ParentHolder;
+            //_DrawConnLine(path, child, horizontalPos);
 
-            _DrawConnLine(path, child, horizontalPos);
-
-            m_Panel.Children.Add(path);
+            if (m_Canvas.Panel != null)
+                m_Canvas.Panel.Children.Add(path);
             Panel.SetZIndex(path, -999);
             m_uiConns.Add(child, path);
         }
@@ -161,38 +170,25 @@ namespace YBehavior.Editor.Core
             if (childConn == null)
                 return;
 
-            path.ChildHolder = child.Conns.ParentHolder;
-
-            //Point parentPoint = uiConn.TransformToAncestor(m_Panel).Transform(new Point(uiConn.ActualWidth / 2, uiConn.ActualHeight / 2));
-            //Point childPoint = childConn.TransformToAncestor(m_Panel).Transform(new Point(childConn.ActualWidth / 2, childConn.ActualHeight / 2));
-            Point parentPoint = uiConn.GetPos(m_Panel);
-            Point childPoint = childConn.GetPos(m_Panel);
+            Point parentPoint = uiConn.GetPos(m_Canvas.Panel);
+            Point childPoint = childConn.GetPos(m_Canvas.Panel);
 
             path.SetWithMidY(parentPoint, childPoint, horizontalPos);
         }
 
-        protected virtual void _RenderSelf()
+        protected virtual void _CreateSelf()
         {
-            _DrawFrame(m_Owner);
-            //_DrawName();
-            _DrawSelfConnectors();
+            _CreateFrame(m_Owner);
+            _CreateConnectors();
         }
 
-        private void _DrawFrame(Node node)
+        private void _CreateFrame(Node node)
         {
-            m_uiFrame.SetCanvas(m_Panel);
-            m_Panel.Children.Add(m_uiFrame);
-
-            _RefreshSelf();
+            m_uiFrame.SetCanvas(m_Canvas);
             m_uiFrame.DataContext = node;
         }
 
-        private void _DrawName()
-        {
-            //m_uiFrame.name.SetBinding(TextBlock.TextProperty, new System.Windows.Data.Binding("NickName") { Source = m_Owner });
-        }
-
-        private void _DrawSelfConnectors()
+        private void _CreateConnectors()
         {
             m_uiConnectors.Clear();
             m_uiFrame.topConnectors.Children.Clear();
@@ -205,7 +201,7 @@ namespace YBehavior.Editor.Core
                     Title = Connection.IdentifierParent,
                     ConnHolder = m_Owner.Conns.ParentHolder
                 };
-                uiConnector.SetCanvas(m_Panel);
+                uiConnector.SetCanvas(m_Canvas);
 
                 m_uiFrame.topConnectors.Children.Add(uiConnector);
 
@@ -222,7 +218,7 @@ namespace YBehavior.Editor.Core
                     Title = conn.Conn.Identifier,
                     ConnHolder = conn
                 };
-                uiConnector.SetCanvas(m_Panel);
+                uiConnector.SetCanvas(m_Canvas);
 
                 m_uiFrame.bottomConnectors.Children.Add(uiConnector);
 
@@ -236,10 +232,9 @@ namespace YBehavior.Editor.Core
             Node parent = m_Owner.Parent as Node;
             if (parent != null)
             {
-                parent.Renderer._RerenderConn();
+                parent.Renderer.RefreshConn();
                 parent.OnChildPosChanged();
             }
-
         }
         void _Move(Vector delta)
         {
@@ -252,7 +247,7 @@ namespace YBehavior.Editor.Core
                 child.Renderer._Move(delta);
             }
 
-            m_Owner.Renderer._RerenderConn();
+            RefreshConn();
         }
     }
 }

@@ -27,7 +27,8 @@ namespace YBehavior.Editor.Core
         public Node Node { get; set; }
 
         Operation m_Operation;
-        Panel m_Panel;
+
+        RenderCanvas m_Canvas;
 
         public UINode()
         {
@@ -41,10 +42,10 @@ namespace YBehavior.Editor.Core
             m_Operation.RegisterDrag(_OnDrag);
         }
 
-        public void SetCanvas(Panel panel)
+        public void SetCanvas(RenderCanvas canvas)
         {
-            m_Panel = panel;
-            m_Operation.SetPanel(panel);
+            m_Canvas = canvas;
+            m_Operation.SetCanvas(canvas);
         }
 
         public void SetDebug(NodeState state = NodeState.NS_INVALID)
@@ -126,7 +127,7 @@ namespace YBehavior.Editor.Core
                     chi.Renderer.Frame.OnDelete(param);
             }
 
-            m_Panel.Children.Remove(this);
+            m_Canvas.Panel.Children.Remove(this);
 
             RemoveNodeArg removeArg = new RemoveNodeArg();
             removeArg.Node = Node;

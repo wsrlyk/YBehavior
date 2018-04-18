@@ -34,7 +34,7 @@ namespace YBehavior.Editor.Core
             {
                 ///> refresh parent connections
                 Node parentNode = parent.Owner as Node;
-                parentNode.Renderer.RenderConnections();
+                parentNode.Renderer.CreateConnections();
 
                 Node childNode = child.Owner as Node;
                 RemoveSubTree(childNode);
@@ -57,7 +57,7 @@ namespace YBehavior.Editor.Core
             if (conn.RemoveNode(oArg.ChildHolder.Owner))
             {
                 Node parentNode = conn.Owner as Node;
-                parentNode.Renderer.RenderConnections();
+                parentNode.Renderer.CreateConnections();
 
                 Node childNode = oArg.ChildHolder.Owner as Node;
                 AddSubTree(childNode);
@@ -97,25 +97,26 @@ namespace YBehavior.Editor.Core
                     }
                     else
                     {
-                        Node node = NodeMgr.Instance.CreateNodeByName(chi.Name);
+                        Node node = NodeMgr.Instance.CreateNodeByName(attr.Value);
                         if (node == null)
                         {
-                            LogMgr.Instance.Error("Cant create node: " + chi.Name);
+                            LogMgr.Instance.Error("Cant create node: " + attr.Value);
                             return false;
                         }
-                        _LoadOneNode(node, chi);
+                        _LoadTree(node, chi);
+                        AddSubTree(node);
                     }
                 }
             }
             return true;
         }
 
-        private bool _LoadTree(Tree tree, XmlNode data)
+        private bool _LoadTree(Node tree, XmlNode data)
         {
             bool bRes = _LoadOneNode(tree, data);
 
             RefreshNodeUID();
-
+            tree.Renderer.CreateConnections();
             return bRes;
         }
 
