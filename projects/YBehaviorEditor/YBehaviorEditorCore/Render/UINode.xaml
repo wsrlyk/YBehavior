@@ -6,6 +6,22 @@
              xmlns:local="clr-namespace:YBehavior.Editor.Core"
              mc:Ignorable="d" 
              MinWidth="60" MinHeight="80" HorizontalAlignment="Center">
+    <UserControl.Resources>
+        <Style TargetType="FrameworkElement" x:Key="VisibleAnimation">
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Setter Property="Opacity" Value="0"/>
+        </Style>
+        <Storyboard x:Key="InstantShowAnim">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                             From="0.0" To="1.0" Duration="0:0:0.1"/>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                             From="1.0" To="0.0" Duration="0:0:0.1" BeginTime="0:0:0.5"/>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.6" Value="{x:Static Visibility.Collapsed}"/>
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
+    </UserControl.Resources>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Height="10"  Name="topConnectors" Orientation="Horizontal"/>
         <StackPanel DockPanel.Dock="Bottom" Height="10" Name="bottomConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />

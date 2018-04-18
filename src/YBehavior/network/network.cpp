@@ -218,6 +218,8 @@ namespace YBehavior
 		m_isConnected = 0;
 		ms_texts = "";
 		m_WriteSocket = 0;
+
+		MessageProcessor::Instance()->OnNetworkClosed();
 	}
 
 	void Network::ClearAll()

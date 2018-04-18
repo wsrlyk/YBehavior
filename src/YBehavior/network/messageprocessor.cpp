@@ -28,4 +28,9 @@ namespace YBehavior
 		}
 	}
 
+	void MessageProcessor::OnNetworkClosed()
+	{
+		DebugMgr::Instance()->ResetTarget();
+	}
+
 }

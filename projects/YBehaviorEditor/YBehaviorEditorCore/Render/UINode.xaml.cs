@@ -8,6 +8,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -23,7 +24,7 @@ namespace YBehavior.Editor.Core
 
         Brush normalBorderBrush;
         public SelectionStateChangeHandler SelectHandler { get; set; }
-        
+
         public Node Node { get; set; }
 
         Operation m_Operation;
@@ -56,10 +57,8 @@ namespace YBehavior.Editor.Core
             }
             else
             {
-                this.debugCover.Visibility = Visibility.Visible;
-
                 Brush bgBrush;
-                switch(state)
+                switch (state)
                 {
                     case NodeState.NS_SUCCESS:
                         bgBrush = new SolidColorBrush(Colors.LightGreen);
@@ -78,7 +77,18 @@ namespace YBehavior.Editor.Core
                         break;
                 }
                 this.debugCover.Background = bgBrush;
+
+                //                this.debugCover.Visibility = Visibility.Visible;
+
+                Storyboard board = this.Resources["InstantShowAnim"] as Storyboard;
+                Storyboard.SetTargetName(board, "debugCover");
+                this.BeginStoryboard(board);
             }
+        }
+
+        public void SetDebugInstant(NodeState state = NodeState.NS_INVALID)
+        {
+            SetDebug(state);
         }
 
         void _OnClick()
@@ -148,5 +158,6 @@ namespace YBehavior.Editor.Core
                 EventMgr.Instance.Send(arg);
             }
         }
+
     }
 }

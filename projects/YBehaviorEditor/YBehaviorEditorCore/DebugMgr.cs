@@ -28,6 +28,9 @@ namespace YBehavior.Editor.Core
 
         public string TargetTreeName { get { return m_TargetTreeName; } }
 
+        bool m_bBreaked;
+        public bool bBreaked { get { return m_bBreaked; } }
+
         SharedData m_SharedData;
         public SharedData DebugSharedData { get { return m_SharedData; } }
         Dictionary<uint, int> m_RunInfo = new Dictionary<uint, int>();

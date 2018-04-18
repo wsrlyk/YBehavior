@@ -141,7 +141,7 @@ namespace YBehavior.Editor.Core
                     DebugMgr.Instance.RunInfo[uint.Parse(strR[0])] = int.Parse(strR[1]);
                 }
 
-                EventMgr.Instance.Send(new TickResultArg());
+                EventMgr.Instance.Send(new TickResultArg() { bInstant = !DebugMgr.Instance.bBreaked });
             }
         }
     }

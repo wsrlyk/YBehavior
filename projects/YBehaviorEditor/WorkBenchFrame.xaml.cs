@@ -92,15 +92,17 @@ namespace YBehavior.Editor
         {
             if (DebugMgr.Instance.IsDebugging())
             {
-                Action renderMainTreeFunc = new Action(_RefreshMainTree);
+                TickResultArg oArg = arg as TickResultArg;
+
+                Action renderMainTreeFunc = new Action(_RefreshMainTreeDebug);
                 this.Canvas.Dispatcher.BeginInvoke(renderMainTreeFunc, null);
             }
         }
 
-        void _RefreshMainTree()
+        void _RefreshMainTreeDebug()
         {
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            bench.MainTree.Renderer.Refresh();
+            bench.MainTree.Renderer.RefreshDebug(true);
         }
 
         private bool _TabCloseClicked(UCTabItemWithClose tab)

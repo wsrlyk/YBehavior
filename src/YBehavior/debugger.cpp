@@ -26,6 +26,11 @@ namespace YBehavior
 		m_bTargetDirty = true;
 	}
 
+	void DebugMgr::ResetTarget()
+	{
+		SetTarget(Utility::StringEmpty, 0);
+	}
+
 	bool DebugMgr::IsValidTarget(Agent* pAgent)
 	{
 		if (pAgent == nullptr)
@@ -85,14 +90,15 @@ namespace YBehavior
 		m_RunInfos.clear();
 	}
 
-	void DebugMgr::Send()
+	void DebugMgr::Send(bool bClearRunInfo)
 	{
 		if (m_SendBuffer.length() == 0)
 			return;
 
 		Network::Instance()->SendText(m_SendBuffer);
 		m_SendBuffer = "";
-		Clear();
+		if (bClearRunInfo)
+			Clear();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -184,7 +190,7 @@ namespace YBehavior
 		}
 		DebugMgr::Instance()->AppendSendContent(buffer);
 
-		DebugMgr::Instance()->Send();
+		DebugMgr::Instance()->Send(!DebugMgr::Instance()->IsPaused());
 	}
 
 	void DebugHelper::CreateRunInfo()

@@ -10,6 +10,7 @@ namespace YBehavior
 	{
 	public:
 		void ProcessOne(const STRING& s);
+		void OnNetworkClosed();
 	};
 }
 

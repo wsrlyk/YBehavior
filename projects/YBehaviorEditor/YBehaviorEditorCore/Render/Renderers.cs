@@ -55,9 +55,23 @@ namespace YBehavior.Editor.Core
 
         private void _RefreshSelf()
         {
-            m_uiFrame.SetDebug(DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(m_Owner.UID) : NodeState.NS_INVALID);
+            m_uiFrame.SetDebug(NodeState.NS_INVALID);
             Canvas.SetLeft(m_uiFrame, m_Owner.Geo.Pos.X);
             Canvas.SetTop(m_uiFrame, m_Owner.Geo.Pos.Y);
+        }
+
+        public void RefreshDebug(bool bInstant)
+        {
+            NodeState state = DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(m_Owner.UID) : NodeState.NS_INVALID;
+            if (bInstant)
+                m_uiFrame.SetDebugInstant(state);
+            else
+                m_uiFrame.SetDebug(state);
+
+            foreach (Node child in m_Owner.Conns)
+            {
+                child.Renderer.RefreshDebug(bInstant);
+            }
         }
 
         public void AddedToPanel(Panel panel)

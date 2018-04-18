@@ -44,6 +44,7 @@ namespace YBehavior
 		bool m_bPaused = true;
 	public:
 		void SetTarget(const STRING& tree, UINT agent);
+		void ResetTarget();
 		bool IsValidTarget(Agent* pAgent);
 		inline UINT GetTargetAgent() { return m_TargetAgent; }
 		inline const std::list<NodeRunInfo*>& GetRunInfos() { return m_RunInfos; }
@@ -58,7 +59,7 @@ namespace YBehavior
 		inline bool IsPaused() { return m_bPaused; }
 
 		void AppendSendContent(const STRING& s) { m_SendBuffer += s; }
-		void Send();
+		void Send(bool bClearRunInfo);
 	};
 
 	class Agent;

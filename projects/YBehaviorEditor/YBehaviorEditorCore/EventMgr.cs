@@ -137,6 +137,7 @@ namespace YBehavior.Editor.Core
     }
     public class TickResultArg : EventArg
     {
+        public bool bInstant { get; set; }
         public override EventType Type => EventType.TickResult;
     }
 
