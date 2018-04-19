@@ -18,7 +18,8 @@ namespace YBehavior
 	const size_t	kGlobalQueueSize = (1024 * 32);
 	const size_t	kLocalQueueSize = (1024 * 8);
 
-	SOCKET AsWinSocket(Handle h) {
+	SOCKET AsWinSocket(Handle h)
+	{
 		return (SOCKET)(h);
 	}
 
@@ -30,11 +31,13 @@ namespace YBehavior
 			return (ret == 0);
 		}
 
-		void ShutdownSockets() {
+		void ShutdownSockets()
+		{
 			WSACleanup();
 		}
 
-		bool TestConnection(Handle h) {
+		bool TestConnection(Handle h) 
+		{
 			SOCKET winSocket = AsWinSocket(h);
 			fd_set readSet;
 			FD_ZERO(&readSet);
@@ -43,7 +46,8 @@ namespace YBehavior
 			int res = ::select(0, &readSet, 0, 0, &timeout);
 
 			if (res > 0) {
-				if (FD_ISSET(winSocket, &readSet)) {
+				if (FD_ISSET(winSocket, &readSet))
+				{
 					return true;
 				}
 			}
@@ -61,7 +65,8 @@ namespace YBehavior
 		{
 			SOCKET winSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-			if (winSocket == INVALID_SOCKET) {
+			if (winSocket == INVALID_SOCKET)
+			{
 				return Handle(0);
 			}
 
@@ -69,7 +74,8 @@ namespace YBehavior
 
 			unsigned long inonBlocking = (bBlock ? 0 : 1);
 
-			if (ioctlsocket(winSocket, FIONBIO, &inonBlocking) == 0) {
+			if (ioctlsocket(winSocket, FIONBIO, &inonBlocking) == 0) 
+			{
 				return r;
 			}
 
@@ -78,14 +84,16 @@ namespace YBehavior
 			return Handle(0);
 		}
 
-		Handle Accept(Handle listeningSocket, size_t bufferSize) {
+		Handle Accept(Handle listeningSocket, size_t bufferSize) 
+		{
 			typedef int socklen_t;
 			sockaddr_in addr;
 			socklen_t len = sizeof(sockaddr_in);
 			memset(&addr, 0, sizeof(sockaddr_in));
 			SOCKET outSocket = ::accept(AsWinSocket(listeningSocket), (sockaddr*)&addr, &len);
 
-			if (outSocket != SOCKET_ERROR) {
+			if (outSocket != SOCKET_ERROR)
+			{
 				int sizeOfBufSize = sizeof(bufferSize);
 				::setsockopt(outSocket, SOL_SOCKET, SO_RCVBUF, (const char*)&bufferSize, sizeOfBufSize);
 				::setsockopt(outSocket, SOL_SOCKET, SO_SNDBUF, (const char*)&bufferSize, sizeOfBufSize);
@@ -95,7 +103,8 @@ namespace YBehavior
 			return Handle(0);
 		}
 
-		bool Listen(Handle h, Port port, int maxConnections) {
+		bool Listen(Handle h, Port port, int maxConnections)
+		{
 			SOCKET winSocket = AsWinSocket(h);
 			sockaddr_in addr = { 0 };
 			addr.sin_addr.s_addr = INADDR_ANY;
@@ -109,12 +118,14 @@ namespace YBehavior
 			//int rcvtimeo = 1000;
 			//::setsockopt(winSocket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&rcvtimeo, sizeof(rcvtimeo));
 
-			if (::bind(winSocket, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) == SOCKET_ERROR) {
+			if (::bind(winSocket, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) == SOCKET_ERROR)
+			{
 				Close(h);
 				return false;
 			}
 
-			if (::listen(winSocket, maxConnections) == SOCKET_ERROR) {
+			if (::listen(winSocket, maxConnections) == SOCKET_ERROR)
+			{
 				Close(h);
 				return false;
 			}
@@ -125,23 +136,28 @@ namespace YBehavior
 		static size_t gs_packetsSent = 0;
 		static size_t gs_packetsReceived = 0;
 
-		bool Write(Handle& h, const void* buffer, size_t bytes, size_t& outBytesWritten) {
+		bool Write(Handle& h, const void* buffer, size_t bytes, size_t& outBytesWritten)
+		{
 			outBytesWritten = 0;
 
-			if (bytes == 0 || !h) {
+			if (bytes == 0 || !h)
+			{
 				return bytes == 0;
 			}
 
 			int res = ::send(AsWinSocket(h), (const char*)buffer, (int)bytes, 0);
 
-			if (res == SOCKET_ERROR) {
+			if (res == SOCKET_ERROR)
+			{
 				int err = WSAGetLastError();
 
-				if (err == WSAECONNRESET || err == WSAECONNABORTED) {
+				if (err == WSAECONNRESET || err == WSAECONNABORTED)
+				{
 					Close(h);
 				}
 			}
-			else {
+			else 
+			{
 				outBytesWritten = (size_t)res;
 				gs_packetsSent++;
 			}
@@ -149,10 +165,12 @@ namespace YBehavior
 			return outBytesWritten != 0;
 		}
 
-		size_t Read(Handle& h, const void* buffer, size_t bytesMax) {
+		size_t Read(Handle& h, const void* buffer, size_t bytesMax)
+		{
 			size_t bytesRead = 0;
 
-			if (bytesMax == 0 || !h) {
+			if (bytesMax == 0 || !h)
+			{
 				return bytesRead;
 			}
 
@@ -167,19 +185,23 @@ namespace YBehavior
 
 			int rv = ::select(2, &readfds, 0, 0, &tv);
 
-			if (rv == -1) {
-				/*BEHAVIAC_ASSERT(0);*/
+			if (rv == -1)
+			{
 			}
-			else if (rv == 0) {
+			else if (rv == 0)
+			{
 				//timeout
 			}
-			else {
+			else
+			{
 				int res = ::recv(AsWinSocket(h), (char*)buffer, (int)bytesMax, 0);
 
-				if (res == SOCKET_ERROR) {
+				if (res == SOCKET_ERROR) 
+				{
 					int err = WSAGetLastError();
 
-					if (err == WSAECONNRESET || err == WSAECONNABORTED) {
+					if (err == WSAECONNRESET || err == WSAECONNABORTED)
+					{
 						Close(h);
 					}
 				}
@@ -188,7 +210,8 @@ namespace YBehavior
 					///> Client has been closed.
 					Close(h);
 				}
-				else {
+				else
+				{
 					bytesRead = (size_t)res;
 					gs_packetsReceived++;
 				}
@@ -199,11 +222,13 @@ namespace YBehavior
 			return 0;
 		}
 
-		size_t GetPacketsSent() {
+		size_t GetPacketsSent()
+		{
 			return gs_packetsSent;
 		}
 
-		size_t GetPacketsReceived() {
+		size_t GetPacketsReceived()
+		{
 			return gs_packetsReceived;
 		}
 	}
@@ -225,7 +250,8 @@ namespace YBehavior
 		}
 	}
 
-	struct Mutex::MutexImpl {
+	struct Mutex::MutexImpl
+	{
 		CRITICAL_SECTION    _criticalSection;
 	};
 
