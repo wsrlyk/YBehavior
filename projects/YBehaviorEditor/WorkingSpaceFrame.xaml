@@ -8,8 +8,9 @@
              d:DesignHeight="300" d:DesignWidth="200">
     <DockPanel>
         <StackPanel Orientation="Horizontal" Height="30" HorizontalAlignment="Left" Width="200"  DockPanel.Dock="Top">
-            <Button Name="btnNew" Click="btnNew_Click" Width="30">New</Button>
-            <Button Name="btnSave" Click="btnSave_Click" Width="30">Save</Button>
+            <Button Name="btnNew" Click="btnNew_Click">New</Button>
+            <Button Name="btnSave" Click="btnSave_Click">Save</Button>
+            <Button Name="btnRefresh" Click="btnRefresh_Click">Refresh</Button>
         </StackPanel>
         <TreeView Name="Files" MouseDoubleClick="OnFilesItemDoubleClick">
             <TreeView.ItemTemplate>

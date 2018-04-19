@@ -30,16 +30,25 @@ namespace YBehavior.Editor
         private void _OnNetworkConnectionChanged(EventArg arg)
         {
             NetworkConnectionChangedArg oArg = arg as NetworkConnectionChangedArg;
-            if (oArg.bConnected)
-            {
-                this.ConnectFrame.Visibility = Visibility.Collapsed;
-                this.DebuggingFrame.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                this.ConnectFrame.Visibility = Visibility.Visible;
-                this.DebuggingFrame.Visibility = Visibility.Collapsed;
-            }
+
+            this.Dispatcher.BeginInvoke(new Action<NetworkConnectionChangedArg>
+                (
+                    (NetworkConnectionChangedArg ooArg) =>
+                    {
+                        if (ooArg.bConnected)
+                        {
+                            this.ConnectFrame.Visibility = Visibility.Collapsed;
+                            this.DebuggingFrame.Visibility = Visibility.Visible;
+                        }
+                        else
+                        {
+                            this.ConnectFrame.Visibility = Visibility.Visible;
+                            this.DebuggingFrame.Visibility = Visibility.Collapsed;
+                        }
+                    }
+                ),
+                
+                oArg);
         }
 
         private void btnStartDebug_Click(object sender, RoutedEventArgs e)

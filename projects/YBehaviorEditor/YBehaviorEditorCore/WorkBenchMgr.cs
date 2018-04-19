@@ -53,16 +53,27 @@ namespace YBehavior.Editor.Core
 
         public bool Switch(WorkBench target)
         {
-            if (m_ActiveWorkBench == target)
-                return true;
-
-            foreach (WorkBench bench in m_OpenedWorkBenchs)
+            if (m_ActiveWorkBench != target)
             {
-                if (bench == target)
+                foreach (WorkBench bench in m_OpenedWorkBenchs)
                 {
-                    m_ActiveWorkBench = target;
-                    return true;
+                    if (bench == target)
+                    {
+                        m_ActiveWorkBench = target;
+
+                        break;
+                    }
                 }
+            }
+
+            if (m_ActiveWorkBench == target)
+            {
+                WorkBenchSelectedArg arg = new WorkBenchSelectedArg
+                {
+                    Bench = m_ActiveWorkBench
+                };
+                EventMgr.Instance.Send(arg);
+                return true;
             }
 
             LogMgr.Instance.Error("Try to switch to a workbench that is not in the mgr: " + target.FileInfo.Name);
@@ -106,16 +117,17 @@ namespace YBehavior.Editor.Core
             return workBench;
         }
 
-        public bool SaveWorkBench(WorkBench bench = null)
+        public int SaveWorkBench(WorkBench bench = null)
         {
             if (bench == null)
                 bench = ActiveWorkBench;
             if (bench == null)
             {
                 LogMgr.Instance.Error("AddNodeToBench Failed: bench == null");
-                return true;
+                return 0;
             }
 
+            bool bNewFile = false;
             if (bench.FileInfo.Path == null)
             {
                 ///> Pop the save dialog
@@ -126,10 +138,12 @@ namespace YBehavior.Editor.Core
                 {
                     bench.FileInfo.Path = sfd.FileName;
                     bench.FileInfo.Name = sfd.SafeFileName.Remove(sfd.SafeFileName.LastIndexOf(".xml"));
+
+                    bNewFile = true;
                 }
                 else
                 {
-                    return false;
+                    return -1;
                 }
             }
 
@@ -141,7 +155,7 @@ namespace YBehavior.Editor.Core
             bench.Save(el, xmlDoc);
             xmlDoc.Save(bench.FileInfo.Path);
 
-            return true;
+            return bNewFile ? 1 : 0;
         }
 
         public bool ExportWorkBench(WorkBench bench = null)

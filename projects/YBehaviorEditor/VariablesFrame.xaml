@@ -11,7 +11,7 @@
             <TextBlock Name="Type" Text ="{Binding Name}" FontSize="14" Height="25"/>
             <DockPanel Background="LightBlue" Margin="2,2,2,2">
                 <TextBlock Text="NickName" FontSize="13" Width="90" DockPanel.Dock="Left" Background="LightCyan"/>
-                <TextBox MinWidth="110" Text="{Binding NickName}"/>
+                <TextBox Name="NickName" MinWidth="110" Text="{Binding NickName}"/>
             </DockPanel>
             <!--local:UIVariable x:Name = "NickName" VariableKey = "NickName" VValue ="{Binding NickName}"  ShowSwitcher ="False"/-->
         </StackPanel>

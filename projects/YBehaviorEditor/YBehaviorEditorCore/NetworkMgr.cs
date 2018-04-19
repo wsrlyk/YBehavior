@@ -202,6 +202,7 @@ namespace YBehavior.Editor.Core
             };
             EventMgr.Instance.Send(arg);
             MessageProcessor.OnNetworkConnectionChanged(false);
+            DebugMgr.Instance.Clear();
         }
 
         SocketPacket _theSocPkt = null;
@@ -283,8 +284,10 @@ namespace YBehavior.Editor.Core
             }
             catch (SocketException exc)
             {
-                //MessageBox.Show(exc.Message, Resources.ConnectError);
+                MessageBox.Show(exc.Message);
                 LogMgr.Instance.Error("ConnectError: " + exc.Message);
+
+                closeSocket();
                 //Invoke(m_delegateOnDisconnect);
 
             }

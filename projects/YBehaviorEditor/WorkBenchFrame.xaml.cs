@@ -43,8 +43,11 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             EventMgr.Instance.Register(EventType.WorkBenchLoaded, _OnWorkBenchLoaded);
+            EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
             EventMgr.Instance.Register(EventType.NewNodeAdded, _OnNewNodeAdded);
             EventMgr.Instance.Register(EventType.TickResult, _OnTickResult);
+            EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);
+            EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             Focus();
 
             DraggingConnection.Instance.SetCanvas(this.Canvas);
@@ -88,6 +91,12 @@ namespace YBehavior.Editor
             //_RenderActiveWorkBench();
         }
 
+        private void _OnWorkBenchSelected(EventArg arg)
+        {
+            ClearCanvas();
+            _CreateActiveWorkBench();
+        }
+
         private void _OnTickResult(EventArg arg)
         {
             if (DebugMgr.Instance.IsDebugging())
@@ -102,12 +111,23 @@ namespace YBehavior.Editor
         {
             if (token != NetworkMgr.Instance.MessageProcessor.TickResultToken)
             {
-                LogMgr.Instance.Log("_RefreshMainTreeDebug Failed. token = " + token.ToString() + " while it's " + NetworkMgr.Instance.MessageProcessor.TickResultToken.ToString());
                 return;
             }
 
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
             bench.MainTree.Renderer.RefreshDebug(bInstant);
+        }
+
+        private void _OnNetworkConnectionChanged(EventArg arg)
+        {
+            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
+            bench.MainTree.Renderer.RefreshDebug(true);
+        }
+
+        private void _OnDebugTargetChanged(EventArg arg)
+        {
+            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
+            bench.MainTree.Renderer.RefreshDebug(true);
         }
 
         private bool _TabCloseClicked(UCTabItemWithClose tab)
@@ -135,6 +155,15 @@ namespace YBehavior.Editor
             }
 
             m_PageDataDic.Remove(tab);
+
+            if (m_PageDataDic.Count == 0)
+            {
+                WorkBenchSelectedArg arg = new WorkBenchSelectedArg()
+                {
+                    Bench = null
+                };
+                EventMgr.Instance.Send(arg);
+            }
             return true;
         }
 
@@ -153,6 +182,8 @@ namespace YBehavior.Editor
         void _CreateActiveWorkBench()
         {
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
+            if (bench == null)
+                return;
             _CreateNode(bench.MainTree);
 
             foreach (var node in bench.Forest)
@@ -215,18 +246,17 @@ namespace YBehavior.Editor
         {
             if (e.Source is TabControl)
             {
-                ClearCanvas();
                 if (e.AddedItems.Count > 0)
                 {
                     foreach (UCTabItemWithClose tab in e.AddedItems)
                     {
                         LogMgr.Instance.Log("Tab selected: " + tab.Header);
                         if (WorkBenchMgr.Instance.Switch(tab.Content as WorkBench))
-                            _CreateActiveWorkBench();
-
-                        m_CurPageData = m_PageDataDic[tab];
-                        this.Canvas.RenderTransform = m_CurPageData.TransGroup;
-                        return;
+                        {
+                            m_CurPageData = m_PageDataDic[tab];
+                            this.Canvas.RenderTransform = m_CurPageData.TransGroup;
+                            return;
+                        }
                     }
 
                     LogMgr.Instance.Error("Tab switch failed.");

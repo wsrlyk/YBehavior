@@ -291,6 +291,16 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        public bool IsEditable
+        {
+            get { return !DebugMgr.Instance.IsDebugging(); }
+        }
+
+        public void DebugStateChanged()
+        {
+            OnPropertyChanged("IsEditable");
+        }
+
         public bool IsValid
         {
             get { return CheckValid(); }

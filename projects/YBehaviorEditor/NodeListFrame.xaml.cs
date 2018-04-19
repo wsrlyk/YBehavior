@@ -99,6 +99,8 @@ namespace YBehavior.Editor
 
         private void OnNodesItemDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            if (DebugMgr.Instance.IsDebugging())
+                return;
             DependencyObject obj = (DependencyObject)e.OriginalSource;
             while (obj != null && obj != this.Nodes)
             {

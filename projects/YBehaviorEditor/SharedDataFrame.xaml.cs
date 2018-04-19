@@ -26,7 +26,7 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
 
-            EventMgr.Instance.Register(EventType.WorkBenchLoaded, _OnWorkBenchLoaded);
+            EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
 
@@ -38,12 +38,14 @@ namespace YBehavior.Editor
             this.VType.ItemsSource = m_Types;
         }
 
-        private void _OnWorkBenchLoaded(EventArg arg)
+        private void _OnWorkBenchSelected(EventArg arg)
         {
-            WorkBenchLoadedArg oArg = arg as WorkBenchLoadedArg;
+            WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
             if (oArg.Bench == null)
+            {
+                this.DataContext = null;
                 return;
-
+            }
             m_CurTree = oArg.Bench.MainTree;
             //this.VariableContainer.SetBinding(ComboBox.ItemsSourceProperty, new Binding("Datas"));
             if (DebugMgr.Instance.IsDebugging())
@@ -73,6 +75,10 @@ namespace YBehavior.Editor
                 LogMgr.Instance.Error("There's no active tree.");
                 return;
             }
+
+            if (DebugMgr.Instance.IsDebugging())
+                return;
+
             string name = this.VName.Text;
             string value = this.VValue.Text;
             string type = this.VType.SelectedValue as string;

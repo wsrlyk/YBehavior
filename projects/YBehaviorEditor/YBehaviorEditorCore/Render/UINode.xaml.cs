@@ -75,7 +75,6 @@ namespace YBehavior.Editor.Core
                         bgBrush = new SolidColorBrush(Colors.LightPink);
                         break;
                     case NodeState.NS_BREAK:
-                        LogMgr.Instance.Log("BREAK Instant ");
                         bgBrush = new SolidColorBrush(Colors.DarkRed);
                         break;
                     default:
@@ -112,7 +111,6 @@ namespace YBehavior.Editor.Core
                         bgBrush = new SolidColorBrush(Colors.LightPink);
                         break;
                     case NodeState.NS_BREAK:
-                        LogMgr.Instance.Log("BREAK");
                         bgBrush = new SolidColorBrush(Colors.DarkRed);
                         break;
                     default:
@@ -140,6 +138,8 @@ namespace YBehavior.Editor.Core
 
         void _OnDrag(Vector delta, Point pos)
         {
+            if (DebugMgr.Instance.IsDebugging())
+                return;
             if (Node != null)
                 Node.Renderer.DragMain(delta, pos);
         }

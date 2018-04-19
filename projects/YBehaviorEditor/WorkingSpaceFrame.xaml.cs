@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -24,8 +25,8 @@ namespace YBehavior.Editor
 
         public class FileInfo
         {
-            private List<FileInfo> m_children = new List<FileInfo>();
-            public List<FileInfo> Children { get { return m_children; } }
+            private ObservableCollection<FileInfo> m_children = new ObservableCollection<FileInfo>();
+            public ObservableCollection<FileInfo> Children { get { return m_children; } }
             public string Name { get; set; }
             public string Icon { get; set; }
             TreeFileMgr.TreeFileInfo source;
@@ -58,6 +59,11 @@ namespace YBehavior.Editor
         public WorkingSpaceFrame()
         {
             InitializeComponent();
+            _RefreshWorkingSpace();
+        }
+
+        private void _RefreshWorkingSpace()
+        {
             m_FileInfos.Build(TreeFileMgr.Instance.GetAllTrees());
             this.Files.ItemsSource = m_FileInfos.Children;
         }
@@ -92,8 +98,11 @@ namespace YBehavior.Editor
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            WorkBenchMgr.Instance.SaveWorkBench();
+            int res = WorkBenchMgr.Instance.SaveWorkBench();
             WorkBenchMgr.Instance.ExportWorkBench();
+
+            if (res == 1)
+                _RefreshWorkingSpace();
         }
 
         private void btnNew_Click(object sender, RoutedEventArgs e)
@@ -105,6 +114,11 @@ namespace YBehavior.Editor
                 arg.Bench = bench;
                 EventMgr.Instance.Send(arg);
             }
+        }
+
+        private void btnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            _RefreshWorkingSpace();
         }
     }
 }

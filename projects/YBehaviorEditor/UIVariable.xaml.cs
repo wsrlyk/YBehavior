@@ -38,6 +38,9 @@ namespace YBehavior.Editor
 
         private void Remover_Click(object sender, RoutedEventArgs e)
         {
+            if (Core.DebugMgr.Instance.IsDebugging())
+                return;
+
             Core.Variable v = DataContext as Core.Variable;
             if (v == null)
                 return;

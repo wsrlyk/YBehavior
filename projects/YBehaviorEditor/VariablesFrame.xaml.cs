@@ -24,10 +24,18 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
 
+            EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
             EventMgr.Instance.Register(EventType.SelectionChanged, _OnSelectionChanged);
             EventMgr.Instance.Register(EventType.SharedVariableChanged, _OnSharedVariableChanged);
+            EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
         }
 
+        private void _OnWorkBenchSelected(EventArg arg)
+        {
+            this.DataContext = null;
+            this.VariableContainer.ItemsSource = null;
+        }
         private void _OnSelectionChanged(EventArg arg)
         {
             SelectionChangedArg oArg = arg as SelectionChangedArg;
@@ -55,6 +63,25 @@ namespace YBehavior.Editor
                 return;
 
             node.Variables.RefreshVariables();
+        }
+
+        private void _OnDebugTargetChanged(EventArg arg)
+        {
+            this.Dispatcher.BeginInvoke(new Action
+                (() =>
+                {
+                    Node node = this.DataContext as Node;
+                    if (node == null)
+                        return;
+
+                    foreach (Variable v in node.Variables.Datas.Values)
+                    {
+                        v.DebugStateChanged();
+                    }
+
+                    this.NickName.IsReadOnly = DebugMgr.Instance.IsDebugging();
+                })
+            );
         }
     }
 }

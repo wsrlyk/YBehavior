@@ -65,11 +65,15 @@ namespace YBehavior.Editor.Core
 
         void _OnStartDragged(Vector delta, Point absPos)
         {
+            if (DebugMgr.Instance.IsDebugging())
+                return;
             DragHandler(this, true);
         }
 
         void _OnDragged(Vector delta, Point absPos)
         {
+            if (DebugMgr.Instance.IsDebugging())
+                return;
             IDropable droppable = _HitTesting(absPos);
 
             ///> DragFinish
@@ -129,6 +133,9 @@ namespace YBehavior.Editor.Core
 
         public void OnDropped(IDragable dragable)
         {
+            if (DebugMgr.Instance.IsDebugging())
+                return;
+
             if (dragable == null)
                 return;
 

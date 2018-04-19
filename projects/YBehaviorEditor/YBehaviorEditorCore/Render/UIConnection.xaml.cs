@@ -93,6 +93,8 @@ namespace YBehavior.Editor.Core
 
         public void OnDelete(int param)
         {
+            if (DebugMgr.Instance.IsDebugging())
+                return;
             NodesDisconnectedArg arg = new NodesDisconnectedArg();
             arg.ChildHolder = this.ChildHolder;
             EventMgr.Instance.Send(arg);

@@ -43,6 +43,14 @@ namespace YBehavior.Editor.Core
             return NodeState.NS_INVALID;
         }
 
+        public void Clear()
+        {
+            m_TargetTreeName = string.Empty;
+            m_UID = 0;
+            m_SharedData = null;
+            m_RunInfo.Clear();
+        }
+
         public bool IsDebugging(string treeName = null)
         {
             if (treeName == null)
@@ -74,6 +82,7 @@ namespace YBehavior.Editor.Core
             m_TargetTreeName = treeName;
             m_UID = uid;
             m_SharedData = WorkBenchMgr.Instance.ActiveWorkBench.MainTree.GetTreeSharedData().Clone();
+            m_RunInfo.Clear();
             NetworkMgr.Instance.MessageProcessor.DebugTreeWithAgent(m_TargetTreeName, m_UID);
 
             DebugTargetChangedArg arg = new DebugTargetChangedArg
