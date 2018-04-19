@@ -60,8 +60,6 @@ namespace YBehavior.Editor
             InitializeComponent();
             m_FileInfos.Build(TreeFileMgr.Instance.GetAllTrees());
             this.Files.ItemsSource = m_FileInfos.Children;
-
-            EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);
         }
 
         private void OnFilesItemDoubleClick(object sender, MouseButtonEventArgs e)
@@ -92,23 +90,6 @@ namespace YBehavior.Editor
 
         }
 
-        private void _OnNetworkConnectionChanged(EventArg arg)
-        {
-            NetworkConnectionChangedArg oArg = arg as NetworkConnectionChangedArg;
-            if (oArg.bConnected)
-            {
-                this.btnStartDebug.Visibility = Visibility.Collapsed;
-                this.btnStopDebug.Visibility = Visibility.Visible;
-                this.DebugThisTree.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                this.btnStartDebug.Visibility = Visibility.Visible;
-                this.btnStopDebug.Visibility = Visibility.Collapsed;
-                this.DebugThisTree.Visibility = Visibility.Collapsed;
-            }
-        }
-
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             WorkBenchMgr.Instance.SaveWorkBench();
@@ -124,28 +105,6 @@ namespace YBehavior.Editor
                 arg.Bench = bench;
                 EventMgr.Instance.Send(arg);
             }
-        }
-
-        private void btnStartDebug_Click(object sender, RoutedEventArgs e)
-        {
-            NetworkConnectWindow networkConnectWindow = new NetworkConnectWindow();
-            networkConnectWindow.Topmost = true;
-            networkConnectWindow.Owner = Application.Current.MainWindow;
-            networkConnectWindow.ShowDialog();
-        }
-
-        private void btnStopDebug_Click(object sender, RoutedEventArgs e)
-        {
-            NetworkMgr.Instance.Disconnect();
-        }
-
-        private void btnDebugThisTree_Click(object sender, RoutedEventArgs e)
-        {
-            if (WorkBenchMgr.Instance.ActiveWorkBench == null || WorkBenchMgr.Instance.ActiveWorkBench.FileInfo == null)
-                return;
-
-            uint.TryParse(this.debugAgentUID.Text, out uint uid);
-            DebugMgr.Instance.StartDebugTreeWithAgent(WorkBenchMgr.Instance.ActiveWorkBench.FileInfo.Name, uid);
         }
     }
 }

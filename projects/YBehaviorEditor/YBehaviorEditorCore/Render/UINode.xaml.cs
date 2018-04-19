@@ -41,6 +41,8 @@ namespace YBehavior.Editor.Core
             m_Operation = new Operation(this.border);
             m_Operation.RegisterClick(_OnClick);
             m_Operation.RegisterDrag(_OnDrag);
+
+            m_InstantAnim = this.Resources["InstantShowAnim"] as Storyboard;
         }
 
         public void SetCanvas(RenderCanvas canvas)
@@ -49,8 +51,48 @@ namespace YBehavior.Editor.Core
             m_Operation.SetCanvas(canvas);
         }
 
+        Storyboard m_InstantAnim;
+
+        public void SetDebugInstant(NodeState state = NodeState.NS_INVALID)
+        {
+            this.debugCover.Visibility = Visibility.Collapsed;
+            if (state == NodeState.NS_INVALID)
+            {
+                m_InstantAnim.Remove(debugCover);
+            }
+            else
+            {
+                Brush bgBrush;
+                switch (state)
+                {
+                    case NodeState.NS_SUCCESS:
+                        bgBrush = new SolidColorBrush(Colors.LightGreen);
+                        break;
+                    case NodeState.NS_FAILED:
+                        bgBrush = new SolidColorBrush(Colors.DarkGreen);
+                        break;
+                    case NodeState.NS_RUNNING:
+                        bgBrush = new SolidColorBrush(Colors.LightPink);
+                        break;
+                    case NodeState.NS_BREAK:
+                        LogMgr.Instance.Log("BREAK Instant ");
+                        bgBrush = new SolidColorBrush(Colors.DarkRed);
+                        break;
+                    default:
+                        bgBrush = new SolidColorBrush(Colors.Red);
+                        break;
+                }
+                this.debugCover.Background = bgBrush;
+
+                //                this.debugCover.Visibility = Visibility.Visible;
+                m_InstantAnim.Begin(this.debugCover, true);
+                //this.debugCover.BeginStoryboard(m_InstantAnim, HandoffBehavior.SnapshotAndReplace, true);
+            }
+        }
+
         public void SetDebug(NodeState state = NodeState.NS_INVALID)
         {
+            m_InstantAnim.Remove(debugCover);
             if (state == NodeState.NS_INVALID)
             {
                 this.debugCover.Visibility = Visibility.Collapsed;
@@ -70,6 +112,7 @@ namespace YBehavior.Editor.Core
                         bgBrush = new SolidColorBrush(Colors.LightPink);
                         break;
                     case NodeState.NS_BREAK:
+                        LogMgr.Instance.Log("BREAK");
                         bgBrush = new SolidColorBrush(Colors.DarkRed);
                         break;
                     default:
@@ -78,17 +121,12 @@ namespace YBehavior.Editor.Core
                 }
                 this.debugCover.Background = bgBrush;
 
-                //                this.debugCover.Visibility = Visibility.Visible;
+                this.debugCover.Visibility = Visibility.Visible;
 
-                Storyboard board = this.Resources["InstantShowAnim"] as Storyboard;
-                Storyboard.SetTargetName(board, "debugCover");
-                this.BeginStoryboard(board);
+                //Storyboard board = this.Resources["ConstantShowAnim"] as Storyboard;
+                //Storyboard.SetTargetName(board, "debugCover");
+                //this.BeginStoryboard(board);
             }
-        }
-
-        public void SetDebugInstant(NodeState state = NodeState.NS_INVALID)
-        {
-            SetDebug(state);
         }
 
         void _OnClick()

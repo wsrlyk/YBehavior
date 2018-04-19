@@ -31,6 +31,14 @@ namespace YBehavior
 		SetTarget(Utility::StringEmpty, 0);
 	}
 
+	void DebugMgr::Stop()
+	{
+		ResetTarget();
+		Clear();
+		m_bPaused = false;
+		m_SendBuffer = "";
+	}
+
 	bool DebugMgr::IsValidTarget(Agent* pAgent)
 	{
 		if (pAgent == nullptr)
@@ -221,17 +229,24 @@ namespace YBehavior
 		DebugMgr::Instance()->TogglePause(true);
 
 		SetResult(NS_BREAK);
+		_SendPause();
 		_SendCurrentInfos();
 		///> Sleep and wait for removing break
 		int i = 0;
 		while (DebugMgr::Instance()->IsPaused())
 		{
 			Thread::SleepMilli(100);
-			if (++i > 10)
-				DebugMgr::Instance()->TogglePause(false);
+			//if (++i > 10)
+			//	DebugMgr::Instance()->TogglePause(false);
 		}
 
 		LOG_BEGIN << "Continue." << LOG_END;
+	}
+
+	void DebugHelper::_SendPause()
+	{
+		DebugMgr::Instance()->AppendSendContent("[Paused]");
+		DebugMgr::Instance()->Send(false);
 	}
 }
 #endif

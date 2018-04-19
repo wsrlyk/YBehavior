@@ -45,6 +45,7 @@ namespace YBehavior
 	public:
 		void SetTarget(const STRING& tree, UINT agent);
 		void ResetTarget();
+		void Stop();
 		bool IsValidTarget(Agent* pAgent);
 		inline UINT GetTargetAgent() { return m_TargetAgent; }
 		inline const std::list<NodeRunInfo*>& GetRunInfos() { return m_RunInfos; }
@@ -71,6 +72,7 @@ namespace YBehavior
 
 		void _SendInfos(const STRING& treeName);
 		void _SendCurrentInfos();
+		void _SendPause();
 	public:
 		DebugHelper(Agent* pAgent, BehaviorNode* pNode);
 		~DebugHelper();

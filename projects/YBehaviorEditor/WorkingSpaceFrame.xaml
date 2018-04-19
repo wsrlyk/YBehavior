@@ -10,12 +10,6 @@
         <StackPanel Orientation="Horizontal" Height="30" HorizontalAlignment="Left" Width="200"  DockPanel.Dock="Top">
             <Button Name="btnNew" Click="btnNew_Click" Width="30">New</Button>
             <Button Name="btnSave" Click="btnSave_Click" Width="30">Save</Button>
-            <Button Name="btnStartDebug" Click="btnStartDebug_Click" Width="30">Dbg</Button>
-            <Button Name="btnStopDebug" Click="btnStopDebug_Click" Background="Red" Width="30" Visibility="Collapsed">Dbg</Button>
-            <StackPanel Name="DebugThisTree" Orientation="Horizontal" Visibility="Collapsed">
-                <Button Name="btnDebugThisTree" Click="btnDebugThisTree_Click" Width="30">This</Button>
-                <TextBox Name="debugAgentUID" Text="0" Width="50"/>
-            </StackPanel>
         </StackPanel>
         <TreeView Name="Files" MouseDoubleClick="OnFilesItemDoubleClick">
             <TreeView.ItemTemplate>

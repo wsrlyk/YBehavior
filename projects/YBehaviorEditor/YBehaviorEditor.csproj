@@ -60,10 +60,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Helpers\VariableHelper.cs" />
-    <Compile Include="NetworkConnectWindow.xaml.cs">
-      <DependentUpon>NetworkConnectWindow.xaml</DependentUpon>
+    <Compile Include="DebugFrame.xaml.cs">
+      <DependentUpon>DebugFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\VariableHelper.cs" />
     <Compile Include="NodeListFrame.xaml.cs">
       <DependentUpon>NodeListFrame.xaml</DependentUpon>
     </Compile>
@@ -93,6 +93,10 @@
     <Compile Include="WorkingSpaceFrame.xaml.cs">
       <DependentUpon>WorkingSpaceFrame.xaml</DependentUpon>
     </Compile>
+    <Page Include="DebugFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -105,10 +109,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="NetworkConnectWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="NodeListFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

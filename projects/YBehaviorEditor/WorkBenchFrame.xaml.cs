@@ -94,15 +94,23 @@ namespace YBehavior.Editor
             {
                 TickResultArg oArg = arg as TickResultArg;
 
-                Action renderMainTreeFunc = new Action(_RefreshMainTreeDebug);
-                this.Canvas.Dispatcher.BeginInvoke(renderMainTreeFunc, null);
+                LogMgr.Instance.Log("Tick: instant = " + oArg.bInstant.ToString());
+                this.Canvas.Dispatcher.BeginInvoke(new Action<bool, uint>(_RefreshMainTreeDebug), oArg.bInstant, oArg.Token);
             }
         }
 
-        void _RefreshMainTreeDebug()
+        void _RefreshMainTreeDebug(bool bInstant, uint token)
         {
+            if (token == NetworkMgr.Instance.MessageProcessor.TickResultToken)
+                LogMgr.Instance.Log("_RefreshMainTreeDebug: instant = " + bInstant.ToString());
+            else
+            {
+                LogMgr.Instance.Log("_RefreshMainTreeDebug Failed. token = " + token.ToString() + " while it's " + NetworkMgr.Instance.MessageProcessor.TickResultToken.ToString());
+                return;
+            }
+
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            bench.MainTree.Renderer.RefreshDebug(true);
+            bench.MainTree.Renderer.RefreshDebug(bInstant);
         }
 
         private bool _TabCloseClicked(UCTabItemWithClose tab)

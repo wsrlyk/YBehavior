@@ -67,6 +67,11 @@ namespace YBehavior.Editor.Core
             NetworkMgr.Instance.SendText(sb.ToString());
         }
 
+        public void DoContinue()
+        {
+            NetworkMgr.Instance.SendText("[Continue]");
+        }
+
         public void Update()
         {
             if (m_ReceiveBuffer.Count == 0)
@@ -99,6 +104,9 @@ namespace YBehavior.Editor.Core
                 case "[TickResult]":
                     _HandleTickResult(words);
                     break;
+                case "[Paused]":
+                    _HandlePaused();
+                    break;
             }
         }
 
@@ -112,6 +120,11 @@ namespace YBehavior.Editor.Core
 
         ///////////////////////////////////////////////////////////////////////////
 
+        uint m_TickResultToken = 0;
+        public uint TickResultToken
+        {
+            get { return m_TickResultToken; }
+        }
         void _HandleTickResult(string[] data)
         {
             if (data.Length > 1)
@@ -130,6 +143,7 @@ namespace YBehavior.Editor.Core
                     v.Value = strV[1];
                 }
 
+                ++m_TickResultToken;
                 DebugMgr.Instance.RunInfo.Clear();
                 string[] runInfos = data[2].Split(';');
                 foreach (string s in runInfos)
@@ -141,8 +155,14 @@ namespace YBehavior.Editor.Core
                     DebugMgr.Instance.RunInfo[uint.Parse(strR[0])] = int.Parse(strR[1]);
                 }
 
-                EventMgr.Instance.Send(new TickResultArg() { bInstant = !DebugMgr.Instance.bBreaked });
+                EventMgr.Instance.Send(new TickResultArg() { bInstant = !DebugMgr.Instance.bBreaked, Token = m_TickResultToken });
             }
+        }
+
+        void _HandlePaused()
+        {
+            LogMgr.Instance.Log("Paused.");
+            DebugMgr.Instance.bBreaked = true;
         }
     }
 }

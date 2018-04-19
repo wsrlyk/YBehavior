@@ -8,16 +8,19 @@
         Title="MainWindow" Height="1024" Width="1280">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20"/>
+            <RowDefinition Height="30"/>
             <RowDefinition/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0" Width="400" Margin="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">
-            <MenuItem Header="Operations" Height="20" Width="100">
-                <MenuItem Header="Open" Height="20" Width="100"/>
-                <MenuItem Header="Close" Height="30" Width="100"/>
-            </MenuItem>
-        </Menu>
+        <DockPanel Grid.Row="0">
+            <Menu DockPanel.Dock="Left" Width="400" Margin="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <MenuItem Header="Operations" Height="20" Width="100">
+                    <MenuItem Header="Open" Height="20" Width="100"/>
+                    <MenuItem Header="Close" Height="30" Width="100"/>
+                </MenuItem>
+            </Menu>
+            <local:DebugFrame DockPanel.Dock="Right"/>
+        </DockPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250"/>

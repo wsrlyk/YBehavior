@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 	{
 		pEntity->GetAgent()->Tick();
 #if _MSC_VER
-		Sleep(100);
+		Sleep(300);
 #else
 		usleep(100000);
 #endif

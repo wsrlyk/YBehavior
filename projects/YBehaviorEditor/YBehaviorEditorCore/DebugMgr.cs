@@ -28,8 +28,7 @@ namespace YBehavior.Editor.Core
 
         public string TargetTreeName { get { return m_TargetTreeName; } }
 
-        bool m_bBreaked;
-        public bool bBreaked { get { return m_bBreaked; } }
+        public bool bBreaked { get; set; }
 
         SharedData m_SharedData;
         public SharedData DebugSharedData { get { return m_SharedData; } }
@@ -84,6 +83,10 @@ namespace YBehavior.Editor.Core
             EventMgr.Instance.Send(arg);
         }
 
-
+        public void Continue()
+        {
+            bBreaked = false;
+            NetworkMgr.Instance.MessageProcessor.DoContinue();
+        }
     }
 }

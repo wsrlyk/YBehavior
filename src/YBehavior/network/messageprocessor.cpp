@@ -17,6 +17,11 @@ namespace YBehavior
 		}
 	}
 
+	void Continue()
+	{
+		DebugMgr::Instance()->TogglePause(false);
+	}
+
 	void MessageProcessor::ProcessOne(const STRING& s)
 	{
 		std::vector<STRING> datas;
@@ -26,11 +31,15 @@ namespace YBehavior
 		{
 			DebugTreeWithAgent(datas);
 		}
+		else if (datas[0] == "[Continue]")
+		{
+			Continue();
+		}
 	}
 
 	void MessageProcessor::OnNetworkClosed()
 	{
-		DebugMgr::Instance()->ResetTarget();
+		DebugMgr::Instance()->Stop();
 	}
 
 }
