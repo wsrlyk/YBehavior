@@ -8,7 +8,11 @@
 
 namespace YBehavior
 {
+#ifdef MSVC
 	typedef unsigned int (_stdcall ThreadFunction)(void* arg);
+#else
+	typedef unsigned int (ThreadFunction)(void* arg);
+#endif
 	typedef void*		ThreadHandle;
 	typedef int	Handle;
 	typedef unsigned short	Port;

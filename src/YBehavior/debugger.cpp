@@ -1,4 +1,3 @@
-#ifdef DEBUGGER
 #include "YBehavior/debugger.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/tools/objectpool.h"
@@ -256,4 +255,3 @@ namespace YBehavior
 		DebugMgr::Instance()->Send(false);
 	}
 }
-#endif

@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_DEBUGGER_H_
 #define _YBEHAVIOR_DEBUGGER_H_
 
-#ifdef DEBUGGER
+
 #include "YBehavior/define.h"
 #include "YBehavior/singleton.h"
 #include "YBehavior/behaviortree.h"
@@ -85,6 +85,4 @@ namespace YBehavior
 		void Breaking();
 	};
 }
-#endif
-
 #endif

@@ -61,4 +61,29 @@ namespace YBehavior
 		CreateVector3(data, vec);
 		return vec;
 	}
+
+	template<>
+	STRING Utility::ToString(const BOOL& t)
+	{
+		STRING str;
+		std::stringstream ss;
+		ss << std::boolalpha << t;
+		ss >> str;
+		return str;
+	}
+
+	template<>
+	STRING Utility::ToString(const std::vector<BOOL>& t)
+	{
+		STRING str;
+		std::stringstream ss;
+		for (int i = 0; i < t.size(); ++i)
+		{
+			if (i != 0)
+				ss << '|';
+			ss << std::boolalpha << t[i];
+		}
+		ss >> str;
+		return str;
+	}
 }
