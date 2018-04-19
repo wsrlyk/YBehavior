@@ -18,7 +18,7 @@ namespace YBehavior.Editor.Core
     /// <summary>
     /// BehaviorNode.xaml 的交互逻辑
     /// </summary>
-    public partial class UINode : UserControl, ISelectable, IDeletable, IDuplicatable
+    public partial class UINode : UserControl, ISelectable, IDeletable, IDuplicatable, IBreakPointable
     {
         static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
 
@@ -69,7 +69,7 @@ namespace YBehavior.Editor.Core
                         bgBrush = new SolidColorBrush(Colors.LightGreen);
                         break;
                     case NodeState.NS_FAILED:
-                        bgBrush = new SolidColorBrush(Colors.DarkGreen);
+                        bgBrush = new SolidColorBrush(Colors.DarkSeaGreen);
                         break;
                     case NodeState.NS_RUNNING:
                         bgBrush = new SolidColorBrush(Colors.LightPink);
@@ -106,7 +106,7 @@ namespace YBehavior.Editor.Core
                         bgBrush = new SolidColorBrush(Colors.LightGreen);
                         break;
                     case NodeState.NS_FAILED:
-                        bgBrush = new SolidColorBrush(Colors.DarkGreen);
+                        bgBrush = new SolidColorBrush(Colors.DarkSeaGreen);
                         break;
                     case NodeState.NS_RUNNING:
                         bgBrush = new SolidColorBrush(Colors.LightPink);
@@ -197,5 +197,12 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        public void ToggleBreakPoint()
+        {
+            if (Node.BreakPointInfo.HitCount > 0)
+                Node.SetBreakPoint(0);
+            else
+                Node.SetBreakPoint(1);
+        }
     }
 }

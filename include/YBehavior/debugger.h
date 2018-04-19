@@ -41,7 +41,7 @@ namespace YBehavior
 
 		STRING m_SendBuffer;
 
-		bool m_bPaused = true;
+		bool m_bPaused = false;
 	public:
 		void SetTarget(const STRING& tree, UINT agent);
 		void ResetTarget();
@@ -53,6 +53,7 @@ namespace YBehavior
 		void ClearBreakPoints() { m_BreakPointInfos.clear(); }
 		void AddBreakPoint(UINT nodeUID);
 
+		void RemoveBreakPoint(UINT nodeUID);
 		NodeRunInfo* CreateAndAppendRunInfo();
 		void Clear();
 

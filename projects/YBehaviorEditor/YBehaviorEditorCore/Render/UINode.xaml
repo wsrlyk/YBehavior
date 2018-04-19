@@ -7,13 +7,14 @@
              mc:Ignorable="d" 
              MinWidth="60" MinHeight="80" HorizontalAlignment="Center">
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
         <Style TargetType="FrameworkElement" x:Key="VisibleAnimation">
             <Setter Property="Visibility" Value="Collapsed"/>
             <Setter Property="Opacity" Value="0"/>
         </Style>
         <Storyboard x:Key="InstantShowAnim" FillBehavior="Stop">
-            <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             From="0.0" To="1.0" Duration="0:0:0.1"/>
+<!--            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                             From="0.0" To="1.0" Duration="0:0:0.1"/>   -->
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
                              From="1.0" To="0.0" Duration="0:0:0.1" BeginTime="0:0:0.5"/>
             <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
@@ -32,13 +33,18 @@
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Height="10"  Name="topConnectors" Orientation="Horizontal"/>
         <StackPanel DockPanel.Dock="Bottom" Height="10" Name="bottomConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
-        <Border Name="border" BorderThickness="3" BorderBrush="LightBlue" Background="#FF6CB2B6">
+        <Border Name="border" BorderThickness="3" BorderBrush="#FFAFCEE8" Background="#FF70B6F0">
             <Grid>
                 <Border Name="debugCover" BorderThickness="0" Background="#FFDA3F1C"/>
                 <StackPanel Name="mainPanel">
                     <TextBlock Name="name" Text="{Binding FullName}"></TextBlock>
                     <TextBlock Name="note" Text="{Binding Note}"></TextBlock>
                 </StackPanel>
+                <Ellipse Name="breakPoint" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Visibility="{Binding Path=BreakPointInfo.HasBreakPoint, Converter={StaticResource visibilityConvertor}}" >
+                    <Ellipse.Fill>
+                        <SolidColorBrush Color="Red" Opacity="0.6" />
+                    </Ellipse.Fill>
+                </Ellipse>
             </Grid>
         </Border>
     </DockPanel>

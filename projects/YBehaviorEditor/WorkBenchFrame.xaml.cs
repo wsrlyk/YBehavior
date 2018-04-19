@@ -94,16 +94,13 @@ namespace YBehavior.Editor
             {
                 TickResultArg oArg = arg as TickResultArg;
 
-                LogMgr.Instance.Log("Tick: instant = " + oArg.bInstant.ToString());
                 this.Canvas.Dispatcher.BeginInvoke(new Action<bool, uint>(_RefreshMainTreeDebug), oArg.bInstant, oArg.Token);
             }
         }
 
         void _RefreshMainTreeDebug(bool bInstant, uint token)
         {
-            if (token == NetworkMgr.Instance.MessageProcessor.TickResultToken)
-                LogMgr.Instance.Log("_RefreshMainTreeDebug: instant = " + bInstant.ToString());
-            else
+            if (token != NetworkMgr.Instance.MessageProcessor.TickResultToken)
             {
                 LogMgr.Instance.Log("_RefreshMainTreeDebug Failed. token = " + token.ToString() + " while it's " + NetworkMgr.Instance.MessageProcessor.TickResultToken.ToString());
                 return;
@@ -203,6 +200,9 @@ namespace YBehavior.Editor
                             Core.SelectionMgr.Instance.TryDuplicateSelection(0);
                         }
                     }
+                    break;
+                case Key.F9:
+                    Core.SelectionMgr.Instance.TryToggleBreakPoint();
                     break;
             }
         }

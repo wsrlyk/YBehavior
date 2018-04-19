@@ -88,5 +88,10 @@ namespace YBehavior.Editor.Core
             bBreaked = false;
             NetworkMgr.Instance.MessageProcessor.DoContinue();
         }
+
+        public void SetBreakPoint(uint uid, int count)
+        {
+            NetworkMgr.Instance.MessageProcessor.SetBreakPoint(uid, count);
+        }
     }
 }

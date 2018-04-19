@@ -22,6 +22,17 @@ namespace YBehavior
 		DebugMgr::Instance()->TogglePause(false);
 	}
 
+	void ProcessBreakPoint(const std::vector<STRING>& datas)
+	{
+		UINT uid = Utility::ToType<UINT>(datas[1]);
+		INT count = Utility::ToType<INT>(datas[2]);
+
+		if (count > 0)
+			DebugMgr::Instance()->AddBreakPoint(uid);
+		else
+			DebugMgr::Instance()->RemoveBreakPoint(uid);
+	}
+
 	void MessageProcessor::ProcessOne(const STRING& s)
 	{
 		std::vector<STRING> datas;
@@ -34,6 +45,10 @@ namespace YBehavior
 		else if (datas[0] == "[Continue]")
 		{
 			Continue();
+		}
+		else if (datas[0] == "[BreakPoint]")
+		{
+			ProcessBreakPoint(datas);
 		}
 	}
 

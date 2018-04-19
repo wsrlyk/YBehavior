@@ -72,6 +72,11 @@ namespace YBehavior.Editor.Core
             NetworkMgr.Instance.SendText("[Continue]");
         }
 
+        public void SetBreakPoint(uint uid, int count)
+        {
+            NetworkMgr.Instance.SendText("[BreakPoint] " + uid.ToString() + " " + count.ToString());
+        }
+
         public void Update()
         {
             if (m_ReceiveBuffer.Count == 0)

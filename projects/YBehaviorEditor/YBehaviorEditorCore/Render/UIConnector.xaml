@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              MinWidth="30" MinHeight="10"
              AllowDrop="True">
-    <Border Name="Main" MinWidth="30" MinHeight="10" HorizontalAlignment="Center" BorderBrush="AliceBlue" BorderThickness="1" Background="Cyan">
+    <Border Name="Main" MinWidth="30" MinHeight="10" HorizontalAlignment="Center" BorderBrush="AliceBlue" BorderThickness="1" Background="#FF9DDEDE">
         <TextBlock Name="title" Text="con" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>        
     </Border>
 </UserControl>

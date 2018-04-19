@@ -20,6 +20,10 @@ namespace YBehavior.Editor.Core
     {
         void OnDuplicated(int param);
     }
+    public interface IBreakPointable
+    {
+        void ToggleBreakPoint();
+    }
 
     public delegate void SelectionStateChangeHandler(ISelectable obj, bool bState);
     public delegate void DeleteHandler(IDeletable obj);
@@ -127,5 +131,16 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        public void TryToggleBreakPoint()
+        {
+            if (m_SingleSelection == null)
+                return;
+
+            IBreakPointable breakPointable = m_SingleSelection as IBreakPointable;
+            if (breakPointable != null)
+            {
+                breakPointable.ToggleBreakPoint();
+            }
+        }
     }
 }

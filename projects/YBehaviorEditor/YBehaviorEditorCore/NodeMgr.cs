@@ -419,6 +419,13 @@ namespace YBehavior.Editor.Core
             return other;
         }
 
+        public void SetBreakPoint(int count)
+        {
+            BreakPointInfo.HitCount = count;
+            OnPropertyChanged("BreakPointInfo");
+            DebugMgr.Instance.SetBreakPoint(UID, count);
+        }
+
         public static int SortByPosX(NodeBase aa, NodeBase bb)
         {
             Node a = aa as Node;

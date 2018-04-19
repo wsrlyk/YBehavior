@@ -82,6 +82,11 @@ namespace YBehavior
 		m_BreakPointInfos[nodeUID] = info;
 	}
 
+	void DebugMgr::RemoveBreakPoint(UINT nodeUID)
+	{
+		m_BreakPointInfos.erase(nodeUID);
+	}
+
 	NodeRunInfo* DebugMgr::CreateAndAppendRunInfo()
 	{
 		NodeRunInfo* pInfo = ObjectPool<NodeRunInfo>::Get();
@@ -198,6 +203,8 @@ namespace YBehavior
 		}
 		DebugMgr::Instance()->AppendSendContent(buffer);
 
+		//if (DebugMgr::Instance()->IsPaused())
+		//	LOG_BEGIN << "Dont Clear Run Info cause paused" << LOG_END;
 		DebugMgr::Instance()->Send(!DebugMgr::Instance()->IsPaused());
 	}
 
