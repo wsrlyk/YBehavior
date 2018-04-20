@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include <netinet/in.h>
-
+#include <memory.h>
 #include "YBehavior/network/network.h"
 #include "YBehavior/logger.h"
 
@@ -22,7 +22,7 @@ namespace YBehavior
 	const size_t	kLocalQueueSize = (1024 * 8);
 
 	typedef int SOCKET;
-	SOCKET AsSocket(behaviac::Socket::Handle h) 
+	SOCKET AsSocket(Handle h) 
 	{
 		return (SOCKET)(h);
 	}
@@ -46,10 +46,11 @@ namespace YBehavior
 			FD_ZERO(&readSet);
 			FD_SET(winSocket, &readSet);
 			timeval timeout = { 0, 17000 };
-			int res = ::select(0, &readSet, 0, 0, &timeout);
+			int res = ::select(winSocket + 1, &readSet, 0, 0, &timeout);
 
 			if (res > 0)
 			{
+				LOG_BEGIN << "Select Res: " << res << LOG_END;
 				if (FD_ISSET(winSocket, &readSet)) 
 				{
 					return true;
@@ -74,20 +75,20 @@ namespace YBehavior
 				return Handle(0);
 			}
 
-#ifndef SO_NONBLOCK
-#ifdef SO_NOSIGPIPE
-			int noSigpipe = 1;
-			setsockopt(s, SOL_SOCKET, SO_NOSIGPIPE, &noSigpipe, sizeof(noSigpipe));
-#endif
-			int inonBlocking = (bBlock ? 0 : 1);
-			return setsockopt(s, SOL_SOCKET, SO_NONBLOCK, &inonBlocking, sizeof(inonBlocking)) == 0 ? Handle(s) : Handle(0));
-#else
+//#ifndef SO_NONBLOCK
+//#ifdef SO_NOSIGPIPE
+//			int noSigpipe = 1;
+//			setsockopt(s, SOL_SOCKET, SO_NOSIGPIPE, &noSigpipe, sizeof(noSigpipe));
+//#endif
+//			int inonBlocking = (bBlock ? 0 : 1);
+//			return setsockopt(s, SOL_SOCKET, SO_NONBLOCK, &inonBlocking, sizeof(inonBlocking)) == 0 ? Handle(s) : Handle(0));
+//#else
 			int v = fcntl(s, F_GETFL, 0);
 			int cntl = !bBlock ? (v | O_NONBLOCK) : (v & ~O_NONBLOCK);
 
 			return fcntl(s, F_SETFL, cntl) != -1 ? Handle(s) : Handle(0);
-#endif
-			return Handle(0);
+//#endif
+//			return Handle(0);
 		}
 
 		Handle Accept(Handle listeningSocket, size_t bufferSize)
@@ -128,17 +129,19 @@ namespace YBehavior
 			//int rcvtimeo = 1000;
 			//::setsockopt(winSocket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&rcvtimeo, sizeof(rcvtimeo));
 
-			if (bind(winSocket, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) < 0)
+			int res = (bind(winSocket, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) < 0);
+			if (res)
 			{
 				Close(h);
-				BEHAVIAC_LOGERROR("Listen failed at bind\n");
+				LOG_BEGIN << "Listen failed at bind, " << strerror(res) << LOG_END;
 				return false;
 			}
 
-			if (listen(winSocket, maxConnections) < 0)
+			res = (listen(winSocket, maxConnections) < 0);
+			if (res)
 			{
 				Close(h);
-				BEHAVIAC_LOGERROR("Listen failed at listen\n");
+				LOG_BEGIN << "Listen failed at listen, " << strerror(res) << LOG_END;
 				return false;
 			}
 
@@ -203,7 +206,7 @@ namespace YBehavior
 
 			if (rv < 0)
 			{
-				BEHAVIAC_ASSERT(0);
+				//BEHAVIAC_ASSERT(0);
 			}
 			else if (rv == 0)
 			{
@@ -213,8 +216,9 @@ namespace YBehavior
 			{
 				int res = ::recv(AsSocket(h), (char*)buffer, (int)bytesMax, 0);
 
-				if (res < 0)
+				if (res <= 0)
 				{
+					LOG_BEGIN << "Recv Error: " << strerror(res) << LOG_END;
 					// int err = WSAGetLastError();
 
 					// if (err == WSAECONNRESET || err == WSAECONNABORTED)

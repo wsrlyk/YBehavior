@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 #if _MSC_VER
 		Sleep(300);
 #else
-		usleep(100000);
+		usleep(1000000);
 #endif
 	}
 	return 0;
