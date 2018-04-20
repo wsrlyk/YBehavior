@@ -121,13 +121,16 @@ namespace YBehavior.Editor
         private void _OnNetworkConnectionChanged(EventArg arg)
         {
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            bench.MainTree.Renderer.RefreshDebug(true);
+            if (bench != null)
+                Dispatcher.BeginInvoke(new Action(() => { bench.MainTree.Renderer.RefreshDebug(true); }));
+            
         }
 
         private void _OnDebugTargetChanged(EventArg arg)
         {
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            bench.MainTree.Renderer.RefreshDebug(true);
+            if (bench != null)
+                Dispatcher.BeginInvoke(new Action(() => { bench.MainTree.Renderer.RefreshDebug(true); }));
         }
 
         private bool _TabCloseClicked(UCTabItemWithClose tab)

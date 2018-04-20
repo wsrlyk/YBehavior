@@ -36,7 +36,7 @@ namespace YBehavior
 	}
 	void Network::ThreadFunc()
 	{
-		m_ListeningHandle = Socket::CreateSocket(false);
+		m_ListeningHandle = Socket::CreateSocket(true);
 
 		if (!Socket::Listen(m_ListeningHandle, 444, 1))
 		{
@@ -47,18 +47,18 @@ namespace YBehavior
 		while (!m_bTerminating)
 		{
 			//wait for connecting
-			while (!m_bTerminating)
-			{
-				//Log("Socket::TestConnection.\n");
-				LOG_BEGIN << "Socket::TestConnection" << LOG_END;
+			//while (!m_bTerminating)
+			//{
+			//	//Log("Socket::TestConnection.\n");
+			//	LOG_BEGIN << "Socket::TestConnection" << LOG_END;
 
-				if (Socket::TestConnection(m_ListeningHandle))
-				{
-					break;
-				}
+			//	if (Socket::TestConnection(m_ListeningHandle))
+			//	{
+			//		break;
+			//	}
 
-				Thread::SleepMilli(100);
-			}
+			//	Thread::SleepMilli(100);
+			//}
 
 
 			if (!m_bTerminating)
