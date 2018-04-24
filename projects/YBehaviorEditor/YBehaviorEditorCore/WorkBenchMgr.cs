@@ -26,6 +26,7 @@ namespace YBehavior.Editor.Core
             EventMgr.Instance.Register(EventType.NodesConnected, _OnNodesConnected);
             EventMgr.Instance.Register(EventType.NodesDisconnected, _OnNodesDisconnected);
             EventMgr.Instance.Register(EventType.RemoveNode, _RemoveNode);
+            EventMgr.Instance.Register(EventType.NodeMoved, _NodeMoved);
         }
 
         private void _OnNodesConnected(EventArg arg)
@@ -49,6 +50,12 @@ namespace YBehavior.Editor.Core
             m_OpenedWorkBenchs.Remove(target);
             if (m_ActiveWorkBench == target)
                 m_ActiveWorkBench = null;
+        }
+
+        private void _NodeMoved(EventArg arg)
+        {
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.OnNodeMoved(arg);
         }
 
         public bool Switch(WorkBench target)
@@ -116,7 +123,11 @@ namespace YBehavior.Editor.Core
 
             return workBench;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bench"></param>
+        /// <returns> 0: normal; 1: new file created; -1: cancel; -2: error</returns>
         public int SaveWorkBench(WorkBench bench = null)
         {
             if (bench == null)
@@ -124,7 +135,14 @@ namespace YBehavior.Editor.Core
             if (bench == null)
             {
                 LogMgr.Instance.Error("AddNodeToBench Failed: bench == null");
-                return 0;
+                return -2;
+            }
+
+            if (!bench.CheckError())
+            {
+                LogMgr.Instance.Error("Something wrong in tree. Save Failed.");
+                MessageBox.Show("Save Failed.");
+                return -2;
             }
 
             bool bNewFile = false;
@@ -155,6 +173,7 @@ namespace YBehavior.Editor.Core
             bench.Save(el, xmlDoc);
             xmlDoc.Save(bench.FileInfo.Path);
 
+            LogMgr.Instance.Log("Saved to " + bench.FileInfo.Path);
             return bNewFile ? 1 : 0;
         }
 

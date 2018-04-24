@@ -105,7 +105,7 @@ namespace YBehavior.Editor.Core
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 Point newPos = e.GetPosition(RenderCanvas.Panel);
-                if (m_DragHandler != null)
+                if (m_DragHandler != null && newPos != m_Pos)
                     m_DragHandler(newPos - m_Pos, newPos);
                 m_Pos = newPos;
             }

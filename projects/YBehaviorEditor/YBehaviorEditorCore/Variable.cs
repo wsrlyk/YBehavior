@@ -314,7 +314,7 @@ namespace YBehavior.Editor.Core
             {
                 if (AlwaysConst)
                 {
-                    LogMgr.Instance.Error(string.Format("This variable cant be pointer: {0}.", Name));
+                    LogMgr.Instance.Log(string.Format("This variable cant be pointer: {0}.", Name));
                     return false;
                 }
                 if (string.IsNullOrEmpty(Value))
@@ -322,21 +322,28 @@ namespace YBehavior.Editor.Core
                 Variable other = SharedData.GetVariable(Value);
                 if (other == null)
                 {
-                    LogMgr.Instance.Error(string.Format("Pointer doesnt exist for variable {0}, while the pointer is {1} ", Name, Value));
+                    LogMgr.Instance.Log(string.Format("Pointer doesnt exist for variable {0}, while the pointer is {1} ", Name, Value));
                     return false;
                 }
 
                 if (other.vType != vType)
                 {
-                    LogMgr.Instance.Error(string.Format("Types dont match: {0}.{1} != {2}.{3}", Name, vType, other.Name, other.vType));
+                    LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", Name, vType, other.Name, other.vType));
                     return false;
                 }
 
                 if (other.cType != cType)
                 {
                     if (m_VectorIndex == null)
-                        LogMgr.Instance.Error(string.Format("Types dont match: {0}.{1} != {2}.{3}", Name, cType, other.Name, other.cType));
-                    return false;
+                    {
+                        LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", Name, cType, other.Name, other.cType));
+                        return false;
+                    }
+                    else if (!m_VectorIndex.CheckValid())
+                    {
+                        LogMgr.Instance.Log(string.Format("VectorIndex invalid: {0}.Index == {1}", Name, m_VectorIndex.Value));
+                        return false;
+                    }
                 }
                 return true;
             }
@@ -363,21 +370,21 @@ namespace YBehavior.Editor.Core
                     {
                         if (int.TryParse(v, out int a))
                             return true;
-                        LogMgr.Instance.Error(string.Format("Variable parse error: int {0} == {1}", Name, v));
+                        LogMgr.Instance.Log(string.Format("Variable parse error: int {0} == {1}", Name, v));
                     }
                     break;
                 case ValueType.VT_FLOAT:
                     {
                         if (float.TryParse(v, out float a))
                             return true;
-                        LogMgr.Instance.Error(string.Format("Variable parse error: float {0} == {1}", Name, v));
+                        LogMgr.Instance.Log(string.Format("Variable parse error: float {0} == {1}", Name, v));
                     }
                     break;
                 case ValueType.VT_BOOL:
                     {
                         if (bool.TryParse(v, out bool a))
                             return true;
-                        LogMgr.Instance.Error(string.Format("Variable parse error: bool {0} == {1}", Name, v));
+                        LogMgr.Instance.Log(string.Format("Variable parse error: bool {0} == {1}", Name, v));
                     }
                     break;
                 case ValueType.VT_STRING:

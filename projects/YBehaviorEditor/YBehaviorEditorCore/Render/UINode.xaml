@@ -37,7 +37,7 @@
             <Grid>
                 <Border Name="debugCover" BorderThickness="0" Background="#FFDA3F1C"/>
                 <StackPanel Name="mainPanel">
-                    <TextBlock Name="name" Text="{Binding FullName}"></TextBlock>
+                    <TextBlock Name="name" Text="{Binding UITitle}"></TextBlock>
                     <TextBlock Name="note" Text="{Binding Note}"></TextBlock>
                 </StackPanel>
                 <Ellipse Name="breakPoint" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Visibility="{Binding Path=BreakPointInfo.HasBreakPoint, Converter={StaticResource visibilityConvertor}}" >

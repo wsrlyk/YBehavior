@@ -145,7 +145,12 @@ namespace YBehavior.Editor
                 MessageBoxResult dr = MessageBox.Show("This file has been modified. Save it?", "To Save Or Not To Save", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
                 if (dr == MessageBoxResult.Yes)
                 {
-                    WorkBenchMgr.Instance.SaveWorkBench(bench);
+                    int res = WorkBenchMgr.Instance.SaveWorkBench(bench);
+                    if (res < 0)
+                    {
+                        MessageBox.Show("Save Failed.");
+                        return false;
+                    }
                 }
                 else if (dr == MessageBoxResult.No)
                 {
@@ -176,7 +181,10 @@ namespace YBehavior.Editor
             if (oArg.Node == null)
                 return;
 
-            ///> TODO: move the node to the center of the canvas
+            ///> move the node to the topleft of the canvas
+            oArg.Node.Renderer.SetPos(new Point(
+                -m_CurPageData.TranslateTransform.X / m_CurPageData.ScaleTransform.ScaleX, 
+                -m_CurPageData.TranslateTransform.Y / m_CurPageData.ScaleTransform.ScaleY));
 
             _CreateNode(oArg.Node);
             //this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<Node>(_ThreadRefreshConnection), oArg.Node);

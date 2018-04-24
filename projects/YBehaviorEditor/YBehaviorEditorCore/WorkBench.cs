@@ -38,6 +38,8 @@ namespace YBehavior.Editor.Core
 
                 Node childNode = child.Owner as Node;
                 RemoveSubTree(childNode);
+
+                RefreshNodeUID();
             }
             else
             {
@@ -62,6 +64,7 @@ namespace YBehavior.Editor.Core
                 Node childNode = oArg.ChildHolder.Owner as Node;
                 AddSubTree(childNode);
 
+                RefreshNodeUID();
             }
             else
             {
@@ -74,6 +77,17 @@ namespace YBehavior.Editor.Core
             RemoveNodeArg oArg = arg as RemoveNodeArg;
 
             RemoveSubTree(oArg.Node);
+        }
+
+        public void OnNodeMoved(EventArg arg)
+        {
+            NodeMovedArg oArg = arg as NodeMovedArg;
+            Node parent = oArg.Node.Parent as Node;
+            if (parent != null)
+            {
+                uint uid = parent.UID;
+                _RefreshNodeUID(parent, ref uid);
+            }
         }
 
         public void CreateEmptyRoot()
@@ -204,15 +218,22 @@ namespace YBehavior.Editor.Core
 
         public void RefreshNodeUID()
         {
-            uint uid = 0;
-            _RefreshNodeUID(MainTree, ref uid);
+            _RefreshNodeUIDFromRoot(MainTree);
         }
+
+        void _RefreshNodeUIDFromRoot(Node node)
+        {
+            uint uid = 1;
+            _RefreshNodeUID(node, ref uid);
+        }
+
         void _RefreshNodeUID(Node node, ref uint uid)
         {
-            node.UID = ++uid;
+            node.UID = uid;
 
             foreach (Node chi in node.Conns)
             {
+                ++uid;
                 _RefreshNodeUID(chi, ref uid);
             }
         }
@@ -236,6 +257,33 @@ namespace YBehavior.Editor.Core
             if (root == null)
                 return;
             m_Forest.Add(root);
+
+            _RefreshNodeUIDFromRoot(root);
+        }
+
+        public bool CheckError()
+        {
+            return _CheckError(m_Tree);
+        }
+
+        private bool _CheckError(Node node)
+        {
+            bool bRes = true;
+            foreach (Variable v in node.Variables.Datas.Values)
+            {
+                if (!v.CheckValid())
+                {
+                    LogMgr.Instance.Error("CheckError in Node: " + node.FullName + ", uid: " + node.UID + ", Variable: " + v.Name);
+                    bRes = false;
+                }
+            }
+
+            foreach (Node child in node.Conns)
+            {
+                if (!_CheckError(child))
+                    bRes = false;
+            }
+            return bRes;
         }
     }
 }

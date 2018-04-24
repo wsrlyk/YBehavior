@@ -141,7 +141,21 @@ namespace YBehavior.Editor.Core
             if (DebugMgr.Instance.IsDebugging())
                 return;
             if (Node != null)
-                Node.Renderer.DragMain(delta, pos);
+            {
+                Node.Renderer.DragMain(delta);
+
+                ///> let the parent node sort the chilren
+                if (delta.LengthSquared == 0 && Node.Parent != null)
+                {
+                    Node.Parent.OnChildChanged();
+
+                    NodeMovedArg arg = new NodeMovedArg
+                    {
+                        Node = this.Node
+                    };
+                    EventMgr.Instance.Send(arg);
+                }
+            }
         }
 
         public void SetSelect(bool bSelect)
@@ -179,7 +193,7 @@ namespace YBehavior.Editor.Core
 
             RemoveNodeArg removeArg = new RemoveNodeArg();
             removeArg.Node = Node;
-            EventMgr.Instance.Send(arg);
+            EventMgr.Instance.Send(removeArg);
         }
 
         public void OnDuplicated(int param)

@@ -82,6 +82,7 @@ namespace YBehavior.Editor.Core
         public void Sort(Comparison<NodeBase> comparer)
         {
             m_Nodes.Sort(comparer);
+            m_Owner.Conns.MarkDirty();
         }
 
         static int CompareByPosX(Node a, Node b)

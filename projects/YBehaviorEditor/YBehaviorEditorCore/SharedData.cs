@@ -14,6 +14,25 @@ namespace YBehavior.Editor.Core
         {
             m_Owner = owner;
         }
+
+        public static bool IsValidVariableName(string name)
+        {
+            string pattern = @"^[a-zA-Z0-9]*$";
+            bool res = false;
+            if (name.Length > 0 && name.Length <= 15)
+            {
+                res = (System.Text.RegularExpressions.Regex.IsMatch(name, pattern));
+            }
+            else
+            {
+                LogMgr.Instance.Error("Name Length (Only: 1~15): " + name);
+                return false;
+            }
+            if (!res)
+                LogMgr.Instance.Error("Contains invalid characters (Only: a~z, A~Z, 0~9): " + name);
+            return res;
+        }
+
         /// <summary>
         /// This function is only for the variables of the whole tree, not for a node.
         /// Add From xml
@@ -23,6 +42,8 @@ namespace YBehavior.Editor.Core
         /// <returns></returns>
         public bool TryAddData(string name, string value)
         {
+            if (!IsValidVariableName(name))
+                return false;
             Variable v = new Variable(this);
             if (!v.SetVariableInNode(value, name))
                 return false;
@@ -46,6 +67,8 @@ namespace YBehavior.Editor.Core
         /// <returns></returns>
         public bool TryCreateVariable(string name, string value, Variable.ValueType vType, Variable.CountType cType)
         {
+            if (!IsValidVariableName(name))
+                return false;
             Variable v = new Variable(this);
             if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, value, null, name))
                 return false;

@@ -13,6 +13,7 @@ namespace YBehavior.Editor.Core
         WorkBenchSelected,
         NewNodeAdded,
         RemoveNode,
+        NodeMoved,
         NodeDuplicated,
         NodeRemoved,
         NodesConnected,
@@ -101,6 +102,15 @@ namespace YBehavior.Editor.Core
     {
         public Node Node { get; set; }
         public override EventType Type => EventType.NodeRemoved;
+    }
+
+    /// <summary>
+    /// After the node is moved, notify mainly the workbench to refresh the uid
+    /// </summary>
+    public class NodeMovedArg : EventArg
+    {
+        public Node Node { get; set; }
+        public override EventType Type => EventType.NodeMoved;
     }
 
     public class NodeDuplicatedArg : EventArg

@@ -99,7 +99,8 @@ namespace YBehavior.Editor
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             int res = WorkBenchMgr.Instance.SaveWorkBench();
-            WorkBenchMgr.Instance.ExportWorkBench();
+            if (res >= 0)
+                WorkBenchMgr.Instance.ExportWorkBench();
 
             if (res == 1)
                 _RefreshWorkingSpace();

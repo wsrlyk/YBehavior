@@ -240,9 +240,20 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        public void DragMain(Vector delta, Point pos)
+        public void DragMain(Vector delta)
         {
             _Move(delta);
+            _OnPosChanged();
+        }
+
+        public void SetPos(Point pos)
+        {
+            _Move(pos - m_Owner.Geo.Pos);
+            _OnPosChanged();
+        }
+
+        void _OnPosChanged()
+        {
             Node parent = m_Owner.Parent as Node;
             if (parent != null)
             {

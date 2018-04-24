@@ -160,8 +160,12 @@ namespace YBehavior.Editor.Core
             set
             {
                 m_NickName = value;
-                OnPropertyChanged("FullName");
+                OnPropertyChanged("UITitle");
             }
+        }
+        public string UITitle
+        {
+            get { return UID.ToString() + ". " + FullName; }
         }
 
         public virtual string Note => string.Empty;
@@ -177,7 +181,16 @@ namespace YBehavior.Editor.Core
         public Renderer Renderer { get { return m_Renderer; } }
         protected Renderer m_Renderer;
 
-        public uint UID { get; set; }
+        private uint m_UID = 0;
+        public uint UID
+        {
+            get { return m_UID; }
+            set
+            {
+                m_UID = value;
+                OnPropertyChanged("UITitle");
+            }
+        }
 
         private Geometry m_Geo = new Geometry();
         public Geometry Geo { get { return m_Geo; } }
