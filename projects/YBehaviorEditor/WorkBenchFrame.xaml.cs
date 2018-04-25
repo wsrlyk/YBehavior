@@ -43,6 +43,7 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             EventMgr.Instance.Register(EventType.WorkBenchLoaded, _OnWorkBenchLoaded);
+            EventMgr.Instance.Register(EventType.WorkBenchSaved, _OnWorkBenchSaved);
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
             EventMgr.Instance.Register(EventType.NewNodeAdded, _OnNewNodeAdded);
             EventMgr.Instance.Register(EventType.TickResult, _OnTickResult);
@@ -89,6 +90,32 @@ namespace YBehavior.Editor
             activeTab.IsSelected = true;
 
             //_RenderActiveWorkBench();
+        }
+
+        private void _OnWorkBenchSaved(EventArg arg)
+        {
+            WorkBenchSavedArg oArg = arg as WorkBenchSavedArg;
+            WorkBench bench = oArg.Bench;
+            if (bench == null)
+                return;
+            ///> Rename the tab title
+            if (oArg.bCreate)
+            {
+                UCTabItemWithClose activeTab = null;
+                foreach (UCTabItemWithClose tab in this.TabController.Items)
+                {
+                    if (tab.Content == bench)
+                    {
+                        activeTab = tab;
+                        break;
+                    }
+                }
+                ///> Create new tab
+                if (activeTab != null)
+                {
+                    activeTab.Header = bench.FileInfo.DisplayName;
+                }
+            }
         }
 
         private void _OnWorkBenchSelected(EventArg arg)
@@ -145,13 +172,13 @@ namespace YBehavior.Editor
                 MessageBoxResult dr = MessageBox.Show("This file has been modified. Save it?", "To Save Or Not To Save", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
                 if (dr == MessageBoxResult.Yes)
                 {
-                    int res = WorkBenchMgr.Instance.SaveWorkBench(bench);
+                    int res = WorkBenchMgr.Instance.SaveAndExport(bench);
                     if (res < 0)
                     {
-                        MessageBox.Show("Save Failed.");
                         return false;
                     }
                 }
+
                 else if (dr == MessageBoxResult.No)
                 {
                     WorkBenchMgr.Instance.Remove(bench);

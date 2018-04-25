@@ -11,6 +11,7 @@ namespace YBehavior.Editor.Core
         None,
         WorkBenchLoaded,
         WorkBenchSelected,
+        WorkBenchSaved,
         NewNodeAdded,
         RemoveNode,
         NodeMoved,
@@ -78,6 +79,13 @@ namespace YBehavior.Editor.Core
     {
         public WorkBench Bench { get; set; }
         public override EventType Type => EventType.WorkBenchSelected;
+    }
+
+    public class WorkBenchSavedArg : EventArg
+    {
+        public WorkBench Bench { get; set; }
+        public bool bCreate { get; set; }
+        public override EventType Type => EventType.WorkBenchSaved;
     }
 
     public class NewNodeAddedArg : EventArg

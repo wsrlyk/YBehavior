@@ -76,7 +76,9 @@ namespace YBehavior.Editor
         public WorkingSpaceFrame()
         {
             InitializeComponent();
-            _RefreshWorkingSpace();
+            EventMgr.Instance.Register(EventType.WorkBenchSaved, _OnWorkBenchSaved);
+
+            _RefreshWorkingSpace(true);
 
             this.Files.ItemsSource = m_FileInfos.Children;
         }
@@ -99,12 +101,12 @@ namespace YBehavior.Editor
         }
 
         HashSet<string> m_ExpandedItems = new HashSet<string>();
-        private void _RefreshWorkingSpace()
+        private void _RefreshWorkingSpace(bool bReload)
         {
             m_ExpandedItems.Clear();
             _GetExpandedItems(this.Files, m_ExpandedItems);
 
-            m_FileInfos.Build(TreeFileMgr.Instance.GetAllTrees(), m_ExpandedItems);
+            m_FileInfos.Build(bReload ? TreeFileMgr.Instance.ReloadAndGetAllTrees() : TreeFileMgr.Instance.AllTrees, m_ExpandedItems);
 //            this.Files.ItemsSource = m_FileInfos.Children;
         }
 
@@ -136,14 +138,26 @@ namespace YBehavior.Editor
 
         }
 
+        private void _OnWorkBenchSaved(EventArg arg)
+        {
+            WorkBenchSavedArg oArg = arg as WorkBenchSavedArg;
+            WorkBench bench = oArg.Bench;
+            if (bench == null)
+                return;
+            ///> Rename the tab title
+            if (oArg.bCreate)
+            {
+                _RefreshWorkingSpace(false);
+            }
+        }
+
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            int res = WorkBenchMgr.Instance.SaveWorkBench();
-            if (res >= 0)
-                WorkBenchMgr.Instance.ExportWorkBench();
+            /*int res = */
+            WorkBenchMgr.Instance.SaveAndExport();
 
-            if (res == 1)
-                _RefreshWorkingSpace();
+            //if (res == 1)
+            //    _RefreshWorkingSpace(false);
         }
 
         private void btnNew_Click(object sender, RoutedEventArgs e)
@@ -159,7 +173,7 @@ namespace YBehavior.Editor
 
         private void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            _RefreshWorkingSpace();
+            _RefreshWorkingSpace(true);
         }
     }
 }

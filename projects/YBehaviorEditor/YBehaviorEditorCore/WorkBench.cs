@@ -13,8 +13,20 @@ namespace YBehavior.Editor.Core
         Tree m_Tree;
         public Tree MainTree { get { return m_Tree; } }
 
-        public TreeFileMgr.TreeFileInfo FileInfo { get; set; }
+        public string FilePath { get; set; }
 
+        private TreeFileMgr.TreeFileInfo m_UntitledFileInfo = null;
+        public TreeFileMgr.TreeFileInfo FileInfo
+        {
+            get
+            {
+                return string.IsNullOrEmpty(FilePath) ? m_UntitledFileInfo : TreeFileMgr.Instance.GetFileInfo(FilePath);
+            }
+            set
+            {
+                m_UntitledFileInfo = value;
+            }
+        }
         static int g_ID_inc = 0;
 
         int m_UID;

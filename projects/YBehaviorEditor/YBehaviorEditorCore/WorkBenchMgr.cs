@@ -103,7 +103,7 @@ namespace YBehavior.Editor.Core
 
             WorkBench workBench = new WorkBench
             {
-                FileInfo = file
+                FilePath = file.Path
             };
 
             WorkBench oldBench = m_ActiveWorkBench;
@@ -122,6 +122,30 @@ namespace YBehavior.Editor.Core
             m_OpenedWorkBenchs.Add(workBench);
 
             return workBench;
+        }
+
+        public int SaveAndExport(WorkBench bench = null)
+        {
+            int res = SaveWorkBench(bench);
+            if (res >= 0)
+            {
+                ExportWorkBench(bench);
+
+                if (bench == null)
+                    bench = ActiveWorkBench;
+                bench.FilePath = bench.FileInfo.Path;
+
+                TreeFileMgr.Instance.Load();
+
+                WorkBenchSavedArg arg = new WorkBenchSavedArg()
+                {
+                    bCreate = res == 1,
+                    Bench = bench
+                };
+                EventMgr.Instance.Send(arg);
+            }
+
+            return res;
         }
         /// <summary>
         /// 
@@ -146,7 +170,8 @@ namespace YBehavior.Editor.Core
             }
 
             bool bNewFile = false;
-            if (bench.FileInfo.Path == null)
+
+            if (string.IsNullOrEmpty(bench.FilePath))
             {
                 ///> Pop the save dialog
                 Microsoft.Win32.SaveFileDialog sfd = new Microsoft.Win32.SaveFileDialog();
@@ -164,7 +189,7 @@ namespace YBehavior.Editor.Core
                     return -1;
                 }
             }
-
+            
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.AppendChild(xmlDoc.CreateXmlDeclaration("1.0", "utf-8", null));
             var el = xmlDoc.CreateElement(bench.FileInfo.Name);
@@ -181,7 +206,7 @@ namespace YBehavior.Editor.Core
         {
             if (bench == null)
                 bench = ActiveWorkBench;
-            if (bench.FileInfo.Path == null)
+            if (string.IsNullOrEmpty(bench.FileInfo.Path))
             {
                 MessageBoxResult dr = MessageBox.Show("This file must be saved first.", "Go to save", MessageBoxButton.OK, MessageBoxImage.Error);
                 return true;
@@ -235,7 +260,12 @@ namespace YBehavior.Editor.Core
         {
             WorkBench workBench = new WorkBench
             {
+                FilePath = string.Empty,
                 FileInfo = new TreeFileMgr.TreeFileInfo()
+                {
+                    Name = TreeFileMgr.TreeFileInfo.UntitledName,
+                    Path = string.Empty
+                }
             };
 
             workBench.CreateEmptyRoot();
