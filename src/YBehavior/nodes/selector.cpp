@@ -1,14 +1,14 @@
-#include "YBehavior/nodes/sequence.h"
+#include "YBehavior/nodes/selector.h"
 
 namespace YBehavior
 {
-	YBehavior::NodeState Sequence::Update(AgentPtr pAgent)
+	YBehavior::NodeState Selector::Update(AgentPtr pAgent)
 	{
-		NodeState ns = NS_SUCCESS;
+		NodeState ns = NS_FAILED;
 		for (auto it = m_Childs->begin(); it != m_Childs->end(); ++it)
 		{
 			ns = (*it)->Execute(pAgent);
-			if (ns == NS_FAILED)
+			if (ns == NS_SUCCESS)
 				break;
 		}
 

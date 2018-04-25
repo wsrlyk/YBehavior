@@ -1,11 +1,11 @@
-#ifndef _YBEHAVIOR_SEQUENCE_H_
-#define _YBEHAVIOR_SEQUENCE_H_
+#ifndef _YBEHAVIOR_SELECTOR_H_
+#define _YBEHAVIOR_SELECTOR_H_
 
 #include "YBehavior/behaviortree.h"
 
 namespace YBehavior
 {
-	class Sequence : public CompositeNode
+	class Selector : public CompositeNode
 	{
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);

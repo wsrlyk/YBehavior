@@ -55,7 +55,7 @@ namespace YBehavior.Editor.Core
 
             action.ClassName = classname;
             action.NoteFormat = noteformat;
-            action.Type = NodeType.NT_Action;
+            action.Type = NodeType.NT_External;
 
             foreach (XmlNode chi in xml.ChildNodes)
             {

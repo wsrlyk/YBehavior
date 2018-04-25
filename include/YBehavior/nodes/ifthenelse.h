@@ -1,6 +1,5 @@
 #ifndef _YBEHAVIOR_IFTHENELSE_H_
 #define _YBEHAVIOR_IFTHENELSE_H_
-#endif
 
 #include "YBehavior/behaviortree.h"
 
@@ -20,3 +19,5 @@ namespace YBehavior
 		BehaviorNode* m_Else;
 	};
 }
+
+#endif

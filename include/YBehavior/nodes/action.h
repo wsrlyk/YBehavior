@@ -1,6 +1,5 @@
 #ifndef _YBEHAVIOR_ACTION_H_
 #define _YBEHAVIOR_ACTION_H_
-#endif
 
 #include "YBehavior/behaviortree.h"
 
@@ -13,3 +12,5 @@ namespace YBehavior
 		~Action();
 	};
 }
+
+#endif

@@ -68,15 +68,8 @@ namespace YBehavior.Editor.Core
     {
         NT_Invalid,
         NT_Root,
-        NT_Sequence,
-        NT_Calculator,
-        NT_Comparer,
-        NT_Not,
-        NT_AlwaysSuccess,
-        NT_AlwaysFailed,
-        NT_Selector,
-        NT_Action,
-        NT_IfThenElse,
+        NT_Default,
+        NT_External
     }
 
     public enum NodeHierachy
@@ -411,6 +404,33 @@ namespace YBehavior.Editor.Core
         public void OnChildPosChanged()
         {
             Conns.Sort(SortByPosX);
+        }
+
+        public bool CheckValid()
+        {
+            if (m_Variables.SameTypeGroup == null)
+                return true;
+            bool bRes = true;
+            foreach (HashSet<string> group in m_Variables.SameTypeGroup)
+            {
+                Variable.ValueType valueType = Variable.ValueType.VT_NONE;
+                foreach (string vName in group)
+                {
+                    Variable v = m_Variables.GetVariable(vName);
+                    if (v == null)
+                        continue;
+
+                    if (valueType == Variable.ValueType.VT_NONE)
+                        valueType = v.vType;
+                    else if (valueType != v.vType)
+                    {
+                        LogMgr.Instance.Log("ValueType not match in Node: " + UITitle + "." + vName);
+                        bRes = false;
+                    }
+                }
+            }
+
+            return bRes;
         }
 
         public virtual Node Clone()

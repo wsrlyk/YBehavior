@@ -6,10 +6,8 @@
 
 namespace YBehavior
 {
-	class Calculator : public BehaviorNode
+	class Calculator : public LeafNode
 	{
-	public:
-		static std::unordered_set<INT> s_ValidTypes;
 	protected:
 		virtual void OnLoaded(const pugi::xml_node& data);
 		virtual NodeState Update(AgentPtr pAgent);

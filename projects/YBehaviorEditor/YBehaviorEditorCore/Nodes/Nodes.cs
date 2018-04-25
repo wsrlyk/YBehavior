@@ -37,7 +37,7 @@ namespace YBehavior.Editor.Core
         public SequenceNode()
         {
             m_Name = "Sequence";
-            m_Type = NodeType.NT_Sequence;
+            m_Type = NodeType.NT_Default;
             m_Hierachy = NodeHierachy.NH_Sequence;
         }
     }
@@ -46,7 +46,7 @@ namespace YBehavior.Editor.Core
         public SelectorNode()
         {
             m_Name = "Selector";
-            m_Type = NodeType.NT_Selector;
+            m_Type = NodeType.NT_Default;
             m_Hierachy = NodeHierachy.NH_Selector;
         }
     }
@@ -95,7 +95,7 @@ namespace YBehavior.Editor.Core
         public CalculatorNode()
         {
             m_Name = "Calculator";
-            m_Type = NodeType.NT_Calculator;
+            m_Type = NodeType.NT_Default;
             m_Hierachy = NodeHierachy.NH_DefaultAction;
 
         }
@@ -120,7 +120,7 @@ namespace YBehavior.Editor.Core
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const
             );
-            Variables.AddVariable(opl);
+            Variables.AddVariable(opl, 1);
 
             Variable opr1 = Variable.CreateVariableInNode(
                 "Opr1",
@@ -129,7 +129,7 @@ namespace YBehavior.Editor.Core
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const
             );
-            Variables.AddVariable(opr1);
+            Variables.AddVariable(opr1, 1);
 
             Variable opr2 = Variable.CreateVariableInNode(
                 "Opr2",
@@ -138,7 +138,7 @@ namespace YBehavior.Editor.Core
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const
             );
-            Variables.AddVariable(opr2);
+            Variables.AddVariable(opr2, 1);
         }
 
         public override string Note
@@ -163,7 +163,7 @@ namespace YBehavior.Editor.Core
         public ComparerNode()
         {
             m_Name = "Comparer";
-            m_Type = NodeType.NT_Comparer;
+            m_Type = NodeType.NT_Default;
             m_Hierachy = NodeHierachy.NH_DefaultAction;
 
         }
@@ -188,7 +188,7 @@ namespace YBehavior.Editor.Core
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const
             );
-            Variables.AddVariable(opl);
+            Variables.AddVariable(opl, 1);
 
             Variable opr = Variable.CreateVariableInNode(
                 "Opr",
@@ -197,7 +197,7 @@ namespace YBehavior.Editor.Core
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const
             );
-            Variables.AddVariable(opr);
+            Variables.AddVariable(opr, 1);
         }
 
         public override string Note
@@ -215,12 +215,57 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    class SetDataNode : LeafNode
+    {
+        public SetDataNode()
+        {
+            m_Name = "SetData";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_DefaultAction;
+
+        }
+
+        public override void CreateVariables()
+        {
+            Variable opl = Variable.CreateVariableInNode(
+                "Target",
+                "0",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer
+            );
+            Variables.AddVariable(opl, 1);
+
+            Variable opr = Variable.CreateVariableInNode(
+                "Source",
+                "0",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const
+            );
+            Variables.AddVariable(opr, 1);
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} <= {1}",
+                    Variables.GetVariable("Target").NoteValue,
+                    Variables.GetVariable("Source").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
     class NotNode : SingleChildNode
     {
         public NotNode()
         {
             m_Name = "Not";
-            m_Type = NodeType.NT_Not;
+            m_Type = NodeType.NT_Default;
             m_Hierachy = NodeHierachy.NH_Decorator;
         }
     }
@@ -230,7 +275,7 @@ namespace YBehavior.Editor.Core
         public AlwaysSuccessNode()
         {
             m_Name = "AlwaysSuccess";
-            m_Type = NodeType.NT_AlwaysSuccess;
+            m_Type = NodeType.NT_Default;
             m_Hierachy = NodeHierachy.NH_Decorator;
         }
     }
@@ -240,7 +285,17 @@ namespace YBehavior.Editor.Core
         public AlwaysFailedNode()
         {
             m_Name = "AlwaysFailed";
-            m_Type = NodeType.NT_AlwaysFailed;
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_Decorator;
+        }
+    }
+
+    class InvertorNode : SingleChildNode
+    {
+        public InvertorNode()
+        {
+            m_Name = "Invertor";
+            m_Type = NodeType.NT_Default;
             m_Hierachy = NodeHierachy.NH_Decorator;
         }
     }
@@ -250,14 +305,12 @@ namespace YBehavior.Editor.Core
         public IfThenElseNode()
         {
             m_Name = "IfThenElse";
-            m_Type = NodeType.NT_IfThenElse;
+            m_Type = NodeType.NT_Default;
             m_Hierachy = NodeHierachy.NH_Compositor;
 
             new ConnectionSingle(this, "if");
             new ConnectionSingle(this, "then");
             new ConnectionSingle(this, "else");
         }
-
-
     }
 }

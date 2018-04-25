@@ -126,7 +126,10 @@ namespace YBehavior
 				if (pVector && index < pVector->size())
 					(*const_cast<std::vector<T>*>(pVector))[index] = *src;
 			}
-			pData->Set<T>(m_Index, src);
+			else
+			{
+				pData->Set<T>(m_Index, src);
+			}
 		}
 
 		///> This function must be called BEFORE SetIndexFromString

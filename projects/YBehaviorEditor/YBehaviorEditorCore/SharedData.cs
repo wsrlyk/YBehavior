@@ -5,10 +5,33 @@ using System.Text;
 
 namespace YBehavior.Editor.Core
 {
+    public class SameTypeGroup : System.Collections.IEnumerable
+    {
+        Dictionary<int, HashSet<string>> m_Groups = new Dictionary<int, HashSet<string>>();
+
+        public void Add(string key, int group)
+        {
+            HashSet<string> groupSet;
+            if (!m_Groups.TryGetValue(group, out groupSet))
+            {
+                groupSet = new HashSet<string>();
+                m_Groups[group] = groupSet;
+            }
+
+            groupSet.Add(key);
+        }
+
+        public System.Collections.IEnumerator GetEnumerator()
+        {
+            return m_Groups.Values.GetEnumerator();
+        }
+    }
+
     public class SharedData
     {
         ObservableDictionary<string, Variable> m_Variables = new ObservableDictionary<string, Variable>();
         Node m_Owner;
+        public SameTypeGroup SameTypeGroup { get; set; } = null;
 
         public SharedData(Node owner)
         {
@@ -82,7 +105,7 @@ namespace YBehavior.Editor.Core
             return AddVariable(v);
         }
 
-        public bool AddVariable(Variable v)
+        public bool AddVariable(Variable v, int sameTypeGroup = 0)
         {
             if (v == null)
                 return false;
@@ -100,6 +123,13 @@ namespace YBehavior.Editor.Core
             m_Variables[v.Name] = v;
             v.Container = this;
             
+            if (sameTypeGroup != 0)
+            {
+                if (SameTypeGroup == null)
+                    SameTypeGroup = new SameTypeGroup();
+                SameTypeGroup.Add(v.Name, sameTypeGroup);
+            }
+
             if (m_Owner is Tree)
             {
                 SharedVariableChangedArg arg = new SharedVariableChangedArg();
@@ -108,6 +138,11 @@ namespace YBehavior.Editor.Core
             return true;
         }
 
+        /// <summary>
+        /// Only for the variables for the whole tree
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
         public bool RemoveVariable(Variable v)
         {
             if (v == null)

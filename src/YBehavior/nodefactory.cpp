@@ -5,6 +5,8 @@
 #include "YBehavior/nodes/comparer.h"
 #include "YBehavior/nodes/ifthenelse.h"
 #include "YBehavior/nodes/decorator.h"
+#include "YBehavior/nodes/selector.h"
+#include "YBehavior/nodes/setdata.h"
 namespace YBehavior
 {
 	void NodeFactory::SetActiveTree(const STRING& tree)
@@ -63,11 +65,14 @@ namespace YBehavior
 	{
 		NodeFactory* factory = new NodeFactory();
 		REGISTER_TYPE(factory, Sequence);
+		REGISTER_TYPE(factory, Selector);
 		REGISTER_TYPE(factory, Calculator);
 		REGISTER_TYPE(factory, Comparer);
 		REGISTER_TYPE(factory, IfThenElse);
 		REGISTER_TYPE(factory, AlwaysSuccess);
 		REGISTER_TYPE(factory, AlwaysFailed);
+		REGISTER_TYPE(factory, Invertor);
+		REGISTER_TYPE(factory, SetData);
 
 		return factory;
 	}

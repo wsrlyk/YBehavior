@@ -1,6 +1,5 @@
 #ifndef _YBEHAVIOR_DECORATOR_H_
 #define _YBEHAVIOR_DECORATOR_H_
-#endif
 
 #include "YBehavior/behaviortree.h"
 
@@ -16,4 +15,11 @@ namespace YBehavior
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 	};
+	class YBEHAVIOR_API Invertor : public SingleChildNode
+	{
+	protected:
+		NodeState Update(AgentPtr pAgent) override;
+	};
 }
+
+#endif

@@ -269,11 +269,13 @@ namespace YBehavior.Editor.Core
         private bool _CheckError(Node node)
         {
             bool bRes = true;
+            if (!node.CheckValid())
+                bRes = false;
             foreach (Variable v in node.Variables.Datas.Values)
             {
                 if (!v.CheckValid())
                 {
-                    LogMgr.Instance.Error("CheckError in Node: " + node.FullName + ", uid: " + node.UID + ", Variable: " + v.Name);
+                    LogMgr.Instance.Error("CheckError in Node: " + node.UITitle + ", Variable: " + v.Name);
                     bRes = false;
                 }
             }
