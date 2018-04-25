@@ -13,6 +13,12 @@
             <Button Name="btnRefresh" Click="btnRefresh_Click">Refresh</Button>
         </StackPanel>
         <TreeView Name="Files" MouseDoubleClick="OnFilesItemDoubleClick">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="{Binding Expanded, Mode=TwoWay}"/>
+                </Style>
+            </TreeView.ItemContainerStyle>
+            
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">

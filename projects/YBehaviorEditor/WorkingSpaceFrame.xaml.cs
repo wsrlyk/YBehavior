@@ -25,33 +25,50 @@ namespace YBehavior.Editor
 
         public class FileInfo
         {
-            private ObservableCollection<FileInfo> m_children = new ObservableCollection<FileInfo>();
-            public ObservableCollection<FileInfo> Children { get { return m_children; } }
+            private DelayableNotificationCollection<FileInfo> m_children = new DelayableNotificationCollection<FileInfo>();
+            public DelayableNotificationCollection<FileInfo> Children { get { return m_children; } }
             public string Name { get; set; }
             public string Icon { get; set; }
             TreeFileMgr.TreeFileInfo source;
             public TreeFileMgr.TreeFileInfo Source { get { return source; } }
-
-            public void Build(TreeFileMgr.TreeFileInfo data)
+            private bool exp = false;
+            public bool Expanded
             {
-                Children.Clear();
-
-                if (data == null)
-                    return;
-
-                source = data;
-                Name = data.Name;
-                Icon = !data.bIsFolder ? "Resources/ICON__0000_46.png"
-                                        : "Resources/ICON__0009_37.png";
-
-                if (data.Children == null)
-                    return;
-
-                foreach(TreeFileMgr.TreeFileInfo child in data.Children)
+                get { return exp; }
+                set
                 {
-                    FileInfo info = new FileInfo();
-                    this.Children.Add(info);
-                    info.Build(child);
+                    exp = value;
+                }
+            }
+
+            public void Build(TreeFileMgr.TreeFileInfo data, HashSet<string> expandedItems = null)
+            {
+                using (var handler = Children.Delay())
+                {
+                    Children.Clear();
+
+                    if (data == null)
+                        return;
+
+                    source = data;
+                    Name = data.Name;
+                    Icon = !data.bIsFolder ? "Resources/ICON__0000_46.png"
+                                            : "Resources/ICON__0009_37.png";
+
+                    if (Name == null)
+                        Expanded = true;
+                    else
+                        Expanded = expandedItems != null ? expandedItems.Contains(Name) : false;
+
+                    if (data.Children == null)
+                        return;
+
+                    foreach (TreeFileMgr.TreeFileInfo child in data.Children)
+                    {
+                        FileInfo info = new FileInfo();
+                        this.Children.Add(info);
+                        info.Build(child, expandedItems);
+                    }
                 }
             }
         }
@@ -60,12 +77,35 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             _RefreshWorkingSpace();
+
+            this.Files.ItemsSource = m_FileInfos.Children;
         }
 
+        void _GetExpandedItems(ItemsControl items, HashSet<string> expandedItems)
+        {
+            foreach (object obj in items.Items)
+            {
+                ItemsControl childControl = items.ItemContainerGenerator.ContainerFromItem(obj) as ItemsControl;
+                if (childControl != null)
+                {
+                    _GetExpandedItems(childControl, expandedItems);
+                }
+                if (childControl is TreeViewItem item && item.IsExpanded)
+                {
+                    if (item.DataContext is FileInfo info)
+                        expandedItems.Add(info.Name);
+                }
+            }
+        }
+
+        HashSet<string> m_ExpandedItems = new HashSet<string>();
         private void _RefreshWorkingSpace()
         {
-            m_FileInfos.Build(TreeFileMgr.Instance.GetAllTrees());
-            this.Files.ItemsSource = m_FileInfos.Children;
+            m_ExpandedItems.Clear();
+            _GetExpandedItems(this.Files, m_ExpandedItems);
+
+            m_FileInfos.Build(TreeFileMgr.Instance.GetAllTrees(), m_ExpandedItems);
+//            this.Files.ItemsSource = m_FileInfos.Children;
         }
 
         private void OnFilesItemDoubleClick(object sender, MouseButtonEventArgs e)
