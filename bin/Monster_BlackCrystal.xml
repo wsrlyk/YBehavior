@@ -4,14 +4,18 @@
     <Node Class="Sequence" Pos="221,151" NickName="Hehequence12345678">
       <Node Class="IfThenElse" Pos="83,238">
         <Node Class="Comparer" Connection="if" Pos="51,464" Operator="_EC &lt;" Opl="_IS add0" Opr="_IC 0" />
-        <Node Class="Calculator" Connection="then" Pos="114,621" Operator="_EC ADD" Opl="_IS add1" Opr1="_IC 0" Opr2="_IC 1" BreakPoint="1"/>
+        <Node Class="Calculator" Connection="then" Pos="114,621" BreakPoint="1" Operator="_EC ADD" Opl="_IS add1" Opr1="_IC 0" Opr2="_IC 1" />
         <Node Class="IfThenElse" Connection="else" Pos="351,406">
           <Node Class="Comparer" Connection="if" Pos="289,573" Operator="_EC &gt;" Opl="_IS add0" Opr="_IC 10" />
-          <Node Class="Calculator" Connection="then" Pos="347,673" Operator="_EC SUB" Opl="_IS add1" Opr1="_IC 0" Opr2="_IC 1" BreakPoint="1"/>
+          <Node Class="Calculator" Connection="then" Pos="347,673" BreakPoint="1" Operator="_EC SUB" Opl="_IS add1" Opr1="_IC 0" Opr2="_IC 1" />
           <Node Class="AlwaysSuccess" Connection="else" Pos="580,677" />
         </Node>
       </Node>
       <Node Class="Calculator" Pos="510,377" Operator="_EC ADD" Opl="_IS add0" Opr1="_IS add0" Opr2="_IS add1" />
     </Node>
   </Node>
+  <Comments>
+    <Comment Title="Hehe" Content="abc&#xD;defghijk&#xD;lmn" Rect="10,10,80,80" />
+    <Comment Title="fdsgdfa" Content="afdasfdasfdasbc&#xD;defghijk&#xD;&#xA;&#xD;&#xA;&#xD;fdasfadsfdaslmn" Rect="100,100,280,380" />
+  </Comments>
 </Monster_BlackCrystal>

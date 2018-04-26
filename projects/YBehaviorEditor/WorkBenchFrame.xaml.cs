@@ -126,7 +126,10 @@ namespace YBehavior.Editor
             _CreateActiveWorkBench();
 
             WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
-            this.commentLayer.ItemsSource = oArg.Bench.Comments;
+            if (oArg.Bench != null)
+                this.commentLayer.ItemsSource = oArg.Bench.Comments;
+            else
+                this.commentLayer.ItemsSource = null;
         }
 
         private void _OnTickResult(EventArg arg)

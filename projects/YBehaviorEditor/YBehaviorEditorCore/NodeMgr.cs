@@ -141,7 +141,7 @@ namespace YBehavior.Editor.Core
     public class Geometry
     {
         Rect m_Rect;
-        public Rect Rec { get { return m_Rect; } }
+        public Rect Rec { get { return m_Rect; } set { m_Rect = value; } }
         public Thickness Thick { get { return new Thickness(m_Rect.Left, m_Rect.Top, m_Rect.Right, m_Rect.Bottom); } }
 
         public Geometry()

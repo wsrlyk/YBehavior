@@ -35,10 +35,6 @@ namespace YBehavior.Editor.Core
         public WorkBench()
         {
             m_UID = ++g_ID_inc;
-
-            //test
-            Comments.Add(new Comment() { Name = "123", Data = "456" });
-            Comments.Add(new Comment() { Name = "756", Data = "kuhjk" });
         }
 
         public void OnNodesConnected(EventArg arg)
@@ -157,6 +153,10 @@ namespace YBehavior.Editor.Core
                         AddSubTree(node);
                     }
                 }
+                else if (chi.Name == "Comments")
+                {
+                    _LoadComments(chi);
+                }
             }
             return true;
         }
@@ -170,6 +170,29 @@ namespace YBehavior.Editor.Core
             return bRes;
         }
 
+        private bool _LoadComments(XmlNode root)
+        {
+            Comments.Clear();
+            foreach (XmlNode chi in root.ChildNodes)
+            {
+                if (chi.Name == "Comment")
+                {
+                    Comment comment = new Comment();
+                    var attr = chi.Attributes.GetNamedItem("Title");
+                    if (attr != null)
+                        comment.Name = attr.Value;
+                    attr = chi.Attributes.GetNamedItem("Content");
+                    if (attr != null)
+                        comment.Data = attr.Value;
+                    attr = chi.Attributes.GetNamedItem("Rect");
+                    if (attr != null)
+                        comment.Geo.Rec = System.Windows.Rect.Parse(attr.Value);
+
+                    Comments.Add(comment);
+                }
+            }
+            return true;
+        }
         private bool _LoadOneNode(Node node, XmlNode data)
         {
             if (node == null)
@@ -214,6 +237,7 @@ namespace YBehavior.Editor.Core
                 _SaveNode(tree, data, xmlDoc);
             }
 
+            _SaveComments(data, xmlDoc);
             RefreshNodeUID();
         }
 
@@ -228,6 +252,24 @@ namespace YBehavior.Editor.Core
             foreach (Node chi in node.Conns)
             {
                 _SaveNode(chi, nodeEl, xmlDoc);
+            }
+        }
+
+        void _SaveComments(XmlElement parent, XmlDocument xmlDoc)
+        {
+            if (Comments.Count > 0)
+            {
+                XmlElement root = xmlDoc.CreateElement("Comments");
+                parent.AppendChild(root);
+
+                foreach (Comment comment in Comments)
+                {
+                    XmlElement comEl = xmlDoc.CreateElement("Comment");
+                    comEl.SetAttribute("Title", comment.Name);
+                    comEl.SetAttribute("Content", comment.Data);
+                    comEl.SetAttribute("Rect", comment.Geo.Rec.ToString());
+                    root.AppendChild(comEl);
+                }
             }
         }
 
