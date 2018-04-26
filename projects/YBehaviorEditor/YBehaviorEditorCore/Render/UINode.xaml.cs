@@ -18,7 +18,7 @@ namespace YBehavior.Editor.Core
     /// <summary>
     /// BehaviorNode.xaml 的交互逻辑
     /// </summary>
-    public partial class UINode : UserControl, ISelectable, IDeletable, IDuplicatable, IBreakPointable
+    public partial class UINode : UserControl, ISelectable, IDeletable, IDuplicatable, IDebugPointable
     {
         static SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
@@ -213,10 +213,18 @@ namespace YBehavior.Editor.Core
 
         public void ToggleBreakPoint()
         {
-            if (Node.BreakPointInfo.HitCount > 0)
-                Node.SetBreakPoint(0);
+            if (Node.DebugPointInfo.HitCount > 0)
+                Node.SetDebugPoint(0);
             else
-                Node.SetBreakPoint(1);
+                Node.SetDebugPoint(1);
+        }
+
+        public void ToggleLogPoint()
+        {
+            if (Node.DebugPointInfo.HitCount < 0)
+                Node.SetDebugPoint(0);
+            else
+                Node.SetDebugPoint(-1);
         }
     }
 }

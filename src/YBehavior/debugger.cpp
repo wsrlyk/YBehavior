@@ -69,21 +69,31 @@ namespace YBehavior
 
 	bool DebugMgr::TryHitBreakPoint(UINT nodeUID)
 	{
-		auto it = m_BreakPointInfos.find(nodeUID);
-		return it != m_BreakPointInfos.end();
+		auto it = m_DebugPointInfos.find(nodeUID);
+		if (it == m_DebugPointInfos.end())
+			return false;
+		return it->second.HasBreakPoint();
 	}
 
 	void DebugMgr::AddBreakPoint(UINT nodeUID)
 	{
-		BreakPointInfo info;
+		DebugPointInfo info;
 		info.nodeUID = nodeUID;
-
-		m_BreakPointInfos[nodeUID] = info;
+		info.count = 1;
+		m_DebugPointInfos[nodeUID] = info;
 	}
 
-	void DebugMgr::RemoveBreakPoint(UINT nodeUID)
+	void DebugMgr::AddLogPoint(UINT nodeUID)
 	{
-		m_BreakPointInfos.erase(nodeUID);
+		DebugPointInfo info;
+		info.nodeUID = nodeUID;
+		info.count = -1;
+		m_DebugPointInfos[nodeUID] = info;
+	}
+
+	void DebugMgr::RemoveDebugPoint(UINT nodeUID)
+	{
+		m_DebugPointInfos.erase(nodeUID);
 	}
 
 	NodeRunInfo* DebugMgr::CreateAndAppendRunInfo()

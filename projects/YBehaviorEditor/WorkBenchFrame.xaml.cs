@@ -294,6 +294,9 @@ namespace YBehavior.Editor
                 case Key.F9:
                     Core.SelectionMgr.Instance.TryToggleBreakPoint();
                     break;
+                case Key.F8:
+                    Core.SelectionMgr.Instance.TryToggleLogPoint();
+                    break;
             }
         }
 

@@ -5,11 +5,13 @@ using System.Text;
 
 namespace YBehavior.Editor.Core
 {
-    public class BreakPointInfo
+    public class DebugPointInfo
     {
         public int HitCount { get; set; }
 
         public bool HasBreakPoint { get { return HitCount > 0; } }
+        public bool HasLogPoint { get { return HitCount < 0; } }
+        public bool NoDebugPoint { get { return HitCount == 0; } }
     }
 
     public enum NodeState
@@ -98,9 +100,9 @@ namespace YBehavior.Editor.Core
             NetworkMgr.Instance.MessageProcessor.DoContinue();
         }
 
-        public void SetBreakPoint(uint uid, int count)
+        public void SetDebugPoint(uint uid, int count)
         {
-            NetworkMgr.Instance.MessageProcessor.SetBreakPoint(uid, count);
+            NetworkMgr.Instance.MessageProcessor.SetDebugPoint(uid, count);
         }
     }
 }

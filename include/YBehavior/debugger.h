@@ -24,11 +24,15 @@ namespace YBehavior
 		STRING value;
 	};
 
-	struct BreakPointInfo
+	struct DebugPointInfo
 	{
 		UINT nodeUID;
-		// TODO
-		// counter, etc.
+		
+		INT count = 0;
+
+		inline bool HasBreakPoint() { return count > 0; }
+		inline bool HasLogPoint() { return count < 0; }
+		inline bool NoDebugPoint() { return count == 0; }
 	};
 	class DebugMgr: public Singleton<DebugMgr>
 	{
@@ -37,7 +41,7 @@ namespace YBehavior
 		bool m_bTargetDirty = false;
 
 		std::list<NodeRunInfo*> m_RunInfos;
-		std::unordered_map<UINT, BreakPointInfo> m_BreakPointInfos;
+		std::unordered_map<UINT, DebugPointInfo> m_DebugPointInfos;
 
 		STRING m_SendBuffer;
 
@@ -50,10 +54,10 @@ namespace YBehavior
 		inline UINT GetTargetAgent() { return m_TargetAgent; }
 		inline const std::list<NodeRunInfo*>& GetRunInfos() { return m_RunInfos; }
 		bool TryHitBreakPoint(UINT nodeUID);
-		void ClearBreakPoints() { m_BreakPointInfos.clear(); }
+		void ClearDebugPoints() { m_DebugPointInfos.clear(); }
 		void AddBreakPoint(UINT nodeUID);
-
-		void RemoveBreakPoint(UINT nodeUID);
+		void AddLogPoint(UINT nodeUID);
+		void RemoveDebugPoint(UINT nodeUID);
 		NodeRunInfo* CreateAndAppendRunInfo();
 		void Clear();
 

@@ -51,9 +51,9 @@ namespace YBehavior.Editor.Core
             Action< Node, StringBuilder> appendOneNode = null;
             appendOneNode = delegate (Node node, StringBuilder stringBuilder) 
             {
-                if (node.BreakPointInfo.HasBreakPoint)
+                if (!node.DebugPointInfo.NoDebugPoint)
                 {
-                    stringBuilder.Append(" ").Append(node.UID);
+                    stringBuilder.Append(" ").Append(node.UID).Append(" ").Append(node.DebugPointInfo.HitCount);
                 }
 
                 foreach (Node chi in node.Conns)
@@ -72,9 +72,9 @@ namespace YBehavior.Editor.Core
             NetworkMgr.Instance.SendText("[Continue]");
         }
 
-        public void SetBreakPoint(uint uid, int count)
+        public void SetDebugPoint(uint uid, int count)
         {
-            NetworkMgr.Instance.SendText("[BreakPoint] " + uid.ToString() + " " + count.ToString());
+            NetworkMgr.Instance.SendText("[DebugPoint] " + uid.ToString() + " " + count.ToString());
         }
 
         public void Update()

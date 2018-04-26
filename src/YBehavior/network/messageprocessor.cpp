@@ -9,11 +9,15 @@ namespace YBehavior
 	{
 		DebugMgr::Instance()->SetTarget(datas[1], Utility::ToType<UINT>(datas[2]));
 
-		DebugMgr::Instance()->ClearBreakPoints();
-		for (int i = 3; i < datas.size(); ++i)
+		DebugMgr::Instance()->ClearDebugPoints();
+		for (int i = 3; i + 1 < datas.size(); ++i)
 		{
 			UINT uid = Utility::ToType<UINT>(datas[i]);
-			DebugMgr::Instance()->AddBreakPoint(uid);
+			INT count = Utility::ToType<INT>(datas[++i]);
+			if (count > 0)
+				DebugMgr::Instance()->AddBreakPoint(uid);
+			else
+				DebugMgr::Instance()->AddLogPoint(uid);
 		}
 	}
 
@@ -22,15 +26,17 @@ namespace YBehavior
 		DebugMgr::Instance()->TogglePause(false);
 	}
 
-	void ProcessBreakPoint(const std::vector<STRING>& datas)
+	void ProcessDebugPoint(const std::vector<STRING>& datas)
 	{
 		UINT uid = Utility::ToType<UINT>(datas[1]);
 		INT count = Utility::ToType<INT>(datas[2]);
 
 		if (count > 0)
 			DebugMgr::Instance()->AddBreakPoint(uid);
+		else if (count < 0)
+			DebugMgr::Instance()->AddLogPoint(uid);
 		else
-			DebugMgr::Instance()->RemoveBreakPoint(uid);
+			DebugMgr::Instance()->RemoveDebugPoint(uid);
 	}
 
 	void MessageProcessor::ProcessOne(const STRING& s)
@@ -46,9 +52,9 @@ namespace YBehavior
 		{
 			Continue();
 		}
-		else if (datas[0] == "[BreakPoint]")
+		else if (datas[0] == "[DebugPoint]")
 		{
-			ProcessBreakPoint(datas);
+			ProcessDebugPoint(datas);
 		}
 	}
 

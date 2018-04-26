@@ -228,7 +228,7 @@ namespace YBehavior.Editor.Core
         public NodeHierachy Hierachy { get { return m_Hierachy; } set { m_Hierachy = value; } }
 
         public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class", "Connection" });
-        public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName", "Connection", "BreakPoint" });
+        public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName", "Connection", "DebugPoint" });
 
         public Renderer Renderer { get { return m_Renderer; } }
         protected Renderer m_Renderer;
@@ -247,7 +247,7 @@ namespace YBehavior.Editor.Core
         private Geometry m_Geo = new Geometry();
         public Geometry Geo { get { return m_Geo; } }
 
-        public BreakPointInfo BreakPointInfo { get; } = new BreakPointInfo();
+        public DebugPointInfo DebugPointInfo { get; } = new DebugPointInfo();
 
         protected SharedData m_Variables;
         public SharedData Variables { get { return m_Variables; } }
@@ -297,8 +297,8 @@ namespace YBehavior.Editor.Core
                 case "NickName":
                     m_NickName = attr.Value;
                     break;
-                case "BreakPoint":
-                    BreakPointInfo.HitCount = 1;
+                case "DebugPoint":
+                    DebugPointInfo.HitCount = int.Parse(attr.Value);
                     break;
                 default:
                     return LoadOtherAttr(attr);
@@ -373,8 +373,8 @@ namespace YBehavior.Editor.Core
             if (!string.IsNullOrEmpty(m_NickName))
                 data.SetAttribute("NickName", m_NickName);
 
-            if (BreakPointInfo.HasBreakPoint)
-                data.SetAttribute("BreakPoint", BreakPointInfo.HitCount.ToString());
+            if (!DebugPointInfo.NoDebugPoint)
+                data.SetAttribute("DebugPoint", DebugPointInfo.HitCount.ToString());
 
             foreach (Variable v in Variables.Datas.Values)
             {
@@ -467,11 +467,11 @@ namespace YBehavior.Editor.Core
             return other;
         }
 
-        public void SetBreakPoint(int count)
+        public void SetDebugPoint(int count)
         {
-            BreakPointInfo.HitCount = count;
-            OnPropertyChanged("BreakPointInfo");
-            DebugMgr.Instance.SetBreakPoint(UID, count);
+            DebugPointInfo.HitCount = count;
+            OnPropertyChanged("DebugPointInfo");
+            DebugMgr.Instance.SetDebugPoint(UID, count);
         }
 
         public static int SortByPosX(NodeBase aa, NodeBase bb)
