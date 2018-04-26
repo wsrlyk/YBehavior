@@ -138,6 +138,65 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    public class Geometry
+    {
+        Rect m_Rect;
+        public Rect Rec { get { return m_Rect; } }
+        public Thickness Thick { get { return new Thickness(m_Rect.Left, m_Rect.Top, m_Rect.Right, m_Rect.Bottom); } }
+
+        public Geometry()
+        {
+            m_Rect = new Rect(0, 0, 80, 60);
+        }
+
+        public Point CenterPoint
+        {
+            get
+            {
+                return new Point((m_Rect.Left + m_Rect.Right) / 2, (m_Rect.Top + m_Rect.Bottom) / 2);
+            }
+        }
+        public Point TopPoint
+        {
+            get
+            {
+                return new Point((m_Rect.Left + m_Rect.Right) / 2, m_Rect.Top);
+            }
+        }
+        public Point BottomPoint
+        {
+            get
+            {
+                return new Point((m_Rect.Left + m_Rect.Right) / 2, m_Rect.Bottom);
+            }
+        }
+
+        public Point Pos
+        {
+            get { return m_Rect.Location; }
+            set { m_Rect.Location = value; }
+        }
+
+        public Point BottomRightPos
+        {
+            get { return m_Rect.BottomRight; }
+            set
+            {
+                Point p = value;
+                if (p.X < m_Rect.X)
+                    p.X = m_Rect.X;
+                if (p.Y < m_Rect.Y)
+                    p.Y = m_Rect.Y;
+                m_Rect.Width = p.X - m_Rect.X;
+                m_Rect.Height = p.Y - m_Rect.Y;
+            }
+        }
+        public void Copy(Geometry other)
+        {
+            m_Rect = other.m_Rect;
+        }
+    }
+
     public class Node : NodeBase, System.ComponentModel.INotifyPropertyChanged
     {
         protected string m_Name;
@@ -208,50 +267,6 @@ namespace YBehavior.Editor.Core
                     return globalTree.Variables;
             }
             return m_TreeSharedData;
-        }
-
-        public class Geometry
-        {
-            Rect m_Rect;
-            public Rect Rec { get { return m_Rect; } }
-            public Thickness Thick { get { return new Thickness(m_Rect.Left, m_Rect.Top, m_Rect.Right, m_Rect.Bottom); } }
-
-            public Geometry()
-            {
-                m_Rect = new Rect(0, 0, 80, 60);
-            }
-
-            public Point CenterPoint
-            {
-                get
-                {
-                    return new Point((m_Rect.Left + m_Rect.Right) / 2, (m_Rect.Top + m_Rect.Bottom) / 2);
-                }
-            }
-            public Point TopPoint
-            {
-                get
-                {
-                    return new Point((m_Rect.Left + m_Rect.Right) / 2, m_Rect.Top);
-                }
-            }
-            public Point BottomPoint
-            {
-                get
-                {
-                    return new Point((m_Rect.Left + m_Rect.Right) / 2, m_Rect.Bottom);
-                }
-            }
-            public Point Pos
-            {
-                get { return m_Rect.Location; }
-                set { m_Rect.Location = value; }
-            }
-
-            public void Copy(Geometry other)
-            {
-                m_Rect = other.m_Rect;
-            }
         }
 
         public Node()

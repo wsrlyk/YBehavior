@@ -20,7 +20,7 @@ namespace YBehavior.Editor.Core
     /// </summary>
     public partial class UINode : UserControl, ISelectable, IDeletable, IDuplicatable, IBreakPointable
     {
-        static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
+        static SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
         Brush normalBorderBrush;
         public SelectionStateChangeHandler SelectHandler { get; set; }
@@ -36,7 +36,7 @@ namespace YBehavior.Editor.Core
             InitializeComponent();
             normalBorderBrush = this.border.BorderBrush;
 
-            SelectHandler = new SelectionStateChangeHandler(defaultSelectHandler);
+            SelectHandler = defaultSelectHandler;
 
             m_Operation = new Operation(this.border);
             m_Operation.RegisterClick(_OnClick);

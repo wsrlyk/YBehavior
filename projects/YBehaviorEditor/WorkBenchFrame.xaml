@@ -24,8 +24,27 @@
         </Grid>-->
         <TabControl Name="TabController" Grid.Row="0" Tag="200" SelectionChanged="TabController_SelectionChanged"></TabControl>
         <Grid Grid.Row="1" Background="Gray" Name="CanvasBoard" ClipToBounds ="True">
-            <Canvas Focusable="True" Name="Canvas">
-            </Canvas>
+            <Grid Focusable="True" Name="canvas">
+                <ItemsControl Focusable="True" Name="commentLayer">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <local:UIComment/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="Canvas.Left" Value="{Binding Geo.Pos.X}" />
+                            <Setter Property="Canvas.Top" Value="{Binding Geo.Pos.Y}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                </ItemsControl>
+                <Canvas Focusable="True" Name="nodeLayer"/>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

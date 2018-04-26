@@ -9,14 +9,14 @@ namespace YBehavior.Editor.Core
 {
     public class DraggingConnection : Singleton<DraggingConnection>
     {
-        Canvas m_Canvas;
-        public Canvas Canvas { get { return m_Canvas; } }
+        Panel m_Canvas;
+        public Panel Canvas { get { return m_Canvas; } }
 
         UIConnection m_Connection;
 
         bool m_bDragging = false;
 
-        public void SetCanvas(Canvas canvas)
+        public void SetCanvas(Panel canvas)
         {
             m_Canvas = canvas;
         }

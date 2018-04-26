@@ -51,7 +51,7 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             Focus();
 
-            DraggingConnection.Instance.SetCanvas(this.Canvas);
+            DraggingConnection.Instance.SetCanvas(this.canvas);
 
             m_Operation = new Operation(this.CanvasBoard);
             m_Operation.RegisterDrag(_OnDrag);
@@ -122,6 +122,9 @@ namespace YBehavior.Editor
         {
             ClearCanvas();
             _CreateActiveWorkBench();
+
+            WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
+            this.commentLayer.ItemsSource = oArg.Bench.Comments;
         }
 
         private void _OnTickResult(EventArg arg)
@@ -130,7 +133,7 @@ namespace YBehavior.Editor
             {
                 TickResultArg oArg = arg as TickResultArg;
 
-                this.Canvas.Dispatcher.BeginInvoke(new Action<bool, uint>(_RefreshMainTreeDebug), oArg.bInstant, oArg.Token);
+                this.nodeLayer.Dispatcher.BeginInvoke(new Action<bool, uint>(_RefreshMainTreeDebug), oArg.bInstant, oArg.Token);
             }
         }
 
@@ -234,7 +237,7 @@ namespace YBehavior.Editor
 
         void _CreateNode(Node node)
         {
-            node.Renderer.AddedToPanel(this.Canvas);
+            node.Renderer.AddedToPanel(this.nodeLayer);
             //node.Renderer.CreateConnections();
         }
 
@@ -278,7 +281,7 @@ namespace YBehavior.Editor
 
         public void ClearCanvas()
         {
-            this.Canvas.Children.Clear();
+            this.nodeLayer.Children.Clear();
         }
         private void TabController_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -292,7 +295,7 @@ namespace YBehavior.Editor
                         if (WorkBenchMgr.Instance.Switch(tab.Content as WorkBench))
                         {
                             m_CurPageData = m_PageDataDic[tab];
-                            this.Canvas.RenderTransform = m_CurPageData.TransGroup;
+                            this.canvas.RenderTransform = m_CurPageData.TransGroup;
                             return;
                         }
                     }
@@ -307,8 +310,8 @@ namespace YBehavior.Editor
             Point pos = e.GetPosition(this.CanvasBoard);
             Point oldPos = new Point(m_CurPageData.TranslateTransform.X, m_CurPageData.TranslateTransform.Y);
 
-            double width = this.Canvas.ActualWidth;
-            double height = this.Canvas.ActualHeight;
+            double width = this.canvas.ActualWidth;
+            double height = this.canvas.ActualHeight;
 
             double oldWidth = width * m_CurPageData.ScaleTransform.ScaleX;
             double oldHeight = height * m_CurPageData.ScaleTransform.ScaleY;

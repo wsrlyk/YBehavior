@@ -72,6 +72,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="UIComment.xaml.cs">
+      <DependentUpon>UIComment.xaml</DependentUpon>
+    </Compile>
     <Compile Include="VariablesFrame.xaml.cs">
       <DependentUpon>VariablesFrame.xaml</DependentUpon>
     </Compile>
@@ -110,6 +113,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="NodeListFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIComment.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

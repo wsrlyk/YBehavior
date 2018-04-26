@@ -13,6 +13,8 @@ namespace YBehavior.Editor.Core
         Tree m_Tree;
         public Tree MainTree { get { return m_Tree; } }
 
+        public DelayableNotificationCollection<Comment> Comments { get; } = new DelayableNotificationCollection<Comment>();
+
         public string FilePath { get; set; }
 
         private TreeFileMgr.TreeFileInfo m_UntitledFileInfo = null;
@@ -33,6 +35,10 @@ namespace YBehavior.Editor.Core
         public WorkBench()
         {
             m_UID = ++g_ID_inc;
+
+            //test
+            Comments.Add(new Comment() { Name = "123", Data = "456" });
+            Comments.Add(new Comment() { Name = "756", Data = "kuhjk" });
         }
 
         public void OnNodesConnected(EventArg arg)
