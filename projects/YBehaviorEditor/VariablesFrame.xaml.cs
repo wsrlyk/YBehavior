@@ -39,20 +39,36 @@ namespace YBehavior.Editor
         private void _OnSelectionChanged(EventArg arg)
         {
             SelectionChangedArg oArg = arg as SelectionChangedArg;
-            if (oArg.Target == null)
-                return;
+            //if (oArg.Target == null)
+            //    return;
 
             UINode node = oArg.Target as UINode;
             if (node == null)
             {
                 // Clear
                 this.VariableContainer.ItemsSource = null;
+                this.VariableTab.DataContext = null;
             }
             else
             {
-                this.DataContext = node.Node;
-                this.VariableContainer.ItemsSource = null;
+                this.VariableTab.DataContext = node.Node;
                 this.VariableContainer.ItemsSource = node.Node.Variables.Datas.Values;
+
+                this.VariableTab.IsSelected = true;
+            }
+
+            UIComment comment = oArg.Target as UIComment;
+            if (comment == null)
+            {
+                // Clear
+                this.CommentTab.DataContext = null;
+            }
+            else
+            {
+                this.CommentTab.DataContext = comment.DataContext;
+
+                this.CommentTab.IsSelected = true;
+
             }
         }
 

@@ -12,7 +12,6 @@
             <StackPanel Name="mainPanel">
                 <TextBlock Name="name" Text="{Binding UITitle}"/>
                 <TextBlock Name="content" Text="{Binding Data}"/>
-                <TextBlock Text="fds"/>
             </StackPanel>
             <Rectangle Name="move" HorizontalAlignment="Left" Width="15" Height="15" VerticalAlignment="Top">
                 <Rectangle.Fill>

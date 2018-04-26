@@ -7,16 +7,35 @@ namespace YBehavior.Editor.Core
 {
     public class Comment: System.ComponentModel.INotifyPropertyChanged
     {
-        public string Name { get; set; }
-        public string Data { get; set; }
+        string m_Name;
+        public string Name
+        {
+            get { return m_Name; }
+            set
+            {
+                m_Name = value;
+                OnPropertyChanged("Name");
+                OnPropertyChanged("UITitle");
+            }
+        }
+        string m_Data;
+        public string Data
+        {
+            get { return m_Data; }
+            set
+            {
+                m_Data = value;
+                OnPropertyChanged("Data");
+            }
+        }
         public string UITitle { get { return Name; } }
         public Geometry Geo { get; } = new Geometry();
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
-        public void SendProperty(string name)
+        public void OnGeometryChanged()
         {
-            OnPropertyChanged(name);
+            OnPropertyChanged("Geo");
         }
         internal protected void OnPropertyChanged(string propertyName)
         {

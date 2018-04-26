@@ -45,6 +45,17 @@ namespace YBehavior.Editor.Core
                 m_ActiveWorkBench.RemoveNode(arg);
         }
 
+        public void RemoveComment(Comment comment)
+        {
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.RemoveComment(comment);
+        }
+        public void CreateComment()
+        {
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.CreateComment();
+        }
+
         public void Remove(WorkBench target)
         {
             m_OpenedWorkBenchs.Remove(target);

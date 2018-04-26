@@ -24,6 +24,7 @@ namespace YBehavior.Editor.Core
         NetworkConnectionChanged,
         DebugTargetChanged,
         TickResult,
+        CommentCreated,
     }
 
     public class EventMgr : Singleton<EventMgr>
@@ -167,4 +168,9 @@ namespace YBehavior.Editor.Core
         public override EventType Type => EventType.TickResult;
     }
 
+    public class CommentCreatedArg : EventArg
+    {
+        public Comment Comment { get; set; }
+        public override EventType Type => EventType.CommentCreated;
+    }
 }

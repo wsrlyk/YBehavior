@@ -49,12 +49,14 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.TickResult, _OnTickResult);
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Register(EventType.CommentCreated, _OnCommentCreated);
             Focus();
 
             DraggingConnection.Instance.SetCanvas(this.canvas);
 
             m_Operation = new Operation(this.CanvasBoard);
             m_Operation.RegisterDrag(_OnDrag);
+            m_Operation.RegisterClick(_OnClick);
         }
 
         private void _OnWorkBenchLoaded(EventArg arg)
@@ -220,6 +222,19 @@ namespace YBehavior.Editor
             //this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<Node>(_ThreadRefreshConnection), oArg.Node);
         }
 
+        private void _OnCommentCreated(EventArg arg)
+        {
+            CommentCreatedArg oArg = arg as CommentCreatedArg;
+            if (oArg.Comment == null)
+                return;
+
+            ///> move the comment to the topleft of the canvas
+            oArg.Comment.Geo.Pos = new Point(
+                -m_CurPageData.TranslateTransform.X / m_CurPageData.ScaleTransform.ScaleX,
+                -m_CurPageData.TranslateTransform.Y / m_CurPageData.ScaleTransform.ScaleY);
+            oArg.Comment.OnGeometryChanged();
+        }
+
         void _CreateActiveWorkBench()
         {
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
@@ -336,7 +351,11 @@ namespace YBehavior.Editor
             m_CurPageData.TranslateTransform.X += delta.X;
             m_CurPageData.TranslateTransform.Y += delta.Y;
         }
-
+        void _OnClick()
+        {
+            Focus();
+            SelectionMgr.Instance.Clear();
+        }
         public void ResetTransform()
         {
             m_CurPageData.ScaleTransform.ScaleX = 0;

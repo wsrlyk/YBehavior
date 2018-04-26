@@ -33,6 +33,16 @@ namespace YBehavior.Editor.Core
         List<ISelectable> m_Selections = new List<ISelectable>();
         ISelectable m_SingleSelection;
 
+        public SelectionMgr()
+        {
+            EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
+        }
+
+        private void _OnWorkBenchSelected(EventArg arg)
+        {
+            Clear();
+        }
+
         private void _FireSelectionEvent()
         {
             SelectionChangedArg arg = new SelectionChangedArg();

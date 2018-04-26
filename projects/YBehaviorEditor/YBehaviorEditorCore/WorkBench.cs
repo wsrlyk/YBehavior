@@ -108,6 +108,24 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        public void RemoveComment(Comment comment)
+        {
+            if (comment != null)
+                Comments.Remove(comment);
+        }
+
+        public void CreateComment()
+        {
+            Comment comment = new Comment();
+            Comments.Add(comment);
+
+            CommentCreatedArg cArg = new CommentCreatedArg()
+            {
+                Comment = comment
+            };
+            EventMgr.Instance.Send(cArg);
+        }
+
         public void CreateEmptyRoot()
         {
             m_Tree = NodeMgr.Instance.CreateNodeByName("Root") as Tree;

@@ -18,14 +18,14 @@ namespace YBehavior.Editor
     /// <summary>
     /// UIComment.xaml 的交互逻辑
     /// </summary>
-    public partial class UIComment : UserControl, ISelectable, IDeletable, IDuplicatable
+    public partial class UIComment : UserControl, ISelectable, IDeletable
     {
         static SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
         Brush normalBorderBrush;
         public SelectionStateChangeHandler SelectHandler { get; set; }
 
-        Operation m_Operation;
+        //Operation m_Operation;
         Operation m_ResizeOperation;
         Operation m_MoveOperation;
 
@@ -57,7 +57,7 @@ namespace YBehavior.Editor
             Comment data = this.DataContext as Comment;
             data.Geo.BottomRightPos = data.Geo.BottomRightPos + delta;
 
-            data.SendProperty("Geo");
+            data.OnGeometryChanged();
         }
 
         protected override void OnVisualParentChanged(DependencyObject oldParent)
@@ -70,7 +70,7 @@ namespace YBehavior.Editor
         {
             SelectHandler(this, true);
 
-            m_Operation.MakeCanvasFocused();
+            m_MoveOperation.MakeCanvasFocused();
         }
 
         void _OnDrag(Vector delta, Point pos)
@@ -81,12 +81,13 @@ namespace YBehavior.Editor
             Comment data = this.DataContext as Comment;
             data.Geo.Pos = data.Geo.Pos + delta;
 
-            data.SendProperty("Geo");
+            data.OnGeometryChanged();
         }
 
         public void OnDelete(int param)
         {
-            throw new NotImplementedException();
+            Comment data = this.DataContext as Comment;
+            WorkBenchMgr.Instance.RemoveComment(data);
         }
 
         public void OnDuplicated(int param)

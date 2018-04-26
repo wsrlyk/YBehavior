@@ -126,6 +126,11 @@ namespace YBehavior.Editor
 
 
         }
+
+        private void AddComment_Click(object sender, RoutedEventArgs e)
+        {
+            WorkBenchMgr.Instance.CreateComment();
+        }
     }
 
 }
