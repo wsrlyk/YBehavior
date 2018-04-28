@@ -21,7 +21,7 @@ namespace YBehavior.Editor.Core
         public static readonly char ENUM = 'E';
         public static readonly char AGENT = 'A';
 
-        public static readonly char POINTER = 'S';
+        public static readonly char POINTER = 'P';
         public static readonly char CONST = 'C';
 
         public static readonly char SINGLE = '_';
@@ -138,7 +138,6 @@ namespace YBehavior.Editor.Core
         string m_Value;
         string m_Name;
         string m_Params = null;
-        bool m_bAlwaysConst = false;
         bool m_bCanbeRemoved = false;
         public SharedData SharedData { get; set; } = null;
         public SharedData Container { get; set; } = null;
@@ -261,9 +260,9 @@ namespace YBehavior.Editor.Core
             OnPropertyChanged("IsValid");
         }
 
-        public bool AlwaysConst { get { return m_bAlwaysConst; } set { m_bAlwaysConst = value; } }
+        public bool LockVBType { get; set; } = false;
         public bool CanBeRemoved { get { return m_bCanbeRemoved; } set { m_bCanbeRemoved = value; } }
-        public bool CanSwitchConst { get { return !AlwaysConst; } }
+        public bool CanSwitchConst { get { return !LockVBType; } }
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
@@ -313,11 +312,11 @@ namespace YBehavior.Editor.Core
                 return false;
             if (vbType == VariableType.VBT_Pointer)
             {
-                if (AlwaysConst)
-                {
-                    LogMgr.Instance.Log(string.Format("This variable cant be pointer: {0}.", Name));
-                    return false;
-                }
+                //if (AlwaysConst)
+                //{
+                //    LogMgr.Instance.Log(string.Format("This variable cant be pointer: {0}.", Name));
+                //    return false;
+                //}
                 if (string.IsNullOrEmpty(Value))
                     return false;
                 Variable other = SharedData.GetVariable(Value);
@@ -479,7 +478,7 @@ namespace YBehavior.Editor.Core
 
             cType = ctype;
 
-            vbType = vbType;
+            vbType = vbtype;
             if (vbType == VariableType.VBT_NONE)
                 return false;
 
@@ -501,7 +500,7 @@ namespace YBehavior.Editor.Core
             v.vbType = vbType;
             v.m_Name = m_Name;
             v.m_Value = m_Value;
-            v.m_bAlwaysConst = m_bAlwaysConst;
+            v.LockVBType = LockVBType;
             v.m_bCanbeRemoved = m_bCanbeRemoved;
             v.m_bInited = m_bInited;
             v.m_Params = m_Params;

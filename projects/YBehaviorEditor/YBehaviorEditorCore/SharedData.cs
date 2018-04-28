@@ -71,7 +71,7 @@ namespace YBehavior.Editor.Core
             if (!v.SetVariableInNode(value, name))
                 return false;
 
-            v.AlwaysConst = true;
+            v.LockVBType = true;
             v.CanBeRemoved = true;
 
             if (!v.CheckValid())
@@ -96,7 +96,7 @@ namespace YBehavior.Editor.Core
             if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, value, null, name))
                 return false;
 
-            v.AlwaysConst = true;
+            v.LockVBType = true;
             v.CanBeRemoved = true;
 
             if (!v.CheckValid())

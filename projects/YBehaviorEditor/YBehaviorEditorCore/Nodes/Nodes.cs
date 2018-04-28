@@ -110,7 +110,7 @@ namespace YBehavior.Editor.Core
                 Variable.VariableType.VBT_Const,
                 "ADD|SUB|MUL|DIV"
             );
-            optr.AlwaysConst = true;
+            optr.LockVBType = true;
             Variables.AddVariable(optr);
 
             Variable opl = Variable.CreateVariableInNode(
@@ -120,6 +120,7 @@ namespace YBehavior.Editor.Core
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const
             );
+            opl.LockVBType = true;
             Variables.AddVariable(opl, 1);
 
             Variable opr1 = Variable.CreateVariableInNode(
@@ -178,7 +179,7 @@ namespace YBehavior.Editor.Core
                 Variable.VariableType.VBT_Const,
                 "==|!=|>|<|>=|<="
             );
-            optr.AlwaysConst = true;
+            optr.LockVBType = true;
             Variables.AddVariable(optr);
 
             Variable opl = Variable.CreateVariableInNode(
@@ -188,6 +189,7 @@ namespace YBehavior.Editor.Core
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const
             );
+            opl.LockVBType = true;
             Variables.AddVariable(opl, 1);
 
             Variable opr = Variable.CreateVariableInNode(
@@ -234,6 +236,7 @@ namespace YBehavior.Editor.Core
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer
             );
+            opl.LockVBType = true;
             Variables.AddVariable(opl, 1);
 
             Variable opr = Variable.CreateVariableInNode(

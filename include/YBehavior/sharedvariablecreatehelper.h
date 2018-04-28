@@ -11,12 +11,9 @@ namespace YBehavior
 {
 	class ISharedVariableCreateHelper
 	{
-		TypeAB m_Type;
 	public:
 		virtual ISharedVariableEx* CreateVariable() = 0;
 		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) = 0;
-		TypeAB GetType() { return m_Type;}
-		void SetType(TypeAB type) { m_Type = type;}
 	};
 
 	template<typename valueType>

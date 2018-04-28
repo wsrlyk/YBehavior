@@ -7,7 +7,6 @@
 
 namespace YBehavior
 {
-
 	template<typename T>
 	class SharedVariableEx : public ISharedVariableEx
 	{
@@ -166,12 +165,14 @@ namespace YBehavior
 		///> This function must be called BEFORE SetIndexFromString
 		void SetVectorIndex(const STRING& vbType, const STRING& s)
 		{
-			if (vbType == "S")
+			if (vbType.length() < 1)
+				return;
+			if (vbType[0] == GlobalDefinitions::POINTER)
 			{
 				m_VectorIndex = new SharedVariableEx<INT>();
 				m_VectorIndex->SetIndexFromString(s);
 			}
-			else if (vbType == "C")
+			else if (vbType[0] == GlobalDefinitions::CONST)
 			{
 				m_VectorIndex = new SharedVariableEx<INT>();
 				m_VectorIndex->SetValueFromString(s);

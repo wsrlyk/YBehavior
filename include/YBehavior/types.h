@@ -196,45 +196,12 @@ namespace YBehavior
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecAgentWrapper, 106);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecVector3, 107);
 
-	typedef CHAR TypeAB;
-	class Types
+	class GlobalDefinitions
 	{
-#define DEFINE_TYPEAB(t, c) const static TypeAB t##AB = c;
 	public:
-		DEFINE_TYPEAB(None, 0);
-		DEFINE_TYPEAB(Int, 'I');
-		DEFINE_TYPEAB(Float, 'F');
-		DEFINE_TYPEAB(Bool, 'B');
-		DEFINE_TYPEAB(String, 'S');
-		DEFINE_TYPEAB(Uint64, 'U');
-		DEFINE_TYPEAB(Vector3, 'V');
+		static const char POINTER = 'P';
+		static const char CONST = 'C';
 	};
-
-	template <char c1, char c2>
-	class Char2Type
-	{
-		typedef Int Result;
-	};
-
-#define DEFINE_Char2Type(t, c)\
-	template <>\
-	class Char2Type<c, c>\
-	{\
-		typedef std::vector<t> Result; \
-	};\
-	template <>\
-	class Char2Type<c, '_'>\
-	{\
-		typedef t Result;\
-	};\
-
-	DEFINE_Char2Type(Int, 'I');
-	DEFINE_Char2Type(Float, 'F');
-	DEFINE_Char2Type(Bool, 'B');
-	DEFINE_Char2Type(String, 'S');
-	DEFINE_Char2Type(Uint64, 'U');
-	DEFINE_Char2Type(Vector3, 'V');
-
 }
 
 #endif

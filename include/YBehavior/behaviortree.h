@@ -77,11 +77,11 @@ namespace YBehavior
 		virtual void OnLoaded(const pugi::xml_node& data) {}
 		virtual void OnAddChild(BehaviorNode* child, const STRING& connection) {}
 		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
-		int CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle);
+		int CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType = 0);
 
 		///>
 		/// single: 1, single; 0, vector; -1, dont care
-		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single = -1);
+		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single = -1, char variableType = 0);
 	};
 
 	class YBEHAVIOR_API BranchNode: public BehaviorNode

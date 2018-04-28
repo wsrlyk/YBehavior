@@ -92,7 +92,7 @@ namespace YBehavior
 		return root;
 	}
 
-	bool BehaviorNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single)
+	bool BehaviorNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single, char variableType)
 	{
 		auto tempChar = attri.value();
 		///> split all spaces
@@ -108,6 +108,15 @@ namespace YBehavior
 			if (!((single == 1) ^ (buffer[0][0] == buffer[0][1])))
 			{
 				ERROR_BEGIN << "Single or Vector Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
+				return false;
+			}
+		}
+
+		if (variableType != 0)
+		{
+			if (buffer[0][2] != variableType)
+			{
+				ERROR_BEGIN << "VariableType Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
 				return false;
 			}
 		}
@@ -128,12 +137,12 @@ namespace YBehavior
 			return "";
 		}
 		std::vector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, 1))
+		if (!ParseVariable(attrOptr, data, buffer, 1, GlobalDefinitions::CONST))
 			return "";
 
 		return buffer[1];
 	}
-	int BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle)
+	int BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 
@@ -143,7 +152,7 @@ namespace YBehavior
 			return -1;
 		}
 		std::vector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, bSingle ? 1 : 0))
+		if (!ParseVariable(attrOptr, data, buffer, bSingle ? 1 : 0, variableType))
 			return -1;
 
 		ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
@@ -157,7 +166,7 @@ namespace YBehavior
 				op->SetVectorIndex(buffer[3], buffer[4]);
 			}
 
-			if (buffer[0][2] == 'S')
+			if (buffer[0][2] == GlobalDefinitions::POINTER)
 				op->SetIndexFromString(buffer[1]);
 			else
 				op->SetValueFromString(buffer[1]);

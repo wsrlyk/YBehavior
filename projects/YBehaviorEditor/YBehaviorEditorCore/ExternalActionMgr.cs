@@ -84,7 +84,42 @@ namespace YBehavior.Editor.Core
             {
                 valueType[i] = Variable.ValueTypeDic.GetKey(valueTypes[i], Variable.ValueType.VT_NONE);
             }
-            bool bAlwaysConst = (valueType.Length == 1 && valueType[0] == Variable.ValueType.VT_ENUM);
+
+
+            Variable.VariableType vbType = Variable.VariableType.VBT_Const;
+            bool bLockVBType = false;
+            ///> Is Enum, always const
+            if (valueType.Length == 1 && valueType[0] == Variable.ValueType.VT_ENUM)
+            {
+                bLockVBType = true;
+            }
+            else
+            {
+                attr = xml.Attributes.GetNamedItem("VariableType");
+                if (attr != null)
+                {
+                    string strVariableType = attr.Value;
+                    if (strVariableType.Length == 1)
+                    {
+                        vbType = Variable.VariableTypeDic.GetKey(strVariableType[0], Variable.VariableType.VBT_NONE);
+                        if (vbType == Variable.VariableType.VBT_NONE)
+                        {
+                            LogMgr.Instance.Error("VariableType format error: " + strVariableType);
+                            return false;
+                        }
+                        else
+                        {
+                            bLockVBType = true;
+                        }
+                    }
+                    else
+                    {
+                        LogMgr.Instance.Error("Too many VariableType: " + strVariableType);
+                        return false;
+                    }
+                }
+            }
+
 
             bool isArray = false;
             attr = xml.Attributes.GetNamedItem("IsArray");
@@ -113,10 +148,10 @@ namespace YBehavior.Editor.Core
                 value,
                 valueType,
                 countType,
-                Variable.VariableType.VBT_Const,
+                vbType,
                 param
             );
-            v.AlwaysConst = bAlwaysConst;
+            v.LockVBType = bLockVBType;
             action.Variables.AddVariable(v);
             return true;
         }

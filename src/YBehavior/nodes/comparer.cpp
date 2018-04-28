@@ -39,7 +39,7 @@ namespace YBehavior
 
 		//////////////////////////////////////////////////////////////////////////
 		///> µÈºÅ×ó±ß
-		m_DataType = CreateVariable(m_Opl, "Opl", data, true);
+		m_DataType = CreateVariable(m_Opl, "Opl", data, true, GlobalDefinitions::POINTER);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
