@@ -98,19 +98,24 @@ namespace YBehavior.Editor.Core
             m_ProcessingMsgs.Clear();
         }
 
+        char[] msgHeadSplitter = { (char)(3) };
+        char[] msgContentSplitter = { (char)(4) };
         void _ProcessMsg(string msg)
         {
-            string[] words = msg.Split(' ');
-            if (words.Length < 1)
+            string[] words = msg.Split(msgHeadSplitter, StringSplitOptions.RemoveEmptyEntries);
+            if (words.Length != 2)
                 return;
 
             switch(words[0])
             {
                 case "[TickResult]":
-                    _HandleTickResult(words);
+                    _HandleTickResult(words[1]);
                     break;
                 case "[Paused]":
                     _HandlePaused();
+                    break;
+                case "[LogPoint]":
+                    _HandleLogPoint(words[1]);
                     break;
             }
         }
@@ -130,11 +135,12 @@ namespace YBehavior.Editor.Core
         {
             get { return m_TickResultToken; }
         }
-        void _HandleTickResult(string[] data)
+        void _HandleTickResult(string ss)
         {
+            string[] data = ss.Split(msgContentSplitter, StringSplitOptions.RemoveEmptyEntries);
             if (data.Length > 1)
             {
-                string[] sharedDatas = data[1].Split(';');
+                string[] sharedDatas = data[0].Split(';');
                 foreach (string s in sharedDatas)
                 {
                     string[] strV = s.Split(',');
@@ -150,7 +156,7 @@ namespace YBehavior.Editor.Core
 
                 ++m_TickResultToken;
                 DebugMgr.Instance.RunInfo.Clear();
-                string[] runInfos = data[2].Split(';');
+                string[] runInfos = data[1].Split(';');
                 foreach (string s in runInfos)
                 {
                     string[] strR = s.Split('=');
@@ -168,6 +174,58 @@ namespace YBehavior.Editor.Core
         {
             LogMgr.Instance.Log("Paused.");
             DebugMgr.Instance.bBreaked = true;
+        }
+
+        void _HandleLogPoint(string ss)
+        {
+            LogMgr.Instance.Log(ss);
+
+            string[] data = ss.Split(msgContentSplitter, StringSplitOptions.RemoveEmptyEntries);
+            if (data.Length > 0)
+            {
+                ///> Head
+                LogMgr.Instance.LogWordWithColor("-------<LogPoint ", ConsoleColor.Cyan);
+
+                int index = 0;
+                if (index < data.Length)
+                {
+                    LogMgr.Instance.LogWordWithColor(data[index], ConsoleColor.Cyan);
+                }
+
+                LogMgr.Instance.LogLineWithColor(">-------", ConsoleColor.Cyan);
+
+                ///> Before
+                ++index;
+                while(index < data.Length)
+                {
+                    if (data[index] == "BEFORE" || data[index] == "AFTER")
+                    {
+                        LogMgr.Instance.LogLineWithColor(data[index], ConsoleColor.Cyan);
+                        ++index;
+                        if (index < data.Length)
+                        {
+                            int vCount = int.Parse(data[index]);
+                            ++index;
+                            if (vCount + index < data.Length)
+                            {
+                                for (int i = 0; i < vCount; ++i)
+                                {
+                                    LogMgr.Instance.LogWordWithColor(data[index + i], ConsoleColor.Magenta);
+                                    LogMgr.Instance.LogWordWithColor("; ", ConsoleColor.Magenta);
+                                }
+                                index += vCount;
+                            }
+                        }
+                        LogMgr.Instance.LogEnd();
+                    }
+                    else
+                    {
+                        LogMgr.Instance.LogWordWithColor(data[index++], ConsoleColor.Yellow);
+                    }
+                }
+                LogMgr.Instance.LogEnd();
+                LogMgr.Instance.LogLineWithColor("-------</LogPoint>-------", ConsoleColor.Cyan);
+            }
         }
     }
 }

@@ -7,6 +7,7 @@
 #include "YBehavior/nodefactory.h"
 #include <sstream>
 
+#ifdef DEBUGGER
 namespace YBehavior
 {
 	const STRING NodeRunInfo::ToString() const
@@ -67,12 +68,20 @@ namespace YBehavior
 		}
 	}
 
-	bool DebugMgr::TryHitBreakPoint(UINT nodeUID)
+	bool DebugMgr::HasBreakPoint(UINT nodeUID)
 	{
 		auto it = m_DebugPointInfos.find(nodeUID);
 		if (it == m_DebugPointInfos.end())
 			return false;
 		return it->second.HasBreakPoint();
+	}
+
+	bool DebugMgr::HasLogPoint(UINT nodeUID)
+	{
+		auto it = m_DebugPointInfos.find(nodeUID);
+		if (it == m_DebugPointInfos.end())
+			return false;
+		return it->second.HasLogPoint();
 	}
 
 	void DebugMgr::AddBreakPoint(UINT nodeUID)
@@ -129,6 +138,7 @@ namespace YBehavior
 
 
 	DebugHelper::DebugHelper(Agent* pAgent, BehaviorNode* pNode)
+		: m_pLogInfo(nullptr)
 	{
 		if (pAgent == nullptr || !DebugMgr::Instance()->IsValidTarget(pAgent))
 		{
@@ -142,20 +152,80 @@ namespace YBehavior
 		CreateRunInfo();
 		m_pRunInfo->nodeUID = pNode->GetUID();
 		m_pRunInfo->runState = NS_RUNNING;
+
+		if (DebugMgr::Instance()->HasLogPoint(pNode->GetUID()))
+		{
+			m_pLogInfo = new NodeLogInfo();
+			pNode->GetDebugLogInfo().str("");
+		}
 	}
 
 	DebugHelper::~DebugHelper()
 	{
-		if (!IsValid())
+		if (IsValid())
+		{
+			_SendLogPoint();
+
+			///> Root node, send shared variables.
+			if (m_pNode->GetParent() == nullptr)
+			{
+				BehaviorTree* tree = dynamic_cast<BehaviorTree*>(m_pNode);
+				if (tree)
+					_SendInfos();
+			}
+		}
+
+		if (m_pLogInfo)
+			delete m_pLogInfo;
+	}
+
+	void DebugHelper::_SendLogPoint()
+	{
+		if (m_pLogInfo == nullptr)
 			return;
 
-		///> Root node, send shared variables.
-		if (m_pNode->GetParent() == nullptr)
+		m_pLogInfo->otherInfo = m_pNode->GetDebugLogInfo().str();
+		m_pNode->GetDebugLogInfo().str("");
+
+		DebugMgr::Instance()->AppendSendContent("[LogPoint]");
+		DebugMgr::Instance()->AppendSendContent(s_HeadSpliter);
+		DebugMgr::Instance()->AppendSendContent(Utility::ToString(m_pNode->GetUID()));
+		DebugMgr::Instance()->AppendSendContent(".");
+		DebugMgr::Instance()->AppendSendContent(m_pNode->GetName());
+		DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
+
+		if (m_pLogInfo->beforeInfo.size() > 0)
 		{
-			BehaviorTree* tree = dynamic_cast<BehaviorTree*>(m_pNode);
-			if (tree)
-				_SendInfos(tree->GetName());
+			DebugMgr::Instance()->AppendSendContent("BEFORE");
+			DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
+			DebugMgr::Instance()->AppendSendContent(Utility::ToString(m_pLogInfo->beforeInfo.size()));
+			DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
+
+			for (auto it = m_pLogInfo->beforeInfo.begin(); it != m_pLogInfo->beforeInfo.end(); ++it)
+			{
+				DebugMgr::Instance()->AppendSendContent(*it);
+				DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
+			}
 		}
+
+		if (m_pLogInfo->afterInfo.size() > 0)
+		{
+			DebugMgr::Instance()->AppendSendContent("AFTER");
+			DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
+			DebugMgr::Instance()->AppendSendContent(Utility::ToString(m_pLogInfo->afterInfo.size()));
+			DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
+
+			for (auto it = m_pLogInfo->afterInfo.begin(); it != m_pLogInfo->afterInfo.end(); ++it)
+			{
+				DebugMgr::Instance()->AppendSendContent(*it);
+				DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
+			}
+		}
+
+		if (m_pLogInfo->otherInfo.size() > 0)
+			DebugMgr::Instance()->AppendSendContent(m_pLogInfo->otherInfo);
+
+		DebugMgr::Instance()->Send(false);
 	}
 
 	void DebugHelper::_SendCurrentInfos()
@@ -168,18 +238,21 @@ namespace YBehavior
 		{
 			BehaviorTree* tree = dynamic_cast<BehaviorTree*>(pRoot);
 			if (tree)
-				_SendInfos(tree->GetName());
+				_SendInfos();
 		}
 
 	}
 
-	void DebugHelper::_SendInfos(const STRING& treeName)
+	void DebugHelper::_SendInfos()
 	{
-		DebugMgr::Instance()->AppendSendContent("[TickResult] ");
+		DebugMgr::Instance()->AppendSendContent("[TickResult]");
+		DebugMgr::Instance()->AppendSendContent(s_HeadSpliter);
 
 		///> SharedDatas:
 		STRING buffer;
 		SharedDataEx* pSharedData = m_Target->GetSharedData();
+
+		const STRING& treeName = DebugMgr::Instance()->GetTargetTree();
 
 		for (int i = 0; i < MAX_TYPE_INDEX; ++i)
 		{
@@ -198,7 +271,7 @@ namespace YBehavior
 		}
 		DebugMgr::Instance()->AppendSendContent(buffer);
 
-		DebugMgr::Instance()->AppendSendContent(" ");
+		DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
 
 		///> Run Info:
 
@@ -232,8 +305,15 @@ namespace YBehavior
 	{
 		if (!IsValid())
 			return;
-		if (DebugMgr::Instance()->TryHitBreakPoint(m_pRunInfo->nodeUID))
+		if (DebugMgr::Instance()->HasBreakPoint(m_pRunInfo->nodeUID))
 			Breaking();
+	}
+
+	bool DebugHelper::HasLogPoint()
+	{
+		if (!IsValid())
+			return false;
+		return DebugMgr::Instance()->HasLogPoint(m_pRunInfo->nodeUID);
 	}
 
 	void DebugHelper::Breaking()
@@ -264,4 +344,41 @@ namespace YBehavior
 		DebugMgr::Instance()->AppendSendContent("[Paused]");
 		DebugMgr::Instance()->Send(false);
 	}
+
+	void DebugHelper::LogSharedData(ISharedVariableEx* pVariable, bool bBefore)
+	{
+		if (!IsValid() || m_pLogInfo == nullptr || pVariable == nullptr)
+			return;
+
+		std::stringstream ss;
+		ss << pVariable->GetName() << " ";
+
+		///>  Like:      Int0 <CONST> 44
+		if (pVariable->IsConst())
+			ss << "<CONST> " << pVariable->GetValueToSTRING(m_Target->GetSharedData());
+		else
+		{
+			ISharedVariableEx* pVectorIndex = pVariable->GetVectorIndex();
+			const STRING& sharedDataVariableName = NodeFactory::Instance()->GetNameByIndex(DebugMgr::Instance()->GetTargetTree(), pVariable->GetIndex(), pVariable->GetReferenceSharedDataSelfID());
+			///>  Like:      Int0 IntArrayM[7] 44
+			if (pVectorIndex)
+			{
+
+				ss << sharedDataVariableName << "[" << pVectorIndex->GetValueToSTRING(m_Target->GetSharedData()) << "] ";
+			}
+			///>  Like:      Int0 IntC 4
+			else
+			{
+				ss << sharedDataVariableName << " ";
+			}
+			ss << pVariable->GetValueToSTRING(m_Target->GetSharedData());
+		}
+
+		STRING res(ss.str());
+		if (bBefore)
+			m_pLogInfo->beforeInfo.push_back(res);
+		else
+			m_pLogInfo->afterInfo.push_back(res);
+	}
 }
+#endif // DEBUGGER

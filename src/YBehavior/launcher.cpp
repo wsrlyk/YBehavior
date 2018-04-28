@@ -10,8 +10,9 @@ namespace YBehavior
 	{
 		core.RegisterActions();
 
+#ifdef DEBUGGER
 		Network::Instance()->InitAndCreateThread();
-
+#endif
 		return true;
 	}
 }

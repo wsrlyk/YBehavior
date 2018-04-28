@@ -1,3 +1,4 @@
+#ifdef DEBUGGER
 #include "YBehavior/network/network.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/network/messageprocessor.h"
@@ -237,3 +238,4 @@ namespace YBehavior
 	}
 
 }
+#endif // DEBUGGER

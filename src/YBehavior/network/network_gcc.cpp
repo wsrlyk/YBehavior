@@ -1,3 +1,4 @@
+#ifdef DEBUGGER
 #include "YBehavior/define.h"
 
 #ifdef GCC
@@ -307,3 +308,4 @@ namespace YBehavior
 }
 
 #endif
+#endif // DEBUGGER

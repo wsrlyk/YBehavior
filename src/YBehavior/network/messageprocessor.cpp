@@ -1,3 +1,4 @@
+#ifdef DEBUGGER
 #include "YBehavior/network/messageprocessor.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
@@ -64,3 +65,4 @@ namespace YBehavior
 	}
 
 }
+#endif // DEBUGGER

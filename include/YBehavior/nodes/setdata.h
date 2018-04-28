@@ -7,6 +7,8 @@ namespace YBehavior
 {
 	class SetData : public LeafNode
 	{
+	public:
+		STRING GetName() const override { return "SetData"; }
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
 		virtual void OnLoaded(const pugi::xml_node& data);

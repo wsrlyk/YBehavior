@@ -78,7 +78,7 @@ namespace YBehavior
 		virtual const STRING GetToString(INT index) const override
 		{
 			if (index < 0 || index >= (INT)m_Datas.size())
-				return nullptr;
+				return Utility::StringEmpty;
 			const T& data = m_Datas[index];
 			return Utility::ToString(data);
 		}

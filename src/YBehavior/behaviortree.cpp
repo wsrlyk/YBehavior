@@ -24,6 +24,10 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
+	Bimap<NodeState, STRING, EnumClassHash> s_NodeStateMap = {
+		{ NS_SUCCESS, "SUCCESS" },{ NS_FAILED, "FAILED" },{ NS_RUNNING, "RUNNING" },{ NS_BREAK, "BREAK" },{ NS_INVALID, "INVALID" }
+	};
+
 	BehaviorNode::BehaviorNode()
 	{
 		m_Parent = nullptr;
@@ -43,10 +47,12 @@ namespace YBehavior
 
 	YBehavior::NodeState BehaviorNode::Execute(AgentPtr pAgent)
 	{
-		///> 检查各种条件 或者 断点
+		///> check breakpoint
 #ifdef DEBUGGER
 		DebugHelper dbgHelper(pAgent, this);
 		dbgHelper.TryHitBreakPoint();
+
+		m_pDebugHelper = &dbgHelper;
 #endif
 
 		//////////////////////////////////////////////////////////////////////////
@@ -55,7 +61,11 @@ namespace YBehavior
 		NodeState state = this->Update(pAgent);
 		m_State = state;
 
-		///> 更新后处理
+		///> postprocessing
+#ifdef DEBUGGER
+		DEBUG_LOG_INFO(" Return" << " " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
+		m_pDebugHelper = nullptr;
+#endif
 
 		DEBUG_RETURN(dbgHelper, state);
 	}
@@ -140,7 +150,7 @@ namespace YBehavior
 		if (helper != nullptr)
 		{
 			op = helper->CreateVariable();
-
+			op->SetName(attriName);
 			///> Vector Index
 			if (buffer.size() >= 5 && buffer[2] == "VI")
 			{

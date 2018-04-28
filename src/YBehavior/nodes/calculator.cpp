@@ -6,6 +6,10 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
 
+#ifdef DEBUGGER
+#include "YBehavior/debugger.h"
+#endif // DEBUGGER
+
 namespace YBehavior
 {
 	///> Too lazy to create a file for just this line. Temporarily put it here
@@ -59,8 +63,20 @@ namespace YBehavior
 
 	YBehavior::NodeState Calculator::Update(AgentPtr pAgent)
 	{
+		IF_HAS_LOG_POINT
+		{
+			LOG_SHARED_DATA(m_Opl, true);
+			LOG_SHARED_DATA(m_Opr1, true);
+			LOG_SHARED_DATA(m_Opr2, true);
+		}
+
 		IVariableOperationHelper* pHelper = m_Opl->GetOperation();
 		pHelper->Calculate(pAgent->GetSharedData(), m_Opl, m_Opr1, m_Opr2, m_Operator);
+
+		IF_HAS_LOG_POINT
+		{
+			LOG_SHARED_DATA(m_Opl, false);
+		}
 
 		return NS_SUCCESS;
 	}

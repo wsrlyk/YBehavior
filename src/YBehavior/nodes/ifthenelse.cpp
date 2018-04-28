@@ -1,5 +1,6 @@
 #include "YBehavior/nodes/ifthenelse.h"
 #include "YBehavior/logger.h"
+#include "YBehavior/debugger.h"
 
 namespace YBehavior
 {
@@ -24,13 +25,19 @@ namespace YBehavior
 		if (state == NS_SUCCESS)
 		{
 			if (m_Then)
+			{
+				DEBUG_LOG_INFO("Run [THEN]; ");
 				return m_Then->Execute(pAgent);
+			}
 			return NS_FAILED;
 		}
 		else
 		{
 			if (m_Else)
+			{
+				DEBUG_LOG_INFO("Run [ELSE]; ");
 				return m_Else->Execute(pAgent);
+			}
 			return NS_FAILED;
 		}
 	}

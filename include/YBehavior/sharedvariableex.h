@@ -37,7 +37,38 @@ namespace YBehavior
 		}
 	public:
 		INT GetTypeID() { return GetClassTypeNumberId<T>(); }
+		INT GetReferenceSharedDataSelfID()
+		{
+			///> it's const, just return itself
+			if (m_Index == SharedDataEx::INVALID_INDEX)
+				return GetClassTypeNumberId<T>();
+
+			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
+			{
+				return GetClassTypeNumberId<std::vector<T>>();
+			}
+
+			return GetClassTypeNumberId<T>();
+		}
+
 		IVariableOperationHelper* GetOperation() { return VariableOperationHelper<T>::Get(); }
+		ISharedVariableEx* GetVectorIndex() override
+		{
+			if (!IsVector<T>::Result)
+				return m_VectorIndex;
+			return nullptr;
+		}
+
+		bool IsConst() override
+		{
+			return m_Index == SharedDataEx::INVALID_INDEX;
+		}
+
+		STRING GetValueToSTRING(SharedDataEx* pData) override
+		{
+			const T* v = GetCastedValue(pData);
+			return Utility::ToString(*v);
+		}
 
 		const void* GetValue(SharedDataEx* pData)
 		{

@@ -23,6 +23,9 @@ namespace YBehavior
 	};
 
 	class ISharedVariableEx;
+#ifdef DEBUGGER
+	class DebugHelper;
+#endif
 	class YBEHAVIOR_API BehaviorNode
 	{
 	protected:
@@ -33,6 +36,22 @@ namespace YBehavior
 
 		static std::unordered_set<STRING> KEY_WORDS;
 
+#ifdef DEBUGGER
+	protected:
+		std::stringstream m_DebugLogInfo;
+		DebugHelper* m_pDebugHelper;
+#define IF_HAS_LOG_POINT if (m_pDebugHelper && m_pDebugHelper->HasLogPoint())
+#define DEBUG_LOG_INFO(info)\
+	IF_HAS_LOG_POINT\
+		m_DebugLogInfo << info;
+#define LOG_SHARED_DATA(variable, isbefore) m_pDebugHelper->LogSharedData(variable, isbefore);
+	public:
+		std::stringstream& GetDebugLogInfo() { return m_DebugLogInfo; }
+#else
+#define DEBUG_LOG_INFO(info);
+#define IF_HAS_LOG_POINT
+#define LOG_SHARED_DATA(variable, isbefore)
+#endif 
 	public:
 		BehaviorNode();
 		virtual ~BehaviorNode();
@@ -40,8 +59,10 @@ namespace YBehavior
 		inline BehaviorNodePtr GetParent() { return m_Parent;}
 		inline void SetParent(BehaviorNodePtr parent) { m_Parent = parent;}
 
-		inline UINT GetUID() { return m_UID; }
+		inline UINT GetUID() const { return m_UID; }
 		inline void SetUID(UINT uid) { m_UID = uid; }
+
+		virtual STRING GetName() const = 0;
 
 		void Load(const pugi::xml_node& data);
 		NodeState Execute(AgentPtr pAgent);
@@ -97,6 +118,8 @@ namespace YBehavior
 	};
 	class YBEHAVIOR_API BehaviorTree : public SingleChildNode
 	{
+	public:
+		STRING GetName() const override { return "Tree"; }
 	private:
 		SharedDataEx* m_SharedData;	///> 原始数据，每个使用此树的Agent都从这拷数据作为初始化
 		STRING m_Name;

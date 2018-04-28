@@ -33,6 +33,8 @@ public:
 
 class GetNameAction : public YBehavior::Action
 {
+public:
+	YBehavior::STRING GetName() const override { return "GetNameAction"; }
 protected:
 	virtual YBehavior::NodeState Update(YBehavior::AgentPtr pAgent);
 };

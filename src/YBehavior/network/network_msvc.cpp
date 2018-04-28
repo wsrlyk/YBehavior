@@ -1,3 +1,4 @@
+#ifdef DEBUGGER
 #include "YBehavior/define.h"
 
 #ifdef MSVC
@@ -285,5 +286,5 @@ namespace YBehavior
 		LeaveCriticalSection(&_impl->_criticalSection);
 	}
 }
-
 #endif
+#endif // DEBUGGER

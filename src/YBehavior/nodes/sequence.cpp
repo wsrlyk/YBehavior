@@ -1,4 +1,5 @@
 #include "YBehavior/nodes/sequence.h"
+#include "YBehavior/debugger.h"
 
 namespace YBehavior
 {
@@ -9,7 +10,10 @@ namespace YBehavior
 		{
 			ns = (*it)->Execute(pAgent);
 			if (ns == NS_FAILED)
+			{
+				DEBUG_LOG_INFO("Break At Child With UID " << Utility::ToString((*it)->GetUID()) << "; ");
 				break;
+			}
 		}
 
 		return ns;

@@ -7,6 +7,8 @@ namespace YBehavior
 {
 	class Selector : public CompositeNode
 	{
+	public:
+		STRING GetName() const override { return "Selector"; }
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
 	};

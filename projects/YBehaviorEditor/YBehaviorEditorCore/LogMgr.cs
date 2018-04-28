@@ -6,7 +6,7 @@ using System.Text;
 
 namespace YBehavior.Editor.Core
 {
-    public class LogMgr : Singleton<LogMgr>, INotifyPropertyChanged
+    public class LogMgr : Singleton<LogMgr>
     {
         public string LatestLog
         {
@@ -70,12 +70,27 @@ namespace YBehavior.Editor.Core
             */
         }
 
+        public void LogWordWithColor(string content, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.Write(content);
+        }
+
+        public void LogLineWithColor(string content, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(content);
+        }
+
+        public void LogEnd()
+        {
+            Console.WriteLine();
+        }
+
         public void Error(string content)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(content);
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

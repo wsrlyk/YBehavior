@@ -5,6 +5,10 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
+#ifdef DEBUGGER
+#include "YBehavior/debugger.h"
+#endif // DEBUGGER
+
 
 namespace YBehavior
 {
@@ -52,6 +56,12 @@ namespace YBehavior
 
 	YBehavior::NodeState Comparer::Update(AgentPtr pAgent)
 	{
+		IF_HAS_LOG_POINT
+		{
+			LOG_SHARED_DATA(m_Opl, true);
+			LOG_SHARED_DATA(m_Opr, true);
+		}
+
 		IVariableOperationHelper* pHelper = m_Opl->GetOperation();
 		return pHelper->Compare(pAgent->GetSharedData(), m_Opl, m_Opr, m_Operator) ? NS_SUCCESS : NS_FAILED;
 	}

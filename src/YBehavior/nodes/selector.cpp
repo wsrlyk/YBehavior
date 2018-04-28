@@ -1,4 +1,7 @@
 #include "YBehavior/nodes/selector.h"
+#ifdef DEBUGGER
+#include "YBehavior/debugger.h"
+#endif // DEBUGGER
 
 namespace YBehavior
 {
@@ -9,7 +12,12 @@ namespace YBehavior
 		{
 			ns = (*it)->Execute(pAgent);
 			if (ns == NS_SUCCESS)
+			{
+#ifdef DEBUGGER
+				DEBUG_LOG_INFO("Break At Child With UID " << Utility::ToString((*it)->GetUID()) << "; ");
+#endif // DEBUGGER
 				break;
+			}
 		}
 
 		return ns;

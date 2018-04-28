@@ -1,6 +1,7 @@
 #ifndef _YBEHAVIOR_DEBUGGER_H_
 #define _YBEHAVIOR_DEBUGGER_H_
 
+#ifdef DEBUGGER
 
 #include "YBehavior/define.h"
 #include "YBehavior/singleton.h"
@@ -18,6 +19,14 @@ namespace YBehavior
 
 		const STRING ToString() const;
 	};
+	struct NodeLogInfo
+	{
+		UINT nodeUID;
+		std::vector<STRING> beforeInfo;
+		std::vector<STRING> afterInfo;
+		STRING otherInfo;
+	};
+
 	struct SharedVariableInfo
 	{
 		STRING name;
@@ -51,9 +60,11 @@ namespace YBehavior
 		void ResetTarget();
 		void Stop();
 		bool IsValidTarget(Agent* pAgent);
+		inline const STRING& GetTargetTree() { return m_TargetTree; }
 		inline UINT GetTargetAgent() { return m_TargetAgent; }
 		inline const std::list<NodeRunInfo*>& GetRunInfos() { return m_RunInfos; }
-		bool TryHitBreakPoint(UINT nodeUID);
+		bool HasBreakPoint(UINT nodeUID);
+		bool HasLogPoint(UINT nodeUID);
 		void ClearDebugPoints() { m_DebugPointInfos.clear(); }
 		void AddBreakPoint(UINT nodeUID);
 		void AddLogPoint(UINT nodeUID);
@@ -65,6 +76,7 @@ namespace YBehavior
 		inline bool IsPaused() { return m_bPaused; }
 
 		void AppendSendContent(const STRING& s) { m_SendBuffer += s; }
+		void AppendSendContent(const char c) { m_SendBuffer += c; }
 		void Send(bool bClearRunInfo);
 	};
 
@@ -74,10 +86,12 @@ namespace YBehavior
 		Agent* m_Target;
 		BehaviorNode* m_pNode;
 		NodeRunInfo* m_pRunInfo;
+		NodeLogInfo* m_pLogInfo;
 
-		void _SendInfos(const STRING& treeName);
+		void _SendInfos();
 		void _SendCurrentInfos();
 		void _SendPause();
+		void _SendLogPoint();
 	public:
 		DebugHelper(Agent* pAgent, BehaviorNode* pNode);
 		~DebugHelper();
@@ -85,8 +99,17 @@ namespace YBehavior
 		void CreateRunInfo();
 		void SetResult(NodeState state);
 		void TryHitBreakPoint();
-
+		bool HasLogPoint();
 		void Breaking();
+
+	public:
+		void LogSharedData(ISharedVariableEx* pVariable, bool bBefore);
+		
+		static const char s_HeadSpliter = (char)3;
+		static const char s_ContentSpliter = (char)4;
 	};
 }
+
+#endif // DEBUGGER
+
 #endif

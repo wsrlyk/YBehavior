@@ -259,6 +259,12 @@ namespace YBehavior.Editor.Core
 
                 SocketPacket packet = (SocketPacket)asyn.AsyncState;
                 int receivedBytes = m_clientSocket.EndReceive(asyn);
+                if (receivedBytes == 0)
+                {
+                    LogMgr.Instance.Error("ConnectError");
+                    closeSocket();
+                    return;
+                }
 
                 List<byte[]> messages = m_msgReceiver.OnDataReceived(packet.dataBuffer, receivedBytes);
                 m_packetsReceived += (uint)messages.Count;
@@ -303,7 +309,20 @@ namespace YBehavior.Editor.Core
             if (m_clientSocket != null && m_clientSocket.Connected)
             {
                 byte[] bytes = System.Text.Encoding.ASCII.GetBytes(msg);
-                m_clientSocket.Send(bytes);
+                try
+                {
+                    m_clientSocket.Send(bytes);
+                }
+                catch (SocketException e)
+                {
+                    LogMgr.Instance.Error("Exception: " + e.Message);
+                    closeSocket();
+                }
+                catch (Exception e)
+                {
+                    LogMgr.Instance.Error("Exception: " + e.Message);
+
+                }
             }
         }
 

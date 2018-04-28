@@ -1,6 +1,7 @@
 #ifndef _YBEHAVIOR_MESSAGEPROCESSOR_H_
 #define _YBEHAVIOR_MESSAGEPROCESSOR_H_
 
+#ifdef DEBUGGER
 #include "YBehavior/types.h"
 #include "YBehavior/singleton.h"
 
@@ -14,4 +15,5 @@ namespace YBehavior
 	};
 }
 
+#endif
 #endif

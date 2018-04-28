@@ -8,6 +8,8 @@ namespace YBehavior
 {
 	class Calculator : public LeafNode
 	{
+	public:
+		STRING GetName() const override { return "Calculator"; }
 	protected:
 		virtual void OnLoaded(const pugi::xml_node& data);
 		virtual NodeState Update(AgentPtr pAgent);
