@@ -56,6 +56,7 @@ namespace YBehavior
 
 		bool m_bPaused = false;
 	public:
+		~DebugMgr();
 		void SetTarget(const STRING& tree, UINT agent);
 		void ResetTarget();
 		void Stop();

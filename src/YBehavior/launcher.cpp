@@ -11,7 +11,8 @@ namespace YBehavior
 		core.RegisterActions();
 
 #ifdef DEBUGGER
-		Network::Instance()->InitAndCreateThread();
+		if (core.OpenDebugger())
+			Network::Instance()->InitAndCreateThread();
 #endif
 		return true;
 	}

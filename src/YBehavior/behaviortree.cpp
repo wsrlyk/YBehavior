@@ -36,6 +36,11 @@ namespace YBehavior
 
 	BehaviorNode::~BehaviorNode()
 	{
+		for (auto it = m_Variables.begin(); it != m_Variables.end(); ++it)
+		{
+			delete *it;
+		}
+		m_Variables.clear();
 	}
 
 	std::unordered_set<STRING> BehaviorNode::KEY_WORDS = { "Class", "Pos", "NickName" };
@@ -159,6 +164,7 @@ namespace YBehavior
 		if (helper != nullptr)
 		{
 			op = helper->CreateVariable();
+			m_Variables.push_back(op);
 			op->SetName(attriName);
 			///> Vector Index
 			if (buffer.size() >= 5 && buffer[2] == "VI")

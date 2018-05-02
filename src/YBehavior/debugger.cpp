@@ -19,6 +19,11 @@ namespace YBehavior
 		return str;
 	}
 
+	DebugMgr::~DebugMgr()
+	{
+		Clear();
+	}
+
 	void DebugMgr::SetTarget(const STRING& tree, UINT agent)
 	{
 		m_TargetTree = tree;

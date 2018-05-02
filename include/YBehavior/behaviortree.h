@@ -33,7 +33,7 @@ namespace YBehavior
 		BehaviorNodePtr m_Parent;
 		NodeState m_State;
 		UINT m_UID;	// Unique in a tree
-
+		std::vector<ISharedVariableEx*> m_Variables;	///> Just for destructions of variables
 		static std::unordered_set<STRING> KEY_WORDS;
 
 #ifdef DEBUGGER
