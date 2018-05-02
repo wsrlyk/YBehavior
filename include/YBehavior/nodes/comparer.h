@@ -10,7 +10,7 @@ namespace YBehavior
 	class Comparer : public LeafNode
 	{
 	public:
-		STRING GetName() const override { return "Comparer"; }
+		STRING GetClassName() const override { return "Comparer"; }
 	protected:
 		virtual void OnLoaded(const pugi::xml_node& data);
 		virtual NodeState Update(AgentPtr pAgent);

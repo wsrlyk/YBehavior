@@ -85,15 +85,51 @@ namespace YBehavior
 
 	BehaviorTree* TreeMgr::GetTree(const STRING& name)
 	{
+		TreeInfo* info;
 		auto it = m_Trees.find(name);
 		if (it != m_Trees.end())
-			return it->second->m_OriginalTree;
+		{
+			BehaviorTree* tree = it->second->GetLatestTree();
+			if (tree)
+			{
+				it->second->ChangeReferenceCount(true);
+				return tree;
+			}
+			else
+				info = it->second;
+		}
+		else
+		{
+			info = new TreeInfo();
+			m_Trees[name] = info;
+		}
 
+		
 		BehaviorTree* tree = _LoadOneTree(name);
-		TreeInfo* info = new TreeInfo();
-		info->m_OriginalTree = tree;
-		m_Trees[name] = info;
+		info->SetLatestTree(tree);
+		info->ChangeReferenceCount(true);
 		return tree;
+	}
+
+	void TreeMgr::ReloadTree(const STRING& name)
+	{
+		auto it = m_Trees.find(name);
+		if (it != m_Trees.end())
+		{
+			it->second->IncreaseLatestVesion();
+		}
+	}
+
+	void TreeMgr::ReturnTree(BehaviorTree* tree)
+	{
+		if (tree == nullptr)
+			return;
+
+		auto it = m_Trees.find(tree->GetTreeName());
+		if (it != m_Trees.end())
+		{
+			it->second->ChangeReferenceCount(false, tree->GetVersion());
+		}
 	}
 
 	TreeMgr::~TreeMgr()
@@ -105,11 +141,110 @@ namespace YBehavior
 
 	TreeMgr* TreeMgr::s_Instance;
 
+	void TreeMgr::Print()
+	{
+		std::cout << "Print all trees" << std::endl;
+		for (auto it = m_Trees.begin(); it != m_Trees.end(); ++it)
+		{
+			std::cout << it->first << std::endl;
+			it->second->Print();
+		}
+		std::cout << "Print all trees end." << std::endl;
+	}
+
+	void TreeInfo::Print()
+	{
+		for (auto it = m_TreeVersions.begin(); it != m_TreeVersions.end(); ++it)
+		{
+			std::cout << "version " << it->first << ", count " << it->second->referenceCount << std::endl;
+		}
+	}
+
+	TreeInfo::TreeInfo()
+		: m_LatestVersion(nullptr)
+	{
+		CreateVersion();
+	}
 
 	TreeInfo::~TreeInfo()
 	{
-		if (m_OriginalTree)
-			delete m_OriginalTree;
+		for (auto it = m_TreeVersions.begin(); it != m_TreeVersions.end(); ++it)
+		{
+			delete it->second->tree;
+			delete it->second;
+		}
+		m_TreeVersions.clear();
+	}
+
+	TreeVersion* TreeInfo::CreateVersion()
+	{
+		TreeVersion* pVersion = new TreeVersion();
+		if (m_LatestVersion == nullptr)
+		{
+			pVersion->version = 0;
+		}
+		else
+		{
+			pVersion->version = m_LatestVersion->version + 1;
+
+			///> Check if the current latest version has no reference. Remove it if true
+			if (m_LatestVersion->referenceCount <= 0)
+			{
+				int v = m_LatestVersion->version;
+				delete m_LatestVersion->tree;
+				delete m_LatestVersion;
+				m_TreeVersions.erase(v);
+			}
+		}
+		m_LatestVersion = pVersion;
+		m_TreeVersions[pVersion->version] = pVersion;
+
+		return pVersion;
+	}
+
+	void TreeInfo::IncreaseLatestVesion()
+	{
+		if (m_LatestVersion == nullptr || m_LatestVersion->tree == nullptr)
+			return;
+
+		CreateVersion();
+	}
+
+	void TreeInfo::SetLatestTree(BehaviorTree* tree)
+	{
+		if (m_LatestVersion == nullptr)
+			CreateVersion();
+		m_LatestVersion->tree = tree;
+		tree->SetVersion(m_LatestVersion->version);
+	}
+
+	void TreeInfo::ChangeReferenceCount(bool bInc, int versionNum /*= -1*/)
+	{
+		TreeVersion* version = nullptr;
+		if (versionNum < 0)
+			version = m_LatestVersion;
+		else
+		{
+			auto it = m_TreeVersions.find(versionNum);
+			if (it != m_TreeVersions.end())
+				version = it->second;
+		}
+
+		if (version == nullptr)
+			return;
+
+		if (bInc)
+			++(version->referenceCount);
+		else
+		{
+			if (--(version->referenceCount) <= 0 && m_LatestVersion != version)
+			{
+				///> Old version has no reference, remove it
+				delete version->tree;
+				delete version;
+				m_TreeVersions.erase(versionNum);
+			}
+		}
 	}
 
 }

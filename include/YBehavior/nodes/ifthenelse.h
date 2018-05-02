@@ -8,7 +8,7 @@ namespace YBehavior
 	class YBEHAVIOR_API IfThenElse : public BranchNode
 	{
 	public:
-		STRING GetName() const override { return "IfThenElse"; }
+		STRING GetClassName() const override { return "IfThenElse"; }
 	public:
 		IfThenElse();
 		~IfThenElse();

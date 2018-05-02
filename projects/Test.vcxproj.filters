@@ -21,6 +21,9 @@
     <ClCompile Include="..\src\Test\customactions.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Test\main-reload.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Test\customactions.h">

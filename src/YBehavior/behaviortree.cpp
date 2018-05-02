@@ -186,7 +186,7 @@ namespace YBehavior
 
 	BehaviorTree::BehaviorTree(const STRING& name)
 	{
-		m_Name = name;
+		m_TreeName = name;
 		m_SharedData = new SharedDataEx();
 	}
 

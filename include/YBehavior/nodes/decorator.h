@@ -8,21 +8,21 @@ namespace YBehavior
 	class YBEHAVIOR_API AlwaysSuccess : public SingleChildNode
 	{
 	public:
-		STRING GetName() const override { return "AlwaysSuccess"; }
+		STRING GetClassName() const override { return "AlwaysSuccess"; }
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 	};
 	class YBEHAVIOR_API AlwaysFailed : public SingleChildNode
 	{
 	public:
-		STRING GetName() const override { return "AlwaysFailed"; }
+		STRING GetClassName() const override { return "AlwaysFailed"; }
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 	};
 	class YBEHAVIOR_API Invertor : public SingleChildNode
 	{
 	public:
-		STRING GetName() const override { return "Invertor"; }
+		STRING GetClassName() const override { return "Invertor"; }
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 	};

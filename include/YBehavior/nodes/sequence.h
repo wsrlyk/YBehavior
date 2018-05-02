@@ -8,7 +8,7 @@ namespace YBehavior
 	class Sequence : public CompositeNode
 	{
 	public:
-		STRING GetName() const override { return "Sequence"; }
+		STRING GetClassName() const override { return "Sequence"; }
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
 	};

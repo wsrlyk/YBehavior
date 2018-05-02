@@ -25,7 +25,10 @@ public:
 		pAgent = new XAgent();
 		pAgent->SetTree("Monster_BlackCrystal");
 	}
-
+	~XEntity()
+	{
+		delete pAgent;
+	}
 	inline const std::string& GetName() { return m_Name; }
 	inline XAgent* GetAgent() { return pAgent; }
 };
@@ -34,7 +37,7 @@ public:
 class GetNameAction : public YBehavior::Action
 {
 public:
-	YBehavior::STRING GetName() const override { return "GetNameAction"; }
+	YBehavior::STRING GetClassName() const override { return "GetNameAction"; }
 protected:
 	virtual YBehavior::NodeState Update(YBehavior::AgentPtr pAgent);
 };

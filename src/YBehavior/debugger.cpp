@@ -48,7 +48,7 @@ namespace YBehavior
 		{
 			if (m_TargetAgent == 0 || m_TargetAgent == pAgent->GetUID())
 			{
-				if (pAgent->GetTree()->GetName() == m_TargetTree)
+				if (pAgent->GetTree()->GetTreeName() == m_TargetTree)
 				{
 					m_bTargetDirty = false;
 					m_TargetAgent = pAgent->GetUID();
@@ -191,7 +191,7 @@ namespace YBehavior
 		DebugMgr::Instance()->AppendSendContent(s_HeadSpliter);
 		DebugMgr::Instance()->AppendSendContent(Utility::ToString(m_pNode->GetUID()));
 		DebugMgr::Instance()->AppendSendContent(".");
-		DebugMgr::Instance()->AppendSendContent(m_pNode->GetName());
+		DebugMgr::Instance()->AppendSendContent(m_pNode->GetClassName());
 		DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
 
 		if (m_pLogInfo->beforeInfo.size() > 0)

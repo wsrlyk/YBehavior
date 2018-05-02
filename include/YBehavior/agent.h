@@ -15,6 +15,7 @@ namespace YBehavior
 		Uint m_UID;
 	public:
 		Agent();
+		~Agent();
 		inline SharedDataEx* GetSharedData() { return &m_SharedData; }
 		inline BehaviorTree* GetTree() { return m_Tree; }
 		void SetTree(const STRING& name);

@@ -62,7 +62,7 @@ namespace YBehavior
 		inline UINT GetUID() const { return m_UID; }
 		inline void SetUID(UINT uid) { m_UID = uid; }
 
-		virtual STRING GetName() const = 0;
+		virtual STRING GetClassName() const = 0;
 
 		void Load(const pugi::xml_node& data);
 		NodeState Execute(AgentPtr pAgent);
@@ -116,17 +116,21 @@ namespace YBehavior
 	{
 
 	};
+
 	class YBEHAVIOR_API BehaviorTree : public SingleChildNode
 	{
 	public:
-		STRING GetName() const override { return "Tree"; }
+		STRING GetClassName() const override { return "Tree"; }
+		inline void SetVersion(int v) { m_Version = v; }
+		inline int GetVersion() const { return m_Version; }
 	private:
 		SharedDataEx* m_SharedData;	///> 原始数据，每个使用此树的Agent都从这拷数据作为初始化
-		STRING m_Name;
+		STRING m_TreeName;
+		int m_Version;
 	public:
 		BehaviorTree(const STRING& name);
 		~BehaviorTree();
-		inline const STRING& GetName() { return m_Name; }
+		inline const STRING& GetTreeName() { return m_TreeName; }
 		inline SharedDataEx* GetSharedData() { return m_SharedData; }
 
 		void CloneData(SharedDataEx& destination);

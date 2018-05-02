@@ -14,29 +14,45 @@ namespace YBehavior
 {
 	class BehaviorNode;
 	class BehaviorTree;
+	struct TreeVersion
+	{
+		int version = -1;
+		BehaviorTree* tree = nullptr;
+		int referenceCount = 0;
+	};
 	class TreeInfo
 	{
 	public:
-		TreeInfo()
-			: m_OriginalTree(nullptr)
-		{
-
-		}
+		TreeInfo();
 		~TreeInfo();
-		BehaviorTree* m_OriginalTree;
+
+		TreeVersion* CreateVersion();
+		BehaviorTree* GetLatestTree() { return m_LatestVersion ? m_LatestVersion->tree : nullptr; }
+		void IncreaseLatestVesion();
+
+		void SetLatestTree(BehaviorTree* tree);
+		void ChangeReferenceCount(bool bInc, int versionNum = -1);
+		void Print();
+	private:
+		TreeVersion* m_LatestVersion;
+		std::unordered_map<int, TreeVersion*> m_TreeVersions;
 	};
 
 	class YBEHAVIOR_API TreeMgr
 	{
 	public:
-		BehaviorTree* GetTree(const STRING& name);
+		BehaviorTree * GetTree(const STRING& name);
+		///> Mark this tree dirty to reload it when GetTree
+		void ReloadTree(const STRING& name);
+		void ReturnTree(BehaviorTree* tree);
 		static TreeMgr* Instance();
+		void Print();
 	protected:
 		BehaviorTree* _LoadOneTree(const STRING& name);
 		bool _LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID);
 	private:
 		static TreeMgr* s_Instance;
-		TreeMgr(){}
+		TreeMgr() {}
 		~TreeMgr();
 
 		std::unordered_map<STRING, TreeInfo*> m_Trees;

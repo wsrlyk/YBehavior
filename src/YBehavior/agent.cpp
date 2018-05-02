@@ -22,3 +22,12 @@ YBehavior::Agent::Agent()
 {
 
 }
+
+YBehavior::Agent::~Agent()
+{
+	if (m_Tree)
+	{
+		TreeMgr::Instance()->ReturnTree(m_Tree);
+		m_Tree = nullptr;
+	}
+}
