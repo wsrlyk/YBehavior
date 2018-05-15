@@ -5,6 +5,7 @@
 #include "YBehavior/tools/bimap.h"
 #include "YBehavior/types.h"
 #include "YBehavior/logger.h"
+#include "utility.h"
 
 namespace YBehavior
 {
@@ -30,6 +31,7 @@ namespace YBehavior
 
 		virtual bool Compare(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op) = 0;
 		virtual void Calculate(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op) = 0;
+		virtual void Random(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1) = 0;
 	};
 
 	class ValueHandler
@@ -40,6 +42,13 @@ namespace YBehavior
 
 		template<typename T>
 		static void Calculate(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op);
+
+		template<typename T>
+		static void Random(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1);
+
+	private:
+		template<typename T>
+		static void _DoRandom(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pSmall, ISharedVariableEx* pLarge);
 	};
 
 	template<typename T>
@@ -110,17 +119,62 @@ namespace YBehavior
 
 		pLeft->SetValue(pData, &left);
 
-		LOG_BEGIN << "=>" << left << LOG_END;
+		LOG_BEGIN << " => " << left << LOG_END;
+	}
+
+
+	template<typename T>
+	void ValueHandler::Random(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
+	{
+	}
+
+	template<typename T>
+	void ValueHandler::_DoRandom(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
+	{
+		const T& right0 = *((const T*)pRight0->GetValue(pData));
+		const T& right1 = *((const T*)pRight1->GetValue(pData));
+
+		LOG_BEGIN << right0 << " " << right1;
+
+		if (right0 == right1)
+		{
+			pLeft->SetValue(pData, &right0);
+			return;
+		}
+		T small = right0;
+		T large = right1;
+		if (small > large)
+		{
+			T tmp = small;
+			small = large;
+			large = tmp;
+		}
+
+		T left = Utility::Rand(small, large);
+		pLeft->SetValue(pData, &left);
+
+		LOG_BEGIN << " => " << left << LOG_END;
 	}
 
 	template<>
 	bool ValueHandler::Compare<AgentWrapper>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op);
+
 
 	template<>
 	void ValueHandler::Calculate<String>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op);
 
 	template<>
 	void ValueHandler::Calculate<AgentWrapper>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op);
+
+
+	template<>
+	void ValueHandler::Random<Int>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1);
+
+	template<>
+	void ValueHandler::Random<Float>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1);
+
+	template<>
+	void ValueHandler::Random<Bool>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1);
 
 	/////////////////////////////////////
 	/////////////////////////////////////
@@ -141,6 +195,11 @@ namespace YBehavior
 		void Calculate(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op)
 		{
 			return ValueHandler::Calculate<T>(pData, pLeft, pRight0, pRight1, op);
+		}
+
+		void Random(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
+		{
+			return ValueHandler::Random<T>(pData, pLeft, pRight0, pRight1);
 		}
 	};
 	template<typename T> VariableOperationHelper<T> VariableOperationHelper<T>::s_Instance;

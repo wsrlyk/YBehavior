@@ -18,4 +18,23 @@ namespace YBehavior
 	{
 
 	}
+
+	template<>
+	void ValueHandler::Random<Int>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
+	{
+		_DoRandom<Int>(pData, pLeft, pRight0, pRight1);
+	}
+
+	template<>
+	void ValueHandler::Random<Float>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
+	{
+		_DoRandom<Float>(pData, pLeft, pRight0, pRight1);
+	}
+
+	template<>
+	void ValueHandler::Random<Bool>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
+	{
+		_DoRandom<Bool>(pData, pLeft, pRight0, pRight1);
+	}
+
 }

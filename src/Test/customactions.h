@@ -23,7 +23,7 @@ public:
 	{
 		m_Name = name;
 		pAgent = new XAgent();
-		pAgent->SetTree("Monster_BlackCrystal");
+		pAgent->SetTree("Monster_BlackCrystal2");
 	}
 	~XEntity()
 	{

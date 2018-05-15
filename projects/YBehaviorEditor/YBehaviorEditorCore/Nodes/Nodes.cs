@@ -118,7 +118,7 @@ namespace YBehavior.Editor.Core
                 "0",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const
+                Variable.VariableType.VBT_Pointer
             );
             opl.LockVBType = true;
             Variables.AddVariable(opl, 1);
@@ -189,7 +189,7 @@ namespace YBehavior.Editor.Core
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const
             );
-            opl.LockVBType = true;
+            //opl.LockVBType = true;
             Variables.AddVariable(opl, 1);
 
             Variable opr = Variable.CreateVariableInNode(
@@ -314,6 +314,61 @@ namespace YBehavior.Editor.Core
             new ConnectionSingle(this, "if");
             new ConnectionSingle(this, "then");
             new ConnectionSingle(this, "else");
+        }
+    }
+
+    class RandomNode : LeafNode
+    {
+        public RandomNode()
+        {
+            m_Name = "Random";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_DefaultAction;
+
+        }
+
+        public override void CreateVariables()
+        {
+            Variable opl = Variable.CreateVariableInNode(
+                "Target",
+                "0",
+                Variable.CreateParams_RandomTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer
+            );
+            opl.LockVBType = true;
+            Variables.AddVariable(opl, 1);
+
+            Variable opr1 = Variable.CreateVariableInNode(
+                "Bound1",
+                "0",
+                Variable.CreateParams_RandomTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const
+            );
+            Variables.AddVariable(opr1, 1);
+
+            Variable opr2 = Variable.CreateVariableInNode(
+                "Bound2",
+                "0",
+                Variable.CreateParams_RandomTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const
+            );
+            Variables.AddVariable(opr2, 1);
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} <= {{ {1} ~ {2} }}",
+                    Variables.GetVariable("Target").NoteValue,
+                    Variables.GetVariable("Bound1").NoteValue,
+                    Variables.GetVariable("Bound2").NoteValue);
+                return sb.ToString();
+            }
         }
     }
 }

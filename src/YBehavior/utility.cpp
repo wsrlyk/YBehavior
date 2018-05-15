@@ -8,6 +8,9 @@ namespace YBehavior
 
 	const YBehavior::STRING Utility::StringEmpty("");
 
+	std::random_device Utility::rd;
+	std::mt19937 Utility::mt(rd());
+
 	void Utility::SplitString(const STRING& s, std::vector<STRING>& output, CHAR c, int count)
 	{
 		int counter = 0;
@@ -63,6 +66,16 @@ namespace YBehavior
 	}
 
 	template<>
+	BOOL Utility::ToType(const STRING& str)
+	{
+		BOOL t;
+		std::stringstream ss;
+		ss << str;
+		ss >> std::boolalpha >> t;
+		return t;
+	}
+
+	template<>
 	STRING Utility::ToString(const BOOL& t)
 	{
 		STRING str;
@@ -85,5 +98,22 @@ namespace YBehavior
 		}
 		ss >> str;
 		return str;
+	}
+
+	template<>
+	Float Utility::Rand<Float>(const Float& small, const Float& large)
+	{
+		std::uniform_real_distribution<Float> dist(small, large);
+		return dist(mt);
+	}
+
+	template<>
+	Bool Utility::Rand<Bool>(const Bool& small, const Bool& large)
+	{
+		Int iSmall = small ? 1 : 0;
+		Int iLarge = large ? 1 : 2;
+
+		std::uniform_int_distribution<Int> dist(iSmall, iLarge);
+		return dist(mt);
 	}
 }

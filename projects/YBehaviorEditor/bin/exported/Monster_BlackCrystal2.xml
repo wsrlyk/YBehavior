@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Monster_BlackCrystal2>
+  <Node Class="Root" target="_AC " add0="_IC 1" add1="_IC 1" fftest="FFC 1.0|2.0|3.0" bbtest="BBC true|false|true|false" btest="_BC true" pos="_VC 100=200=300">
+    <Node Class="Sequence">
+      <Node Class="Random" Target="_BP btest" Bound1="_BC TRUE" Bound2="_BC FALSE" />
+    </Node>
+  </Node>
+</Monster_BlackCrystal2>

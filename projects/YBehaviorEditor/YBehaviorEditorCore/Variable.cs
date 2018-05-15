@@ -34,6 +34,8 @@ namespace YBehavior.Editor.Core
         public static readonly ValueType[] CreateParams_Enum = new ValueType[] { ValueType.VT_ENUM };
         public static readonly ValueType[] CreateParams_Vector3 = new ValueType[] { ValueType.VT_VECTOR3 };
         public static readonly ValueType[] CreateParams_AllTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_VECTOR3, ValueType.VT_STRING, ValueType.VT_BOOL, ValueType.VT_AGENT };
+        public static readonly ValueType[] CreateParams_RandomTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_BOOL };
+
 
         public enum ValueType
         {
@@ -382,7 +384,7 @@ namespace YBehavior.Editor.Core
                     break;
                 case ValueType.VT_BOOL:
                     {
-                        if (bool.TryParse(v, out bool a))
+                        if (bool.TryParse(v, out bool a) && System.Text.RegularExpressions.Regex.IsMatch(v, "[a-z]"))
                             return true;
                         LogMgr.Instance.Log(string.Format("Variable parse error: bool {0} == {1}", Name, v));
                     }

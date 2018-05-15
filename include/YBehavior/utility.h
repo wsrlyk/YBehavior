@@ -4,7 +4,7 @@
 #include "YBehavior/types.h"
 #include <vector>
 #include <sstream>
-
+#include <random>
 namespace YBehavior
 {
 	class Utility
@@ -37,6 +37,13 @@ namespace YBehavior
 		static STRING ToString(const std::vector<T>& t);
 		//template<>
 		//static STRING ToString(const std::vector<BOOL>& t);
+
+		template<typename T>
+		static T Rand(const T& small, const T& large);
+
+	private:
+		static std::random_device rd;
+		static std::mt19937 mt;
 	};
 
 	template<typename T>
@@ -48,6 +55,9 @@ namespace YBehavior
 		ss >> str;
 		return str;
 	}
+
+	template<>
+	BOOL Utility::ToType(const STRING& str);
 
 	template<>
 	STRING Utility::ToString(const BOOL& t);
@@ -70,6 +80,19 @@ namespace YBehavior
 
 	template<>
 	STRING Utility::ToString(const std::vector<BOOL>& t);
+
+	template<typename T>
+	T Utility::Rand(const T& small, const T& large)
+	{
+		std::uniform_int_distribution<T> dist(small, large);
+		return dist(mt);
+	}
+
+	template<>
+	Float Utility::Rand<Float>(const Float& small, const Float& large);
+
+	template<>
+	Bool Utility::Rand<Bool>(const Bool& small, const Bool& large);
 
 }
 
