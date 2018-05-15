@@ -221,6 +221,7 @@ namespace YBehavior.Editor.Core
         }
 
         public virtual string Note => string.Empty;
+        public virtual string Icon => Connection.IdentifierParent;
 
         protected NodeType m_Type = NodeType.NT_Invalid;
         public NodeType Type { get { return m_Type; } set { m_Type = value; } }

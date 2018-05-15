@@ -212,7 +212,7 @@ namespace YBehavior.Editor.Core
             {
                 UIConnector uiConnector = new UIConnector
                 {
-                    Title = Connection.IdentifierParent,
+                    Title = m_Owner.Icon,
                     ConnHolder = m_Owner.Conns.ParentHolder
                 };
                 uiConnector.SetCanvas(m_Canvas);

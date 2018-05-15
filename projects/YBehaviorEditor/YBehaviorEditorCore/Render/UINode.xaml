@@ -31,7 +31,7 @@
         </Storyboard>
     </UserControl.Resources>
     <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Height="10"  Name="topConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
+        <StackPanel DockPanel.Dock="Top" Height="20"  Name="topConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
         <StackPanel DockPanel.Dock="Bottom" Height="10" Name="bottomConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
         <Border Name="border" BorderThickness="3" BorderBrush="#FFAFCEE8" Background="#FF70B6F0">
             <Grid>

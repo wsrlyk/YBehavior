@@ -40,6 +40,8 @@ namespace YBehavior.Editor.Core
             m_Type = NodeType.NT_Default;
             m_Hierachy = NodeHierachy.NH_Sequence;
         }
+
+        public override string Icon => "➜➜➜";
     }
     class SelectorNode : CompositeNode
     {
@@ -49,6 +51,8 @@ namespace YBehavior.Editor.Core
             m_Type = NodeType.NT_Default;
             m_Hierachy = NodeHierachy.NH_Selector;
         }
+
+        public override string Icon => "？？？";
     }
 
     class ActionNode : LeafNode
@@ -56,6 +60,7 @@ namespace YBehavior.Editor.Core
         public string NoteFormat { get; set; }
         public string ClassName { get; set; }
         public override string Name => ClassName;
+        public override string Icon => "▶";
 
         public ActionNode()
         {
@@ -92,6 +97,7 @@ namespace YBehavior.Editor.Core
     {
         static Dictionary<string, string> s_OperatorDic = new Dictionary<string, string>() { { "ADD", "+" }, { "SUB", "-" }, { "MUL", "*" }, { "DIV", "/" } };
 
+        public override string Icon => "+-x/";
         public CalculatorNode()
         {
             m_Name = "Calculator";
@@ -160,6 +166,7 @@ namespace YBehavior.Editor.Core
     class ComparerNode : LeafNode
     {
         //static Dictionary<string, string> s_OperatorDic = new Dictionary<string, string>() { { "ADD", "+" }, { "SUB", "-" }, { "MUL", "*" }, { "DIV", "/" } };
+        public override string Icon => "x ？y";
 
         public ComparerNode()
         {
@@ -219,6 +226,8 @@ namespace YBehavior.Editor.Core
 
     class SetDataNode : LeafNode
     {
+        public override string Icon => "x<=y";
+
         public SetDataNode()
         {
             m_Name = "SetData";
@@ -263,18 +272,10 @@ namespace YBehavior.Editor.Core
         }
     }
 
-    class NotNode : SingleChildNode
-    {
-        public NotNode()
-        {
-            m_Name = "Not";
-            m_Type = NodeType.NT_Default;
-            m_Hierachy = NodeHierachy.NH_Decorator;
-        }
-    }
-
     class AlwaysSuccessNode : SingleChildNode
     {
+        public override string Icon => "✔";
+
         public AlwaysSuccessNode()
         {
             m_Name = "AlwaysSuccess";
@@ -285,6 +286,8 @@ namespace YBehavior.Editor.Core
 
     class AlwaysFailedNode : SingleChildNode
     {
+        public override string Icon => "✘";
+
         public AlwaysFailedNode()
         {
             m_Name = "AlwaysFailed";
@@ -295,6 +298,8 @@ namespace YBehavior.Editor.Core
 
     class InvertorNode : SingleChildNode
     {
+        public override string Icon => "!";
+
         public InvertorNode()
         {
             m_Name = "Invertor";
@@ -305,6 +310,8 @@ namespace YBehavior.Editor.Core
 
     class IfThenElseNode : Node
     {
+        public override string Icon => "↙ ？↘";
+
         public IfThenElseNode()
         {
             m_Name = "IfThenElse";
@@ -319,6 +326,8 @@ namespace YBehavior.Editor.Core
 
     class RandomNode : LeafNode
     {
+        public override string Icon => " ？";
+
         public RandomNode()
         {
             m_Name = "Random";
