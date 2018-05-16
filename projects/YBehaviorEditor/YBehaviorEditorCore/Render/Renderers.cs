@@ -194,6 +194,7 @@ namespace YBehavior.Editor.Core
         {
             _CreateFrame(m_Owner);
             _CreateConnectors();
+            _SetCommentPos();
         }
 
         private void _CreateFrame(Node node)
@@ -240,6 +241,13 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        private void _SetCommentPos()
+        {
+            //if (m_uiFrame.bottomConnectors.Children.Count > 0)
+            //    DockPanel.SetDock(m_uiFrame.commentBorder, Dock.Right);
+            //else
+            //    DockPanel.SetDock(m_uiFrame.commentBorder, Dock.Bottom);
+        }
         public void DragMain(Vector delta)
         {
             _Move(delta);

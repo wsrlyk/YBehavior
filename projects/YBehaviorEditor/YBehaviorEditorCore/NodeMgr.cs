@@ -223,6 +223,17 @@ namespace YBehavior.Editor.Core
         public virtual string Note => string.Empty;
         public virtual string Icon => Connection.IdentifierParent;
 
+        string m_Comment = "This is a node comment test.";
+        public string Comment
+        {
+            get { return m_Comment; }
+            set
+            {
+                m_Comment = value;
+                OnPropertyChanged("Comment");
+            }
+        }
+
         protected NodeType m_Type = NodeType.NT_Invalid;
         public NodeType Type { get { return m_Type; } set { m_Type = value; } }
         protected NodeHierachy m_Hierachy = NodeHierachy.NH_None;

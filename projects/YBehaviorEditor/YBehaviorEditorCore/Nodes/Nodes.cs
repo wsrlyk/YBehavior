@@ -97,7 +97,7 @@ namespace YBehavior.Editor.Core
     {
         static Dictionary<string, string> s_OperatorDic = new Dictionary<string, string>() { { "ADD", "+" }, { "SUB", "-" }, { "MUL", "*" }, { "DIV", "/" } };
 
-        public override string Icon => "+-x/";
+        public override string Icon => "+-×÷";
         public CalculatorNode()
         {
             m_Name = "Calculator";
@@ -194,9 +194,9 @@ namespace YBehavior.Editor.Core
                 "0",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const
+                Variable.VariableType.VBT_Pointer
             );
-            //opl.LockVBType = true;
+            opl.LockVBType = true;
             Variables.AddVariable(opl, 1);
 
             Variable opr = Variable.CreateVariableInNode(

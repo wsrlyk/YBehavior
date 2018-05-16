@@ -107,6 +107,22 @@ namespace YBehavior.Editor
         }
     }
 
+    [ValueConversion(typeof(string), typeof(bool))]
+    public class StringNullOrEmptyConvertor : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string s = value as string;
+            return string.IsNullOrEmpty(s);
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+            //string s = (string)value;
+            //return ValueTypeDic.GetKey(s, Variable.ValueType.VT_NONE);
+        }
+    }
+
 
     public class ValueConverterGroup : List<IValueConverter>, IValueConverter
     {
