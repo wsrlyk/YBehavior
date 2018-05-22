@@ -256,8 +256,8 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        private Geometry m_Geo = new Geometry();
-        public Geometry Geo { get { return m_Geo; } }
+        //private Geometry m_Geo = new Geometry();
+        //public Geometry Geo { get { return m_Geo; } }
 
         public DebugPointInfo DebugPointInfo { get; } = new DebugPointInfo();
 
@@ -287,6 +287,7 @@ namespace YBehavior.Editor.Core
                 m_Connections.CreateParentHolder(this);
 
             m_Variables = new SharedData(this);
+            m_Renderer = new Renderer(this);
         }
 
         public virtual void Load(System.Xml.XmlNode data)
@@ -304,7 +305,7 @@ namespace YBehavior.Editor.Core
             switch (attr.Name)
             {
                 case "Pos":
-                    m_Geo.Pos = Point.Parse(attr.Value);
+                    Renderer.Geo.Pos = Point.Parse(attr.Value);
                     break;
                 case "NickName":
                     m_NickName = attr.Value;
@@ -381,7 +382,7 @@ namespace YBehavior.Editor.Core
                     data.SetAttribute("Connection", Conns.ParentHolder.Conn.Identifier);
             }
 
-            data.SetAttribute("Pos", m_Geo.Pos.ToString());
+            data.SetAttribute("Pos", Renderer.Geo.Pos.ToString());
             if (!string.IsNullOrEmpty(m_NickName))
                 data.SetAttribute("NickName", m_NickName);
 
@@ -467,8 +468,8 @@ namespace YBehavior.Editor.Core
             other.m_Type = this.m_Type;
             other.m_Hierachy = this.m_Hierachy;
             other.m_NickName = this.m_NickName;
-            other.m_Geo.Copy(this.m_Geo);
-            other.m_Geo.Pos = other.m_Geo.Pos + new Vector(5, 5);
+            other.Renderer.Geo.Copy(this.Renderer.Geo);
+            other.Renderer.Geo.Pos = other.Renderer.Geo.Pos + new Vector(5, 5);
             other.m_TreeSharedData = this.m_TreeSharedData;
 
             foreach (var v in m_Variables.Datas.Values)
@@ -477,6 +478,34 @@ namespace YBehavior.Editor.Core
                 other.Variables.AddVariable(newv);
             }
             return other;
+        }
+
+        public void Delete(int param)
+        {
+            ///> Check if is root
+            if (Type == NodeType.NT_Root)
+                return;
+
+            ///> Disconnect all the connection
+            NodesDisconnectedArg arg = new NodesDisconnectedArg();
+            arg.ChildHolder = Conns.ParentHolder;
+            EventMgr.Instance.Send(arg);
+
+            foreach (var child in Conns)
+            {
+                Node chi = child as Node;
+                if (chi == null)
+                    continue;
+                arg.ChildHolder = chi.Conns.ParentHolder;
+                EventMgr.Instance.Send(arg);
+
+                if (param != 0)
+                    chi.Delete(param);
+            }
+
+            RemoveNodeArg removeArg = new RemoveNodeArg();
+            removeArg.Node = this;
+            EventMgr.Instance.Send(removeArg);
         }
 
         public void SetDebugPoint(int count)
@@ -493,7 +522,7 @@ namespace YBehavior.Editor.Core
             if (a == null || b == null)
                 return 0;
 
-            return a.Geo.Pos.X.CompareTo(b.Geo.Pos.X);
+            return a.Renderer.Geo.Pos.X.CompareTo(b.Renderer.Geo.Pos.X);
         }
     }
 

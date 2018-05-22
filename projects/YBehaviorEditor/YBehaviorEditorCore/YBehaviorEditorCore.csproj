@@ -48,6 +48,7 @@
     <Compile Include="ExternalActionMgr.cs" />
     <Compile Include="MessageProcessor.cs" />
     <Compile Include="NetworkMgr.cs" />
+    <Compile Include="Render\RenderMgr.cs" />
     <Compile Include="SharedData.cs" />
     <Compile Include="Tools\Bimap.cs" />
     <Compile Include="Tools\ObservableCollectionEx.cs" />
@@ -61,16 +62,6 @@
     <Compile Include="Operation.cs" />
     <Compile Include="RenderersMgr.cs" />
     <Compile Include="NodeMgr.cs" />
-    <Compile Include="Render\DraggingConnection.cs" />
-    <Compile Include="Render\UIConnection.xaml.cs">
-      <DependentUpon>UIConnection.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Render\UIConnector.xaml.cs">
-      <DependentUpon>UIConnector.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Render\UINode.xaml.cs">
-      <DependentUpon>UINode.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Render\Renderers.cs" />
     <Compile Include="Nodes\Nodes.cs" />
     <Compile Include="DragDropMgr.cs" />
@@ -80,20 +71,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorkBenchMgr.cs" />
     <Compile Include="WorkBench.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Render\UIConnection.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Render\UIConnector.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Render\UINode.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

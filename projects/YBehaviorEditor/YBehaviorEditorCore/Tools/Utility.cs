@@ -9,7 +9,6 @@ namespace YBehavior.Editor.Core
         public static Node CloneNode(Node template, bool bIncludeChildren)
         {
             Node node = template.Clone();
-            node.CreateRenderer();
             node.Init();
 
             if (bIncludeChildren)

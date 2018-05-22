@@ -63,6 +63,7 @@
     <Compile Include="DebugFrame.xaml.cs">
       <DependentUpon>DebugFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DraggingConnection.cs" />
     <Compile Include="Helpers\VariableHelper.cs" />
     <Compile Include="NodeListFrame.xaml.cs">
       <DependentUpon>NodeListFrame.xaml</DependentUpon>
@@ -74,6 +75,15 @@
     </Compile>
     <Compile Include="UIComment.xaml.cs">
       <DependentUpon>UIComment.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIConnection.xaml.cs">
+      <DependentUpon>UIConnection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIConnector.xaml.cs">
+      <DependentUpon>UIConnector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UINode.xaml.cs">
+      <DependentUpon>UINode.xaml</DependentUpon>
     </Compile>
     <Compile Include="VariablesFrame.xaml.cs">
       <DependentUpon>VariablesFrame.xaml</DependentUpon>
@@ -119,6 +129,18 @@
     <Page Include="UIComment.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIConnection.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UIConnector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UINode.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="VariablesFrame.xaml">
       <Generator>MSBuild:Compile</Generator>

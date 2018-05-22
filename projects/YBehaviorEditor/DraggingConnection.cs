@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using YBehavior.Editor.Core;
 
-namespace YBehavior.Editor.Core
+namespace YBehavior.Editor
 {
     public class DraggingConnection : Singleton<DraggingConnection>
     {

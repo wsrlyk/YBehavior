@@ -19,7 +19,7 @@ namespace YBehavior.Editor.Core
         DragHandler m_StartDragHandler;
 
         RenderCanvas m_Canvas;
-        RenderCanvas RenderCanvas
+        public RenderCanvas RenderCanvas
         {
             get
             {

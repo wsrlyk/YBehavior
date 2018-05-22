@@ -11,8 +11,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using YBehavior.Editor.Core;
 
-namespace YBehavior.Editor.Core
+namespace YBehavior.Editor
 {
     /// <summary>
     /// UIConnector.xaml 的交互逻辑
@@ -31,6 +32,25 @@ namespace YBehavior.Editor.Core
 
         Operation m_Operation;
 
+        #region Dependency Property/Event Definitions
+
+        public static readonly DependencyProperty HotspotProperty =
+            DependencyProperty.Register("Hotspot", typeof(Point), typeof(UIConnector));
+
+        #endregion Dependency Property/Event Definitions
+
+        public Point Hotspot
+        {
+            get
+            {
+                return (Point)GetValue(HotspotProperty);
+            }
+            set
+            {
+                SetValue(HotspotProperty, value);
+            }
+        }
+
         public UIConnector()
         {
             InitializeComponent();
@@ -43,6 +63,18 @@ namespace YBehavior.Editor.Core
 
             m_Operation = new Operation(this);
             m_Operation.RegisterDragDrop(_OnDragged, _OnStartDragged);
+
+            this.LayoutUpdated += _OnLayoutUpdated;
+        }
+
+        void _OnLayoutUpdated(object sender, EventArgs e)
+        {
+            _UpdateHotspot();
+        }
+
+        private void _UpdateHotspot()
+        {
+            Hotspot = GetPos(m_Operation.RenderCanvas.Panel);
         }
 
         public void SetCanvas(RenderCanvas canvas)

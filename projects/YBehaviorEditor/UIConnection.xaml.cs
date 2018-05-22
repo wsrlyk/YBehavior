@@ -11,8 +11,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using YBehavior.Editor.Core;
 
-namespace YBehavior.Editor.Core
+namespace YBehavior.Editor
 {
     /// <summary>
     /// UIConnection.xaml 的交互逻辑
@@ -33,14 +34,20 @@ namespace YBehavior.Editor.Core
         public UIConnection()
         {
             InitializeComponent();
-            figure = PathGeometry.Figures[0];
-            Clear();
+            //figure = PathGeometry.Figures[0];
+            //Clear();
             normalStrokeBrush = this.path.Stroke;
 
             SelectHandler = new SelectionStateChangeHandler(defaultSelectHandler);
 
             m_Operation = new Operation(this);
             m_Operation.RegisterClick(_OnClick);
+            this.DataContextChanged += _DataContextChangedEventHandler;
+        }
+
+        void _DataContextChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            ConnectionRenderer renderer = this.DataContext as ConnectionRenderer;
         }
 
         public void SetCanvas(RenderCanvas canvas)

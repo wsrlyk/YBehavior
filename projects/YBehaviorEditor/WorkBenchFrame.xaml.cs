@@ -130,6 +130,9 @@ namespace YBehavior.Editor
                 this.commentLayer.ItemsSource = oArg.Bench.Comments;
             else
                 this.commentLayer.ItemsSource = null;
+
+            this.nodeLayer.ItemsSource = RenderMgr.Instance.NodeList;
+            this.connectionLayer.ItemsSource = RenderMgr.Instance.ConnectionList;
         }
 
         private void _OnTickResult(EventArg arg)
@@ -243,19 +246,24 @@ namespace YBehavior.Editor
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
             if (bench == null)
                 return;
-            _CreateNode(bench.MainTree);
 
-            foreach (var node in bench.Forest)
+            using (var handler = RenderMgr.Instance.NodeList.Delay())
             {
-                _CreateNode(node);
-            }
+                RenderMgr.Instance.ClearNodes();
 
+                _CreateNode(bench.MainTree);
+
+                foreach (var node in bench.Forest)
+                {
+                    _CreateNode(node);
+                }
+            }
             //this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(_ThreadRefreshConnections));
         }
 
         void _CreateNode(Node node)
         {
-            node.Renderer.AddedToPanel(this.nodeLayer);
+            node.Renderer.AddedToPanel(nodeLayer);
             //node.Renderer.CreateConnections();
         }
 
@@ -302,7 +310,7 @@ namespace YBehavior.Editor
 
         public void ClearCanvas()
         {
-            this.nodeLayer.Children.Clear();
+            RenderMgr.Instance.ClearNodes();
         }
         private void TabController_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

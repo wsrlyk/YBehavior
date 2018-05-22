@@ -19,7 +19,7 @@ namespace YBehavior.Editor.Core
     public delegate void DragHandler(IDragable obj, bool bState);
     public delegate void DropHandler(IDropable obj);
 
-    class DragDropMgr : Singleton<DragDropMgr>
+    public class DragDropMgr : Singleton<DragDropMgr>
     {
         IDragable m_Dragging;
         IDropable m_Dropping;
