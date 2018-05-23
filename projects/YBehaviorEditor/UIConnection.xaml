@@ -10,7 +10,8 @@
         <Path.Data>
             <PathGeometry>
                 <PathFigure IsFilled="False" StartPoint="{Binding ParentPos, Mode=OneWay}"  IsClosed="False">
-                    <LineSegment Point="{Binding ParentPos, Mode=OneWay}" />
+                    <LineSegment Point="{Binding FirstCorner, Mode=OneWay}" />
+                    <LineSegment Point="{Binding SecondCorner, Mode=OneWay}" />
                     <LineSegment Point="{Binding ChildPos, Mode=OneWay}" />
                 </PathFigure>
             </PathGeometry>
