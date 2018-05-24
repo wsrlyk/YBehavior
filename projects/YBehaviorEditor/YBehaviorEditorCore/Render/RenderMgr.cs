@@ -14,6 +14,10 @@ namespace YBehavior.Editor.Core
         {
             ConnectionList.Add(connectionRenderer);
         }
+        public void RemoveConnection(ConnectionRenderer connectionRenderer)
+        {
+            ConnectionList.Remove(connectionRenderer);
+        }
 
         public void AddNode(Renderer renderer)
         {

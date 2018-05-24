@@ -34,7 +34,7 @@ namespace YBehavior.Editor
         public UIConnection()
         {
             InitializeComponent();
-            //figure = PathGeometry.Figures[0];
+            figure = PathGeometry.Figures[0];
             //Clear();
             normalStrokeBrush = this.path.Stroke;
 
@@ -48,6 +48,9 @@ namespace YBehavior.Editor
         void _DataContextChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e)
         {
             ConnectionRenderer renderer = this.DataContext as ConnectionRenderer;
+            ChildHolder = renderer.ChildConn;
+
+            SetCanvas((renderer.ChildConn.Owner as Node).Renderer.RenderCanvas);
         }
 
         public void SetCanvas(RenderCanvas canvas)
@@ -57,31 +60,24 @@ namespace YBehavior.Editor
 
         public PathGeometry PathGeometry { get { return path.Data as PathGeometry; } }
 
-        public void Clear()
-        {
-            figure.Segments.Clear();
-            figure.StartPoint = new Point();
-        }
+        //public void Clear()
+        //{
+        //    figure.Segments.Clear();
+        //    figure.StartPoint = new Point();
+        //}
 
         public void SetWithMidY(Point start, Point end, double midY)
         {
-            Clear();
+            //Clear();
             figure.StartPoint = start;
-            LineSegment fstLine = new LineSegment
-            {
-                Point = new Point(start.X, midY)
-            };
-            LineSegment secLine = new LineSegment
-            {
-                Point = new Point(end.X, midY)
-            };
-            LineSegment trdLine = new LineSegment
-            {
-                Point = end
-            };
-            figure.Segments.Add(fstLine);
-            figure.Segments.Add(secLine);
-            figure.Segments.Add(trdLine);
+
+            LineSegment fstLine = figure.Segments[0] as LineSegment;
+            fstLine.Point = new Point(start.X, midY);
+            LineSegment secLine = figure.Segments[1] as LineSegment;
+            secLine.Point = new Point(end.X, midY);
+            LineSegment trdLine = figure.Segments[2] as LineSegment;
+            trdLine.Point = end;
+
         }
 
         void _OnClick()

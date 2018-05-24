@@ -53,7 +53,6 @@ namespace YBehavior.Editor
         void _DataContextChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e)
         {
             Node = (DataContext as Renderer).Owner;
-            Node.Renderer.UINodeRef = this;
 
             SetCanvas(Node.Renderer.RenderCanvas);
 
@@ -79,7 +78,7 @@ namespace YBehavior.Editor
 
             if (m_uiConnectors.TryGetValue(identifier, out UIConnector uiConnector))
             {
-                ConnectorGeometry geo = Node.Renderer.GetConnectorGeometry(identifier);
+                ConnectorGeometry geo = Node.Conns.GetConnHolder(identifier).Geo;
                 uiConnector.DataContext = geo;
                 uiConnector.SetBinding(UIConnector.HotspotProperty, new Binding()
                 {

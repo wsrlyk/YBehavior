@@ -47,8 +47,8 @@ namespace YBehavior.Editor.Core
             if (ConnectionHolder.TryConnect(oArg.Holder0, oArg.Holder1, out parent, out child))
             {
                 ///> refresh parent connections
-                Node parentNode = parent.Owner as Node;
-                parentNode.Renderer.CreateConnections();
+                //Node parentNode = parent.Owner as Node;
+                //parentNode.Renderer.CreateConnections();
 
                 Node childNode = child.Owner as Node;
                 RemoveSubTree(childNode);
@@ -72,8 +72,8 @@ namespace YBehavior.Editor.Core
 
             if (conn.RemoveNode(oArg.ChildHolder.Owner))
             {
-                Node parentNode = conn.Owner as Node;
-                parentNode.Renderer.CreateConnections();
+                //Node parentNode = conn.Owner as Node;
+                //parentNode.Renderer.CreateConnections();
 
                 Node childNode = oArg.ChildHolder.Owner as Node;
                 AddSubTree(childNode);
@@ -166,7 +166,7 @@ namespace YBehavior.Editor.Core
             bool bRes = _LoadOneNode(tree, data);
 
             RefreshNodeUID();
-            tree.Renderer.CreateConnections();
+            //tree.Renderer.CreateConnections();
             return bRes;
         }
 

@@ -17,26 +17,6 @@ namespace YBehavior.Editor.Core
     public class ConnectorGeometry
     {
         public string Identifier { get; set; }
-        public double X
-        {
-            get { return m_Pos.X; }
-            set
-            {
-                m_Pos.X = value;
-                if (onPosChanged != null)
-                    onPosChanged();
-            }
-        }
-        public double Y
-        {
-            get { return m_Pos.Y; }
-            set
-            {
-                m_Pos.Y = value;
-                if (onPosChanged != null)
-                    onPosChanged();
-            }
-        }
 
         Point m_Pos;
         public Point Pos
@@ -111,16 +91,7 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        Renderer m_ParentRenderer;
-        public Renderer ParentRenderer
-        {
-            get { return m_ParentRenderer; }
-            set
-            {
-                m_ParentRenderer = value;
-            }
-        }
-        public Renderer ChildRenderer { get; set; }
+        public ConnectionHolder ChildConn { get; set; }
 
         void _OnChildPosChanged()
         {
@@ -144,8 +115,7 @@ namespace YBehavior.Editor.Core
         {
             ParentConnectorGeo = null;
             ChildConnectorGeo = null;
-            ParentRenderer = null;
-            ChildRenderer = null;
+            ChildConn = null;
         }
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         internal protected void OnPropertyChanged(string propertyName)
@@ -169,26 +139,6 @@ namespace YBehavior.Editor.Core
         //public UINode Frame { get { return m_uiFrame; } }
 
         public Geometry Geo { get; } = new Geometry();
-        Dictionary<string, ConnectorGeometry> m_ConnectorGeos = new Dictionary<string, ConnectorGeometry>();
-        public ConnectorGeometry GetConnectorGeometry(string identifier)
-        {
-            if (m_ConnectorGeos.TryGetValue(identifier, out ConnectorGeometry geo))
-            {
-                return geo;
-            }
-            return null;
-        }
-
-        Dictionary<Node, ConnectionRenderer> m_Connections = new Dictionary<Node, ConnectionRenderer>();
-        public ConnectionRenderer GetConnectionRenderer(Node node)
-        {
-            if (m_Connections.TryGetValue(node, out ConnectionRenderer renderer))
-            {
-                return renderer;
-            }
-            return null;
-        }
-        public object UINodeRef { get; set; }
 
         public Renderer(Node node)
         {
@@ -199,35 +149,6 @@ namespace YBehavior.Editor.Core
             //};
 
             _CreateSelf();
-        }
-
-        //Dictionary<Node, UIConnection> m_uiConns = new Dictionary<Node, UIConnection>();
-
-        //Dictionary<string, UIConnector> m_uiConnectors = new Dictionary<string, UIConnector>();
-        //public UIConnector GetConnector(string identifier)
-        //{
-        //    UIConnector conn;
-        //    m_uiConnectors.TryGetValue(identifier, out conn);
-        //    return conn;
-        //}
-
-        public void Refresh()
-        {
-            _RefreshSelf();
-
-            foreach (Node child in m_Owner.Conns)
-            {
-                child.Renderer.Refresh();
-            }
-        }
-
-        private void _RefreshSelf()
-        {
-            // TODO
-            //m_uiFrame.SetDebug(NodeState.NS_INVALID);
-
-            //Canvas.SetLeft(m_uiFrame, Geo.Pos.X);
-            //Canvas.SetTop(m_uiFrame, Geo.Pos.Y);
         }
 
         public void RefreshDebug(bool bInstant)
@@ -270,119 +191,10 @@ namespace YBehavior.Editor.Core
             //panel.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(RefreshConn));
         }
 
-        protected void _ClearConns()
-        {
-            //foreach (var pair in m_uiConns)
-            //{
-            //    m_Canvas.Panel.Children.Remove(pair.Value);
-            //}
-            //m_uiConns.Clear();
-            m_Connections.Clear();
-        }
-        protected double _CalcHorizontalPos(Connection conn)
-        {
-            double y = 0;
-            double miny = double.MaxValue;
-            foreach (Node child in conn)
-            {
-                double top = child.Renderer.GetConnectorGeometry(Connection.IdentifierParent).Pos.Y;
-                y += top;
-                miny = Math.Min(miny, top);
-            }
-            y /= conn.NodeCount;
-            y -= 20;
-            miny -= 20;
-            y = Math.Min(miny, y);
-            y = Math.Max(y, GetConnectorGeometry(conn.Identifier).Pos.Y + /*Frame.ActualHeight + */10);
-            return y;
-        }
-
-        public void CreateConnections()
-        {
-            _ClearConns();
-            foreach (ConnectionHolder conn in m_Owner.Conns.ConnectionsList)
-            {
-                //double y = _CalcHorizontalPos(conn.Conn);
-                foreach (Node child in conn.Conn)
-                {
-                    child.Renderer.CreateConnections();
-                    _CreateConn(child, 0);
-                }
-            }
-
-            //if (m_Canvas.Panel != null)
-            //    m_Canvas.Panel.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(RefreshConn));
-        }
-
-        public void RefreshConns()
-        {
-            RefreshConn();
-            foreach (Node child in m_Owner.Conns)
-            {
-                child.Renderer.RefreshConns();
-            }
-        }
-
-        public void RefreshConn()
-        {
-            foreach (ConnectionHolder conn in m_Owner.Conns.ConnectionsList)
-            {
-                //double y = _CalcHorizontalPos(conn.Conn);
-                foreach (Node child in conn.Conn)
-                {
-                    ConnectionRenderer connectionRenderer;
-                    if (!m_Connections.TryGetValue(child, out connectionRenderer))
-                        continue;
-
-                    _SetConn(connectionRenderer, child, 0);
-                }
-            }
-        }
-        protected void _CreateConn(Node child, double horizontalPos)
-        {
-            //UIConnection path = new UIConnection();
-            //path.SetCanvas(m_Canvas);
-            //path.ChildHolder = child.Conns.ParentHolder;
-
-            //if (m_Canvas.Panel != null)
-            //    m_Canvas.Panel.Children.Add(path);
-            //Panel.SetZIndex(path, -999);
-            //m_uiConns.Add(child, path);
-            ConnectionRenderer connectionRenderer = new ConnectionRenderer();
-            _SetConn(connectionRenderer, child, horizontalPos);
-            m_Connections.Add(child, connectionRenderer);
-            RenderMgr.Instance.AddConnection(connectionRenderer);
-        }
-
-        protected void _SetConn(ConnectionRenderer connectionRenderer, Node child, double horizontalPos)
-        {
-            connectionRenderer.ParentConnectorGeo = this.GetConnectorGeometry(child.ParentConn.Identifier);
-            connectionRenderer.ChildConnectorGeo = child.Renderer.GetConnectorGeometry(Connection.IdentifierParent);
-            connectionRenderer.ParentRenderer = this;
-            connectionRenderer.ChildRenderer = child.Renderer;
-        }
-
-        //protected void _DrawConnLine(UIConnection path, Node child, double horizontalPos)
-        //{
-        //    if (child.ParentConn == null)
-        //        return;
-            //UIConnector uiConn = GetConnector(child.ParentConn.Identifier);
-            //if (uiConn == null)
-            //    return;
-            //UIConnector childConn = child.Renderer.GetConnector(Connection.IdentifierParent);
-            //if (childConn == null)
-            //    return;
-
-            //Point parentPoint = uiConn.GetPos(m_Canvas.Panel);
-            //Point childPoint = childConn.GetPos(m_Canvas.Panel);
-
-            //path.SetWithMidY(parentPoint, childPoint, horizontalPos);
-        //}
-
         protected virtual void _CreateSelf()
         {
             //_CreateFrame(m_Owner);
-            _CreateConnectors();
+            //_CreateConnectors();
             _SetCommentPos();
         }
 
@@ -392,60 +204,6 @@ namespace YBehavior.Editor.Core
         //    m_uiFrame.DataContext = node;
         //}
 
-        private void _CreateConnectors()
-        {
-            m_ConnectorGeos.Clear();
-
-            if (m_Owner.Conns.ParentHolder != null)
-            {
-                ConnectorGeometry connector = new ConnectorGeometry
-                {
-                    Identifier = Connection.IdentifierParent,
-                    onPosChanged = _OnParentConnectorChanged
-                };
-                m_ConnectorGeos.Add(Connection.IdentifierParent, connector);
-            }
-
-            foreach (ConnectionHolder conn in m_Owner.Conns.ConnectionsList)
-            {
-                if (conn.Conn is ConnectionNone)
-                    continue;
-
-                ConnectorGeometry connector = new ConnectorGeometry
-                {
-                    Identifier = conn.Conn.Identifier,
-                    onPosChanged = _OnChildConnectorChanged
-                };
-                m_ConnectorGeos.Add(conn.Conn.Identifier, connector);
-            }
-        }
-
-        private void _OnParentConnectorChanged()
-        {
-            Node parent = m_Owner.Parent as Node;
-            if (parent != null)
-            {
-                parent.Renderer._RecalcMidY();
-            }
-        }
-
-
-        private void _OnChildConnectorChanged()
-        {
-            _RecalcMidY();
-        }
-
-        private void _RecalcMidY()
-        {
-            foreach (ConnectionHolder conn in m_Owner.Conns.ConnectionsList)
-            {
-                ConnectorGeometry geo = GetConnectorGeometry(conn.Conn.Identifier);
-                if (geo == null)
-                    continue;
-                double y = _CalcHorizontalPos(conn.Conn);
-                geo.MidY = y;
-            }
-        }
         private void _SetCommentPos()
         {
             //if (m_uiFrame.bottomConnectors.Children.Count > 0)
@@ -456,24 +214,13 @@ namespace YBehavior.Editor.Core
         public void DragMain(Vector delta)
         {
             _Move(delta);
-            _OnPosChanged();
         }
 
         public void SetPos(Point pos)
         {
             _Move(pos - Geo.Pos);
-            _OnPosChanged();
         }
 
-        void _OnPosChanged()
-        {
-            //Node parent = m_Owner.Parent as Node;
-            //if (parent != null)
-            //{
-            //    parent.Renderer.RefreshConn();
-            //    parent.OnChildPosChanged();
-            //}
-        }
         void _Move(Vector delta)
         {
             Geo.Pos = Geo.Pos + delta;
@@ -487,8 +234,6 @@ namespace YBehavior.Editor.Core
             {
                 child.Renderer._Move(delta);
             }
-
-            RefreshConn();
         }
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;

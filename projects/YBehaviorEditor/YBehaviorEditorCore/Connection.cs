@@ -10,17 +10,53 @@ namespace YBehavior.Editor.Core
         public static readonly string IdentifierChildren = "children";
         public static readonly string IdentifierParent = "parent";
 
+        public ConnectionHolder Holder { get; set; }
         protected NodeBase m_Owner;
         public NodeBase Owner { get { return m_Owner; } }
         protected List<NodeBase> m_Nodes = new List<NodeBase>();
         protected string m_Identifier;
         public string Identifier { get { return m_Identifier; } }
 
+        Dictionary<NodeBase, ConnectionRenderer> m_ConnectionRenderers = new Dictionary<NodeBase, ConnectionRenderer>();
+        public ConnectionRenderer GetConnectionRenderer(NodeBase node)
+        {
+            if (m_ConnectionRenderers.TryGetValue(node, out ConnectionRenderer renderer))
+            {
+                return renderer;
+            }
+            return null;
+        }
+
+        protected void _CreateConnRenderer(NodeBase child)
+        {
+            ConnectionRenderer connectionRenderer = new ConnectionRenderer();
+            _SetConnRenderer(connectionRenderer, child);
+            m_ConnectionRenderers.Add(child, connectionRenderer);
+            RenderMgr.Instance.AddConnection(connectionRenderer);
+        }
+        protected void _RemoveConnRenderer(NodeBase child)
+        {
+            if (m_ConnectionRenderers.TryGetValue(child, out ConnectionRenderer connectionRenderer))
+            {
+                RenderMgr.Instance.RemoveConnection(connectionRenderer);
+                connectionRenderer.Destroy();
+                m_ConnectionRenderers.Remove(child);
+            }
+        }
+
+        protected void _SetConnRenderer(ConnectionRenderer connectionRenderer, NodeBase child)
+        {
+            connectionRenderer.ParentConnectorGeo = this.Holder.Geo;
+            connectionRenderer.ChildConnectorGeo = child.Conns.ParentHolder.Geo;
+            connectionRenderer.ChildConn = child.Conns.ParentHolder;
+        }
+
+
         public Connection(NodeBase node, string identifier)
         {
             m_Owner = node;
-            node.Conns.Add(this);
             m_Identifier = identifier;
+            node.Conns.Add(this);
         }
 
         public System.Collections.IEnumerator GetEnumerator()
@@ -46,9 +82,12 @@ namespace YBehavior.Editor.Core
 
 
             target.Conns.ParentHolder.SetConn(this);
+            this.Holder.RecalcMidY();
 
             target.OnParentChanged();
             Owner.OnChildChanged();
+
+            _CreateConnRenderer(target);
             return true;
         }
 
@@ -64,11 +103,13 @@ namespace YBehavior.Editor.Core
             {
                 if (m_Nodes[i] == target)
                 {
+                    _RemoveConnRenderer(target);
+
                     m_Nodes.RemoveAt(i);
                     m_Owner.Conns.MarkDirty();
 
                     target.Conns.ParentHolder.SetConn(null);
-
+                    this.Holder.RecalcMidY();
                     target.OnParentChanged();
                     Owner.OnChildChanged();
 
@@ -91,6 +132,25 @@ namespace YBehavior.Editor.Core
         }
 
         protected virtual bool _CanAdd() { return true; }
+
+        public double CalcHorizontalPos()
+        {
+            double y = 0;
+            double miny = double.MaxValue;
+            foreach (Node child in m_Nodes)
+            {
+                double top = child.Conns.ParentHolder.Geo.Pos.Y;
+                y += top;
+                miny = Math.Min(miny, top);
+            }
+            y /= NodeCount;
+            y -= 20;
+            miny -= 20;
+            y = Math.Min(miny, y);
+            y = Math.Max(y, Holder.Geo.Pos.Y + /*Frame.ActualHeight + */10);
+            return y;
+        }
+
     }
 
     public class ConnectionHolder
@@ -101,22 +161,53 @@ namespace YBehavior.Editor.Core
         protected NodeBase m_Owner;
         public NodeBase Owner { get { return m_Owner; } }
 
+        public ConnectorGeometry Geo { get { return m_Geo; } }
+        ConnectorGeometry m_Geo = new ConnectorGeometry();
+
         public ConnectionHolder(Connection conn)
         {
             if (conn == null)
                 return;
             m_Conn = conn;
             m_Owner = conn.Owner;
+
+            m_Geo.Identifier = conn.Identifier;
+            m_Geo.onPosChanged = _OnChildConnectorChanged;
+
+            conn.Holder = this;
         }
 
+        /// <summary>
+        /// Virtual Holder for connection to the parent
+        /// </summary>
+        /// <param name="owner"></param>
         public ConnectionHolder(NodeBase owner)
         {
             m_Owner = owner;
+            m_Geo.Identifier = Connection.IdentifierParent;
+            m_Geo.onPosChanged = _OnParentConnectorChanged;
         }
 
         public void SetConn(Connection conn)
         {
             m_Conn = conn;
+        }
+
+        private void _OnParentConnectorChanged()
+        {
+            if (m_Conn != null)
+                m_Conn.Holder._OnChildConnectorChanged();
+        }
+
+
+        private void _OnChildConnectorChanged()
+        {
+            RecalcMidY();
+        }
+
+        public void RecalcMidY()
+        {
+            m_Geo.MidY = m_Conn.CalcHorizontalPos();
         }
 
         public static bool TryConnect(ConnectionHolder left, ConnectionHolder right, out ConnectionHolder parent, out ConnectionHolder child)
@@ -211,13 +302,21 @@ namespace YBehavior.Editor.Core
 
         public Connection GetConn(string identifier)
         {
+            ConnectionHolder holder = GetConnHolder(identifier);
+            if (holder != null)
+                return holder.Conn;
+            return null;
+        }
+        public ConnectionHolder GetConnHolder(string identifier)
+        {
+            if (identifier == Connection.IdentifierParent && m_ParentHolder != null)
+                return m_ParentHolder;
+
             foreach (var conn in m_Connections)
             {
                 if (conn.Conn.Identifier == identifier)
-                    return conn.Conn;
+                    return conn;
             }
-            if (identifier == Connection.IdentifierParent && m_ParentHolder != null)
-                return m_ParentHolder.Conn;
 
             return null;
         }
