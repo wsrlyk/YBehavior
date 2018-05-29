@@ -103,18 +103,20 @@ namespace YBehavior.Editor.Core
         void _ProcessMsg(string msg)
         {
             string[] words = msg.Split(msgHeadSplitter, StringSplitOptions.RemoveEmptyEntries);
-            if (words.Length != 2)
-                return;
 
             switch(words[0])
             {
                 case "[TickResult]":
+                    if (words.Length != 2)
+                        return;
                     _HandleTickResult(words[1]);
                     break;
                 case "[Paused]":
                     _HandlePaused();
                     break;
                 case "[LogPoint]":
+                    if (words.Length != 2)
+                        return;
                     _HandleLogPoint(words[1]);
                     break;
             }
@@ -166,6 +168,7 @@ namespace YBehavior.Editor.Core
                     DebugMgr.Instance.RunInfo[uint.Parse(strR[0])] = int.Parse(strR[1]);
                 }
 
+                LogMgr.Instance.Log("TickResult bInstant = " + (DebugMgr.Instance.bBreaked ? "False" : "True"));
                 EventMgr.Instance.Send(new TickResultArg() { bInstant = !DebugMgr.Instance.bBreaked, Token = m_TickResultToken });
             }
         }

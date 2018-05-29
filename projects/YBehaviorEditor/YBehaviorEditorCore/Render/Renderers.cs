@@ -157,43 +157,39 @@ namespace YBehavior.Editor.Core
 
         public void RefreshDebug(bool bInstant)
         {
-            // TODO
-            //NodeState state = DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(m_Owner.UID) : NodeState.NS_INVALID;
-            //if (bInstant)
-            //    m_uiFrame.SetDebugInstant(state);
-            //else
-            //    m_uiFrame.SetDebug(state);
+            if (bInstant)
+                DebugInstant = !DebugInstant;
+            else
+                DebugConstant = !DebugConstant;
 
-            //foreach (Node child in m_Owner.Conns)
-            //{
-            //    child.Renderer.RefreshDebug(bInstant);
-            //}
-        }
-
-        public void AddedToPanel(FrameworkElement panel)
-        {
-            //RenderMgr.Instance.AddNode(this);
             foreach (Node child in m_Owner.Conns)
             {
-                child.Renderer.AddedToPanel(panel);
+                child.Renderer.RefreshDebug(bInstant);
             }
-
-            m_Canvas.Panel = panel;
-
-            //panel.Children.Add(m_uiFrame);
-            //_RefreshSelf();
-            //foreach (Node child in m_Owner.Conns)
-            //{
-            //    child.Renderer.AddedToPanel(panel);
-            //}
-
-            //foreach (UIConnection uiconn in m_uiConns.Values)
-            //{
-            //    panel.Children.Add(uiconn);
-            //}
-
-            //panel.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(RefreshConn));
         }
+
+        private bool m_bDebugInstant;
+        public bool DebugInstant
+        {
+            get { return m_bDebugInstant; }
+            set
+            {
+                m_bDebugInstant = value;
+                OnPropertyChanged("DebugInstant");
+            }
+        }
+        private bool m_bDebugConstant;
+        public bool DebugConstant
+        {
+            get { return m_bDebugConstant; }
+            set
+            {
+                m_bDebugConstant = value;
+                OnPropertyChanged("DebugConstant");
+            }
+        }
+
+        public NodeState RunState { get { return DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(m_Owner.UID) : NodeState.NS_INVALID; } }
 
         protected virtual void _CreateSelf()
         {

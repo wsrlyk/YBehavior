@@ -146,7 +146,8 @@ namespace YBehavior.Editor
             {
                 TickResultArg oArg = arg as TickResultArg;
 
-                this.nodeLayer.Dispatcher.BeginInvoke(new Action<bool, uint>(_RefreshMainTreeDebug), oArg.bInstant, oArg.Token);
+                _RefreshMainTreeDebug(oArg.bInstant, oArg.Token);
+                //this.nodeLayer.Dispatcher.BeginInvoke(new Action<bool, uint>(_RefreshMainTreeDebug), oArg.bInstant, oArg.Token);
             }
         }
 
@@ -165,7 +166,10 @@ namespace YBehavior.Editor
         {
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
             if (bench != null)
-                Dispatcher.BeginInvoke(new Action(() => { bench.MainTree.Renderer.RefreshDebug(true); }));
+            {
+                bench.MainTree.Renderer.RefreshDebug(true);
+                //Dispatcher.BeginInvoke(new Action(() => { bench.MainTree.Renderer.RefreshDebug(true); }));
+            }
             
         }
 
@@ -173,7 +177,10 @@ namespace YBehavior.Editor
         {
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
             if (bench != null)
-                Dispatcher.BeginInvoke(new Action(() => { bench.MainTree.Renderer.RefreshDebug(true); }));
+            {
+                bench.MainTree.Renderer.RefreshDebug(true);
+                //Dispatcher.BeginInvoke(new Action(() => { bench.MainTree.Renderer.RefreshDebug(true); }));
+            }
         }
 
         private bool _TabCloseClicked(UCTabItemWithClose tab)

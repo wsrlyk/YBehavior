@@ -48,6 +48,17 @@ namespace YBehavior.Editor
             m_InstantAnim = this.Resources["InstantShowAnim"] as Storyboard;
 
             this.DataContextChanged += _DataContextChangedEventHandler;
+
+            //this.SetBinding(DebugInstantProperty, new Binding()
+            //{
+            //    Path = new PropertyPath("DebugInstant"),
+            //    Mode = BindingMode.OneWay
+            //});
+            //this.SetBinding(DebugConstantProperty, new Binding()
+            //{
+            //    Path = new PropertyPath("DebugConstant"),
+            //    Mode = BindingMode.OneWay
+            //});
         }
 
         void _DataContextChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e)
@@ -58,6 +69,8 @@ namespace YBehavior.Editor
 
             _CreateConnectors();
             _BuildConnectionBinding();
+
+            SetDebug(NodeState.NS_INVALID);
         }
 
         protected override void _OnAncestorPropertyChanged()
@@ -139,6 +152,34 @@ namespace YBehavior.Editor
         //    m_Canvas = canvas;
         //    m_Operation.SetCanvas(canvas);
         //}
+        public static readonly DependencyProperty DebugInstantProperty =
+            DependencyProperty.Register("DebugInstant",
+            typeof(bool), typeof(UINode), new FrameworkPropertyMetadata(DebugInstant_PropertyChanged));
+        private static void DebugInstant_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            UINode c = (UINode)d;
+            c.SetDebugInstant(c.Node.Renderer.RunState);
+        }
+        public bool DebugInstant
+        {
+            get { return (bool)GetValue(DebugInstantProperty); }
+            set { SetValue(DebugInstantProperty, value); }
+        }
+
+        public static readonly DependencyProperty DebugConstantProperty =
+            DependencyProperty.Register("DebugConstant",
+            typeof(bool), typeof(UINode), new FrameworkPropertyMetadata(DebugConstant_PropertyChanged));
+        private static void DebugConstant_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            UINode c = (UINode)d;
+            c.SetDebug(c.Node.Renderer.RunState);
+        }
+        public bool DebugConstant
+        {
+            get { return (bool)GetValue(DebugConstantProperty); }
+            set { SetValue(DebugConstantProperty, value); }
+        }
+
 
         Storyboard m_InstantAnim;
 
@@ -174,6 +215,7 @@ namespace YBehavior.Editor
 
                 //                this.debugCover.Visibility = Visibility.Visible;
                 m_InstantAnim.Begin(this.debugCover, true);
+                LogMgr.Instance.Log("InstantAnim");
                 //this.debugCover.BeginStoryboard(m_InstantAnim, HandoffBehavior.SnapshotAndReplace, true);
             }
         }
@@ -209,6 +251,8 @@ namespace YBehavior.Editor
                 this.debugCover.Background = bgBrush;
 
                 this.debugCover.Visibility = Visibility.Visible;
+
+                LogMgr.Instance.Log("ConstantAnim");
 
                 //Storyboard board = this.Resources["ConstantShowAnim"] as Storyboard;
                 //Storyboard.SetTargetName(board, "debugCover");
