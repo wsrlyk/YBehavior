@@ -246,7 +246,7 @@ namespace YBehavior.Editor.Core
 
             Node node = NodeMgr.Instance.CreateNodeByName(template.Name);
             node.Init();
-            bench.AddSubTree(node);
+            bench.AddForestTree(node);
 
             return node;
         }
@@ -262,7 +262,7 @@ namespace YBehavior.Editor.Core
             }
 
             Node node = Utility.CloneNode(template, bIncludeChildren);
-            bench.AddSubTree(node);
+            bench.AddForestTree(node);
 
             return node;
         }

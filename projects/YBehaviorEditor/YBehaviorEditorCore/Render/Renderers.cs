@@ -53,6 +53,9 @@ namespace YBehavior.Editor.Core
 
     public class ConnectionRenderer : System.ComponentModel.INotifyPropertyChanged
     {
+        bool m_bIsValid = true;
+        public bool IsValid { get { return m_bIsValid; } }
+
         public Point ParentPos { get { return ParentConnectorGeo.Pos; } }
         public Point ChildPos { get { return ChildConnectorGeo.Pos; } }
         public Point FirstCorner { get { return new Point(ParentConnectorGeo.Pos.X, m_ParentConnectorGeo.MidY); } }
@@ -116,6 +119,7 @@ namespace YBehavior.Editor.Core
             ParentConnectorGeo = null;
             ChildConnectorGeo = null;
             ChildConn = null;
+            m_bIsValid = false;
         }
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         internal protected void OnPropertyChanged(string propertyName)
@@ -168,7 +172,7 @@ namespace YBehavior.Editor.Core
 
         public void AddedToPanel(FrameworkElement panel)
         {
-            RenderMgr.Instance.AddNode(this);
+            //RenderMgr.Instance.AddNode(this);
             foreach (Node child in m_Owner.Conns)
             {
                 child.Renderer.AddedToPanel(panel);

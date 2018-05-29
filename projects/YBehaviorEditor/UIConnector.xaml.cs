@@ -18,7 +18,7 @@ namespace YBehavior.Editor
     /// <summary>
     /// UIConnector.xaml 的交互逻辑
     /// </summary>
-    public partial class UIConnector : UserControl, IDragable, IDropable
+    public partial class UIConnector : YUserControl, IDragable, IDropable
     {
         static DragHandler defaultDragHandler = new DragHandler(DragDropMgr.Instance.OnDragged);
         static DropHandler defaultDropHandler = new DropHandler(DragDropMgr.Instance.OnDropped);
@@ -72,9 +72,23 @@ namespace YBehavior.Editor
             _UpdateHotspot();
         }
 
+        protected override void _OnAncestorPropertyChanged()
+        {
+            m_Operation.RenderCanvas.Panel = this.Ancestor;
+        }
+
         private void _UpdateHotspot()
         {
-            Hotspot = GetPos(m_Operation.RenderCanvas.Panel);
+            if (this.Ancestor != null && !this.Ancestor.IsAncestorOf(this))
+            {
+                this.Ancestor = null;
+                return;
+            }
+
+            if (Ancestor == null)
+                return;
+
+            Hotspot = GetPos(Ancestor);
         }
 
         public void SetCanvas(RenderCanvas canvas)
@@ -92,7 +106,17 @@ namespace YBehavior.Editor
 
         public Point GetPos(Visual visual)
         {
-            return TransformToAncestor(visual).Transform(new Point(ActualWidth / 2, ActualHeight / 2));
+            if (visual == null)
+                return new Point();
+            try
+            {
+                return TransformToAncestor(visual).Transform(new Point(ActualWidth / 2, ActualHeight / 2));
+            }
+            catch(Exception e)
+            {
+                LogMgr.Instance.Log(e.ToString());
+                return new Point();
+            }
         }
 
         void _OnStartDragged(Vector delta, Point absPos)

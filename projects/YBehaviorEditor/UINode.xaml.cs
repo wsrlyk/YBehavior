@@ -19,7 +19,7 @@ namespace YBehavior.Editor
     /// <summary>
     /// BehaviorNode.xaml 的交互逻辑
     /// </summary>
-    public partial class UINode : UserControl, ISelectable, IDeletable, IDuplicatable, IDebugPointable
+    public partial class UINode : YUserControl, ISelectable, IDeletable, IDuplicatable, IDebugPointable
     {
         static SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
@@ -54,12 +54,21 @@ namespace YBehavior.Editor
         {
             Node = (DataContext as Renderer).Owner;
 
-            SetCanvas(Node.Renderer.RenderCanvas);
+            //SetCanvas(Node.Renderer.RenderCanvas);
 
             _CreateConnectors();
             _BuildConnectionBinding();
         }
 
+        protected override void _OnAncestorPropertyChanged()
+        {
+            m_Operation.RenderCanvas.Panel = Ancestor;
+        }
+
+        public void Dispose(object sender, EventArgs e)
+        {
+            LogMgr.Instance.Log("Dispose " + this.Node.UITitle);
+        }
         private void _BuildConnectionBinding()
         {
             foreach (ConnectionHolder conn in Node.Conns.ConnectionsList)
@@ -100,7 +109,7 @@ namespace YBehavior.Editor
                     Title = Node.Icon,
                     ConnHolder = Node.Conns.ParentHolder
                 };
-                uiConnector.SetCanvas(m_Canvas);
+                //uiConnector.SetCanvas(m_Canvas);
 
                 topConnectors.Children.Add(uiConnector);
 
@@ -117,7 +126,7 @@ namespace YBehavior.Editor
                     Title = conn.Conn.Identifier,
                     ConnHolder = conn
                 };
-                uiConnector.SetCanvas(m_Canvas);
+                //uiConnector.SetCanvas(m_Canvas);
 
                 bottomConnectors.Children.Add(uiConnector);
 
@@ -125,11 +134,11 @@ namespace YBehavior.Editor
             }
         }
 
-        public void SetCanvas(RenderCanvas canvas)
-        {
-            m_Canvas = canvas;
-            m_Operation.SetCanvas(canvas);
-        }
+        //public void SetCanvas(RenderCanvas canvas)
+        //{
+        //    m_Canvas = canvas;
+        //    m_Operation.SetCanvas(canvas);
+        //}
 
         Storyboard m_InstantAnim;
 

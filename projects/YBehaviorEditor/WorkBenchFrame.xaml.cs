@@ -123,16 +123,21 @@ namespace YBehavior.Editor
         private void _OnWorkBenchSelected(EventArg arg)
         {
             ClearCanvas();
-            _CreateActiveWorkBench();
+            //_CreateActiveWorkBench();
 
             WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
             if (oArg.Bench != null)
+            {
+                this.nodeLayer.ItemsSource = oArg.Bench.NodeList;
                 this.commentLayer.ItemsSource = oArg.Bench.Comments;
+                this.connectionLayer.ItemsSource = oArg.Bench.ConnectionList;
+            }
             else
+            {
+                this.nodeLayer.ItemsSource = null;
                 this.commentLayer.ItemsSource = null;
-
-            this.nodeLayer.ItemsSource = RenderMgr.Instance.NodeList;
-            this.connectionLayer.ItemsSource = RenderMgr.Instance.ConnectionList;
+                this.connectionLayer.ItemsSource = null;
+            }
         }
 
         private void _OnTickResult(EventArg arg)
@@ -224,7 +229,7 @@ namespace YBehavior.Editor
                 -m_CurPageData.TranslateTransform.X / m_CurPageData.ScaleTransform.ScaleX, 
                 -m_CurPageData.TranslateTransform.Y / m_CurPageData.ScaleTransform.ScaleY));
 
-            _CreateNode(oArg.Node);
+            //_CreateNode(oArg.Node);
             //this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<Node>(_ThreadRefreshConnection), oArg.Node);
         }
 
@@ -241,31 +246,31 @@ namespace YBehavior.Editor
             oArg.Comment.OnGeometryChanged();
         }
 
-        void _CreateActiveWorkBench()
-        {
-            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            if (bench == null)
-                return;
+        //void _CreateActiveWorkBench()
+        //{
+        //    WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
+        //    if (bench == null)
+        //        return;
 
-            using (var handler = RenderMgr.Instance.NodeList.Delay())
-            {
-                RenderMgr.Instance.ClearNodes();
+        //    using (var handler = RenderMgr.Instance.NodeList.Delay())
+        //    {
+        //        RenderMgr.Instance.ClearNodes();
 
-                _CreateNode(bench.MainTree);
+        //        _CreateNode(bench.MainTree);
 
-                foreach (var node in bench.Forest)
-                {
-                    _CreateNode(node);
-                }
-            }
-            //this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(_ThreadRefreshConnections));
-        }
+        //        foreach (var node in bench.Forest)
+        //        {
+        //            _CreateNode(node);
+        //        }
+        //    }
+        //    //this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(_ThreadRefreshConnections));
+        //}
 
-        void _CreateNode(Node node)
-        {
-            node.Renderer.AddedToPanel(nodeLayer);
-            //node.Renderer.CreateConnections();
-        }
+        //void _CreateNode(Node node)
+        //{
+        //    node.Renderer.AddedToPanel(nodeLayer);
+        //    //node.Renderer.CreateConnections();
+        //}
 
 
         private void _KeyDown(object sender, KeyEventArgs e)
@@ -310,7 +315,7 @@ namespace YBehavior.Editor
 
         public void ClearCanvas()
         {
-            RenderMgr.Instance.ClearNodes();
+            //RenderMgr.Instance.ClearNodes();
         }
         private void TabController_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

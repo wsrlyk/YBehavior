@@ -14,6 +14,8 @@ namespace YBehavior.Editor.Core
         public Tree MainTree { get { return m_Tree; } }
 
         public DelayableNotificationCollection<Comment> Comments { get; } = new DelayableNotificationCollection<Comment>();
+        public DelayableNotificationCollection<Renderer> NodeList { get; } = new DelayableNotificationCollection<Renderer>();
+        public DelayableNotificationCollection<ConnectionRenderer> ConnectionList { get; } = new DelayableNotificationCollection<ConnectionRenderer>();
 
         public string FilePath { get; set; }
 
@@ -49,9 +51,12 @@ namespace YBehavior.Editor.Core
                 ///> refresh parent connections
                 //Node parentNode = parent.Owner as Node;
                 //parentNode.Renderer.CreateConnections();
+                ConnectionRenderer connRenderer = child.Conn.GetConnectionRenderer(child.Owner);
+                if (connRenderer != null)
+                    ConnectionList.Add(connRenderer);
 
                 Node childNode = child.Owner as Node;
-                RemoveSubTree(childNode);
+                RemoveForestTree(childNode, false);
 
                 RefreshNodeUID();
             }
@@ -69,14 +74,17 @@ namespace YBehavior.Editor.Core
             Connection conn = oArg.ChildHolder.Conn;
             if (conn == null)
                 return;
+            ConnectionRenderer connRenderer = conn.GetConnectionRenderer(oArg.ChildHolder.Owner);
 
             if (conn.RemoveNode(oArg.ChildHolder.Owner))
             {
+                if (connRenderer != null)
+                    ConnectionList.Remove(connRenderer);
                 //Node parentNode = conn.Owner as Node;
                 //parentNode.Renderer.CreateConnections();
 
                 Node childNode = oArg.ChildHolder.Owner as Node;
-                AddSubTree(childNode);
+                AddForestTree(childNode, false);
 
                 RefreshNodeUID();
             }
@@ -90,7 +98,7 @@ namespace YBehavior.Editor.Core
         {
             RemoveNodeArg oArg = arg as RemoveNodeArg;
 
-            RemoveSubTree(oArg.Node);
+            RemoveForestTree(oArg.Node);
         }
 
         public void OnNodeMoved(EventArg arg)
@@ -140,6 +148,7 @@ namespace YBehavior.Editor.Core
                     {
                         m_Tree = NodeMgr.Instance.CreateNodeByName("Root") as Tree;
                         _LoadTree(m_Tree, chi);
+                        AddRenderers(m_Tree);
                     }
                     else
                     {
@@ -150,7 +159,7 @@ namespace YBehavior.Editor.Core
                             return false;
                         }
                         _LoadTree(node, chi);
-                        AddSubTree(node);
+                        AddForestTree(node);
                     }
                 }
                 else if (chi.Name == "Comments")
@@ -316,27 +325,85 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        public void RemoveSubTree(Node root)
+        public void RemoveForestTree(Node root, bool bRemoveRenderer = true)
         {
             if (root == null)
                 return;
-            for (int i = 0; i < m_Forest.Count; ++i)
-            {
-                if (m_Forest[i] == root)
-                {
-                    m_Forest.RemoveAt(i);
-                    break;
-                }
-            }
+
+            if (bRemoveRenderer)
+                RemoveRenderers(root);
+
+            m_Forest.Remove(root);
         }
 
-        public void AddSubTree(Node root)
+        public void AddForestTree(Node root, bool bAddRenderer = true)
         {
             if (root == null)
                 return;
             m_Forest.Add(root);
 
+            if (bAddRenderer)
+                AddRenderers(root);
+
             _RefreshNodeUIDFromRoot(root);
+        }
+
+        public void AddRenderers(Node node)
+        {
+            using (var v1 = ConnectionList.Delay())
+            {
+                using (var v2 = NodeList.Delay())
+                {
+                    _AddRenderers(node);
+                }
+            }
+        }
+
+        void _AddRenderers(Node node)
+        {
+            NodeList.Add(node.Renderer);
+
+            foreach (Node chi in node.Conns)
+            {
+                _AddRenderers(chi);
+            }
+
+            foreach (ConnectionHolder conn in node.Conns.ConnectionsList)
+            {
+                foreach (ConnectionRenderer renderer in conn.Conn.Renderers)
+                {
+                    ConnectionList.Add(renderer);
+                }
+            }
+        }
+
+        public void RemoveRenderers(Node node)
+        {
+            //using (var v1 = ConnectionList.Delay())
+            {
+                //using (var v2 = NodeList.Delay())
+                {
+                    _RemoveRenderers(node);
+                }
+            }
+        }
+
+        void _RemoveRenderers(Node node)
+        {
+            foreach (ConnectionHolder conn in node.Conns.ConnectionsList)
+            {
+                foreach (ConnectionRenderer renderer in conn.Conn.Renderers)
+                {
+                    ConnectionList.Remove(renderer);
+                }
+            }
+
+            foreach (Node chi in node.Conns)
+            {
+                _RemoveRenderers(chi);
+            }
+
+            NodeList.Remove(node.Renderer);
         }
 
         public bool CheckError()

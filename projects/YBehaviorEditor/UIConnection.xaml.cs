@@ -18,7 +18,7 @@ namespace YBehavior.Editor
     /// <summary>
     /// UIConnection.xaml 的交互逻辑
     /// </summary>
-    public partial class UIConnection : UserControl, ISelectable, IDeletable
+    public partial class UIConnection : YUserControl, ISelectable, IDeletable
     {
         static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
         //static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
@@ -50,7 +50,12 @@ namespace YBehavior.Editor
             ConnectionRenderer renderer = this.DataContext as ConnectionRenderer;
             ChildHolder = renderer.ChildConn;
 
-            SetCanvas((renderer.ChildConn.Owner as Node).Renderer.RenderCanvas);
+            //SetCanvas((renderer.ChildConn.Owner as Node).Renderer.RenderCanvas);
+        }
+
+        protected override void _OnAncestorPropertyChanged()
+        {
+            m_Operation.RenderCanvas.Panel = Ancestor;
         }
 
         public void SetCanvas(RenderCanvas canvas)

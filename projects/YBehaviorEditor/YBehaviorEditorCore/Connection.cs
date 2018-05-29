@@ -18,6 +18,8 @@ namespace YBehavior.Editor.Core
         public string Identifier { get { return m_Identifier; } }
 
         Dictionary<NodeBase, ConnectionRenderer> m_ConnectionRenderers = new Dictionary<NodeBase, ConnectionRenderer>();
+        public System.Collections.IEnumerable Renderers { get { return m_ConnectionRenderers.Values; } }
+
         public ConnectionRenderer GetConnectionRenderer(NodeBase node)
         {
             if (m_ConnectionRenderers.TryGetValue(node, out ConnectionRenderer renderer))
@@ -32,13 +34,13 @@ namespace YBehavior.Editor.Core
             ConnectionRenderer connectionRenderer = new ConnectionRenderer();
             _SetConnRenderer(connectionRenderer, child);
             m_ConnectionRenderers.Add(child, connectionRenderer);
-            RenderMgr.Instance.AddConnection(connectionRenderer);
+            //RenderMgr.Instance.AddConnection(connectionRenderer);
         }
         protected void _RemoveConnRenderer(NodeBase child)
         {
             if (m_ConnectionRenderers.TryGetValue(child, out ConnectionRenderer connectionRenderer))
             {
-                RenderMgr.Instance.RemoveConnection(connectionRenderer);
+                //RenderMgr.Instance.RemoveConnection(connectionRenderer);
                 connectionRenderer.Destroy();
                 m_ConnectionRenderers.Remove(child);
             }

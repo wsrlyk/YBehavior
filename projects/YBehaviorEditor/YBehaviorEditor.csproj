@@ -106,6 +106,7 @@
     <Compile Include="WorkingSpaceFrame.xaml.cs">
       <DependentUpon>WorkingSpaceFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="YUserControl.cs" />
     <Page Include="DebugFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
