@@ -96,6 +96,8 @@ namespace YBehavior.Editor.Core
             }
 
             m_ProcessingMsgs.Clear();
+
+            _FireTickResult();
         }
 
         char[] msgHeadSplitter = { (char)(3) };
@@ -133,6 +135,7 @@ namespace YBehavior.Editor.Core
         ///////////////////////////////////////////////////////////////////////////
 
         uint m_TickResultToken = 0;
+        uint m_LastTickResultToken = 0;
         public uint TickResultToken
         {
             get { return m_TickResultToken; }
@@ -168,8 +171,17 @@ namespace YBehavior.Editor.Core
                     DebugMgr.Instance.RunInfo[uint.Parse(strR[0])] = int.Parse(strR[1]);
                 }
 
+                //EventMgr.Instance.Send(new TickResultArg() { bInstant = !DebugMgr.Instance.bBreaked, Token = m_TickResultToken });
+            }
+        }
+
+        void _FireTickResult()
+        {
+            if (m_LastTickResultToken != m_TickResultToken)
+            {
                 LogMgr.Instance.Log("TickResult bInstant = " + (DebugMgr.Instance.bBreaked ? "False" : "True"));
                 EventMgr.Instance.Send(new TickResultArg() { bInstant = !DebugMgr.Instance.bBreaked, Token = m_TickResultToken });
+                m_LastTickResultToken = m_TickResultToken;
             }
         }
 

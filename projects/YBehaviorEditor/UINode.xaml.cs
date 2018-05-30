@@ -46,17 +46,6 @@ namespace YBehavior.Editor
             m_InstantAnim = this.Resources["InstantShowAnim"] as Storyboard;
 
             this.DataContextChanged += _DataContextChangedEventHandler;
-
-            //this.SetBinding(DebugInstantProperty, new Binding()
-            //{
-            //    Path = new PropertyPath("DebugInstant"),
-            //    Mode = BindingMode.OneWay
-            //});
-            //this.SetBinding(DebugConstantProperty, new Binding()
-            //{
-            //    Path = new PropertyPath("DebugConstant"),
-            //    Mode = BindingMode.OneWay
-            //});
         }
 
         void _DataContextChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e)
@@ -155,11 +144,6 @@ namespace YBehavior.Editor
             }
         }
 
-        //public void SetCanvas(RenderCanvas canvas)
-        //{
-        //    m_Canvas = canvas;
-        //    m_Operation.SetCanvas(canvas);
-        //}
         public static readonly DependencyProperty DebugInstantProperty =
             DependencyProperty.Register("DebugInstant",
             typeof(bool), typeof(UINode), new FrameworkPropertyMetadata(DebugInstant_PropertyChanged));
@@ -223,7 +207,7 @@ namespace YBehavior.Editor
 
                 //                this.debugCover.Visibility = Visibility.Visible;
                 m_InstantAnim.Begin(this.debugCover, true);
-                LogMgr.Instance.Log("InstantAnim");
+                //LogMgr.Instance.Log("InstantAnim");
                 //this.debugCover.BeginStoryboard(m_InstantAnim, HandoffBehavior.SnapshotAndReplace, true);
             }
         }
@@ -260,7 +244,7 @@ namespace YBehavior.Editor
 
                 this.debugCover.Visibility = Visibility.Visible;
 
-                LogMgr.Instance.Log("ConstantAnim");
+                //LogMgr.Instance.Log("ConstantAnim");
 
                 //Storyboard board = this.Resources["ConstantShowAnim"] as Storyboard;
                 //Storyboard.SetTargetName(board, "debugCover");

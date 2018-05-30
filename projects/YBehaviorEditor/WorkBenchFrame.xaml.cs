@@ -253,33 +253,6 @@ namespace YBehavior.Editor
             oArg.Comment.OnGeometryChanged();
         }
 
-        //void _CreateActiveWorkBench()
-        //{
-        //    WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-        //    if (bench == null)
-        //        return;
-
-        //    using (var handler = RenderMgr.Instance.NodeList.Delay())
-        //    {
-        //        RenderMgr.Instance.ClearNodes();
-
-        //        _CreateNode(bench.MainTree);
-
-        //        foreach (var node in bench.Forest)
-        //        {
-        //            _CreateNode(node);
-        //        }
-        //    }
-        //    //this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(_ThreadRefreshConnections));
-        //}
-
-        //void _CreateNode(Node node)
-        //{
-        //    node.Renderer.AddedToPanel(nodeLayer);
-        //    //node.Renderer.CreateConnections();
-        //}
-
-
         private void _KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)

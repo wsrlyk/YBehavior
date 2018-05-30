@@ -136,23 +136,11 @@ namespace YBehavior.Editor.Core
         Node m_Owner;
         public Node Owner { get { return m_Owner; } }
 
-        RenderCanvas m_Canvas = new RenderCanvas();
-        public RenderCanvas RenderCanvas { get { return m_Canvas; } }
-
-        //UINode m_uiFrame;
-        //public UINode Frame { get { return m_uiFrame; } }
-
         public Geometry Geo { get; } = new Geometry();
 
         public Renderer(Node node)
         {
             m_Owner = node;
-            //m_uiFrame = new UINode
-            //{
-            //    Node = node
-            //};
-
-            _CreateSelf();
         }
 
         public void RefreshDebug(bool bInstant)
@@ -191,19 +179,6 @@ namespace YBehavior.Editor.Core
 
         public NodeState RunState { get { return DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(m_Owner.UID) : NodeState.NS_INVALID; } }
 
-        protected virtual void _CreateSelf()
-        {
-            //_CreateFrame(m_Owner);
-            //_CreateConnectors();
-            //_SetCommentPos();
-        }
-
-        //private void _CreateFrame(Node node)
-        //{
-        //    m_uiFrame.SetCanvas(m_Canvas);
-        //    m_uiFrame.DataContext = node;
-        //}
-
         public void DragMain(Vector delta)
         {
             _Move(delta);
@@ -219,9 +194,6 @@ namespace YBehavior.Editor.Core
             Geo.Pos = Geo.Pos + delta;
 
             OnPropertyChanged("Geo");
-            // TODO
-            //Canvas.SetLeft(m_uiFrame, Geo.Pos.X);
-            //Canvas.SetTop(m_uiFrame, Geo.Pos.Y);
 
             foreach (Node child in m_Owner.Conns)
             {

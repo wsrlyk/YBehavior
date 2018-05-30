@@ -256,9 +256,6 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        //private Geometry m_Geo = new Geometry();
-        //public Geometry Geo { get { return m_Geo; } }
-
         public DebugPointInfo DebugPointInfo { get; } = new DebugPointInfo();
 
         protected SharedData m_Variables;
