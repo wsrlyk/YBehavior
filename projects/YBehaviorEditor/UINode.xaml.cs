@@ -30,8 +30,6 @@ namespace YBehavior.Editor
 
         Operation m_Operation;
 
-        RenderCanvas m_Canvas;
-
         Dictionary<string, UIConnector> m_uiConnectors = new Dictionary<string, UIConnector>();
 
         public UINode()
@@ -69,7 +67,7 @@ namespace YBehavior.Editor
 
             _CreateConnectors();
             _BuildConnectionBinding();
-
+            _SetCommentPos();
             SetDebug(NodeState.NS_INVALID);
         }
 
@@ -78,10 +76,6 @@ namespace YBehavior.Editor
             m_Operation.RenderCanvas.Panel = Ancestor;
         }
 
-        public void Dispose(object sender, EventArgs e)
-        {
-            LogMgr.Instance.Log("Dispose " + this.Node.UITitle);
-        }
         private void _BuildConnectionBinding()
         {
             foreach (ConnectionHolder conn in Node.Conns.ConnectionsList)
@@ -144,6 +138,20 @@ namespace YBehavior.Editor
                 bottomConnectors.Children.Add(uiConnector);
 
                 m_uiConnectors.Add(conn.Conn.Identifier, uiConnector);
+            }
+        }
+
+        private void _SetCommentPos()
+        {
+            if (bottomConnectors.Children.Count > 0)
+            {
+                DockPanel.SetDock(commentBorder, Dock.Right);
+                commentBorder.Margin = new Thickness(0, this.topConnectors.Height, 0, bottomConnectors.Height);
+            }
+            else
+            {
+                DockPanel.SetDock(commentBorder, Dock.Bottom);
+                commentBorder.Margin = new Thickness(0);
             }
         }
 

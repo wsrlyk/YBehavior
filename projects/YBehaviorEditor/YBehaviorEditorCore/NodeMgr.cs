@@ -223,7 +223,7 @@ namespace YBehavior.Editor.Core
         public virtual string Note => string.Empty;
         public virtual string Icon => Connection.IdentifierParent;
 
-        string m_Comment = "This is a node comment test.";
+        string m_Comment = string.Empty;// "This is a node comment test.";
         public string Comment
         {
             get { return m_Comment; }
@@ -240,7 +240,7 @@ namespace YBehavior.Editor.Core
         public NodeHierachy Hierachy { get { return m_Hierachy; } set { m_Hierachy = value; } }
 
         public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class", "Connection" });
-        public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName", "Connection", "DebugPoint" });
+        public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName", "Connection", "DebugPoint", "Comment" });
 
         public Renderer Renderer { get { return m_Renderer; } }
         protected Renderer m_Renderer;
@@ -312,6 +312,9 @@ namespace YBehavior.Editor.Core
                     break;
                 case "DebugPoint":
                     DebugPointInfo.HitCount = int.Parse(attr.Value);
+                    break;
+                case "Comment":
+                    Comment = attr.Value;
                     break;
                 default:
                     return LoadOtherAttr(attr);
@@ -388,6 +391,11 @@ namespace YBehavior.Editor.Core
 
             if (!DebugPointInfo.NoDebugPoint)
                 data.SetAttribute("DebugPoint", DebugPointInfo.HitCount.ToString());
+
+            if (!string.IsNullOrEmpty(Comment))
+            {
+                data.SetAttribute("Comment", Comment);
+            }
 
             foreach (Variable v in Variables.Datas.Values)
             {

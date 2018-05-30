@@ -14,6 +14,12 @@
     </UserControl.Style>
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
+        <local:ValueConverterGroup x:Key="invertStringEmptyAndVisibilityConvertor">
+            <local:StringNullOrEmptyConvertor/>
+            <local:InvertBoolConverter/>
+            <BooleanToVisibilityConverter/>
+        </local:ValueConverterGroup>
+
         <Style TargetType="FrameworkElement" x:Key="VisibleAnimation">
             <Setter Property="Visibility" Value="Collapsed"/>
             <Setter Property="Opacity" Value="0"/>
@@ -37,6 +43,10 @@
         </Storyboard>
     </UserControl.Resources>
     <DockPanel>
+        <Border Name="commentBorder" DockPanel.Dock="Right" Margin="0,20,0,10" BorderThickness="1" BorderBrush="#FFE8D3AF" Background="#FFF1E0C6"
+                Visibility="{Binding Path=Owner.Comment, Converter={StaticResource invertStringEmptyAndVisibilityConvertor}}">
+            <TextBlock Text="{Binding Owner.Comment, Mode=OneWay}" FontSize="10"/>
+        </Border>
         <StackPanel DockPanel.Dock="Top" Height="20"  Name="topConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
         <StackPanel DockPanel.Dock="Bottom" Height="10" Name="bottomConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
         <Border Name="border" BorderThickness="3" BorderBrush="#FFAFCEE8" Background="#FF70B6F0">

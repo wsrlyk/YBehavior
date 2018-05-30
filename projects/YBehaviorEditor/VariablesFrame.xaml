@@ -6,9 +6,12 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
+    </UserControl.Resources>
     <Grid>
         <TabControl Name="TabController" Grid.Row="0" Tag="200">
-            <TabItem Header="Variable" Name="VariableTab">
+            <TabItem Header="Variable" Name="VariableTab" Visibility="{Binding IsSelected, ElementName=VariableTab, Converter={StaticResource visibilityConvertor}}">
                 <DockPanel Background="DarkGray">
                     <StackPanel DockPanel.Dock="Top">
                         <TextBlock Name="Type" Text ="{Binding Name}" FontSize="14" Height="25"/>
@@ -39,7 +42,7 @@
                     </ScrollViewer>
                 </DockPanel>
             </TabItem>
-            <TabItem Header="Comment" Name="CommentTab">
+            <TabItem Header="Comment" Name="CommentTab" Visibility="{Binding IsSelected, ElementName=CommentTab, Converter={StaticResource visibilityConvertor}}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100"/>
