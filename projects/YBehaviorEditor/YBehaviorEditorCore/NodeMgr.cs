@@ -191,6 +191,56 @@ namespace YBehavior.Editor.Core
                 m_Rect.Height = p.Y - m_Rect.Y;
             }
         }
+
+
+        public Point TopLeftPos
+        {
+            get { return m_Rect.TopLeft; }
+            set
+            {
+                Point p = value;
+                if (p.Y > m_Rect.Y + m_Rect.Height)
+                    p.Y = m_Rect.Y + m_Rect.Height;
+                if (p.X > m_Rect.X + m_Rect.Width)
+                    p.X = m_Rect.X + m_Rect.Width;
+                m_Rect.Height = m_Rect.Y + m_Rect.Height - p.Y;
+                m_Rect.Y = p.Y;
+                m_Rect.Width = m_Rect.X + m_Rect.Width - p.X;
+                m_Rect.X = p.X;
+            }
+        }
+
+        public Point TopRightPos
+        {
+            get { return m_Rect.TopRight; }
+            set
+            {
+                Point p = value;
+                if (p.X < m_Rect.X)
+                    p.X = m_Rect.X;
+                if (p.Y > m_Rect.Y + m_Rect.Height)
+                    p.Y = m_Rect.Y + m_Rect.Height;
+                m_Rect.Height = m_Rect.Y + m_Rect.Height - p.Y;
+                m_Rect.Y = p.Y;
+                m_Rect.Width = p.X - m_Rect.X;
+            }
+        }
+
+        public Point BottomLeftPos
+        {
+            get { return m_Rect.BottomLeft; }
+            set
+            {
+                Point p = value;
+                if (p.Y < m_Rect.Y)
+                    p.Y = m_Rect.Y;
+                if (p.X > m_Rect.X + m_Rect.Width)
+                    p.X = m_Rect.X + m_Rect.Width;
+                m_Rect.Width = m_Rect.X + m_Rect.Width - p.X;
+                m_Rect.X = p.X;
+                m_Rect.Height = p.Y - m_Rect.Y;
+            }
+        }
         public void Copy(Geometry other)
         {
             m_Rect = other.m_Rect;

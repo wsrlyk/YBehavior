@@ -9,6 +9,11 @@ using System.Windows.Media;
 
 namespace YBehavior.Editor.Core
 {
+    public interface IHasAncestor
+    {
+        FrameworkElement Ancestor { get; }
+    }
+
     public class Operation
     {
         public delegate void ClickHandler();
@@ -18,16 +23,8 @@ namespace YBehavior.Editor.Core
         DragHandler m_DragHandler;
         DragHandler m_StartDragHandler;
 
-        RenderCanvas m_Canvas;
-        public RenderCanvas RenderCanvas
-        {
-            get
-            {
-                if (m_Canvas == null)
-                    m_Canvas = new RenderCanvas();
-                return m_Canvas;
-            }
-        }
+        IHasAncestor m_Target;
+        FrameworkElement RenderCanvas { get { return m_Target != null ? m_Target.Ancestor : null; } }
 
         public Operation(UIElement target)
         {
@@ -39,16 +36,16 @@ namespace YBehavior.Editor.Core
             target.PreviewMouseMove += _PreviewMouseMove;
             target.MouseLeftButtonUp -= _MouseLeftButtonUp;
             target.MouseLeftButtonUp += _MouseLeftButtonUp;
-        }
 
-        public void SetCanvas(RenderCanvas canvas)
-        {
-            m_Canvas = canvas;
+            m_Target = target as IHasAncestor;
         }
 
         public void MakeCanvasFocused()
         {
-            RenderCanvas.Panel.Focus();
+            //RenderCanvas.Panel.Focus();
+            var canvas = RenderCanvas;
+            if (canvas != null)
+                canvas.Focus();
         }
 
         public void RegisterClick(ClickHandler handler)
@@ -77,7 +74,7 @@ namespace YBehavior.Editor.Core
             tmp.CaptureMouse();
             m_bStartClick = true;
             m_bStartDrag = true;
-            m_Pos = e.GetPosition(RenderCanvas.Panel);
+            m_Pos = e.GetPosition(RenderCanvas);
             e.Handled = true;
         }
         void _PreviewMouseMove(object sender, MouseEventArgs e)
@@ -104,7 +101,7 @@ namespace YBehavior.Editor.Core
                 return;
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                Point newPos = e.GetPosition(RenderCanvas.Panel);
+                Point newPos = e.GetPosition(RenderCanvas);
                 if (m_DragHandler != null && newPos != m_Pos)
                     m_DragHandler(newPos - m_Pos, newPos);
                 m_Pos = newPos;
@@ -138,7 +135,7 @@ namespace YBehavior.Editor.Core
         {
             m_HitTestResult.Clear();
             VisualTreeHelper.HitTest(
-                RenderCanvas.Panel, 
+                RenderCanvas, 
                 null, 
                 new HitTestResultCallback(MyHitTestResult),
                 new PointHitTestParameters(pos));

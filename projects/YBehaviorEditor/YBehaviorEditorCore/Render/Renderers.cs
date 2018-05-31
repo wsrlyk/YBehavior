@@ -9,11 +9,6 @@ using System.Windows.Shapes;
 
 namespace YBehavior.Editor.Core
 {
-    public class RenderCanvas
-    {
-        public FrameworkElement Panel { get; set; }
-    }
-
     public class ConnectorGeometry
     {
         public string Identifier { get; set; }

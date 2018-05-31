@@ -53,16 +53,6 @@ namespace YBehavior.Editor
             //SetCanvas((renderer.ChildConn.Owner as Node).Renderer.RenderCanvas);
         }
 
-        protected override void _OnAncestorPropertyChanged()
-        {
-            m_Operation.RenderCanvas.Panel = Ancestor;
-        }
-
-        public void SetCanvas(RenderCanvas canvas)
-        {
-            m_Operation.SetCanvas(canvas);
-        }
-
         public PathGeometry PathGeometry { get { return path.Data as PathGeometry; } }
 
         //public void Clear()

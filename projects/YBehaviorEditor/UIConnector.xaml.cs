@@ -72,11 +72,6 @@ namespace YBehavior.Editor
             _UpdateHotspot();
         }
 
-        protected override void _OnAncestorPropertyChanged()
-        {
-            m_Operation.RenderCanvas.Panel = this.Ancestor;
-        }
-
         private void _UpdateHotspot()
         {
             if (this.Ancestor != null && !this.Ancestor.IsAncestorOf(this))
@@ -89,11 +84,6 @@ namespace YBehavior.Editor
                 return;
 
             Hotspot = GetPos(Ancestor);
-        }
-
-        public void SetCanvas(RenderCanvas canvas)
-        {
-            m_Operation.SetCanvas(canvas);
         }
 
         public string Title

@@ -60,11 +60,6 @@ namespace YBehavior.Editor
             SetDebug(NodeState.NS_INVALID);
         }
 
-        protected override void _OnAncestorPropertyChanged()
-        {
-            m_Operation.RenderCanvas.Panel = Ancestor;
-        }
-
         private void _BuildConnectionBinding()
         {
             foreach (ConnectionHolder conn in Node.Conns.ConnectionsList)

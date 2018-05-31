@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="YBehavior.Editor.UIComment"
+﻿<local:YUserControl x:Class="YBehavior.Editor.UIComment"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -13,16 +13,26 @@
                 <TextBlock Name="name" Text="{Binding UITitle}"/>
                 <TextBlock Name="content" Text="{Binding Data}"/>
             </StackPanel>
-            <Rectangle Name="move" HorizontalAlignment="Left" Width="15" Height="15" VerticalAlignment="Top">
+            <Rectangle Name="resizeTopLeft" HorizontalAlignment="Left" Width="11" Height="11" VerticalAlignment="Top" Cursor="SizeNWSE">
                 <Rectangle.Fill>
                     <SolidColorBrush Color="DarkOrange" Opacity="0.6" />
                 </Rectangle.Fill>
             </Rectangle>
-            <Rectangle Name="resize" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Bottom">
+            <Rectangle Name="resizeBottomRight" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Bottom" Cursor="SizeNWSE">
+                <Rectangle.Fill>
+                    <SolidColorBrush Color="DarkOrange" Opacity="0.6" />
+                </Rectangle.Fill>
+            </Rectangle>
+            <Rectangle Name="moveTopRight" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Cursor="SizeAll">
+                <Rectangle.Fill>
+                    <SolidColorBrush Color="DarkOrange" Opacity="0.6" />
+                </Rectangle.Fill>
+            </Rectangle>
+            <Rectangle Name="moveBottomLeft" HorizontalAlignment="Left" Width="11" Height="11" VerticalAlignment="Bottom" Cursor="SizeAll">
                 <Rectangle.Fill>
                     <SolidColorBrush Color="DarkOrange" Opacity="0.6" />
                 </Rectangle.Fill>
             </Rectangle>
         </Grid>
     </Border>
-</UserControl>
+</local:YUserControl>

@@ -18,7 +18,7 @@ namespace YBehavior.Editor
     /// <summary>
     /// UIComment.xaml 的交互逻辑
     /// </summary>
-    public partial class UIComment : UserControl, ISelectable, IDeletable
+    public partial class UIComment : YUserControl, ISelectable, IDeletable
     {
         static SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
@@ -26,10 +26,10 @@ namespace YBehavior.Editor
         public SelectionStateChangeHandler SelectHandler { get; set; }
 
         //Operation m_Operation;
-        Operation m_ResizeOperation;
-        Operation m_MoveOperation;
-
-        RenderCanvas m_Canvas = new RenderCanvas();
+        Operation m_Resize0Operation;
+        Operation m_Resize1Operation;
+        Operation m_Move0Operation;
+        Operation m_Move1Operation;
 
         public UIComment()
         {
@@ -39,17 +39,20 @@ namespace YBehavior.Editor
 
             SelectHandler = defaultSelectHandler;
 
-            m_MoveOperation = new Operation(this.move);
-            m_MoveOperation.RegisterClick(_OnClick);
-            m_MoveOperation.RegisterDrag(_OnDrag);
-            m_MoveOperation.SetCanvas(m_Canvas);
+            m_Move0Operation = new Operation(this.moveBottomLeft);
+            m_Move0Operation.RegisterClick(_OnClick);
+            m_Move0Operation.RegisterDrag(_OnDrag);
+            m_Move1Operation = new Operation(this.moveTopRight);
+            m_Move1Operation.RegisterClick(_OnClick);
+            m_Move1Operation.RegisterDrag(_OnDrag);
 
-            m_ResizeOperation = new Operation(this.resize);
-            m_ResizeOperation.RegisterDrag(_OnResizeDrag);
-            m_ResizeOperation.SetCanvas(m_Canvas);
+            m_Resize0Operation = new Operation(this.resizeBottomRight);
+            m_Resize0Operation.RegisterDrag(_OnResizeDrag0);
+            m_Resize1Operation = new Operation(this.resizeTopLeft);
+            m_Resize1Operation.RegisterDrag(_OnResizeDrag1);
         }
 
-        private void _OnResizeDrag(Vector delta, Point absPos)
+        private void _OnResizeDrag0(Vector delta, Point absPos)
         {
             if (DebugMgr.Instance.IsDebugging())
                 return;
@@ -60,17 +63,22 @@ namespace YBehavior.Editor
             data.OnGeometryChanged();
         }
 
-        protected override void OnVisualParentChanged(DependencyObject oldParent)
+        private void _OnResizeDrag1(Vector delta, Point absPos)
         {
-            base.OnVisualParentChanged(oldParent);
-            m_Canvas.Panel = VisualTreeHelper.GetParent(this.VisualParent) as Panel;
+            if (DebugMgr.Instance.IsDebugging())
+                return;
+
+            Comment data = this.DataContext as Comment;
+            data.Geo.TopLeftPos = data.Geo.TopLeftPos + delta;
+
+            data.OnGeometryChanged();
         }
 
         void _OnClick()
         {
             SelectHandler(this, true);
 
-            m_MoveOperation.MakeCanvasFocused();
+            m_Move0Operation.MakeCanvasFocused();
         }
 
         void _OnDrag(Vector delta, Point pos)
