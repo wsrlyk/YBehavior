@@ -111,13 +111,7 @@ namespace YBehavior.Editor
                     {
                         string nodeText = item.Name;
 
-                        Node node = null;
-                        if ((node = WorkBenchMgr.Instance.AddNodeToBench(item.Source)) != null)
-                        {
-                            NewNodeAddedArg arg = new NewNodeAddedArg();
-                            arg.Node = node;
-                            EventMgr.Instance.Send(arg);
-                        }
+                        WorkBenchMgr.Instance.CreateNodeToBench(item.Source);
                     }
                     break;
                 }

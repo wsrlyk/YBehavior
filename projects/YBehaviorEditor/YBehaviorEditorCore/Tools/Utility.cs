@@ -9,7 +9,6 @@ namespace YBehavior.Editor.Core
         public static Node CloneNode(Node template, bool bIncludeChildren)
         {
             Node node = template.Clone();
-            node.Init();
 
             if (bIncludeChildren)
             {
@@ -22,5 +21,19 @@ namespace YBehavior.Editor.Core
 
             return node;
         }
+
+        public static void InitNode(Node node, bool bIncludeChildren)
+        {
+            node.Init();
+
+            if (bIncludeChildren)
+            {
+                foreach (Node child in node.Conns)
+                {
+                    InitNode(child, bIncludeChildren);
+                }
+            }
+        }
+
     }
 }

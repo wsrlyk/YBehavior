@@ -19,6 +19,7 @@ namespace YBehavior.Editor.Core
     public interface IDuplicatable
     {
         void OnDuplicated(int param);
+        void OnCopied(int param);
     }
     public interface IDebugPointable
     {
@@ -139,6 +140,18 @@ namespace YBehavior.Editor.Core
             if (duplicatable != null)
             {
                 duplicatable.OnDuplicated(param);
+            }
+        }
+
+        public void TryCopySelection(int param)
+        {
+            if (m_SingleSelection == null)
+                return;
+
+            IDuplicatable duplicatable = m_SingleSelection as IDuplicatable;
+            if (duplicatable != null)
+            {
+                duplicatable.OnCopied(param);
             }
         }
 

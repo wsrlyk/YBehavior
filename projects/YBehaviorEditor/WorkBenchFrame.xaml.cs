@@ -272,7 +272,7 @@ namespace YBehavior.Editor
                 case Key.D:
                     if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.None)
                     {
-                        if((Keyboard.Modifiers & ModifierKeys.Shift)!= ModifierKeys.None)
+                        if ((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.None)
                         {
                             ///> Duplicate all children
                             Core.SelectionMgr.Instance.TryDuplicateSelection(1);
@@ -283,6 +283,24 @@ namespace YBehavior.Editor
                             Core.SelectionMgr.Instance.TryDuplicateSelection(0);
                         }
                     }
+                    break;
+                case Key.C:
+                    if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.None)
+                    {
+                        if ((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.None)
+                        {
+                            ///> Duplicate all children
+                            Core.SelectionMgr.Instance.TryCopySelection(1);
+                        }
+                        else
+                        {
+                            ///> Duplicate only one
+                            Core.SelectionMgr.Instance.TryCopySelection(0);
+                        }
+                    }
+                    break;
+                case Key.V:
+                    WorkBenchMgr.Instance.PasteCopiedToBench();
                     break;
                 case Key.F9:
                     Core.SelectionMgr.Instance.TryToggleBreakPoint();

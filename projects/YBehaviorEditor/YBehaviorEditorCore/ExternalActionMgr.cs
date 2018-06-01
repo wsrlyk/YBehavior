@@ -143,16 +143,17 @@ namespace YBehavior.Editor.Core
                 param = attr.Value;
             }
 
-            Variable v = Variable.CreateVariableInNode(
+            // TODO: typeGroup
+            Variable v = action.Variables.CreateVariableInNode(
                 name,
                 value,
                 valueType,
                 countType,
                 vbType,
+                bLockVBType,
+                0,
                 param
             );
-            v.LockVBType = bLockVBType;
-            action.Variables.AddVariable(v);
             return true;
         }
     }

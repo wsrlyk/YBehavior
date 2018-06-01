@@ -7,6 +7,10 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core
 {
+    public interface IVariableDataSource
+    {
+        SharedData SharedData { get; }
+    }
     public class Variable : System.ComponentModel.INotifyPropertyChanged
     {
         public static readonly char ListSpliter = '|';
@@ -141,10 +145,10 @@ namespace YBehavior.Editor.Core
         string m_Name;
         string m_Params = null;
         bool m_bCanbeRemoved = false;
-        public SharedData SharedData { get; set; } = null;
+        public IVariableDataSource SharedDataSource { get; set; } = null;
         public SharedData Container { get; set; } = null;
 
-        public Variable(SharedData sharedData) => SharedData = sharedData;
+        public Variable(IVariableDataSource sharedData) => SharedDataSource = sharedData;
 
         static List<string> candidatesBuffer = new List<string>();
         public void RefreshCandidates(bool bForce = false)
@@ -152,7 +156,7 @@ namespace YBehavior.Editor.Core
             if (!m_bInited && !bForce)
                 return;
             m_bInited = true;
-            if (SharedData == null || vbType != VariableType.VBT_Pointer)
+            if (SharedDataSource == null || SharedDataSource.SharedData == null || vbType != VariableType.VBT_Pointer)
             {
                 Candidates.Clear();
             }
@@ -164,7 +168,7 @@ namespace YBehavior.Editor.Core
                 {
                     Candidates.Clear();
                     m_VectorCandidates.Clear();
-                    foreach (var v in SharedData.Datas.Values)
+                    foreach (var v in SharedDataSource.SharedData.Datas.Values)
                     {
                         if (v.vType == vType)
                         {
@@ -228,7 +232,7 @@ namespace YBehavior.Editor.Core
                     {
                         if (cType == CountType.CT_SINGLE && m_VectorCandidates.Contains(m_Value))
                         {
-                            m_VectorIndex = new Variable(SharedData);
+                            m_VectorIndex = new Variable(SharedDataSource);
                             m_VectorIndex.m_Parent = this;
                             m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, "0");
                             OnPropertyChanged("VectorIndex");
@@ -310,7 +314,7 @@ namespace YBehavior.Editor.Core
 
         public bool CheckValid()
         {
-            if (SharedData == null)
+            if (SharedDataSource == null || SharedDataSource.SharedData == null)
                 return false;
             if (vbType == VariableType.VBT_Pointer)
             {
@@ -321,7 +325,7 @@ namespace YBehavior.Editor.Core
                 //}
                 if (string.IsNullOrEmpty(Value))
                     return false;
-                Variable other = SharedData.GetVariable(Value);
+                Variable other = SharedDataSource.SharedData.GetVariable(Value);
                 if (other == null)
                 {
                     LogMgr.Instance.Log(string.Format("Pointer doesnt exist for variable {0}, while the pointer is {1} ", Name, Value));
@@ -443,7 +447,7 @@ namespace YBehavior.Editor.Core
 
         private bool SetVectorIndex(string variableType, string value)
         {
-            m_VectorIndex = new Variable(SharedData);
+            m_VectorIndex = new Variable(SharedDataSource);
             m_VectorIndex.m_Parent = this;
             m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableTypeDic.GetKey(variableType[0],VariableType.VBT_NONE), value);
             return true;
@@ -493,9 +497,9 @@ namespace YBehavior.Editor.Core
             return true;
         }
 
-        public Variable Clone()
+        public Variable Clone(IVariableDataSource newDataSource = null)
         {
-            Variable v = new Variable(SharedData);
+            Variable v = new Variable(newDataSource == null ? SharedDataSource : newDataSource);
             v.vTypeSet.AddRange(vTypeSet.ToArray());
             v.vType = vType;
             v.cType = cType;
@@ -508,21 +512,21 @@ namespace YBehavior.Editor.Core
             v.m_Params = m_Params;
             if (m_VectorIndex != null)
             {
-                v.m_VectorIndex = m_VectorIndex.Clone();
+                v.m_VectorIndex = m_VectorIndex.Clone(newDataSource);
                 v.m_VectorIndex.m_Parent = v;
             }
             return v;
         }
-        public static Variable CreateVariableInNode(string name, string defaultValue, ValueType[] valueType, CountType countType, VariableType vbType, string param = null)
-        {
-            Variable v = new Variable(null);
-            v.vTypeSet.AddRange(valueType);
-            v.cType = countType;
-            v.vbType = vbType;
+        //public static Variable CreateVariableInNode(string name, string defaultValue, ValueType[] valueType, CountType countType, VariableType vbType, string param = null)
+        //{
+        //    Variable v = new Variable(null);
+        //    v.vTypeSet.AddRange(valueType);
+        //    v.cType = countType;
+        //    v.vbType = vbType;
 
-            v.SetVariable(valueType[0], countType, vbType, defaultValue, param, name);
-            return v;
-        }
+        //    v.SetVariable(valueType[0], countType, vbType, defaultValue, param, name);
+        //    return v;
+        //}
 
         //public static Variable CreateVariable(SharedData sharedData, char valueType, char countType, char variableType, string name, string value, string param = null)
         //{

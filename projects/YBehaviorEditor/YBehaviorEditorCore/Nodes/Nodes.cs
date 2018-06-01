@@ -18,7 +18,7 @@ namespace YBehavior.Editor.Core
         {
             get
             {
-                return WorkBenchMgr.Instance.ActiveWorkBench.MainTree;
+                return WorkBenchMgr.Instance.ActiveWorkBench != null ? WorkBenchMgr.Instance.ActiveWorkBench.MainTree: null;
             }
         }
         protected override bool _HasParentHolder()
@@ -108,44 +108,46 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable optr = Variable.CreateVariableInNode(
+            Variable optr = Variables.CreateVariableInNode(
                 "Operator",
                 "ADD",
                 Variable.CreateParams_Enum,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
+                true,
+                0,
                 "ADD|SUB|MUL|DIV"
             );
-            optr.LockVBType = true;
-            Variables.AddVariable(optr);
 
-            Variable opl = Variable.CreateVariableInNode(
+            Variable opl = Variables.CreateVariableInNode(
                 "Opl",
                 "0",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Pointer
+                Variable.VariableType.VBT_Pointer,
+                true,
+                1
             );
-            opl.LockVBType = true;
-            Variables.AddVariable(opl, 1);
 
-            Variable opr1 = Variable.CreateVariableInNode(
+            Variable opr1 = Variables.CreateVariableInNode(
                 "Opr1",
                 "0",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const
+                Variable.VariableType.VBT_Const,
+                false,
+                1
             );
-            Variables.AddVariable(opr1, 1);
 
-            Variable opr2 = Variable.CreateVariableInNode(
+            Variable opr2 = Variables.CreateVariableInNode(
                 "Opr2",
                 "0",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const
+                Variable.VariableType.VBT_Const,
+                false,
+                1
             );
-            Variables.AddVariable(opr2, 1);
         }
 
         public override string Note
@@ -178,35 +180,36 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable optr = Variable.CreateVariableInNode(
+            Variable optr = Variables.CreateVariableInNode(
                 "Operator",
                 "==",
                 Variable.CreateParams_Enum,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
+                true,
+                0,
                 "==|!=|>|<|>=|<="
             );
-            optr.LockVBType = true;
-            Variables.AddVariable(optr);
 
-            Variable opl = Variable.CreateVariableInNode(
+            Variable opl = Variables.CreateVariableInNode(
                 "Opl",
                 "0",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Pointer
+                Variable.VariableType.VBT_Pointer,
+                true,
+                1
             );
-            opl.LockVBType = true;
-            Variables.AddVariable(opl, 1);
 
-            Variable opr = Variable.CreateVariableInNode(
+            Variable opr = Variables.CreateVariableInNode(
                 "Opr",
                 "0",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const
+                Variable.VariableType.VBT_Const,
+                false,
+                1
             );
-            Variables.AddVariable(opr, 1);
         }
 
         public override string Note
@@ -238,24 +241,25 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable opl = Variable.CreateVariableInNode(
+            Variable opl = Variables.CreateVariableInNode(
                 "Target",
                 "0",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Pointer
+                Variable.VariableType.VBT_Pointer,
+                true,
+                1
             );
-            opl.LockVBType = true;
-            Variables.AddVariable(opl, 1);
 
-            Variable opr = Variable.CreateVariableInNode(
+            Variable opr = Variables.CreateVariableInNode(
                 "Source",
                 "0",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const
+                Variable.VariableType.VBT_Const,
+                false,
+                1
             );
-            Variables.AddVariable(opr, 1);
         }
 
         public override string Note
@@ -338,33 +342,35 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable opl = Variable.CreateVariableInNode(
+            Variable opl = Variables.CreateVariableInNode(
                 "Target",
                 "0",
                 Variable.CreateParams_RandomTypes,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Pointer
+                Variable.VariableType.VBT_Pointer,
+                true,
+                1
             );
-            opl.LockVBType = true;
-            Variables.AddVariable(opl, 1);
 
-            Variable opr1 = Variable.CreateVariableInNode(
+            Variable opr1 = Variables.CreateVariableInNode(
                 "Bound1",
                 "0",
                 Variable.CreateParams_RandomTypes,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const
+                Variable.VariableType.VBT_Const,
+                false,
+                1
             );
-            Variables.AddVariable(opr1, 1);
 
-            Variable opr2 = Variable.CreateVariableInNode(
+            Variable opr2 = Variables.CreateVariableInNode(
                 "Bound2",
                 "0",
                 Variable.CreateParams_RandomTypes,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const
+                Variable.VariableType.VBT_Const,
+                false,
+                1
             );
-            Variables.AddVariable(opr2, 1);
         }
 
         public override string Note

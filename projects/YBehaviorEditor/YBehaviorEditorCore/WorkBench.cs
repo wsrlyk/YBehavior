@@ -173,7 +173,7 @@ namespace YBehavior.Editor.Core
         private bool _LoadTree(Node tree, XmlNode data)
         {
             bool bRes = _LoadOneNode(tree, data);
-
+            Utility.InitNode(tree, true);
             RefreshNodeUID();
             //tree.Renderer.CreateConnections();
             return bRes;
@@ -208,7 +208,7 @@ namespace YBehavior.Editor.Core
                 return false;
 
             node.Load(data);
-            node.Init();
+
             foreach (XmlNode chi in data.ChildNodes)
             {
                 if (chi.Name == "Node")

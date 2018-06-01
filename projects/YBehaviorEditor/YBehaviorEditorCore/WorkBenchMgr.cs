@@ -21,6 +21,9 @@ namespace YBehavior.Editor.Core
                 return m_ActiveWorkBench.FileInfo.Name;
             }
         }
+
+        private Node CopiedSubTree { get; set; }
+
         public WorkBenchMgr()
         {
             EventMgr.Instance.Register(EventType.NodesConnected, _OnNodesConnected);
@@ -234,7 +237,7 @@ namespace YBehavior.Editor.Core
             return true;
         }
 
-        public Node AddNodeToBench(Node template, WorkBench bench = null)
+        public Node CreateNodeToBench(Node template, WorkBench bench = null)
         {
             if (bench == null)
                 bench = ActiveWorkBench;
@@ -245,8 +248,13 @@ namespace YBehavior.Editor.Core
             }
 
             Node node = NodeMgr.Instance.CreateNodeByName(template.Name);
-            node.Init();
+
+            Utility.InitNode(node, true);
             bench.AddForestTree(node);
+
+            NewNodeAddedArg arg = new NewNodeAddedArg();
+            arg.Node = node;
+            EventMgr.Instance.Send(arg);
 
             return node;
         }
@@ -262,7 +270,46 @@ namespace YBehavior.Editor.Core
             }
 
             Node node = Utility.CloneNode(template, bIncludeChildren);
+            Utility.InitNode(node, true);
             bench.AddForestTree(node);
+
+            NewNodeAddedArg arg = new NewNodeAddedArg();
+            arg.Node = node;
+            EventMgr.Instance.Send(arg);
+
+            return node;
+        }
+
+        public void CopyNode(Node template, bool bIncludeChildren)
+        {
+            CopiedSubTree = Utility.CloneNode(template, bIncludeChildren);
+        }
+
+        public void PasteCopiedToBench(WorkBench bench = null)
+        {
+            PasteNodeToBench(CopiedSubTree, true, bench);
+        }
+
+        public Node PasteNodeToBench(Node template, bool bIncludeChildren, WorkBench bench = null)
+        {
+            if (CopiedSubTree == null)
+                return null;
+
+            if (bench == null)
+                bench = ActiveWorkBench;
+            if (bench == null)
+            {
+                LogMgr.Instance.Error("CloneNodeToBench Failed: bench == null");
+                return null;
+            }
+
+            Node node = Utility.CloneNode(template, bIncludeChildren);
+            Utility.InitNode(node, true);
+            bench.AddForestTree(node);
+
+            NewNodeAddedArg arg = new NewNodeAddedArg();
+            arg.Node = node;
+            EventMgr.Instance.Send(arg);
 
             return node;
         }

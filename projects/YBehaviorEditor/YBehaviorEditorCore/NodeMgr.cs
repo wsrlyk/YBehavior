@@ -247,7 +247,7 @@ namespace YBehavior.Editor.Core
         }
     }
 
-    public class Node : NodeBase, System.ComponentModel.INotifyPropertyChanged
+    public class Node : NodeBase, System.ComponentModel.INotifyPropertyChanged, IVariableDataSource
     {
         protected string m_Name;
         protected string m_NickName;
@@ -311,6 +311,7 @@ namespace YBehavior.Editor.Core
         protected SharedData m_Variables;
         public SharedData Variables { get { return m_Variables; } }
 
+        public SharedData SharedData { get { return GetTreeSharedData(); } }
         protected SharedData m_TreeSharedData = null;
         public SharedData GetTreeSharedData()
         {
@@ -401,18 +402,13 @@ namespace YBehavior.Editor.Core
 
         protected virtual void OnInit()
         {
-            _InitVariables();
-        }
-
-        public override void OnParentChanged()
-        {
-            base.OnParentChanged();
+            m_TreeSharedData = null;
             _InitVariables();
         }
 
         public override void OnChildChanged()
         {
-            base.OnParentChanged();
+            base.OnChildChanged();
             Conns.Sort(SortByPosX);
         }
 
@@ -420,7 +416,6 @@ namespace YBehavior.Editor.Core
         {
             foreach (var v in m_Variables.Datas.Values)
             {
-                v.SharedData = GetTreeSharedData();
                 v.RefreshCandidates(true);
             }
         }
@@ -529,7 +524,7 @@ namespace YBehavior.Editor.Core
 
             foreach (var v in m_Variables.Datas.Values)
             {
-                Variable newv = v.Clone();
+                Variable newv = v.Clone(other);
                 other.Variables.AddVariable(newv);
             }
             return other;

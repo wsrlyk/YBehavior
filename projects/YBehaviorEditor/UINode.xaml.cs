@@ -297,13 +297,16 @@ namespace YBehavior.Editor
             if (Node.Type == NodeType.NT_Root)
                 return;
 
-            Node node = null;
-            if ((node = WorkBenchMgr.Instance.CloneNodeToBench(Node, param != 0)) != null)
-            {
-                NewNodeAddedArg arg = new NewNodeAddedArg();
-                arg.Node = node;
-                EventMgr.Instance.Send(arg);
-            }
+            WorkBenchMgr.Instance.CloneNodeToBench(Node, param != 0);
+        }
+
+        public void OnCopied(int param)
+        {
+            ///> Check if is root
+            if (Node.Type == NodeType.NT_Root)
+                return;
+
+            WorkBenchMgr.Instance.CopyNode(Node, param != 0);
         }
 
         public void ToggleBreakPoint()

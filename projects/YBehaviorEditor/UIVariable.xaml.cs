@@ -49,8 +49,8 @@ namespace YBehavior.Editor
             if (dr == MessageBoxResult.Yes)
             {
 
-                if (v.SharedData != null)
-                    v.SharedData.RemoveVariable(v);
+                if (v.SharedDataSource.SharedData != null)
+                    v.SharedDataSource.SharedData.RemoveVariable(v);
             }
         }
 

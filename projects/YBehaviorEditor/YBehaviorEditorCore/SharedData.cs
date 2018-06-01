@@ -67,7 +67,7 @@ namespace YBehavior.Editor.Core
         {
             if (!IsValidVariableName(name))
                 return false;
-            Variable v = new Variable(this);
+            Variable v = new Variable(this.m_Owner);
             if (!v.SetVariableInNode(value, name))
                 return false;
 
@@ -92,7 +92,7 @@ namespace YBehavior.Editor.Core
         {
             if (!IsValidVariableName(name))
                 return false;
-            Variable v = new Variable(this);
+            Variable v = new Variable(this.m_Owner);
             if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, value, null, name))
                 return false;
 
@@ -103,6 +103,28 @@ namespace YBehavior.Editor.Core
                 return false;
 
             return AddVariable(v);
+        }
+
+        public Variable CreateVariableInNode(
+            string name, 
+            string defaultValue, 
+            Variable.ValueType[] valueType, 
+            Variable.CountType countType, 
+            Variable.VariableType vbType, 
+            bool bLockVBType,
+            int typeGroup = 0,
+            string param = null)
+        {
+            Variable v = new Variable(m_Owner);
+            v.vTypeSet.AddRange(valueType);
+            v.cType = countType;
+            v.vbType = vbType;
+            v.SetVariable(valueType[0], countType, vbType, defaultValue, param, name);
+            v.LockVBType = bLockVBType;
+
+            if (AddVariable(v, typeGroup))
+                return v;
+            return null;
         }
 
         public bool AddVariable(Variable v, int sameTypeGroup = 0)
