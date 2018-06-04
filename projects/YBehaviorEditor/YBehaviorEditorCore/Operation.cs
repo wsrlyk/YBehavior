@@ -103,8 +103,13 @@ namespace YBehavior.Editor.Core
             {
                 Point newPos = e.GetPosition(RenderCanvas);
                 if (m_DragHandler != null && newPos != m_Pos)
-                    m_DragHandler(newPos - m_Pos, newPos);
-                m_Pos = newPos;
+                {
+                    Vector vector = newPos - m_Pos;
+                    if (vector.LengthSquared < 9)
+                        return;
+                    m_DragHandler(vector, newPos);
+                    m_Pos = newPos;
+                }
             }
         }
         void _MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
