@@ -1,14 +1,14 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2005
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YBehavior", "YBehavior.vcxproj", "{C1582006-77B9-497E-A630-43FC48DD4B18}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test.vcxproj", "{E266CCBE-E012-408A-B85A-C535613E87A0}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C1582006-77B9-497E-A630-43FC48DD4B18} = {C1582006-77B9-497E-A630-43FC48DD4B18}
 	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AllBuild", "AllBuild.vcxproj", "{D8B1C06D-39CD-49F9-B10C-B33C582659BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,12 +24,11 @@ Global
 		{E266CCBE-E012-408A-B85A-C535613E87A0}.Debug|Win32.Build.0 = Debug|Win32
 		{E266CCBE-E012-408A-B85A-C535613E87A0}.Release|Win32.ActiveCfg = Release|Win32
 		{E266CCBE-E012-408A-B85A-C535613E87A0}.Release|Win32.Build.0 = Release|Win32
-		{D8B1C06D-39CD-49F9-B10C-B33C582659BB}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D8B1C06D-39CD-49F9-B10C-B33C582659BB}.Debug|Win32.Build.0 = Debug|Win32
-		{D8B1C06D-39CD-49F9-B10C-B33C582659BB}.Release|Win32.ActiveCfg = Release|Win32
-		{D8B1C06D-39CD-49F9-B10C-B33C582659BB}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E6337AFC-B03E-47E9-9287-90DC7146E71B}
 	EndGlobalSection
 EndGlobal

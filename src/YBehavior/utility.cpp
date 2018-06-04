@@ -90,7 +90,7 @@ namespace YBehavior
 	{
 		STRING str;
 		std::stringstream ss;
-		for (int i = 0; i < t.size(); ++i)
+		for (unsigned i = 0; i < t.size(); ++i)
 		{
 			if (i != 0)
 				ss << '|';

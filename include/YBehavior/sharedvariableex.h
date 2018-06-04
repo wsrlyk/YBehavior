@@ -91,7 +91,7 @@ namespace YBehavior
 					Utility::SplitString(str, res, '|');
 					for (auto it = res.begin(); it != res.end(); ++it)
 					{
-						mValue.push_back(std::move(Utility::ToType<ElementType>(*it)));
+						mValue.push_back(Utility::ToType<ElementType>(*it));
 					}
 				}
 				else
@@ -128,7 +128,7 @@ namespace YBehavior
 					return nullptr;
 				}
 				const std::vector<T>* pVector = (const std::vector<T>*)pData->Get<std::vector<T>>(m_Index);
-				if (pVector && index < pVector->size())
+				if (pVector && (UINT)index < pVector->size())
 				{
 					const T& t = (*pVector)[index];
 					return &t;
@@ -153,7 +153,7 @@ namespace YBehavior
 				if (index < 0)
 					return;
 				const std::vector<T>* pVector = (const std::vector<T>*)pData->Get<std::vector<T>>(m_Index);
-				if (pVector && index < pVector->size())
+				if (pVector && (UINT)index < pVector->size())
 					(*const_cast<std::vector<T>*>(pVector))[index] = *src;
 			}
 			else

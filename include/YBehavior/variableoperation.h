@@ -166,6 +166,9 @@ namespace YBehavior
 	template<>
 	void ValueHandler::Calculate<AgentWrapper>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op);
 
+	template<>
+	void ValueHandler::Calculate<Bool>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op);
+
 
 	template<>
 	void ValueHandler::Random<Int>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1);

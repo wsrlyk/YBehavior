@@ -106,7 +106,7 @@ namespace YBehavior
 			if ((INT)m_Datas.size() <= index)
 			{
 				m_Datas.resize(index);
-				m_Datas.push_back(std::move(src));
+				m_Datas.push_back(src);
 			}
 			else
 			{
@@ -259,7 +259,7 @@ namespace YBehavior
 	{
 		IDataArray* iarray = m_Datas[GetTypeIndex<T>()];
 		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return parray->Set(index, std::move(src));
+		return parray->Set(index, src);
 	}
 
 
@@ -276,7 +276,7 @@ namespace YBehavior
 	{
 		IDataArray* iarray = m_Datas[GetTypeIndex<T>()];
 		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return parray->Set(index, std::move(src));
+		return parray->Set(index, src);
 	}
 
 	///

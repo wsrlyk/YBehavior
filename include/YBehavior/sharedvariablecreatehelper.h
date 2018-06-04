@@ -47,7 +47,7 @@ namespace YBehavior
 			Utility::SplitString(str, splitRes, '|');
 			for (auto it = splitRes.begin(); it != splitRes.end(); ++it)
 			{
-				res.push_back(std::move(Utility::ToType<elementType>(*it)));
+				res.push_back(Utility::ToType<elementType>(*it));
 			}
 			pData->Set(index, std::move(res));
 		}
