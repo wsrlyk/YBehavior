@@ -7,8 +7,9 @@
              mc:Ignorable="d" 
              MinWidth="60" MinHeight="80"
              Width="{Binding Geo.Rec.Width}" Height="{Binding Geo.Rec.Height}">
-    <Border Name="border" BorderThickness="3" BorderBrush="#FFF5BEA4" Background="#FFF7E3B7" Opacity="0.6" >
+    <Border Name="border" BorderThickness="2" BorderBrush="#FFF5BEA4" Background="#FFF7E3B7" Opacity="0.6" >
         <Grid>
+            <Border Name="selectCover" BorderThickness="4" BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"/>
             <StackPanel Name="mainPanel">
                 <TextBlock Name="name" Text="{Binding UITitle}"/>
                 <TextBlock Name="content" Text="{Binding Data}"/>

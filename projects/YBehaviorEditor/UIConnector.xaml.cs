@@ -189,10 +189,7 @@ namespace YBehavior.Editor
             if (other == null)
                 return;
 
-            NodesConnectedArg arg = new NodesConnectedArg();
-            arg.Holder0 = this.ConnHolder;
-            arg.Holder1 = other.ConnHolder;
-            EventMgr.Instance.Send(arg);
+            WorkBenchMgr.Instance.ConnectNodes(this.ConnHolder, other.ConnHolder);
         }
     }
 }

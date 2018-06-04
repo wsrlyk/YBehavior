@@ -4,8 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Windows;
-
-namespace YBehaviorEditor
+namespace YBehavior.Editor
 {
     /// <summary>
     /// App.xaml 的交互逻辑

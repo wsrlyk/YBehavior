@@ -49,10 +49,12 @@
         </Border>
         <StackPanel DockPanel.Dock="Top" Height="20"  Name="topConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
         <StackPanel DockPanel.Dock="Bottom" Height="10" Name="bottomConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
-        <Border Name="border" BorderThickness="3" BorderBrush="#FFAFCEE8" Background="#FF70B6F0">
+        <Border Name="border" BorderThickness="2" BorderBrush="#FFC1C7CD" Background="#FFB4B7B9">
             <Grid>
+                <Border Name="disableCover" BorderThickness="0" Background="#FF4B4B4B" Visibility="{Binding Owner.Disabled, Converter={StaticResource visibilityConvertor}}"/>
                 <Border Name="debugCover" BorderThickness="0" Background="#FFDA3F1C"/>
-                <StackPanel Name="mainPanel">
+                <Border Name="selectCover" BorderThickness="4" BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"/>
+                <StackPanel Name="mainPanel" Margin="3">
                     <TextBlock Name="name" Text="{Binding Owner.UITitle}"></TextBlock>
                     <TextBlock Name="note" Text="{Binding Owner.Note}"></TextBlock>
                 </StackPanel>

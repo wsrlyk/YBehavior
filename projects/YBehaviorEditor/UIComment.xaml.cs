@@ -22,7 +22,6 @@ namespace YBehavior.Editor
     {
         static SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
-        Brush normalBorderBrush;
         public SelectionStateChangeHandler SelectHandler { get; set; }
 
         //Operation m_Operation;
@@ -35,7 +34,7 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
 
-            normalBorderBrush = this.border.BorderBrush;
+            this.selectCover.Visibility = Visibility.Collapsed;
 
             SelectHandler = defaultSelectHandler;
 
@@ -106,9 +105,9 @@ namespace YBehavior.Editor
         public void SetSelect(bool bSelect)
         {
             if (bSelect)
-                this.border.BorderBrush = new SolidColorBrush(Colors.DarkBlue);
+                this.selectCover.Visibility = Visibility.Visible;
             else
-                this.border.BorderBrush = normalBorderBrush;
+                this.selectCover.Visibility = Visibility.Collapsed;
         }
     }
 }

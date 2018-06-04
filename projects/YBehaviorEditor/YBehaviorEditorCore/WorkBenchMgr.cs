@@ -26,26 +26,23 @@ namespace YBehavior.Editor.Core
 
         public WorkBenchMgr()
         {
-            EventMgr.Instance.Register(EventType.NodesConnected, _OnNodesConnected);
-            EventMgr.Instance.Register(EventType.NodesDisconnected, _OnNodesDisconnected);
-            EventMgr.Instance.Register(EventType.RemoveNode, _RemoveNode);
             EventMgr.Instance.Register(EventType.NodeMoved, _NodeMoved);
         }
 
-        private void _OnNodesConnected(EventArg arg)
+        public void ConnectNodes(ConnectionHolder holder0, ConnectionHolder holder1)
         {
             if (m_ActiveWorkBench != null)
-                m_ActiveWorkBench.OnNodesConnected(arg);
+                m_ActiveWorkBench.ConnectNodes(holder0, holder1);
         }
-        private void _OnNodesDisconnected(EventArg arg)
+        public void DisconnectNodes(ConnectionHolder childHolder)
         {
             if (m_ActiveWorkBench != null)
-                m_ActiveWorkBench.OnNodesDisconnected(arg);
+                m_ActiveWorkBench.DisconnectNodes(childHolder);
         }
-        private void _RemoveNode(EventArg arg)
+        public void RemoveNode(Node node)
         {
             if (m_ActiveWorkBench != null)
-                m_ActiveWorkBench.RemoveNode(arg);
+                m_ActiveWorkBench.RemoveNode(node);
         }
 
         public void RemoveComment(Comment comment)
@@ -59,6 +56,11 @@ namespace YBehavior.Editor.Core
                 m_ActiveWorkBench.CreateComment();
         }
 
+        public void RefreshNodeUID()
+        {
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.RefreshNodeUID();
+        }
         public void Remove(WorkBench target)
         {
             m_OpenedWorkBenchs.Remove(target);

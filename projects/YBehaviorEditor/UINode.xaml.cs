@@ -19,11 +19,10 @@ namespace YBehavior.Editor
     /// <summary>
     /// BehaviorNode.xaml 的交互逻辑
     /// </summary>
-    public partial class UINode : YUserControl, ISelectable, IDeletable, IDuplicatable, IDebugPointable
+    public partial class UINode : YUserControl, ISelectable, IDeletable, IDuplicatable, IDebugPointable, ICanDisable
     {
         static SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
-        Brush normalBorderBrush;
         public SelectionStateChangeHandler SelectHandler { get; set; }
 
         public Node Node { get; set; }
@@ -35,11 +34,11 @@ namespace YBehavior.Editor
         public UINode()
         {
             InitializeComponent();
-            normalBorderBrush = this.border.BorderBrush;
+            this.selectCover.Visibility = Visibility.Collapsed;
 
             SelectHandler = defaultSelectHandler;
 
-            m_Operation = new Operation(this.border);
+            m_Operation = new Operation(this);
             m_Operation.RegisterClick(_OnClick);
             m_Operation.RegisterDrag(_OnDrag);
 
@@ -249,11 +248,10 @@ namespace YBehavior.Editor
 
         void _OnClick()
         {
+            m_Operation.MakeCanvasFocused();
             if (Node is Tree)
                 return;
             SelectHandler(this, true);
-
-            m_Operation.MakeCanvasFocused();
         }
 
         void _OnDrag(Vector delta, Point pos)
@@ -281,9 +279,9 @@ namespace YBehavior.Editor
         public void SetSelect(bool bSelect)
         {
             if (bSelect)
-                this.border.BorderBrush = new SolidColorBrush(Colors.DarkBlue);
+                this.selectCover.Visibility = Visibility.Visible;
             else
-                this.border.BorderBrush = normalBorderBrush;
+                this.selectCover.Visibility = Visibility.Collapsed;
         }
 
         public void OnDelete(int param)
@@ -323,6 +321,11 @@ namespace YBehavior.Editor
                 Node.SetDebugPoint(0);
             else
                 Node.SetDebugPoint(-1);
+        }
+
+        public void ToggleDisable()
+        {
+            Node.Disabled = !Node.SelfDisabled;
         }
     }
 }

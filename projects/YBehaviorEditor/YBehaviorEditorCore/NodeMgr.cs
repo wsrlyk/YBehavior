@@ -111,7 +111,6 @@ namespace YBehavior.Editor.Core
                 return parentConn.Owner;
             }
         }
-        protected NodeBase m_Parent;
 
         public NodeBase Root
         {
@@ -284,6 +283,51 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        int m_DisableCount = 0;
+        int m_SelfDisabled = 0;
+        public bool Disabled
+        {
+            get { return m_DisableCount > 0; }
+            set
+            {
+                int newValue = value ? 1 : 0;
+                if (m_SelfDisabled == newValue)
+                    return;
+                m_SelfDisabled = newValue;
+                if (value)
+                    Utility.OperateNode(this, true, _IncreaseDisable);
+                else
+                    Utility.OperateNode(this, true, _DecreaseDisable);
+
+                WorkBenchMgr.Instance.RefreshNodeUID();
+            }
+        }
+
+        public bool SelfDisabled { get { return m_SelfDisabled > 0; } }
+        public int DisableCount { get { return m_DisableCount; } }
+
+        static void _IncreaseDisable(Node node)
+        {
+            ++node.m_DisableCount;
+            node.OnPropertyChanged("Disabled");
+        }
+        static void _DecreaseDisable(Node node)
+        {
+            if (node.m_DisableCount > 0)
+            {
+                --node.m_DisableCount;
+                node.OnPropertyChanged("Disabled");
+            }
+        }
+        static void _SetDisableBasedOnParent(Node node)
+        {
+            Node parent = node.Parent as Node;
+            if (parent == null)
+                node.m_DisableCount = node.m_SelfDisabled;
+            else
+                node.m_DisableCount = node.m_SelfDisabled + parent.DisableCount;
+        }
+
         protected NodeType m_Type = NodeType.NT_Invalid;
         public NodeType Type { get { return m_Type; } set { m_Type = value; } }
         protected NodeHierachy m_Hierachy = NodeHierachy.NH_None;
@@ -364,6 +408,9 @@ namespace YBehavior.Editor.Core
                 case "Comment":
                     Comment = attr.Value;
                     break;
+                case "Disabled":
+                    Disabled = bool.Parse(attr.Value);
+                    break;
                 default:
                     return LoadOtherAttr(attr);
             }
@@ -437,6 +484,11 @@ namespace YBehavior.Editor.Core
             if (!string.IsNullOrEmpty(Comment))
             {
                 data.SetAttribute("Comment", Comment);
+            }
+
+            if (SelfDisabled)
+            {
+                data.SetAttribute("Disabled", "true");
             }
 
             foreach (Variable v in Variables.Datas.Values)
@@ -537,25 +589,21 @@ namespace YBehavior.Editor.Core
                 return;
 
             ///> Disconnect all the connection
-            NodesDisconnectedArg arg = new NodesDisconnectedArg();
-            arg.ChildHolder = Conns.ParentHolder;
-            EventMgr.Instance.Send(arg);
+            WorkBenchMgr.Instance.DisconnectNodes(Conns.ParentHolder);
 
             foreach (var child in Conns)
             {
                 Node chi = child as Node;
                 if (chi == null)
                     continue;
-                arg.ChildHolder = chi.Conns.ParentHolder;
-                EventMgr.Instance.Send(arg);
+
+                WorkBenchMgr.Instance.DisconnectNodes(chi.Conns.ParentHolder);
 
                 if (param != 0)
                     chi.Delete(param);
             }
 
-            RemoveNodeArg removeArg = new RemoveNodeArg();
-            removeArg.Node = this;
-            EventMgr.Instance.Send(removeArg);
+            WorkBenchMgr.Instance.RemoveNode(this);
         }
 
         public void SetDebugPoint(int count)
@@ -563,6 +611,14 @@ namespace YBehavior.Editor.Core
             DebugPointInfo.HitCount = count;
             OnPropertyChanged("DebugPointInfo");
             DebugMgr.Instance.SetDebugPoint(UID, count);
+        }
+
+        public override void OnParentChanged()
+        {
+            base.OnParentChanged();
+            Node parent = Parent as Node;
+            if ((parent == null && m_DisableCount - m_SelfDisabled > 0) || (parent != null && parent.Disabled))
+                Utility.OperateNode(this, true, _SetDisableBasedOnParent);
         }
 
         public static int SortByPosX(NodeBase aa, NodeBase bb)

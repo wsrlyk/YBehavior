@@ -84,7 +84,7 @@ namespace YBehavior.Editor
         public void SetSelect(bool bSelect)
         {
             if (bSelect)
-                this.path.Stroke = new SolidColorBrush(Colors.DarkBlue);
+                this.path.SetResourceReference(Shape.StrokeProperty, SystemColors.HotTrackBrushKey);
             else
                 this.path.Stroke = normalStrokeBrush;
         }
@@ -93,9 +93,8 @@ namespace YBehavior.Editor
         {
             if (DebugMgr.Instance.IsDebugging())
                 return;
-            NodesDisconnectedArg arg = new NodesDisconnectedArg();
-            arg.ChildHolder = this.ChildHolder;
-            EventMgr.Instance.Send(arg);
+
+            WorkBenchMgr.Instance.DisconnectNodes(this.ChildHolder);
         }
     }
 }

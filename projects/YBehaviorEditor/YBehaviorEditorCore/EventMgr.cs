@@ -13,12 +13,8 @@ namespace YBehavior.Editor.Core
         WorkBenchSelected,
         WorkBenchSaved,
         NewNodeAdded,
-        RemoveNode,
         NodeMoved,
         NodeDuplicated,
-        NodeRemoved,
-        NodesConnected,
-        NodesDisconnected,
         SelectionChanged,
         SharedVariableChanged,
         NetworkConnectionChanged,
@@ -96,24 +92,6 @@ namespace YBehavior.Editor.Core
     }
 
     /// <summary>
-    /// Do the removing operation
-    /// </summary>
-    public class RemoveNodeArg : EventArg
-    {
-        public Node Node { get; set; }
-        public override EventType Type => EventType.RemoveNode;
-    }
-
-    /// <summary>
-    /// After the node is removed, notify others
-    /// </summary>
-    public class NodeRemovedArg : EventArg
-    {
-        public Node Node { get; set; }
-        public override EventType Type => EventType.NodeRemoved;
-    }
-
-    /// <summary>
     /// After the node is moved, notify mainly the workbench to refresh the uid
     /// </summary>
     public class NodeMovedArg : EventArg
@@ -129,19 +107,6 @@ namespace YBehavior.Editor.Core
         public override EventType Type => EventType.NodeDuplicated;
     }
 
-
-    public class NodesConnectedArg : EventArg
-    {
-        public ConnectionHolder Holder0 { get; set; }
-        public ConnectionHolder Holder1 { get; set; }
-        public override EventType Type => EventType.NodesConnected;
-    }
-
-    public class NodesDisconnectedArg : EventArg
-    {
-        public ConnectionHolder ChildHolder { get; set; }
-        public override EventType Type => EventType.NodesDisconnected;
-    }
     public class SelectionChangedArg : EventArg
     {
         public ISelectable Target { get; set; }

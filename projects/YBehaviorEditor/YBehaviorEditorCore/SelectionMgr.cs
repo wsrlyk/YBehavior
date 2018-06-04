@@ -27,6 +27,11 @@ namespace YBehavior.Editor.Core
         void ToggleLogPoint();
     }
 
+    public interface ICanDisable
+    {
+        void ToggleDisable();
+    }
+
     public delegate void SelectionStateChangeHandler(ISelectable obj, bool bState);
     public delegate void DeleteHandler(IDeletable obj);
 
@@ -176,6 +181,18 @@ namespace YBehavior.Editor.Core
             if (debugPointable != null)
             {
                 debugPointable.ToggleLogPoint();
+            }
+        }
+
+        public void TryToggleDisable()
+        {
+            if (m_SingleSelection == null)
+                return;
+
+            ICanDisable disable = m_SingleSelection as ICanDisable;
+            if (disable != null)
+            {
+                disable.ToggleDisable();
             }
         }
     }

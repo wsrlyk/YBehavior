@@ -39,14 +39,12 @@ namespace YBehavior.Editor.Core
             m_UID = ++g_ID_inc;
         }
 
-        public void OnNodesConnected(EventArg arg)
+        public void ConnectNodes(ConnectionHolder holder0, ConnectionHolder holder1)
         {
-            NodesConnectedArg oArg = arg as NodesConnectedArg;
-
             ConnectionHolder parent;
             ConnectionHolder child;
 
-            if (ConnectionHolder.TryConnect(oArg.Holder0, oArg.Holder1, out parent, out child))
+            if (ConnectionHolder.TryConnect(holder0, holder1, out parent, out child))
             {
                 ///> refresh parent connections
                 //Node parentNode = parent.Owner as Node;
@@ -67,23 +65,21 @@ namespace YBehavior.Editor.Core
 
         }
 
-        public void OnNodesDisconnected(EventArg arg)
+        public void DisconnectNodes(ConnectionHolder childHolder)
         {
-            NodesDisconnectedArg oArg = arg as NodesDisconnectedArg;
-
-            Connection conn = oArg.ChildHolder.Conn;
+            Connection conn = childHolder.Conn;
             if (conn == null)
                 return;
-            ConnectionRenderer connRenderer = conn.GetConnectionRenderer(oArg.ChildHolder.Owner);
+            ConnectionRenderer connRenderer = conn.GetConnectionRenderer(childHolder.Owner);
 
-            if (conn.RemoveNode(oArg.ChildHolder.Owner))
+            if (conn.RemoveNode(childHolder.Owner))
             {
                 if (connRenderer != null)
                     ConnectionList.Remove(connRenderer);
                 //Node parentNode = conn.Owner as Node;
                 //parentNode.Renderer.CreateConnections();
 
-                Node childNode = oArg.ChildHolder.Owner as Node;
+                Node childNode = childHolder.Owner as Node;
                 AddForestTree(childNode, false);
 
                 RefreshNodeUID();
@@ -94,11 +90,9 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        public void RemoveNode(EventArg arg)
+        public void RemoveNode(Node node)
         {
-            RemoveNodeArg oArg = arg as RemoveNodeArg;
-
-            RemoveForestTree(oArg.Node);
+            RemoveForestTree(node);
         }
 
         public void OnNodeMoved(EventArg arg)
@@ -107,8 +101,7 @@ namespace YBehavior.Editor.Core
             Node parent = oArg.Node.Parent as Node;
             if (parent != null)
             {
-                uint uid = parent.UID;
-                _RefreshNodeUID(parent, ref uid);
+                _RefreshNodeUIDFromMiddle(parent);
             }
         }
 
@@ -291,6 +284,9 @@ namespace YBehavior.Editor.Core
 
         void _ExportNode(Node node, XmlElement data, XmlDocument xmlDoc)
         {
+            if (node.Disabled)
+                return;
+
             XmlElement nodeEl = xmlDoc.CreateElement("Node");
             data.AppendChild(nodeEl);
 
@@ -310,17 +306,25 @@ namespace YBehavior.Editor.Core
 
         void _RefreshNodeUIDFromRoot(Node node)
         {
-            uint uid = 1;
+            uint uid = 0;
+            _RefreshNodeUID(node, ref uid);
+        }
+
+        void _RefreshNodeUIDFromMiddle(Node node)
+        {
+            uint uid = node.UID - 1;
             _RefreshNodeUID(node, ref uid);
         }
 
         void _RefreshNodeUID(Node node, ref uint uid)
         {
-            node.UID = uid;
+            if (node.Disabled)
+                node.UID = 0;
+            else
+                node.UID = ++uid;
 
             foreach (Node chi in node.Conns)
             {
-                ++uid;
                 _RefreshNodeUID(chi, ref uid);
             }
         }

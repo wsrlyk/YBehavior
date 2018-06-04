@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:YBehavior.Editor"
         mc:Ignorable="d"
+        KeyDown="_KeyDown"
         Title="MainWindow" Height="1024" Width="1280">
     <Grid>
         <Grid.RowDefinitions>
@@ -13,12 +14,12 @@
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
-            <Menu DockPanel.Dock="Left" Width="400" Margin="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <!--<Menu DockPanel.Dock="Left" Width="400" Margin="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">
                 <MenuItem Header="Operations" Height="20" Width="100">
                     <MenuItem Header="Open" Height="20" Width="100"/>
                     <MenuItem Header="Close" Height="30" Width="100"/>
                 </MenuItem>
-            </Menu>
+            </Menu>-->
             <local:DebugFrame DockPanel.Dock="Right"/>
         </DockPanel>
         <Grid Grid.Row="1">
