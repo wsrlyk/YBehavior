@@ -55,7 +55,7 @@ namespace YBehavior.Editor
             DraggingConnection.Instance.SetCanvas(this.canvas);
 
             m_Operation = new Operation(this.CanvasBoard);
-            m_Operation.RegisterDrag(_OnDrag);
+            m_Operation.RegisterDrag(_OnDrag, null);
             m_Operation.RegisterClick(_OnClick);
         }
 

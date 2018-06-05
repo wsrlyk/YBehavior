@@ -75,6 +75,18 @@ namespace YBehavior.Editor
                 case Key.V:
                     WorkBenchMgr.Instance.PasteCopiedToBench();
                     break;
+                case Key.Z:
+                    if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.None)
+                    {
+                        WorkBenchMgr.Instance.Undo();
+                    }
+                    break;
+                case Key.Y:
+                    if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.None)
+                    {
+                        WorkBenchMgr.Instance.Redo();
+                    }
+                    break;
                 case Key.F9:
                     Core.SelectionMgr.Instance.TryToggleBreakPoint();
                     break;

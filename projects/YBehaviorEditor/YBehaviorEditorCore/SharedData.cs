@@ -102,7 +102,16 @@ namespace YBehavior.Editor.Core
             if (!v.CheckValid())
                 return false;
 
-            return AddVariable(v);
+            bool res = AddVariable(v);
+            if (res)
+            {
+                AddSharedVariableCommand addSharedVariableCommand = new AddSharedVariableCommand()
+                {
+                    Variable = v
+                };
+                WorkBenchMgr.Instance.PushCommand(addSharedVariableCommand);
+            }
+            return res;
         }
 
         public Variable CreateVariableInNode(
@@ -170,13 +179,17 @@ namespace YBehavior.Editor.Core
             if (v == null)
                 return false;
 
-            if (!m_Variables.ContainsKey(v.Name))
+            if (!m_Variables.Remove(v.Name))
             {
                 LogMgr.Instance.Error("Variable not exist when try remove: " + v.Name);
                 return false;
             }
 
-            m_Variables.Remove(v.Name);
+            RemoveSharedVariableCommand removeSharedVariableCommand = new RemoveSharedVariableCommand()
+            {
+                Variable = v
+            };
+            WorkBenchMgr.Instance.PushCommand(removeSharedVariableCommand);
 
             if (m_Owner is Tree)
             {
@@ -204,6 +217,8 @@ namespace YBehavior.Editor.Core
             foreach (var v in m_Variables.Values)
             {
                 v.RefreshCandidates(true);
+                if (v.VectorIndex != null)
+                    v.VectorIndex.RefreshCandidates(true);
             }
         }
 

@@ -179,6 +179,28 @@ namespace YBehavior.Editor.Core
             _Move(delta);
         }
 
+        public void FinishDrag(Vector delta, Point pos)
+        {
+            if (m_Owner.Parent != null)
+            {
+                ///> let the parent node sort the chilren
+                m_Owner.Parent.OnChildChanged();
+            }
+
+            NodeMovedArg arg = new NodeMovedArg
+            {
+                Node = this.m_Owner
+            };
+            EventMgr.Instance.Send(arg);
+
+            MoveNodeCommand moveNodeCommand = new MoveNodeCommand()
+            {
+                Node = this.m_Owner,
+                OriginPos = pos - delta,
+                FinalPos = pos
+            };
+            WorkBenchMgr.Instance.PushCommand(moveNodeCommand);
+        }
         public void SetPos(Point pos)
         {
             _Move(pos - Geo.Pos);

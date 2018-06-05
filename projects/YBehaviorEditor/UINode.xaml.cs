@@ -40,7 +40,7 @@ namespace YBehavior.Editor
 
             m_Operation = new Operation(this);
             m_Operation.RegisterClick(_OnClick);
-            m_Operation.RegisterDrag(_OnDrag);
+            m_Operation.RegisterDrag(_OnDrag, _OnFinishDrag);
 
             m_InstantAnim = this.Resources["InstantShowAnim"] as Storyboard;
 
@@ -261,19 +261,15 @@ namespace YBehavior.Editor
             if (Node != null)
             {
                 Node.Renderer.DragMain(delta);
-
-                ///> let the parent node sort the chilren
-                if (delta.LengthSquared == 0 && Node.Parent != null)
-                {
-                    Node.Parent.OnChildChanged();
-
-                    NodeMovedArg arg = new NodeMovedArg
-                    {
-                        Node = this.Node
-                    };
-                    EventMgr.Instance.Send(arg);
-                }
             }
+        }
+
+        void _OnFinishDrag(Vector delta, Point pos)
+        {
+            if (DebugMgr.Instance.IsDebugging() || Node == null)
+                return;
+
+            Node.Renderer.FinishDrag(delta, pos);
         }
 
         public void SetSelect(bool bSelect)

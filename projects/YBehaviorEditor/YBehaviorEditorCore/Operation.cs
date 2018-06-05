@@ -22,6 +22,7 @@ namespace YBehavior.Editor.Core
         ClickHandler m_ClickHandler;
         DragHandler m_DragHandler;
         DragHandler m_StartDragHandler;
+        DragHandler m_FinishDragHandler;
 
         IHasAncestor m_Target;
         FrameworkElement RenderCanvas { get { return m_Target != null ? m_Target.Ancestor : null; } }
@@ -53,19 +54,22 @@ namespace YBehavior.Editor.Core
             m_ClickHandler = handler;
         }
 
-        public void RegisterDragDrop(DragHandler handler, DragHandler starthandler)
+        public void RegisterDragDrop(DragHandler handler, DragHandler starthandler, DragHandler finishhandler)
         {
             m_DragHandler = handler;
             m_StartDragHandler = starthandler;
+            m_FinishDragHandler = finishhandler;
         }
 
-        public void RegisterDrag(DragHandler handler)
+        public void RegisterDrag(DragHandler handler, DragHandler finishhandler)
         {
             m_DragHandler = handler;
+            m_FinishDragHandler = finishhandler;
         }
 
         bool m_bStartClick = false;
         bool m_bStartDrag = false;
+        Point m_StartPos = new Point();
         Point m_Pos = new Point();
 
         void _MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -75,6 +79,7 @@ namespace YBehavior.Editor.Core
             m_bStartClick = true;
             m_bStartDrag = true;
             m_Pos = e.GetPosition(RenderCanvas);
+            m_StartPos = m_Pos;
             e.Handled = true;
         }
         void _PreviewMouseMove(object sender, MouseEventArgs e)
@@ -120,7 +125,7 @@ namespace YBehavior.Editor.Core
             if (m_bStartClick)
             {
                 m_bStartClick = false;
-
+                m_bStartDrag = false;
                 if (m_ClickHandler != null)
                     m_ClickHandler();
             }
@@ -129,8 +134,8 @@ namespace YBehavior.Editor.Core
             {
                 m_bStartDrag = false;
 
-                if (m_DragHandler != null)
-                    m_DragHandler(new Vector(0, 0), m_Pos);
+                if (m_FinishDragHandler != null)
+                    m_FinishDragHandler(m_Pos - m_StartPos, m_Pos);
             }
             e.Handled = true;
         }

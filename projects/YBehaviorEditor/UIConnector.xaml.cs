@@ -62,7 +62,7 @@ namespace YBehavior.Editor
             HoverHandler = new DropHandler(defaultHoverHandler);
 
             m_Operation = new Operation(this);
-            m_Operation.RegisterDragDrop(_OnDragged, _OnStartDragged);
+            m_Operation.RegisterDragDrop(_OnDragged, _OnStartDragged, _OnFinishDragged);
 
             this.LayoutUpdated += _OnLayoutUpdated;
         }
@@ -122,14 +122,6 @@ namespace YBehavior.Editor
                 return;
             IDropable droppable = _HitTesting(absPos);
 
-            ///> DragFinish
-            if (delta.LengthSquared == 0)
-            {
-                DraggingConnection.Instance.FinishDrag();
-
-                DropHandler(droppable);
-            }
-            else
             {
                 Point from = GetPos(DraggingConnection.Instance.Canvas);
                 Point to = absPos;
@@ -137,6 +129,15 @@ namespace YBehavior.Editor
 
                 HoverHandler(droppable);
             }
+        }
+        void _OnFinishDragged(Vector delta, Point absPos)
+        {
+            if (DebugMgr.Instance.IsDebugging())
+                return;
+            IDropable droppable = _HitTesting(absPos);
+            DraggingConnection.Instance.FinishDrag();
+
+            DropHandler(droppable);
         }
 
         IDropable _HitTesting(Point pos)

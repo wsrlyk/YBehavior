@@ -74,7 +74,7 @@ namespace YBehavior.Editor
 
         private void _OnSharedVariableChanged(EventArg arg)
         {
-            Node node = this.DataContext as Node;
+            Node node = this.VariableTab.DataContext as Node;
             if (node == null)
                 return;
 
@@ -86,7 +86,7 @@ namespace YBehavior.Editor
             this.Dispatcher.BeginInvoke(new Action
                 (() =>
                 {
-                    Node node = this.DataContext as Node;
+                    Node node = this.VariableTab.DataContext as Node;
                     if (node == null)
                         return;
 

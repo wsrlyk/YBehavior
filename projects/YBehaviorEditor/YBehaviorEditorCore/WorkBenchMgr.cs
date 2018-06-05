@@ -45,11 +45,24 @@ namespace YBehavior.Editor.Core
                 m_ActiveWorkBench.RemoveNode(node);
         }
 
+        public void AddNode(Node node)
+        {
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.AddNode(node);
+        }
+
         public void RemoveComment(Comment comment)
         {
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.RemoveComment(comment);
         }
+
+        public void AddComment(Comment comment)
+        {
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.AddComment(comment);
+        }
+
         public void CreateComment()
         {
             if (m_ActiveWorkBench != null)
@@ -239,10 +252,9 @@ namespace YBehavior.Editor.Core
             return true;
         }
 
-        public Node CreateNodeToBench(Node template, WorkBench bench = null)
+        public Node CreateNodeToBench(Node template)
         {
-            if (bench == null)
-                bench = ActiveWorkBench;
+            WorkBench bench = ActiveWorkBench;
             if (bench == null)
             {
                 LogMgr.Instance.Error("AddNodeToBench Failed: bench == null");
@@ -252,7 +264,8 @@ namespace YBehavior.Editor.Core
             Node node = NodeMgr.Instance.CreateNodeByName(template.Name);
 
             Utility.InitNode(node, true);
-            bench.AddForestTree(node);
+
+            AddNode(node);
 
             NewNodeAddedArg arg = new NewNodeAddedArg();
             arg.Node = node;
@@ -261,10 +274,9 @@ namespace YBehavior.Editor.Core
             return node;
         }
 
-        public Node CloneNodeToBench(Node template, bool bIncludeChildren, WorkBench bench = null)
+        public Node CloneNodeToBench(Node template, bool bIncludeChildren)
         {
-            if (bench == null)
-                bench = ActiveWorkBench;
+            WorkBench bench = ActiveWorkBench;
             if (bench == null)
             {
                 LogMgr.Instance.Error("CloneNodeToBench Failed: bench == null");
@@ -273,7 +285,8 @@ namespace YBehavior.Editor.Core
 
             Node node = Utility.CloneNode(template, bIncludeChildren);
             Utility.InitNode(node, true);
-            bench.AddForestTree(node);
+
+            AddNode(node);
 
             NewNodeAddedArg arg = new NewNodeAddedArg();
             arg.Node = node;
@@ -287,18 +300,17 @@ namespace YBehavior.Editor.Core
             CopiedSubTree = Utility.CloneNode(template, bIncludeChildren);
         }
 
-        public void PasteCopiedToBench(WorkBench bench = null)
+        public void PasteCopiedToBench()
         {
-            PasteNodeToBench(CopiedSubTree, true, bench);
+            PasteNodeToBench(CopiedSubTree, true);
         }
 
-        public Node PasteNodeToBench(Node template, bool bIncludeChildren, WorkBench bench = null)
+        public Node PasteNodeToBench(Node template, bool bIncludeChildren)
         {
             if (CopiedSubTree == null)
                 return null;
 
-            if (bench == null)
-                bench = ActiveWorkBench;
+            WorkBench bench = ActiveWorkBench;
             if (bench == null)
             {
                 LogMgr.Instance.Error("CloneNodeToBench Failed: bench == null");
@@ -307,7 +319,8 @@ namespace YBehavior.Editor.Core
 
             Node node = Utility.CloneNode(template, bIncludeChildren);
             Utility.InitNode(node, true);
-            bench.AddForestTree(node);
+
+            AddNode(node);
 
             NewNodeAddedArg arg = new NewNodeAddedArg();
             arg.Node = node;
@@ -333,6 +346,28 @@ namespace YBehavior.Editor.Core
             m_OpenedWorkBenchs.Add(workBench);
             m_ActiveWorkBench = workBench;
             return workBench;
+        }
+
+        public void PushCommand(ICommand command)
+        {
+            if (ActiveWorkBench == null)
+                return;
+
+            ActiveWorkBench.CommandMgr.PushDoneCommand(command);
+        }
+
+        public void Undo()
+        {
+            if (ActiveWorkBench == null)
+                return;
+            ActiveWorkBench.CommandMgr.Undo();
+        }
+
+        public void Redo()
+        {
+            if (ActiveWorkBench == null)
+                return;
+            ActiveWorkBench.CommandMgr.Redo();
         }
     }
 }

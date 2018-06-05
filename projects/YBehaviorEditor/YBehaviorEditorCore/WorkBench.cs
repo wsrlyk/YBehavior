@@ -12,6 +12,7 @@ namespace YBehavior.Editor.Core
         public List<Node> Forest { get { return m_Forest; } }
         Tree m_Tree;
         public Tree MainTree { get { return m_Tree; } }
+        public CommandMgr CommandMgr { get; } = new CommandMgr();
 
         public DelayableNotificationCollection<Comment> Comments { get; } = new DelayableNotificationCollection<Comment>();
         public DelayableNotificationCollection<Renderer> NodeList { get; } = new DelayableNotificationCollection<Renderer>();
@@ -57,6 +58,13 @@ namespace YBehavior.Editor.Core
                 RemoveForestTree(childNode, false);
 
                 RefreshNodeUID();
+
+                ConnectNodeCommand connectNodeCommand = new ConnectNodeCommand
+                {
+                    Parent = parent,
+                    Child = child
+                };
+                CommandMgr.PushDoneCommand(connectNodeCommand);
             }
             else
             {
@@ -83,6 +91,13 @@ namespace YBehavior.Editor.Core
                 AddForestTree(childNode, false);
 
                 RefreshNodeUID();
+
+                DisconnectNodeCommand disconnectNodeCommand = new DisconnectNodeCommand
+                {
+                    Parent = conn.Holder,
+                    Child = childHolder
+                };
+                CommandMgr.PushDoneCommand(disconnectNodeCommand);
             }
             else
             {
@@ -93,6 +108,23 @@ namespace YBehavior.Editor.Core
         public void RemoveNode(Node node)
         {
             RemoveForestTree(node);
+
+            RemoveNodeCommand removeNodeCommand = new RemoveNodeCommand()
+            {
+                Node = node
+            };
+            CommandMgr.PushDoneCommand(removeNodeCommand);
+        }
+
+        public void AddNode(Node node)
+        {
+            AddForestTree(node);
+
+            AddNodeCommand addNodeCommand = new AddNodeCommand()
+            {
+                Node = node
+            };
+            CommandMgr.PushDoneCommand(addNodeCommand);
         }
 
         public void OnNodeMoved(EventArg arg)
@@ -109,12 +141,30 @@ namespace YBehavior.Editor.Core
         {
             if (comment != null)
                 Comments.Remove(comment);
+
+            RemoveCommentCommand removeCommentCommand = new RemoveCommentCommand()
+            {
+                Comment = comment
+            };
+            CommandMgr.PushDoneCommand(removeCommentCommand);
+        }
+
+        public void AddComment(Comment comment)
+        {
+            if (comment != null)
+                Comments.Add(comment);
+
+            AddCommentCommand addCommentCommand = new AddCommentCommand()
+            {
+                Comment = comment
+            };
+            CommandMgr.PushDoneCommand(addCommentCommand);
         }
 
         public void CreateComment()
         {
             Comment comment = new Comment();
-            Comments.Add(comment);
+            AddComment(comment);
 
             CommentCreatedArg cArg = new CommentCreatedArg()
             {
