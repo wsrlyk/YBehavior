@@ -295,6 +295,8 @@ namespace YBehavior.Editor.Core
 
             _SaveComments(data, xmlDoc);
             RefreshNodeUID();
+
+            CommandMgr.Dirty = false;
         }
 
         void _SaveNode(Node node, XmlElement data, XmlDocument xmlDoc)

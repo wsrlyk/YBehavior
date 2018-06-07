@@ -19,6 +19,7 @@ namespace YBehavior.Editor.Core
 
         public bool Blocked { get; set; } = true;
 
+        public bool Dirty { get; set; }
         bool m_bDoing = false;
         public void PushDoneCommand(ICommand command)
         {
@@ -35,6 +36,8 @@ namespace YBehavior.Editor.Core
 
             OnPropertyChanged("HasDoneCommands");
             OnPropertyChanged("HasUndoCommands");
+
+            Dirty = true;
         }
 
         public void Undo()

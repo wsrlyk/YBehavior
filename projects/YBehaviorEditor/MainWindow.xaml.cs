@@ -113,5 +113,14 @@ namespace YBehavior.Editor
         {
             ProcessKeyDown(e.Key, Keyboard.Modifiers);
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            MessageBoxResult dr = MessageBox.Show("Really want to exit?", "Exit Or Not", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (dr == MessageBoxResult.No)
+            {
+                e.Cancel = true;
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:YBehavior.Editor"
         mc:Ignorable="d"
         KeyDown="_KeyDown"
+        Closing="Window_Closing"
         Title="MainWindow" Height="1024" Width="1280">
     <Grid>
         <Grid.RowDefinitions>

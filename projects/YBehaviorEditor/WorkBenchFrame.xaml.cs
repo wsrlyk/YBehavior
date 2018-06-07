@@ -189,7 +189,7 @@ namespace YBehavior.Editor
                 return false;
 
             WorkBench bench = tab.Content as WorkBench;
-            if (bench != null)
+            if (bench != null && bench.CommandMgr.Dirty)
             // if is dirty
             {
                 MessageBoxResult dr = MessageBox.Show("This file has been modified. Save it?", "To Save Or Not To Save", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
