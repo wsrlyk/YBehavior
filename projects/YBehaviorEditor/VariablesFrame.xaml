@@ -44,19 +44,19 @@
             </TabItem>
             <TabItem Header="Comment" Name="CommentTab" Visibility="{Binding IsSelected, ElementName=CommentTab, Converter={StaticResource visibilityConvertor}}">
                 <Grid>
-                    <Grid.ColumnDefinitions>
+                    <!--<Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="100"/>
-                    </Grid.RowDefinitions>
+                    </Grid.RowDefinitions>-->
 
-                    <TextBlock Text="Title"/>
-                    <TextBlock Text="Content" Grid.Row="1"/>
-                    <TextBox Grid.Column="1" Text="{Binding Name}"/>
-                    <TextBox Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Text="{Binding Data}"/>
+                    <!--<TextBlock Text="Title"/>-->
+                    <!--<TextBlock Text="Content" Grid.Row="1"/>-->
+                    <!--<TextBox Grid.Column="1" Text="{Binding Name}"/>-->
+                    <TextBox TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Text="{Binding Content}"/>
                 </Grid>
             </TabItem>
         </TabControl>

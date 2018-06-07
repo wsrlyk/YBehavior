@@ -9,10 +9,13 @@ namespace YBehavior.Editor.Core
         void Undo();
     }
 
-    public class CommandMgr
+    public class CommandMgr : System.ComponentModel.INotifyPropertyChanged
     {
         LinkedList<ICommand> m_DoneCommands = new LinkedList<ICommand>();
         LinkedList<ICommand> m_UndoCommands = new LinkedList<ICommand>();
+
+        public bool HasDoneCommands { get { return m_DoneCommands.Count > 0; } }
+        public bool HasUndoCommands { get { return m_UndoCommands.Count > 0; } }
 
         public bool Blocked { get; set; } = true;
 
@@ -29,6 +32,9 @@ namespace YBehavior.Editor.Core
             m_UndoCommands.Clear();
 
             LogMgr.Instance.Log("Push command: " + command.ToString() + ", Total: " + m_DoneCommands.Count.ToString());
+
+            OnPropertyChanged("HasDoneCommands");
+            OnPropertyChanged("HasUndoCommands");
         }
 
         public void Undo()
@@ -41,6 +47,9 @@ namespace YBehavior.Editor.Core
                 last.Undo();
                 m_UndoCommands.AddLast(last);
                 m_bDoing = false;
+
+                OnPropertyChanged("HasDoneCommands");
+                OnPropertyChanged("HasUndoCommands");
             }
         }
 
@@ -54,6 +63,18 @@ namespace YBehavior.Editor.Core
                 last.Redo();
                 m_DoneCommands.AddLast(last);
                 m_bDoing = false;
+
+                OnPropertyChanged("HasDoneCommands");
+                OnPropertyChanged("HasUndoCommands");
+            }
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        internal protected void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
             }
         }
     }

@@ -90,6 +90,7 @@ namespace YBehavior.Editor
                 VariableHelper.ValueTypeDic.GetKey(type, Variable.ValueType.VT_NONE),
                 isarray == 1 ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE))
             {
+                this.VName.Text = string.Empty;
             }
             else
             {

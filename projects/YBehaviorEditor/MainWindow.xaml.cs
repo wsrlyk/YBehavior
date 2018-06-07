@@ -11,7 +11,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Input;
 using YBehavior.Editor.Core;
 
 namespace YBehavior.Editor
@@ -26,12 +25,12 @@ namespace YBehavior.Editor
             InitializeComponent();
         }
 
-        private void _KeyDown(object sender, KeyEventArgs e)
+        public static void ProcessKeyDown(Key key, ModifierKeys modifier)
         {
-            switch (e.Key)
+            switch (key)
             {
                 case Key.Delete:
-                    if ((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.None)
+                    if ((modifier & ModifierKeys.Shift) != ModifierKeys.None)
                     {
                         ///> Duplicate all children
                         Core.SelectionMgr.Instance.TryDeleteSelection(1);
@@ -43,9 +42,11 @@ namespace YBehavior.Editor
                     }
                     break;
                 case Key.D:
-                    if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.None)
+                    if (DebugMgr.Instance.IsDebugging())
+                        break;
+                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
                     {
-                        if ((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.None)
+                        if ((modifier & ModifierKeys.Shift) != ModifierKeys.None)
                         {
                             ///> Duplicate all children
                             Core.SelectionMgr.Instance.TryDuplicateSelection(1);
@@ -58,9 +59,11 @@ namespace YBehavior.Editor
                     }
                     break;
                 case Key.C:
-                    if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.None)
+                    if (DebugMgr.Instance.IsDebugging())
+                        break;
+                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
                     {
-                        if ((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.None)
+                        if ((modifier & ModifierKeys.Shift) != ModifierKeys.None)
                         {
                             ///> Duplicate all children
                             Core.SelectionMgr.Instance.TryCopySelection(1);
@@ -73,16 +76,22 @@ namespace YBehavior.Editor
                     }
                     break;
                 case Key.V:
+                    if (DebugMgr.Instance.IsDebugging())
+                        break;
                     WorkBenchMgr.Instance.PasteCopiedToBench();
                     break;
                 case Key.Z:
-                    if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.None)
+                    if (DebugMgr.Instance.IsDebugging())
+                        break;
+                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
                     {
                         WorkBenchMgr.Instance.Undo();
                     }
                     break;
                 case Key.Y:
-                    if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.None)
+                    if (DebugMgr.Instance.IsDebugging())
+                        break;
+                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
                     {
                         WorkBenchMgr.Instance.Redo();
                     }
@@ -94,9 +103,15 @@ namespace YBehavior.Editor
                     Core.SelectionMgr.Instance.TryToggleLogPoint();
                     break;
                 case Key.F12:
+                    if (DebugMgr.Instance.IsDebugging())
+                        break;
                     Core.SelectionMgr.Instance.TryToggleDisable();
                     break;
             }
+        }
+        private void _KeyDown(object sender, KeyEventArgs e)
+        {
+            ProcessKeyDown(e.Key, Keyboard.Modifiers);
         }
     }
 }
