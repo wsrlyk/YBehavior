@@ -14,10 +14,12 @@ namespace YBehavior.Editor.Core
         LinkedList<ICommand> m_DoneCommands = new LinkedList<ICommand>();
         LinkedList<ICommand> m_UndoCommands = new LinkedList<ICommand>();
 
+        public bool Blocked { get; set; } = true;
+
         bool m_bDoing = false;
         public void PushDoneCommand(ICommand command)
         {
-            if (m_bDoing)
+            if (m_bDoing || Blocked)
                 return;
 
             if (m_DoneCommands.Count > 20)
@@ -25,6 +27,8 @@ namespace YBehavior.Editor.Core
             m_DoneCommands.AddLast(command);
 
             m_UndoCommands.Clear();
+
+            LogMgr.Instance.Log("Push command: " + command.ToString() + ", Total: " + m_DoneCommands.Count.ToString());
         }
 
         public void Undo()
@@ -170,6 +174,53 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    public class ChangeNodeCommentCommand : ICommand
+    {
+        public Node Node { get; set; }
+        public string OriginComment { get; set; }
+        public string FinalComment { get; set; }
+
+        public void Redo()
+        {
+            Node.Comment = FinalComment;
+        }
+        public void Undo()
+        {
+            Node.Comment = OriginComment;
+        }
+    }
+
+    public class ChangeNodeDisableCommand : ICommand
+    {
+        public Node Node { get; set; }
+        public bool OriginState { get; set; }
+
+        public void Redo()
+        {
+            Node.Disabled = !OriginState;
+        }
+        public void Undo()
+        {
+            Node.Disabled  = OriginState;
+        }
+    }
+
+    public class ChangeNodeNickNameCommand : ICommand
+    {
+        public Node Node { get; set; }
+        public string OriginNickName { get; set; }
+        public string FinalNickName { get; set; }
+
+        public void Redo()
+        {
+            Node.NickName = FinalNickName;
+        }
+        public void Undo()
+        {
+            Node.NickName = OriginNickName;
+        }
+    }
+
     public class AddCommentCommand : ICommand
     {
         public Comment Comment { get; set; }
@@ -198,4 +249,91 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    public class ChangeCommentCommand : ICommand
+    {
+        public Comment Comment { get; set; }
+        public string OriginContent { get; set; }
+        public string FinalContent { get; set; }
+
+        public void Redo()
+        {
+            Comment.Content = FinalContent;
+        }
+        public void Undo()
+        {
+            Comment.Content = OriginContent;
+        }
+    }
+
+    public class MoveCommentCommand : ICommand
+    {
+        public Comment Comment { get; set; }
+        public System.Windows.Rect OriginRec { get; set; }
+        public System.Windows.Rect FinalRec { get; set; }
+
+        public void Redo()
+        {
+            Comment.Geo.Rec = FinalRec;
+            Comment.OnGeometryChangedWithoutCommand();
+        }
+        public void Undo()
+        {
+            Comment.Geo.Rec = OriginRec;
+            Comment.OnGeometryChangedWithoutCommand();
+        }
+    }
+
+    public class ChangeVariableValueCommand : ICommand
+    {
+        public Variable Variable { get; set; }
+        public string OldValue { get; set; }
+        public string NewValue { get; set; }
+
+        //public Variable OldVectorIndex { get; set; }
+
+        public void Redo()
+        {
+            Variable.Value = NewValue;
+        }
+        public void Undo()
+        {
+            Variable.Value = OldValue;
+            //if (OldVectorIndex != null)
+            //{
+            //    Variable.VectorIndex = OldVectorIndex;
+            //}
+        }
+    }
+
+    public class ChangeVariableVBTypeCommand : ICommand
+    {
+        public Variable Variable { get; set; }
+        public Variable.VariableType OldType { get; set; }
+        public Variable.VariableType NewType { get; set; }
+
+        public void Redo()
+        {
+            Variable.vbType = NewType;
+        }
+        public void Undo()
+        {
+            Variable.vbType = OldType;
+        }
+    }
+
+    public class ChangeVariableVTypeCommand : ICommand
+    {
+        public Variable Variable { get; set; }
+        public Variable.ValueType OldType { get; set; }
+        public Variable.ValueType NewType { get; set; }
+
+        public void Redo()
+        {
+            Variable.vType = NewType;
+        }
+        public void Undo()
+        {
+            Variable.vType = OldType;
+        }
+    }
 }

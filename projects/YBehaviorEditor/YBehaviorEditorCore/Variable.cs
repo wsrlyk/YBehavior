@@ -102,6 +102,13 @@ namespace YBehavior.Editor.Core
             get { return m_vType; }
             set
             {
+                ChangeVariableVTypeCommand command = new ChangeVariableVTypeCommand()
+                {
+                    OldType = m_vType,
+                    NewType = value,
+                    Variable = this
+                };
+
                 if (m_vTypeSet.Count == 0)
                 {
                     m_vTypeSet.Add(value);
@@ -110,8 +117,12 @@ namespace YBehavior.Editor.Core
                     m_vType = value;
                 else
                     m_vType = ValueType.VT_NONE;
+                command.NewType = m_vType;
+
                 RefreshCandidates();
                 _OnConditionChanged();
+
+                WorkBenchMgr.Instance.PushCommand(command);
             }
         }
 
@@ -130,9 +141,22 @@ namespace YBehavior.Editor.Core
             get { return m_vbType; }
             set
             {
+                ChangeVariableVBTypeCommand command = new ChangeVariableVBTypeCommand()
+                {
+                    OldType = m_vbType,
+                    NewType = value,
+                    Variable = this
+                };
+
                 m_vbType = value;
                 RefreshCandidates();
+
+                Value = null;
+
+                OnPropertyChanged("vbType");
                 _OnConditionChanged();
+
+                WorkBenchMgr.Instance.PushCommand(command);
             }
         }
 
@@ -193,9 +217,10 @@ namespace YBehavior.Editor.Core
         /// </summary>
         Variable m_Parent;
         Variable m_VectorIndex = null;
-        public Variable VectorIndex { get { return m_VectorIndex; } }
+        bool m_bVectorIndexEnabled = false;
+        public Variable VectorIndex { get { return m_VectorIndex; } set { m_VectorIndex = value; OnPropertyChanged("VectorIndex"); } }
 
-        public bool IsElement { get { return cType == CountType.CT_SINGLE && m_VectorIndex != null; } }
+        public bool IsElement { get { return cType == CountType.CT_SINGLE && m_bVectorIndexEnabled && m_VectorIndex != null; } }
         public bool IsIndex { get { return m_Parent != null; } }
         //bool m_bCandidatesDirty = true;
         bool m_bInited = false;
@@ -224,6 +249,13 @@ namespace YBehavior.Editor.Core
             get { return m_Value; }
             set
             {
+                ChangeVariableValueCommand command = new ChangeVariableValueCommand()
+                {
+                    OldValue = m_Value,
+                    NewValue = value,
+                    Variable = this,
+                    //OldVectorIndex = m_VectorIndex
+                };
                 m_Value = value;
 
                 if (!IsIndex)
@@ -232,23 +264,31 @@ namespace YBehavior.Editor.Core
                     {
                         if (cType == CountType.CT_SINGLE && m_VectorCandidates.Contains(m_Value))
                         {
-                            m_VectorIndex = new Variable(SharedDataSource);
-                            m_VectorIndex.m_Parent = this;
-                            m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, "0");
-                            OnPropertyChanged("VectorIndex");
+                            if (m_VectorIndex == null)
+                            {
+                                m_VectorIndex = new Variable(SharedDataSource);
+                                m_VectorIndex.m_Parent = this;
+                                m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, "0");
+                                OnPropertyChanged("VectorIndex");
+                            }
+                            m_bVectorIndexEnabled = true;
                         }
                         else
                         {
-                            m_VectorIndex = null;
+                            m_bVectorIndexEnabled = false;
+                            //m_VectorIndex = null;
                         }
                     }
                     else
                     {
-                        m_VectorIndex = null;
+                        m_bVectorIndexEnabled = false;
+                        //m_VectorIndex = null;
                     }
                 }
                 _OnValueChanged();
                 _OnConditionChanged();
+
+                WorkBenchMgr.Instance.PushCommand(command);
             }
         }
 
@@ -340,15 +380,18 @@ namespace YBehavior.Editor.Core
 
                 if (other.cType != cType)
                 {
-                    if (m_VectorIndex == null)
+                    if (m_bVectorIndexEnabled)
                     {
-                        LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", Name, cType, other.Name, other.cType));
-                        return false;
-                    }
-                    else if (!m_VectorIndex.CheckValid())
-                    {
-                        LogMgr.Instance.Log(string.Format("VectorIndex invalid: {0}.Index == {1}", Name, m_VectorIndex.Value));
-                        return false;
+                        if (m_VectorIndex == null)
+                        {
+                            LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", Name, cType, other.Name, other.cType));
+                            return false;
+                        }
+                        else if (!m_VectorIndex.CheckValid())
+                        {
+                            LogMgr.Instance.Log(string.Format("VectorIndex invalid: {0}.Index == {1}", Name, m_VectorIndex.Value));
+                            return false;
+                        }
                     }
                 }
                 return true;
@@ -447,6 +490,7 @@ namespace YBehavior.Editor.Core
 
         private bool SetVectorIndex(string variableType, string value)
         {
+            m_bVectorIndexEnabled = true;
             m_VectorIndex = new Variable(SharedDataSource);
             m_VectorIndex.m_Parent = this;
             m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableTypeDic.GetKey(variableType[0],VariableType.VBT_NONE), value);
@@ -510,10 +554,11 @@ namespace YBehavior.Editor.Core
             v.m_bCanbeRemoved = m_bCanbeRemoved;
             v.m_bInited = m_bInited;
             v.m_Params = m_Params;
-            if (m_VectorIndex != null)
+            if (m_VectorIndex != null && m_bVectorIndexEnabled)
             {
                 v.m_VectorIndex = m_VectorIndex.Clone(newDataSource);
                 v.m_VectorIndex.m_Parent = v;
+                v.m_bVectorIndexEnabled = true;
             }
             return v;
         }

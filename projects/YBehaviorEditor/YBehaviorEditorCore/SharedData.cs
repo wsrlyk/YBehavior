@@ -185,17 +185,18 @@ namespace YBehavior.Editor.Core
                 return false;
             }
 
+            if (m_Owner is Tree)
+            {
+                SharedVariableChangedArg arg = new SharedVariableChangedArg();
+                EventMgr.Instance.Send(arg);
+            }
+
             RemoveSharedVariableCommand removeSharedVariableCommand = new RemoveSharedVariableCommand()
             {
                 Variable = v
             };
             WorkBenchMgr.Instance.PushCommand(removeSharedVariableCommand);
 
-            if (m_Owner is Tree)
-            {
-                SharedVariableChangedArg arg = new SharedVariableChangedArg();
-                EventMgr.Instance.Send(arg);
-            }
             return true;
         }
         public Variable GetVariable(string name)

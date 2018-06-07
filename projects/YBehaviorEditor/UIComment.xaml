@@ -11,8 +11,8 @@
         <Grid>
             <Border Name="selectCover" BorderThickness="4" BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"/>
             <StackPanel Name="mainPanel">
-                <TextBlock Name="name" Text="{Binding UITitle}"/>
-                <TextBlock Name="content" Text="{Binding Data}"/>
+                <!--<TextBlock Name="name" Text="{Binding UITitle}"/>-->
+                <TextBlock Name="content" Text="{Binding Content}"/>
             </StackPanel>
             <Rectangle Name="resizeTopLeft" HorizontalAlignment="Left" Width="11" Height="11" VerticalAlignment="Top" Cursor="SizeNWSE">
                 <Rectangle.Fill>

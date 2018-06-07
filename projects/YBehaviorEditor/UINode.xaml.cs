@@ -275,7 +275,10 @@ namespace YBehavior.Editor
         public void SetSelect(bool bSelect)
         {
             if (bSelect)
+            {
                 this.selectCover.Visibility = Visibility.Visible;
+                this.Node.Variables.RefreshVariables();
+            }
             else
                 this.selectCover.Visibility = Visibility.Collapsed;
         }

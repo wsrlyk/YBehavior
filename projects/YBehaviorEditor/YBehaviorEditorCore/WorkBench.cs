@@ -180,6 +180,8 @@ namespace YBehavior.Editor.Core
 
         public bool Load(XmlElement data)
         {
+            CommandMgr.Blocked = true;
+
             foreach (XmlNode chi in data.ChildNodes)
             {
                 if (chi.Name == "Node")
@@ -210,6 +212,8 @@ namespace YBehavior.Editor.Core
                     _LoadComments(chi);
                 }
             }
+
+            CommandMgr.Blocked = false;
             return true;
         }
 
@@ -230,12 +234,12 @@ namespace YBehavior.Editor.Core
                 if (chi.Name == "Comment")
                 {
                     Comment comment = new Comment();
-                    var attr = chi.Attributes.GetNamedItem("Title");
+                    //var attr = chi.Attributes.GetNamedItem("Title");
+                    //if (attr != null)
+                    //    comment.Name = attr.Value;
+                    var attr = chi.Attributes.GetNamedItem("Content");
                     if (attr != null)
-                        comment.Name = attr.Value;
-                    attr = chi.Attributes.GetNamedItem("Content");
-                    if (attr != null)
-                        comment.Data = attr.Value;
+                        comment.Content = attr.Value;
                     attr = chi.Attributes.GetNamedItem("Rect");
                     if (attr != null)
                         comment.Geo.Rec = System.Windows.Rect.Parse(attr.Value);
@@ -317,8 +321,8 @@ namespace YBehavior.Editor.Core
                 foreach (Comment comment in Comments)
                 {
                     XmlElement comEl = xmlDoc.CreateElement("Comment");
-                    comEl.SetAttribute("Title", comment.Name);
-                    comEl.SetAttribute("Content", comment.Data);
+                    //comEl.SetAttribute("Title", comment.Name);
+                    comEl.SetAttribute("Content", comment.Content);
                     comEl.SetAttribute("Rect", comment.Geo.Rec.ToString());
                     root.AppendChild(comEl);
                 }

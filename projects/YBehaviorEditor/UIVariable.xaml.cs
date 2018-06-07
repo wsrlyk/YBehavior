@@ -33,7 +33,6 @@ namespace YBehavior.Editor
         public UIVariable()
         {
             InitializeComponent();
-
         }
 
         private void Remover_Click(object sender, RoutedEventArgs e)

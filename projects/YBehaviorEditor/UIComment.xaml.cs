@@ -40,15 +40,21 @@ namespace YBehavior.Editor
 
             m_Move0Operation = new Operation(this.moveBottomLeft);
             m_Move0Operation.RegisterClick(_OnClick);
-            m_Move0Operation.RegisterDrag(_OnDrag, null);
+            m_Move0Operation.RegisterDrag(_OnDrag, _OnDragFinish);
             m_Move1Operation = new Operation(this.moveTopRight);
             m_Move1Operation.RegisterClick(_OnClick);
-            m_Move1Operation.RegisterDrag(_OnDrag, null);
+            m_Move1Operation.RegisterDrag(_OnDrag, _OnDragFinish);
 
             m_Resize0Operation = new Operation(this.resizeBottomRight);
-            m_Resize0Operation.RegisterDrag(_OnResizeDrag0, null);
+            m_Resize0Operation.RegisterDrag(_OnResizeDrag0, _OnDragFinish);
             m_Resize1Operation = new Operation(this.resizeTopLeft);
-            m_Resize1Operation.RegisterDrag(_OnResizeDrag1, null);
+            m_Resize1Operation.RegisterDrag(_OnResizeDrag1, _OnDragFinish);
+        }
+
+        private void _OnDragFinish(Vector delta, Point pos)
+        {
+            Comment data = this.DataContext as Comment;
+            data.OnFinishGeometryChanged();
         }
 
         private void _OnResizeDrag0(Vector delta, Point absPos)

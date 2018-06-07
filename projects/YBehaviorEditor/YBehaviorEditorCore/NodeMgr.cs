@@ -260,8 +260,17 @@ namespace YBehavior.Editor.Core
             get { return m_NickName; }
             set
             {
+                ChangeNodeNickNameCommand command = new ChangeNodeNickNameCommand()
+                {
+                    Node = this,
+                    OriginNickName = m_NickName,
+                    FinalNickName = value,
+                };
+
                 m_NickName = value;
                 OnPropertyChanged("UITitle");
+
+                WorkBenchMgr.Instance.PushCommand(command);
             }
         }
         public string UITitle
@@ -278,8 +287,17 @@ namespace YBehavior.Editor.Core
             get { return m_Comment; }
             set
             {
+                ChangeNodeCommentCommand command = new ChangeNodeCommentCommand()
+                {
+                    Node = this,
+                    OriginComment = m_Comment,
+                    FinalComment = value,
+                };
+
                 m_Comment = value;
                 OnPropertyChanged("Comment");
+
+                WorkBenchMgr.Instance.PushCommand(command);
             }
         }
 
@@ -293,6 +311,13 @@ namespace YBehavior.Editor.Core
                 int newValue = value ? 1 : 0;
                 if (m_SelfDisabled == newValue)
                     return;
+
+                ChangeNodeDisableCommand command = new ChangeNodeDisableCommand()
+                {
+                    Node = this,
+                    OriginState = SelfDisabled,
+                };
+
                 m_SelfDisabled = newValue;
                 if (value)
                     Utility.OperateNode(this, true, _IncreaseDisable);
@@ -300,6 +325,8 @@ namespace YBehavior.Editor.Core
                     Utility.OperateNode(this, true, _DecreaseDisable);
 
                 WorkBenchMgr.Instance.RefreshNodeUID();
+
+                WorkBenchMgr.Instance.PushCommand(command);
             }
         }
 
