@@ -190,7 +190,7 @@ namespace YBehavior.Editor
                         bgBrush = new SolidColorBrush(Colors.LightGreen);
                         break;
                     case NodeState.NS_FAILED:
-                        bgBrush = new SolidColorBrush(Colors.DarkSeaGreen);
+                        bgBrush = new SolidColorBrush(Colors.LightBlue);
                         break;
                     case NodeState.NS_RUNNING:
                         bgBrush = new SolidColorBrush(Colors.LightPink);
@@ -227,7 +227,7 @@ namespace YBehavior.Editor
                         bgBrush = new SolidColorBrush(Colors.LightGreen);
                         break;
                     case NodeState.NS_FAILED:
-                        bgBrush = new SolidColorBrush(Colors.DarkSeaGreen);
+                        bgBrush = new SolidColorBrush(Colors.LightBlue);
                         break;
                     case NodeState.NS_RUNNING:
                         bgBrush = new SolidColorBrush(Colors.LightPink);

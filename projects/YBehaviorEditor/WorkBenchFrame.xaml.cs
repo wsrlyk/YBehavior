@@ -47,7 +47,7 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
             EventMgr.Instance.Register(EventType.NewNodeAdded, _OnNewNodeAdded);
             EventMgr.Instance.Register(EventType.TickResult, _OnTickResult);
-            EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);
+            EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.CommentCreated, _OnCommentCreated);
             Focus();
@@ -162,17 +162,6 @@ namespace YBehavior.Editor
             bench.MainTree.Renderer.RefreshDebug(bInstant);
         }
 
-        private void _OnNetworkConnectionChanged(EventArg arg)
-        {
-            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            if (bench != null)
-            {
-                bench.MainTree.Renderer.RefreshDebug(true);
-                //Dispatcher.BeginInvoke(new Action(() => { bench.MainTree.Renderer.RefreshDebug(true); }));
-            }
-            
-        }
-
         private void _OnDebugTargetChanged(EventArg arg)
         {
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
@@ -180,6 +169,12 @@ namespace YBehavior.Editor
             {
                 bench.MainTree.Renderer.RefreshDebug(true);
                 //Dispatcher.BeginInvoke(new Action(() => { bench.MainTree.Renderer.RefreshDebug(true); }));
+                this.Dispatcher.BeginInvoke(new Action
+                    (() =>
+                    {
+                        this.TabController.IsEnabled = !DebugMgr.Instance.IsDebugging();
+                    })
+                );
             }
         }
 

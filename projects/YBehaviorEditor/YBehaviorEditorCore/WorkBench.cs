@@ -280,7 +280,8 @@ namespace YBehavior.Editor.Core
                 }
             }
             node.Conns.Sort(Node.SortByPosX);
-
+            if (node.HasConditionConnection)
+                node.EnableCondition = true;
             return true;
         }
 

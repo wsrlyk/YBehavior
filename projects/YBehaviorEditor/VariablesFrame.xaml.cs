@@ -96,6 +96,7 @@ namespace YBehavior.Editor
                     }
 
                     this.NickName.IsReadOnly = DebugMgr.Instance.IsDebugging();
+                    this.Comment.IsReadOnly = DebugMgr.Instance.IsDebugging();
                 })
             );
         }

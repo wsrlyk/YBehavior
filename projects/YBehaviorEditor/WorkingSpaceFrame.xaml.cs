@@ -77,6 +77,8 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             EventMgr.Instance.Register(EventType.WorkBenchSaved, _OnWorkBenchSaved);
+            EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
 
             _RefreshWorkingSpace(true);
 
@@ -149,6 +151,17 @@ namespace YBehavior.Editor
             {
                 _RefreshWorkingSpace(false);
             }
+        }
+
+        private void _OnDebugTargetChanged(EventArg arg)
+        {
+            this.Dispatcher.BeginInvoke(new Action
+                (() =>
+                {
+                    this.Files.IsEnabled = !DebugMgr.Instance.IsDebugging();
+                    this.FileOperatePanel.IsEnabled = !DebugMgr.Instance.IsDebugging();
+                })
+            );
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)

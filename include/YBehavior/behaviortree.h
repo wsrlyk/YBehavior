@@ -31,6 +31,7 @@ namespace YBehavior
 	protected:
 		typedef BehaviorNode* BehaviorNodePtr;
 		BehaviorNodePtr m_Parent;
+		BehaviorNodePtr m_Condition;
 		NodeState m_State;
 		UINT m_UID;	// Unique in a tree
 		std::vector<ISharedVariableEx*> m_Variables;	///> Just for destructions of variables
@@ -67,12 +68,13 @@ namespace YBehavior
 		void Load(const pugi::xml_node& data);
 		NodeState Execute(AgentPtr pAgent);
 		static BehaviorNode* CreateNodeByName(const STRING& name);
-		virtual void AddChild(BehaviorNode* child, const STRING& connection);
+		void AddChild(BehaviorNode* child, const STRING& connection);
 
 		virtual STRING GetNodeInfoForPrint() { return "";}
 
 		BehaviorNodePtr GetRoot();
 	protected:
+		virtual void _AddChild(BehaviorNode* child, const STRING& connection);
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
 		virtual void OnLoaded(const pugi::xml_node& data) {}
 		virtual void OnAddChild(BehaviorNode* child, const STRING& connection) {}
@@ -93,7 +95,7 @@ namespace YBehavior
 	protected:
 		std::vector<BehaviorNodePtr>* m_Childs;
 
-		void AddChild(BehaviorNode* child, const STRING& connection) override;
+		void _AddChild(BehaviorNode* child, const STRING& connection) override;
 		void _DestroyChilds();
 	};
 

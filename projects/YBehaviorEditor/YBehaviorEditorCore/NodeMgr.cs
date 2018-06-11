@@ -402,6 +402,7 @@ namespace YBehavior.Editor.Core
 
         Connection m_ConditonConnection;
         bool m_bEnableConditionConnection = false;
+        public bool HasConditionConnection { get { return m_ConditonConnection.NodeCount > 0; } }
         public bool EnableCondition
         {
             get { return m_bEnableConditionConnection; }

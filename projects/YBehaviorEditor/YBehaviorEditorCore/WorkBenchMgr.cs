@@ -348,9 +348,10 @@ namespace YBehavior.Editor.Core
             return workBench;
         }
 
+        public Lock CommandLocker { get; } = new Lock();
         public void PushCommand(ICommand command)
         {
-            if (ActiveWorkBench == null)
+            if (ActiveWorkBench == null || CommandLocker.IsLocked)
                 return;
 
             ActiveWorkBench.CommandMgr.PushDoneCommand(command);

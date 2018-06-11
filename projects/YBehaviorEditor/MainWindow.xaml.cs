@@ -30,6 +30,8 @@ namespace YBehavior.Editor
             switch (key)
             {
                 case Key.Delete:
+                    if (DebugMgr.Instance.IsDebugging())
+                        break;
                     if ((modifier & ModifierKeys.Shift) != ModifierKeys.None)
                     {
                         ///> Duplicate all children

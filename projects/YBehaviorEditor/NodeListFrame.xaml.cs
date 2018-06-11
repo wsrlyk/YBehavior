@@ -123,6 +123,8 @@ namespace YBehavior.Editor
 
         private void AddComment_Click(object sender, RoutedEventArgs e)
         {
+            if (DebugMgr.Instance.IsDebugging())
+                return;
             WorkBenchMgr.Instance.CreateComment();
         }
     }

@@ -31,11 +31,15 @@ namespace YBehavior
 	BehaviorNode::BehaviorNode()
 	{
 		m_Parent = nullptr;
+		m_Condition = nullptr;
 	}
 
 
 	BehaviorNode::~BehaviorNode()
 	{
+		if (m_Condition != nullptr)
+			delete m_Condition;
+
 		for (auto it = m_Variables.begin(); it != m_Variables.end(); ++it)
 		{
 			delete *it;
@@ -52,12 +56,21 @@ namespace YBehavior
 
 	YBehavior::NodeState BehaviorNode::Execute(AgentPtr pAgent)
 	{
-		///> check breakpoint
 #ifdef DEBUGGER
 		DebugHelper dbgHelper(pAgent, this);
-		dbgHelper.TryHitBreakPoint();
-
 		m_pDebugHelper = &dbgHelper;
+#endif
+		///> check condition
+		if (m_Condition != nullptr)
+		{
+			NodeState res = m_Condition->Execute(pAgent);
+			if (res == NS_FAILED)
+				DEBUG_RETURN(dbgHelper, res);
+		}
+
+		///> check breakpoint
+#ifdef DEBUGGER
+		dbgHelper.TryHitBreakPoint();
 #endif
 
 		//////////////////////////////////////////////////////////////////////////
@@ -81,6 +94,19 @@ namespace YBehavior
 	}
 
 	void BehaviorNode::AddChild(BehaviorNode* child, const STRING& connection)
+	{
+		if (connection == "condition")
+		{
+			m_Condition = child;
+			child->SetParent(this);
+		}
+		else
+		{
+			_AddChild(child, connection);
+		}
+	}
+
+	void BehaviorNode::_AddChild(BehaviorNode* child, const STRING& connection)
 	{
 		ERROR_BEGIN << "Cant add child to this node: " << ERROR_END;
 	}
@@ -273,7 +299,7 @@ namespace YBehavior
 	}
 
 
-	void BranchNode::AddChild(BehaviorNode* child, const STRING& connection)
+	void BranchNode::_AddChild(BehaviorNode* child, const STRING& connection)
 	{
 		if (child == nullptr)
 			return;

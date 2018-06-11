@@ -226,13 +226,14 @@ namespace YBehavior.Editor.Core
         public SharedData Clone()
         {
             SharedData sharedData = new SharedData(m_Owner);
-
-            foreach (KeyValuePair<string, Variable> v in m_Variables)
+            using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
             {
-                Variable vv = v.Value.Clone();
-                sharedData.AddVariable(vv);
+                foreach (KeyValuePair<string, Variable> v in m_Variables)
+                {
+                    Variable vv = v.Value.Clone();
+                    sharedData.AddVariable(vv);
+                }
             }
-
             return sharedData;
         }
     }

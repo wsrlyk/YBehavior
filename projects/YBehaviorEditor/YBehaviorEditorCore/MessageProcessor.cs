@@ -145,20 +145,22 @@ namespace YBehavior.Editor.Core
             string[] data = ss.Split(msgContentSplitter, StringSplitOptions.RemoveEmptyEntries);
             if (data.Length > 1)
             {
-                string[] sharedDatas = data[0].Split(';');
-                foreach (string s in sharedDatas)
+                using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
                 {
-                    string[] strV = s.Split(',');
-                    if (strV.Length != 2)
-                        continue;
+                    string[] sharedDatas = data[0].Split(';');
+                    foreach (string s in sharedDatas)
+                    {
+                        string[] strV = s.Split(',');
+                        if (strV.Length != 2)
+                            continue;
 
-                    Variable v = DebugMgr.Instance.DebugSharedData.GetVariable(strV[0]);
-                    if (v == null)
-                        continue;
+                        Variable v = DebugMgr.Instance.DebugSharedData.GetVariable(strV[0]);
+                        if (v == null)
+                            continue;
 
-                    v.Value = strV[1];
+                        v.Value = strV[1];
+                    }
                 }
-
                 ++m_TickResultToken;
                 DebugMgr.Instance.RunInfo.Clear();
                 string[] runInfos = data[1].Split(';');
