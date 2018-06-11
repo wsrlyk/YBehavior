@@ -12,7 +12,7 @@ namespace YBehavior.Editor.Core
     public class ConnectorGeometry
     {
         public string Identifier { get; set; }
-
+        public ConnectionHolder Holder { get; set; }
         Point m_Pos;
         public Point Pos
         {

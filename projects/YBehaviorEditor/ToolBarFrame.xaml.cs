@@ -80,5 +80,10 @@ namespace YBehavior.Editor
         {
             MainWindow.ProcessKeyDown(Key.F12, ModifierKeys.None);
         }
+
+        private void btnCondition_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.ProcessKeyDown(Key.F11, ModifierKeys.None);
+        }
     }
 }

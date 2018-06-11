@@ -19,7 +19,7 @@ namespace YBehavior.Editor
     /// <summary>
     /// BehaviorNode.xaml 的交互逻辑
     /// </summary>
-    public partial class UINode : YUserControl, ISelectable, IDeletable, IDuplicatable, IDebugPointable, ICanDisable
+    public partial class UINode : YUserControl, ISelectable, IDeletable, IDuplicatable, IDebugPointable, ICanDisable, IHasCondition
     {
         static SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
@@ -91,6 +91,28 @@ namespace YBehavior.Editor
             m_uiConnectors.Clear();
             topConnectors.Children.Clear();
             bottomConnectors.Children.Clear();
+            leftConnectors.Child = null;
+
+            foreach (ConnectionHolder conn in Node.Conns.ConnectionsList)
+            {
+                if (conn.Conn is ConnectionNone)
+                    continue;
+
+                UIConnector uiConnector = new UIConnector
+                {
+                    Title = conn.Conn.Identifier,
+                    ConnHolder = conn
+                };
+                //uiConnector.SetCanvas(m_Canvas);
+                if (conn.Conn.Identifier == Connection.IdentifierCondition)
+                {
+                    leftConnectors.Child = uiConnector;
+                }
+                else
+                    bottomConnectors.Children.Add(uiConnector);
+
+                m_uiConnectors.Add(conn.Conn.Identifier, uiConnector);
+            }
 
             if (Node.Conns.ParentHolder != null)
             {
@@ -104,23 +126,6 @@ namespace YBehavior.Editor
                 topConnectors.Children.Add(uiConnector);
 
                 m_uiConnectors.Add(Connection.IdentifierParent, uiConnector);
-            }
-
-            foreach (ConnectionHolder conn in Node.Conns.ConnectionsList)
-            {
-                if (conn.Conn is ConnectionNone)
-                    continue;
-
-                UIConnector uiConnector = new UIConnector
-                {
-                    Title = conn.Conn.Identifier,
-                    ConnHolder = conn
-                };
-                //uiConnector.SetCanvas(m_Canvas);
-
-                bottomConnectors.Children.Add(uiConnector);
-
-                m_uiConnectors.Add(conn.Conn.Identifier, uiConnector);
             }
         }
 
@@ -325,6 +330,11 @@ namespace YBehavior.Editor
         public void ToggleDisable()
         {
             Node.Disabled = !Node.SelfDisabled;
+        }
+
+        public void ToggleCondition()
+        {
+            Node.EnableCondition = !Node.EnableCondition;
         }
     }
 }

@@ -400,6 +400,27 @@ namespace YBehavior.Editor.Core
             return m_TreeSharedData;
         }
 
+        Connection m_ConditonConnection;
+        bool m_bEnableConditionConnection = false;
+        public bool EnableCondition
+        {
+            get { return m_bEnableConditionConnection; }
+            set
+            {
+                if (value == false)
+                {
+                    ///> Check if has connection
+                    if (m_ConditonConnection.NodeCount > 0)
+                    {
+                        LogMgr.Instance.Error("Should remove connection first");
+                        return;
+                    }
+                }
+                m_bEnableConditionConnection = value;
+                OnPropertyChanged("EnableCondition");
+            }
+        }
+
         public Node()
         {
             if (_HasParentHolder())
@@ -407,6 +428,8 @@ namespace YBehavior.Editor.Core
 
             m_Variables = new SharedData(this);
             m_Renderer = new Renderer(this);
+
+            m_ConditonConnection = new ConnectionSingle(this, Connection.IdentifierCondition);
         }
 
         public virtual void Load(System.Xml.XmlNode data)

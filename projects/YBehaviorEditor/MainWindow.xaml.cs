@@ -107,6 +107,11 @@ namespace YBehavior.Editor
                         break;
                     Core.SelectionMgr.Instance.TryToggleDisable();
                     break;
+                case Key.F11:
+                    if (DebugMgr.Instance.IsDebugging())
+                        break;
+                    Core.SelectionMgr.Instance.TryToggleCondition();
+                    break;
             }
         }
         private void _KeyDown(object sender, KeyEventArgs e)

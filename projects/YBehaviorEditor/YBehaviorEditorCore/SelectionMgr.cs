@@ -32,6 +32,11 @@ namespace YBehavior.Editor.Core
         void ToggleDisable();
     }
 
+    public interface IHasCondition
+    {
+        void ToggleCondition();
+    }
+
     public delegate void SelectionStateChangeHandler(ISelectable obj, bool bState);
     public delegate void DeleteHandler(IDeletable obj);
 
@@ -193,6 +198,18 @@ namespace YBehavior.Editor.Core
             if (disable != null)
             {
                 disable.ToggleDisable();
+            }
+        }
+
+        public void TryToggleCondition()
+        {
+            if (m_SingleSelection == null)
+                return;
+
+            IHasCondition condition = m_SingleSelection as IHasCondition;
+            if (condition != null)
+            {
+                condition.ToggleCondition();
             }
         }
     }

@@ -31,7 +31,10 @@
         <Button Name="btnDebug" Width="60" Click="btnDebug_Click">
             <TextBlock Text ="DbgPoint&#x0a;    F9"/>
         </Button>
-        <Button Name="btnDisable" Width="60" Click="btnDisable_Click">
+        <Button Name="btnCondition" Width="60" Click="btnCondition_Click">
+            <TextBlock Text ="Condition&#x0a;    F11"/>
+        </Button>
+        <Button Name="btnDisable" Width="50" Click="btnDisable_Click">
             <TextBlock Text ="Disable&#x0a;    F12"/>
         </Button>
     </StackPanel>

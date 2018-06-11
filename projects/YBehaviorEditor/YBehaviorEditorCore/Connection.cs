@@ -9,6 +9,7 @@ namespace YBehavior.Editor.Core
     {
         public static readonly string IdentifierChildren = "children";
         public static readonly string IdentifierParent = "parent";
+        public static readonly string IdentifierCondition = "condition";
 
         public ConnectionHolder Holder { get; set; }
         protected NodeBase m_Owner;
@@ -137,22 +138,21 @@ namespace YBehavior.Editor.Core
 
         public double CalcHorizontalPos()
         {
-            double y = 0;
+            //double y = 0;
             double miny = double.MaxValue;
             foreach (Node child in m_Nodes)
             {
                 double top = child.Conns.ParentHolder.Geo.Pos.Y;
-                y += top;
+                //y += top;
                 miny = Math.Min(miny, top);
             }
-            y /= NodeCount;
-            y -= 20;
-            miny -= 20;
-            y = Math.Min(miny, y);
-            y = Math.Max(y, Holder.Geo.Pos.Y + /*Frame.ActualHeight + */10);
-            return y;
+            //y /= NodeCount;
+            //y -= 20;
+            //miny -= 20;
+            //y = Math.Min(miny, y);
+            //y = Math.Max(y, Holder.Geo.Pos.Y + /*Frame.ActualHeight + */10);
+            return miny;
         }
-
     }
 
     public class ConnectionHolder
@@ -164,8 +164,9 @@ namespace YBehavior.Editor.Core
         public NodeBase Owner { get { return m_Owner; } }
 
         public ConnectorGeometry Geo { get { return m_Geo; } }
-        ConnectorGeometry m_Geo = new ConnectorGeometry();
+        ConnectorGeometry m_Geo;
 
+        int m_Dir = 1;  //> Connections on the top of the nodes = -1;
         public ConnectionHolder(Connection conn)
         {
             if (conn == null)
@@ -173,8 +174,17 @@ namespace YBehavior.Editor.Core
             m_Conn = conn;
             m_Owner = conn.Owner;
 
-            m_Geo.Identifier = conn.Identifier;
-            m_Geo.onPosChanged = _OnChildConnectorChanged;
+            m_Geo = new ConnectorGeometry()
+            {
+                Holder = this,
+                Identifier = conn.Identifier,
+                onPosChanged = _OnChildConnectorChanged,
+            };
+
+            if (conn.Identifier == Connection.IdentifierCondition)
+            {
+                m_Dir = -1;
+            }
 
             conn.Holder = this;
         }
@@ -186,8 +196,13 @@ namespace YBehavior.Editor.Core
         public ConnectionHolder(NodeBase owner)
         {
             m_Owner = owner;
-            m_Geo.Identifier = Connection.IdentifierParent;
-            m_Geo.onPosChanged = _OnParentConnectorChanged;
+            m_Geo = new ConnectorGeometry()
+            {
+                Holder = this,
+                Identifier = Connection.IdentifierParent,
+                onPosChanged = _OnParentConnectorChanged,
+            };
+            m_Dir = -1;
         }
 
         public void SetConn(Connection conn)
@@ -209,7 +224,21 @@ namespace YBehavior.Editor.Core
 
         public void RecalcMidY()
         {
-            m_Geo.MidY = m_Conn.CalcHorizontalPos();
+            double childPos = m_Conn.CalcHorizontalPos();
+            double parentPos = Geo.Pos.Y;
+            double midPos;
+            if (m_Dir > 0)
+            {
+                if (childPos <= parentPos)
+                    midPos = parentPos;
+                else
+                    midPos = parentPos + (childPos - parentPos) * 0.666;
+            }
+            else
+            {
+                midPos = Math.Min(childPos, parentPos);
+            }
+            m_Geo.MidY = midPos;
         }
 
         public static bool TryConnect(ConnectionHolder left, ConnectionHolder right, out ConnectionHolder parent, out ConnectionHolder child)
