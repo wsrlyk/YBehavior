@@ -6,6 +6,7 @@
 #include "YBehavior/interface.h"
 #include "YBehavior/nodefactory.h"
 #include <sstream>
+#include "YBehavior/shareddataex.h"
 
 #ifdef DEBUGGER
 namespace YBehavior

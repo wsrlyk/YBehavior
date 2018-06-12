@@ -7,6 +7,7 @@
 #include "YBehavior/sharedvariablecreatehelper.h"
 #include "YBehavior/sharedvariableex.h"
 #include "YBehavior/debugger.h"
+#include "YBehavior/shareddataex.h"
 
 namespace YBehavior
 {

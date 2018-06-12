@@ -66,7 +66,9 @@ namespace YBehavior
 		STRING GetValueToSTRING(SharedDataEx* pData) override
 		{
 			const T* v = GetCastedValue(pData);
-			return Utility::ToString(*v);
+			if (v != nullptr)
+				return Utility::ToString(*v);
+			return Utility::StringEmpty;
 		}
 
 		const void* GetValue(SharedDataEx* pData)
@@ -130,8 +132,16 @@ namespace YBehavior
 				const std::vector<T>* pVector = (const std::vector<T>*)pData->Get<std::vector<T>>(m_Index);
 				if (pVector && (UINT)index < pVector->size())
 				{
-					const T& t = (*pVector)[index];
-					return &t;
+					const T* t = &(*pVector)[index];
+					return t;
+				}
+				if (pVector)
+				{
+					ERROR_BEGIN << "VectorIndex out of range: " << index << ", Total " << pVector->size() << ERROR_END;
+				}
+				else
+				{
+					ERROR_BEGIN << "Invalid SharedData: " << m_Index << ERROR_END;
 				}
 				return nullptr;
 			}

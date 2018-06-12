@@ -2,7 +2,7 @@
 #define _YBEHAVIOR_BEHAVIORTREE_H_
 
 #include "YBehavior/define.h"
-#include "YBehavior/shareddataex.h"
+#include "YBehavior/types.h"
 #include <unordered_map>
 #include <unordered_set>
 namespace pugi
@@ -23,6 +23,7 @@ namespace YBehavior
 	};
 
 	class ISharedVariableEx;
+	class SharedDataEx;
 #ifdef DEBUGGER
 	class DebugHelper;
 #endif

@@ -43,7 +43,7 @@ namespace YBehavior
 
 	private:
 		static std::random_device rd;
-		static std::mt19937 mt;
+		static std::default_random_engine mt;
 	};
 
 	template<typename T>
@@ -84,7 +84,7 @@ namespace YBehavior
 	template<typename T>
 	T Utility::Rand(const T& small, const T& large)
 	{
-		std::uniform_int_distribution<T> dist(small, large);
+		std::uniform_int_distribution<T> dist(small, large - 1);
 		return dist(mt);
 	}
 

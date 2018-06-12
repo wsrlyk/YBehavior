@@ -34,14 +34,14 @@
     <Filter Include="头文件\tools">
       <UniqueIdentifier>{018354f9-4f64-489d-945e-9135337c06aa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\bimap">
-      <UniqueIdentifier>{82bdd3ff-c222-40d1-b868-cdd73fdca0e7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\network">
       <UniqueIdentifier>{6d5183c3-5943-4d86-9585-08b1f2be6860}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\network">
       <UniqueIdentifier>{d88afcd2-9777-4f04-8920-f68535231901}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\tools">
+      <UniqueIdentifier>{82bdd3ff-c222-40d1-b868-cdd73fdca0e7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +144,9 @@
     <ClInclude Include="..\include\YBehavior\nodes\random.h">
       <Filter>头文件\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\tools\common.h">
+      <Filter>头文件\tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -172,9 +175,6 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodefactory.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\tools\bimap.cpp">
-      <Filter>源文件\bimap</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodes\action.cpp">
       <Filter>源文件\nodes</Filter>
@@ -217,6 +217,9 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodes\random.cpp">
       <Filter>源文件\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\tools\common.cpp">
+      <Filter>源文件\tools</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

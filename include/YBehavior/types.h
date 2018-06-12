@@ -143,7 +143,7 @@ namespace YBehavior
 	typedef unsigned int		UINT;
 	typedef unsigned long		UINT64;
 	typedef unsigned char       BYTE;
-	typedef bool				BOOL;
+	typedef unsigned short		BOOL;	///> WARNING: short has been used for bool. Cause bool in vector is specialized and has quite different behaviors with others.
 	typedef float				FLOAT;
 	typedef char				CHAR;
 

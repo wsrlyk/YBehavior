@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Monster_BlackCrystal2>
   <Node Class="Root" Pos="10,10" target="_AC " add0="_IC 1" add1="_IC 1" fftest="FFC 1.0|2.0|3.0" bbtest="BBC true|false|true|false" btest="_BC true" pos="_VC 100=200=300">
-    <Node Class="Sequence" Pos="100,100" NickName="Hehequence12345678">
-      <Node Class="AlwaysSuccess" Connection="condition" Pos="24,212" />
-      <Node Class="Random" Pos="154,364" Target="_BP bbtest VI P add0" Bound1="_BC false" Bound2="_BC true" />
+    <Node Class="RandomSequence" Pos="152,141">
+      <Node Class="SetData" Pos="17,362" Target="_IP add0" Source="_IC 0" />
+      <Node Class="Calculator" Pos="180,377" Operator="_EC ADD" Opl="_IP add0" Opr1="_IP add0" Opr2="_IC 3" />
+      <Node Class="Random" Pos="469,356" Target="_BP bbtest VI P add1" Bound1="_BC false" Bound2="_BC true" />
     </Node>
   </Node>
 </Monster_BlackCrystal2>

@@ -38,7 +38,7 @@ namespace YBehavior.Editor.Core
         {
             m_Name = "Sequence";
             m_Type = NodeType.NT_Default;
-            m_Hierachy = NodeHierachy.NH_Sequence;
+            m_Hierachy = NodeHierachy.NH_Compositor;
         }
 
         public override string Icon => "➜➜➜";
@@ -49,10 +49,33 @@ namespace YBehavior.Editor.Core
         {
             m_Name = "Selector";
             m_Type = NodeType.NT_Default;
-            m_Hierachy = NodeHierachy.NH_Selector;
+            m_Hierachy = NodeHierachy.NH_Compositor;
         }
 
         public override string Icon => "？？？";
+    }
+
+    class RandomSequenceNode : CompositeNode
+    {
+        public RandomSequenceNode()
+        {
+            m_Name = "RandomSequence";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_Compositor;
+        }
+
+        public override string Icon => "～➜➜➜";
+    }
+    class RandomSelectorNode : CompositeNode
+    {
+        public RandomSelectorNode()
+        {
+            m_Name = "RandomSelector";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_Compositor;
+        }
+
+        public override string Icon => "～？？？";
     }
 
     class ActionNode : LeafNode
@@ -330,7 +353,7 @@ namespace YBehavior.Editor.Core
 
     class RandomNode : LeafNode
     {
-        public override string Icon => " ？";
+        public override string Icon => "～";
 
         public RandomNode()
         {

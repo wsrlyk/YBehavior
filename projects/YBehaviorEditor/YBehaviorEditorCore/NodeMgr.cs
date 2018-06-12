@@ -78,9 +78,6 @@ namespace YBehavior.Editor.Core
         NH_Action = 1,
         NH_Decorator = 2,
         NH_Compositor = 3,
-
-        NH_Sequence = 13,
-        NH_Selector = 23,
         
         NH_DefaultAction = 11,
         NH_Custom = 21,

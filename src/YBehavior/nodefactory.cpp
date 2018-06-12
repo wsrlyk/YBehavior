@@ -67,6 +67,8 @@ namespace YBehavior
 		NodeFactory* factory = new NodeFactory();
 		REGISTER_TYPE(factory, Sequence);
 		REGISTER_TYPE(factory, Selector);
+		REGISTER_TYPE(factory, RandomSequence);
+		REGISTER_TYPE(factory, RandomSelector);
 		REGISTER_TYPE(factory, Calculator);
 		REGISTER_TYPE(factory, Comparer);
 		REGISTER_TYPE(factory, IfThenElse);

@@ -39,6 +39,7 @@
     <ClInclude Include="..\include\YBehavior\sharedvariableex.h" />
     <ClInclude Include="..\include\YBehavior\singleton.h" />
     <ClInclude Include="..\include\YBehavior\tools\bimap.h" />
+    <ClInclude Include="..\include\YBehavior\tools\common.h" />
     <ClInclude Include="..\include\YBehavior\tools\meta.h" />
     <ClInclude Include="..\include\YBehavior\tools\objectpool.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
@@ -67,7 +68,7 @@
     <ClCompile Include="..\src\YBehavior\nodes\sequence.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\setdata.cpp" />
     <ClCompile Include="..\src\YBehavior\shareddataex.cpp" />
-    <ClCompile Include="..\src\YBehavior\tools\bimap.cpp" />
+    <ClCompile Include="..\src\YBehavior\tools\common.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />
     <ClCompile Include="..\src\YBehavior\variableoperation.cpp" />
   </ItemGroup>
@@ -108,7 +109,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>YBEHAVIOR_DLL;YBEHAVIOR_EXPORTS;DEBUGGER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>E:\Develop\YBehavior\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
