@@ -4,6 +4,7 @@ PROJECT(${ProjectName})
 INCLUDE_DIRECTORIES(../../include)
 
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
+list(REMOVE_ITEM DIR_SRCS ./main-reload.cpp)
 
 SET(CMAKE_CXX_COMPILER ${CompilerSetting})
 
