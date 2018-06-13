@@ -19,7 +19,7 @@ namespace YBehavior
 	};
 
 	//////////////////////////////////////////////////////////////////////////////////////////
-	static std::unordered_set<INT> s_ValidTypes = { GetClassTypeNumberId<Int>(), GetClassTypeNumberId<Float>() };
+	static std::unordered_set<TYPEID> s_ValidTypes = { GetClassTypeNumberId<Int>(), GetClassTypeNumberId<Float>() };
 
 	void Calculator::OnLoaded(const pugi::xml_node& data)
 	{
@@ -39,14 +39,14 @@ namespace YBehavior
 
 		//////////////////////////////////////////////////////////////////////////
 		///> µÈºÅ×ó±ß
-		m_DataType = CreateVariable(m_Opl, "Opl", data, true, GlobalDefinitions::POINTER);
+		m_DataType = CreateVariable(m_Opl, "Opl", data, true, POINTER);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Opl in calculator: " << m_DataType << ERROR_END;
 			return;
 		}
 		///> µÈºÅÓÒ±ß1
-		INT dataType = CreateVariable(m_Opr1, "Opr1", data, true);
+		TYPEID dataType = CreateVariable(m_Opr1, "Opr1", data, true);
 		if (dataType != m_DataType)
 		{
 			ERROR_BEGIN << "Different types:  " << dataType << " with " << m_DataType << ERROR_END;

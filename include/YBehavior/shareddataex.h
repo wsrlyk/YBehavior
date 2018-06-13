@@ -52,81 +52,81 @@ namespace YBehavior
 			return newArray;
 		}
 
-		INT GetTypeID() const override
+		TYPEID GetTypeID() const override
 		{
 			return GetClassTypeNumberId<T>();
 		}
 
-		INT Length() const override { return (INT)m_Datas.size(); }
+		SIZE_KEY Length() const override { return (SIZE_KEY)m_Datas.size(); }
 
-		bool Get(INT index, const T& res) const
+		bool Get(KEY key, const T& res) const
 		{
-			if (index < 0 || index >= (INT)m_Datas.size())
+			if (key < 0 || key >= (KEY)m_Datas.size())
 				return false;
-			res = m_Datas[index];
+			res = m_Datas[key];
 			return true;
 		}
 
-		virtual const void* Get(INT index) const override
+		virtual const void* Get(KEY key) const override
 		{
-			if (index < 0 || index >= (INT)m_Datas.size())
+			if (key < 0 || key >= (KEY)m_Datas.size())
 				return nullptr;
-			const T* data = &m_Datas[index];
+			const T* data = &m_Datas[key];
 			return (data);
 		}
 
-		virtual const STRING GetToString(INT index) const override
+		virtual const STRING GetToString(KEY key) const override
 		{
-			if (index < 0 || index >= (INT)m_Datas.size())
+			if (key < 0 || key >= (KEY)m_Datas.size())
 				return Utility::StringEmpty;
-			const T& data = m_Datas[index];
+			const T& data = m_Datas[key];
 			return Utility::ToString(data);
 		}
 
-		bool Set(INT index, const T& src)
+		bool Set(KEY key, const T& src)
 		{
-			if (index < 0)
+			if (key < 0)
 				return false;
-			if ((INT)m_Datas.size() <= index)
+			if ((KEY)m_Datas.size() <= key)
 			{
-				m_Datas.resize(index);
+				m_Datas.resize(key);
 				m_Datas.push_back(src);
 			}
 			else
 			{
-				m_Datas[index] = src;
+				m_Datas[key] = src;
 			}
 			return true;
 		}
 
-		bool Set(INT index, T&& src)
+		bool Set(KEY key, T&& src)
 		{
-			if (index < 0)
+			if (key < 0)
 				return false;
-			if ((INT)m_Datas.size() <= index)
+			if ((KEY)m_Datas.size() <= key)
 			{
-				m_Datas.resize(index);
+				m_Datas.resize(key);
 				m_Datas.push_back(src);
 			}
 			else
 			{
-				m_Datas[index] = src;
+				m_Datas[key] = src;
 			}
 			return true;
 		}
 
-		virtual bool Set(INT index, const void* src) override
+		virtual bool Set(KEY key, const void* src) override
 		{
-			if (index < 0 || src == nullptr)
+			if (key < 0 || src == nullptr)
 				return false;
-			if ((INT)m_Datas.size() <= index)
+			if ((KEY)m_Datas.size() <= key)
 			{
-				m_Datas.resize(index);
+				m_Datas.resize(key);
 				m_Datas.push_back(*((T*)src));
 			}
 			else
 			{
-				m_Datas[index] = *((T*)src);
+				m_Datas[key] = *((T*)src);
 			}
 			return true;
 		}
@@ -135,37 +135,37 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 
-#define MAX_TYPE_INDEX 14
+#define MAX_TYPE_KEY 14
 
 	class SharedDataEx
 	{
 	public:
-		const static int INVALID_INDEX = -1;
+		const static KEY INVALID_KEY = -1;
 
 		template<typename T>
-		INT GetTypeIndex();
+		KEY GetTypeKey();
 		
 
 	protected:
-		IDataArray* m_Datas[MAX_TYPE_INDEX];
+		IDataArray* m_Datas[MAX_TYPE_KEY];
 
 	public:
 		SharedDataEx();
 
 		~SharedDataEx()
 		{
-			for (int i = 0; i < MAX_TYPE_INDEX; ++i)
+			for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
 			{
 				if (m_Datas[i] != nullptr)
 					delete m_Datas[i];
 			}
 		}
 
-		inline const IDataArray* GetDataArray(INT typeIndex) { return m_Datas[typeIndex]; }
+		inline const IDataArray* GetDataArray(KEY typeKey) { return m_Datas[typeKey]; }
 
 		void Clone(const SharedDataEx& other)
 		{
-			for (int i = 0; i < MAX_TYPE_INDEX; ++i)
+			for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
 			{
 				if (other.m_Datas[i] == nullptr)
 				{
@@ -178,105 +178,105 @@ namespace YBehavior
 		}
 
 		template<typename T>
-		bool Get(INT index, T& res);
+		bool Get(KEY key, T& res);
 
 		template<typename T>
-		const T* Get(INT index);
+		const T* Get(KEY key);
 
-		const void* Get(INT index, INT typeIndex)
+		const void* Get(KEY key, KEY typeKey)
 		{
-			IDataArray* iarray = m_Datas[typeIndex];
-			return iarray->Get(index);
+			IDataArray* iarray = m_Datas[typeKey];
+			return iarray->Get(key);
 		}
-		STRING GetToString(INT index, INT typeIndex)
+		STRING GetToString(KEY key, KEY typeKey)
 		{
-			IDataArray* iarray = m_Datas[typeIndex];
-			return iarray->GetToString(index);
+			IDataArray* iarray = m_Datas[typeKey];
+			return iarray->GetToString(key);
 		}
 
 		template<typename T>
-		bool Set(INT index, const T& src);
+		bool Set(KEY key, const T& src);
 
 
 		template<typename T>
-		bool Set(INT index, const T* src);
+		bool Set(KEY key, const T* src);
 
 		template<typename T>
-		bool Set(INT index, T&& src);
+		bool Set(KEY key, T&& src);
 
-		bool Set(INT index, INT typeIndex, void* src)
+		bool Set(KEY key, KEY typeKey, void* src)
 		{
-			IDataArray* iarray = m_Datas[typeIndex];
-			return iarray->Set(index, src);
+			IDataArray* iarray = m_Datas[typeKey];
+			return iarray->Set(key, src);
 		}
 	};
 
 	template<typename T>
-	INT SharedDataEx::GetTypeIndex() {
+	KEY SharedDataEx::GetTypeKey() {
 		return -1;
 	}
 
-#define YBEHAVIOR_SHAREDDATA_STORE_INDEX(type, id)			\
-		template<> inline INT SharedDataEx::GetTypeIndex<type>() \
+#define YBEHAVIOR_SHAREDDATA_STORE_KEY(type, id)			\
+		template<> inline KEY SharedDataEx::GetTypeKey<type>() \
 		{\
 			return id;\
 		}
 
 
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(Int, 0);
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(Uint64, 1);
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(Bool, 2);
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(Float, 3);
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(String, 4);
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(AgentWrapper, 5);
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(Vector3, 6);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(Int, 0);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(Uint64, 1);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(Bool, 2);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(Float, 3);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(String, 4);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(AgentWrapper, 5);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(Vector3, 6);
 
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(VecInt, 7);
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(VecUint64, 8);
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(VecBool, 9);
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(VecFloat, 10);
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(VecString, 11);
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(VecAgentWrapper, 12);
-	YBEHAVIOR_SHAREDDATA_STORE_INDEX(VecVector3, 13);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecInt, 7);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecUint64, 8);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecBool, 9);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecFloat, 10);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecString, 11);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecAgentWrapper, 12);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecVector3, 13);
 
 	template<typename T>
-	bool SharedDataEx::Get(INT index, T& res)
+	bool SharedDataEx::Get(KEY key, T& res)
 	{
-		IDataArray* iarray = m_Datas[GetTypeIndex<T>()];
+		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
 		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return parray->Get(index, res);
+		return parray->Get(key, res);
 	}
 	template<typename T>
-	const T* SharedDataEx::Get(INT index)
+	const T* SharedDataEx::Get(KEY key)
 	{
-		IDataArray* iarray = m_Datas[GetTypeIndex<T>()];
+		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
 		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return (const T*)parray->Get(index);
-	}
-
-	template<typename T>
-	bool SharedDataEx::Set(INT index, const T& src)
-	{
-		IDataArray* iarray = m_Datas[GetTypeIndex<T>()];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return parray->Set(index, src);
-	}
-
-
-	template<typename T>
-	bool SharedDataEx::Set(INT index, const T* src)
-	{
-		IDataArray* iarray = m_Datas[GetTypeIndex<T>()];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return parray->Set(index, *src);
+		return (const T*)parray->Get(key);
 	}
 
 	template<typename T>
-	bool SharedDataEx::Set(INT index, T&& src)
+	bool SharedDataEx::Set(KEY key, const T& src)
 	{
-		IDataArray* iarray = m_Datas[GetTypeIndex<T>()];
+		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
 		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return parray->Set(index, src);
+		return parray->Set(key, src);
+	}
+
+
+	template<typename T>
+	bool SharedDataEx::Set(KEY key, const T* src)
+	{
+		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
+		DataArray<T>* parray = (DataArray<T>*)iarray;
+		return parray->Set(key, *src);
+	}
+
+	template<typename T>
+	bool SharedDataEx::Set(KEY key, T&& src)
+	{
+		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
+		DataArray<T>* parray = (DataArray<T>*)iarray;
+		return parray->Set(key, src);
 	}
 
 	///

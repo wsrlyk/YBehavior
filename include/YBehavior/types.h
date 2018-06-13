@@ -138,12 +138,18 @@ namespace YBehavior
 		}
 	};
 
+	typedef int					KEY;	///> Key to get value from the shareddata
+	typedef int					SIZE_KEY;
+	typedef int					TYPEID;
+
+
 	typedef std::string			STRING;
 	typedef int					INT;
 	typedef unsigned int		UINT;
 	typedef unsigned long		UINT64;
 	typedef unsigned char       BYTE;
-	typedef unsigned short		BOOL;	///> WARNING: short has been used for bool. Cause bool in vector is specialized and has quite different behaviors with others.
+	typedef bool				BOOL_REAL;
+	typedef unsigned short		BOOL;	///> WARNING: bool is defined by short. Cause bool in vector is specialized and has quite different behaviors with others.
 	typedef float				FLOAT;
 	typedef char				CHAR;
 
@@ -166,17 +172,17 @@ namespace YBehavior
 	typedef std::vector<Vector3>	VecVector3;
 
 #define YBEHAVIOR_BASICTYPE_NUMBER_ID(type, id)			\
-	template<> inline int GetClassTypeNumberId<type>() \
+	template<> inline TYPEID GetClassTypeNumberId<type>() \
 	{\
 		return id;\
 	}\
-	template<> inline int GetClassTypeNumberId<const type>() \
+	template<> inline TYPEID GetClassTypeNumberId<const type>() \
 	{\
 		return id; \
 	}
 
 	template<typename T>
-	inline int GetClassTypeNumberId() {
+	inline TYPEID GetClassTypeNumberId() {
 		return -1;
 	}
 
@@ -196,12 +202,10 @@ namespace YBehavior
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecAgentWrapper, 106);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecVector3, 107);
 
-	class GlobalDefinitions
-	{
-	public:
-		static const char POINTER = 'P';
-		static const char CONST = 'C';
-	};
+	static const char POINTER = 'P';
+	static const char CONST = 'C';
+	static const BOOL TRUE = 1;
+	static const BOOL FALSE = 0;
 }
 
 #endif

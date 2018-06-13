@@ -14,3 +14,10 @@ YBehavior::NodeState GetNameAction::Update(YBehavior::AgentPtr pAgent)
 
 	return ns;
 }
+
+YBehavior::KEY XAgent::tickCount0;
+YBehavior::KEY XAgent::tickCount1;
+YBehavior::KEY XAgent::isfighting;
+YBehavior::KEY XAgent::heartrate;
+YBehavior::KEY XAgent::isdead;
+

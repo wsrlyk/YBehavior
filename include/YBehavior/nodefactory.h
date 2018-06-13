@@ -16,36 +16,36 @@ namespace YBehavior
 		static NodeFactory* Instance();
 		void SetActiveTree(const STRING& tree);
 		template<typename T>
-		INT CreateIndexByName(const STRING& name);
+		KEY CreateKeyByName(const STRING& name);
 
 #ifdef DEBUGGER
 		template<typename T>
-		const STRING& GetNameByIndex(const STRING& treeName, INT index);
+		const STRING& GetNameByKey(const STRING& treeName, KEY key);
 
-		const STRING& GetNameByIndex(const STRING& treeName, INT index, INT typeNumberId);
+		const STRING& GetNameByKey(const STRING& treeName, KEY key, TYPEID typeNumberId);
 #endif
 	public:
-		struct YBEHAVIOR_API NameIndexInfo
+		struct YBEHAVIOR_API NameKeyInfo
 		{
-			std::unordered_map<STRING, INT> mNameHash;
-			INT mNameIndex;
+			std::unordered_map<STRING, KEY> mNameHash;
+			KEY mKeyCounter;
 
-			NameIndexInfo()
+			NameKeyInfo()
 			{
-				mNameIndex = 0;
+				mKeyCounter = 0;
 			}
 
 			void Reset()
 			{
 				mNameHash.clear();
-				mNameIndex = 0;
+				mKeyCounter = 0;
 			}
 		};
 
-		struct YBEHAVIOR_API NameIndexMgr
+		struct YBEHAVIOR_API NameKeyMgr
 		{
 		private:
-			std::unordered_map<int, NameIndexInfo> m_Infos;
+			std::unordered_map<TYPEID, NameKeyInfo> m_Infos;
 		public:
 			void Reset()
 			{
@@ -53,69 +53,68 @@ namespace YBehavior
 					it->second.Reset();
 			}
 
-			NameIndexInfo& Get(int index)
+			NameKeyInfo& Get(TYPEID typeID)
 			{
-				return m_Infos[index];
+				return m_Infos[typeID];
 			}
 
-			void AssignIndex(const NameIndexMgr& other)
+			void AssignKey(const NameKeyMgr& other)
 			{
 				for (auto it = other.m_Infos.begin(); it != other.m_Infos.end(); ++it)
 				{
-					m_Infos[it->first].mNameIndex = it->second.mNameIndex;
+					m_Infos[it->first].mKeyCounter = it->second.mKeyCounter;
 				}
 			}
 		};
 	private:
-		//static std::map<std::string, NameIndexInfo> mNameIndexInfos;
-		NameIndexMgr mCommonNameIndexInfo;
-		NameIndexMgr mTempNameIndexInfo;
-		NameIndexMgr* mpCurActiveNameIndexInfo;
+		NameKeyMgr mCommonNameKeyInfo;
+		NameKeyMgr mTempNameKeyInfo;
+		NameKeyMgr* mpCurActiveNameKeyInfo;
 		STRING mCurActiveTreeName;
 
 #ifdef DEBUGGER
-		typedef std::unordered_map<INT, STRING> IndexNameMapType;
-		IndexNameMapType mCommonIndexNameMap;
-		std::unordered_map<STRING, IndexNameMapType> mIndexNameMap;
-		IndexNameMapType* mpCurActiveIndexNameMap;
+		typedef std::unordered_map<KEY, STRING> KeyNameMapType;
+		KeyNameMapType mCommonKeyNameMap;
+		std::unordered_map<STRING, KeyNameMapType> mKeyNameMap;
+		KeyNameMapType* mpCurActiveKeyNameMap;
 #endif
 	};
 
 	template<typename T>
-	INT NodeFactory::CreateIndexByName(const STRING& name)
+	KEY NodeFactory::CreateKeyByName(const STRING& name)
 	{
-		int typeNumberId = GetClassTypeNumberId<T>();
+		TYPEID typeNumberId = GetClassTypeNumberId<T>();
 
-		NameIndexInfo& commonNameIndexInfo = mCommonNameIndexInfo.Get(typeNumberId);
+		NameKeyInfo& commonNameKeyInfo = mCommonNameKeyInfo.Get(typeNumberId);
 
-		auto it = commonNameIndexInfo.mNameHash.find(name);
-		if (it != commonNameIndexInfo.mNameHash.end())
+		auto it = commonNameKeyInfo.mNameHash.find(name);
+		if (it != commonNameKeyInfo.mNameHash.end())
 			return it->second;
 
-		if (mpCurActiveNameIndexInfo == NULL)
+		if (mpCurActiveNameKeyInfo == NULL)
 			return -1;
 
-		NameIndexInfo& curActiveNameIndexInfo = mpCurActiveNameIndexInfo->Get(typeNumberId);
+		NameKeyInfo& curActiveNameKeyInfo = mpCurActiveNameKeyInfo->Get(typeNumberId);
 		///> common已经找过，不用再找一遍
-		if (mpCurActiveNameIndexInfo == &mCommonNameIndexInfo || curActiveNameIndexInfo.mNameHash.find(name) == curActiveNameIndexInfo.mNameHash.end())
+		if (mpCurActiveNameKeyInfo == &mCommonNameKeyInfo || curActiveNameKeyInfo.mNameHash.find(name) == curActiveNameKeyInfo.mNameHash.end())
 		{
-			INT index = curActiveNameIndexInfo.mNameIndex++;
-			LOG_BEGIN << "ADD node: " << name << "index: " << index << LOG_END;
-			curActiveNameIndexInfo.mNameHash[name] = index;
+			KEY key = curActiveNameKeyInfo.mKeyCounter++;
+			LOG_BEGIN << "ADD node: " << name << "key: " << key << LOG_END;
+			curActiveNameKeyInfo.mNameHash[name] = key;
 
 #ifdef DEBUGGER
-			(*mpCurActiveIndexNameMap)[typeNumberId << 16 | index] = name;
+			(*mpCurActiveKeyNameMap)[typeNumberId << 16 | key] = name;
 #endif
 		}
 
-		return curActiveNameIndexInfo.mNameHash[name];
+		return curActiveNameKeyInfo.mNameHash[name];
 	}
 
 #ifdef DEBUGGER
 	template<typename T>
-	const STRING& NodeFactory::GetNameByIndex(const STRING& treeName, INT index)
+	const STRING& NodeFactory::GetNameByKey(const STRING& treeName, KEY key)
 	{
-		return GetNameByIndex(treeName, index, GetClassTypeNumberId<T>());
+		return GetNameByKey(treeName, key, GetClassTypeNumberId<T>());
 	}
 #endif
 }

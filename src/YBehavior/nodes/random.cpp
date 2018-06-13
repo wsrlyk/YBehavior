@@ -11,7 +11,7 @@
 
 namespace YBehavior
 {
-	static std::unordered_set<INT> s_ValidTypes = {
+	static std::unordered_set<TYPEID> s_ValidTypes = {
 		GetClassTypeNumberId<Int>(),
 		GetClassTypeNumberId<Float>(),
 		GetClassTypeNumberId<Bool>(),
@@ -21,14 +21,14 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> µÈºÅ×ó±ß
-		m_DataType = CreateVariable(m_Opl, "Target", data, true, GlobalDefinitions::POINTER);
+		m_DataType = CreateVariable(m_Opl, "Target", data, true, POINTER);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
 			return;
 		}
 		///> µÈºÅÓÒ±ß1
-		INT dataType = CreateVariable(m_Opr1, "Bound1", data, true);
+		TYPEID dataType = CreateVariable(m_Opr1, "Bound1", data, true);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;

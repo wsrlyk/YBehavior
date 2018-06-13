@@ -13,6 +13,7 @@ namespace YBehavior
 		SharedDataEx* m_SharedData;
 		BehaviorTree* m_Tree;
 		Uint m_UID;
+
 	public:
 		Agent();
 		~Agent();

@@ -18,36 +18,36 @@ namespace YBehavior
 
 		if (tree.empty())
 		{
-			mpCurActiveNameIndexInfo = &mCommonNameIndexInfo;
+			mpCurActiveNameKeyInfo = &mCommonNameKeyInfo;
 #ifdef DEBUGGER
-			mpCurActiveIndexNameMap = &mCommonIndexNameMap;
+			mpCurActiveKeyNameMap = &mCommonKeyNameMap;
 #endif
 			return;
 		}
 		else
 		{
-			mpCurActiveNameIndexInfo = &mTempNameIndexInfo;
+			mpCurActiveNameKeyInfo = &mTempNameKeyInfo;
 #ifdef DEBUGGER
-			IndexNameMapType newMap;
-			mIndexNameMap[tree] = newMap;
-			mpCurActiveIndexNameMap = &mIndexNameMap[tree];
+			KeyNameMapType newMap;
+			mKeyNameMap[tree] = newMap;
+			mpCurActiveKeyNameMap = &mKeyNameMap[tree];
 #endif
 
 		}
 
-		mpCurActiveNameIndexInfo->Reset();
-		mpCurActiveNameIndexInfo->AssignIndex(mCommonNameIndexInfo);
+		mpCurActiveNameKeyInfo->Reset();
+		mpCurActiveNameKeyInfo->AssignKey(mCommonNameKeyInfo);
 	}
 
 #ifdef DEBUGGER
-	const STRING& NodeFactory::GetNameByIndex(const STRING& treeName, INT index, INT typeNumberId)
+	const STRING& NodeFactory::GetNameByKey(const STRING& treeName, KEY key, TYPEID typeNumberId)
 	{
-		auto it = mIndexNameMap.find(treeName);
-		if (it != mIndexNameMap.end())
+		auto it = mKeyNameMap.find(treeName);
+		if (it != mKeyNameMap.end())
 		{
-			IndexNameMapType& indexnamemap = it->second;
-			auto it2 = indexnamemap.find(typeNumberId << 16 | index);
-			if (it2 != indexnamemap.end())
+			KeyNameMapType& keynamemap = it->second;
+			auto it2 = keynamemap.find(typeNumberId << 16 | key);
+			if (it2 != keynamemap.end())
 				return it2->second;
 			return Utility::StringEmpty;
 		}
@@ -58,8 +58,8 @@ namespace YBehavior
 
 	NodeFactory::NodeFactory()
 	{
-		mCommonNameIndexInfo.Reset();
-		mTempNameIndexInfo.Reset();
+		mCommonNameKeyInfo.Reset();
+		mTempNameKeyInfo.Reset();
 	}
 
 	NodeFactory* CreateNodeFactory()

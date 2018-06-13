@@ -26,8 +26,8 @@ namespace YBehavior
 		}
 		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) override
 		{
-			INT index = NodeFactory::Instance()->CreateIndexByName<valueType>(name);
-			pData->Set(index, Utility::ToType<valueType>(str));
+			KEY key = NodeFactory::Instance()->CreateKeyByName<valueType>(name);
+			pData->Set(key, Utility::ToType<valueType>(str));
 		}
 	};
 
@@ -41,7 +41,7 @@ namespace YBehavior
 		}
 		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) override
 		{
-			INT index = NodeFactory::Instance()->CreateIndexByName<std::vector<elementType>>(name);
+			KEY key = NodeFactory::Instance()->CreateKeyByName<std::vector<elementType>>(name);
 			std::vector<STRING> splitRes;
 			std::vector<elementType> res;
 			Utility::SplitString(str, splitRes, '|');
@@ -49,7 +49,7 @@ namespace YBehavior
 			{
 				res.push_back(Utility::ToType<elementType>(*it));
 			}
-			pData->Set(index, std::move(res));
+			pData->Set(key, std::move(res));
 		}
 	};
 

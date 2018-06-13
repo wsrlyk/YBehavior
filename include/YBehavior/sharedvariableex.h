@@ -15,7 +15,7 @@ namespace YBehavior
 		SharedVariableEx()
 		{
 			m_VectorIndex = nullptr;
-			m_Index = SharedDataEx::INVALID_INDEX;
+			m_Key = SharedDataEx::INVALID_KEY;
 		}
 		~SharedVariableEx()
 		{
@@ -35,11 +35,11 @@ namespace YBehavior
 			return &m_Value;
 		}
 	public:
-		INT GetTypeID() { return GetClassTypeNumberId<T>(); }
-		INT GetReferenceSharedDataSelfID()
+		TYPEID GetTypeID() { return GetClassTypeNumberId<T>(); }
+		TYPEID GetReferenceSharedDataSelfID()
 		{
 			///> it's const, just return itself
-			if (m_Index == SharedDataEx::INVALID_INDEX)
+			if (m_Key == SharedDataEx::INVALID_KEY)
 				return GetClassTypeNumberId<T>();
 
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
@@ -60,7 +60,7 @@ namespace YBehavior
 
 		bool IsConst() override
 		{
-			return m_Index == SharedDataEx::INVALID_INDEX;
+			return m_Key == SharedDataEx::INVALID_KEY;
 		}
 
 		STRING GetValueToSTRING(SharedDataEx* pData) override
@@ -103,22 +103,22 @@ namespace YBehavior
 				}
 			}
 		}
-		void SetIndexFromString(const STRING& s)
+		void SetKeyFromString(const STRING& s)
 		{
 			///> if T is a single type but has vector index, it means this variable is an element of a vector.
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
 			{
-				SetIndex(NodeFactory::Instance()->CreateIndexByName<std::vector<T>>(s));
+				SetKey(NodeFactory::Instance()->CreateKeyByName<std::vector<T>>(s));
 			}
 			else
 			{
-				SetIndex(NodeFactory::Instance()->CreateIndexByName<T>(s));
+				SetKey(NodeFactory::Instance()->CreateKeyByName<T>(s));
 			}
 		}
 
 		const T* GetCastedValue(SharedDataEx* pData)
 		{
-			if (pData == nullptr || m_Index == SharedDataEx::INVALID_INDEX)
+			if (pData == nullptr || m_Key == SharedDataEx::INVALID_KEY)
 				return &m_Value;
 			///> It's an element of a vector
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
@@ -129,7 +129,7 @@ namespace YBehavior
 					ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << ERROR_END;
 					return nullptr;
 				}
-				const std::vector<T>* pVector = (const std::vector<T>*)pData->Get<std::vector<T>>(m_Index);
+				const std::vector<T>* pVector = (const std::vector<T>*)pData->Get<std::vector<T>>(m_Key);
 				if (pVector && (UINT)index < pVector->size())
 				{
 					const T* t = &(*pVector)[index];
@@ -141,17 +141,17 @@ namespace YBehavior
 				}
 				else
 				{
-					ERROR_BEGIN << "Invalid SharedData: " << m_Index << ERROR_END;
+					ERROR_BEGIN << "Invalid SharedData: " << m_Key << ERROR_END;
 				}
 				return nullptr;
 			}
 
-			return (const T*)pData->Get<T>(m_Index);
+			return (const T*)pData->Get<T>(m_Key);
 		}
 
 		void SetCastedValue(SharedDataEx* pData, const T* src)
 		{
-			if (pData == nullptr || m_Index == SharedDataEx::INVALID_INDEX)
+			if (pData == nullptr || m_Key == SharedDataEx::INVALID_KEY)
 			{
 				m_Value = *((T*)src);
 				return;
@@ -162,13 +162,13 @@ namespace YBehavior
 				INT index = *(m_VectorIndex->GetCastedValue(pData));
 				if (index < 0)
 					return;
-				const std::vector<T>* pVector = (const std::vector<T>*)pData->Get<std::vector<T>>(m_Index);
+				const std::vector<T>* pVector = (const std::vector<T>*)pData->Get<std::vector<T>>(m_Key);
 				if (pVector && (UINT)index < pVector->size())
 					(*const_cast<std::vector<T>*>(pVector))[index] = *src;
 			}
 			else
 			{
-				pData->Set<T>(m_Index, src);
+				pData->Set<T>(m_Key, src);
 			}
 		}
 
@@ -177,12 +177,12 @@ namespace YBehavior
 		{
 			if (vbType.length() < 1)
 				return;
-			if (vbType[0] == GlobalDefinitions::POINTER)
+			if (vbType[0] == POINTER)
 			{
 				m_VectorIndex = new SharedVariableEx<INT>();
-				m_VectorIndex->SetIndexFromString(s);
+				m_VectorIndex->SetKeyFromString(s);
 			}
-			else if (vbType[0] == GlobalDefinitions::CONST)
+			else if (vbType[0] == CONST)
 			{
 				m_VectorIndex = new SharedVariableEx<INT>();
 				m_VectorIndex->SetValueFromString(s);

@@ -260,13 +260,13 @@ namespace YBehavior
 
 		const STRING& treeName = DebugMgr::Instance()->GetTargetTree();
 
-		for (int i = 0; i < MAX_TYPE_INDEX; ++i)
+		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
 		{
 			auto iarray = pSharedData->GetDataArray(i);
-			int length = iarray->Length();
-			for (int j = 0; j < length; ++j)
+			SIZE_KEY length = iarray->Length();
+			for (KEY j = 0; j < length; ++j)
 			{
-				const STRING& name = NodeFactory::Instance()->GetNameByIndex(treeName, j, iarray->GetTypeID());
+				const STRING& name = NodeFactory::Instance()->GetNameByKey(treeName, j, iarray->GetTypeID());
 				if (name == Utility::StringEmpty)
 					continue;
 				STRING content(name + "," + iarray->GetToString(j));
@@ -365,7 +365,7 @@ namespace YBehavior
 		else
 		{
 			ISharedVariableEx* pVectorIndex = pVariable->GetVectorIndex();
-			const STRING& sharedDataVariableName = NodeFactory::Instance()->GetNameByIndex(DebugMgr::Instance()->GetTargetTree(), pVariable->GetIndex(), pVariable->GetReferenceSharedDataSelfID());
+			const STRING& sharedDataVariableName = NodeFactory::Instance()->GetNameByKey(DebugMgr::Instance()->GetTargetTree(), pVariable->GetKey(), pVariable->GetReferenceSharedDataSelfID());
 			///>  Like:      Int0 IntArrayM[7] 44
 			if (pVectorIndex)
 			{

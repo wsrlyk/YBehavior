@@ -20,7 +20,7 @@ namespace YBehavior
 		ISharedVariableEx* m_Opl;
 		ISharedVariableEx* m_Opr;
 
-		INT m_DataType;
+		TYPEID m_DataType;
 
 	};
 }

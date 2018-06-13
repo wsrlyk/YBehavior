@@ -169,12 +169,12 @@ namespace YBehavior
 			return "";
 		}
 		std::vector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, 1, GlobalDefinitions::CONST))
+		if (!ParseVariable(attrOptr, data, buffer, 1, CONST))
 			return "";
 
 		return buffer[1];
 	}
-	int BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType)
+	TYPEID BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 
@@ -199,8 +199,8 @@ namespace YBehavior
 				op->SetVectorIndex(buffer[3], buffer[4]);
 			}
 
-			if (buffer[0][2] == GlobalDefinitions::POINTER)
-				op->SetIndexFromString(buffer[1]);
+			if (buffer[0][2] == POINTER)
+				op->SetKeyFromString(buffer[1]);
 			else
 				op->SetValueFromString(buffer[1]);
 

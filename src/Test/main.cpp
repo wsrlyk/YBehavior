@@ -15,9 +15,15 @@ int main(int argc, char** argv)
 {
 	MyLaunchCore core;
 	YBehavior::Launcher::Launch(core);
+
+	XAgent::InitData();
+
 	std::vector<int> a(1);
 	XEntity* pEntity = new XEntity("Hehe");
 	pEntity->GetAgent()->SetEntity(pEntity);
+
+	XEntity* pEntity1 = new XEntity("Haha");
+	pEntity1->GetAgent()->SetEntity(pEntity1);
 	//pEntity->GetAgent()->GetSharedData()->GetBool(3);
 
 	//aa.GetValue(pEntity->GetAgent()->GetSharedData());
