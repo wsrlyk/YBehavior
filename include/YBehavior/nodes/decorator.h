@@ -12,10 +12,10 @@ namespace YBehavior
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 	};
-	class YBEHAVIOR_API AlwaysFailed : public SingleChildNode
+	class YBEHAVIOR_API AlwaysFailure : public SingleChildNode
 	{
 	public:
-		STRING GetClassName() const override { return "AlwaysFailed"; }
+		STRING GetClassName() const override { return "AlwaysFailure"; }
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 	};

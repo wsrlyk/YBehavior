@@ -63,7 +63,7 @@ namespace YBehavior
 		}
 
 		IVariableOperationHelper* pHelper = m_Opl->GetOperation();
-		return pHelper->Compare(pAgent->GetSharedData(), m_Opl, m_Opr, m_Operator) ? NS_SUCCESS : NS_FAILED;
+		return pHelper->Compare(pAgent->GetSharedData(), m_Opl, m_Opr, m_Operator) ? NS_SUCCESS : NS_FAILURE;
 	}
 
 }

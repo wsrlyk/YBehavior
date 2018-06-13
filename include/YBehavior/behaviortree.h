@@ -17,7 +17,7 @@ namespace YBehavior
 	{
 		NS_INVALID = -1,
 		NS_SUCCESS,
-		NS_FAILED,
+		NS_FAILURE,
 		NS_BREAK,
 		NS_RUNNING,
 	};

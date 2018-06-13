@@ -311,13 +311,13 @@ namespace YBehavior.Editor.Core
         }
     }
 
-    class AlwaysFailedNode : SingleChildNode
+    class AlwaysFailureNode : SingleChildNode
     {
         public override string Icon => "✘";
 
-        public AlwaysFailedNode()
+        public AlwaysFailureNode()
         {
-            m_Name = "AlwaysFailed";
+            m_Name = "AlwaysFailure";
             m_Type = NodeType.NT_Default;
             m_Hierachy = NodeHierachy.NH_Decorator;
         }

@@ -12,7 +12,7 @@ namespace YBehavior
 		for (auto it = m_Childs->begin(); it != m_Childs->end(); ++it)
 		{
 			ns = (*it)->Execute(pAgent);
-			if (ns == NS_FAILED)
+			if (ns == NS_FAILURE)
 			{
 				DEBUG_LOG_INFO("Break At Child With UID " << Utility::ToString((*it)->GetUID()) << "; ");
 				break;
@@ -34,7 +34,7 @@ namespace YBehavior
 			DEBUG_LOG_INFO(index << ", ")
 
 			ns = (*m_Childs)[index]->Execute(pAgent);
-			if (ns == NS_FAILED)
+			if (ns == NS_FAILURE)
 			{
 				DEBUG_LOG_INFO("Break At Child With UID " << Utility::ToString((*m_Childs)[index]->GetUID()) << "; ");
 				break;

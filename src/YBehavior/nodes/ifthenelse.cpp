@@ -19,7 +19,7 @@ namespace YBehavior
 	NodeState IfThenElse::Update(AgentPtr pAgent)
 	{
 		if (m_If == nullptr)
-			return NS_FAILED;
+			return NS_FAILURE;
 
 		NodeState state = m_If->Execute(pAgent);
 		if (state == NS_SUCCESS)
@@ -29,7 +29,7 @@ namespace YBehavior
 				DEBUG_LOG_INFO("Run [THEN]; ");
 				return m_Then->Execute(pAgent);
 			}
-			return NS_FAILED;
+			return NS_FAILURE;
 		}
 		else
 		{
@@ -38,7 +38,7 @@ namespace YBehavior
 				DEBUG_LOG_INFO("Run [ELSE]; ");
 				return m_Else->Execute(pAgent);
 			}
-			return NS_FAILED;
+			return NS_FAILURE;
 		}
 	}
 

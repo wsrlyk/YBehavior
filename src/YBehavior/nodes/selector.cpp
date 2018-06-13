@@ -8,7 +8,7 @@ namespace YBehavior
 {
 	YBehavior::NodeState Selector::Update(AgentPtr pAgent)
 	{
-		NodeState ns = NS_FAILED;
+		NodeState ns = NS_FAILURE;
 		for (auto it = m_Childs->begin(); it != m_Childs->end(); ++it)
 		{
 			ns = (*it)->Execute(pAgent);
@@ -24,7 +24,7 @@ namespace YBehavior
 
 	NodeState RandomSelector::Update(AgentPtr pAgent)
 	{
-		NodeState ns = NS_FAILED;
+		NodeState ns = NS_FAILURE;
 		m_RandomIndex.Rand();
 
 		DEBUG_LOG_INFO("Order: ")

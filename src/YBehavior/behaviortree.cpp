@@ -26,7 +26,7 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	Bimap<NodeState, STRING, EnumClassHash> s_NodeStateMap = {
-		{ NS_SUCCESS, "SUCCESS" },{ NS_FAILED, "FAILED" },{ NS_RUNNING, "RUNNING" },{ NS_BREAK, "BREAK" },{ NS_INVALID, "INVALID" }
+		{ NS_SUCCESS, "SUCCESS" },{ NS_FAILURE, "FAILURE" },{ NS_RUNNING, "RUNNING" },{ NS_BREAK, "BREAK" },{ NS_INVALID, "INVALID" }
 	};
 
 	BehaviorNode::BehaviorNode()
@@ -65,7 +65,7 @@ namespace YBehavior
 		if (m_Condition != nullptr)
 		{
 			NodeState res = m_Condition->Execute(pAgent);
-			if (res == NS_FAILED)
+			if (res == NS_FAILURE)
 				DEBUG_RETURN(dbgHelper, res);
 		}
 
@@ -277,7 +277,7 @@ namespace YBehavior
 		if (m_Child)
 			return m_Child->Execute(pAgent);
 
-		return NS_FAILED;
+		return NS_FAILURE;
 	}
 
 

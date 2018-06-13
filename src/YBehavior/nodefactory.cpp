@@ -73,7 +73,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, Comparer);
 		REGISTER_TYPE(factory, IfThenElse);
 		REGISTER_TYPE(factory, AlwaysSuccess);
-		REGISTER_TYPE(factory, AlwaysFailed);
+		REGISTER_TYPE(factory, AlwaysFailure);
 		REGISTER_TYPE(factory, Invertor);
 		REGISTER_TYPE(factory, SetData);
 		REGISTER_TYPE(factory, Random);
