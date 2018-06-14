@@ -28,7 +28,7 @@ namespace YBehavior
 		m_RandomIndex.Rand();
 
 		DEBUG_LOG_INFO("Order: ")
-			for (auto i = 0; i < m_Childs->size(); ++i)
+			for (size_t i = 0; i < m_Childs->size(); ++i)
 			{
 				int index = m_RandomIndex[i];
 				DEBUG_LOG_INFO(index << ", ")
