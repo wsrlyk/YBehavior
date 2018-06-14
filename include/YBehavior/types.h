@@ -147,6 +147,7 @@ namespace YBehavior
 	typedef int					INT;
 	typedef unsigned int		UINT;
 	typedef unsigned long		UINT64;
+	typedef unsigned long		ULONG;
 	typedef unsigned char       BYTE;
 	typedef bool				BOOL_REAL;
 	typedef unsigned short		BOOL;	///> WARNING: bool is defined by short. Cause bool in vector is specialized and has quite different behaviors with others.
@@ -158,6 +159,7 @@ namespace YBehavior
 	typedef INT					Int;
 	typedef UINT				Uint;
 	typedef UINT64				Uint64;
+	typedef UINT64				Ulong;
 	typedef BYTE				Byte;
 	typedef BOOL				Bool;
 	typedef FLOAT				Float;
@@ -165,6 +167,7 @@ namespace YBehavior
 	typedef std::vector<INT>	VecInt;
 	typedef std::vector<UINT>	VecUint;
 	typedef std::vector<UINT64>	VecUint64;
+	typedef std::vector<ULONG>	VecUlong;
 	typedef std::vector<BYTE>	VecByte;
 	typedef std::vector<BOOL>	VecBool;
 	typedef std::vector<FLOAT>	VecFloat;

@@ -37,7 +37,7 @@ namespace YBehavior
 	public:
 		virtual ISharedVariableEx* CreateVariable() override
 		{
-			return new SharedVariableEx<elementType>();
+			return new SharedVariableEx<std::vector<elementType>>();
 		}
 		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) override
 		{

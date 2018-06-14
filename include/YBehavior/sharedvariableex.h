@@ -115,6 +115,30 @@ namespace YBehavior
 				SetKey(NodeFactory::Instance()->CreateKeyByName<T>(s));
 			}
 		}
+		const ElementType* _GetCastedValue(SharedDataEx* pData)
+		{
+			INT index = *(m_VectorIndex->GetCastedValue(pData));
+			if (index < 0)
+			{
+				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << ERROR_END;
+				return nullptr;
+			}
+			const std::vector<ElementType>* pVector = (const std::vector<ElementType>*)pData->Get<std::vector<ElementType>>(m_Key);
+			if (pVector && (UINT)index < pVector->size())
+			{
+				const ElementType* t = &(*pVector)[index];
+				return t;
+			}
+			if (pVector)
+			{
+				ERROR_BEGIN << "VectorIndex out of range: " << index << ", Total " << pVector->size() << ERROR_END;
+			}
+			else
+			{
+				ERROR_BEGIN << "Invalid SharedData: " << m_Key << ERROR_END;
+			}
+			return nullptr;
+		}
 
 		const T* GetCastedValue(SharedDataEx* pData)
 		{
@@ -123,30 +147,20 @@ namespace YBehavior
 			///> It's an element of a vector
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
 			{
-				INT index = *(m_VectorIndex->GetCastedValue(pData));
-				if (index < 0)
-				{
-					ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << ERROR_END;
-					return nullptr;
-				}
-				const std::vector<T>* pVector = (const std::vector<T>*)pData->Get<std::vector<T>>(m_Key);
-				if (pVector && (UINT)index < pVector->size())
-				{
-					const T* t = &(*pVector)[index];
-					return t;
-				}
-				if (pVector)
-				{
-					ERROR_BEGIN << "VectorIndex out of range: " << index << ", Total " << pVector->size() << ERROR_END;
-				}
-				else
-				{
-					ERROR_BEGIN << "Invalid SharedData: " << m_Key << ERROR_END;
-				}
-				return nullptr;
+				return (const T*)_GetCastedValue(pData);
 			}
 
 			return (const T*)pData->Get<T>(m_Key);
+		}
+
+		void _SetCastedValue(SharedDataEx* pData, const ElementType* src)
+		{
+			INT index = *(m_VectorIndex->GetCastedValue(pData));
+			if (index < 0)
+				return;
+			const std::vector<ElementType>* pVector = (const std::vector<ElementType>*)pData->Get<std::vector<ElementType>>(m_Key);
+			if (pVector && (UINT)index < pVector->size())
+				(*const_cast<std::vector<ElementType>*>(pVector))[index] = *src;
 		}
 
 		void SetCastedValue(SharedDataEx* pData, const T* src)
@@ -159,12 +173,7 @@ namespace YBehavior
 			///> It's an element of a vector
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
 			{
-				INT index = *(m_VectorIndex->GetCastedValue(pData));
-				if (index < 0)
-					return;
-				const std::vector<T>* pVector = (const std::vector<T>*)pData->Get<std::vector<T>>(m_Key);
-				if (pVector && (UINT)index < pVector->size())
-					(*const_cast<std::vector<T>*>(pVector))[index] = *src;
+				_SetCastedValue(pData, (const ElementType*)src);
 			}
 			else
 			{

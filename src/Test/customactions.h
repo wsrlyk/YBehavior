@@ -37,6 +37,7 @@ public:
 		this->GetSharedData()->Set<YBehavior::FLOAT>(heartrate, 2);
 	}
 	XEntity* GetEntity() { return m_pEntity; }
+	void Update();
 };
 class XEntity
 {

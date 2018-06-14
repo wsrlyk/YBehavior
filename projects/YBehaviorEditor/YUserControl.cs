@@ -45,6 +45,22 @@ namespace YBehavior.Editor
             });
         }
 
+        public YUserControl(bool bFindAncestor)
+        {
+            if (bFindAncestor)
+            {
+                this.SetBinding(AncestorProperty, new Binding()
+                {
+                    RelativeSource = new RelativeSource()
+                    {
+                        Mode = RelativeSourceMode.FindAncestor,
+                        AncestorLevel = 1,
+                        AncestorType = typeof(ItemsControl)
+                    }
+                });
+            }
+        }
+
         protected void _OnAncestorPropertyChanged() { }
     }
 }

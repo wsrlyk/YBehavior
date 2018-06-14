@@ -28,7 +28,7 @@ namespace YBehavior.Editor
                 return;
 
             if (m_Connection == null)
-                m_Connection = new UIConnection();
+                m_Connection = new UIConnection(false);
 
             if (!m_bDragging)
             {

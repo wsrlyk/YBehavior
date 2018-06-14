@@ -30,7 +30,7 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
 
-            foreach (KeyValuePair<Variable.ValueType, string> pair in VariableHelper.ValueTypeDic)
+            foreach (KeyValuePair<Variable.ValueType, string> pair in Variable.ValueTypeDic2)
             {
                 m_Types.Add(pair.Value);
             }
@@ -87,7 +87,7 @@ namespace YBehavior.Editor
             if (m_CurTree.Variables.TryCreateVariable(
                 name, 
                 value, 
-                VariableHelper.ValueTypeDic.GetKey(type, Variable.ValueType.VT_NONE),
+                Variable.ValueTypeDic2.GetKey(type, Variable.ValueType.VT_NONE),
                 isarray == 1 ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE))
             {
                 this.VName.Text = string.Empty;

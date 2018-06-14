@@ -92,18 +92,24 @@ namespace YBehavior.Editor.Core
         {
             if (!IsValidVariableName(name))
                 return false;
-            Variable v = new Variable(this.m_Owner);
-            if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, value, null, name))
-                return false;
+            Variable v;
+            using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
+            {
+                v = new Variable(this.m_Owner);
+                if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, value, null, name))
+                    return false;
 
-            v.LockVBType = true;
-            v.CanBeRemoved = true;
+                v.LockVBType = true;
+                v.CanBeRemoved = true;
 
-            if (!v.CheckValid())
-                return false;
+                if (!v.CheckValid())
+                    return false;
 
-            bool res = AddVariable(v);
-            if (res)
+                bool res = AddVariable(v);
+                if (!res)
+                    return false;
+            }
+
             {
                 AddSharedVariableCommand addSharedVariableCommand = new AddSharedVariableCommand()
                 {
@@ -111,7 +117,7 @@ namespace YBehavior.Editor.Core
                 };
                 WorkBenchMgr.Instance.PushCommand(addSharedVariableCommand);
             }
-            return res;
+            return true;
         }
 
         public Variable CreateVariableInNode(

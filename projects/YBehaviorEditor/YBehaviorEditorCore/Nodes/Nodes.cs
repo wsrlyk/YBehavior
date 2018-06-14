@@ -409,4 +409,97 @@ namespace YBehavior.Editor.Core
             }
         }
     }
+
+    class ReadRegisterNode : LeafNode
+    {
+        public override string Icon => "[_↓_]";
+
+        public ReadRegisterNode()
+        {
+            m_Name = "ReadRegister";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_DefaultAction;
+
+        }
+
+        public override void CreateVariables()
+        {
+            Variable name = Variables.CreateVariableInNode(
+                "Event",
+                "",
+                Variable.CreateParams_String,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                0
+            );
+
+            Variable ints = Variables.CreateVariableInNode(
+                "Int",
+                "",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                0
+            );
+
+            Variable floats = Variables.CreateVariableInNode(
+                "Float",
+                "",
+                Variable.CreateParams_Float,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                0
+            );
+
+            Variable strings = Variables.CreateVariableInNode(
+                "String",
+                "",
+                Variable.CreateParams_String,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                0
+            );
+
+            Variable ulongs = Variables.CreateVariableInNode(
+                "Ulong",
+                "",
+                Variable.CreateParams_Ulong,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                0
+            );
+
+            Variable bools = Variables.CreateVariableInNode(
+                "Bool",
+                "",
+                Variable.CreateParams_Bool,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                0
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0}\nInt: {1}\nFloat: {2}\nString: {3}\nUlong: {4}\nBool: {5}",
+                    Variables.GetVariable("Event").NoteValue,
+                    Variables.GetVariable("Int").NoteValue,
+                    Variables.GetVariable("Float").NoteValue,
+                    Variables.GetVariable("String").NoteValue,
+                    Variables.GetVariable("Ulong").NoteValue,
+                    Variables.GetVariable("Bool").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
+
 }

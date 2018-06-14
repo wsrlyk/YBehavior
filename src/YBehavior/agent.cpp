@@ -2,8 +2,16 @@
 #include "YBehavior/behaviortreemgr.h"
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/shareddataex.h"
+#include "YBehavior/registerdata.h"
 
 YBehavior::UINT YBehavior::Agent::s_UID = 0;
+
+YBehavior::RegisterData* YBehavior::Agent::GetRegister()
+{
+	if (m_RegisterData == nullptr)
+		m_RegisterData = new RegisterData();
+	return m_RegisterData;
+}
 
 void YBehavior::Agent::SetTree(const STRING& name)
 {
@@ -20,6 +28,7 @@ void YBehavior::Agent::Tick()
 YBehavior::Agent::Agent()
 	: m_Tree(nullptr)
 	, m_UID(++s_UID)
+	, m_RegisterData(nullptr)
 {
 	m_SharedData = new SharedDataEx();
 }
@@ -31,6 +40,8 @@ YBehavior::Agent::~Agent()
 		TreeMgr::Instance()->ReturnTree(m_Tree);
 		m_Tree = nullptr;
 	}
+	if (m_RegisterData)
+		delete m_RegisterData;
 
 	delete m_SharedData;
 }

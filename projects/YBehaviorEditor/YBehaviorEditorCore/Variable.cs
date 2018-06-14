@@ -13,7 +13,7 @@ namespace YBehavior.Editor.Core
     }
     public class Variable : System.ComponentModel.INotifyPropertyChanged
     {
-        public static readonly char ListSpliter = '|';
+        public static readonly char[] ListSpliter = new char[] { '|' };
         public static readonly char SpaceSpliter = ' ';
 
         public static readonly char NONE = (char)0;
@@ -24,6 +24,7 @@ namespace YBehavior.Editor.Core
         public static readonly char STRING = 'S';
         public static readonly char ENUM = 'E';
         public static readonly char AGENT = 'A';
+        public static readonly char ULONG = 'U';
 
         public static readonly char POINTER = 'P';
         public static readonly char CONST = 'C';
@@ -32,6 +33,7 @@ namespace YBehavior.Editor.Core
 
         public static readonly ValueType[] CreateParams_AllNumbers = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT };
         public static readonly ValueType[] CreateParams_Int = new ValueType[] { ValueType.VT_INT };
+        public static readonly ValueType[] CreateParams_Ulong = new ValueType[] { ValueType.VT_ULONG };
         public static readonly ValueType[] CreateParams_Float = new ValueType[] { ValueType.VT_FLOAT };
         public static readonly ValueType[] CreateParams_String = new ValueType[] { ValueType.VT_STRING };
         public static readonly ValueType[] CreateParams_Bool = new ValueType[] { ValueType.VT_BOOL };
@@ -51,6 +53,7 @@ namespace YBehavior.Editor.Core
             VT_STRING,
             VT_ENUM,
             VT_AGENT,
+            VT_ULONG,
         }
 
         public static Bimap<ValueType, char> ValueTypeDic = new Bimap<ValueType, char>
@@ -61,7 +64,20 @@ namespace YBehavior.Editor.Core
             {ValueType.VT_VECTOR3, VECTOR3 },
             {ValueType.VT_STRING, STRING },
             {ValueType.VT_ENUM, ENUM },
-            {ValueType.VT_AGENT, AGENT }
+            {ValueType.VT_AGENT, AGENT },
+            {ValueType.VT_ULONG, ULONG }
+        };
+
+        public static Bimap<Variable.ValueType, string> ValueTypeDic2 = new Bimap<Variable.ValueType, string>
+        {
+            {Variable.ValueType.VT_INT, "INT" },
+            {Variable.ValueType.VT_FLOAT, "FLOAT" },
+            {Variable.ValueType.VT_BOOL, "BOOL" },
+            {Variable.ValueType.VT_VECTOR3, "VECTOR3" },
+            {Variable.ValueType.VT_STRING, "STRING" },
+            {Variable.ValueType.VT_ENUM, "ENUM" },
+            {Variable.ValueType.VT_AGENT, "AGENT" },
+            {Variable.ValueType.VT_ULONG, "ULONG" }
         };
 
         public enum CountType
@@ -399,7 +415,7 @@ namespace YBehavior.Editor.Core
 
             if (cType == CountType.CT_LIST)
             {
-                string[] ss = Value.Split(ListSpliter);
+                string[] ss = Value.Split(ListSpliter, StringSplitOptions.RemoveEmptyEntries);
                 foreach(var s in ss)
                 {
                     if (!CheckValidSingle(s))
@@ -460,6 +476,13 @@ namespace YBehavior.Editor.Core
                         /// TODO
                         return true;
                     }
+                case ValueType.VT_ULONG:
+                    {
+                        if (ulong.TryParse(v, out ulong a))
+                            return true;
+                        LogMgr.Instance.Log(string.Format("Variable parse error: int {0} == {1}", Name, v));
+                    }
+                    break;
                 default:
                     return false;
             }

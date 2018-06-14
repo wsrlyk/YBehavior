@@ -206,6 +206,29 @@ namespace YBehavior
 		}
 	};
 	template<typename T> VariableOperationHelper<T> VariableOperationHelper<T>::s_Instance;
+
+	template<typename elementType>
+	class VariableOperationHelper<std::vector<elementType>> : public IVariableOperationHelper
+	{
+		static VariableOperationHelper<std::vector<elementType>> s_Instance;
+	public:
+		static IVariableOperationHelper* Get() { return &s_Instance; }
+
+		bool Compare(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op)
+		{
+			return false;
+		}
+
+		void Calculate(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op)
+		{
+		}
+
+		void Random(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
+		{
+		}
+	};
+	template<typename elementType> VariableOperationHelper<std::vector<elementType>> VariableOperationHelper<std::vector<elementType>>::s_Instance;
+
 }
 
 #endif

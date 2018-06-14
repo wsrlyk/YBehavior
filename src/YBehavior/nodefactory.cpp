@@ -8,6 +8,7 @@
 #include "YBehavior/nodes/selector.h"
 #include "YBehavior/nodes/setdata.h"
 #include "YBehavior/nodes/random.h"
+#include "YBehavior/nodes/register.h"
 namespace YBehavior
 {
 	void NodeFactory::SetActiveTree(const STRING& tree)
@@ -77,6 +78,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, Invertor);
 		REGISTER_TYPE(factory, SetData);
 		REGISTER_TYPE(factory, Random);
+		REGISTER_TYPE(factory, ReadRegister);
 
 		return factory;
 	}

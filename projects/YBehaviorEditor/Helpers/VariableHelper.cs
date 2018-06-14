@@ -24,20 +24,6 @@ namespace YBehavior.Editor
         }
     }
 
-    public static class VariableHelper
-    {
-        public static Bimap<Variable.ValueType, string> ValueTypeDic = new Bimap<Variable.ValueType, string>
-        {
-            {Variable.ValueType.VT_INT, "INT" },
-            {Variable.ValueType.VT_FLOAT, "FLOAT" },
-            {Variable.ValueType.VT_BOOL, "BOOL" },
-            {Variable.ValueType.VT_VECTOR3, "VECTOR3" },
-            {Variable.ValueType.VT_STRING, "STRING" },
-            {Variable.ValueType.VT_ENUM, "ENUM" },
-            {Variable.ValueType.VT_AGENT, "AGENT" }
-        };
-    }
-
     [ValueConversion(typeof(Variable.ValueType), typeof(string))]
     public class VariableValueTypeConvertor : IValueConverter
     {
@@ -46,7 +32,7 @@ namespace YBehavior.Editor
             if (!(value is Variable.ValueType))
                 return string.Empty;
             Variable.ValueType type = (Variable.ValueType)value;
-            return VariableHelper.ValueTypeDic.GetValue(type, string.Empty);
+            return Variable.ValueTypeDic2.GetValue(type, string.Empty);
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {

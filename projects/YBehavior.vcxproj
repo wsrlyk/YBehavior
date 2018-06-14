@@ -31,9 +31,11 @@
     <ClInclude Include="..\include\YBehavior\nodes\decorator.h" />
     <ClInclude Include="..\include\YBehavior\nodes\ifthenelse.h" />
     <ClInclude Include="..\include\YBehavior\nodes\random.h" />
+    <ClInclude Include="..\include\YBehavior\nodes\register.h" />
     <ClInclude Include="..\include\YBehavior\nodes\selector.h" />
     <ClInclude Include="..\include\YBehavior\nodes\sequence.h" />
     <ClInclude Include="..\include\YBehavior\nodes\setdata.h" />
+    <ClInclude Include="..\include\YBehavior\registerdata.h" />
     <ClInclude Include="..\include\YBehavior\shareddataex.h" />
     <ClInclude Include="..\include\YBehavior\sharedvariablecreatehelper.h" />
     <ClInclude Include="..\include\YBehavior\sharedvariableex.h" />
@@ -64,9 +66,11 @@
     <ClCompile Include="..\src\YBehavior\nodes\decorator.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\ifthenelse.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\random.cpp" />
+    <ClCompile Include="..\src\YBehavior\nodes\register.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\selector.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\sequence.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\setdata.cpp" />
+    <ClCompile Include="..\src\YBehavior\registerdata.cpp" />
     <ClCompile Include="..\src\YBehavior\shareddataex.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\common.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />

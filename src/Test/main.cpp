@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 	int i = 0;
 	while(i < 100)
 	{
-		pEntity->GetAgent()->Tick();
+		pEntity->GetAgent()->Update();
 #if _MSC_VER
 		Sleep(300);
 #else
