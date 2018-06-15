@@ -6,7 +6,12 @@
 namespace YBehavior
 {
 
-	const YBehavior::STRING Utility::StringEmpty("");
+	const STRING Utility::StringEmpty("");
+	const VecInt Utility::VecIntEmpty;
+	const VecFloat Utility::VecFloatEmpty;
+	const VecBool Utility::VecBoolEmpty;
+	const VecString Utility::VecStringEmpty;
+	const VecUlong Utility::VecUlongEmpty;
 
 	std::random_device Utility::rd;
 	std::default_random_engine Utility::mt(rd());

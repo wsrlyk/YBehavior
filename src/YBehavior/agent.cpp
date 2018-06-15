@@ -25,6 +25,17 @@ void YBehavior::Agent::Tick()
 		m_Tree->Execute(this);
 }
 
+void YBehavior::Agent::ProcessRegister()
+{
+		_OnProcessRegister();
+		m_RegisterData->GetSendData().Clear();
+}
+
+void YBehavior::Agent::_OnProcessRegister()
+{
+
+}
+
 YBehavior::Agent::Agent()
 	: m_Tree(nullptr)
 	, m_UID(++s_UID)

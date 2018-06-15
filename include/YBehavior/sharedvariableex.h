@@ -167,7 +167,9 @@ namespace YBehavior
 		{
 			if (pData == nullptr || m_Key == SharedDataEx::INVALID_KEY)
 			{
-				m_Value = *((T*)src);
+				///> Currently, we treat the non-pointer as CONST, then this function wont change their values.
+				//m_Value = *((T*)src);
+				//ERROR_BEGIN << "Try to modify a CONST variable value: " << this->GetName() << ERROR_END;
 				return;
 			}
 			///> It's an element of a vector

@@ -79,6 +79,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, SetData);
 		REGISTER_TYPE(factory, Random);
 		REGISTER_TYPE(factory, ReadRegister);
+		REGISTER_TYPE(factory, WriteRegister);
 
 		return factory;
 	}

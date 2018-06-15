@@ -15,37 +15,43 @@ namespace YBehavior
 	void ReadRegister::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID typeID;
-		if ((typeID = CreateVariable(m_Event, "Event", data, true, POINTER)) != GetClassTypeNumberId<String>())
+		typeID = CreateVariable(m_Event, "Event", data, true, POINTER);
+		if (!m_Event)
 		{
 			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
 			return;
 		}
 
-		if ((typeID = CreateVariable(m_Int, "Int", data, false, POINTER)) != GetClassTypeNumberId<VecInt>())
+		typeID = CreateVariable(m_Int, "Int", data, false, POINTER);
+		if (!m_Int)
 		{
 			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
 			return;
 		}
 
-		if ((typeID = CreateVariable(m_Float, "Float", data, false, POINTER)) != GetClassTypeNumberId<VecFloat>())
+		typeID = CreateVariable(m_Float, "Float", data, false, POINTER);
+		if (!m_Float)
 		{
 			ERROR_BEGIN << "Invalid type for Float in ReadRegister " << typeID << ERROR_END;
 			return;
 		}
 
-		if ((typeID = CreateVariable(m_Bool, "Bool", data, false, POINTER)) != GetClassTypeNumberId<VecBool>())
+		typeID = CreateVariable(m_Bool, "Bool", data, false, POINTER);
+		if (!m_Bool)
 		{
 			ERROR_BEGIN << "Invalid type for Bool in ReadRegister " << typeID << ERROR_END;
 			return;
 		}
 
-		if ((typeID = CreateVariable(m_Ulong, "Ulong", data, false, POINTER)) != GetClassTypeNumberId<VecUint64>())
+		typeID = CreateVariable(m_Ulong, "Ulong", data, false, POINTER);
+		if (!m_Ulong)
 		{
 			ERROR_BEGIN << "Invalid type for Ulong in ReadRegister " << typeID << ERROR_END;
 			return;
 		}
 
-		if ((typeID = CreateVariable(m_String, "String", data, false, POINTER)) != GetClassTypeNumberId<VecString>())
+		typeID = CreateVariable(m_String, "String", data, false, POINTER);
+		if (!m_String)
 		{
 			ERROR_BEGIN << "Invalid type for String in ReadRegister " << typeID << ERROR_END;
 			return;
@@ -60,12 +66,12 @@ namespace YBehavior
 			DEBUG_LOG_INFO("No Event.");
 			return NS_FAILURE;
 		}
-		m_Event->SetValue(pAgent->GetSharedData(), pRegister->GetEvent());
-		m_Int->SetValue(pAgent->GetSharedData(), pRegister->GetInt());
-		m_Float->SetValue(pAgent->GetSharedData(), pRegister->GetFloat());
-		m_Bool->SetValue(pAgent->GetSharedData(), pRegister->GetBool());
-		m_Ulong->SetValue(pAgent->GetSharedData(), pRegister->GetUlong());
-		m_String->SetValue(pAgent->GetSharedData(), pRegister->GetString());
+		m_Event->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pEvent);
+		m_Int->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecInt);
+		m_Float->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecFloat);
+		m_Bool->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecBool);
+		m_Ulong->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecUlong);
+		m_String->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecString);
 
 		pRegister->Clear();
 
@@ -81,4 +87,90 @@ namespace YBehavior
 
 		return NS_SUCCESS;
 	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	void WriteRegister::OnLoaded(const pugi::xml_node& data)
+	{
+		TYPEID typeID;
+		typeID = CreateVariable(m_Event, "Event", data, true);
+		if (!m_Event)
+		{
+			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
+			return;
+		}
+
+		typeID = CreateVariable(m_Int, "Int", data, false);
+		if (!m_Int)
+		{
+			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
+			return;
+		}
+
+		typeID = CreateVariable(m_Float, "Float", data, false);
+		if (!m_Float)
+		{
+			ERROR_BEGIN << "Invalid type for Float in ReadRegister " << typeID << ERROR_END;
+			return;
+		}
+
+		typeID = CreateVariable(m_Bool, "Bool", data, false);
+		if (!m_Bool)
+		{
+			ERROR_BEGIN << "Invalid type for Bool in ReadRegister " << typeID << ERROR_END;
+			return;
+		}
+
+		typeID = CreateVariable(m_Ulong, "Ulong", data, false);
+		if (!m_Ulong)
+		{
+			ERROR_BEGIN << "Invalid type for Ulong in ReadRegister " << typeID << ERROR_END;
+			return;
+		}
+
+		typeID = CreateVariable(m_String, "String", data, false);
+		if (!m_String)
+		{
+			ERROR_BEGIN << "Invalid type for String in ReadRegister " << typeID << ERROR_END;
+			return;
+		}
+	}
+
+	NodeState WriteRegister::Update(AgentPtr pAgent)
+	{
+		RegisterData* pRegister = pAgent->GetRegister();
+
+		pRegister->GetSendData().pEvent = m_Event->GetCastedValue(pAgent->GetSharedData());
+		pRegister->GetSendData().pVecInt = m_Int->GetCastedValue(pAgent->GetSharedData());
+		pRegister->GetSendData().pVecFloat = m_Float->GetCastedValue(pAgent->GetSharedData());
+		pRegister->GetSendData().pVecBool = m_Bool->GetCastedValue(pAgent->GetSharedData());
+		pRegister->GetSendData().pVecUlong = m_Ulong->GetCastedValue(pAgent->GetSharedData());
+		pRegister->GetSendData().pVecString = m_String->GetCastedValue(pAgent->GetSharedData());
+
+		IF_HAS_LOG_POINT
+		{
+			LOG_SHARED_DATA(m_Event, true);
+			LOG_SHARED_DATA(m_Int, true);
+			LOG_SHARED_DATA(m_Float, true);
+			LOG_SHARED_DATA(m_String, true);
+			LOG_SHARED_DATA(m_Bool, true);
+			LOG_SHARED_DATA(m_Ulong, true);
+		};
+
+		m_Int->SetCastedValue(pAgent->GetSharedData(), &Utility::VecIntEmpty);
+		m_Float->SetCastedValue(pAgent->GetSharedData(), &Utility::VecFloatEmpty);
+		m_Bool->SetCastedValue(pAgent->GetSharedData(), &Utility::VecBoolEmpty);
+		m_Ulong->SetCastedValue(pAgent->GetSharedData(), &Utility::VecUlongEmpty);
+		m_String->SetCastedValue(pAgent->GetSharedData(), &Utility::VecStringEmpty);
+
+		pAgent->ProcessRegister();
+
+		return NS_SUCCESS;
+	}
+
 }

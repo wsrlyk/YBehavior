@@ -25,6 +25,10 @@ namespace YBehavior
 		void SetTree(const STRING& name);
 		void Tick();
 		inline UINT GetUID() { return m_UID; }
+
+		void ProcessRegister();
+	protected:
+		virtual void _OnProcessRegister();
 	};
 }
 

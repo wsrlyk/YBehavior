@@ -1,5 +1,5 @@
-#ifndef _YBEHAVIOR_BIMAP_H_
-#define _YBEHAVIOR_BIMAP_H_
+#ifndef _YBEHAVIOR_OBJECTPOOL_H_
+#define _YBEHAVIOR_OBJECTPOOL_H_
 
 #include <list>
 

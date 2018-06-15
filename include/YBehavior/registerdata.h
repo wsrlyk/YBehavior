@@ -5,26 +5,48 @@
 #include "YBehavior/types.h"
 namespace YBehavior
 {
+#define FOR_EACH_REGISTER_TYPE(func)    \
+		func(Int);    \
+		func(Float);    \
+		func(String);    \
+		func(Bool);    \
+		func(Ulong);    
+
 	class YBEHAVIOR_API RegisterData
 	{
-		VecInt m_VecInt;
-		VecFloat m_VecFloat;
-		VecString m_VecString;
-		VecUlong m_VecUlong;
-		VecBool m_VecBool;
+		struct Datas
+		{
+#define DATA_VARIABLE_DEFINE(TYPE) const Vec##TYPE* pVec##TYPE;
+			///> const VecInt* pVecInt;
+			FOR_EACH_REGISTER_TYPE(DATA_VARIABLE_DEFINE);
+
+			const String* pEvent;
+
+			void Clear()
+			{
+#define DATA_VARIABLE_CLEAR(TYPE) pVec##TYPE = nullptr;
+				///> pVecInt = nullptr;
+				FOR_EACH_REGISTER_TYPE(DATA_VARIABLE_CLEAR);
+				pEvent = nullptr;
+			}
+		};
+
+#define RECEIVE_DEFINE(TYPE) Vec##TYPE m_Vec##TYPE;
+		///> VecInt m_VecInt;
+		FOR_EACH_REGISTER_TYPE(RECEIVE_DEFINE);
 
 		String m_Event;
+
+		Datas m_ReceiveData;
+		Datas m_SendData;
 
 		bool m_bDirty;
 	public:
 		RegisterData();
 		void Clear();
-		inline VecInt* GetInt() { return &m_VecInt; }
-		inline VecFloat* GetFloat() { return &m_VecFloat; }
-		inline VecString* GetString() { return &m_VecString; }
-		inline VecUlong* GetUlong() { return &m_VecUlong; }
-		inline VecBool* GetBool() { return &m_VecBool; }
-		inline String* GetEvent() { return &m_Event; }
+		inline const Datas& GetReceiveData() { return m_ReceiveData; }
+		inline Datas& GetSendData() { return m_SendData; }
+
 		inline void SetEvent(const String& s)
 		{			
 			m_Event = s;
@@ -36,6 +58,15 @@ namespace YBehavior
 			m_bDirty = true;
 		}
 		inline bool IsDirty() { return m_bDirty; }
+		
+#define PUSH_FUNCTION(TYPE)\
+		void Push(const TYPE& data)\
+		{\
+			m_Vec##TYPE.push_back(data);\
+		}
+
+		FOR_EACH_REGISTER_TYPE(PUSH_FUNCTION);
+
 	};
 }
 

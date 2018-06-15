@@ -2,7 +2,10 @@
 <Monster_BlackCrystal2>
   <Node Class="Root" target="_AC " add0="_IC 1" add1="_IC 1" fftest="FFC 1.0|2.0|3.0" bbtest="BBC true|false|true|false" btest="_BC true" pos="_VC 100=200=300" iitest="IIC 1" sstest="SSC 1" event="_SC 1" uutest="UUC ">
     <Node Class="RandomSequence">
-      <Node Class="ReadRegister" Event="_SP event" Int="IIP iitest" Float="FFP fftest" String="SSP sstest" Ulong="UUP uutest" Bool="BBP bbtest" />
+      <Node Class="Sequence">
+        <Node Class="ReadRegister" Event="_SP event" Int="IIP iitest" Float="FFP fftest" String="SSP sstest" Ulong="UUP uutest" Bool="BBP bbtest" />
+        <Node Class="WriteRegister" Event="_SC aistring" Int="IIC " Float="FFP fftest" String="SSC str|ing" Ulong="UUC " Bool="BBC " />
+      </Node>
       <Node Class="SetData" Target="_IP add0" Source="_IC 0" />
       <Node Class="Calculator" Operator="_EC ADD" Opl="_IP add0" Opr1="_IP add0" Opr2="_IC 3" />
       <Node Class="Random" Target="_BP bbtest VI P add1" Bound1="_BC false" Bound2="_BC true" />

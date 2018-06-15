@@ -5,6 +5,7 @@
 #include "YBehavior/types.h"
 #include <unordered_map>
 #include <unordered_set>
+#include "sharedvariableex.h"
 namespace pugi
 {
 	class xml_node;
@@ -81,11 +82,29 @@ namespace YBehavior
 		virtual void OnAddChild(BehaviorNode* child, const STRING& connection) {}
 		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
 		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType = 0);
-
+		template <typename T> 
+		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType = 0);
 		///>
 		/// single: 1, single; 0, vector; -1, dont care
 		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single = -1, char variableType = 0);
 	};
+
+	template <typename T>
+	TYPEID BehaviorNode::CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType)
+	{
+		ISharedVariableEx* pTemp;
+		TYPEID typeID = CreateVariable(pTemp, attriName, data, bSingle, variableType);
+		if (typeID == GetClassTypeNumberId<T>())
+		{
+			op = (SharedVariableEx<T>*)pTemp;
+		}
+		else
+		{
+			op = nullptr;
+			ERROR_BEGIN << "Invalid type for " << attriName << " with type: " << typeID << ERROR_END;
+		}
+		return typeID;
+	}
 
 	class YBEHAVIOR_API BranchNode: public BehaviorNode
 	{

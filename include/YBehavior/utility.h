@@ -14,6 +14,11 @@ namespace YBehavior
 		static const char ListSpliter = '|';
 		static const char SpaceSpliter = ' ';
 		static const STRING StringEmpty;
+		static const VecInt VecIntEmpty;
+		static const VecFloat VecFloatEmpty;
+		static const VecBool VecBoolEmpty;
+		static const VecString VecStringEmpty;
+		static const VecUlong VecUlongEmpty;
 
 		static void SplitString(const STRING& s, std::vector<STRING>& v, CHAR c, int count = 0);
 		static Vector3 CreateVector3(const std::vector<STRING>& data);

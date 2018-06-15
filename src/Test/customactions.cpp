@@ -32,33 +32,30 @@ void XAgent::Update()
 	
 	pRegister->SetEvent("hehe");
 
-	auto ints = pRegister->GetInt();
 	if (i > 5)
 		i = 1;
 	for (int k = 0; k < i; ++k)
 	{
-		ints->push_back(k);
+		pRegister->Push(k);
 	}
 	++i;
 
-	auto floats = pRegister->GetFloat();
 	if (f > 0.7f)
 		f -= 0.7f;
 	for (float j = 0.1f; j < f; j += 0.11f)
 	{
-		floats->push_back(j);
+		pRegister->Push(j);
 	}
 	f += 0.17f;
 
-	auto bools = pRegister->GetBool();
 	if (b)
 	{
-		bools->push_back(YBehavior::FALSE);
-		bools->push_back(YBehavior::TRUE);
+		pRegister->Push(YBehavior::FALSE);
+		pRegister->Push(YBehavior::TRUE);
 	}
 	else
 	{
-		bools->push_back(YBehavior::TRUE);
+		pRegister->Push(YBehavior::TRUE);
 	}
 	b = !b;
 
