@@ -34,7 +34,7 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <local:UIVariable/>
+                                    <local:UIVariable DataContext="{Binding Variable}"/>
                                     <!--TextBlock Text = "{Binding Name}"/-->
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>

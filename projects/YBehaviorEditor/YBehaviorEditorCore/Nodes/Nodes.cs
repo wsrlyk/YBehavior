@@ -107,9 +107,9 @@ namespace YBehavior.Editor.Core
             {
                 string[] values = new string[m_Variables.Datas.Count];
                 int i = 0;
-                foreach (var v in m_Variables.Datas.Values)
+                foreach (var v in m_Variables.Datas)
                 {
-                    values[i++] = v.NoteValue;
+                    values[i++] = v.Variable.NoteValue;
                 }
                 return string.Format(NoteFormat, values);
             }

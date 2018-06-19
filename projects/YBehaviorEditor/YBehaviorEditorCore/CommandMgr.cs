@@ -142,40 +142,40 @@ namespace YBehavior.Editor.Core
 
     public class AddSharedVariableCommand : ICommand
     {
-        public Variable Variable { get; set; }
+        public VariableHolder VariableHolder { get; set; }
 
         public void Redo()
         {
             if (WorkBenchMgr.Instance.ActiveWorkBench != null && WorkBenchMgr.Instance.ActiveWorkBench.MainTree != null)
             {
-                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.SharedData.AddVariable(Variable);
+                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.SharedData.AddBackVariable(VariableHolder);
             }
         }
         public void Undo()
         {
             if (WorkBenchMgr.Instance.ActiveWorkBench != null && WorkBenchMgr.Instance.ActiveWorkBench.MainTree != null)
             {
-                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.SharedData.RemoveVariable(Variable);
+                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.SharedData.RemoveVariable(VariableHolder.Variable);
             }
         }
     }
 
     public class RemoveSharedVariableCommand : ICommand
     {
-        public Variable Variable { get; set; }
+        public VariableHolder VariableHolder { get; set; }
 
         public void Redo()
         {
             if (WorkBenchMgr.Instance.ActiveWorkBench != null && WorkBenchMgr.Instance.ActiveWorkBench.MainTree != null)
             {
-                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.SharedData.RemoveVariable(Variable);
+                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.SharedData.RemoveVariable(VariableHolder.Variable);
             }
         }
         public void Undo()
         {
             if (WorkBenchMgr.Instance.ActiveWorkBench != null && WorkBenchMgr.Instance.ActiveWorkBench.MainTree != null)
             {
-                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.SharedData.AddVariable(Variable);
+                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.SharedData.AddBackVariable(VariableHolder);
             }
         }
     }

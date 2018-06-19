@@ -477,11 +477,11 @@ namespace YBehavior.Editor.Core
             bool bRes = true;
             if (!node.CheckValid())
                 bRes = false;
-            foreach (Variable v in node.Variables.Datas.Values)
+            foreach (VariableHolder v in node.Variables.Datas)
             {
-                if (!v.CheckValid())
+                if (!v.Variable.CheckValid())
                 {
-                    LogMgr.Instance.Error("CheckError in Node: " + node.UITitle + ", Variable: " + v.Name);
+                    LogMgr.Instance.Error("CheckError in Node: " + node.UITitle + ", Variable: " + v.Variable.Name);
                     bRes = false;
                 }
             }

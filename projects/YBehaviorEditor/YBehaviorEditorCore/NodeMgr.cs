@@ -509,9 +509,9 @@ namespace YBehavior.Editor.Core
 
         protected void _InitVariables()
         {
-            foreach (var v in m_Variables.Datas.Values)
+            foreach (var v in m_Variables.Datas)
             {
-                v.RefreshCandidates(true);
+                v.Variable.RefreshCandidates(true);
             }
         }
         public virtual void Save(System.Xml.XmlElement data)
@@ -539,9 +539,9 @@ namespace YBehavior.Editor.Core
                 data.SetAttribute("Disabled", "true");
             }
 
-            foreach (Variable v in Variables.Datas.Values)
+            foreach (VariableHolder v in Variables.Datas)
             {
-                data.SetAttribute(v.Name, v.ValueInXml);
+                data.SetAttribute(v.Variable.Name, v.Variable.ValueInXml);
             }
         }
 
@@ -553,9 +553,9 @@ namespace YBehavior.Editor.Core
                     data.SetAttribute("Connection", Conns.ParentHolder.Conn.Identifier);
             }
 
-            foreach (Variable v in Variables.Datas.Values)
+            foreach (VariableHolder v in Variables.Datas)
             {
-                data.SetAttribute(v.Name, v.ValueInXml);
+                data.SetAttribute(v.Variable.Name, v.Variable.ValueInXml);
             }
         }
 
@@ -622,11 +622,9 @@ namespace YBehavior.Editor.Core
             other.Renderer.Geo.Pos = other.Renderer.Geo.Pos + new Vector(5, 5);
             other.m_TreeSharedData = this.m_TreeSharedData;
 
-            foreach (var v in m_Variables.Datas.Values)
-            {
-                Variable newv = v.Clone(other);
-                other.Variables.AddVariable(newv);
-            }
+            this.Variables.CloneTo(other.Variables);
+
+
             return other;
         }
 

@@ -25,11 +25,37 @@ namespace YBehavior.Editor.Core
         {
             return m_Groups.Values.GetEnumerator();
         }
+
+        public SameTypeGroup Clone()
+        {
+            SameTypeGroup other = new SameTypeGroup();
+            
+            foreach (var keypair in m_Groups)
+            {
+                HashSet<string> groupSet = new HashSet<string>();
+
+                foreach (var groups in keypair.Value)
+                {
+                    groupSet.Add(groups);
+                }
+
+                other.m_Groups[keypair.Key] = groupSet;
+            }
+
+            return other;
+        }
     }
 
+    public class VariableHolder
+    {
+        public Variable Variable { get; set; }
+        public int Index;
+    }
     public class SharedData
     {
-        ObservableDictionary<string, Variable> m_Variables = new ObservableDictionary<string, Variable>();
+        ObservableDictionary<string, VariableHolder> m_Variables = new ObservableDictionary<string, VariableHolder>();
+        DelayableNotificationCollection<VariableHolder> m_VariableList = new DelayableNotificationCollection<VariableHolder>();
+
         Node m_Owner;
         public SameTypeGroup SameTypeGroup { get; set; } = null;
 
@@ -113,7 +139,7 @@ namespace YBehavior.Editor.Core
             {
                 AddSharedVariableCommand addSharedVariableCommand = new AddSharedVariableCommand()
                 {
-                    Variable = v
+                    VariableHolder = m_Variables[v.Name]
                 };
                 WorkBenchMgr.Instance.PushCommand(addSharedVariableCommand);
             }
@@ -142,6 +168,17 @@ namespace YBehavior.Editor.Core
             return null;
         }
 
+        private VariableHolder _AddVariable(Variable v)
+        {
+            VariableHolder holder = new VariableHolder()
+            {
+                Variable = v,
+                Index = m_VariableList.Count
+            };
+            m_Variables[v.Name] = holder;
+            m_VariableList.Add(holder);
+            return holder;
+        }
         public bool AddVariable(Variable v, int sameTypeGroup = 0)
         {
             if (v == null)
@@ -157,7 +194,7 @@ namespace YBehavior.Editor.Core
                 LogMgr.Instance.Error("Reserved name: " + v.Name);
                 return false;
             }
-            m_Variables[v.Name] = v;
+            _AddVariable(v);
             v.Container = this;
             
             if (sameTypeGroup != 0)
@@ -175,6 +212,38 @@ namespace YBehavior.Editor.Core
             return true;
         }
 
+        public bool AddBackVariable(VariableHolder holder)
+        {
+            if (m_Variables.ContainsKey(holder.Variable.Name))
+            {
+                LogMgr.Instance.Error("Duplicated variable name: " + holder.Variable.Name);
+                return false;
+            }
+
+            m_Variables[holder.Variable.Name] = holder;
+            m_VariableList.Insert(holder.Index, holder);
+
+            for (int i = holder.Index + 1; i < m_VariableList.Count; ++i)
+            {
+                ++m_VariableList[i].Index;
+            }
+
+            SharedVariableChangedArg arg = new SharedVariableChangedArg();
+            EventMgr.Instance.Send(arg);
+
+            return true;
+        }
+        private bool _Remove(VariableHolder holder)
+        {
+            m_Variables.Remove(holder.Variable.Name);
+            m_VariableList.RemoveAt(holder.Index);
+
+            for (int i = holder.Index; i < m_VariableList.Count; ++i)
+            {
+                --m_VariableList[i].Index;
+            }
+            return true;
+        }
         /// <summary>
         /// Only for the variables for the whole tree
         /// </summary>
@@ -185,7 +254,7 @@ namespace YBehavior.Editor.Core
             if (v == null)
                 return false;
 
-            if (!m_Variables.Remove(v.Name))
+            if (!m_Variables.TryGetValue(v.Name, out VariableHolder holder) || !_Remove(holder))
             {
                 LogMgr.Instance.Error("Variable not exist when try remove: " + v.Name);
                 return false;
@@ -199,7 +268,7 @@ namespace YBehavior.Editor.Core
 
             RemoveSharedVariableCommand removeSharedVariableCommand = new RemoveSharedVariableCommand()
             {
-                Variable = v
+                VariableHolder = holder
             };
             WorkBenchMgr.Instance.PushCommand(removeSharedVariableCommand);
 
@@ -207,11 +276,11 @@ namespace YBehavior.Editor.Core
         }
         public Variable GetVariable(string name)
         {
-            m_Variables.TryGetValue(name, out Variable v);
-            return v;
+            m_Variables.TryGetValue(name, out VariableHolder v);
+            return v?.Variable;
         }
 
-        public ObservableDictionary<string, Variable> Datas { get { return m_Variables; } }
+        public DelayableNotificationCollection<VariableHolder> Datas { get { return m_VariableList; } }
 
         public void OnVariableValueChanged(Variable v)
         {
@@ -223,24 +292,32 @@ namespace YBehavior.Editor.Core
         {
             foreach (var v in m_Variables.Values)
             {
-                v.RefreshCandidates(true);
-                if (v.VectorIndex != null)
-                    v.VectorIndex.RefreshCandidates(true);
+                v.Variable.RefreshCandidates(true);
+                if (v.Variable.VectorIndex != null)
+                    v.Variable.VectorIndex.RefreshCandidates(true);
             }
         }
 
-        public SharedData Clone()
+        public SharedData Clone(Node owner = null)
         {
-            SharedData sharedData = new SharedData(m_Owner);
+            SharedData sharedData = new SharedData(owner ?? m_Owner);
+            CloneTo(sharedData);
+            return sharedData;
+        }
+
+        public void CloneTo(SharedData other)
+        {
             using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
             {
-                foreach (KeyValuePair<string, Variable> v in m_Variables)
+                foreach (VariableHolder v in m_VariableList)
                 {
-                    Variable vv = v.Value.Clone();
-                    sharedData.AddVariable(vv);
+                    Variable vv = v.Variable.Clone();
+                    other.AddVariable(vv);
                 }
+
+                if (SameTypeGroup != null)
+                    other.SameTypeGroup = this.SameTypeGroup.Clone();
             }
-            return sharedData;
         }
     }
 }

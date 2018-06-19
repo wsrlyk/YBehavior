@@ -52,7 +52,7 @@ namespace YBehavior.Editor
             else
             {
                 this.VariableTab.DataContext = node.Node;
-                this.VariableContainer.ItemsSource = node.Node.Variables.Datas.Values;
+                this.VariableContainer.ItemsSource = node.Node.Variables.Datas;
 
                 this.VariableTab.IsSelected = true;
             }
@@ -90,9 +90,9 @@ namespace YBehavior.Editor
                     if (node == null)
                         return;
 
-                    foreach (Variable v in node.Variables.Datas.Values)
+                    foreach (VariableHolder v in node.Variables.Datas)
                     {
-                        v.DebugStateChanged();
+                        v.Variable.DebugStateChanged();
                     }
 
                     this.NickName.IsReadOnly = DebugMgr.Instance.IsDebugging();

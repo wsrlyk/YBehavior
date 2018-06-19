@@ -208,17 +208,17 @@ namespace YBehavior.Editor.Core
                 {
                     Candidates.Clear();
                     m_VectorCandidates.Clear();
-                    foreach (var v in SharedDataSource.SharedData.Datas.Values)
+                    foreach (var v in SharedDataSource.SharedData.Datas)
                     {
-                        if (v.vType == vType)
+                        if (v.Variable.vType == vType)
                         {
-                            if (v.cType == cType)
-                                Candidates.Add(v.Name);
+                            if (v.Variable.cType == cType)
+                                Candidates.Add(v.Variable.Name);
                             ///> List can also be added to the candidates if the target is single
-                            else if (v.cType == CountType.CT_LIST && !IsIndex)
+                            else if (v.Variable.cType == CountType.CT_LIST && !IsIndex)
                             {
-                                Candidates.Add(v.Name);
-                                m_VectorCandidates.Add(v.Name);
+                                Candidates.Add(v.Variable.Name);
+                                m_VectorCandidates.Add(v.Variable.Name);
                             }
                         }
                     }

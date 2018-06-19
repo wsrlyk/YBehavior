@@ -254,17 +254,20 @@ namespace YBehavior.Editor.Core
 
         public Node CreateNodeToBench(Node template)
         {
-            WorkBench bench = ActiveWorkBench;
-            if (bench == null)
+            Node node;
+            using (var locker = this.CommandLocker.StartLock())
             {
-                LogMgr.Instance.Error("AddNodeToBench Failed: bench == null");
-                return null;
+                WorkBench bench = ActiveWorkBench;
+                if (bench == null)
+                {
+                    LogMgr.Instance.Error("AddNodeToBench Failed: bench == null");
+                    return null;
+                }
+
+                node = NodeMgr.Instance.CreateNodeByName(template.Name);
+
+                Utility.InitNode(node, true);
             }
-
-            Node node = NodeMgr.Instance.CreateNodeByName(template.Name);
-
-            Utility.InitNode(node, true);
-
             AddNode(node);
 
             NewNodeAddedArg arg = new NewNodeAddedArg();
@@ -283,9 +286,12 @@ namespace YBehavior.Editor.Core
                 return null;
             }
 
-            Node node = Utility.CloneNode(template, bIncludeChildren);
-            Utility.InitNode(node, true);
-
+            Node node;
+            using (var locker = this.CommandLocker.StartLock())
+            {
+                node = Utility.CloneNode(template, bIncludeChildren);
+                Utility.InitNode(node, true);
+            }
             AddNode(node);
 
             NewNodeAddedArg arg = new NewNodeAddedArg();

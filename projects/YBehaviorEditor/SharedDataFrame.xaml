@@ -22,7 +22,7 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <local:UIVariable DataContext="{Binding Value}"/>
+                                    <local:UIVariable DataContext="{Binding Variable}"/>
                                     <!--TextBlock Text = "{Binding Name}"/-->
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
