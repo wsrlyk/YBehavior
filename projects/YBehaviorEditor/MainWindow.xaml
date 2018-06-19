@@ -8,7 +8,7 @@
         KeyDown="_KeyDown"
         Closing="Window_Closing"
         Title="MainWindow" Height="1024" Width="1280">
-    <Grid>
+    <Grid  Background="DimGray">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition/>
@@ -28,18 +28,18 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="300"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0">
-                <local:WorkingSpaceFrame BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="387" Margin="5,5,0,0" VerticalAlignment="Top" Width="240"/>
-                <local:NodeListFrame BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="387" Margin="5,5,0,0" VerticalAlignment="Top" Width="240"/>
-            </StackPanel>
+            <DockPanel Grid.Column="0">
+                <local:WorkingSpaceFrame DockPanel.Dock="Top" Height="400" Margin="5,0"/>
+                <local:NodeListFrame Margin="5, 5"/>
+            </DockPanel>
             <local:WorkBenchFrame Grid.Column="1" Margin="0,0,0,0"/>
-            <StackPanel Grid.Column="2">
-                <local:SharedDataFrame BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="387" Margin="5,5,0,0" VerticalAlignment="Top" Width="240"/>
-                <local:VariablesFrame BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" Height="387" Margin="5,5,0,0" Width="240"/>
-            </StackPanel>
+            <DockPanel Grid.Column="2">
+                <local:SharedDataFrame DockPanel.Dock="Top" Height="450" Margin="5, 0"/>
+                <local:VariablesFrame Margin="5, 5"/>
+            </DockPanel>
         </Grid>
-        <local:StateBarFrame Grid.Row="2"  Height="34" VerticalAlignment="Bottom" Margin="10,0,0,0"/>
+        <!--<local:StateBarFrame Grid.Row="2"  Height="34" VerticalAlignment="Bottom" Margin="10,0,0,0"/>-->
     </Grid>
 </Window>

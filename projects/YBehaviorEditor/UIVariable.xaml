@@ -32,12 +32,14 @@
                 </ComboBox.Resources>
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <Label Content="{Binding Converter={StaticResource valueTypeConvertor}}" FontSize="12"/>
+                        <TextBlock Text="{Binding Converter={StaticResource valueTypeConvertor}}" FontSize="10" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
             <CheckBox IsEnabled="{Binding IsEditable}" Width="20" Height="20" Name="Switcher" Background="Orange" Foreground="GreenYellow" DockPanel.Dock="Right" IsChecked="{Binding vbType, Converter={StaticResource variableTypeConvertor}}" Visibility="{Binding Path = CanSwitchConst, Converter={StaticResource visibilityConvertor}}"/>
-            <Button Width="20" Height="20" Name="Remover" Background="Red" DockPanel.Dock="Right" Visibility="{Binding Path = CanBeRemoved,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="Remover_Click"/>
+            <Button Width="20" Height="20" Name="Remover" Background="IndianRed"  DockPanel.Dock="Right" Visibility="{Binding Path = CanBeRemoved,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="Remover_Click">
+                X
+            </Button>
             <ComboBox IsEnabled="{Binding IsEditable}" SelectedItem="{Binding Value}" ItemsSource="{Binding Candidates}" x:Name="VPointer" MinWidth="110" MaxDropDownHeight ="150"
                       Visibility="{Binding Path=IsChecked, ElementName=Switcher, Converter={StaticResource visibilityConvertor}}" 
                       Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}">
@@ -48,7 +50,7 @@
                 </ComboBox.ItemsPanel>
             </ComboBox>
             <Grid Visibility="{Binding Path=IsChecked, ElementName=Switcher, Converter={StaticResource invertBoolAndVisibilityConvertor}}">
-                <TextBox IsReadOnly="{Binding IsEditable, Converter={StaticResource invertBoolConvertor}}" Name="VConst" Text="{Binding Value}"  Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}"/>
+                <TextBox ToolTip="{Binding Value}"  IsReadOnly="{Binding IsEditable, Converter={StaticResource invertBoolConvertor}}" Name="VConst" Text="{Binding Value}"  Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}"/>
                 <ComboBox IsEnabled="{Binding IsEditable}" Name="VEnum" SelectedItem="{Binding Value}" ItemsSource="{Binding Enums}" Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}"/>
             </Grid>
         </DockPanel>
@@ -65,7 +67,7 @@
                 </ComboBox.ItemsPanel>
             </ComboBox>
             <Grid Visibility="{Binding Path=IsChecked, ElementName=VectorIndexSwitcher, Converter={StaticResource invertBoolAndVisibilityConvertor}}">
-                <TextBox IsReadOnly="{Binding IsEditable, Converter={StaticResource invertBoolConvertor}}" Name="VectorIndexConst" Text="{Binding Path=VectorIndex.Value}"  Background="{Binding Path = VectorIndex.IsValid, Converter={StaticResource validConvertor}}"/>
+                <TextBox IsReadOnly="{Binding IsEditable, Converter={StaticResource invertBoolConvertor}}" Name="VectorIndexConst" Text="{Binding Path=VectorIndex.Value}" ToolTip="{Binding Path=VectorIndex.Value}"  Background="{Binding Path = VectorIndex.IsValid, Converter={StaticResource validConvertor}}"/>
             </Grid>
 
         </DockPanel>

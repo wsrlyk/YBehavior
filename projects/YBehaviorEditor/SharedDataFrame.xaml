@@ -10,9 +10,9 @@
         <TabControl Name="TabController" Grid.Row="0" Tag="200">
             <TabItem Header="Datas">
                 <DockPanel Background="DarkGray">
-                    <StackPanel DockPanel.Dock="Top">
+                    <!--<StackPanel DockPanel.Dock="Top">
                         <TextBlock Name="Type" Text ="{Binding Path=Datas.Count}" FontSize="14" Height="25"/>
-                    </StackPanel>
+                    </StackPanel>-->
                     <ScrollViewer VerticalScrollBarVisibility ="Auto">
                         <ItemsControl Name="VariableContainer" ItemsSource="{Binding Datas}">
                             <ItemsControl.ItemsPanel>

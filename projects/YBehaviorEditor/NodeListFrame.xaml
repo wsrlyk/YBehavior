@@ -10,7 +10,7 @@
         <StackPanel Orientation="Horizontal" Height="30" HorizontalAlignment="Left" Width="200" DockPanel.Dock="Top">
             <Button Name="AddComment" Click="AddComment_Click">Add Comment</Button>
         </StackPanel>
-        <TreeView Name="Nodes" Margin="0,5,0,0" MouseDoubleClick="OnNodesItemDoubleClick">
+        <TreeView Name="Nodes" Margin="0,5,0,0" MouseDoubleClick="OnNodesItemDoubleClick" Background="DarkGray">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">

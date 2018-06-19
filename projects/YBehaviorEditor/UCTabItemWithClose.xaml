@@ -49,7 +49,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="true">
-                                <Setter Property="Background" Value="#FFFF923E"></Setter>
+                                <Setter Property="Background" Value="#FFF5B481"></Setter>
                                 <Setter Property="Foreground" Value="White"></Setter>
                             </Trigger>
                         </ControlTemplate.Triggers>

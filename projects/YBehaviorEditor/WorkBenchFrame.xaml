@@ -21,7 +21,7 @@
             <Button Name="Operation0" Grid.Row="0" Grid.Column="0" Width="20" HorizontalAlignment="Left" Click="Operation0_Click"></Button>
             <Button Name="Operation1" Grid.Row="0" Grid.Column="1" Width="20" HorizontalAlignment="Left"></Button>
         </Grid>-->
-        <TabControl Name="TabController" Grid.Row="0" Tag="200" SelectionChanged="TabController_SelectionChanged"/>
+        <TabControl Name="TabController" Grid.Row="0" Tag="200" SelectionChanged="TabController_SelectionChanged" Background="DarkGray"/>
         <Grid Grid.Row="1" Background="#FF555353" Name="CanvasBoard" ClipToBounds ="True">
             <Grid Focusable="True" Name="canvas">
                 <ItemsControl Focusable="True" Name="commentLayer">
