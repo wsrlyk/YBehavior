@@ -21,6 +21,7 @@ namespace YBehavior.Editor.Core
         DebugTargetChanged,
         TickResult,
         CommentCreated,
+        ShowSystemTips,
     }
 
     public class EventMgr : Singleton<EventMgr>
@@ -137,5 +138,11 @@ namespace YBehavior.Editor.Core
     {
         public Comment Comment { get; set; }
         public override EventType Type => EventType.CommentCreated;
+    }
+
+    public class ShowSystemTipsArg : EventArg
+    {
+        public string Content { get; set; }
+        public override EventType Type => EventType.ShowSystemTips;
     }
 }

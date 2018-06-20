@@ -91,10 +91,21 @@ namespace YBehavior.Editor
                 isarray == 1 ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE))
             {
                 this.VName.Text = string.Empty;
+                ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
+                {
+                    Content = "Created successfully."
+                };
+                EventMgr.Instance.Send(showSystemTipsArg);
             }
             else
             {
                 LogMgr.Instance.Error("Variable creation failed. Check the params.");
+
+                ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
+                {
+                    Content = "Variable creation failed. Check the params."
+                };
+                EventMgr.Instance.Send(showSystemTipsArg);
                 return;
             }
 

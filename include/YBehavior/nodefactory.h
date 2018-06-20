@@ -95,7 +95,7 @@ namespace YBehavior
 			return -1;
 
 		NameKeyInfo& curActiveNameKeyInfo = mpCurActiveNameKeyInfo->Get(typeNumberId);
-		///> common已经找过，不用再找一遍
+
 		if (mpCurActiveNameKeyInfo == &mCommonNameKeyInfo || curActiveNameKeyInfo.mNameHash.find(name) == curActiveNameKeyInfo.mNameHash.end())
 		{
 			KEY key = curActiveNameKeyInfo.mKeyCounter++;
