@@ -175,7 +175,10 @@ namespace YBehavior.Editor.Core
 
         public void CreateEmptyRoot()
         {
+            CommandMgr.Blocked = true;
             m_Tree = NodeMgr.Instance.CreateNodeByName("Root") as Tree;
+            AddRenderers(m_Tree);
+            CommandMgr.Blocked = false;
         }
 
         public bool Load(XmlElement data)

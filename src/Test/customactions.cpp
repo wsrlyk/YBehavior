@@ -1,9 +1,15 @@
 #include "customactions.h"
 #include "YBehavior/registerdata.h"
+#include "YBehavior/behaviortree.h"
+#ifdef DEBUGGER
+#include "YBehavior/debugger.h"
+#endif // DEBUGGER
 
 void MyLaunchCore::RegisterActions() const
 {
 	_Register<GetNameAction>();
+	_Register<SelectTargetAction>();
+	_Register<GetTargetNameAction>();
 }
 
 YBehavior::NodeState GetNameAction::Update(YBehavior::AgentPtr pAgent)
@@ -30,6 +36,7 @@ void XAgent::Update()
 	static float f = 0.0f;
 	static YBehavior::BOOL b = YBehavior::FALSE;
 	
+	pRegister->Clear();
 	pRegister->SetEvent("hehe");
 
 	if (i > 5)
@@ -62,3 +69,65 @@ void XAgent::Update()
 	this->Tick();
 }
 
+YBehavior::STRING XAgent::ToString() const
+{
+	return m_pEntity->GetName();
+}
+
+YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
+{
+	IF_HAS_LOG_POINT
+	{
+		LOG_SHARED_DATA(m_Target, true);
+	}
+	const YBehavior::AgentWrapper* currentTarget = m_Target->GetCastedValue(pAgent->GetSharedData());
+	if (currentTarget->IsValid())
+	{
+		YBehavior::AgentWrapper wrapper;
+		m_Target->SetCastedValue(pAgent->GetSharedData(), &wrapper);
+	}
+	else
+	{
+		YBehavior::AgentWrapper wrapper(pAgent->CreateWrapper());
+		m_Target->SetCastedValue(pAgent->GetSharedData(), &wrapper);
+	}
+	IF_HAS_LOG_POINT
+	{
+		LOG_SHARED_DATA(m_Target, false);
+	}
+	return YBehavior::NS_SUCCESS;
+}
+
+void SelectTargetAction::OnLoaded(const pugi::xml_node& data)
+{
+	YBehavior::TYPEID typeID = CreateVariable(m_Target, "Target", data, true, YBehavior::POINTER);
+	if (typeID != YBehavior::GetClassTypeNumberId<YBehavior::AgentWrapper>())
+	{
+		ERROR_BEGIN << "Type of [Target] Error in SelectTargetAction" << ERROR_END;
+	}
+
+}
+
+YBehavior::NodeState GetTargetNameAction::Update(YBehavior::AgentPtr pAgent)
+{
+	const YBehavior::AgentWrapper* currentTarget = m_Target->GetCastedValue(pAgent->GetSharedData());
+	if (currentTarget->IsValid())
+	{
+		LOG_BEGIN << ((XAgent*)currentTarget->Get())->GetEntity()->GetName() << LOG_END;
+	}
+	else
+	{
+		LOG_BEGIN << "No Target" << LOG_END;
+	}
+
+	return YBehavior::NS_SUCCESS;
+}
+
+void GetTargetNameAction::OnLoaded(const pugi::xml_node& data)
+{
+	YBehavior::TYPEID typeID = CreateVariable(m_Target, "Target", data, true, YBehavior::POINTER);
+	if (typeID != YBehavior::GetClassTypeNumberId<YBehavior::AgentWrapper>())
+	{
+		ERROR_BEGIN << "Type of [Target] Error in SelectTargetAction" << ERROR_END;
+	}
+}

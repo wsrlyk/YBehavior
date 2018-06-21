@@ -5,6 +5,8 @@
 #include <vector>
 #include "define.h"
 #include <sstream>
+#include <memory>
+#include "tools/linkedlist.h"
 
 namespace YBehavior
 {
@@ -115,27 +117,62 @@ namespace YBehavior
 	class Agent;
 	struct YBEHAVIOR_API AgentWrapper
 	{
+	protected:
 		Agent* m_Data;
+		std::shared_ptr<bool> m_IsValid;
+		LinkedListNode<AgentWrapper>* m_Reference;
 
+	protected:
+		bool _CheckValidAndReset();
+	public:
 		AgentWrapper()
 			: m_Data(nullptr)
+			, m_IsValid(new bool(false))
+			, m_Reference(nullptr)
 		{
-
 		}
 		AgentWrapper(Agent* pAgent)
 			: m_Data(pAgent)
+			, m_IsValid(new bool(true))
+			, m_Reference(nullptr)
 		{
+		}
 
-		}
-		friend std::stringstream & operator<<(std::stringstream &out, const AgentWrapper &obj)
+		AgentWrapper(const AgentWrapper& other)
+			: m_Data(other.m_Data)
+			, m_IsValid(other.m_IsValid)
+			, m_Reference(other.m_Reference)
 		{
-			return out;
+			//LOG_BEGIN << "Copy Construct" << LOG_END;
 		}
+
+		AgentWrapper& operator = (const AgentWrapper& other)
+		{
+			if (m_Reference != other.m_Reference)
+			{
+				_CheckValidAndReset();
+			}
+			m_Data = other.m_Data;
+			m_IsValid = other.m_IsValid;
+			m_Reference = other.m_Reference;
+			return *this;
+		}
+
+		~AgentWrapper();
+
+		void Reset();
+
+		friend std::stringstream & operator<<(std::stringstream &out, const AgentWrapper &obj);
 
 		friend std::stringstream & operator >> (std::stringstream &in, AgentWrapper &obj)
 		{
 			return in;
 		}
+
+		inline Agent* Get() const { return m_Data; }
+		inline bool IsValid() const { return *m_IsValid; }
+		inline void SetValid(bool b) { *m_IsValid = b; }
+		inline void SetReference(LinkedListNode<AgentWrapper>* r) { m_Reference = r; }
 	};
 
 	typedef int					KEY;	///> Key to get value from the shareddata

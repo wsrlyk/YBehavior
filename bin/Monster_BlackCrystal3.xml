@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Monster_BlackCrystal3>
+  <Node Class="Root" Pos="149,10" Target="_AC ">
+    <Node Class="Sequence" Pos="112,158">
+      <Node Class="SelectTargetAction" Pos="3,344" Target="_AP Target" />
+      <Node Class="GetTargetNameAction" Pos="219,336" Target="_AP Target" />
+    </Node>
+  </Node>
+</Monster_BlackCrystal3>

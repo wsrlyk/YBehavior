@@ -58,9 +58,9 @@ namespace YBehavior.Editor
         {
             NetworkConnectionChangedArg oArg = arg as NetworkConnectionChangedArg;
             if (oArg.bConnected)
-            {
-                ///> make Add Button unable to click
-            }
+                this.DataContext = DebugMgr.Instance.DebugSharedData;
+            else
+                this.DataContext = m_CurTree.Variables;
         }
 
         private void _OnDebugTargetChanged(EventArg arg)

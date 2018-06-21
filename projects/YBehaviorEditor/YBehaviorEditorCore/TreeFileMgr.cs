@@ -49,7 +49,7 @@ namespace YBehavior.Editor.Core
                 };
                 thisFolder.Children.Add(thisFile);
 
-                m_FileDic.Add(thisFile.Path, thisFile);
+                m_FileDic.Add(thisFile.Path.ToLower(), thisFile);
             }
         }
 
@@ -92,7 +92,7 @@ namespace YBehavior.Editor.Core
 
         public TreeFileInfo GetFileInfo(string path)
         {
-            if (m_FileDic.TryGetValue(path, out TreeFileInfo info))
+            if (m_FileDic.TryGetValue(path.ToLower(), out TreeFileInfo info))
                 return info;
             return null;
         }

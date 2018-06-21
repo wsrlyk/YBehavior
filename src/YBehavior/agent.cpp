@@ -31,9 +31,27 @@ void YBehavior::Agent::ProcessRegister()
 		m_RegisterData->GetSendData().Clear();
 }
 
-void YBehavior::Agent::_OnProcessRegister()
+YBehavior::AgentWrapper YBehavior::Agent::CreateWrapper()
 {
+	AgentWrapper wrapper(this);
 
+	if (m_WrapperList == nullptr)
+		m_WrapperList = new	LinkedList<AgentWrapper>();
+
+	LinkedListNode<AgentWrapper>* node = m_WrapperList->Append(wrapper);
+	wrapper.SetReference(node);
+	return wrapper;
+}
+
+void YBehavior::Agent::DeleteWrapper(LinkedListNode<AgentWrapper>* node)
+{
+	if (m_WrapperList != nullptr)
+		m_WrapperList->Remove(node);
+}
+
+YBehavior::STRING YBehavior::Agent::ToString() const
+{
+	return Utility::ToString(m_UID);
 }
 
 YBehavior::Agent::Agent()
@@ -55,4 +73,15 @@ YBehavior::Agent::~Agent()
 		delete m_RegisterData;
 
 	delete m_SharedData;
+
+	if (m_WrapperList != nullptr)
+	{
+		LinkedListNode<AgentWrapper>* node = m_WrapperList->GetNext();
+		while (node != nullptr)
+		{
+			node->GetValue().SetValid(false);
+			node = node->GetNext();
+		}
+		delete m_WrapperList;
+	}
 }

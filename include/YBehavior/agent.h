@@ -3,11 +3,13 @@
 
 #include "YBehavior/define.h"
 #include "YBehavior/types.h"
+#include "tools/linkedlist.h"
 namespace YBehavior
 {
 	class BehaviorTree;
 	class SharedDataEx;
 	class RegisterData;
+
 	class YBEHAVIOR_API Agent
 	{
 		static UINT s_UID;
@@ -15,7 +17,7 @@ namespace YBehavior
 		BehaviorTree* m_Tree;
 		RegisterData* m_RegisterData;
 		Uint m_UID;
-
+		LinkedList<AgentWrapper>* m_WrapperList;
 	public:
 		Agent();
 		~Agent();
@@ -27,8 +29,12 @@ namespace YBehavior
 		inline UINT GetUID() { return m_UID; }
 
 		void ProcessRegister();
+
+		AgentWrapper CreateWrapper();
+		void DeleteWrapper(LinkedListNode<AgentWrapper>* node);
+		virtual STRING ToString() const;
 	protected:
-		virtual void _OnProcessRegister();
+		virtual void _OnProcessRegister() {}
 	};
 }
 

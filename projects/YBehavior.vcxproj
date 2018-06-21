@@ -42,6 +42,7 @@
     <ClInclude Include="..\include\YBehavior\singleton.h" />
     <ClInclude Include="..\include\YBehavior\tools\bimap.h" />
     <ClInclude Include="..\include\YBehavior\tools\common.h" />
+    <ClInclude Include="..\include\YBehavior\tools\linkedlist.h" />
     <ClInclude Include="..\include\YBehavior\tools\meta.h" />
     <ClInclude Include="..\include\YBehavior\tools\objectpool.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
@@ -73,6 +74,7 @@
     <ClCompile Include="..\src\YBehavior\registerdata.cpp" />
     <ClCompile Include="..\src\YBehavior\shareddataex.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\common.cpp" />
+    <ClCompile Include="..\src\YBehavior\types.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />
     <ClCompile Include="..\src\YBehavior\variableoperation.cpp" />
   </ItemGroup>

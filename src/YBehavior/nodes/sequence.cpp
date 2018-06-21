@@ -9,6 +9,8 @@ namespace YBehavior
 	NodeState Sequence::Update(AgentPtr pAgent)
 	{
 		NodeState ns = NS_SUCCESS;
+		if (m_Childs == nullptr)
+			return ns;
 		for (auto it = m_Childs->begin(); it != m_Childs->end(); ++it)
 		{
 			ns = (*it)->Execute(pAgent);
@@ -25,6 +27,9 @@ namespace YBehavior
 	NodeState RandomSequence::Update(AgentPtr pAgent)
 	{
 		NodeState ns = NS_SUCCESS;
+		if (m_Childs == nullptr)
+			return ns;
+
 		m_RandomIndex.Rand();
 
 		DEBUG_LOG_INFO("Order: ")

@@ -38,6 +38,7 @@ public:
 	}
 	XEntity* GetEntity() { return m_pEntity; }
 	void Update();
+	YBehavior::STRING ToString() const override;
 };
 class XEntity
 {
@@ -48,7 +49,7 @@ public:
 	{
 		m_Name = name;
 		pAgent = new XAgent();
-		pAgent->SetTree("Monster_BlackCrystal2");
+		pAgent->SetTree("Monster_BlackCrystal3");
 		pAgent->SetData();
 	}
 	~XEntity()
@@ -66,6 +67,29 @@ public:
 	YBehavior::STRING GetClassName() const override { return "GetNameAction"; }
 protected:
 	virtual YBehavior::NodeState Update(YBehavior::AgentPtr pAgent);
+};
+
+class GetTargetNameAction : public YBehavior::Action
+{
+public:
+	YBehavior::STRING GetClassName() const override { return "GetTargetNameAction"; }
+protected:
+	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;
+	void OnLoaded(const pugi::xml_node& data) override;
+
+	YBehavior::SharedVariableEx<YBehavior::AgentWrapper>* m_Target;
+};
+
+class SelectTargetAction : public YBehavior::Action
+{
+public:
+	YBehavior::STRING GetClassName() const override { return "SelectTargetAction"; }
+
+protected:
+	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;
+	void OnLoaded(const pugi::xml_node& data) override;
+
+	YBehavior::SharedVariableEx<YBehavior::AgentWrapper>* m_Target;
 };
 
 
