@@ -14,6 +14,7 @@ namespace YBehavior.Editor.Core
     public class Variable : System.ComponentModel.INotifyPropertyChanged
     {
         public static readonly char[] ListSpliter = new char[] { '|' };
+        public static readonly char[] SequenceSpliter = new char[] { '=' };
         public static readonly char SpaceSpliter = ' ';
 
         public static readonly char NONE = (char)0;
@@ -458,8 +459,21 @@ namespace YBehavior.Editor.Core
                     }
                 case ValueType.VT_VECTOR3:
                     {
-                        /// TODO
-                        return true;
+                        string[] ss = v.Split(SequenceSpliter);
+                        if (ss.Length == 3)
+                        {
+                            foreach (string s in ss)
+                            {
+                                if (!float.TryParse(s, out float a))
+                                {
+                                    LogMgr.Instance.Log(string.Format("Variable parse error: Vector3 {0} == {1}", Name, v));
+                                    return false;
+                                }
+                            }
+                            return true;
+                        }
+                        LogMgr.Instance.Log(string.Format("Variable parse error: Vector3 {0} == {1}", Name, v));
+                        return false;
                     }
                 case ValueType.VT_ENUM:
                     {
@@ -480,7 +494,7 @@ namespace YBehavior.Editor.Core
                     {
                         if (ulong.TryParse(v, out ulong a))
                             return true;
-                        LogMgr.Instance.Log(string.Format("Variable parse error: int {0} == {1}", Name, v));
+                        LogMgr.Instance.Log(string.Format("Variable parse error: ulong {0} == {1}", Name, v));
                     }
                     break;
                 default:

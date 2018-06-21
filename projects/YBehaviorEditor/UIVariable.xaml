@@ -22,7 +22,7 @@
     <StackPanel>
         <DockPanel Background="LightBlue" Margin="2,2,2,2">
             <TextBlock Name="VKey" Text="{Binding Name}" FontSize="13" Width="90" DockPanel.Dock="Left" Background="LightCyan"/>
-            <ComboBox IsEnabled="{Binding IsEditable}" Name="VTypes" Width="50" ItemsSource="{Binding vTypeSet}" SelectedItem="{Binding vType}"
+            <ComboBox IsEnabled="{Binding IsEditable}" Name="VTypes" Width="55" ItemsSource="{Binding vTypeSet}" SelectedItem="{Binding vType}"
                 IsHitTestVisible="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}">
                 <!--IsEditable="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}"
                       Focusable="False"
