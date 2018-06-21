@@ -1,3 +1,3 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<YBehaviorEditor WorkingDir="E:\Develop\YBehavior\bin" ExportingDir="E:\Develop\YBehavior\projects\YBehaviorEditor\bin\exported" ExternalAction="actions.xml">
+<YBehaviorEditor WorkingDir="..\..\..\bin" ExportingDir="exported" ExternalAction="actions.xml">
 </YBehaviorEditor>
