@@ -28,7 +28,7 @@ namespace YBehavior
 	{
 	public:
 		static Bimap<OperationType, STRING, EnumClassHash> s_OperatorMap;
-
+		virtual bool Compare(SharedDataEx* pData, const void* pLeft, const void* pRight, OperationType op) = 0;
 		virtual bool Compare(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op) = 0;
 		virtual void Calculate(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op) = 0;
 		virtual void Random(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1) = 0;
@@ -38,7 +38,7 @@ namespace YBehavior
 	{
 	public:
 		template<typename T>
-		static bool Compare(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op);
+		static bool Compare(SharedDataEx* pData, const void* pLeft, const void* pRight, OperationType op);
 
 		template<typename T>
 		static void Calculate(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op);
@@ -52,10 +52,10 @@ namespace YBehavior
 	};
 
 	template<typename T>
-	bool ValueHandler::Compare(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op)
+	bool ValueHandler::Compare(SharedDataEx* pData, const void* pLeft, const void* pRight, OperationType op)
 	{
-		const T& left = *((const T*)pLeft->GetValue(pData));
-		const T& right = *((const T*)pRight->GetValue(pData));
+		const T& left = *((const T*)pLeft);
+		const T& right = *((const T*)pRight);
 
 		STRING strOp;
 		IVariableOperationHelper::s_OperatorMap.TryGetValue(op, strOp);
@@ -157,7 +157,7 @@ namespace YBehavior
 	}
 
 	template<>
-	bool ValueHandler::Compare<AgentWrapper>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op);
+	bool ValueHandler::Compare<AgentWrapper>(SharedDataEx* pData, const void* pLeft, const void* pRight, OperationType op);
 
 
 	template<>
@@ -192,7 +192,12 @@ namespace YBehavior
 
 		bool Compare(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op)
 		{
-			return ValueHandler::Compare<T>(pData, pLeft, pRight, op);
+			return ValueHandler::Compare<T>(pData, pLeft->GetValue(pData), pRight->GetValue(pData), op);
+		}
+
+		bool Compare(SharedDataEx* pData, const void* pLeftValue, const void* pRightValue, OperationType op)
+		{
+			return ValueHandler::Compare<T>(pData, pLeftValue, pRightValue, op);
 		}
 
 		void Calculate(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op)
@@ -213,6 +218,11 @@ namespace YBehavior
 		static VariableOperationHelper<std::vector<elementType>> s_Instance;
 	public:
 		static IVariableOperationHelper* Get() { return &s_Instance; }
+
+		bool Compare(SharedDataEx* pData, const void* pLeftValue, const void* pRightValue, OperationType op)
+		{
+			return false;
+		}
 
 		bool Compare(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op)
 		{

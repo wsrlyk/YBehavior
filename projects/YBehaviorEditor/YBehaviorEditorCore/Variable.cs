@@ -42,6 +42,7 @@ namespace YBehavior.Editor.Core
         public static readonly ValueType[] CreateParams_Vector3 = new ValueType[] { ValueType.VT_VECTOR3 };
         public static readonly ValueType[] CreateParams_AllTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_VECTOR3, ValueType.VT_STRING, ValueType.VT_BOOL, ValueType.VT_AGENT };
         public static readonly ValueType[] CreateParams_RandomTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_BOOL };
+        public static readonly ValueType[] CreateParams_SwitchTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_BOOL, ValueType.VT_ULONG, ValueType.VT_STRING };
 
 
         public enum ValueType
@@ -416,6 +417,8 @@ namespace YBehavior.Editor.Core
 
             if (cType == CountType.CT_LIST)
             {
+                if (string.IsNullOrEmpty(Value))
+                    return true;
                 string[] ss = Value.Split(ListSpliter, StringSplitOptions.RemoveEmptyEntries);
                 foreach(var s in ss)
                 {

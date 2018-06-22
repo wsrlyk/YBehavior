@@ -1,9 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Monster_BlackCrystal3>
-  <Node Class="Root" Pos="149,10" Target="_AC ">
+  <Node Class="Root" Pos="149,10" Target="_AC " f="_FC 1" ff="FFC 1|2|4">
     <Node Class="Sequence" Pos="112,158">
       <Node Class="SelectTargetAction" Pos="3,344" Target="_AP Target" />
       <Node Class="GetTargetNameAction" Pos="219,336" Target="_AP Target" />
+      <Node Class="SwitchCase" Pos="505,349" Switch="_FP f" Cases="FFP ff">
+        <Node Class="SetData" Pos="432.208504801097,630.486968449931" Target="_FP f" Source="_FC 4" />
+        <Node Class="SetData" Pos="506.074074074074,624" Target="_FP f" Source="_FC 5" />
+        <Node Class="SetData" Pos="603,622" Target="_FP f" Source="_FC 2" />
+        <Node Class="SetData" Connection="default" Pos="685.921810699588,575.063100137174" Target="_FP f" Source="_FC 1" />
+      </Node>
     </Node>
   </Node>
 </Monster_BlackCrystal3>

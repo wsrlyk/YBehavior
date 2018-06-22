@@ -3,7 +3,7 @@
 namespace YBehavior
 {
 	template<>
-	bool ValueHandler::Compare<AgentWrapper>(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op)
+	bool ValueHandler::Compare<AgentWrapper>(SharedDataEx* pData, const void* pLeft, const void* pRight, OperationType op)
 	{
 		return false;
 	}

@@ -98,12 +98,59 @@ namespace YBehavior
 			return m_Key == SharedDataEx::INVALID_KEY;
 		}
 
+		const std::vector<ElementType>* _Convert2Vector(SharedDataEx* pData)
+		{
+			if (IsVector<T>::Result)
+			{
+				///> would have compile error if directly operate the m_Value when T is not a std::vector<XX>
+				const std::vector<ElementType>* mValue;
+				if (pData == nullptr || m_Key == SharedDataEx::INVALID_KEY)
+					mValue = (const std::vector<ElementType>*)_GetValue();
+				else
+					mValue = (const std::vector<ElementType>*)GetValue(pData);
+				
+				return mValue;
+			}
+			else
+				return nullptr;
+		}
+		INT VectorSize(SharedDataEx* pData) override
+		{
+			const std::vector<ElementType>* mValue = _Convert2Vector(pData);
+
+			if (mValue != nullptr)
+				return (INT)mValue->size();
+
+			return 0;
+		}
+
 		STRING GetValueToSTRING(SharedDataEx* pData) override
 		{
 			const T* v = GetCastedValue(pData);
 			if (v != nullptr)
 				return Utility::ToString(*v);
 			return Utility::StringEmpty;
+		}
+		const void* GetElement(SharedDataEx* pData, INT index) override
+		{
+			const std::vector<ElementType>* mValue = _Convert2Vector(pData);
+
+			if (mValue != nullptr)
+			{
+				if ((INT)mValue->size() <= index)
+				{
+					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << ERROR_END;
+					return nullptr;
+				}
+				else
+				{
+					return &(*mValue)[index];
+				}
+			}
+			else
+			{
+				return nullptr;
+			}
 		}
 
 		const void* GetValue(SharedDataEx* pData)

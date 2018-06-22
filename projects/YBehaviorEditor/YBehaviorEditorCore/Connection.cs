@@ -10,6 +10,7 @@ namespace YBehavior.Editor.Core
         public static readonly string IdentifierChildren = "children";
         public static readonly string IdentifierParent = "parent";
         public static readonly string IdentifierCondition = "condition";
+        public static readonly string IdentifierDefault = "default";
 
         public ConnectionHolder Holder { get; set; }
         protected NodeBase m_Owner;

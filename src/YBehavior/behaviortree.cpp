@@ -94,6 +94,11 @@ namespace YBehavior
 		OnLoaded(data);
 	}
 
+	void BehaviorNode::LoadFinish()
+	{
+		OnLoadFinish();
+	}
+
 	void BehaviorNode::AddChild(BehaviorNode* child, const STRING& connection)
 	{
 		if (connection == "condition")

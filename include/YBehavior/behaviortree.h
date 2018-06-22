@@ -68,6 +68,7 @@ namespace YBehavior
 		virtual STRING GetClassName() const = 0;
 
 		void Load(const pugi::xml_node& data);
+		void LoadFinish();
 		NodeState Execute(AgentPtr pAgent);
 		static BehaviorNode* CreateNodeByName(const STRING& name);
 		void AddChild(BehaviorNode* child, const STRING& connection);
@@ -79,6 +80,7 @@ namespace YBehavior
 		virtual void _AddChild(BehaviorNode* child, const STRING& connection);
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
 		virtual void OnLoaded(const pugi::xml_node& data) {}
+		virtual void OnLoadFinish() {}
 		virtual void OnAddChild(BehaviorNode* child, const STRING& connection) {}
 		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
 		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType = 0);

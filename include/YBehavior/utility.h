@@ -24,6 +24,8 @@ namespace YBehavior
 		static Vector3 CreateVector3(const std::vector<STRING>& data);
 		static void CreateVector3(const std::vector<STRING>& data, Vector3& vector3);
 
+		static bool IsElement(TYPEID eleType, TYPEID vectorType);
+
 		template<typename T>
 		static T ToType(const STRING& str)
 		{

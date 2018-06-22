@@ -79,7 +79,7 @@ namespace YBehavior
 
 			}
 		}
-
+		node->LoadFinish();
 		return true;
 	}
 

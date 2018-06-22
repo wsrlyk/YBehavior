@@ -595,4 +595,53 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    class SwitchCaseNode : CompositeNode
+    {
+        public override string Icon => "↙↓↘";
+
+        public SwitchCaseNode()
+        {
+            m_Name = "SwitchCase";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_Compositor;
+
+            new ConnectionSingle(this, Connection.IdentifierDefault);
+        }
+
+        public override void CreateVariables()
+        {
+            Variables.CreateVariableInNode(
+                "Switch",
+                "0",
+                Variable.CreateParams_SwitchTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                1
+            );
+
+            Variables.CreateVariableInNode(
+                "Cases",
+                "0",
+                Variable.CreateParams_SwitchTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Const,
+                false,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} from {{ {1} }}",
+                    Variables.GetVariable("Switch").NoteValue,
+                    Variables.GetVariable("Cases").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
+
 }

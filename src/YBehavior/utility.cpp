@@ -70,6 +70,11 @@ namespace YBehavior
 		return vec;
 	}
 
+	bool Utility::IsElement(TYPEID eleType, TYPEID vectorType)
+	{
+		return ((vectorType % 10) == eleType) && (eleType != vectorType);
+	}
+
 	template<>
 	BOOL Utility::ToType(const STRING& str)
 	{
