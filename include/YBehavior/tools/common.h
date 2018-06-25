@@ -2,6 +2,7 @@
 #define _YBEHAVIOR_COMMON_H_
 
 #include <vector>
+#include "YBehavior/3rd/pugixml/pugixml.hpp"
 
 namespace YBehavior
 {
@@ -13,6 +14,24 @@ namespace YBehavior
 		int operator[] (int index);
 	protected:
 		std::vector<int> m_IndexList;
+	};
+
+	struct xml_string_writer : pugi::xml_writer
+	{
+		std::string result;
+
+		virtual void write(const void* data, size_t size)
+		{
+			result.append(static_cast<const char*>(data), size);
+		}
+
+		static std::string node_to_string(pugi::xml_node node)
+		{
+			xml_string_writer writer;
+			node.print(writer);
+
+			return writer.result;
+		}
 	};
 }
 

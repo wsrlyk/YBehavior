@@ -110,6 +110,17 @@ namespace YBehavior
 		return str;
 	}
 
+	UINT Utility::Hash(const STRING& str)
+	{
+		UINT len = str.length();
+		UINT hash = 0;
+		for (UINT i = 0; i < len; ++i)
+		{
+			hash = (hash << 5) + hash + (UINT)str[i];
+		}
+		return hash;
+	}
+
 	template<>
 	Float Utility::Rand<Float>(const Float& small, const Float& large)
 	{

@@ -21,12 +21,14 @@ namespace YBehavior.Editor.Core
                 if (m_Timer != null)
                     m_Timer.Dispose();
                 m_Timer = new System.Threading.Timer(_MessageTimerCallback, null, 0, 1000);
+                m_ReceiveBuffer.Clear();
             }
             else
             {
                 if (m_Timer != null)
                     m_Timer.Dispose();
                 m_Timer = null;
+                m_ReceiveBuffer.Clear();
             }
         }
 
@@ -35,7 +37,7 @@ namespace YBehavior.Editor.Core
             Update();
         }
 
-        public void DebugTreeWithAgent(string treename, uint agentUID = 0)
+        public void DebugTreeWithAgent(string treename, uint hash, uint agentUID = 0)
         {
             WorkBench workBench = WorkBenchMgr.Instance.ActiveWorkBench;
             if (workBench == null || workBench.MainTree == null)
@@ -46,6 +48,7 @@ namespace YBehavior.Editor.Core
 
             StringBuilder sb = new StringBuilder();
             sb.Append("[DebugTreeWithAgent] ").Append(workBench.FileInfo.Name);
+            sb.Append(" ").Append(hash);
             sb.Append(" ").Append(agentUID);
 
             Action< Node, StringBuilder> appendOneNode = null;

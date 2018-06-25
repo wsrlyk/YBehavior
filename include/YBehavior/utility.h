@@ -48,6 +48,7 @@ namespace YBehavior
 		template<typename T>
 		static T Rand(const T& small, const T& large);
 
+		static UINT Hash(const STRING& str);
 	private:
 		static std::random_device rd;
 		static std::default_random_engine mt;

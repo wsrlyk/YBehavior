@@ -25,16 +25,17 @@ namespace YBehavior
 		Clear();
 	}
 
-	void DebugMgr::SetTarget(const STRING& tree, UINT agent)
+	void DebugMgr::SetTarget(const STRING& tree, UINT hash, UINT agent)
 	{
 		m_TargetTree = tree;
+		m_TargetHash = hash;
 		m_TargetAgent = agent;
 		m_bTargetDirty = true;
 	}
 
 	void DebugMgr::ResetTarget()
 	{
-		SetTarget(Utility::StringEmpty, 0);
+		SetTarget(Utility::StringEmpty, 0, 0);
 	}
 
 	void DebugMgr::Stop()
@@ -56,12 +57,27 @@ namespace YBehavior
 			{
 				if (pAgent->GetTree()->GetTreeName() == m_TargetTree)
 				{
-					m_bTargetDirty = false;
-					m_TargetAgent = pAgent->GetUID();
-					return true;
+					if (m_TargetHash == pAgent->GetTree()->GetHash())
+					{
+						m_bTargetDirty = false;
+						m_TargetAgent = pAgent->GetUID();
+						return true;
+					}
+					else
+					{
+						LOG_BEGIN << "Agent " << pAgent->GetUID() << " has diffrent VERSION of tree with Editor" << LOG_END;
+						return false;
+					}
 				}
-				m_TargetAgent = 0;
-				return false;
+				else
+				{
+					if (m_TargetAgent != 0)
+					{
+						LOG_BEGIN << "Agent " << m_TargetAgent << " is running " << pAgent->GetTree()->GetTreeName() << " instead of " << m_TargetTree << LOG_END;
+					}
+					//m_TargetAgent = 0;
+					return false;
+				}
 			}
 			else
 			{

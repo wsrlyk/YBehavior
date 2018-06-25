@@ -5,6 +5,7 @@
 #include "YBehavior/logger.h"
 #include "YBehavior/nodefactory.h"
 #include <string.h>
+#include "YBehavior/tools/common.h"
 
 namespace YBehavior
 {
@@ -42,6 +43,12 @@ namespace YBehavior
 			return nullptr;
 		}
 
+#ifdef DEBUGGER
+		xml_string_writer writer;
+		rootData.print(writer, PUGIXML_TEXT("\t"), pugi::format_indent | pugi::format_raw);
+		writer.result.erase(std::remove_if(writer.result.begin(), writer.result.end(), ::isspace), writer.result.end());
+		tree->SetHash(Utility::Hash(writer.result));
+#endif
 		return tree;
 	}
 

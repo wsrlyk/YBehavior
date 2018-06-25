@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
@@ -179,6 +180,7 @@ namespace YBehavior.Editor.Core
             m_Tree = NodeMgr.Instance.CreateNodeByName("Root") as Tree;
             AddRenderers(m_Tree);
             CommandMgr.Blocked = false;
+            CommandMgr.Dirty = true;
         }
 
         public bool Load(XmlElement data)
@@ -301,6 +303,7 @@ namespace YBehavior.Editor.Core
             RefreshNodeUID();
 
             CommandMgr.Dirty = false;
+            m_ExportFileHash = 0;
         }
 
         void _SaveNode(Node node, XmlElement data, XmlDocument xmlDoc)
@@ -339,6 +342,7 @@ namespace YBehavior.Editor.Core
         {
             _ExportNode(MainTree, data, xmlDoc);
 
+            m_ExportFileHash = GenerateHash(data.OuterXml.Replace(" ", string.Empty));
             RefreshNodeUID();
         }
 
@@ -495,6 +499,34 @@ namespace YBehavior.Editor.Core
                     bRes = false;
             }
             return bRes;
+        }
+
+        uint m_ExportFileHash = 0;
+        public uint ExportFileHash
+        {
+            get
+            {
+                if (m_ExportFileHash == 0)
+                {
+                    XmlDocument xmlDoc = new XmlDocument();
+                    xmlDoc.Load(FileInfo.ExportingPath);
+                    return GenerateHash(xmlDoc.DocumentElement.OuterXml.Replace(" ", string.Empty));
+                }
+                return m_ExportFileHash;
+            }
+        }
+        public uint GenerateHash(string str)
+        {
+            int len = str.Length;
+            uint hash = 0;
+            for (int i = 0; i < len; ++i)
+            {
+                hash = (hash << 5) + hash + (uint)str[i];
+            }
+
+            m_ExportFileHash = hash;
+
+            return m_ExportFileHash;
         }
     }
 }

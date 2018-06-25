@@ -79,13 +79,13 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        public void StartDebugTreeWithAgent(string treeName, uint uid)
+        public void StartDebugTreeWithAgent(string treeName, uint hash, uint uid)
         {
             m_TargetTreeName = treeName;
             m_UID = uid;
             m_SharedData = WorkBenchMgr.Instance.ActiveWorkBench.MainTree.GetTreeSharedData().Clone();
             m_RunInfo.Clear();
-            NetworkMgr.Instance.MessageProcessor.DebugTreeWithAgent(m_TargetTreeName, m_UID);
+            NetworkMgr.Instance.MessageProcessor.DebugTreeWithAgent(m_TargetTreeName, hash, m_UID);
 
             DebugTargetChangedArg arg = new DebugTargetChangedArg
             {

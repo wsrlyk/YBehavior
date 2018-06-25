@@ -53,6 +53,25 @@ namespace YBehavior.Editor
 
         private void btnStartDebug_Click(object sender, RoutedEventArgs e)
         {
+            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
+            if (bench == null)
+            {
+                ShowSystemTipsArg arg = new ShowSystemTipsArg()
+                {
+                    Content = "Should Open A Tree."
+                };
+                EventMgr.Instance.Send(arg);
+                return;
+            }
+            if (bench.CommandMgr.Dirty)
+            {
+                ShowSystemTipsArg arg = new ShowSystemTipsArg()
+                {
+                    Content = "Should Save First."
+                };
+                EventMgr.Instance.Send(arg);
+                return;
+            }
             string ip = this.IP.Text;
             string port = this.Port.Text;
 
@@ -70,7 +89,10 @@ namespace YBehavior.Editor
                 return;
 
             uint.TryParse(this.debugAgentUID.Text, out uint uid);
-            DebugMgr.Instance.StartDebugTreeWithAgent(WorkBenchMgr.Instance.ActiveWorkBench.FileInfo.Name, uid);
+            DebugMgr.Instance.StartDebugTreeWithAgent(
+                WorkBenchMgr.Instance.ActiveWorkBench.FileInfo.Name,
+                WorkBenchMgr.Instance.ActiveWorkBench.ExportFileHash,
+                uid);
         }
 
         private void btnContinue_Click(object sender, RoutedEventArgs e)

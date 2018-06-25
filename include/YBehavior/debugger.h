@@ -46,6 +46,7 @@ namespace YBehavior
 	class DebugMgr: public Singleton<DebugMgr>
 	{
 		UINT m_TargetAgent;
+		UINT m_TargetHash;
 		STRING m_TargetTree;
 		bool m_bTargetDirty = false;
 
@@ -57,7 +58,7 @@ namespace YBehavior
 		bool m_bPaused = false;
 	public:
 		~DebugMgr();
-		void SetTarget(const STRING& tree, UINT agent);
+		void SetTarget(const STRING& tree, UINT hash, UINT agent);
 		void ResetTarget();
 		void Stop();
 		bool IsValidTarget(Agent* pAgent);

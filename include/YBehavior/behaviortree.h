@@ -147,10 +147,17 @@ namespace YBehavior
 		STRING GetClassName() const override { return "Tree"; }
 		inline void SetVersion(int v) { m_Version = v; }
 		inline int GetVersion() const { return m_Version; }
+#ifdef DEBUGGER
+		inline UINT GetHash() { return m_Hash; }
+		inline void SetHash(UINT hash) { m_Hash = hash; }
+#endif
 	private:
 		SharedDataEx* m_SharedData;	///> 原始数据，每个使用此树的Agent都从这拷数据作为初始化
 		STRING m_TreeName;
 		int m_Version;
+#ifdef DEBUGGER
+		UINT m_Hash;
+#endif
 	public:
 		BehaviorTree(const STRING& name);
 		~BehaviorTree();
