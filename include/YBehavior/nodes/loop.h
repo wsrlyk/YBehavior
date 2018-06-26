@@ -31,8 +31,8 @@ namespace YBehavior
 		void OnLoaded(const pugi::xml_node& data) override;
 
 		SharedVariableEx<BOOL>* m_ExitWhenFailure = nullptr;
-		ISharedVariableEx* m_For = nullptr;
-		ISharedVariableEx* m_Each = nullptr;
+		ISharedVariableEx* m_Collection = nullptr;
+		ISharedVariableEx* m_Current = nullptr;
 	};
 }
 

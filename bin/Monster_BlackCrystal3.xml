@@ -16,7 +16,7 @@
         <Node Class="Calculator" Connection="inc" Pos="846.024994489249,742.03777068526" Operator="_EC ADD" Opl="_FP f0" Opr1="_FP f0" Opr2="_FC 1" />
         <Node Class="GetTargetNameAction" Pos="877.154848696702,809.507028921155" Target="_AP Target" />
       </Node>
-      <Node Class="ForEach" Pos="1025.64496820052,500.3915700212" For="FFP ff" Each="_FP f0" ExitWhenFailure="_BC false">
+      <Node Class="ForEach" Pos="1025.64496820052,500.3915700212" Collection="FFP ff" Current="_FP f" ExitWhenFailure="_BC false">
         <Node Class="GetTargetNameAction" Pos="1036.17551371049,682.459159496197" Target="_AP Target" />
       </Node>
     </Node>

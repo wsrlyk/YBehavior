@@ -107,24 +107,24 @@ namespace YBehavior
 
 	NodeState ForEach::Update(AgentPtr pAgent)
 	{
-		INT size = m_For->VectorSize(pAgent->GetSharedData());
+		INT size = m_Collection->VectorSize(pAgent->GetSharedData());
 
-		DEBUG_LOG_INFO("ForEach " << m_For->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
+		DEBUG_LOG_INFO("Collection: " << m_Collection->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
 
 		for (INT i = 0; i < size; ++i)
 		{
-			const void* element = m_For->GetElement(pAgent->GetSharedData(), i);
+			const void* element = m_Collection->GetElement(pAgent->GetSharedData(), i);
 			if (element == nullptr)
 				continue;
 
-			m_Each->SetValue(pAgent->GetSharedData(), element);
+			m_Current->SetValue(pAgent->GetSharedData(), element);
 
 			if (m_Child != nullptr)
 			{
 				NodeState ns = m_Child->Execute(pAgent);
 				if (ns == NS_FAILURE && *m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData()))
 				{
-					DEBUG_LOG_INFO("ExitWhenFailure at " << m_Each->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
+					DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
 					break;
 				}
 			}
@@ -135,11 +135,11 @@ namespace YBehavior
 
 	void ForEach::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID forType = CreateVariable(m_For, "For", data, false);
-		TYPEID eachType = CreateVariable(m_Each, "Each", data, true);
-		if (!Utility::IsElement(eachType, forType))
+		TYPEID collectionType = CreateVariable(m_Collection, "Collection", data, false);
+		TYPEID currentType = CreateVariable(m_Current, "Current", data, true);
+		if (!Utility::IsElement(currentType, collectionType))
 		{
-			ERROR_BEGIN << "Types not match in ForEach: " << forType << " and " << eachType << ERROR_END;
+			ERROR_BEGIN << "Types not match in ForEach: " << currentType << " and " << collectionType << ERROR_END;
 			return;
 		}
 

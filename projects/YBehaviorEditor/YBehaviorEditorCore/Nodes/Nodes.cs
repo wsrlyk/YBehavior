@@ -689,7 +689,7 @@ namespace YBehavior.Editor.Core
         public override void CreateVariables()
         {
             Variables.CreateVariableInNode(
-                "For",
+                "Collection",
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
@@ -698,7 +698,7 @@ namespace YBehavior.Editor.Core
                 1
             );
             Variables.CreateVariableInNode(
-                "Each",
+                "Current",
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
@@ -722,8 +722,8 @@ namespace YBehavior.Editor.Core
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendFormat("{0} from {{ {1} }}",
-                    Variables.GetVariable("Each").NoteValue,
-                    Variables.GetVariable("For").NoteValue);
+                    Variables.GetVariable("Current").NoteValue,
+                    Variables.GetVariable("Collection").NoteValue);
                 return sb.ToString();
             }
         }
