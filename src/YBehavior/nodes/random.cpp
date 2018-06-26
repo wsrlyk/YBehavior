@@ -48,8 +48,8 @@ namespace YBehavior
 		IF_HAS_LOG_POINT
 		{
 			LOG_SHARED_DATA(m_Opr1, true);
-		LOG_SHARED_DATA(m_Opr2, true);
-		LOG_SHARED_DATA(m_Opl, true);
+			LOG_SHARED_DATA(m_Opr2, true);
+			LOG_SHARED_DATA(m_Opl, true);
 		}
 
 		IVariableOperationHelper* pHelper = m_Opl->GetOperation();

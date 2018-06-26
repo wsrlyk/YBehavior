@@ -48,6 +48,9 @@ namespace YBehavior
 	IF_HAS_LOG_POINT\
 		m_DebugLogInfo << info;
 #define LOG_SHARED_DATA(variable, isbefore) m_pDebugHelper->LogSharedData(variable, isbefore);
+#define LOG_SHARED_DATA_IF_HAS_LOG_POINT(variable, isbefore) \
+		IF_HAS_LOG_POINT\
+			LOG_SHARED_DATA(variable, isbefore);
 	public:
 		std::stringstream& GetDebugLogInfo() { return m_DebugLogInfo; }
 #else

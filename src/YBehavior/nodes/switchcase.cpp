@@ -19,10 +19,7 @@ namespace YBehavior
 	{
 		NodeState ns = NS_FAILURE;
 
-		IF_HAS_LOG_POINT
-		{
-			LOG_SHARED_DATA(m_Switch, true);
-		}
+		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Switch, true);
 
 		INT size = m_CasesChilds.size();
 

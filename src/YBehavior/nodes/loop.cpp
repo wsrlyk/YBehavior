@@ -109,7 +109,7 @@ namespace YBehavior
 	{
 		INT size = m_Collection->VectorSize(pAgent->GetSharedData());
 
-		DEBUG_LOG_INFO("Collection: " << m_Collection->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
+		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Collection, true);
 
 		for (INT i = 0; i < size; ++i)
 		{

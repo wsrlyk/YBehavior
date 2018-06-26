@@ -76,10 +76,8 @@ YBehavior::STRING XAgent::ToString() const
 
 YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 {
-	IF_HAS_LOG_POINT
-	{
-		LOG_SHARED_DATA(m_Target, true);
-	}
+	LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Target, true);
+
 	const YBehavior::AgentWrapper* currentTarget = m_Target->GetCastedValue(pAgent->GetSharedData());
 	if (currentTarget->IsValid())
 	{
@@ -91,10 +89,9 @@ YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 		YBehavior::AgentWrapper wrapper(pAgent->CreateWrapper());
 		m_Target->SetCastedValue(pAgent->GetSharedData(), &wrapper);
 	}
-	IF_HAS_LOG_POINT
-	{
-		LOG_SHARED_DATA(m_Target, false);
-	}
+
+	LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Target, false);
+
 	return YBehavior::NS_SUCCESS;
 }
 

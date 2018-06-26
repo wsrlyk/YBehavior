@@ -41,16 +41,11 @@ namespace YBehavior
 
 	YBehavior::NodeState SetData::Update(AgentPtr pAgent)
 	{
-		IF_HAS_LOG_POINT
-		{
-			LOG_SHARED_DATA(m_Opl, true);
-		}
+		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Opl, true);
+
 		m_Opl->SetValue(pAgent->GetSharedData(), m_Opr->GetValue(pAgent->GetSharedData()));
 
-		IF_HAS_LOG_POINT
-		{
-			LOG_SHARED_DATA(m_Opl, false);
-		}
+		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Opl, false);
 
 		return NS_SUCCESS;
 	}
