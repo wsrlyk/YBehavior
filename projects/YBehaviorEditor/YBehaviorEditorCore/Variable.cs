@@ -40,7 +40,7 @@ namespace YBehavior.Editor.Core
         public static readonly ValueType[] CreateParams_Bool = new ValueType[] { ValueType.VT_BOOL };
         public static readonly ValueType[] CreateParams_Enum = new ValueType[] { ValueType.VT_ENUM };
         public static readonly ValueType[] CreateParams_Vector3 = new ValueType[] { ValueType.VT_VECTOR3 };
-        public static readonly ValueType[] CreateParams_AllTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_VECTOR3, ValueType.VT_STRING, ValueType.VT_BOOL, ValueType.VT_AGENT };
+        public static readonly ValueType[] CreateParams_AllTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_VECTOR3, ValueType.VT_ULONG, ValueType.VT_STRING, ValueType.VT_BOOL, ValueType.VT_AGENT };
         public static readonly ValueType[] CreateParams_RandomTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_BOOL };
         public static readonly ValueType[] CreateParams_SwitchTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_BOOL, ValueType.VT_ULONG, ValueType.VT_STRING };
 
@@ -602,28 +602,6 @@ namespace YBehavior.Editor.Core
             }
             return v;
         }
-        //public static Variable CreateVariableInNode(string name, string defaultValue, ValueType[] valueType, CountType countType, VariableType vbType, string param = null)
-        //{
-        //    Variable v = new Variable(null);
-        //    v.vTypeSet.AddRange(valueType);
-        //    v.cType = countType;
-        //    v.vbType = vbType;
-
-        //    v.SetVariable(valueType[0], countType, vbType, defaultValue, param, name);
-        //    return v;
-        //}
-
-        //public static Variable CreateVariable(SharedData sharedData, char valueType, char countType, char variableType, string name, string value, string param = null)
-        //{
-        //    Variable v = new Variable(sharedData);
-
-        //    if (!v.SetVariable(valueType, countType, variableType, value, param))
-        //        return null;
-
-        //    v.m_Name = name;
-
-        //    return v;
-        //}
     }
 
 }

@@ -16,6 +16,9 @@
         <Node Class="Calculator" Connection="inc" Operator="_EC ADD" Opl="_FP f0" Opr1="_FP f0" Opr2="_FC 1" />
         <Node Class="GetTargetNameAction" Target="_AP Target" />
       </Node>
+      <Node Class="ForEach" For="FFP ff" Each="_FP f0" ExitWhenFailure="_BC false">
+        <Node Class="GetTargetNameAction" Target="_AP Target" />
+      </Node>
     </Node>
   </Node>
 </Monster_BlackCrystal3>

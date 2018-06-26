@@ -84,6 +84,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, WriteRegister);
 		REGISTER_TYPE(factory, SwitchCase);
 		REGISTER_TYPE(factory, For);
+		REGISTER_TYPE(factory, ForEach);
 
 		return factory;
 	}

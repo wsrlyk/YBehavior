@@ -45,10 +45,10 @@ namespace YBehavior
 
 	void For::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID switchType = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data, true);
-		if (switchType != GetClassTypeNumberId<Bool>())
+		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data, true);
+		if (type != GetClassTypeNumberId<Bool>())
 		{
-			ERROR_BEGIN << "Invalid type for ExitWhenFailure in For: " << switchType << ERROR_END;
+			ERROR_BEGIN << "Invalid type for ExitWhenFailure in For: " << type << ERROR_END;
 			return;
 		}
 	}
@@ -101,4 +101,53 @@ namespace YBehavior
 		}
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////
+
+	NodeState ForEach::Update(AgentPtr pAgent)
+	{
+		INT size = m_For->VectorSize(pAgent->GetSharedData());
+
+		DEBUG_LOG_INFO("ForEach " << m_For->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
+
+		for (INT i = 0; i < size; ++i)
+		{
+			const void* element = m_For->GetElement(pAgent->GetSharedData(), i);
+			if (element == nullptr)
+				continue;
+
+			m_Each->SetValue(pAgent->GetSharedData(), element);
+
+			if (m_Child != nullptr)
+			{
+				NodeState ns = m_Child->Execute(pAgent);
+				if (ns == NS_FAILURE && *m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData()))
+				{
+					DEBUG_LOG_INFO("ExitWhenFailure at " << m_Each->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
+					break;
+				}
+			}
+		}
+
+		return NS_SUCCESS;
+	}
+
+	void ForEach::OnLoaded(const pugi::xml_node& data)
+	{
+		TYPEID forType = CreateVariable(m_For, "For", data, false);
+		TYPEID eachType = CreateVariable(m_Each, "Each", data, true);
+		if (!Utility::IsElement(eachType, forType))
+		{
+			ERROR_BEGIN << "Types not match in ForEach: " << forType << " and " << eachType << ERROR_END;
+			return;
+		}
+
+		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data, true);
+		if (type != GetClassTypeNumberId<Bool>())
+		{
+			ERROR_BEGIN << "Invalid type for ExitWhenFailure in For: " << type << ERROR_END;
+			return;
+		}
+	}
 }

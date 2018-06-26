@@ -669,9 +669,63 @@ namespace YBehavior.Editor.Core
                 "false",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Pointer,
+                Variable.VariableType.VBT_Const,
                 false
             );
+        }
+    }
+
+    class ForEachNode : SingleChildNode
+    {
+        public override string Icon => "↺";
+
+        public ForEachNode()
+        {
+            m_Name = "ForEach";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_Compositor;
+        }
+
+        public override void CreateVariables()
+        {
+            Variables.CreateVariableInNode(
+                "For",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Const,
+                false,
+                1
+            );
+            Variables.CreateVariableInNode(
+                "Each",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                1
+            );
+            Variables.CreateVariableInNode(
+                "ExitWhenFailure",
+                "false",
+                Variable.CreateParams_Bool,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                false
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} from {{ {1} }}",
+                    Variables.GetVariable("Each").NoteValue,
+                    Variables.GetVariable("For").NoteValue);
+                return sb.ToString();
+            }
         }
     }
 }
