@@ -23,7 +23,7 @@
         </Grid>-->
         <TabControl Name="TabController" Grid.Row="0" Tag="200" SelectionChanged="TabController_SelectionChanged" Background="DarkGray"/>
         <Grid Grid.Row="1" Background="#FF555353" Name="CanvasBoard" ClipToBounds ="True">
-            <Grid Focusable="True" Name="canvas">
+            <Canvas Focusable="True" Name="canvas">
                 <ItemsControl Focusable="True" Name="commentLayer">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -73,7 +73,7 @@
                     </ItemsControl.ItemContainerStyle>
                 </ItemsControl>
                 <Canvas Focusable="True" Name="nodeLayer_old"/>
-            </Grid>
+            </Canvas>
         </Grid>
     </Grid>
 </UserControl>
