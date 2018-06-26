@@ -10,6 +10,7 @@
 #include "YBehavior/nodes/random.h"
 #include "YBehavior/nodes/register.h"
 #include "YBehavior/nodes/switchcase.h"
+#include "YBehavior/nodes/loop.h"
 namespace YBehavior
 {
 	void NodeFactory::SetActiveTree(const STRING& tree)
@@ -82,6 +83,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, ReadRegister);
 		REGISTER_TYPE(factory, WriteRegister);
 		REGISTER_TYPE(factory, SwitchCase);
+		REGISTER_TYPE(factory, For);
 
 		return factory;
 	}

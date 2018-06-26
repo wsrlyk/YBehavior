@@ -29,6 +29,7 @@
     <ClInclude Include="..\include\YBehavior\nodes\calculator.h" />
     <ClInclude Include="..\include\YBehavior\nodes\comparer.h" />
     <ClInclude Include="..\include\YBehavior\nodes\decorator.h" />
+    <ClInclude Include="..\include\YBehavior\nodes\loop.h" />
     <ClInclude Include="..\include\YBehavior\nodes\ifthenelse.h" />
     <ClInclude Include="..\include\YBehavior\nodes\random.h" />
     <ClInclude Include="..\include\YBehavior\nodes\register.h" />
@@ -66,6 +67,7 @@
     <ClCompile Include="..\src\YBehavior\nodes\calculator.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\comparer.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\decorator.cpp" />
+    <ClCompile Include="..\src\YBehavior\nodes\loop.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\ifthenelse.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\random.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\register.cpp" />

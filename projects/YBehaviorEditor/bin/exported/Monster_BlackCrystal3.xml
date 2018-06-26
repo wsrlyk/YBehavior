@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Monster_BlackCrystal3>
-  <Node Class="Root" Target="_AC " f="_FC 1" ff="FFC 1|2|4">
+  <Node Class="Root" Target="_AC " f="_FC 1" ff="FFC 1|2|4" f0="_FC 0">
     <Node Class="Sequence">
       <Node Class="SelectTargetAction" Target="_AP Target" />
       <Node Class="GetTargetNameAction" Target="_AP Target" />
@@ -9,6 +9,12 @@
         <Node Class="SetData" Target="_FP f" Source="_FC 5" />
         <Node Class="SetData" Target="_FP f" Source="_FC 2" />
         <Node Class="SetData" Connection="default" Target="_FP f" Source="_FC 1" />
+      </Node>
+      <Node Class="For" ExitWhenFailure="_BC false">
+        <Node Class="SetData" Connection="init" Target="_FP f0" Source="_FC 0" />
+        <Node Class="Comparer" Connection="cond" Operator="_EC &lt;=" Opl="_FP f0" Opr="_FP f" />
+        <Node Class="Calculator" Connection="inc" Operator="_EC ADD" Opl="_FP f0" Opr1="_FP f0" Opr2="_FC 1" />
+        <Node Class="GetTargetNameAction" Target="_AP Target" />
       </Node>
     </Node>
   </Node>

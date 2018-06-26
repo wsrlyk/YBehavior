@@ -18,7 +18,7 @@ namespace YBehavior.Editor.Core
         {
             get
             {
-                return WorkBenchMgr.Instance.ActiveWorkBench != null ? WorkBenchMgr.Instance.ActiveWorkBench.MainTree: null;
+                return WorkBenchMgr.Instance.ActiveWorkBench != null ? WorkBenchMgr.Instance.ActiveWorkBench.MainTree : null;
             }
         }
         protected override bool _HasParentHolder()
@@ -252,7 +252,7 @@ namespace YBehavior.Editor.Core
 
     class SetDataNode : LeafNode
     {
-        public override string Icon => "x<=y";
+        public override string Icon => "x<<y";
 
         public SetDataNode()
         {
@@ -290,7 +290,7 @@ namespace YBehavior.Editor.Core
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} <= {1}",
+                sb.AppendFormat("{0} << {1}",
                     Variables.GetVariable("Target").NoteValue,
                     Variables.GetVariable("Source").NoteValue
                     );
@@ -644,4 +644,34 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    class ForNode : BranchNode
+    {
+        public override string Icon => "↺";
+
+        public ForNode()
+        {
+            m_Name = "For";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_Compositor;
+
+            new ConnectionSingle(this, Connection.IdentifierInit);
+            new ConnectionSingle(this, Connection.IdentifierCond);
+            new ConnectionSingle(this, Connection.IdentifierIncrement);
+
+            ///> to make the "chilren" conn the last conn
+            m_ChildConn = new ConnectionSingle(this, Connection.IdentifierChildren);
+        }
+
+        public override void CreateVariables()
+        {
+            Variables.CreateVariableInNode(
+                "ExitWhenFailure",
+                "false",
+                Variable.CreateParams_Bool,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                false
+            );
+        }
+    }
 }

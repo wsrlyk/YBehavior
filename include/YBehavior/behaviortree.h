@@ -152,7 +152,7 @@ namespace YBehavior
 		inline void SetHash(UINT hash) { m_Hash = hash; }
 #endif
 	private:
-		SharedDataEx* m_SharedData;	///> 原始数据，每个使用此树的Agent都从这拷数据作为初始化
+		SharedDataEx* m_SharedData;	///> Original data, copied to each agent using this tree
 		STRING m_TreeName;
 		int m_Version;
 #ifdef DEBUGGER
