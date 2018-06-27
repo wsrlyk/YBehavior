@@ -527,7 +527,8 @@ namespace YBehavior.Editor.Core
                     data.SetAttribute("Connection", Conns.ParentHolder.Conn.Identifier);
             }
 
-            data.SetAttribute("Pos", Renderer.Geo.Pos.ToString());
+            Point intPos = new Point((int)Renderer.Geo.Pos.X, (int)Renderer.Geo.Pos.Y);
+            data.SetAttribute("Pos", intPos.ToString());
             if (!string.IsNullOrEmpty(m_NickName))
                 data.SetAttribute("NickName", m_NickName);
 

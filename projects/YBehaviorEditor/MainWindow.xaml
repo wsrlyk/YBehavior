@@ -28,7 +28,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="400"/>
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0">
                 <local:WorkingSpaceFrame DockPanel.Dock="Top" Height="400" Margin="5,0"/>

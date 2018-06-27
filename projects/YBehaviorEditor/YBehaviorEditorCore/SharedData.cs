@@ -66,19 +66,19 @@ namespace YBehavior.Editor.Core
 
         public static bool IsValidVariableName(string name)
         {
-            string pattern = @"^[a-zA-Z0-9]*$";
+            string pattern = @"^[a-zA-Z0-9_]*$";
             bool res = false;
-            if (name.Length > 0 && name.Length <= 15)
+            if (name.Length > 0 && name.Length <= 20)
             {
                 res = (System.Text.RegularExpressions.Regex.IsMatch(name, pattern));
             }
             else
             {
-                LogMgr.Instance.Error("Name Length (Only: 1~15): " + name);
+                LogMgr.Instance.Error("Name Length (Only: 1~20): " + name);
                 return false;
             }
             if (!res)
-                LogMgr.Instance.Error("Contains invalid characters (Only: a~z, A~Z, 0~9): " + name);
+                LogMgr.Instance.Error("Contains invalid characters (Only: a~z, A~Z, 0~9, _ ): " + name);
             return res;
         }
 

@@ -3,21 +3,21 @@
   <Node Class="Root" Pos="149,10" Target="_AC " f="_FC 1" ff="FFC 1|2|4" f0="_FC 0">
     <Node Class="Sequence" Pos="112,158">
       <Node Class="SelectTargetAction" Pos="3,344" Target="_AP Target" />
-      <Node Class="GetTargetNameAction" Pos="246.71196186834,336" Target="_AP Target" />
+      <Node Class="GetTargetNameAction" Pos="246,336" Target="_AP Target" />
       <Node Class="SwitchCase" Pos="505,349" Switch="_FP f" Cases="FFP ff">
-        <Node Class="SetData" Pos="432.208504801097,630.486968449931" Target="_FP f" Source="_FC 4" />
-        <Node Class="SetData" Pos="506.074074074074,624" Target="_FP f" Source="_FC 5" />
+        <Node Class="SetData" Pos="432,630" Target="_FP f" Source="_FC 4" />
+        <Node Class="SetData" Pos="506,624" Target="_FP f" Source="_FC 5" />
         <Node Class="SetData" Pos="603,622" Target="_FP f" Source="_FC 2" />
-        <Node Class="SetData" Connection="default" Pos="685.921810699588,575.063100137174" Target="_FP f" Source="_FC 1" />
+        <Node Class="SetData" Connection="default" Pos="685,575" Target="_FP f" Source="_FC 1" />
       </Node>
-      <Node Class="For" Pos="807.044928593474,460.435850996011" ExitWhenFailure="_BC false">
-        <Node Class="SetData" Connection="init" Pos="729.144376912394,731.926162552997" Target="_FP f0" Source="_FC 0" />
-        <Node Class="Comparer" Connection="cond" Pos="788.957940572643,680.025694006987" Operator="_EC &lt;=" Opl="_FP f0" Opr="_FP f" />
-        <Node Class="Calculator" Connection="inc" Pos="846.024994489249,742.03777068526" Operator="_EC ADD" Opl="_FP f0" Opr1="_FP f0" Opr2="_FC 1" />
-        <Node Class="GetTargetNameAction" Pos="877.154848696702,809.507028921155" Target="_AP Target" />
+      <Node Class="For" Pos="807,460" ExitWhenFailure="_BC false">
+        <Node Class="SetData" Connection="init" Pos="729,731" Target="_FP f0" Source="_FC 0" />
+        <Node Class="Comparer" Connection="cond" Pos="788,680" Operator="_EC &lt;=" Opl="_FP f0" Opr="_FP f" />
+        <Node Class="Calculator" Connection="inc" Pos="846,742" Operator="_EC ADD" Opl="_FP f0" Opr1="_FP f0" Opr2="_FC 1" />
+        <Node Class="GetTargetNameAction" Pos="877,809" Target="_AP Target" />
       </Node>
-      <Node Class="ForEach" Pos="1025.64496820052,500.3915700212" Collection="FFP ff" Current="_FP f" ExitWhenFailure="_BC false">
-        <Node Class="GetTargetNameAction" Pos="1036.17551371049,682.459159496197" Target="_AP Target" />
+      <Node Class="ForEach" Pos="1025,500" Collection="FFP ff" Current="_FP f" ExitWhenFailure="_BC false">
+        <Node Class="GetTargetNameAction" Pos="1036,682" Target="_AP Target" />
       </Node>
     </Node>
   </Node>

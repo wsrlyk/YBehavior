@@ -198,7 +198,9 @@ namespace YBehavior
 		{
 			op = helper->CreateVariable();
 			m_Variables.push_back(op);
+#ifdef DEBUGGER
 			op->SetName(attriName);
+#endif
 			///> Vector Index
 			if (buffer.size() >= 5 && buffer[2] == "VI")
 			{

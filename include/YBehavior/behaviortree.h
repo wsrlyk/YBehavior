@@ -57,6 +57,7 @@ namespace YBehavior
 #define DEBUG_LOG_INFO(info);
 #define IF_HAS_LOG_POINT
 #define LOG_SHARED_DATA(variable, isbefore)
+#define LOG_SHARED_DATA_IF_HAS_LOG_POINT(variable, isbefore)
 #endif 
 	public:
 		BehaviorNode();
