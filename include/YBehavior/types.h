@@ -246,6 +246,7 @@ namespace YBehavior
 	static const char CONST = 'C';
 	static const BOOL TRUE = 1;
 	static const BOOL FALSE = 0;
+	static const KEY INVALID_KEY = -1;
 }
 
 #endif

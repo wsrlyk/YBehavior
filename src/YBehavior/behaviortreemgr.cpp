@@ -34,8 +34,9 @@ namespace YBehavior
 		if (rootData == nullptr)
 			return nullptr;
 
-		NodeFactory::Instance()->SetActiveTree(name);
 		BehaviorTree* tree = new BehaviorTree(name);
+		NodeFactory::Instance()->SetActiveTree(tree->GetNameKeyMgr(), true);
+
 		UINT uid = 0;
 		if (!_LoadOneNode(tree, rootData.first_child(), uid))
 		{

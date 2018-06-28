@@ -282,7 +282,7 @@ namespace YBehavior
 			SIZE_KEY length = iarray->Length();
 			for (KEY j = 0; j < length; ++j)
 			{
-				const STRING& name = NodeFactory::Instance()->GetNameByKey(treeName, j, iarray->GetTypeID());
+				const STRING& name = NodeFactory::Instance()->GetNameByKey(j, iarray->GetTypeID());
 				if (name == Utility::StringEmpty)
 					continue;
 				STRING content(name + "," + iarray->GetToString(j));
@@ -381,7 +381,7 @@ namespace YBehavior
 		else
 		{
 			ISharedVariableEx* pVectorIndex = pVariable->GetVectorIndex();
-			const STRING& sharedDataVariableName = NodeFactory::Instance()->GetNameByKey(DebugMgr::Instance()->GetTargetTree(), pVariable->GetKey(), pVariable->GetReferenceSharedDataSelfID());
+			const STRING& sharedDataVariableName = NodeFactory::Instance()->GetNameByKey(pVariable->GetKey(), pVariable->GetReferenceSharedDataSelfID());
 			///>  Like:      Int0 IntArrayM[7] 44
 			if (pVectorIndex)
 			{

@@ -22,7 +22,7 @@ public:
 	}
 	static void InitData()
 	{
-		YBehavior::NodeFactory::Instance()->SetActiveTree("");
+		YBehavior::NodeFactory::Instance()->SetActiveTree(nullptr, true);
 		tickCount0 = YBehavior::NodeFactory::Instance()->CreateKeyByName<YBehavior::INT>("tickCount0");
 		tickCount1 = YBehavior::NodeFactory::Instance()->CreateKeyByName<YBehavior::INT>("tickCount1");
 		isfighting = YBehavior::NodeFactory::Instance()->CreateKeyByName<YBehavior::BOOL>("isfighting");
@@ -35,11 +35,16 @@ public:
 		this->GetSharedData()->Set<YBehavior::INT>(tickCount0, 3);
 		this->GetSharedData()->Set<YBehavior::BOOL>(isfighting, YBehavior::FALSE);
 		this->GetSharedData()->Set<YBehavior::FLOAT>(heartrate, 2);
+
+		YBehavior::KEY f = YBehavior::NodeFactory::Instance()->GetKeyByName<YBehavior::FLOAT>("f");
+		YBehavior::KEY ff = YBehavior::NodeFactory::Instance()->GetKeyByName<YBehavior::VecFloat>("ff");
 	}
+
 	XEntity* GetEntity() { return m_pEntity; }
 	void Update();
 	YBehavior::STRING ToString() const override;
 };
+
 class XEntity
 {
 	XAgent* pAgent;

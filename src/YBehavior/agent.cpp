@@ -3,6 +3,7 @@
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/registerdata.h"
+#include "YBehavior/nodefactory.h"
 
 YBehavior::UINT YBehavior::Agent::s_UID = 0;
 
@@ -17,6 +18,8 @@ void YBehavior::Agent::SetTree(const STRING& name)
 {
 	m_Tree = TreeMgr::Instance()->GetTree(name);
 	m_Tree->CloneData(*m_SharedData);
+
+	NodeFactory::Instance()->SetActiveTree(m_Tree->GetNameKeyMgr(), false);
 }
 
 void YBehavior::Agent::Tick()

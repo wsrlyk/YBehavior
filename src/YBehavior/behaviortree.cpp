@@ -229,11 +229,13 @@ namespace YBehavior
 	{
 		m_TreeName = name;
 		m_SharedData = new SharedDataEx();
+		m_NameKeyMgr = new NameKeyMgr();
 	}
 
 	BehaviorTree::~BehaviorTree()
 	{
 		delete m_SharedData;
+		delete m_NameKeyMgr;
 	}
 
 	void BehaviorTree::OnLoaded(const pugi::xml_node& data)

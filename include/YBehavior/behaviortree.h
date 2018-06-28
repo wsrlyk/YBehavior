@@ -25,6 +25,7 @@ namespace YBehavior
 
 	class ISharedVariableEx;
 	class SharedDataEx;
+	struct NameKeyMgr;
 #ifdef DEBUGGER
 	class DebugHelper;
 #endif
@@ -157,6 +158,7 @@ namespace YBehavior
 #endif
 	private:
 		SharedDataEx* m_SharedData;	///> Original data, copied to each agent using this tree
+		NameKeyMgr* m_NameKeyMgr;
 		STRING m_TreeName;
 		int m_Version;
 #ifdef DEBUGGER
@@ -167,7 +169,7 @@ namespace YBehavior
 		~BehaviorTree();
 		inline const STRING& GetTreeName() { return m_TreeName; }
 		inline SharedDataEx* GetSharedData() { return m_SharedData; }
-
+		inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }
 		void CloneData(SharedDataEx& destination);
 	protected:
 		virtual void OnLoaded(const pugi::xml_node& data);

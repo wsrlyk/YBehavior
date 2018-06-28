@@ -140,7 +140,6 @@ namespace YBehavior
 	class SharedDataEx
 	{
 	public:
-		const static KEY INVALID_KEY = -1;
 
 		template<typename T>
 		KEY GetTypeKey();

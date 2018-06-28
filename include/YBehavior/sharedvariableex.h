@@ -15,7 +15,7 @@ namespace YBehavior
 		SharedVariableEx()
 		{
 			m_VectorIndex = nullptr;
-			m_Key = SharedDataEx::INVALID_KEY;
+			m_Key = INVALID_KEY;
 		}
 		~SharedVariableEx()
 		{
@@ -74,7 +74,7 @@ namespace YBehavior
 		TYPEID GetReferenceSharedDataSelfID()
 		{
 			///> it's const, just return itself
-			if (m_Key == SharedDataEx::INVALID_KEY)
+			if (m_Key == INVALID_KEY)
 				return GetClassTypeNumberId<T>();
 
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
@@ -95,7 +95,7 @@ namespace YBehavior
 
 		bool IsConst() override
 		{
-			return m_Key == SharedDataEx::INVALID_KEY;
+			return m_Key == INVALID_KEY;
 		}
 
 		const std::vector<ElementType>* _Convert2Vector(SharedDataEx* pData)
@@ -104,7 +104,7 @@ namespace YBehavior
 			{
 				///> would have compile error if directly operate the m_Value when T is not a std::vector<XX>
 				const std::vector<ElementType>* mValue;
-				if (pData == nullptr || m_Key == SharedDataEx::INVALID_KEY)
+				if (pData == nullptr || m_Key == INVALID_KEY)
 					mValue = (const std::vector<ElementType>*)_GetValue();
 				else
 					mValue = (const std::vector<ElementType>*)GetValue(pData);
@@ -190,17 +190,17 @@ namespace YBehavior
 			///> if T is a single type but has vector index, it means this variable is an element of a vector.
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
 			{
-				SetKey(NodeFactory::Instance()->CreateKeyByName<std::vector<T>>(s));
+				SetKey(NodeFactory::Instance()->GetKeyByName<std::vector<T>>(s));
 			}
 			else
 			{
-				SetKey(NodeFactory::Instance()->CreateKeyByName<T>(s));
+				SetKey(NodeFactory::Instance()->GetKeyByName<T>(s));
 			}
 		}
 
 		const T* GetCastedValue(SharedDataEx* pData)
 		{
-			if (pData == nullptr || m_Key == SharedDataEx::INVALID_KEY)
+			if (pData == nullptr || m_Key == INVALID_KEY)
 				return &m_Value;
 			///> It's an element of a vector
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
@@ -213,7 +213,7 @@ namespace YBehavior
 
 		void SetCastedValue(SharedDataEx* pData, const T* src)
 		{
-			if (pData == nullptr || m_Key == SharedDataEx::INVALID_KEY)
+			if (pData == nullptr || m_Key == INVALID_KEY)
 			{
 				///> Currently, we treat the non-pointer as CONST, then this function wont change their values.
 				//m_Value = *((T*)src);

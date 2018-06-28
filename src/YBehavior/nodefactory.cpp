@@ -13,56 +13,54 @@
 #include "YBehavior/nodes/loop.h"
 namespace YBehavior
 {
-	void NodeFactory::SetActiveTree(const STRING& tree)
+	void NodeFactory::SetActiveTree(NameKeyMgr* nameKeyMgr, bool bReset)
 	{
-		LOG_BEGIN << "SetActiveTree: " << tree.c_str() << LOG_END;
+		//LOG_BEGIN << "SetActiveTree: " << tree.c_str() << LOG_END;
 
-		mCurActiveTreeName = tree;
-
-		if (tree.empty())
+		if (nameKeyMgr == nullptr)
 		{
 			mpCurActiveNameKeyInfo = &mCommonNameKeyInfo;
-#ifdef DEBUGGER
-			mpCurActiveKeyNameMap = &mCommonKeyNameMap;
-#endif
 			return;
 		}
 		else
 		{
-			mpCurActiveNameKeyInfo = &mTempNameKeyInfo;
-#ifdef DEBUGGER
-			KeyNameMapType newMap;
-			mKeyNameMap[tree] = newMap;
-			mpCurActiveKeyNameMap = &mKeyNameMap[tree];
-#endif
-
+			mpCurActiveNameKeyInfo = nameKeyMgr;
 		}
 
-		mpCurActiveNameKeyInfo->Reset();
-		mpCurActiveNameKeyInfo->AssignKey(mCommonNameKeyInfo);
-	}
-
-#ifdef DEBUGGER
-	const STRING& NodeFactory::GetNameByKey(const STRING& treeName, KEY key, TYPEID typeNumberId)
-	{
-		auto it = mKeyNameMap.find(treeName);
-		if (it != mKeyNameMap.end())
+		if (bReset)
 		{
-			KeyNameMapType& keynamemap = it->second;
-			auto it2 = keynamemap.find(typeNumberId << 16 | key);
-			if (it2 != keynamemap.end())
-				return it2->second;
-			return Utility::StringEmpty;
+			mpCurActiveNameKeyInfo->Reset();
+			mpCurActiveNameKeyInfo->AssignKey(mCommonNameKeyInfo);
 		}
-
-		return Utility::StringEmpty;
 	}
-#endif
+
+	KEY NodeFactory::GetKeyByName(const STRING& name, TYPEID typeID)
+	{
+		auto info = mCommonNameKeyInfo.Get(typeID);
+		KEY key = info.Get(name);
+		if (key != INVALID_KEY)
+			return key;
+		if (mpCurActiveNameKeyInfo == NULL)
+			return INVALID_KEY;
+		info = mpCurActiveNameKeyInfo->Get(typeID);
+		return info.Get(name);
+	}
+
+	const STRING& NodeFactory::GetNameByKey(KEY key, TYPEID typeID)
+	{
+		auto info = mCommonNameKeyInfo.Get(typeID);
+		const STRING& name = info.Get(key);
+		if (name != Utility::StringEmpty)
+			return name;
+		if (mpCurActiveNameKeyInfo == NULL)
+			return Utility::StringEmpty;
+		info = mpCurActiveNameKeyInfo->Get(typeID);
+		return info.Get(key);
+	}
 
 	NodeFactory::NodeFactory()
 	{
 		mCommonNameKeyInfo.Reset();
-		mTempNameKeyInfo.Reset();
 	}
 
 	NodeFactory* CreateNodeFactory()
