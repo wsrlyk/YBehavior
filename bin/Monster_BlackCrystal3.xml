@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Monster_BlackCrystal3>
-  <Node Class="Root" Pos="149,10" Target="_AC " f="_FC 1" ff="FFC 1|2|4" f0="_FC 0">
+  <Node Class="Root" Pos="149,10" Target="_AC " f="_FC 1" ff="FFC 1|2|4" f0="_FC 0" i="_IC 0">
     <Node Class="Sequence" Pos="112,158">
       <Node Class="SelectTargetAction" Pos="3,344" Target="_AP Target" />
       <Node Class="GetTargetNameAction" Pos="246,336" Target="_AP Target" />
@@ -19,6 +19,7 @@
       <Node Class="ForEach" Pos="1025,500" Collection="FFP ff" Current="_FP f" ExitWhenFailure="_BC false">
         <Node Class="GetTargetNameAction" Pos="1036,682" Target="_AP Target" />
       </Node>
+      <Node Class="PiecewiseFunction" Pos="1313,666" DebugPoint="-1" KeyPointX="IIC 1|2|2|4|6" KeyPointY="IIC 1|4|8|16|16" InputX="_IC 2000" OutputY="_IP i" />
     </Node>
   </Node>
 </Monster_BlackCrystal3>

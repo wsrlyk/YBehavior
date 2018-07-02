@@ -57,10 +57,24 @@ namespace YBehavior.Editor
         private void _OnNetworkConnectionChanged(EventArg arg)
         {
             NetworkConnectionChangedArg oArg = arg as NetworkConnectionChangedArg;
-            if (oArg.bConnected)
-                this.DataContext = DebugMgr.Instance.DebugSharedData;
-            else
-                this.DataContext = m_CurTree.Variables;
+
+            this.Dispatcher.BeginInvoke(new Action<NetworkConnectionChangedArg>
+                (
+                    (NetworkConnectionChangedArg ooArg) =>
+                    {
+                        if (ooArg.bConnected)
+                        {
+                            this.DataContext = DebugMgr.Instance.DebugSharedData;
+                        }
+                        else
+                        {
+                            this.DataContext = m_CurTree.Variables;
+                        }
+                    }
+                ),
+
+                oArg);
+
         }
 
         private void _OnDebugTargetChanged(EventArg arg)

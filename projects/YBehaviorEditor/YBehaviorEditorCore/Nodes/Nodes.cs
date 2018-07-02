@@ -728,4 +728,72 @@ namespace YBehavior.Editor.Core
             }
         }
     }
+
+    class PiecewiseFunctionNode: SingleChildNode
+    {
+        public override string Icon => "_|￣";
+
+        public PiecewiseFunctionNode()
+        {
+            m_Name = "PiecewiseFunction";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_DefaultAction;
+        }
+
+        public override void CreateVariables()
+        {
+            Variables.CreateVariableInNode(
+                "KeyPointX",
+                "",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Const,
+                false,
+                1
+            );
+
+            Variables.CreateVariableInNode(
+                "KeyPointY",
+                "",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Const,
+                false,
+                1
+            );
+
+            Variables.CreateVariableInNode(
+                "InputX",
+                "",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                false,
+                1
+            );
+
+            Variables.CreateVariableInNode(
+                "OutputY",
+                "",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                1
+            );
+
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} << func({1})",
+                    Variables.GetVariable("OutputY").NoteValue,
+                    Variables.GetVariable("InputX").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
 }

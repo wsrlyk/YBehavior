@@ -31,6 +31,7 @@
     <ClInclude Include="..\include\YBehavior\nodes\decorator.h" />
     <ClInclude Include="..\include\YBehavior\nodes\loop.h" />
     <ClInclude Include="..\include\YBehavior\nodes\ifthenelse.h" />
+    <ClInclude Include="..\include\YBehavior\nodes\piecewisefunction.h" />
     <ClInclude Include="..\include\YBehavior\nodes\random.h" />
     <ClInclude Include="..\include\YBehavior\nodes\register.h" />
     <ClInclude Include="..\include\YBehavior\nodes\selector.h" />
@@ -69,6 +70,7 @@
     <ClCompile Include="..\src\YBehavior\nodes\decorator.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\loop.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\ifthenelse.cpp" />
+    <ClCompile Include="..\src\YBehavior\nodes\piecewisefunction.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\random.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\register.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\selector.cpp" />

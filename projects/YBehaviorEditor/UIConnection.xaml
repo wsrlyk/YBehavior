@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              >
-    <Path Name="path" Stroke="#FFDADCE4" StrokeThickness="3" Fill="#FFE1E3E8">
+    <Path Name="path" Stroke="#FFDADCE4" StrokeThickness="5" Fill="#FFE1E3E8">
         <Path.Data>
             <PathGeometry>
                 <PathFigure IsFilled="False" StartPoint="{Binding ParentPos, Mode=OneWay}"  IsClosed="False">

@@ -31,7 +31,7 @@ namespace YBehavior
 			if (onecase == nullptr)
 				continue;
 
-			if (pHelper->Compare(pAgent->GetSharedData(), m_Switch->GetValue(pAgent->GetSharedData()), onecase, OT_EQUAL))
+			if (pHelper->Compare(m_Switch->GetValue(pAgent->GetSharedData()), onecase, OT_EQUAL))
 			{
 				DEBUG_LOG_INFO("Switch to case " << Utility::ToString(m_CasesChilds[i]->GetUID()) << "; ");
 

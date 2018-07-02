@@ -172,6 +172,13 @@ namespace YBehavior.Editor.Core
                     Bench = bench
                 };
                 EventMgr.Instance.Send(arg);
+
+                ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
+                {
+                    Content = "Saved successfully."
+                };
+                EventMgr.Instance.Send(showSystemTipsArg);
+
             }
 
             return res;

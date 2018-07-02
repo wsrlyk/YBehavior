@@ -11,6 +11,7 @@
 #include "YBehavior/nodes/register.h"
 #include "YBehavior/nodes/switchcase.h"
 #include "YBehavior/nodes/loop.h"
+#include "YBehavior/nodes/piecewisefunction.h"
 namespace YBehavior
 {
 	void NodeFactory::SetActiveTree(NameKeyMgr* nameKeyMgr, bool bReset)
@@ -36,7 +37,7 @@ namespace YBehavior
 
 	KEY NodeFactory::GetKeyByName(const STRING& name, TYPEID typeID)
 	{
-		auto info = mCommonNameKeyInfo.Get(typeID);
+		NameKeyInfo& info = mCommonNameKeyInfo.Get(typeID);
 		KEY key = info.Get(name);
 		if (key != INVALID_KEY)
 			return key;
@@ -48,7 +49,7 @@ namespace YBehavior
 
 	const STRING& NodeFactory::GetNameByKey(KEY key, TYPEID typeID)
 	{
-		auto info = mCommonNameKeyInfo.Get(typeID);
+		NameKeyInfo& info = mCommonNameKeyInfo.Get(typeID);
 		const STRING& name = info.Get(key);
 		if (name != Utility::StringEmpty)
 			return name;
@@ -83,6 +84,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, SwitchCase);
 		REGISTER_TYPE(factory, For);
 		REGISTER_TYPE(factory, ForEach);
+		REGISTER_TYPE(factory, PiecewiseFunction);
 
 		return factory;
 	}

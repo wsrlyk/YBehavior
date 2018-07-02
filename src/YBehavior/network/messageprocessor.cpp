@@ -11,7 +11,7 @@ namespace YBehavior
 		DebugMgr::Instance()->SetTarget(datas[1], Utility::ToType<UINT>(datas[2]), Utility::ToType<UINT>(datas[3]));
 
 		DebugMgr::Instance()->ClearDebugPoints();
-		for (unsigned i = 3; i + 1 < datas.size(); ++i)
+		for (unsigned i = 4; i + 1 < datas.size(); ++i)
 		{
 			UINT uid = Utility::ToType<UINT>(datas[i]);
 			INT count = Utility::ToType<INT>(datas[++i]);

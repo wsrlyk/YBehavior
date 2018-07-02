@@ -2,7 +2,7 @@
 #define _YBEHAVIOR_LINKEDLIST_H_
 
 #include <unordered_map>
-#include "../logger.h"
+#include "YBehavior/logger.h"
 
 namespace YBehavior
 {

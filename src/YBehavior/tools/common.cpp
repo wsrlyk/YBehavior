@@ -1,6 +1,6 @@
 #include "YBehavior/tools/common.h"
 #include "YBehavior/utility.h"
-#include "../../../include/YBehavior/logger.h"
+#include "YBehavior/logger.h"
 
 namespace YBehavior
 {
