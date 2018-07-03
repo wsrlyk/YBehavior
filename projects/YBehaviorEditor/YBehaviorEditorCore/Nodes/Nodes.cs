@@ -729,7 +729,7 @@ namespace YBehavior.Editor.Core
         }
     }
 
-    class PiecewiseFunctionNode: SingleChildNode
+    class PiecewiseFunctionNode : LeafNode
     {
         public override string Icon => "_|￣";
 
@@ -793,6 +793,85 @@ namespace YBehavior.Editor.Core
                     Variables.GetVariable("OutputY").NoteValue,
                     Variables.GetVariable("InputX").NoteValue);
                 return sb.ToString();
+            }
+        }
+    }
+
+    class DiceNode : LeafNode
+    {
+        public override string Icon => "⚄";
+
+        public DiceNode()
+        {
+            m_Name = "Dice";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_DefaultAction;
+        }
+
+        public override void CreateVariables()
+        {
+            Variables.CreateVariableInNode(
+                "Distribution",
+                "",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Const,
+                false,
+                1
+            );
+
+            Variables.CreateVariableInNode(
+                "Values",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Const,
+                false,
+                2
+            );
+
+            Variables.CreateVariableInNode(
+                "Input",
+                "0",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                false,
+                1
+            );
+
+            Variables.CreateVariableInNode(
+                "Output",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                2
+            );
+
+            Variables.CreateVariableInNode(
+                "IgnoreInput",
+                "true",
+                Variable.CreateParams_Bool,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                false,
+                0
+            );
+
+        }
+
+        public override string Note
+        {
+            get
+            {
+                return string.Empty;
+                //StringBuilder sb = new StringBuilder();
+                //sb.AppendFormat("{0} << func({1})",
+                //    Variables.GetVariable("OutputY").NoteValue,
+                //    Variables.GetVariable("InputX").NoteValue);
+                //return sb.ToString();
             }
         }
     }

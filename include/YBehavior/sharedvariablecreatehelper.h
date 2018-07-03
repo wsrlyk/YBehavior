@@ -26,7 +26,7 @@ namespace YBehavior
 		}
 		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) override
 		{
-			KEY key = NodeFactory::Instance()->CreateKeyByName<valueType>(name);
+			KEY key = TreeKeyMgr::Instance()->CreateKeyByName<valueType>(name);
 			pData->Set(key, Utility::ToType<valueType>(str));
 		}
 	};
@@ -41,7 +41,7 @@ namespace YBehavior
 		}
 		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) override
 		{
-			KEY key = NodeFactory::Instance()->CreateKeyByName<std::vector<elementType>>(name);
+			KEY key = TreeKeyMgr::Instance()->CreateKeyByName<std::vector<elementType>>(name);
 			std::vector<STRING> splitRes;
 			std::vector<elementType> res;
 			Utility::SplitString(str, splitRes, '|');

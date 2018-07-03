@@ -137,13 +137,13 @@ namespace YBehavior
 		TYPEID xType = CreateVariable(m_InputX, "InputX", data, true);
 		if (s_ValidTypes.find(xType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for KeyPointX in PiecewiseFunction: " << xType << ERROR_END;
+			ERROR_BEGIN << "Invalid type for InputX in PiecewiseFunction: " << xType << ERROR_END;
 			return;
 		}
 		TYPEID yType = CreateVariable(m_OutputY, "OutputY", data, true);
 		if (s_ValidTypes.find(yType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for KeyPointY in PiecewiseFunction: " << yType << ERROR_END;
+			ERROR_BEGIN << "Invalid type for OutputY in PiecewiseFunction: " << yType << ERROR_END;
 			return;
 		}
 

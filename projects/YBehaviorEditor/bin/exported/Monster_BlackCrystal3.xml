@@ -20,6 +20,7 @@
         <Node Class="GetTargetNameAction" Target="_AP Target" />
       </Node>
       <Node Class="PiecewiseFunction" KeyPointX="IIC 1|2|2|4|6" KeyPointY="IIC 1|4|8|16|16" InputX="_IC 2000" OutputY="_IP i" />
+      <Node Class="Dice" Distribution="IIC 3|1|9|4" Values="FFC 0.1|0.2|0.3|0.4" Input="_IC 0" Output="_FP f" IgnoreInput="_BC true" />
     </Node>
   </Node>
 </Monster_BlackCrystal3>

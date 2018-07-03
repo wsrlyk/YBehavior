@@ -19,13 +19,16 @@ void YBehavior::Agent::SetTree(const STRING& name)
 	m_Tree = TreeMgr::Instance()->GetTree(name);
 	m_Tree->CloneData(*m_SharedData);
 
-	NodeFactory::Instance()->SetActiveTree(m_Tree->GetNameKeyMgr(), false);
+	TreeKeyMgr::Instance()->SetActiveTree(m_Tree->GetNameKeyMgr(), false);
 }
 
 void YBehavior::Agent::Tick()
 {
 	if (m_Tree)
+	{
+		TreeKeyMgr::Instance()->SetActiveTree(m_Tree->GetNameKeyMgr(), false);
 		m_Tree->Execute(this);
+	}
 }
 
 void YBehavior::Agent::ProcessRegister()

@@ -12,58 +12,9 @@
 #include "YBehavior/nodes/switchcase.h"
 #include "YBehavior/nodes/loop.h"
 #include "YBehavior/nodes/piecewisefunction.h"
+#include "YBehavior/nodes/dice.h"
 namespace YBehavior
 {
-	void NodeFactory::SetActiveTree(NameKeyMgr* nameKeyMgr, bool bReset)
-	{
-		//LOG_BEGIN << "SetActiveTree: " << tree.c_str() << LOG_END;
-
-		if (nameKeyMgr == nullptr)
-		{
-			mpCurActiveNameKeyInfo = &mCommonNameKeyInfo;
-			return;
-		}
-		else
-		{
-			mpCurActiveNameKeyInfo = nameKeyMgr;
-		}
-
-		if (bReset)
-		{
-			mpCurActiveNameKeyInfo->Reset();
-			mpCurActiveNameKeyInfo->AssignKey(mCommonNameKeyInfo);
-		}
-	}
-
-	KEY NodeFactory::GetKeyByName(const STRING& name, TYPEID typeID)
-	{
-		NameKeyInfo& info = mCommonNameKeyInfo.Get(typeID);
-		KEY key = info.Get(name);
-		if (key != INVALID_KEY)
-			return key;
-		if (mpCurActiveNameKeyInfo == NULL)
-			return INVALID_KEY;
-		info = mpCurActiveNameKeyInfo->Get(typeID);
-		return info.Get(name);
-	}
-
-	const STRING& NodeFactory::GetNameByKey(KEY key, TYPEID typeID)
-	{
-		NameKeyInfo& info = mCommonNameKeyInfo.Get(typeID);
-		const STRING& name = info.Get(key);
-		if (name != Utility::StringEmpty)
-			return name;
-		if (mpCurActiveNameKeyInfo == NULL)
-			return Utility::StringEmpty;
-		info = mpCurActiveNameKeyInfo->Get(typeID);
-		return info.Get(key);
-	}
-
-	NodeFactory::NodeFactory()
-	{
-		mCommonNameKeyInfo.Reset();
-	}
-
 	NodeFactory* CreateNodeFactory()
 	{
 		NodeFactory* factory = new NodeFactory();
@@ -85,6 +36,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, For);
 		REGISTER_TYPE(factory, ForEach);
 		REGISTER_TYPE(factory, PiecewiseFunction);
+		REGISTER_TYPE(factory, Dice);
 
 		return factory;
 	}

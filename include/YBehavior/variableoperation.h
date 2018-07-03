@@ -34,7 +34,9 @@ namespace YBehavior
 		virtual void Calculate(void* pLeft, const void* pRight0, const void* pRight1, OperationType op) = 0;
 		virtual const void* Calculate(const void* pRight0, const void* pRight1, OperationType op) = 0;
 		virtual void Calculate(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op) = 0;
+		virtual void Random(void* pLeft, const void* pRight0, const void* pRight1) = 0;
 		virtual void Random(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1) = 0;
+		virtual void Set(void* pLeft, const void* pRight0) = 0;
 		virtual void* AllocData() = 0;
 		virtual void RecycleData(void* pData) = 0;
 	};
@@ -60,6 +62,9 @@ namespace YBehavior
 
 		template<typename T>
 		static void Random(void* pLeft, const void* pRight0, const void* pRight1);
+
+		template<typename T>
+		static void Set(void* pLeft, const void* pRight0);
 
 	private:
 		template<typename T>
@@ -151,6 +156,12 @@ namespace YBehavior
 		LOG_BEGIN << " => " << left << LOG_END;
 	}
 
+	template<typename T>
+	void ValueHandler::Set(void* pLeft, const void* pRight0)
+	{
+		T& left = *((T*)pLeft);
+		left = *((T*)pRight0);
+	}
 
 	template<typename T>
 	void ValueHandler::Random(void* pLeft, const void* pRight0, const void* pRight1)
@@ -264,11 +275,21 @@ namespace YBehavior
 			pLeft->SetValue(pData, &left);
 		}
 
+		void Random(void* pLeft, const void* pRight0, const void* pRight1)
+		{
+			ValueHandler::Random<T>(pLeft, pRight0, pRight1);
+		}
+
 		void Random(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
 		{
 			T left;
 			ValueHandler::Random<T>(&left, pRight0->GetValue(pData), pRight1->GetValue(pData));
 			pLeft->SetValue(pData, &left);
+		}
+
+		void Set(void* pLeft, const void* pRight0)
+		{
+			ValueHandler::Set<T>(pLeft, pRight0);
 		}
 
 		void* AllocData()
@@ -315,8 +336,17 @@ namespace YBehavior
 		{
 		}
 
+		void Random(void* pLeft, const void* pRight0, const void* pRight1)
+		{
+		}
+
 		void Random(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
 		{
+		}
+
+		void Set(void* pLeft, const void* pRight0)
+		{
+			ValueHandler::Set<std::vector<elementType>>(pLeft, pRight0);
 		}
 
 		void* AllocData()

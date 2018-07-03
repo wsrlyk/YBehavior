@@ -165,6 +165,12 @@
     <ClInclude Include="..\include\YBehavior\nodes\piecewisefunction.h">
       <Filter>头文件\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\nodes\dice.h">
+      <Filter>头文件\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\treekeymgr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -256,6 +262,12 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodes\piecewisefunction.cpp">
       <Filter>源文件\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\nodes\dice.cpp">
+      <Filter>源文件\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\treekeymgr.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

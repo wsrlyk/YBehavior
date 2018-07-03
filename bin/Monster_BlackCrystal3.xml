@@ -4,11 +4,11 @@
     <Node Class="Sequence" Pos="112,158">
       <Node Class="SelectTargetAction" Pos="3,344" Target="_AP Target" />
       <Node Class="GetTargetNameAction" Pos="246,336" Target="_AP Target" />
-      <Node Class="SwitchCase" Pos="505,349" Switch="_FP f" Cases="FFP ff">
-        <Node Class="SetData" Pos="432,630" Target="_FP f" Source="_FC 4" />
-        <Node Class="SetData" Pos="506,624" Target="_FP f" Source="_FC 5" />
-        <Node Class="SetData" Pos="603,622" Target="_FP f" Source="_FC 2" />
-        <Node Class="SetData" Connection="default" Pos="685,575" Target="_FP f" Source="_FC 1" />
+      <Node Class="SwitchCase" Pos="484,466" Switch="_FP f" Cases="FFP ff">
+        <Node Class="SetData" Pos="411,747" Target="_FP f" Source="_FC 4" />
+        <Node Class="SetData" Pos="485,741" Target="_FP f" Source="_FC 5" />
+        <Node Class="SetData" Pos="582,739" Target="_FP f" Source="_FC 2" />
+        <Node Class="SetData" Connection="default" Pos="664,692" Target="_FP f" Source="_FC 1" />
       </Node>
       <Node Class="For" Pos="807,460" ExitWhenFailure="_BC false">
         <Node Class="SetData" Connection="init" Pos="729,731" Target="_FP f0" Source="_FC 0" />
@@ -16,10 +16,11 @@
         <Node Class="Calculator" Connection="inc" Pos="846,742" Operator="_EC ADD" Opl="_FP f0" Opr1="_FP f0" Opr2="_FC 1" />
         <Node Class="GetTargetNameAction" Pos="877,809" Target="_AP Target" />
       </Node>
-      <Node Class="ForEach" Pos="1025,500" Collection="FFP ff" Current="_FP f" ExitWhenFailure="_BC false">
-        <Node Class="GetTargetNameAction" Pos="1036,682" Target="_AP Target" />
+      <Node Class="ForEach" Pos="1057,506" Collection="FFP ff" Current="_FP f" ExitWhenFailure="_BC false">
+        <Node Class="GetTargetNameAction" Pos="1068,688" Target="_AP Target" />
       </Node>
       <Node Class="PiecewiseFunction" Pos="1313,666" DebugPoint="-1" KeyPointX="IIC 1|2|2|4|6" KeyPointY="IIC 1|4|8|16|16" InputX="_IC 2000" OutputY="_IP i" />
+      <Node Class="Dice" Pos="1485,643" Distribution="IIC 3|1|9|4" Values="FFC 0.1|0.2|0.3|0.4" Input="_IC 0" Output="_FP f" IgnoreInput="_BC true" />
     </Node>
   </Node>
 </Monster_BlackCrystal3>

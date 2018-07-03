@@ -6,10 +6,10 @@
 
 namespace YBehavior
 {
-	class PiecewiseFunction : public SingleChildNode
+	class PiecewiseFunction : public LeafNode
 	{
 	public:
-		STRING GetClassName() const override { return "SwitchCase"; }
+		STRING GetClassName() const override { return "PiecewiseFunction"; }
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
 		virtual void OnLoaded(const pugi::xml_node& data);

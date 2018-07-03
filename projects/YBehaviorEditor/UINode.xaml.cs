@@ -122,7 +122,7 @@ namespace YBehavior.Editor
                     ConnHolder = Node.Conns.ParentHolder
                 };
                 //uiConnector.SetCanvas(m_Canvas);
-
+                uiConnector.title.FontSize = 14;
                 topConnectors.Children.Add(uiConnector);
 
                 m_uiConnectors.Add(Connection.IdentifierParent, uiConnector);

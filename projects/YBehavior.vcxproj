@@ -29,6 +29,7 @@
     <ClInclude Include="..\include\YBehavior\nodes\calculator.h" />
     <ClInclude Include="..\include\YBehavior\nodes\comparer.h" />
     <ClInclude Include="..\include\YBehavior\nodes\decorator.h" />
+    <ClInclude Include="..\include\YBehavior\nodes\dice.h" />
     <ClInclude Include="..\include\YBehavior\nodes\loop.h" />
     <ClInclude Include="..\include\YBehavior\nodes\ifthenelse.h" />
     <ClInclude Include="..\include\YBehavior\nodes\piecewisefunction.h" />
@@ -48,6 +49,7 @@
     <ClInclude Include="..\include\YBehavior\tools\linkedlist.h" />
     <ClInclude Include="..\include\YBehavior\tools\meta.h" />
     <ClInclude Include="..\include\YBehavior\tools\objectpool.h" />
+    <ClInclude Include="..\include\YBehavior\treekeymgr.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />
     <ClInclude Include="..\include\YBehavior\variableoperation.h" />
@@ -68,6 +70,7 @@
     <ClCompile Include="..\src\YBehavior\nodes\calculator.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\comparer.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\decorator.cpp" />
+    <ClCompile Include="..\src\YBehavior\nodes\dice.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\loop.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\ifthenelse.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\piecewisefunction.cpp" />
@@ -80,6 +83,7 @@
     <ClCompile Include="..\src\YBehavior\registerdata.cpp" />
     <ClCompile Include="..\src\YBehavior\shareddataex.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\common.cpp" />
+    <ClCompile Include="..\src\YBehavior\treekeymgr.cpp" />
     <ClCompile Include="..\src\YBehavior\types.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />
     <ClCompile Include="..\src\YBehavior\variableoperation.cpp" />

@@ -4,6 +4,7 @@
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/variableoperation.h"
 #include "YBehavior/interface.h"
+#include "treekeymgr.h"
 
 namespace YBehavior
 {
@@ -190,11 +191,11 @@ namespace YBehavior
 			///> if T is a single type but has vector index, it means this variable is an element of a vector.
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
 			{
-				SetKey(NodeFactory::Instance()->GetKeyByName<std::vector<T>>(s));
+				SetKey(TreeKeyMgr::Instance()->GetKeyByName<std::vector<T>>(s));
 			}
 			else
 			{
-				SetKey(NodeFactory::Instance()->GetKeyByName<T>(s));
+				SetKey(TreeKeyMgr::Instance()->GetKeyByName<T>(s));
 			}
 		}
 
