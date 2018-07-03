@@ -106,7 +106,7 @@ namespace YBehavior
 
 		if (ns == NS_FAILURE)
 		{
-			DEBUG_LOG_INFO("Input below zero; ");
+			DEBUG_LOG_INFO("Input above max; ");
 		}
 		//if (m_DefaultChild != nullptr)
 		//{

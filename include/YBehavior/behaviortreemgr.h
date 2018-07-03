@@ -44,6 +44,7 @@ namespace YBehavior
 		BehaviorTree * GetTree(const STRING& name);
 		///> Mark this tree dirty to reload it when GetTree
 		void ReloadTree(const STRING& name);
+		void ReloadAll();
 		void ReturnTree(BehaviorTree* tree);
 		static TreeMgr* Instance();
 		void Print();

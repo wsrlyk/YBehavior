@@ -128,6 +128,14 @@ namespace YBehavior
 		}
 	}
 
+	void TreeMgr::ReloadAll()
+	{
+		for (auto it = m_Trees.begin(); it != m_Trees.end(); ++it)
+		{
+			it->second->IncreaseLatestVesion();
+		}
+	}
+
 	void TreeMgr::ReturnTree(BehaviorTree* tree)
 	{
 		if (tree == nullptr)
