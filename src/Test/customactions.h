@@ -50,11 +50,11 @@ class XEntity
 	XAgent* pAgent;
 	std::string m_Name;
 public:
-	XEntity(const std::string& name)
+	XEntity(const std::string& name, const std::string& tree)
 	{
 		m_Name = name;
 		pAgent = new XAgent();
-		pAgent->SetTree("Monster_BlackCrystal3");
+		pAgent->SetTree(tree);
 		pAgent->SetData();
 	}
 	~XEntity()

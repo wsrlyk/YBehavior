@@ -18,11 +18,14 @@ int main(int argc, char** argv)
 
 	XAgent::InitData();
 
+	std::string tree("Monster_BlackCrystal3");
+	if (argc >= 2)
+		tree = argv[1];
 	std::vector<int> a(1);
-	XEntity* pEntity = new XEntity("Hehe");
+	XEntity* pEntity = new XEntity("Hehe", tree);
 	pEntity->GetAgent()->SetEntity(pEntity);
 
-	XEntity* pEntity1 = new XEntity("Haha");
+	XEntity* pEntity1 = new XEntity("Haha", tree);
 	pEntity1->GetAgent()->SetEntity(pEntity1);
 
 	LOG_BEGIN << "wrapper begin" << LOG_END;
