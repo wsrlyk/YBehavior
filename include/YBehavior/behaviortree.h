@@ -159,7 +159,8 @@ namespace YBehavior
 	private:
 		SharedDataEx* m_SharedData;	///> Original data, copied to each agent using this tree
 		NameKeyMgr* m_NameKeyMgr;
-		STRING m_TreeName;
+		STRING m_TreeNameWithPath;	///> Full Path
+		STRING m_TreeName;	///> Only File
 		int m_Version;
 #ifdef DEBUGGER
 		UINT m_Hash;
@@ -167,6 +168,7 @@ namespace YBehavior
 	public:
 		BehaviorTree(const STRING& name);
 		~BehaviorTree();
+		inline const STRING& GetTreeNameWithPath() { return m_TreeNameWithPath; }
 		inline const STRING& GetTreeName() { return m_TreeName; }
 		inline SharedDataEx* GetSharedData() { return m_SharedData; }
 		inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }

@@ -141,7 +141,7 @@ namespace YBehavior
 		if (tree == nullptr)
 			return;
 
-		auto it = m_Trees.find(tree->GetTreeName());
+		auto it = m_Trees.find(tree->GetTreeNameWithPath());
 		if (it != m_Trees.end())
 		{
 			it->second->ChangeReferenceCount(false, tree->GetVersion());

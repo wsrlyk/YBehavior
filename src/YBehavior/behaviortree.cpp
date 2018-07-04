@@ -227,7 +227,15 @@ namespace YBehavior
 
 	BehaviorTree::BehaviorTree(const STRING& name)
 	{
-		m_TreeName = name;
+		m_TreeNameWithPath = name;
+		{
+			auto it = name.find_last_of('/');
+			if (it != STRING::npos)
+				m_TreeName = name.substr(it + 1);
+			it = m_TreeName.find_last_of('\\');
+			if (it != STRING::npos)
+				m_TreeName = m_TreeName.substr(it + 1);
+		}
 		m_SharedData = new SharedDataEx();
 		m_NameKeyMgr = new NameKeyMgr();
 	}
