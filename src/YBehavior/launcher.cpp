@@ -11,8 +11,8 @@ namespace YBehavior
 		core.RegisterActions();
 
 #ifdef DEBUGGER
-		if (core.OpenDebugger())
-			Network::Instance()->InitAndCreateThread();
+		if (core.StartWithDebugListeningPort())
+			Network::Instance()->InitAndCreateThread(core.StartWithDebugListeningPort());
 #endif
 		return true;
 	}

@@ -622,7 +622,7 @@ namespace YBehavior.Editor.Core
 
             Variables.CreateVariableInNode(
                 "Cases",
-                "0",
+                "",
                 Variable.CreateParams_SwitchTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Const,

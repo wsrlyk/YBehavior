@@ -99,15 +99,17 @@ namespace YBehavior
 
 		int m_isConnected;
 		bool m_bTerminating = false;
-
+		int m_Port;
 		String ms_texts;
 		String ms_sendBuffer;
 
 		Mutex m_Mutex;
 	public:
+		Network();
 		bool IsConnected() const;
 
-		void InitAndCreateThread();
+		void InitAndCreateThread(int port);
+		void Close();
 
 		static void _ThreadFunc(Network*);
 		void ThreadFunc();

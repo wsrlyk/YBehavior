@@ -12,6 +12,11 @@ namespace YBehavior
 	const size_t	kGlobalQueueSize = (1024 * 32);
 	const size_t	kLocalQueueSize = (1024 * 8);
 
+	Network::Network()
+	{
+		m_ThreadHandle = 0;
+	}
+
 	bool Network::IsConnected() const
 	{
 		return m_isConnected != 0 && this->m_WriteSocket;
@@ -25,10 +30,30 @@ namespace YBehavior
 	//	return m_isInited != 0;
 	//}
 
-	void Network::InitAndCreateThread()
+	void Network::InitAndCreateThread(int port)
 	{
+		if (m_ThreadHandle)
+		{
+			ERROR_BEGIN << "Already has a thread." << ERROR_END;
+			return;
+		}
+
 		Socket::InitSockets();
+		m_Port = port;
 		m_ThreadHandle = Thread::CreateThread((ThreadFunction*)&_ThreadFunc, this);
+	}
+
+	void Network::Close()
+	{
+		if (!m_ThreadHandle)
+		{
+			ERROR_BEGIN << "Has no thread." << ERROR_END;
+			return;
+		}
+
+		m_bTerminating = true;
+		Socket::Close(m_ListeningHandle);
+		m_ThreadHandle = 0;
 	}
 
 	void Network::_ThreadFunc(Network* network)
@@ -39,7 +64,7 @@ namespace YBehavior
 	{
 		m_ListeningHandle = Socket::CreateSocket(true);
 
-		if (!Socket::Listen(m_ListeningHandle, 444, 1))
+		if (!Socket::Listen(m_ListeningHandle, m_Port, 1))
 		{
 			Socket::Close(m_ListeningHandle);
 			return;

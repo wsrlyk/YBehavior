@@ -102,5 +102,6 @@ class MyLaunchCore : public YBehavior::LaunchCore
 {
 public:
 	virtual void RegisterActions() const;
+	int StartWithDebugListeningPort() const override { return 444; }
 };
 

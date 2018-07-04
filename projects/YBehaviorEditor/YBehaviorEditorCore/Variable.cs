@@ -545,9 +545,12 @@ namespace YBehavior.Editor.Core
 
             cType = GetCountType(valueType, countType);
 
-            vbType = VariableTypeDic.GetKey(variableType, VariableType.VBT_NONE);
-            if (vbType == VariableType.VBT_NONE)
-                return false;
+            if (!LockVBType)
+            {
+                vbType = VariableTypeDic.GetKey(variableType, VariableType.VBT_NONE);
+                if (vbType == VariableType.VBT_NONE)
+                    return false;
+            }
 
             m_Value = value;
             if (param != null)

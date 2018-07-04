@@ -15,11 +15,29 @@ namespace YBehavior
 		GetClassTypeNumberId<Uint64>(),
 	};
 
+	static std::unordered_set<TYPEID> s_ValidVecTypes = {
+		GetClassTypeNumberId<VecInt>(),
+		GetClassTypeNumberId<VecFloat>(),
+		GetClassTypeNumberId<VecBool>(),
+		GetClassTypeNumberId<VecString>(),
+		GetClassTypeNumberId<VecUint64>(),
+	};
+
 	NodeState SwitchCase::Update(AgentPtr pAgent)
 	{
-		NodeState ns = NS_FAILURE;
+		IF_HAS_LOG_POINT
+		{
+			LOG_SHARED_DATA(m_Switch, true);
+			LOG_SHARED_DATA(m_Cases, true);
+		}
 
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Switch, true);
+		if (m_CasesChilds.size() != m_Cases->VectorSize(pAgent->GetSharedData()))
+		{
+			ERROR_BEGIN << "Cases size not match in SwitchCase" << ERROR_END;
+			return NS_FAILURE;
+		}
+
+		NodeState ns = NS_FAILURE;
 
 		INT size = m_CasesChilds.size();
 
@@ -57,7 +75,7 @@ namespace YBehavior
 			return;
 		}
 		TYPEID casesType = CreateVariable(m_Cases, "Cases", data, false);
-		if (s_ValidTypes.find(casesType) == s_ValidTypes.end())
+		if (s_ValidVecTypes.find(casesType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Cases in SwitchCase: " << casesType << ERROR_END;
 			return;
@@ -66,14 +84,6 @@ namespace YBehavior
 		if (!Utility::IsElement(switchType, casesType))
 		{
 			ERROR_BEGIN << "Different types in SwitchCase:  " << switchType << " and " << casesType << ERROR_END;
-		}
-	}
-
-	void SwitchCase::OnLoadFinish()
-	{
-		if (m_CasesChilds.size() != m_Cases->VectorSize(nullptr))
-		{
-			ERROR_BEGIN << "Cases size not match in SwitchCase" << ERROR_END;
 		}
 	}
 

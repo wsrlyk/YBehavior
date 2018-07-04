@@ -8,7 +8,7 @@ namespace YBehavior
 	{
 	public:
 		virtual void RegisterActions() const;
-		virtual bool OpenDebugger() const { return true; }
+		virtual int StartWithDebugListeningPort() const { return 0; }
 	protected:
 		template<typename T>
 		void _Register() const;

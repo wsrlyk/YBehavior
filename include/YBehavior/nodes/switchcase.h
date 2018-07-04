@@ -13,7 +13,6 @@ namespace YBehavior
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
 		virtual void OnLoaded(const pugi::xml_node& data);
-		virtual void OnLoadFinish();
 		void OnAddChild(BehaviorNode * child, const STRING & connection) override;
 
 		ISharedVariableEx* m_Switch;
