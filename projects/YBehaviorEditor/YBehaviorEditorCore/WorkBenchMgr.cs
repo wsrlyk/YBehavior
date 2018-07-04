@@ -254,6 +254,7 @@ namespace YBehavior.Editor.Core
             xmlDoc.AppendChild(el);
 
             bench.Export(el, xmlDoc);
+            new System.IO.FileInfo(bench.FileInfo.ExportingPath).Directory.Create();
             xmlDoc.Save(bench.FileInfo.ExportingPath);
 
             return true;
