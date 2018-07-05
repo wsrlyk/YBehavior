@@ -23,7 +23,7 @@ namespace YBehavior
 
 	void Comparer::OnLoaded(const pugi::xml_node& data)
 	{
-		///> ÔËËã·û
+		///> Operator
 		auto attrOptr = data.attribute("Operator");
 		if (attrOptr.empty())
 		{
@@ -38,14 +38,14 @@ namespace YBehavior
 		}
 
 		//////////////////////////////////////////////////////////////////////////
-		///> µÈºÅ×ó±ß
-		m_DataType = CreateVariable(m_Opl, "Opl", data, true, POINTER);
+		///> Left
+		m_DataType = CreateVariable(m_Opl, "Opl", data, true, Utility::POINTER_CHAR);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
 			return;
 		}
-		///> µÈºÅÓÒ±ß1
+		///> Right
 		TYPEID dataType = CreateVariable(m_Opr, "Opr", data, true);
 		if (m_DataType != dataType)
 		{

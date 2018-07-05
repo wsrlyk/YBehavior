@@ -241,12 +241,6 @@ namespace YBehavior
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecString, 105);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecAgentWrapper, 106);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecVector3, 107);
-
-	static const char POINTER = 'P';
-	static const char CONST = 'C';
-	static const BOOL TRUE = 1;
-	static const BOOL FALSE = 0;
-	static const KEY INVALID_KEY = -1;
 }
 
 #endif

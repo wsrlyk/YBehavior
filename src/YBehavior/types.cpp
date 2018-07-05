@@ -39,5 +39,4 @@ namespace YBehavior
 		m_Data = nullptr;
 		m_Reference = nullptr;
 	}
-
 }

@@ -34,7 +34,7 @@ void XAgent::Update()
 
 	static int i = 1;
 	static float f = 0.0f;
-	static YBehavior::BOOL b = YBehavior::FALSE;
+	static YBehavior::BOOL b = YBehavior::Utility::FALSE_VALUE;
 	
 	pRegister->Clear();
 	pRegister->SetEvent("hehe");
@@ -57,12 +57,12 @@ void XAgent::Update()
 
 	if (b)
 	{
-		pRegister->Push(YBehavior::FALSE);
-		pRegister->Push(YBehavior::TRUE);
+		pRegister->Push(YBehavior::Utility::FALSE_VALUE);
+		pRegister->Push(YBehavior::Utility::TRUE_VALUE);
 	}
 	else
 	{
-		pRegister->Push(YBehavior::TRUE);
+		pRegister->Push(YBehavior::Utility::TRUE_VALUE);
 	}
 	b = !b;
 
@@ -97,7 +97,7 @@ YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 
 void SelectTargetAction::OnLoaded(const pugi::xml_node& data)
 {
-	YBehavior::TYPEID typeID = CreateVariable(m_Target, "Target", data, true, YBehavior::POINTER);
+	YBehavior::TYPEID typeID = CreateVariable(m_Target, "Target", data, true, YBehavior::Utility::POINTER_CHAR);
 	if (typeID != YBehavior::GetClassTypeNumberId<YBehavior::AgentWrapper>())
 	{
 		ERROR_BEGIN << "Type of [Target] Error in SelectTargetAction" << ERROR_END;
@@ -122,7 +122,7 @@ YBehavior::NodeState GetTargetNameAction::Update(YBehavior::AgentPtr pAgent)
 
 void GetTargetNameAction::OnLoaded(const pugi::xml_node& data)
 {
-	YBehavior::TYPEID typeID = CreateVariable(m_Target, "Target", data, true, YBehavior::POINTER);
+	YBehavior::TYPEID typeID = CreateVariable(m_Target, "Target", data, true, YBehavior::Utility::POINTER_CHAR);
 	if (typeID != YBehavior::GetClassTypeNumberId<YBehavior::AgentWrapper>())
 	{
 		ERROR_BEGIN << "Type of [Target] Error in SelectTargetAction" << ERROR_END;

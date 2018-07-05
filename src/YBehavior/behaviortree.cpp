@@ -174,7 +174,7 @@ namespace YBehavior
 			return "";
 		}
 		std::vector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, 1, CONST))
+		if (!ParseVariable(attrOptr, data, buffer, 1, Utility::CONST_CHAR))
 			return "";
 
 		return buffer[1];
@@ -207,7 +207,7 @@ namespace YBehavior
 				op->SetVectorIndex(buffer[3], buffer[4]);
 			}
 
-			if (buffer[0][2] == POINTER)
+			if (buffer[0][2] == Utility::POINTER_CHAR)
 				op->SetKeyFromString(buffer[1]);
 			else
 				op->SetValueFromString(buffer[1]);

@@ -19,6 +19,11 @@ namespace YBehavior
 		static const VecBool VecBoolEmpty;
 		static const VecString VecStringEmpty;
 		static const VecUlong VecUlongEmpty;
+		static const char POINTER_CHAR;
+		static const char CONST_CHAR;
+		static const BOOL TRUE_VALUE;
+		static const BOOL FALSE_VALUE;
+		static const KEY INVALID_KEY;
 
 		static void SplitString(const STRING& s, std::vector<STRING>& v, CHAR c, int count = 0);
 		static Vector3 CreateVector3(const std::vector<STRING>& data);
@@ -46,7 +51,7 @@ namespace YBehavior
 		//static STRING ToString(const std::vector<BOOL>& t);
 
 		template<typename T>
-		static T Rand(const T& small, const T& large);
+		static T Rand(const T& smallNum, const T& largeNum);
 
 		static UINT Hash(const STRING& str);
 	private:
@@ -90,17 +95,17 @@ namespace YBehavior
 	STRING Utility::ToString(const std::vector<BOOL>& t);
 
 	template<typename T>
-	T Utility::Rand(const T& small, const T& large)
+	T Utility::Rand(const T& smallNum, const T& largeNum)
 	{
-		std::uniform_int_distribution<T> dist(small, large - 1);
+		std::uniform_int_distribution<T> dist(smallNum, largeNum - 1);
 		return dist(mt);
 	}
 
 	template<>
-	Float Utility::Rand<Float>(const Float& small, const Float& large);
+	Float Utility::Rand<Float>(const Float& smallNum, const Float& largeNum);
 
 	template<>
-	Bool Utility::Rand<Bool>(const Bool& small, const Bool& large);
+	Bool Utility::Rand<Bool>(const Bool& smallNum, const Bool& largeNum);
 
 }
 

@@ -33,7 +33,7 @@ public:
 	void SetData()
 	{
 		this->GetSharedData()->Set<YBehavior::INT>(tickCount0, 3);
-		this->GetSharedData()->Set<YBehavior::BOOL>(isfighting, YBehavior::FALSE);
+		this->GetSharedData()->Set<YBehavior::BOOL>(isfighting, YBehavior::Utility::FALSE_VALUE);
 		this->GetSharedData()->Set<YBehavior::FLOAT>(heartrate, 2);
 
 		YBehavior::KEY f = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::FLOAT>("f");

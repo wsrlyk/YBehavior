@@ -15,42 +15,42 @@ namespace YBehavior
 	void ReadRegister::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID typeID;
-		typeID = CreateVariable(m_Event, "Event", data, true, POINTER);
+		typeID = CreateVariable(m_Event, "Event", data, true, Utility::POINTER_CHAR);
 		if (!m_Event)
 		{
 			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
 			return;
 		}
 
-		typeID = CreateVariable(m_Int, "Int", data, false, POINTER);
+		typeID = CreateVariable(m_Int, "Int", data, false, Utility::POINTER_CHAR);
 		if (!m_Int)
 		{
 			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
 			return;
 		}
 
-		typeID = CreateVariable(m_Float, "Float", data, false, POINTER);
+		typeID = CreateVariable(m_Float, "Float", data, false, Utility::POINTER_CHAR);
 		if (!m_Float)
 		{
 			ERROR_BEGIN << "Invalid type for Float in ReadRegister " << typeID << ERROR_END;
 			return;
 		}
 
-		typeID = CreateVariable(m_Bool, "Bool", data, false, POINTER);
+		typeID = CreateVariable(m_Bool, "Bool", data, false, Utility::POINTER_CHAR);
 		if (!m_Bool)
 		{
 			ERROR_BEGIN << "Invalid type for Bool in ReadRegister " << typeID << ERROR_END;
 			return;
 		}
 
-		typeID = CreateVariable(m_Ulong, "Ulong", data, false, POINTER);
+		typeID = CreateVariable(m_Ulong, "Ulong", data, false, Utility::POINTER_CHAR);
 		if (!m_Ulong)
 		{
 			ERROR_BEGIN << "Invalid type for Ulong in ReadRegister " << typeID << ERROR_END;
 			return;
 		}
 
-		typeID = CreateVariable(m_String, "String", data, false, POINTER);
+		typeID = CreateVariable(m_String, "String", data, false, Utility::POINTER_CHAR);
 		if (!m_String)
 		{
 			ERROR_BEGIN << "Invalid type for String in ReadRegister " << typeID << ERROR_END;

@@ -23,14 +23,14 @@ namespace YBehavior
 	void SetData::OnLoaded(const pugi::xml_node& data)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		///> µÈºÅ×ó±ß
-		m_DataType = CreateVariable(m_Opl, "Target", data, true, POINTER);
+		///> Left
+		m_DataType = CreateVariable(m_Opl, "Target", data, true, Utility::POINTER_CHAR);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
 			return;
 		}
-		///> µÈºÅÓÒ±ß1
+		///> Right
 		TYPEID dataType = CreateVariable(m_Opr, "Source", data, true);
 		if (m_DataType != dataType)
 		{

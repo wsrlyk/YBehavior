@@ -20,21 +20,21 @@ namespace YBehavior
 	void Random::OnLoaded(const pugi::xml_node& data)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		///> µÈºÅ×ó±ß
-		m_DataType = CreateVariable(m_Opl, "Target", data, true, POINTER);
+		///> Left
+		m_DataType = CreateVariable(m_Opl, "Target", data, true, Utility::POINTER_CHAR);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
 			return;
 		}
-		///> µÈºÅÓÒ±ß1
+		///> Right1
 		TYPEID dataType = CreateVariable(m_Opr1, "Bound1", data, true);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
 			return;
 		}
-		///> µÈºÅÓÒ±ß1
+		///> Right2
 		dataType = CreateVariable(m_Opr2, "Bound2", data, true);
 		if (m_DataType != dataType)
 		{

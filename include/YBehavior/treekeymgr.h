@@ -34,7 +34,7 @@ namespace YBehavior
 			auto it = mNameHash.find(s);
 			if (it != mNameHash.end())
 				return it->second;
-			return INVALID_KEY;
+			return Utility::INVALID_KEY;
 		}
 #ifdef DEBUGGER
 		const STRING& Get(const KEY& key)
@@ -127,15 +127,15 @@ namespace YBehavior
 	KEY TreeKeyMgr::CreateKeyByName(const STRING& name)
 	{
 		KEY key = mCommonNameKeyInfo.GetKey<T>(name);
-		if (key != INVALID_KEY)
+		if (key != Utility::INVALID_KEY)
 			return key;
 		if (mpCurActiveNameKeyInfo == NULL)
-			return INVALID_KEY;
+			return Utility::INVALID_KEY;
 
 		TYPEID typeNumberId = GetClassTypeNumberId<T>();
 		NameKeyInfo& curActiveNameKeyInfo = mpCurActiveNameKeyInfo->Get(typeNumberId);
 
-		if (mpCurActiveNameKeyInfo == &mCommonNameKeyInfo || curActiveNameKeyInfo.Get(name) == INVALID_KEY)
+		if (mpCurActiveNameKeyInfo == &mCommonNameKeyInfo || curActiveNameKeyInfo.Get(name) == Utility::INVALID_KEY)
 		{
 			KEY key = curActiveNameKeyInfo.mKeyCounter++;
 			LOG_BEGIN << "ADD node: " << name << "key: " << key << LOG_END;

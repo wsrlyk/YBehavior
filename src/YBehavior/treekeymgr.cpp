@@ -27,10 +27,10 @@ namespace YBehavior
 	{
 		NameKeyInfo& info = mCommonNameKeyInfo.Get(typeID);
 		KEY key = info.Get(name);
-		if (key != INVALID_KEY)
+		if (key != Utility::INVALID_KEY)
 			return key;
 		if (mpCurActiveNameKeyInfo == NULL)
-			return INVALID_KEY;
+			return Utility::INVALID_KEY;
 		info = mpCurActiveNameKeyInfo->Get(typeID);
 		return info.Get(name);
 	}
