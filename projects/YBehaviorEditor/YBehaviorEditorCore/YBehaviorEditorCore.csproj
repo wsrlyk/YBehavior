@@ -46,6 +46,7 @@
     <Compile Include="Comment.cs" />
     <Compile Include="DebugMgr.cs" />
     <Compile Include="ExternalActionMgr.cs" />
+    <Compile Include="Tools\IniFile.cs" />
     <Compile Include="MessageProcessor.cs" />
     <Compile Include="NetworkMgr.cs" />
     <Compile Include="SharedData.cs" />

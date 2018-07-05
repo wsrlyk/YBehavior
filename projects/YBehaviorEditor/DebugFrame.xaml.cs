@@ -25,6 +25,20 @@ namespace YBehavior.Editor
             InitializeComponent();
             this.DebuggingFrame.Visibility = Visibility.Collapsed;
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);
+
+            this.IP.SetBinding(TextBox.TextProperty, new Binding()
+            {
+                Path = new PropertyPath("DebugIP"),
+                Mode = BindingMode.TwoWay,
+                Source = Config.Instance
+            });
+
+            this.Port.SetBinding(TextBox.TextProperty, new Binding()
+            {
+                Path = new PropertyPath("DebugPort"),
+                Mode = BindingMode.TwoWay,
+                Source = Config.Instance
+            });
         }
 
         private void _OnNetworkConnectionChanged(EventArg arg)
