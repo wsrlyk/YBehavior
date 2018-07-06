@@ -875,4 +875,36 @@ namespace YBehavior.Editor.Core
             }
         }
     }
+
+    class SubTreeNode : LeafNode
+    {
+        public override string Icon => "♣";
+
+        public SubTreeNode()
+        {
+            m_Name = "SubTree";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_DefaultAction;
+        }
+
+        public override void CreateVariables()
+        {
+            Variables.CreateVariableInNode(
+                "Tree",
+                "",
+                Variable.CreateParams_String,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                true
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                return Variables.GetVariable("Tree").NoteValue;
+            }
+        }
+    }
 }
