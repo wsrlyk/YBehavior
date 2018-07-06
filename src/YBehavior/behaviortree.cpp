@@ -237,13 +237,13 @@ namespace YBehavior
 				m_TreeName = m_TreeName.substr(it + 1);
 		}
 		m_SharedData = new SharedDataEx();
-		m_NameKeyMgr = new NameKeyMgr();
+		//m_NameKeyMgr = new NameKeyMgr();
 	}
 
 	BehaviorTree::~BehaviorTree()
 	{
 		delete m_SharedData;
-		delete m_NameKeyMgr;
+		//delete m_NameKeyMgr;
 	}
 
 	void BehaviorTree::OnLoaded(const pugi::xml_node& data)

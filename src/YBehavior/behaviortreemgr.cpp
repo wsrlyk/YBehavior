@@ -35,7 +35,6 @@ namespace YBehavior
 			return nullptr;
 
 		BehaviorTree* tree = new BehaviorTree(name);
-		TreeKeyMgr::Instance()->SetActiveTree(tree->GetNameKeyMgr(), true);
 
 		UINT uid = 0;
 		if (!_LoadOneNode(tree, rootData.first_child(), uid))

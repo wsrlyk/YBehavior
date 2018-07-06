@@ -2,26 +2,26 @@
 #include "YBehavior/logger.h"
 namespace YBehavior
 {
-	void TreeKeyMgr::SetActiveTree(NameKeyMgr* nameKeyMgr, bool bReset)
-	{
-		//LOG_BEGIN << "SetActiveTree: " << tree.c_str() << LOG_END;
+	//void TreeKeyMgr::SetActiveTree(NameKeyMgr* nameKeyMgr, bool bReset)
+	//{
+	//	//LOG_BEGIN << "SetActiveTree: " << tree.c_str() << LOG_END;
 
-		if (nameKeyMgr == nullptr)
-		{
-			mpCurActiveNameKeyInfo = &mCommonNameKeyInfo;
-			return;
-		}
-		else
-		{
-			mpCurActiveNameKeyInfo = nameKeyMgr;
-		}
+	//	if (nameKeyMgr == nullptr)
+	//	{
+	//		mpCurActiveNameKeyInfo = &mCommonNameKeyInfo;
+	//		return;
+	//	}
+	//	else
+	//	{
+	//		mpCurActiveNameKeyInfo = nameKeyMgr;
+	//	}
 
-		if (bReset)
-		{
-			mpCurActiveNameKeyInfo->Reset();
-			mpCurActiveNameKeyInfo->AssignKey(mCommonNameKeyInfo);
-		}
-	}
+	//	if (bReset)
+	//	{
+	//		mpCurActiveNameKeyInfo->Reset();
+	//		mpCurActiveNameKeyInfo->AssignKey(mCommonNameKeyInfo);
+	//	}
+	//}
 
 	KEY TreeKeyMgr::GetKeyByName(const STRING& name, TYPEID typeID)
 	{
@@ -50,5 +50,6 @@ namespace YBehavior
 	TreeKeyMgr::TreeKeyMgr()
 	{
 		mCommonNameKeyInfo.Reset();
+		mpCurActiveNameKeyInfo = &mCommonNameKeyInfo;
 	}
 }

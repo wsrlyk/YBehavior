@@ -92,7 +92,8 @@ namespace YBehavior
 	{
 	public:
 		TreeKeyMgr();
-		void SetActiveTree(NameKeyMgr* nameKeyMgr, bool bReset);
+		///> All infos now are stored in common info, so this function is disabled.
+		//void SetActiveTree(NameKeyMgr* nameKeyMgr, bool bReset);
 		template<typename T>
 		KEY CreateKeyByName(const STRING& name);
 		template<typename T>

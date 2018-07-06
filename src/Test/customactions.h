@@ -22,7 +22,7 @@ public:
 	}
 	static void InitData()
 	{
-		YBehavior::TreeKeyMgr::Instance()->SetActiveTree(nullptr, true);
+		//YBehavior::TreeKeyMgr::Instance()->SetActiveTree(nullptr, true);
 		tickCount0 = YBehavior::TreeKeyMgr::Instance()->CreateKeyByName<YBehavior::INT>("tickCount0");
 		tickCount1 = YBehavior::TreeKeyMgr::Instance()->CreateKeyByName<YBehavior::INT>("tickCount1");
 		isfighting = YBehavior::TreeKeyMgr::Instance()->CreateKeyByName<YBehavior::BOOL>("isfighting");

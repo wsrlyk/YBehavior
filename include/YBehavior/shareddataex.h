@@ -43,7 +43,7 @@ namespace YBehavior
 	template<typename T>
 	class DataArray : public IDataArray
 	{
-		std::vector<T> m_Datas;
+		std::unordered_map<KEY, T> m_Datas;
 	public:
 		virtual IDataArray* Clone() const override
 		{
@@ -61,73 +61,93 @@ namespace YBehavior
 
 		bool Get(KEY key, const T& res) const
 		{
-			if (key < 0 || key >= (KEY)m_Datas.size())
+			//if (key < 0 || key >= (KEY)m_Datas.size())
+			//	return false;
+			//res = m_Datas[key];
+			//return true;
+			auto it = m_Datas.find(key);
+			if (it == m_Datas.end())
 				return false;
-			res = m_Datas[key];
+			res = it->second;
 			return true;
 		}
 
 		virtual const void* Get(KEY key) const override
 		{
-			if (key < 0 || key >= (KEY)m_Datas.size())
-				return nullptr;
-			const T* data = &m_Datas[key];
-			return (data);
+			//if (key < 0 || key >= (KEY)m_Datas.size())
+			//	return nullptr;
+			//const T* data = &m_Datas[key];
+			//return (data);
+			auto it = m_Datas.find(key);
+			if (it == m_Datas.end())
+				return false;
+			return &(it->second);
 		}
 
 		virtual const STRING GetToString(KEY key) const override
 		{
-			if (key < 0 || key >= (KEY)m_Datas.size())
+			//if (key < 0 || key >= (KEY)m_Datas.size())
+			//	return Utility::StringEmpty;
+			//const T& data = m_Datas[key];
+			//return Utility::ToString(data);
+			auto it = m_Datas.find(key);
+			if (it == m_Datas.end())
 				return Utility::StringEmpty;
-			const T& data = m_Datas[key];
+			const T& data = it->second;
 			return Utility::ToString(data);
 		}
 
 		bool Set(KEY key, const T& src)
 		{
-			if (key < 0)
-				return false;
-			if ((KEY)m_Datas.size() <= key)
-			{
-				m_Datas.resize(key);
-				m_Datas.push_back(src);
-			}
-			else
-			{
-				m_Datas[key] = src;
-			}
+			//if (key < 0)
+			//	return false;
+			//if ((KEY)m_Datas.size() <= key)
+			//{
+			//	m_Datas.resize(key);
+			//	m_Datas.push_back(src);
+			//}
+			//else
+			//{
+			//	m_Datas[key] = src;
+			//}
+			//return true;
+			m_Datas[key] = src;
 			return true;
 		}
 
 		bool Set(KEY key, T&& src)
 		{
-			if (key < 0)
-				return false;
-			if ((KEY)m_Datas.size() <= key)
-			{
-				m_Datas.resize(key);
-				m_Datas.push_back(src);
-			}
-			else
-			{
-				m_Datas[key] = src;
-			}
+			//if (key < 0)
+			//	return false;
+			//if ((KEY)m_Datas.size() <= key)
+			//{
+			//	m_Datas.resize(key);
+			//	m_Datas.push_back(src);
+			//}
+			//else
+			//{
+			//	m_Datas[key] = src;
+			//}
+			//return true;
+			m_Datas[key] = src;
 			return true;
 		}
 
 		virtual bool Set(KEY key, const void* src) override
 		{
-			if (key < 0 || src == nullptr)
-				return false;
-			if ((KEY)m_Datas.size() <= key)
-			{
-				m_Datas.resize(key);
-				m_Datas.push_back(*((T*)src));
-			}
-			else
-			{
-				m_Datas[key] = *((T*)src);
-			}
+			//if (key < 0 || src == nullptr)
+			//	return false;
+			//if ((KEY)m_Datas.size() <= key)
+			//{
+			//	m_Datas.resize(key);
+			//	m_Datas.push_back(*((T*)src));
+			//}
+			//else
+			//{
+			//	m_Datas[key] = *((T*)src);
+			//}
+			//return true;
+			m_Datas[key] = *((T*)src);
 			return true;
 		}
 	};
