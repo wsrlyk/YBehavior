@@ -45,11 +45,27 @@ namespace YBehavior
 	{
 		std::unordered_map<KEY, T> m_Datas;
 	public:
-		virtual IDataArray* Clone() const override
+		IDataArray * Clone() const override
 		{
 			DataArray<T>* newArray = new DataArray<T>();
 			newArray->m_Datas = m_Datas;
 			return newArray;
+		}
+
+		void Merge(IDataArray* other, bool bOverride) override
+		{
+			DataArray<T>* otherArray = (DataArray<T>*) other;
+			for (auto it = otherArray->m_Datas.begin(); it != otherArray->m_Datas.end(); ++it)
+			{
+				if (!bOverride)
+					this->m_Datas[it->first] = it->second;
+				else
+				{
+					KEY key = it->first;
+					T val = it->second;
+					m_Datas.insert(std::make_pair<KEY, T>(std::move(key), std::move(val)));
+				}
+			}
 		}
 
 		TYPEID GetTypeID() const override
@@ -170,31 +186,15 @@ namespace YBehavior
 
 	public:
 		SharedDataEx();
+		SharedDataEx(SharedDataEx&& other);
 
-		~SharedDataEx()
-		{
-			for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
-			{
-				if (m_Datas[i] != nullptr)
-					delete m_Datas[i];
-			}
-		}
+		~SharedDataEx();
 
 		inline const IDataArray* GetDataArray(KEY typeKey) { return m_Datas[typeKey]; }
 
-		void Clone(const SharedDataEx& other)
-		{
-			for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
-			{
-				if (other.m_Datas[i] == nullptr)
-				{
-					m_Datas[i] = nullptr;
-					continue;
-				}
+		void Clone(const SharedDataEx& other);
 
-				m_Datas[i] = other.m_Datas[i]->Clone();
-			}
-		}
+		void Merge(const SharedDataEx& other, bool bOverride);
 
 		template<typename T>
 		bool Get(KEY key, T& res);

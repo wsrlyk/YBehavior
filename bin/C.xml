@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<C>
+  <Node Class="Root" Pos="225,7" c="_IC 3">
+    <Node Class="Sequence" Pos="253,149">
+      <Node Class="SubTree" Pos="195,329" Disabled="true" Tree="_SC A" />
+      <Node Class="SubTree" Pos="412,387" Tree="_SC D" />
+    </Node>
+  </Node>
+</C>

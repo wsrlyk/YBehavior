@@ -4,6 +4,8 @@
 #include "YBehavior/define.h"
 #include "YBehavior/types.h"
 #include <unordered_map>
+#include <list>
+#include <unordered_set>
 
 namespace pugi
 {
@@ -48,7 +50,11 @@ namespace YBehavior
 		void ReturnTree(BehaviorTree* tree);
 		static TreeMgr* Instance();
 		void Print();
+
+		void PushToBeLoadedTree(const STRING& name) { m_ToBeLoadedTree.push_back(name); }
 	protected:
+		bool _GetTree(const STRING& name, BehaviorTree * &tree);
+		BehaviorTree * _LoadTree(const STRING& name);
 		BehaviorTree* _LoadOneTree(const STRING& name);
 		bool _LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID);
 	private:
@@ -57,6 +63,8 @@ namespace YBehavior
 		~TreeMgr();
 
 		std::unordered_map<STRING, TreeInfo*> m_Trees;
+
+		std::list<STRING> m_ToBeLoadedTree;
 	};
 }
 

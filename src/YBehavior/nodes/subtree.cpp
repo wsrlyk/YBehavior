@@ -8,6 +8,7 @@
 #ifdef DEBUGGER
 #include "YBehavior/debugger.h"
 #endif // DEBUGGER
+#include "YBehavior/behaviortreemgr.h"
 
 namespace YBehavior
 {
@@ -20,6 +21,15 @@ namespace YBehavior
 			ERROR_BEGIN << "Invalid type for Tree in SubTree: " << typeID << ERROR_END;
 			return;
 		}
+
+		const STRING* treeName = (const STRING*)m_TreeName->GetCastedValue(nullptr);
+		if (treeName == nullptr || *treeName == Utility::StringEmpty)
+		{
+			ERROR_BEGIN << "Null Value for Tree in SubTree: " << typeID << ERROR_END;
+			return;
+		}
+
+		TreeMgr::Instance()->PushToBeLoadedTree(*treeName);
 	}
 
 	YBehavior::NodeState SubTree::Update(AgentPtr pAgent)

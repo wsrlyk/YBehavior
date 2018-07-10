@@ -232,6 +232,8 @@ namespace YBehavior
 			auto it = name.find_last_of('/');
 			if (it != STRING::npos)
 				m_TreeName = name.substr(it + 1);
+			else
+				m_TreeName = name;
 			it = m_TreeName.find_last_of('\\');
 			if (it != STRING::npos)
 				m_TreeName = m_TreeName.substr(it + 1);

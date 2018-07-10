@@ -165,6 +165,9 @@ namespace YBehavior
 #ifdef DEBUGGER
 		UINT m_Hash;
 #endif
+
+		std::vector<BehaviorTree*> m_SubTrees;
+		std::vector<BehaviorTree*> m_ParentTrees;
 	public:
 		BehaviorTree(const STRING& name);
 		~BehaviorTree();
@@ -173,6 +176,10 @@ namespace YBehavior
 		inline SharedDataEx* GetSharedData() { return m_SharedData; }
 		//inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }
 		void CloneData(SharedDataEx& destination);
+
+		void AddSubTree(BehaviorTree* sub) { m_SubTrees.push_back(sub); }
+		void AddParentTree(BehaviorTree* parent) { m_ParentTrees.push_back(parent); }
+		inline std::vector<BehaviorTree*>& GetSubTrees() { return m_SubTrees; }
 	protected:
 		virtual void OnLoaded(const pugi::xml_node& data);
 	};

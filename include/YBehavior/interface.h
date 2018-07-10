@@ -47,6 +47,7 @@ namespace YBehavior
 		virtual const STRING GetToString(KEY key) const = 0;
 		virtual bool Set(KEY key, const void* src) = 0;
 		virtual IDataArray* Clone() const = 0;
+		virtual void Merge(IDataArray* other, bool bOverride) = 0;
 		virtual SIZE_KEY Length() const = 0;
 		virtual TYPEID GetTypeID() const = 0;
 	};
