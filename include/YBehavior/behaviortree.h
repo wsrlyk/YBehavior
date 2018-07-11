@@ -167,7 +167,6 @@ namespace YBehavior
 #endif
 
 		std::vector<BehaviorTree*> m_SubTrees;
-		std::vector<BehaviorTree*> m_ParentTrees;
 	public:
 		BehaviorTree(const STRING& name);
 		~BehaviorTree();
@@ -178,7 +177,6 @@ namespace YBehavior
 		void CloneData(SharedDataEx& destination);
 
 		void AddSubTree(BehaviorTree* sub) { m_SubTrees.push_back(sub); }
-		void AddParentTree(BehaviorTree* parent) { m_ParentTrees.push_back(parent); }
 		inline std::vector<BehaviorTree*>& GetSubTrees() { return m_SubTrees; }
 	protected:
 		virtual void OnLoaded(const pugi::xml_node& data);

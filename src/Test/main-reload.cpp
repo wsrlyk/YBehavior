@@ -28,6 +28,7 @@ int main(int argc, char** argv)
 		arrays[i] = nullptr;
 	}
 
+	std::string treeName[3]{ "A", "B", "C" };
 	while (1)
 	{
 		char c;
@@ -42,7 +43,7 @@ int main(int argc, char** argv)
 		{
 			int index = '2' - c;
 			if (arrays[index] == nullptr)
-				arrays[index] = new XEntity("Hehe");
+				arrays[index] = new XEntity("Hehe", treeName[index]);
 			else
 			{
 				delete arrays[index];
@@ -54,9 +55,21 @@ int main(int argc, char** argv)
 			break;
 		}
 		case 'r':
-			TreeMgr::Instance()->ReloadTree("Monster_BlackCrystal");
+			TreeMgr::Instance()->ReloadTree("A");
 			TreeMgr::Instance()->Print();
 			break;
+		case 'a':
+		case 'b':
+		case 'c':
+		case 'd':
+		case 'e':
+		case 'f':
+		{
+			std::string s(1, c + ('A' - 'a'));
+			TreeMgr::Instance()->ReloadTree(s);
+			TreeMgr::Instance()->Print();
+			break;
+		}
 		default:
 			break;
 		}

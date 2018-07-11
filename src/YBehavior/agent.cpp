@@ -73,7 +73,7 @@ YBehavior::Agent::~Agent()
 {
 	if (m_Tree)
 	{
-		TreeMgr::Instance()->ReturnTree(m_Tree);
+		TreeMgr::Instance()->ReturnTree(m_Tree, true);
 		m_Tree = nullptr;
 	}
 	if (m_RegisterData)
