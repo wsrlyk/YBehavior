@@ -29,16 +29,30 @@ namespace YBehavior
 			return;
 		}
 
-		TreeMgr::Instance()->PushToBeLoadedTree(*treeName);
+		if (m_Root == nullptr || m_Root->GetTreeNameWithPath() != *treeName)
+			TreeMgr::Instance()->PushToBeLoadedTree(*treeName);
 	}
 
 	YBehavior::NodeState SubTree::Update(AgentPtr pAgent)
 	{
-		if (m_Tree == nullptr)
+		if (m_Tree == nullptr && m_Root != nullptr)
 		{
-
+			const STRING* treeName = (const STRING*)m_TreeName->GetCastedValue(nullptr);
+			for (auto it = m_Root->GetSubTrees().begin(); it != m_Root->GetSubTrees().end(); ++it)
+			{
+				if ((*it)->GetTreeNameWithPath() == *treeName)
+				{
+					m_Tree = *it;
+					break;
+				}
+			}
+			if (m_Tree == nullptr && m_Root->GetTreeNameWithPath() == *treeName)
+				m_Tree = m_Root;
 		}
 
-		return NS_SUCCESS;
+		if (m_Tree != nullptr)
+			return m_Tree->Execute(pAgent);
+
+		return NS_FAILURE;
 	}
 }

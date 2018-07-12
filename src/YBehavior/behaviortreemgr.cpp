@@ -6,7 +6,7 @@
 #include "YBehavior/nodefactory.h"
 #include <string.h>
 #include "YBehavior/tools/common.h"
-#include <stack>
+#include "YBehavior/tools/treemgrhelper.hpp"
 
 namespace YBehavior
 {
@@ -44,7 +44,7 @@ namespace YBehavior
 		BehaviorTree* tree = new BehaviorTree(name);
 
 		UINT uid = 0;
-		if (!_LoadOneNode(tree, rootData.first_child(), uid))
+		if (!_LoadOneNode(tree, rootData.first_child(), uid, tree))
 		{
 			ERROR_BEGIN << "Load xml failed: " << name << ERROR_END;
 			return nullptr;
@@ -59,11 +59,12 @@ namespace YBehavior
 		return tree;
 	}
 
-	bool TreeMgr::_LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID)
+	bool TreeMgr::_LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID, BehaviorTree* root)
 	{
 		if (node == nullptr)
 			return false;
 
+		node->SetRoot(root);
 		node->Load(data);
 		node->SetUID(++parentUID);
 		for (auto it = data.begin(); it != data.end(); ++it)
@@ -86,7 +87,7 @@ namespace YBehavior
 				auto connectionName = it->attribute("Connection");
 				node->AddChild(childNode, connectionName.value());
 
-				_LoadOneNode(childNode, *it, parentUID);
+				_LoadOneNode(childNode, *it, parentUID, root);
 			}
 			else
 			{
@@ -95,337 +96,6 @@ namespace YBehavior
 		}
 		node->LoadFinish();
 		return true;
-	}
-
-	struct MergedTreeNode
-	{
-		std::list<BehaviorTree*> trees;
-		std::vector<MergedTreeNode*> children;
-
-		~MergedTreeNode()
-		{
-			if (m_bAutoDeleteMergedSharedData && m_MergedSharedData)
-				delete m_MergedSharedData;
-		}
-		SharedDataEx* CreateMergedSharedData()
-		{
-			if (m_MergedSharedData && m_bAutoDeleteMergedSharedData)
-				delete m_MergedSharedData;
-			m_MergedSharedData = new SharedDataEx();
-			m_bAutoDeleteMergedSharedData = true;
-			return m_MergedSharedData;
-		}
-		SharedDataEx* GetSharedData() { return m_MergedSharedData; }
-		void SetSharedData(SharedDataEx* data)
-		{
-			if (m_MergedSharedData && m_bAutoDeleteMergedSharedData)
-				delete m_MergedSharedData;
-			m_MergedSharedData = data;
-			m_bAutoDeleteMergedSharedData = false;
-		}
-	private:
-		SharedDataEx* m_MergedSharedData = nullptr;
-		bool m_bAutoDeleteMergedSharedData = false;
-
-	};
-
-	struct TreeBuildingInfo 
-	{
-		BehaviorTree* tree = nullptr;
-		bool sharedDataBuilt = false;
-		int cycleID = -1;
-	};
-
-	struct CurrentBuildingInfo
-	{
-		std::list<BehaviorTree*> visitedTrees;
-		std::unordered_set<BehaviorTree*> visitedTreesSet;
-		std::unordered_map<BehaviorTree*, TreeBuildingInfo*> treeInfos;
-		std::list<std::unordered_set<int>> sameCycle;
-		int maxCycleID = -1;
-
-		MergedTreeNode* mergedRoot = nullptr;
-
-		~CurrentBuildingInfo()
-		{
-			for (auto it = treeInfos.begin(); it != treeInfos.end(); ++it)
-			{
-				delete it->second;
-			}
-
-			if (mergedRoot)
-			{
-				std::list<MergedTreeNode*> nodes;
-				nodes.push_back(mergedRoot);
-				while (nodes.size() > 0)
-				{
-					MergedTreeNode* node = nodes.front();
-					nodes.pop_front();
-					for (auto it = node->children.begin(); it != node->children.end(); ++it)
-					{
-						nodes.push_back(*it);
-					}
-
-					delete node;
-				}
-			}
-		}
-
-		TreeBuildingInfo* GetTreeInfo(BehaviorTree* tree)
-		{
-			auto it = treeInfos.find(tree);
-			if (it == treeInfos.end())
-			{
-				TreeBuildingInfo* info = new TreeBuildingInfo();
-				info->tree = tree;
-				treeInfos[tree] = info;
-				return info;
-			}
-			else
-			{
-				return it->second;
-			}
-		}
-
-		void AddCycle(int cycle)
-		{
-			std::unordered_set<int> newSet;
-			newSet.insert(cycle);
-			sameCycle.push_back(std::move(newSet));
-		}
-
-		bool IsSameCycle(int cycle0, int cycle1)
-		{
-			if (cycle0 == cycle1)
-				return true;
-
-			std::unordered_set<int>* sameCycle0 = nullptr;
-			std::unordered_set<int>* sameCycle1 = nullptr;
-
-			for (auto it = sameCycle.begin(); it != sameCycle.end(); ++it)
-			{
-				if (sameCycle0 == nullptr && it->count(cycle0))
-					sameCycle0 = &(*it);
-				if (sameCycle1 == nullptr && it->count(cycle1))
-					sameCycle1 = &(*it);
-
-				if (sameCycle0 != nullptr && sameCycle1 != nullptr)
-				{
-					return sameCycle0 == sameCycle1;
-				}
-			}
-
-			return false;
-		}
-
-		void MergeCycle(int cycle0, int cycle1)
-		{
-			std::unordered_set<int>* sameCycle0 = nullptr;
-			std::unordered_set<int>* sameCycle1 = nullptr;
-
-			for (auto it = sameCycle.begin(); it != sameCycle.end(); ++it)
-			{
-				if (sameCycle0 == nullptr && it->count(cycle0))
-					sameCycle0 = &(*it);
-				if (sameCycle1 == nullptr && it->count(cycle1))
-					sameCycle1 = &(*it);
-
-				if (sameCycle0 != nullptr && sameCycle1 != nullptr)
-				{
-					if (sameCycle0 == sameCycle1)
-					{
-						///> Already in same merged cycle;
-						return;
-					}
-
-					///> merge the latter into the former, and erase the latter
-					if (sameCycle1 == &(*it))
-					{
-						sameCycle0->insert(sameCycle1->begin(), sameCycle1->end());
-						sameCycle.erase(it);
-						return;
-					}
-					if (sameCycle0 == &(*it))
-					{
-						sameCycle1->insert(sameCycle0->begin(), sameCycle0->end());
-						sameCycle.erase(it);
-						return;
-					}
-				}
-			}
-
-			if (sameCycle0 == nullptr && sameCycle1 == nullptr)
-			{
-				///> create new merged cycle
-				std::unordered_set<int> newSet;
-				newSet.insert(cycle0);
-				newSet.insert(cycle1);
-				sameCycle.push_back(std::move(newSet));
-				return;
-			}
-			if (sameCycle0 != nullptr)
-				sameCycle0->insert(cycle1);
-			else
-				sameCycle1->insert(cycle0);
-		}
-	};
-	bool _BuildSharedData(BehaviorTree* current, BehaviorTree* parent, CurrentBuildingInfo& builingInfo)
-	{
-		TreeBuildingInfo* treeInfo = builingInfo.GetTreeInfo(current);
-		///> There's cycle
-		if (builingInfo.visitedTreesSet.count(current))
-		{
-			std::unordered_set<int> mergedCycle;
-			builingInfo.AddCycle(++builingInfo.maxCycleID);
-			for (auto it = builingInfo.visitedTrees.rbegin(); it != builingInfo.visitedTrees.rend(); ++it)
-			{
-				TreeBuildingInfo* previousTree = builingInfo.GetTreeInfo(*it);
-				
-				///> Already in a cycle
-				if (previousTree->cycleID >= 0 && mergedCycle.count(previousTree->cycleID) == 0)
-				{
-					builingInfo.MergeCycle(builingInfo.maxCycleID, previousTree->cycleID);
-					mergedCycle.insert(previousTree->cycleID);
-				}
-				else
-				{
-					previousTree->cycleID = builingInfo.maxCycleID;
-				}
-
-				if (current == *it)
-					break;
-			}
-
-			return false;
-		}
-
-		if (treeInfo->cycleID < 0)
-		{
-			builingInfo.visitedTreesSet.insert(current);
-			builingInfo.visitedTrees.push_back(current);
-
-			bool allChildrenBuilt = true;
-			for (auto it = current->GetSubTrees().begin(); it != current->GetSubTrees().end(); ++it)
-			{
-				bool built = _BuildSharedData(*it, current, builingInfo);
-				if (built)
-					current->GetSharedData()->Merge(*(*it)->GetSharedData(), false);
-
-				allChildrenBuilt &= built;
-			}
-
-			builingInfo.visitedTreesSet.erase(current);
-			builingInfo.visitedTrees.pop_back();
-
-			treeInfo->sharedDataBuilt = allChildrenBuilt;
-
-			return allChildrenBuilt;
-		}
-
-		return false;
-	}
-
-	void _BuildMergedTree(BehaviorTree* current, TreeBuildingInfo* info, MergedTreeNode* node, CurrentBuildingInfo& builingInfo);
-	void BuildMergedTree(BehaviorTree* root, CurrentBuildingInfo& builingInfo)
-	{
-		MergedTreeNode* node = new MergedTreeNode();
-		node->trees.push_back(root);
-		builingInfo.mergedRoot = node;
-		TreeBuildingInfo* info = builingInfo.GetTreeInfo(root);
-		_BuildMergedTree(root, info, node, builingInfo);
-	}
-
-	void _BuildMergedTree(BehaviorTree* current, TreeBuildingInfo* info, MergedTreeNode* node, CurrentBuildingInfo& builingInfo)
-	{
-		std::list<BehaviorTree*> trees;
-		std::unordered_set<BehaviorTree*> visited;
-		visited.insert(current);
-		trees.push_back(current);
-		while (trees.size() > 0)
-		{
-			BehaviorTree* tree = trees.front();
-			trees.pop_front();
-			bool bCreate = false;
-			for (auto it = tree->GetSubTrees().begin(); it != tree->GetSubTrees().end(); ++it)
-			{
-				if (visited.count(*it))
-					continue;
-				TreeBuildingInfo* childInfo = builingInfo.GetTreeInfo(*it);
-				if (childInfo->sharedDataBuilt)
-					continue;
-				///> every child will create a MergedTreeNode, cause parent belongs to no one of the cycles
-				if (info->cycleID < 0)
-				{
-					bCreate = true;
-				}
-				else
-				{
-					if (childInfo->cycleID < 0)
-						bCreate = true;
-					else
-					{
-						bCreate = !builingInfo.IsSameCycle(info->cycleID, childInfo->cycleID);
-					}
-				}
-
-				if (bCreate)
-				{
-					MergedTreeNode* childNode = new MergedTreeNode();
-					childNode->trees.push_back(*it);
-					node->children.push_back(childNode);
-					_BuildMergedTree(*it, childInfo, childNode, builingInfo);
-				}
-				else
-				{
-					node->trees.push_back(*it);
-					trees.push_back(*it);
-					visited.insert(*it);
-				}
-			}
-		}
-	}
-
-	void _FinalBuild(MergedTreeNode* node, CurrentBuildingInfo& buildingInfo)
-	{
-		if (node->trees.size() == 0)
-		{
-			LOG_BEGIN << "Something is wrong that MergedTreeNode has no tree." << LOG_END;
-			return;
-		}
-		SharedDataEx* commonData;
-		if (node->trees.size() != 1)
-		{
-			commonData = node->CreateMergedSharedData();
-			for (auto it = node->trees.begin(); it != node->trees.end(); ++it)
-			{
-				commonData->Merge(*(*it)->GetSharedData(), false);
-			}
-		}
-		else
-		{
-			node->SetSharedData(node->trees.front()->GetSharedData());
-			commonData = node->GetSharedData();
-		}
-		if (node->children.size() > 0)
-		{
-			for (auto it = node->children.begin(); it != node->children.end(); ++it)
-			{
-				_FinalBuild(*it, buildingInfo);
-				commonData->Merge(*(*it)->GetSharedData(), false);
-			}
-		}
-
-		if (node->trees.size() != 1)
-		{
-			for (auto it = node->trees.begin(); it != node->trees.end(); ++it)
-			{
-				(*it)->GetSharedData()->Merge(*commonData, true);
-			}
-		}
-	}
-	void FinalBuild(CurrentBuildingInfo& buildingInfo)
-	{
-		_FinalBuild(buildingInfo.mergedRoot, buildingInfo);
 	}
 
 	BehaviorTree * TreeMgr::GetTree(const STRING& name)
@@ -475,15 +145,14 @@ namespace YBehavior
 		bool bNoChildren = true;
 		if (m_ToBeLoadedTree.size() > 0)
 		{
-			std::list<STRING> tobeload;
+			std::unordered_set<STRING> tobeload;
 			tobeload.swap(m_ToBeLoadedTree);
-			while (tobeload.size() > 0)
+			for (auto it2 = tobeload.begin(); it2 != tobeload.end(); ++it2)
 			{
 				BehaviorTree* subTree;
 				
-				_GetTree(tobeload.front(), subTree, false);
+				_GetTree(*it2, subTree, false);
 
-				tobeload.pop_front();
 				tree->AddSubTree(subTree);
 			}
 
@@ -593,6 +262,69 @@ namespace YBehavior
 		std::cout << "Print all trees end." << std::endl;
 	}
 
+	void TreeMgr::GarbageCollection()
+	{
+		std::unordered_set<BehaviorTree*> hasAgent;
+		std::unordered_set<BehaviorTree*> noAgent;
+
+		std::list<BehaviorTree*> temp;
+
+		for (auto it = m_Trees.begin(); it != m_Trees.end(); ++it)
+		{
+			TreeInfo* info = it->second;
+			for (auto it2 = info->GetVersions().begin(); it2 != info->GetVersions().end(); ++it2)
+			{
+				TreeVersion* version = it2->second;
+				if (version == info->GetLatestVersion())
+					continue;
+
+				if (version->agentReferenceCount > 0)
+				{
+					hasAgent.insert(version->tree);
+					///> Get all children and mark them as having reference.
+					temp.clear();
+					temp.push_back(version->tree);
+					while (!temp.empty())
+					{
+						BehaviorTree* tree = temp.front();
+						temp.pop_front();
+						if (hasAgent.count(tree))
+							continue;
+						hasAgent.insert(tree);
+						noAgent.erase(tree);
+
+						for (auto it3 = tree->GetSubTrees().begin(); it3 != tree->GetSubTrees().end(); ++it3)
+						{
+							temp.push_back(*it3);
+						}
+					}
+				}
+				else
+				{
+					noAgent.insert(version->tree);
+				}
+			}
+		}
+
+		for (auto it = noAgent.begin(); it != noAgent.end(); ++it)
+		{
+			(*it)->ClearSubTree();
+
+			auto it2 = m_Trees.find((*it)->GetTreeNameWithPath());
+			if (it2 == m_Trees.end())
+			{
+				ERROR_BEGIN << "Cant find info about tree: " << (*it)->GetTreeNameWithPath() << ERROR_END;
+				continue;
+			}
+
+			it2->second->RemoveVersion((*it)->GetVersion());
+		}
+	}
+
+	///>//////////////////////////////////////////////////////////////////////////////////////////
+	///>//////////////////////////////////////////////////////////////////////////////////////////
+	///>//////////////////////////////////////////////////////////////////////////////////////////
+
 	void TreeInfo::Print()
 	{
 		for (auto it = m_TreeVersions.begin(); it != m_TreeVersions.end(); ++it)
@@ -621,7 +353,11 @@ namespace YBehavior
 	{
 		if (version == nullptr || version->tree == nullptr || version->GetReferenceCount() > 0)
 			return;
+		RemoveVersion(version);
+	}
 
+	void TreeInfo::RemoveVersion(TreeVersion* version)
+	{
 		{
 			if (version->tree->GetSubTrees().size() > 0)
 			{
@@ -637,6 +373,7 @@ namespace YBehavior
 		delete version->tree;
 		delete version;
 	}
+
 	TreeVersion* TreeInfo::CreateVersion()
 	{
 		TreeVersion* pVersion = new TreeVersion();
@@ -672,19 +409,18 @@ namespace YBehavior
 		if (m_LatestVersion == nullptr)
 			CreateVersion();
 		m_LatestVersion->tree = tree;
-		tree->SetVersion(m_LatestVersion->version);
+		tree->SetVersion(m_LatestVersion);
 	}
 
-	void TreeInfo::ChangeReferenceCount(bool bInc, bool bAgent, int versionNum /*= -1*/)
+	void TreeInfo::ChangeReferenceCount(bool bInc, bool bAgent, TreeVersion* version)
 	{
-		TreeVersion* version = nullptr;
-		if (versionNum < 0)
+		if (version == nullptr)
 			version = m_LatestVersion;
 		else
 		{
-			auto it = m_TreeVersions.find(versionNum);
-			if (it != m_TreeVersions.end())
-				version = it->second;
+			auto it = m_TreeVersions.find(version->version);
+			if (it != m_TreeVersions.end() && it->second != version)
+				version = nullptr;
 		}
 
 		if (version == nullptr)

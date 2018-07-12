@@ -50,6 +50,7 @@
     <ClInclude Include="..\include\YBehavior\tools\linkedlist.h" />
     <ClInclude Include="..\include\YBehavior\tools\meta.h" />
     <ClInclude Include="..\include\YBehavior\tools\objectpool.h" />
+    <ClInclude Include="..\include\YBehavior\tools\treemgrhelper.hpp" />
     <ClInclude Include="..\include\YBehavior\treekeymgr.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />

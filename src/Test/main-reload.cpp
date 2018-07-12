@@ -22,13 +22,14 @@ int main(int argc, char** argv)
 
 	//aa.GetValue(pEntity->GetAgent()->GetSharedData());
 	//TreeMgr::Instance()->LoadOneTree("Monster_BlackCrystal");
-	XEntity* arrays[3];
-	for (int i = 0; i < 3; ++i)
+#define TOTAL 7
+	XEntity* arrays[TOTAL];
+	for (int i = 0; i < TOTAL; ++i)
 	{
 		arrays[i] = nullptr;
 	}
 
-	std::string treeName[3]{ "A", "B", "C" };
+	std::string treeName[TOTAL]{ "A", "B", "C", "D", "E", "F", "G" };
 	while (1)
 	{
 		char c;
@@ -37,11 +38,15 @@ int main(int argc, char** argv)
 		{
 		case ' ':
 			return 0;
-		case '0':
 		case '1':
 		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
 		{
-			int index = '2' - c;
+			int index = c - '1';
 			if (arrays[index] == nullptr)
 				arrays[index] = new XEntity("Hehe", treeName[index]);
 			else
@@ -50,7 +55,9 @@ int main(int argc, char** argv)
 				arrays[index] = nullptr;
 			}
 
-			std::cout << (arrays[0] != nullptr) << ' ' << (arrays[1] != nullptr) << ' ' << (arrays[2] != nullptr) << ' ' << std::endl;
+			for (int i = 0; i < TOTAL; ++i)
+				std::cout << (arrays[i] != nullptr) << ' ';
+			std::cout << std::endl;
 			TreeMgr::Instance()->Print();
 			break;
 		}
@@ -70,6 +77,12 @@ int main(int argc, char** argv)
 			TreeMgr::Instance()->Print();
 			break;
 		}
+		case '/':
+		{
+			TreeMgr::Instance()->GarbageCollection();
+			TreeMgr::Instance()->Print();
+		}
+		break;
 		default:
 			break;
 		}

@@ -16,7 +16,7 @@ namespace YBehavior
 	private:
 		SharedVariableEx<STRING>* m_TreeName;
 
-		BehaviorTree* m_Tree;
+		BehaviorTree* m_Tree = nullptr;
 	};
 }
 

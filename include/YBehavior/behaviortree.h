@@ -29,6 +29,7 @@ namespace YBehavior
 #ifdef DEBUGGER
 	class DebugHelper;
 #endif
+	class BehaviorTree;
 	class YBEHAVIOR_API BehaviorNode
 	{
 	protected:
@@ -39,7 +40,7 @@ namespace YBehavior
 		UINT m_UID;	// Unique in a tree
 		std::vector<ISharedVariableEx*> m_Variables;	///> Just for destructions of variables
 		static std::unordered_set<STRING> KEY_WORDS;
-
+		BehaviorTree* m_Root;
 #ifdef DEBUGGER
 	protected:
 		std::stringstream m_DebugLogInfo;
@@ -69,6 +70,8 @@ namespace YBehavior
 
 		inline UINT GetUID() const { return m_UID; }
 		inline void SetUID(UINT uid) { m_UID = uid; }
+		inline BehaviorTree* GetRoot() const { return m_Root; }
+		inline void SetRoot(BehaviorTree* root) { m_Root = root; }
 
 		virtual STRING GetClassName() const = 0;
 
@@ -146,12 +149,13 @@ namespace YBehavior
 
 	};
 
+	struct TreeVersion;
 	class YBEHAVIOR_API BehaviorTree : public SingleChildNode
 	{
 	public:
 		STRING GetClassName() const override { return "Tree"; }
-		inline void SetVersion(int v) { m_Version = v; }
-		inline int GetVersion() const { return m_Version; }
+		inline void SetVersion(TreeVersion* v) { m_Version = v; }
+		inline TreeVersion* GetVersion() const { return m_Version; }
 #ifdef DEBUGGER
 		inline UINT GetHash() { return m_Hash; }
 		inline void SetHash(UINT hash) { m_Hash = hash; }
@@ -161,7 +165,7 @@ namespace YBehavior
 		//NameKeyMgr* m_NameKeyMgr;
 		STRING m_TreeNameWithPath;	///> Full Path
 		STRING m_TreeName;	///> Only File
-		int m_Version;
+		TreeVersion* m_Version;
 #ifdef DEBUGGER
 		UINT m_Hash;
 #endif
@@ -178,6 +182,9 @@ namespace YBehavior
 
 		void AddSubTree(BehaviorTree* sub) { m_SubTrees.push_back(sub); }
 		inline std::vector<BehaviorTree*>& GetSubTrees() { return m_SubTrees; }
+
+		///> CAUTION: this function can only be called in garbage collection
+		void ClearSubTree() { m_SubTrees.clear(); }
 	protected:
 		virtual void OnLoaded(const pugi::xml_node& data);
 	};

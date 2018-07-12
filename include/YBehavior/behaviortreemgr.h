@@ -31,13 +31,17 @@ namespace YBehavior
 		~TreeInfo();
 
 		void TryRemoveVersion(TreeVersion* version);
+		void RemoveVersion(TreeVersion* version);
 		TreeVersion* CreateVersion();
 		BehaviorTree* GetLatestTree() { return m_LatestVersion ? m_LatestVersion->tree : nullptr; }
+		inline TreeVersion* GetLatestVersion() { return m_LatestVersion; }
 		void IncreaseLatestVesion();
 
 		void SetLatestTree(BehaviorTree* tree);
-		void ChangeReferenceCount(bool bInc, bool bAgent, int versionNum = -1);
+		void ChangeReferenceCount(bool bInc, bool bAgent, TreeVersion* version = nullptr);
 		void Print();
+
+		inline std::unordered_map<int, TreeVersion*>& GetVersions() { return m_TreeVersions; }
 	private:
 		TreeVersion* m_LatestVersion;
 		std::unordered_map<int, TreeVersion*> m_TreeVersions;
@@ -54,13 +58,14 @@ namespace YBehavior
 		static TreeMgr* Instance();
 		void Print();
 
-		void PushToBeLoadedTree(const STRING& name) { m_ToBeLoadedTree.push_back(name); }
+		void PushToBeLoadedTree(const STRING& name) { m_ToBeLoadedTree.insert(name); }
+		void GarbageCollection();
 	protected:
 		bool _GetTree(const STRING& name, BehaviorTree * &tree, bool bToAgent);
 		void _CheckSubTree(const STRING& name, BehaviorTree* current, std::unordered_set<BehaviorTree*>& visited, std::list<BehaviorTree*>& visitedStack);
 		BehaviorTree * _LoadTree(const STRING& name);
 		BehaviorTree* _LoadOneTree(const STRING& name);
-		bool _LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID);
+		bool _LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID, BehaviorTree* root);
 	private:
 		static TreeMgr* s_Instance;
 		TreeMgr() {}
@@ -68,7 +73,7 @@ namespace YBehavior
 
 		std::unordered_map<STRING, TreeInfo*> m_Trees;
 
-		std::list<STRING> m_ToBeLoadedTree;
+		std::unordered_set<STRING> m_ToBeLoadedTree;
 	};
 }
 
