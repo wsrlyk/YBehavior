@@ -96,8 +96,8 @@ namespace YBehavior
 			//return (data);
 			auto it = m_Datas.find(key);
 			if (it == m_Datas.end())
-				return false;
-			return &(it->second);
+				return nullptr;
+			return (const void*)&(it->second);
 		}
 
 		virtual const STRING GetToString(KEY key) const override
@@ -205,7 +205,7 @@ namespace YBehavior
 		const void* Get(KEY key, KEY typeKey)
 		{
 			IDataArray* iarray = m_Datas[typeKey];
-			return iarray->Get(key);
+			return (const void*)iarray->Get(key);
 		}
 		STRING GetToString(KEY key, KEY typeKey)
 		{

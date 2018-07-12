@@ -98,14 +98,14 @@ namespace YBehavior
 	{
 	public:
 		LinkedList()
-			: LinkedListNode()
+			: LinkedListNode<T>()
 		{
 		}
 
 		~LinkedList()
 		{
 			LinkedListNode<T>* node;
-			LinkedListNode<T>* next = GetNext();
+			LinkedListNode<T>* next = this->GetNext();
 
 			while (next != nullptr)
 			{
