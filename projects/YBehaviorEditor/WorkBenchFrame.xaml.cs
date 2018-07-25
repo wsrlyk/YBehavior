@@ -34,7 +34,7 @@ namespace YBehavior.Editor
     /// </summary>
     public partial class WorkBenchFrame : UserControl
     {
-        Dictionary<UCTabItemWithClose, PageData> m_PageDataDic = new Dictionary<UCTabItemWithClose, PageData>();
+        Dictionary<TabItem, PageData> m_PageDataDic = new Dictionary<TabItem, PageData>();
 
         PageData m_CurPageData;
         Core.Operation m_Operation;
@@ -83,9 +83,11 @@ namespace YBehavior.Editor
                 activeTab.Header = oArg.Bench.FileInfo.DisplayName;
                 activeTab.ToolTip = oArg.Bench.FileInfo.DisplayPath;
                 activeTab.Content = oArg.Bench;
-                activeTab.CloseHandler = _TabCloseClicked;
+                //activeTab.CloseHandler = _TabCloseClicked;
                 this.TabController.Items.Add(activeTab);
-
+                activeTab.PreviewMouseMove += TabItem_PreviewMouseMove;
+                activeTab.Drop += TabItem_Drop;
+                activeTab.AllowDrop = true;
                 m_PageDataDic[activeTab] = new PageData();
             }
 
@@ -232,6 +234,36 @@ namespace YBehavior.Editor
             return true;
         }
 
+        private void TabItem_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (Mouse.PrimaryDevice.LeftButton != MouseButtonState.Pressed)
+                return;
+            var tabItem = e.Source as UCTabItemWithClose;
+            if (tabItem == null)
+                return;
+
+            DragDrop.DoDragDrop(tabItem, tabItem, DragDropEffects.All);
+        }
+
+        private void TabItem_Drop(object sender, DragEventArgs e)
+        {
+            var tabItemTarget = e.Source as TabItem;
+
+            var tabItemSource = e.Data.GetData(typeof(UCTabItemWithClose)) as UCTabItemWithClose;
+
+            if (!tabItemTarget.Equals(tabItemSource))
+            {
+                var tabControl = tabItemTarget.Parent as TabControl;
+                int targetIndex = tabControl.Items.IndexOf(tabItemTarget);
+
+                tabControl.Items.Remove(tabItemSource);
+                tabControl.Items.Insert(targetIndex, tabItemSource);
+
+                //tabControl.Items.Remove(tabItemTarget);
+                //tabControl.Items.Insert(sourceIndex, tabItemTarget);
+            }
+        }
+
         private void _OnNewNodeAdded(EventArg arg)
         {
             NewNodeAddedArg oArg = arg as NewNodeAddedArg;
@@ -270,7 +302,7 @@ namespace YBehavior.Editor
             {
                 if (e.AddedItems.Count > 0)
                 {
-                    foreach (UCTabItemWithClose tab in e.AddedItems)
+                    foreach (TabItem tab in e.AddedItems)
                     {
                         LogMgr.Instance.Log("Tab selected: " + tab.Header);
                         if (WorkBenchMgr.Instance.Switch(tab.Content as WorkBench))

@@ -17,6 +17,7 @@ namespace YBehavior.Editor
 {
     /// <summary>
     /// UCTabItemWithClose.xaml 的交互逻辑
+    /// From https://www.cnblogs.com/tsliwei/p/5625398.html
     /// </summary>
     public partial class UCTabItemWithClose : TabItem
     {
