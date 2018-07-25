@@ -107,7 +107,8 @@ namespace YBehavior.Editor
                 this.VName.Text = string.Empty;
                 ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
                 {
-                    Content = "Created successfully."
+                    Content = "Created successfully.",
+                    TipType = ShowSystemTipsArg.TipsType.TT_Success,
                 };
                 EventMgr.Instance.Send(showSystemTipsArg);
             }
@@ -117,7 +118,8 @@ namespace YBehavior.Editor
 
                 ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
                 {
-                    Content = "Variable creation failed. Check the params."
+                    Content = "Variable creation failed. Check the params.",
+                    TipType = ShowSystemTipsArg.TipsType.TT_Error,
                 };
                 EventMgr.Instance.Send(showSystemTipsArg);
                 return;

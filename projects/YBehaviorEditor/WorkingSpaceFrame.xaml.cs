@@ -167,7 +167,7 @@ namespace YBehavior.Editor
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             /*int res = */
-            WorkBenchMgr.Instance.SaveAndExport();
+            WorkBenchMgr.Instance.TrySaveAndExport();
 
             //if (res == 1)
             //    _RefreshWorkingSpace(false);

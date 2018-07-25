@@ -161,6 +161,21 @@ namespace YBehavior.Editor.Core
             return workBench;
         }
 
+        public void TrySaveAndExport(WorkBench bench = null)
+        {
+            if (NetworkMgr.Instance.IsConnected)
+            {
+                ShowSystemTipsArg arg = new ShowSystemTipsArg
+                {
+                    Content = "Still Connecting..",
+                    TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                };
+                EventMgr.Instance.Send(arg);
+            }
+            else
+                SaveAndExport(bench);
+
+        }
         public int SaveAndExport(WorkBench bench = null)
         {
             int res = SaveWorkBench(bench);
@@ -183,7 +198,8 @@ namespace YBehavior.Editor.Core
 
                 ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
                 {
-                    Content = "Saved successfully."
+                    Content = "Saved successfully.",
+                    TipType = ShowSystemTipsArg.TipsType.TT_Success,
                 };
                 EventMgr.Instance.Send(showSystemTipsArg);
 
@@ -202,14 +218,19 @@ namespace YBehavior.Editor.Core
                 bench = ActiveWorkBench;
             if (bench == null)
             {
-                LogMgr.Instance.Error("AddNodeToBench Failed: bench == null");
+                LogMgr.Instance.Error("Save Failed: bench == null");
                 return -2;
             }
 
             if (!bench.CheckError())
             {
                 LogMgr.Instance.Error("Something wrong in tree. Save Failed.");
-                MessageBox.Show("Save Failed.");
+                ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
+                {
+                    Content = "Saved Failed.",
+                    TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                };
+                EventMgr.Instance.Send(showSystemTipsArg);
                 return -2;
             }
 

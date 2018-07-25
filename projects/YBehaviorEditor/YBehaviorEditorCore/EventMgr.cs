@@ -142,7 +142,13 @@ namespace YBehavior.Editor.Core
 
     public class ShowSystemTipsArg : EventArg
     {
+        public enum TipsType
+        {
+            TT_Error,
+            TT_Success,
+        }
         public string Content { get; set; }
+        public TipsType TipType { get; set; } = TipsType.TT_Success;
         public override EventType Type => EventType.ShowSystemTips;
     }
 }

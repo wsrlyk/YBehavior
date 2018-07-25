@@ -12,7 +12,7 @@ namespace YBehavior
 
 		std::vector<STRING> treedata;
 		DebugMgr::Instance()->ClearTreeDebugInfo();
-		for (unsigned i = 3; i + 1 < datas.size(); ++i)
+		for (unsigned i = 3; i < datas.size(); ++i)
 		{
 			treedata.clear();
 			Utility::SplitString(datas[i], treedata, DebugHelper::s_ContentSpliter);

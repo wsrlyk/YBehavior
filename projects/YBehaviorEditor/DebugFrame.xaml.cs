@@ -72,7 +72,8 @@ namespace YBehavior.Editor
             {
                 ShowSystemTipsArg arg = new ShowSystemTipsArg()
                 {
-                    Content = "Should Open A Tree."
+                    Content = "Should Open A Tree.",
+                    TipType = ShowSystemTipsArg.TipsType.TT_Error,
                 };
                 EventMgr.Instance.Send(arg);
                 return;
@@ -81,7 +82,8 @@ namespace YBehavior.Editor
             {
                 ShowSystemTipsArg arg = new ShowSystemTipsArg()
                 {
-                    Content = "Should Save First."
+                    Content = "Should Save First.",
+                    TipType = ShowSystemTipsArg.TipsType.TT_Error,
                 };
                 EventMgr.Instance.Send(arg);
                 return;

@@ -98,6 +98,12 @@ namespace YBehavior.Editor
                         WorkBenchMgr.Instance.Redo();
                     }
                     break;
+                case Key.S:
+                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
+                    {
+                        WorkBenchMgr.Instance.TrySaveAndExport();
+                    }
+                    break;
                 case Key.F9:
                     Core.SelectionMgr.Instance.TryToggleBreakPoint();
                     break;

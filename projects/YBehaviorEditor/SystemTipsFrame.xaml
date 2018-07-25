@@ -15,16 +15,16 @@
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
                     From="0.0" To="1.0" Duration="0:0:0.2"/>   
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                    From="1.0" To="0.0" Duration="0:0:0.2" BeginTime="0:0:1.2"/>
+                    From="1.0" To="0.0" Duration="0:0:0.2" BeginTime="0:0:1.5"/>
             <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
                 <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
-                <DiscreteObjectKeyFrame KeyTime="0:0:1.4" Value="{x:Static Visibility.Collapsed}"/>
+                <DiscreteObjectKeyFrame KeyTime="0:0:1.7" Value="{x:Static Visibility.Collapsed}"/>
             </ObjectAnimationUsingKeyFrames>
         </Storyboard>
     </UserControl.Resources>
     <Grid>
         <Grid Name="Bg">
-            <Border Background="#FFE47A48" Width="250" Height="80" CornerRadius="20">
+            <Border Name="Border" Background="#FFE47A48" Width="250" Height="80" CornerRadius="20">
             </Border>
             <TextBlock Name="Str" Text="SystemTips" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,5"/>
         </Grid>

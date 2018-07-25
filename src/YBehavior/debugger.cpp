@@ -57,26 +57,47 @@ namespace YBehavior
 			{
 				if (pAgent->GetTree()->GetTreeName() == m_TargetTree)
 				{
-					auto it = m_TreeDebugInfo.find(pTree->GetTreeName());
-					if (it == m_TreeDebugInfo.end())
+					std::list<BehaviorTree*> toVisit;
+					std::unordered_set<BehaviorTree*> visited;
+
+					toVisit.push_back(pAgent->GetTree());
+					visited.insert(pAgent->GetTree());
+					while (!toVisit.empty())
 					{
-						if (m_TargetAgent != 0)
+						BehaviorTree* pCurTree = toVisit.front();
+						toVisit.pop_front();
+
+						auto it = m_TreeDebugInfo.find(pCurTree->GetTreeName());
+						if (it == m_TreeDebugInfo.end())
 						{
-							LOG_BEGIN << "Agent " << m_TargetAgent << " is running " << pAgent->GetTree()->GetTreeName() << " but there's no DebugInfo." << LOG_END;
+							if (m_TargetAgent != 0)
+							{
+								LOG_BEGIN << "Agent " << m_TargetAgent << " is running " << pCurTree->GetTreeName() << " but there's no DebugInfo." << LOG_END;
+								m_TargetAgent = 0;
+							}
+							return false;
 						}
-						return false;
+						if (it->second.Hash == pCurTree->GetHash())
+						{
+							for (auto it2 : pCurTree->GetSubTrees())
+							{
+								if (visited.count(it2) == 0)
+								{
+									toVisit.push_back(it2);
+									visited.insert(it2);
+								}
+							}
+						}
+						else
+						{
+							LOG_BEGIN << "Agent " << pAgent->GetUID() <<"with tree " << pCurTree->GetTreeName() << " has diffrent VERSION of tree with Editor" << LOG_END;
+							return false;
+						}
 					}
-					if (it->second.Hash == pTree->GetHash())
-					{
-						m_bTargetDirty = false;
-						m_TargetAgent = pAgent->GetUID();
-						return true;
-					}
-					else
-					{
-						LOG_BEGIN << "Agent " << pAgent->GetUID() << " has diffrent VERSION of tree with Editor" << LOG_END;
-						return false;
-					}
+
+					m_bTargetDirty = false;
+					m_TargetAgent = pAgent->GetUID();
+					return true;
 				}
 				else
 				{

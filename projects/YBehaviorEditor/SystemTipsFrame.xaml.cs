@@ -22,6 +22,9 @@ namespace YBehavior.Editor
     public partial class SystemTipsFrame : UserControl
     {
         Storyboard m_InstantAnim;
+        Color m_ErrorColor = Color.FromRgb(0xE4, 0x7A, 0x48);
+        Color m_SuccessColor = Color.FromRgb(0x48, 0xE4, 0x64);
+
         public SystemTipsFrame()
         {
             InitializeComponent();
@@ -35,7 +38,7 @@ namespace YBehavior.Editor
         {
             ShowSystemTipsArg oArg = arg as ShowSystemTipsArg;
             this.Str.Text = oArg.Content;
-
+            this.Border.Background = new SolidColorBrush(oArg.TipType == ShowSystemTipsArg.TipsType.TT_Success ? m_SuccessColor : m_ErrorColor);
             m_InstantAnim.Begin(this.Bg, true);
         }
     }

@@ -413,7 +413,8 @@ namespace YBehavior.Editor.Core
                         LogMgr.Instance.Error("Should remove connection first");
                         ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
                         {
-                            Content = "Should remove connection first."
+                            Content = "Should remove connection first.",
+                            TipType = ShowSystemTipsArg.TipsType.TT_Error,
                         };
                         EventMgr.Instance.Send(showSystemTipsArg);
                         return;
