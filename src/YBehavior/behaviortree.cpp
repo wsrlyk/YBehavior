@@ -117,18 +117,6 @@ namespace YBehavior
 		ERROR_BEGIN << "Cant add child to this node: " << ERROR_END;
 	}
 
-	BehaviorNode::BehaviorNodePtr BehaviorNode::GetRoot()
-	{
-		BehaviorNodePtr root = this;
-		BehaviorNodePtr parent = GetParent();
-		while (parent != nullptr)
-		{
-			root = parent;
-			parent = parent->GetParent();
-		}
-		return root;
-	}
-
 	bool BehaviorNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single, char variableType)
 	{
 		auto tempChar = attri.value();

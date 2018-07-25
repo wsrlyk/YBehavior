@@ -31,7 +31,7 @@ namespace YBehavior
 
 		pugi::xml_parse_result result = doc.load_file((name + ".xml").c_str());
 		LOG_BEGIN << "Loading: " << name << ".xml" << LOG_END;
-		if (!result)
+		if (result.status)
 		{
 			ERROR_BEGIN << "Load result: " << result.description() << ERROR_END;
 			return nullptr;

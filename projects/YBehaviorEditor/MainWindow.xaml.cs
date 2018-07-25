@@ -114,6 +114,10 @@ namespace YBehavior.Editor
                         break;
                     Core.SelectionMgr.Instance.TryToggleCondition();
                     break;
+                case Key.T:
+                    ///> Test....
+                    WorkBenchMgr.Instance.OpenAllRelated();
+                    break;
             }
         }
         private void _KeyDown(object sender, KeyEventArgs e)

@@ -118,6 +118,14 @@ namespace YBehavior.Editor.Core
 
         public WorkBench OpenWorkBench(TreeFileMgr.TreeFileInfo file)
         {
+            WorkBench bench = OpenWorkBenchInBackGround(file);
+            if (bench != null)
+                m_ActiveWorkBench = bench;
+
+            return bench;
+        }
+        public WorkBench OpenWorkBenchInBackGround(TreeFileMgr.TreeFileInfo file)
+        {
             if (file == null)
                 return null;
 
@@ -125,7 +133,6 @@ namespace YBehavior.Editor.Core
             {
                 if (t.FileInfo == file)
                 {
-                    m_ActiveWorkBench = t;
                     return t;
                 }
             }
@@ -148,6 +155,7 @@ namespace YBehavior.Editor.Core
                 return null;
             }
 
+            m_ActiveWorkBench = oldBench;
             m_OpenedWorkBenchs.Add(workBench);
 
             return workBench;
@@ -383,6 +391,57 @@ namespace YBehavior.Editor.Core
             if (ActiveWorkBench == null)
                 return;
             ActiveWorkBench.CommandMgr.Redo();
+        }
+
+        public List<WorkBench> OpenAllRelated()
+        {
+            if (ActiveWorkBench == null)
+                return null;
+
+            HashSet<string> loaded = new HashSet<string>();
+            Queue<WorkBench> loading = new Queue<WorkBench>();
+            HashSet<string> toload = new HashSet<string>();
+            List<WorkBench> res = new List<WorkBench>();
+            Action<Node> action = new Action<Node>
+                (
+                    (Node node) =>
+                    {
+                        SubTreeNode subTreeNode = node as SubTreeNode;
+                        if (subTreeNode != null)
+                            toload.Add(subTreeNode.Variables.GetVariable("Tree").Value);
+                    }
+                );
+
+            loading.Enqueue(ActiveWorkBench);
+            loaded.Add(ActiveWorkBench.FilePath);
+            res.Add(ActiveWorkBench);
+            while (loading.Count > 0)
+            {
+                WorkBench bench = loading.Dequeue();
+                Utility.OperateNode(bench.MainTree, true, action);
+
+                foreach (string toloadtree in toload)
+                {
+                    System.IO.FileInfo file = new System.IO.FileInfo(Config.Instance.WorkingDir + toloadtree + ".xml");
+                    if (!file.Exists || loaded.Contains(file.FullName))
+                        continue;
+
+                    TreeFileMgr.TreeFileInfo fileInfo = TreeFileMgr.Instance.GetFileInfo(file.FullName);
+                    WorkBench newBench = OpenWorkBenchInBackGround(fileInfo);
+
+                    WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
+                    arg.Bench = newBench;
+                    EventMgr.Instance.Send(arg);
+
+                    res.Add(newBench);
+                    loaded.Add(newBench.FilePath);
+                    loading.Enqueue(newBench);
+                }
+
+                toload.Clear();
+            }
+
+            return res;
         }
     }
 }

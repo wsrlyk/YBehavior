@@ -51,6 +51,7 @@
     <Compile Include="NetworkMgr.cs" />
     <Compile Include="SharedData.cs" />
     <Compile Include="Tools\Bimap.cs" />
+    <Compile Include="Tools\ObjectPool.cs" />
     <Compile Include="Tools\ObservableCollectionEx.cs" />
     <Compile Include="Tools\ObservableDictionary.cs" />
     <Compile Include="Tools\Utility.cs" />

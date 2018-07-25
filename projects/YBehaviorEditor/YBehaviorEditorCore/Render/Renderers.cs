@@ -138,37 +138,27 @@ namespace YBehavior.Editor.Core
             m_Owner = node;
         }
 
-        public void RefreshDebug(bool bInstant)
+        public void RefreshDebug()
         {
-            if (bInstant)
-                DebugInstant = !DebugInstant;
-            else
-                DebugConstant = !DebugConstant;
+            DebugTrigger = !DebugTrigger;
 
             foreach (Node child in m_Owner.Conns)
             {
-                child.Renderer.RefreshDebug(bInstant);
+                child.Renderer.RefreshDebug();
             }
         }
 
-        private bool m_bDebugInstant;
-        public bool DebugInstant
+        /// <summary>
+        /// Only a trigger to UI, meaningless
+        /// </summary>
+        private bool m_bDebugTrigger;
+        public bool DebugTrigger
         {
-            get { return m_bDebugInstant; }
+            get { return m_bDebugTrigger; }
             set
             {
-                m_bDebugInstant = value;
-                OnPropertyChanged("DebugInstant");
-            }
-        }
-        private bool m_bDebugConstant;
-        public bool DebugConstant
-        {
-            get { return m_bDebugConstant; }
-            set
-            {
-                m_bDebugConstant = value;
-                OnPropertyChanged("DebugConstant");
+                m_bDebugTrigger = value;
+                OnPropertyChanged("DebugTrigger");
             }
         }
 

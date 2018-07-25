@@ -25,17 +25,17 @@ namespace YBehavior
 		Clear();
 	}
 
-	void DebugMgr::SetTarget(const STRING& tree, UINT hash, UINT agent)
+	void DebugMgr::SetTarget(const STRING& tree, UINT agent)
 	{
 		m_TargetTree = tree;
-		m_TargetHash = hash;
+		//m_TargetHash = hash;
 		m_TargetAgent = agent;
 		m_bTargetDirty = true;
 	}
 
 	void DebugMgr::ResetTarget()
 	{
-		SetTarget(Utility::StringEmpty, 0, 0);
+		SetTarget(Utility::StringEmpty, 0);
 	}
 
 	void DebugMgr::Stop()
@@ -46,7 +46,7 @@ namespace YBehavior
 		m_SendBuffer = "";
 	}
 
-	bool DebugMgr::IsValidTarget(Agent* pAgent)
+	bool DebugMgr::IsValidTarget(Agent* pAgent, BehaviorTree* pTree)
 	{
 		if (pAgent == nullptr)
 			return false;
@@ -57,7 +57,16 @@ namespace YBehavior
 			{
 				if (pAgent->GetTree()->GetTreeName() == m_TargetTree)
 				{
-					if (m_TargetHash == pAgent->GetTree()->GetHash())
+					auto it = m_TreeDebugInfo.find(pTree->GetTreeName());
+					if (it == m_TreeDebugInfo.end())
+					{
+						if (m_TargetAgent != 0)
+						{
+							LOG_BEGIN << "Agent " << m_TargetAgent << " is running " << pAgent->GetTree()->GetTreeName() << " but there's no DebugInfo." << LOG_END;
+						}
+						return false;
+					}
+					if (it->second.Hash == pTree->GetHash())
 					{
 						m_bTargetDirty = false;
 						m_TargetAgent = pAgent->GetUID();
@@ -90,41 +99,62 @@ namespace YBehavior
 		}
 	}
 
-	bool DebugMgr::HasBreakPoint(UINT nodeUID)
+	bool DebugMgr::HasBreakPoint(const STRING& treeName, UINT nodeUID)
 	{
-		auto it = m_DebugPointInfos.find(nodeUID);
-		if (it == m_DebugPointInfos.end())
+		auto it = m_TreeDebugInfo.find(treeName);
+		if (it == m_TreeDebugInfo.end())
 			return false;
-		return it->second.HasBreakPoint();
+		auto it2 = it->second.DebugPointInfos.find(nodeUID);
+		if (it2 == it->second.DebugPointInfos.end())
+			return false;
+		return it2->second.HasBreakPoint();
 	}
 
-	bool DebugMgr::HasLogPoint(UINT nodeUID)
+	bool DebugMgr::HasLogPoint(const STRING& treeName, UINT nodeUID)
 	{
-		auto it = m_DebugPointInfos.find(nodeUID);
-		if (it == m_DebugPointInfos.end())
+		auto it = m_TreeDebugInfo.find(treeName);
+		if (it == m_TreeDebugInfo.end())
 			return false;
-		return it->second.HasLogPoint();
+		auto it2 = it->second.DebugPointInfos.find(nodeUID);
+		if (it2 == it->second.DebugPointInfos.end())
+			return false;
+		return it2->second.HasLogPoint();
 	}
 
-	void DebugMgr::AddBreakPoint(UINT nodeUID)
+	void DebugMgr::AddBreakPoint(const STRING& treeName, UINT nodeUID)
 	{
+		auto it = m_TreeDebugInfo.find(treeName);
+		if (it == m_TreeDebugInfo.end())
+			return;
 		DebugPointInfo info;
 		info.nodeUID = nodeUID;
 		info.count = 1;
-		m_DebugPointInfos[nodeUID] = info;
+		it->second.DebugPointInfos[nodeUID] = info;
 	}
 
-	void DebugMgr::AddLogPoint(UINT nodeUID)
+	void DebugMgr::AddLogPoint(const STRING& treeName, UINT nodeUID)
 	{
+		auto it = m_TreeDebugInfo.find(treeName);
+		if (it == m_TreeDebugInfo.end())
+			return;
 		DebugPointInfo info;
 		info.nodeUID = nodeUID;
 		info.count = -1;
-		m_DebugPointInfos[nodeUID] = info;
+		it->second.DebugPointInfos[nodeUID] = info;
 	}
 
-	void DebugMgr::RemoveDebugPoint(UINT nodeUID)
+	void DebugMgr::AddTreeDebugInfo(STRING&& name, TreeDebugInfo&& info)
 	{
-		m_DebugPointInfos.erase(nodeUID);
+		m_TreeDebugInfo[name] = info;
+	}
+
+	void DebugMgr::RemoveDebugPoint(const STRING& treeName, UINT nodeUID)
+	{
+		auto it = m_TreeDebugInfo.find(treeName);
+		if (it == m_TreeDebugInfo.end())
+			return;
+
+		it->second.DebugPointInfos.erase(nodeUID);
 	}
 
 	NodeRunInfo* DebugMgr::CreateAndAppendRunInfo()
@@ -162,7 +192,7 @@ namespace YBehavior
 	DebugHelper::DebugHelper(Agent* pAgent, BehaviorNode* pNode)
 		: m_pLogInfo(nullptr)
 	{
-		if (pAgent == nullptr || !DebugMgr::Instance()->IsValidTarget(pAgent))
+		if (pAgent == nullptr || !DebugMgr::Instance()->IsValidTarget(pAgent, pNode->GetRoot()))
 		{
 			m_Target = nullptr;
 			return;
@@ -174,8 +204,9 @@ namespace YBehavior
 		CreateRunInfo();
 		m_pRunInfo->nodeUID = pNode->GetUID();
 		m_pRunInfo->runState = NS_RUNNING;
+		m_pRunInfo->tree = pNode->GetRoot();
 
-		if (DebugMgr::Instance()->HasLogPoint(pNode->GetUID()))
+		if (DebugMgr::Instance()->HasLogPoint(pNode->GetRoot()->GetTreeName(), pNode->GetUID()))
 		{
 			m_pLogInfo = new NodeLogInfo();
 			pNode->GetDebugLogInfo().str("");
@@ -192,7 +223,7 @@ namespace YBehavior
 			if (m_pNode->GetParent() == nullptr)
 			{
 				BehaviorTree* tree = dynamic_cast<BehaviorTree*>(m_pNode);
-				if (tree)
+				if (tree && tree->GetTreeName() == DebugMgr::Instance()->GetTargetTree())
 					_SendInfos();
 			}
 		}
@@ -211,6 +242,8 @@ namespace YBehavior
 
 		DebugMgr::Instance()->AppendSendContent("[LogPoint]");
 		DebugMgr::Instance()->AppendSendContent(s_HeadSpliter);
+		DebugMgr::Instance()->AppendSendContent(((BehaviorTree*)m_pNode->GetRoot())->GetTreeName());
+		DebugMgr::Instance()->AppendSendContent(" ");
 		DebugMgr::Instance()->AppendSendContent(Utility::ToString(m_pNode->GetUID()));
 		DebugMgr::Instance()->AppendSendContent(".");
 		DebugMgr::Instance()->AppendSendContent(m_pNode->GetClassName());
@@ -293,19 +326,24 @@ namespace YBehavior
 		}
 		DebugMgr::Instance()->AppendSendContent(buffer);
 
-		DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
-
 		///> Run Info:
 
-		buffer = "";
 		const std::list<NodeRunInfo*>& runInfos = DebugMgr::Instance()->GetRunInfos();
+		std::unordered_map<BehaviorTree*, STRING> treeBuffer;
 		for (auto it = runInfos.begin(); it != runInfos.end(); ++it)
 		{
-			if (buffer.length() > 0)
-				buffer += ";";
-			buffer += (*it)->ToString();
+			STRING& buf = treeBuffer[(*it)->tree];
+			if (buf.length() > 0)
+				buf += ";";
+			buf += (*it)->ToString();
 		}
-		DebugMgr::Instance()->AppendSendContent(buffer);
+		for (auto it = treeBuffer.begin(); it != treeBuffer.end(); ++it)
+		{
+			DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
+			DebugMgr::Instance()->AppendSendContent(it->first->GetTreeName());
+			DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
+			DebugMgr::Instance()->AppendSendContent(it->second);
+		}
 
 		//if (DebugMgr::Instance()->IsPaused())
 		//	LOG_BEGIN << "Dont Clear Run Info cause paused" << LOG_END;
@@ -327,7 +365,7 @@ namespace YBehavior
 	{
 		if (!IsValid())
 			return;
-		if (DebugMgr::Instance()->HasBreakPoint(m_pRunInfo->nodeUID))
+		if (DebugMgr::Instance()->HasBreakPoint(m_pNode->GetRoot()->GetTreeName(), m_pRunInfo->nodeUID))
 			Breaking();
 	}
 
@@ -335,7 +373,7 @@ namespace YBehavior
 	{
 		if (!IsValid())
 			return false;
-		return DebugMgr::Instance()->HasLogPoint(m_pRunInfo->nodeUID);
+		return DebugMgr::Instance()->HasLogPoint(m_pNode->GetRoot()->GetTreeName(), m_pRunInfo->nodeUID);
 	}
 
 	void DebugHelper::Breaking()

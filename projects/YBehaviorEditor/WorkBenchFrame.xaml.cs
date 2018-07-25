@@ -89,7 +89,7 @@ namespace YBehavior.Editor
                 m_PageDataDic[activeTab] = new PageData();
             }
 
-            activeTab.IsSelected = true;
+            activeTab.IsSelected = WorkBenchMgr.Instance.ActiveWorkBench == oArg.Bench;
 
             //_RenderActiveWorkBench();
         }
@@ -126,8 +126,14 @@ namespace YBehavior.Editor
             //_CreateActiveWorkBench();
 
             WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
+
             if (oArg.Bench != null)
             {
+                //if (DebugMgr.Instance.IsDebugging(oArg.Bench.FileInfo.Name) && DebugMgr.Instance.bBreaked)
+                //{
+                //    _RefreshMainTreeDebug(false, NetworkMgr.Instance.MessageProcessor.TickResultToken);
+                //}
+
                 this.nodeLayer.ItemsSource = oArg.Bench.NodeList;
                 this.commentLayer.ItemsSource = oArg.Bench.Comments;
                 this.connectionLayer.ItemsSource = oArg.Bench.ConnectionList;
@@ -146,12 +152,12 @@ namespace YBehavior.Editor
             {
                 TickResultArg oArg = arg as TickResultArg;
 
-                _RefreshMainTreeDebug(oArg.bInstant, oArg.Token);
+                _RefreshMainTreeDebug(oArg.Token);
                 //this.nodeLayer.Dispatcher.BeginInvoke(new Action<bool, uint>(_RefreshMainTreeDebug), oArg.bInstant, oArg.Token);
             }
         }
 
-        void _RefreshMainTreeDebug(bool bInstant, uint token)
+        void _RefreshMainTreeDebug(uint token)
         {
             if (token != NetworkMgr.Instance.MessageProcessor.TickResultToken)
             {
@@ -159,7 +165,7 @@ namespace YBehavior.Editor
             }
 
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            bench.MainTree.Renderer.RefreshDebug(bInstant);
+            bench.MainTree.Renderer.RefreshDebug();
         }
 
         private void _OnDebugTargetChanged(EventArg arg)
@@ -167,14 +173,14 @@ namespace YBehavior.Editor
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
             if (bench != null)
             {
-                bench.MainTree.Renderer.RefreshDebug(true);
-                //Dispatcher.BeginInvoke(new Action(() => { bench.MainTree.Renderer.RefreshDebug(true); }));
-                this.Dispatcher.BeginInvoke(new Action
-                    (() =>
-                    {
-                        this.TabController.IsEnabled = !DebugMgr.Instance.IsDebugging();
-                    })
-                );
+                bench.MainTree.Renderer.RefreshDebug();
+
+                //this.Dispatcher.BeginInvoke(new Action
+                //    (() =>
+                //    {
+                //        this.TabController.IsEnabled = !DebugMgr.Instance.IsDebugging();
+                //    })
+                //);
             }
         }
 
@@ -184,26 +190,32 @@ namespace YBehavior.Editor
                 return false;
 
             WorkBench bench = tab.Content as WorkBench;
-            if (bench != null && bench.CommandMgr.Dirty)
-            // if is dirty
+            if (bench != null)
             {
-                MessageBoxResult dr = MessageBox.Show("This file has been modified. Save it?", "To Save Or Not To Save", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-                if (dr == MessageBoxResult.Yes)
+                if (DebugMgr.Instance.IsDebugging(bench.FileInfo.Name))
+                    return false;
+
+                if (bench.CommandMgr.Dirty)
+                // if is dirty
                 {
-                    int res = WorkBenchMgr.Instance.SaveAndExport(bench);
-                    if (res < 0)
+                    MessageBoxResult dr = MessageBox.Show("This file has been modified. Save it?", "To Save Or Not To Save", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                    if (dr == MessageBoxResult.Yes)
+                    {
+                        int res = WorkBenchMgr.Instance.SaveAndExport(bench);
+                        if (res < 0)
+                        {
+                            return false;
+                        }
+                    }
+
+                    else if (dr == MessageBoxResult.No)
+                    {
+                        WorkBenchMgr.Instance.Remove(bench);
+                    }
+                    else
                     {
                         return false;
                     }
-                }
-
-                else if (dr == MessageBoxResult.No)
-                {
-                    WorkBenchMgr.Instance.Remove(bench);
-                }
-                else
-                {
-                    return false;
                 }
             }
 

@@ -16,6 +16,7 @@ namespace YBehavior
 	{
 		UINT nodeUID;
 		NodeState runState;
+		BehaviorTree* tree;
 
 		const STRING ToString() const;
 	};
@@ -43,34 +44,44 @@ namespace YBehavior
 		inline bool HasLogPoint() { return count < 0; }
 		inline bool NoDebugPoint() { return count == 0; }
 	};
+
+	struct TreeDebugInfo
+	{
+		std::unordered_map<UINT, DebugPointInfo> DebugPointInfos;
+		UINT Hash;
+	};
+
 	class DebugMgr: public Singleton<DebugMgr>
 	{
 		UINT m_TargetAgent;
-		UINT m_TargetHash;
+		//UINT m_TargetHash;
 		STRING m_TargetTree;
 		bool m_bTargetDirty = false;
 
 		std::list<NodeRunInfo*> m_RunInfos;
-		std::unordered_map<UINT, DebugPointInfo> m_DebugPointInfos;
+		//std::unordered_map<UINT, DebugPointInfo> m_DebugPointInfos;
+
+		std::unordered_map<STRING, TreeDebugInfo> m_TreeDebugInfo;
 
 		STRING m_SendBuffer;
 
 		bool m_bPaused = false;
 	public:
 		~DebugMgr();
-		void SetTarget(const STRING& tree, UINT hash, UINT agent);
+		void SetTarget(const STRING& tree, UINT agent);
 		void ResetTarget();
 		void Stop();
-		bool IsValidTarget(Agent* pAgent);
+		bool IsValidTarget(Agent* pAgent, BehaviorTree* pTree);
 		inline const STRING& GetTargetTree() { return m_TargetTree; }
 		inline UINT GetTargetAgent() { return m_TargetAgent; }
 		inline const std::list<NodeRunInfo*>& GetRunInfos() { return m_RunInfos; }
-		bool HasBreakPoint(UINT nodeUID);
-		bool HasLogPoint(UINT nodeUID);
-		void ClearDebugPoints() { m_DebugPointInfos.clear(); }
-		void AddBreakPoint(UINT nodeUID);
-		void AddLogPoint(UINT nodeUID);
-		void RemoveDebugPoint(UINT nodeUID);
+		bool HasBreakPoint(const STRING& treeName, UINT nodeUID);
+		bool HasLogPoint(const STRING& treeName, UINT nodeUID);
+		void ClearTreeDebugInfo() { m_TreeDebugInfo.clear(); }
+		void AddBreakPoint(const STRING& treeName, UINT nodeUID);
+		void AddLogPoint(const STRING& treeName, UINT nodeUID);
+		void AddTreeDebugInfo(STRING&& name, TreeDebugInfo&& info);
+		void RemoveDebugPoint(const STRING& treeName, UINT nodeUID);
 		NodeRunInfo* CreateAndAppendRunInfo();
 		void Clear();
 

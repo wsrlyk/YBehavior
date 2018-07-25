@@ -8,8 +8,8 @@
              MinWidth="60" MinHeight="80" HorizontalAlignment="Center">
     <UserControl.Style>
         <Style>
-            <Setter Property="local:UINode.DebugInstant" Value="{Binding Path=DebugInstant}" />
-            <Setter Property="local:UINode.DebugConstant" Value="{Binding Path=DebugConstant}" />
+            <Setter Property="local:UINode.DebugTrigger" Value="{Binding Path=DebugTrigger}" />
+            <!--<Setter Property="local:UINode.DebugConstant" Value="{Binding Path=DebugConstant}" />-->
         </Style>
     </UserControl.Style>
     <UserControl.Resources>

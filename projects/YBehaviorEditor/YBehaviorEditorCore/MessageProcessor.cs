@@ -37,26 +37,20 @@ namespace YBehavior.Editor.Core
             Update();
         }
 
-        public void DebugTreeWithAgent(string treename, uint hash, uint agentUID = 0)
+        public void DebugTreeWithAgent(string treename, uint agentUID, List<WorkBench> benches)
         {
-            WorkBench workBench = WorkBenchMgr.Instance.ActiveWorkBench;
-            if (workBench == null || workBench.MainTree == null)
+            if (benches == null || benches.Count == 0)
             {
                 LogMgr.Instance.Error("No Active Tree");
                 return;
             }
 
-            StringBuilder sb = new StringBuilder();
-            sb.Append("[DebugTreeWithAgent] ").Append(workBench.FileInfo.Name);
-            sb.Append(" ").Append(hash);
-            sb.Append(" ").Append(agentUID);
-
-            Action< Node, StringBuilder> appendOneNode = null;
-            appendOneNode = delegate (Node node, StringBuilder stringBuilder) 
+            Action<Node, StringBuilder> appendOneNode = null;
+            appendOneNode = delegate (Node node, StringBuilder stringBuilder)
             {
                 if (!node.DebugPointInfo.NoDebugPoint)
                 {
-                    stringBuilder.Append(" ").Append(node.UID).Append(" ").Append(node.DebugPointInfo.HitCount);
+                    stringBuilder.Append(cContentSplitter).Append(node.UID).Append(cContentSplitter).Append(node.DebugPointInfo.HitCount);
                 }
 
                 foreach (Node chi in node.Conns)
@@ -65,7 +59,19 @@ namespace YBehavior.Editor.Core
                 }
             };
 
-            appendOneNode(workBench.MainTree, sb);
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[DebugTreeWithAgent] ").Append(treename);
+            sb.Append(" ").Append(agentUID);
+
+            foreach (WorkBench workBench in benches)
+            {
+                sb.Append(" ");
+                sb.Append(workBench.FileInfo.Name).Append(cContentSplitter).Append(workBench.ExportFileHash);
+
+                appendOneNode(workBench.MainTree, sb);
+            }
+
 
             NetworkMgr.Instance.SendText(sb.ToString());
         }
@@ -75,9 +81,9 @@ namespace YBehavior.Editor.Core
             NetworkMgr.Instance.SendText("[Continue]");
         }
 
-        public void SetDebugPoint(uint uid, int count)
+        public void SetDebugPoint(string treename, uint uid, int count)
         {
-            NetworkMgr.Instance.SendText("[DebugPoint] " + uid.ToString() + " " + count.ToString());
+            NetworkMgr.Instance.SendText("[DebugPoint] " + treename + " " + uid.ToString() + " " + count.ToString());
         }
 
         public void Update()
@@ -104,7 +110,8 @@ namespace YBehavior.Editor.Core
         }
 
         char[] msgHeadSplitter = { (char)(3) };
-        char[] msgContentSplitter = { (char)(4) };
+        char[] msgContentSplitter = { cContentSplitter };
+        static readonly char cContentSplitter = (char)4;
         void _ProcessMsg(string msg)
         {
             string[] words = msg.Split(msgHeadSplitter, StringSplitOptions.RemoveEmptyEntries);
@@ -165,17 +172,30 @@ namespace YBehavior.Editor.Core
                     }
                 }
                 ++m_TickResultToken;
-                DebugMgr.Instance.RunInfo.Clear();
-                string[] runInfos = data[1].Split(';');
-                foreach (string s in runInfos)
+
+                if (data.Length % 2 == 1)
                 {
-                    string[] strR = s.Split('=');
-                    if (strR.Length != 2)
-                        continue;
+                    DebugMgr.Instance.ClearRunState();
+                    RunInfo runInfo = null;
+                    for (int i = 1; i < data.Length; ++i)
+                    {
+                        if (i % 2 == 1)
+                        {
+                            runInfo = DebugMgr.Instance.GetRunInfo(data[i]);
+                            runInfo.info.Clear();
+                            continue;
+                        }
+                        string[] runInfos = data[i].Split(';');
+                        foreach (string s in runInfos)
+                        {
+                            string[] strR = s.Split('=');
+                            if (strR.Length != 2)
+                                continue;
 
-                    DebugMgr.Instance.RunInfo[uint.Parse(strR[0])] = int.Parse(strR[1]);
+                            runInfo.info[uint.Parse(strR[0])] = int.Parse(strR[1]);
+                        }
+                    }
                 }
-
                 //EventMgr.Instance.Send(new TickResultArg() { bInstant = !DebugMgr.Instance.bBreaked, Token = m_TickResultToken });
             }
         }
@@ -185,7 +205,7 @@ namespace YBehavior.Editor.Core
             if (m_LastTickResultToken != m_TickResultToken)
             {
                 LogMgr.Instance.Log("TickResult bInstant = " + (DebugMgr.Instance.bBreaked ? "False" : "True"));
-                EventMgr.Instance.Send(new TickResultArg() { bInstant = !DebugMgr.Instance.bBreaked, Token = m_TickResultToken });
+                EventMgr.Instance.Send(new TickResultArg() { /*bInstant = !DebugMgr.Instance.bBreaked, */Token = m_TickResultToken });
                 m_LastTickResultToken = m_TickResultToken;
             }
         }

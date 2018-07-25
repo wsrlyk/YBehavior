@@ -8,17 +8,30 @@ namespace YBehavior
 {
 	void DebugTreeWithAgent(const std::vector<STRING>& datas)
 	{
-		DebugMgr::Instance()->SetTarget(datas[1], Utility::ToType<UINT>(datas[2]), Utility::ToType<UINT>(datas[3]));
+		DebugMgr::Instance()->SetTarget(datas[1], Utility::ToType<UINT>(datas[2]));
 
-		DebugMgr::Instance()->ClearDebugPoints();
-		for (unsigned i = 4; i + 1 < datas.size(); ++i)
+		std::vector<STRING> treedata;
+		DebugMgr::Instance()->ClearTreeDebugInfo();
+		for (unsigned i = 3; i + 1 < datas.size(); ++i)
 		{
-			UINT uid = Utility::ToType<UINT>(datas[i]);
-			INT count = Utility::ToType<INT>(datas[++i]);
-			if (count > 0)
-				DebugMgr::Instance()->AddBreakPoint(uid);
-			else
-				DebugMgr::Instance()->AddLogPoint(uid);
+			treedata.clear();
+			Utility::SplitString(datas[i], treedata, DebugHelper::s_ContentSpliter);
+			TreeDebugInfo info;
+			STRING name = treedata[0];
+			info.Hash = Utility::ToType<UINT>(treedata[1]);
+
+			for (unsigned j = 2; j + 1 < treedata.size(); ++j)
+			{
+				UINT uid = Utility::ToType<UINT>(treedata[j]);
+				INT count = Utility::ToType<INT>(treedata[++j]);
+				DebugPointInfo dbginfo;
+				dbginfo.nodeUID = uid;
+				dbginfo.count = count;
+
+				info.DebugPointInfos[uid] = dbginfo;
+			}
+			
+			DebugMgr::Instance()->AddTreeDebugInfo(std::move(name), std::move(info));
 		}
 	}
 
@@ -29,15 +42,16 @@ namespace YBehavior
 
 	void ProcessDebugPoint(const std::vector<STRING>& datas)
 	{
-		UINT uid = Utility::ToType<UINT>(datas[1]);
-		INT count = Utility::ToType<INT>(datas[2]);
+		const STRING& treeName = datas[1];
+		UINT uid = Utility::ToType<UINT>(datas[2]);
+		INT count = Utility::ToType<INT>(datas[3]);
 
 		if (count > 0)
-			DebugMgr::Instance()->AddBreakPoint(uid);
+			DebugMgr::Instance()->AddBreakPoint(treeName, uid);
 		else if (count < 0)
-			DebugMgr::Instance()->AddLogPoint(uid);
+			DebugMgr::Instance()->AddLogPoint(treeName, uid);
 		else
-			DebugMgr::Instance()->RemoveDebugPoint(uid);
+			DebugMgr::Instance()->RemoveDebugPoint(treeName, uid);
 	}
 
 	void MessageProcessor::ProcessOne(const STRING& s)

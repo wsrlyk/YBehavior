@@ -56,8 +56,12 @@ namespace YBehavior.Editor.Core
 
             DirectoryInfo workingDir = new DirectoryInfo(WorkingDir);
             WorkingDir = workingDir.FullName;
+            if (!WorkingDir.EndsWith("\\"))
+                WorkingDir = WorkingDir + "\\";
             DirectoryInfo exportDir = new DirectoryInfo(ExportingDir);
             ExportingDir = exportDir.FullName;
+            if (!ExportingDir.EndsWith("\\"))
+                ExportingDir = ExportingDir + "\\";
 
             ////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////

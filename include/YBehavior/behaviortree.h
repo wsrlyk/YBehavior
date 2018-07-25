@@ -83,7 +83,6 @@ namespace YBehavior
 
 		virtual STRING GetNodeInfoForPrint() { return "";}
 
-		BehaviorNodePtr GetRoot();
 	protected:
 		virtual void _AddChild(BehaviorNode* child, const STRING& connection);
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }

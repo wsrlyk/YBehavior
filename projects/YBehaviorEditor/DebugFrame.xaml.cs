@@ -104,8 +104,6 @@ namespace YBehavior.Editor
 
             uint.TryParse(this.debugAgentUID.Text, out uint uid);
             DebugMgr.Instance.StartDebugTreeWithAgent(
-                WorkBenchMgr.Instance.ActiveWorkBench.FileInfo.Name,
-                WorkBenchMgr.Instance.ActiveWorkBench.ExportFileHash,
                 uid);
         }
 

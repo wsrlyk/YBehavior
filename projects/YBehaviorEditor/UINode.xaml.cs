@@ -56,7 +56,10 @@ namespace YBehavior.Editor
             _CreateConnectors();
             _BuildConnectionBinding();
             _SetCommentPos();
-            SetDebug(NodeState.NS_INVALID);
+            if (DebugMgr.Instance.bBreaked)
+                SetDebug(Node.Renderer.RunState);
+            else
+                SetDebug(NodeState.NS_INVALID);
         }
 
         private void _BuildConnectionBinding()
@@ -143,32 +146,35 @@ namespace YBehavior.Editor
             }
         }
 
-        public static readonly DependencyProperty DebugInstantProperty =
-            DependencyProperty.Register("DebugInstant",
-            typeof(bool), typeof(UINode), new FrameworkPropertyMetadata(DebugInstant_PropertyChanged));
-        private static void DebugInstant_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            UINode c = (UINode)d;
-            c.SetDebugInstant(c.Node.Renderer.RunState);
-        }
-        public bool DebugInstant
-        {
-            get { return (bool)GetValue(DebugInstantProperty); }
-            set { SetValue(DebugInstantProperty, value); }
-        }
+        //public static readonly DependencyProperty DebugInstantProperty =
+        //    DependencyProperty.Register("DebugInstant",
+        //    typeof(bool), typeof(UINode), new FrameworkPropertyMetadata(DebugInstant_PropertyChanged));
+        //private static void DebugInstant_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    UINode c = (UINode)d;
+        //    c.SetDebugInstant(c.Node.Renderer.RunState);
+        //}
+        //public bool DebugInstant
+        //{
+        //    get { return (bool)GetValue(DebugInstantProperty); }
+        //    set { SetValue(DebugInstantProperty, value); }
+        //}
 
-        public static readonly DependencyProperty DebugConstantProperty =
-            DependencyProperty.Register("DebugConstant",
-            typeof(bool), typeof(UINode), new FrameworkPropertyMetadata(DebugConstant_PropertyChanged));
-        private static void DebugConstant_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public static readonly DependencyProperty DebugTriggerProperty =
+            DependencyProperty.Register("DebugTrigger",
+            typeof(bool), typeof(UINode), new FrameworkPropertyMetadata(DebugTrigger_PropertyChanged));
+        private static void DebugTrigger_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UINode c = (UINode)d;
-            c.SetDebug(c.Node.Renderer.RunState);
+            if (DebugMgr.Instance.bBreaked)
+                c.SetDebug(c.Node.Renderer.RunState);
+            else
+                c.SetDebugInstant(c.Node.Renderer.RunState);
         }
-        public bool DebugConstant
+        public bool DebugTrigger
         {
-            get { return (bool)GetValue(DebugConstantProperty); }
-            set { SetValue(DebugConstantProperty, value); }
+            get { return (bool)GetValue(DebugTriggerProperty); }
+            set { SetValue(DebugTriggerProperty, value); }
         }
 
 
