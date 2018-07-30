@@ -24,7 +24,7 @@ namespace YBehavior.Editor.Core
         public static readonly char VECTOR3 = 'V';
         public static readonly char STRING = 'S';
         public static readonly char ENUM = 'E';
-        public static readonly char AGENT = 'A';
+        public static readonly char ENTITY = 'A';
         public static readonly char ULONG = 'U';
 
         public static readonly char POINTER = 'P';
@@ -40,7 +40,7 @@ namespace YBehavior.Editor.Core
         public static readonly ValueType[] CreateParams_Bool = new ValueType[] { ValueType.VT_BOOL };
         public static readonly ValueType[] CreateParams_Enum = new ValueType[] { ValueType.VT_ENUM };
         public static readonly ValueType[] CreateParams_Vector3 = new ValueType[] { ValueType.VT_VECTOR3 };
-        public static readonly ValueType[] CreateParams_AllTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_VECTOR3, ValueType.VT_ULONG, ValueType.VT_STRING, ValueType.VT_BOOL, ValueType.VT_AGENT };
+        public static readonly ValueType[] CreateParams_AllTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_VECTOR3, ValueType.VT_ULONG, ValueType.VT_STRING, ValueType.VT_BOOL, ValueType.VT_ENTITY };
         public static readonly ValueType[] CreateParams_RandomTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_BOOL };
         public static readonly ValueType[] CreateParams_SwitchTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_BOOL, ValueType.VT_ULONG, ValueType.VT_STRING };
 
@@ -54,7 +54,7 @@ namespace YBehavior.Editor.Core
             VT_VECTOR3,
             VT_STRING,
             VT_ENUM,
-            VT_AGENT,
+            VT_ENTITY,
             VT_ULONG,
         }
 
@@ -66,7 +66,7 @@ namespace YBehavior.Editor.Core
             {ValueType.VT_VECTOR3, VECTOR3 },
             {ValueType.VT_STRING, STRING },
             {ValueType.VT_ENUM, ENUM },
-            {ValueType.VT_AGENT, AGENT },
+            {ValueType.VT_ENTITY, ENTITY },
             {ValueType.VT_ULONG, ULONG }
         };
 
@@ -78,7 +78,7 @@ namespace YBehavior.Editor.Core
             {Variable.ValueType.VT_VECTOR3, "VECTOR3" },
             {Variable.ValueType.VT_STRING, "STRING" },
             {Variable.ValueType.VT_ENUM, "ENUM" },
-            {Variable.ValueType.VT_AGENT, "AGENT" },
+            {Variable.ValueType.VT_ENTITY, "ENTITY" },
             {Variable.ValueType.VT_ULONG, "ULONG" }
         };
 
@@ -488,7 +488,7 @@ namespace YBehavior.Editor.Core
                         }
                     }
                     break;
-                case ValueType.VT_AGENT:
+                case ValueType.VT_ENTITY:
                     {
                         /// TODO
                         return true;

@@ -37,36 +37,12 @@ void YBehavior::Agent::ProcessRegister()
 		m_RegisterData->GetSendData().Clear();
 }
 
-YBehavior::AgentWrapper YBehavior::Agent::CreateWrapper()
-{
-	AgentWrapper wrapper(this);
-
-	if (m_WrapperList == nullptr)
-		m_WrapperList = new	LinkedList<AgentWrapper>();
-
-	LinkedListNode<AgentWrapper>* node = m_WrapperList->Append(wrapper);
-	wrapper.SetReference(node);
-	return wrapper;
-}
-
-void YBehavior::Agent::DeleteWrapper(LinkedListNode<AgentWrapper>* node)
-{
-	if (m_WrapperList != nullptr)
-		m_WrapperList->Remove(node);
-}
-
-YBehavior::STRING YBehavior::Agent::ToString() const
-{
-	return Utility::ToString(m_UID);
-}
-
 YBehavior::Agent::Agent()
 	: m_Tree(nullptr)
-	, m_UID(++s_UID)
 	, m_RegisterData(nullptr)
 {
+	m_UID = ++s_UID;
 	m_SharedData = new SharedDataEx();
-	m_WrapperList = nullptr;
 }
 
 YBehavior::Agent::~Agent()
@@ -81,9 +57,18 @@ YBehavior::Agent::~Agent()
 
 	delete m_SharedData;
 
+}
+
+YBehavior::Entity::Entity()
+{
+	m_WrapperList = nullptr;
+}
+
+YBehavior::Entity::~Entity()
+{
 	if (m_WrapperList != nullptr)
 	{
-		LinkedListNode<AgentWrapper>* node = m_WrapperList->GetNext();
+		LinkedListNode<EntityWrapper>* node = m_WrapperList->GetNext();
 		while (node != nullptr)
 		{
 			node->GetValue().SetValid(false);
@@ -91,4 +76,27 @@ YBehavior::Agent::~Agent()
 		}
 		delete m_WrapperList;
 	}
+}
+
+YBehavior::STRING YBehavior::Entity::ToString() const
+{
+	return Utility::StringEmpty;
+}
+
+YBehavior::EntityWrapper YBehavior::Entity::CreateWrapper()
+{
+	EntityWrapper wrapper(this);
+
+	if (m_WrapperList == nullptr)
+		m_WrapperList = new	LinkedList<EntityWrapper>();
+
+	LinkedListNode<EntityWrapper>* node = m_WrapperList->Append(wrapper);
+	wrapper.SetReference(node);
+	return wrapper;
+}
+
+void YBehavior::Entity::DeleteWrapper(LinkedListNode<EntityWrapper>* node)
+{
+	if (m_WrapperList != nullptr)
+		m_WrapperList->Remove(node);
 }

@@ -13,7 +13,7 @@
 	func(Float);	\
 	func(String);	\
 	func(Vector3);	\
-	func(AgentWrapper);	
+	func(EntityWrapper);	
 #define FOR_EACH_VECTOR_NORMAL_TYPE(func)	\
 	func(VecInt);\
 	func(VecUint64);\
@@ -21,21 +21,21 @@
 	func(VecFloat);\
 	func(VecString);\
 	func(VecVector3);\
-	func(VecAgentWrapper);
+	func(VecEntityWrapper);
 #define FOR_EACH_TYPE(func)    \
     func(Int);    \
     func(Uint64);    \
     func(Bool);    \
     func(Float);    \
     func(String);    \
-    func(AgentWrapper);    \
+    func(EntityWrapper);    \
     func(Vector3);\
     func(VecInt);\
     func(VecUint64);\
     func(VecBool);\
     func(VecFloat);\
     func(VecString);\
-    func(VecAgentWrapper);\
+    func(VecEntityWrapper);\
     func(VecVector3);
 
 namespace YBehavior
@@ -247,7 +247,7 @@ namespace YBehavior
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(Bool, 2);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(Float, 3);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(String, 4);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(AgentWrapper, 5);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(EntityWrapper, 5);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(Vector3, 6);
 
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecInt, 7);
@@ -255,7 +255,7 @@ namespace YBehavior
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecBool, 9);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecFloat, 10);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecString, 11);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecAgentWrapper, 12);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecEntityWrapper, 12);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecVector3, 13);
 
 	template<typename T>

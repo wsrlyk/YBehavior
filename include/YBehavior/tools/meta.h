@@ -24,7 +24,7 @@ namespace YBehavior
 		const static bool Result = true;
 	};
 	template<>
-	struct CanFromString<AgentWrapper>
+	struct CanFromString<EntityWrapper>
 	{
 		const static bool Result = false;
 	};

@@ -88,14 +88,14 @@ namespace YBehavior
 				REGISTER_HELPER(Bool, "_B");
 				REGISTER_HELPER(Float, "_F");
 				REGISTER_HELPER(String, "_S");
-				REGISTER_HELPER(AgentWrapper, "_A");
+				REGISTER_HELPER(EntityWrapper, "_A");
 				REGISTER_HELPER(Vector3, "_V");
 				REGISTER_HELPER(VecInt, "II");
 				REGISTER_HELPER(VecUint64, "UU");
 				REGISTER_HELPER(VecBool, "BB");
 				REGISTER_HELPER(VecFloat, "FF");
 				REGISTER_HELPER(VecString, "SS");
-				REGISTER_HELPER(VecAgentWrapper, "AA");
+				REGISTER_HELPER(VecEntityWrapper, "AA");
 				REGISTER_HELPER(VecVector3, "VV");
 			}
 		};

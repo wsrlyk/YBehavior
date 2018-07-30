@@ -29,19 +29,19 @@ int main(int argc, char** argv)
 	pEntity1->GetAgent()->SetEntity(pEntity1);
 
 	LOG_BEGIN << "wrapper begin" << LOG_END;
-	AgentWrapper wrapper = pEntity->GetAgent()->CreateWrapper();
+	EntityWrapper wrapper = pEntity->GetAgent()->GetEntity()->CreateWrapper();
 	LOG_BEGIN << "{" << LOG_END;
 	{
-		AgentWrapper wrapper0 = pEntity->GetAgent()->CreateWrapper();
+		EntityWrapper wrapper0 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
 		LOG_BEGIN << "wrapper00" << LOG_END;
-		AgentWrapper wrapper00 = wrapper0;
+		EntityWrapper wrapper00 = wrapper0;
 		LOG_BEGIN << "wrapper_0" << LOG_END;
-		AgentWrapper wrapper_0 = wrapper;
+		EntityWrapper wrapper_0 = wrapper;
 	}
 	LOG_BEGIN << "}" << LOG_END;
-	AgentWrapper wrapper1 = pEntity->GetAgent()->CreateWrapper();
+	EntityWrapper wrapper1 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
 	LOG_BEGIN << "wrapper_1" << LOG_END;
-	AgentWrapper wrapper_1 = wrapper;
+	EntityWrapper wrapper_1 = wrapper;
 
 	//LOG_BEGIN << "delete entity" << LOG_END;
 	//delete pEntity;

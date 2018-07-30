@@ -3,7 +3,7 @@
 
 namespace YBehavior
 {
-	std::stringstream & operator<<(std::stringstream &out, const AgentWrapper &obj)
+	std::stringstream & operator<<(std::stringstream &out, const EntityWrapper &obj)
 	{
 		if (obj.IsValid() && obj.Get() != nullptr)
 			out << obj.Get()->ToString();
@@ -12,7 +12,7 @@ namespace YBehavior
 		return out;
 	}
 
-	bool AgentWrapper::_CheckValidAndReset()
+	bool EntityWrapper::_CheckValidAndReset()
 	{
 		if (IsValid() && m_Data != nullptr && m_IsValid.use_count() == 2)
 		{
@@ -27,13 +27,13 @@ namespace YBehavior
 		}
 	}
 
-	AgentWrapper::~AgentWrapper()
+	EntityWrapper::~EntityWrapper()
 	{
 		//LOG_BEGIN << "Destruct Wrapper" << LOG_END;
 		_CheckValidAndReset();
 	}
 
-	void AgentWrapper::Reset()
+	void EntityWrapper::Reset()
 	{
 		_CheckValidAndReset();
 		m_Data = nullptr;

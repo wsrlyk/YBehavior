@@ -114,31 +114,32 @@ namespace YBehavior
 		const static Vector3 zero;
 	};
 
+	class Entity;
 	class Agent;
-	struct YBEHAVIOR_API AgentWrapper
+	struct YBEHAVIOR_API EntityWrapper
 	{
 	protected:
-		Agent* m_Data;
+		Entity* m_Data;
 		std::shared_ptr<bool> m_IsValid;
-		LinkedListNode<AgentWrapper>* m_Reference;
+		LinkedListNode<EntityWrapper>* m_Reference;
 
 	protected:
 		bool _CheckValidAndReset();
 	public:
-		AgentWrapper()
+		EntityWrapper()
 			: m_Data(nullptr)
 			, m_IsValid(new bool(false))
 			, m_Reference(nullptr)
 		{
 		}
-		AgentWrapper(Agent* pAgent)
-			: m_Data(pAgent)
+		EntityWrapper(Entity* pEntity)
+			: m_Data(pEntity)
 			, m_IsValid(new bool(true))
 			, m_Reference(nullptr)
 		{
 		}
 
-		AgentWrapper(const AgentWrapper& other)
+		EntityWrapper(const EntityWrapper& other)
 			: m_Data(other.m_Data)
 			, m_IsValid(other.m_IsValid)
 			, m_Reference(other.m_Reference)
@@ -146,7 +147,7 @@ namespace YBehavior
 			//LOG_BEGIN << "Copy Construct" << LOG_END;
 		}
 
-		AgentWrapper& operator = (const AgentWrapper& other)
+		EntityWrapper& operator = (const EntityWrapper& other)
 		{
 			if (m_Reference != other.m_Reference)
 			{
@@ -158,21 +159,21 @@ namespace YBehavior
 			return *this;
 		}
 
-		~AgentWrapper();
+		~EntityWrapper();
 
 		void Reset();
 
-		friend std::stringstream & operator<<(std::stringstream &out, const AgentWrapper &obj);
+		friend std::stringstream & operator<<(std::stringstream &out, const EntityWrapper &obj);
 
-		friend std::stringstream & operator >> (std::stringstream &in, AgentWrapper &obj)
+		friend std::stringstream & operator >> (std::stringstream &in, EntityWrapper &obj)
 		{
 			return in;
 		}
 
-		inline Agent* Get() const { return m_Data; }
+		inline Entity* Get() const { return m_Data; }
 		inline bool IsValid() const { return *m_IsValid; }
 		inline void SetValid(bool b) { *m_IsValid = b; }
-		inline void SetReference(LinkedListNode<AgentWrapper>* r) { m_Reference = r; }
+		inline void SetReference(LinkedListNode<EntityWrapper>* r) { m_Reference = r; }
 	};
 
 	typedef int					KEY;	///> Key to get value from the shareddata
@@ -208,7 +209,7 @@ namespace YBehavior
 	typedef std::vector<BYTE>	VecByte;
 	typedef std::vector<BOOL>	VecBool;
 	typedef std::vector<FLOAT>	VecFloat;
-	typedef std::vector<AgentWrapper>	VecAgentWrapper;
+	typedef std::vector<EntityWrapper>	VecEntityWrapper;
 	typedef std::vector<Vector3>	VecVector3;
 
 #define YBEHAVIOR_BASICTYPE_NUMBER_ID(type, id)			\
@@ -231,7 +232,7 @@ namespace YBehavior
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Uint64, 3);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Float, 4);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(String, 5);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(AgentWrapper, 6);
+	YBEHAVIOR_BASICTYPE_NUMBER_ID(EntityWrapper, 6);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Vector3, 7);
 
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecBool, 101);
@@ -239,7 +240,7 @@ namespace YBehavior
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecUint64, 103);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecFloat, 104);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecString, 105);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecAgentWrapper, 106);
+	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecEntityWrapper, 106);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecVector3, 107);
 }
 

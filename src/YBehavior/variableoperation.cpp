@@ -3,7 +3,7 @@
 namespace YBehavior
 {
 	template<>
-	bool ValueHandler::Compare<AgentWrapper>(const void* pLeft, const void* pRight, OperationType op)
+	bool ValueHandler::Compare<EntityWrapper>(const void* pLeft, const void* pRight, OperationType op)
 	{
 		return false;
 	}
@@ -14,7 +14,7 @@ namespace YBehavior
 
 	}
 	template<>
-	void ValueHandler::Calculate<AgentWrapper>( void* pLeft, const void* pRight0, const void* pRight1, OperationType op)
+	void ValueHandler::Calculate<EntityWrapper>( void* pLeft, const void* pRight0, const void* pRight1, OperationType op)
 	{
 
 	}

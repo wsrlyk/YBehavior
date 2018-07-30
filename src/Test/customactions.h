@@ -7,8 +7,6 @@
 class XEntity;
 class XAgent : public YBehavior::Agent
 {
-	XEntity* m_pEntity;
-
 	static YBehavior::KEY tickCount0;
 	static YBehavior::KEY tickCount1;
 	static YBehavior::KEY isfighting;
@@ -16,10 +14,7 @@ class XAgent : public YBehavior::Agent
 	static YBehavior::KEY isdead;
 
 public:
-	void SetEntity(XEntity* pEntity)
-	{
-		m_pEntity = pEntity;
-	}
+
 	static void InitData()
 	{
 		//YBehavior::TreeKeyMgr::Instance()->SetActiveTree(nullptr, true);
@@ -40,12 +35,10 @@ public:
 		YBehavior::KEY ff = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::VecFloat>("ff");
 	}
 
-	XEntity* GetEntity() { return m_pEntity; }
 	void Update();
-	YBehavior::STRING ToString() const override;
 };
 
-class XEntity
+class XEntity : public YBehavior::Entity
 {
 	XAgent* pAgent;
 	std::string m_Name;
@@ -61,8 +54,9 @@ public:
 	{
 		delete pAgent;
 	}
-	inline const std::string& GetName() { return m_Name; }
+	inline const std::string& GetName() const { return m_Name; }
 	inline XAgent* GetAgent() { return pAgent; }
+	YBehavior::STRING ToString() const override;
 };
 
 
@@ -82,7 +76,7 @@ protected:
 	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;
 	void OnLoaded(const pugi::xml_node& data) override;
 
-	YBehavior::SharedVariableEx<YBehavior::AgentWrapper>* m_Target;
+	YBehavior::SharedVariableEx<YBehavior::EntityWrapper>* m_Target;
 };
 
 class SelectTargetAction : public YBehavior::Action
@@ -94,7 +88,7 @@ protected:
 	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;
 	void OnLoaded(const pugi::xml_node& data) override;
 
-	YBehavior::SharedVariableEx<YBehavior::AgentWrapper>* m_Target;
+	YBehavior::SharedVariableEx<YBehavior::EntityWrapper>* m_Target;
 };
 
 
