@@ -54,8 +54,9 @@ namespace YBehavior
 
 		const void* input;
 		void* randRes;
-		///> 
-		if (*m_IgnoreInput->GetCastedValue(pAgent->GetSharedData()))
+		
+		const BOOL* bIgnoreInput = m_IgnoreInput->GetCastedValue(pAgent->GetSharedData());
+		if (bIgnoreInput && *bIgnoreInput)
 		{
 			void* pSum = pHelper->AllocData();
 			pHelper->Set(pSum, pZero);
@@ -119,50 +120,53 @@ namespace YBehavior
 		return ns;
 	}
 
-	void Dice::OnLoaded(const pugi::xml_node& data)
+	bool Dice::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID xVecType = CreateVariable(m_Distribution, "Distribution", data, false);
 		if (s_ValidVecTypes.find(xVecType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Distribution in Dice: " << xVecType << ERROR_END;
-			return;
+			return false;
 		}
 		TYPEID yVecType = CreateVariable(m_Values, "Values", data, false);
 		if (s_ValidVecTypes.find(yVecType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Values in Dice: " << yVecType << ERROR_END;
-			return;
+			return false;
 		}
 
 		TYPEID xType = CreateVariable(m_Input, "Input", data, true);
 		if (s_ValidTypes.find(xType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Input in Dice: " << xType << ERROR_END;
-			return;
+			return false;
 		}
 		TYPEID yType = CreateVariable(m_Output, "Output", data, true);
 		if (s_ValidTypes.find(yType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Output in Dice: " << yType << ERROR_END;
-			return;
+			return false;
 		}
 
 		if (!Utility::IsElement(xType, xVecType))
 		{
 			ERROR_BEGIN << "Different types in Dice:  " << xType << " and " << xVecType << ERROR_END;
-			return;
+			return false;
 		}
 
 		if (!Utility::IsElement(yType, yVecType))
 		{
 			ERROR_BEGIN << "Different types in Dice:  " << yType << " and " << yVecType << ERROR_END;
-			return;
+			return false;
 		}
 
 		TYPEID bType = CreateVariable(m_IgnoreInput, "IgnoreInput", data, true);
 		if (bType != GetClassTypeNumberId<BOOL>())
 		{
 			ERROR_BEGIN << "Invalid type for IgnoreInput in Dice: " << yType << ERROR_END;
+			return false;
 		}
+
+		return true;
 	}
 }

@@ -12,25 +12,27 @@
 
 namespace YBehavior
 {
-	void SubTree::OnLoaded(const pugi::xml_node& data)
+	bool SubTree::OnLoaded(const pugi::xml_node& data)
 	{
 		//////////////////////////////////////////////////////////////////////////
 		TYPEID typeID = CreateVariable(m_TreeName, "Tree", data, true, Utility::CONST_CHAR);
 		if (typeID != GetClassTypeNumberId<STRING>())
 		{
 			ERROR_BEGIN << "Invalid type for Tree in SubTree: " << typeID << ERROR_END;
-			return;
+			return false;
 		}
 
 		const STRING* treeName = (const STRING*)m_TreeName->GetCastedValue(nullptr);
 		if (treeName == nullptr || *treeName == Utility::StringEmpty)
 		{
 			ERROR_BEGIN << "Null Value for Tree in SubTree: " << typeID << ERROR_END;
-			return;
+			return false;
 		}
 
 		if (m_Root == nullptr || m_Root->GetTreeNameWithPath() != *treeName)
 			TreeMgr::Instance()->PushToBeLoadedTree(*treeName);
+
+		return true;
 	}
 
 	YBehavior::NodeState SubTree::Update(AgentPtr pAgent)

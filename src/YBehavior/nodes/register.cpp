@@ -12,50 +12,52 @@
 
 namespace YBehavior
 {
-	void ReadRegister::OnLoaded(const pugi::xml_node& data)
+	bool ReadRegister::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID typeID;
 		typeID = CreateVariable(m_Event, "Event", data, true, Utility::POINTER_CHAR);
 		if (!m_Event)
 		{
 			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
-			return;
+			return false;
 		}
 
 		typeID = CreateVariable(m_Int, "Int", data, false, Utility::POINTER_CHAR);
 		if (!m_Int)
 		{
 			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
-			return;
+			return false;
 		}
 
 		typeID = CreateVariable(m_Float, "Float", data, false, Utility::POINTER_CHAR);
 		if (!m_Float)
 		{
 			ERROR_BEGIN << "Invalid type for Float in ReadRegister " << typeID << ERROR_END;
-			return;
+			return false;
 		}
 
 		typeID = CreateVariable(m_Bool, "Bool", data, false, Utility::POINTER_CHAR);
 		if (!m_Bool)
 		{
 			ERROR_BEGIN << "Invalid type for Bool in ReadRegister " << typeID << ERROR_END;
-			return;
+			return false;
 		}
 
 		typeID = CreateVariable(m_Ulong, "Ulong", data, false, Utility::POINTER_CHAR);
 		if (!m_Ulong)
 		{
 			ERROR_BEGIN << "Invalid type for Ulong in ReadRegister " << typeID << ERROR_END;
-			return;
+			return false;
 		}
 
 		typeID = CreateVariable(m_String, "String", data, false, Utility::POINTER_CHAR);
 		if (!m_String)
 		{
 			ERROR_BEGIN << "Invalid type for String in ReadRegister " << typeID << ERROR_END;
-			return;
+			return false;
 		}
+
+		return true;
 	}
 
 	NodeState ReadRegister::Update(AgentPtr pAgent)
@@ -95,50 +97,52 @@ namespace YBehavior
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	void WriteRegister::OnLoaded(const pugi::xml_node& data)
+	bool WriteRegister::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID typeID;
 		typeID = CreateVariable(m_Event, "Event", data, true);
 		if (!m_Event)
 		{
 			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
-			return;
+			return false;
 		}
 
 		typeID = CreateVariable(m_Int, "Int", data, false);
 		if (!m_Int)
 		{
 			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
-			return;
+			return false;
 		}
 
 		typeID = CreateVariable(m_Float, "Float", data, false);
 		if (!m_Float)
 		{
 			ERROR_BEGIN << "Invalid type for Float in ReadRegister " << typeID << ERROR_END;
-			return;
+			return false;
 		}
 
 		typeID = CreateVariable(m_Bool, "Bool", data, false);
 		if (!m_Bool)
 		{
 			ERROR_BEGIN << "Invalid type for Bool in ReadRegister " << typeID << ERROR_END;
-			return;
+			return false;
 		}
 
 		typeID = CreateVariable(m_Ulong, "Ulong", data, false);
 		if (!m_Ulong)
 		{
 			ERROR_BEGIN << "Invalid type for Ulong in ReadRegister " << typeID << ERROR_END;
-			return;
+			return false;
 		}
 
 		typeID = CreateVariable(m_String, "String", data, false);
 		if (!m_String)
 		{
 			ERROR_BEGIN << "Invalid type for String in ReadRegister " << typeID << ERROR_END;
-			return;
+			return false;
 		}
+
+		return true;
 	}
 
 	NodeState WriteRegister::Update(AgentPtr pAgent)

@@ -304,7 +304,7 @@ namespace YBehavior.Editor
                 {
                     foreach (TabItem tab in e.AddedItems)
                     {
-                        LogMgr.Instance.Log("Tab selected: " + tab.Header);
+                        //LogMgr.Instance.Log("Tab selected: " + tab.Header);
                         if (WorkBenchMgr.Instance.Switch(tab.Content as WorkBench))
                         {
                             m_CurPageData = m_PageDataDic[tab];

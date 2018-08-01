@@ -11,7 +11,7 @@ namespace YBehavior
 	public:
 		STRING GetClassName() const override { return "Calculator"; }
 	protected:
-		virtual void OnLoaded(const pugi::xml_node& data);
+		virtual bool OnLoaded(const pugi::xml_node& data);
 		virtual NodeState Update(AgentPtr pAgent);
 
 	private:

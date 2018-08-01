@@ -20,7 +20,7 @@ namespace YBehavior
 		GetClassTypeNumberId<Uint64>()
 	};
 
-	void SetData::OnLoaded(const pugi::xml_node& data)
+	bool SetData::OnLoaded(const pugi::xml_node& data)
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
@@ -28,15 +28,17 @@ namespace YBehavior
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
-			return;
+			return false;
 		}
 		///> Right
 		TYPEID dataType = CreateVariable(m_Opr, "Source", data, true);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
-			return;
+			return false;
 		}
+
+		return true;
 	}
 
 	YBehavior::NodeState SetData::Update(AgentPtr pAgent)

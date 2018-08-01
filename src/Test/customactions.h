@@ -74,7 +74,7 @@ public:
 	YBehavior::STRING GetClassName() const override { return "GetTargetNameAction"; }
 protected:
 	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;
-	void OnLoaded(const pugi::xml_node& data) override;
+	bool OnLoaded(const pugi::xml_node& data) override;
 
 	YBehavior::SharedVariableEx<YBehavior::EntityWrapper>* m_Target;
 };
@@ -86,7 +86,7 @@ public:
 
 protected:
 	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;
-	void OnLoaded(const pugi::xml_node& data) override;
+	bool OnLoaded(const pugi::xml_node& data) override;
 
 	YBehavior::SharedVariableEx<YBehavior::EntityWrapper>* m_Target;
 };

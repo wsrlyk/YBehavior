@@ -21,20 +21,20 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////////////////////
 	static std::unordered_set<TYPEID> s_ValidTypes = { GetClassTypeNumberId<Int>(), GetClassTypeNumberId<Float>() };
 
-	void Calculator::OnLoaded(const pugi::xml_node& data)
+	bool Calculator::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Operator
 		auto attrOptr = data.attribute("Operator");
 		if (attrOptr.empty())
 		{
 			ERROR_BEGIN << "Cant Find Calculator Operator: " << data.name() << ERROR_END;
-			return;
+			return false;
 		}
 		STRING tempChar = GetValue("Operator", data);
 		if (!IVariableOperationHelper::s_OperatorMap.TryGetKey(tempChar, m_Operator))
 		{
 			ERROR_BEGIN << "Operator Error: " << tempChar << ERROR_END;
-			return;
+			return false;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -43,22 +43,24 @@ namespace YBehavior
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Opl in calculator: " << m_DataType << ERROR_END;
-			return;
+			return false;
 		}
 		///> Right1
 		TYPEID dataType = CreateVariable(m_Opr1, "Opr1", data, true);
 		if (dataType != m_DataType)
 		{
 			ERROR_BEGIN << "Different types:  " << dataType << " with " << m_DataType << ERROR_END;
-			return;
+			return false;
 		}
 		///> Right2
 		dataType = CreateVariable(m_Opr2, "Opr2", data, true);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN << "Different types:  " << dataType << " with " << m_DataType << ERROR_END;
-			return;
+			return false;
 		}
+
+		return true;
 	}
 
 	YBehavior::NodeState Calculator::Update(AgentPtr pAgent)

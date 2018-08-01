@@ -416,7 +416,8 @@ namespace YBehavior.Editor.Core
         private void handleText(byte[] msgData)
         {
             string text = GetStringFromBuffer(msgData, 0, kMaxTextLength, true);
-            LogMgr.Instance.Log(text);
+            if (Config.Instance.PrintIntermediateInfo)
+                LogMgr.Instance.Log(text);
             MessageProcessor.Receive(text);
         }
 

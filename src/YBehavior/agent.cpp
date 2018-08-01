@@ -14,11 +14,13 @@ YBehavior::RegisterData* YBehavior::Agent::GetRegister()
 	return m_RegisterData;
 }
 
-void YBehavior::Agent::SetTree(const STRING& name)
+bool YBehavior::Agent::SetTree(const STRING& name)
 {
 	m_Tree = TreeMgr::Instance()->GetTree(name);
+	if (!m_Tree)
+		return false;
 	m_Tree->CloneData(*m_SharedData);
-
+	return true;
 	//TreeKeyMgr::Instance()->SetActiveTree(m_Tree->GetNameKeyMgr(), false);
 }
 

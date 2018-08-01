@@ -13,7 +13,7 @@ namespace YBehavior.Editor.Core
 
         System.Threading.Timer m_Timer;
         delegate void DebugTreeWithAgentAppendOneNode(Node node, StringBuilder stringBuilder);
-
+        
         public void OnNetworkConnectionChanged(bool bConnected)
         {
             if (bConnected)
@@ -204,7 +204,7 @@ namespace YBehavior.Editor.Core
         {
             if (m_LastTickResultToken != m_TickResultToken)
             {
-                LogMgr.Instance.Log("TickResult bInstant = " + (DebugMgr.Instance.bBreaked ? "False" : "True"));
+                //LogMgr.Instance.Log("TickResult bInstant = " + (DebugMgr.Instance.bBreaked ? "False" : "True"));
                 EventMgr.Instance.Send(new TickResultArg() { /*bInstant = !DebugMgr.Instance.bBreaked, */Token = m_TickResultToken });
                 m_LastTickResultToken = m_TickResultToken;
             }
@@ -218,7 +218,8 @@ namespace YBehavior.Editor.Core
 
         void _HandleLogPoint(string ss)
         {
-            LogMgr.Instance.Log(ss);
+            if (Config.Instance.PrintIntermediateInfo)
+                LogMgr.Instance.Log(ss);
 
             string[] data = ss.Split(msgContentSplitter, StringSplitOptions.RemoveEmptyEntries);
             if (data.Length > 0)

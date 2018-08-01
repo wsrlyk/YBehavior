@@ -74,6 +74,17 @@ namespace YBehavior
 	template<typename T>
 	bool ValueHandler::Compare(const void* pLeft, const void* pRight, OperationType op)
 	{
+		if (pLeft == nullptr)
+		{
+			ERROR_BEGIN << "pLeft is null in Calculate" << ERROR_END;
+			return false;
+		}
+		if (pRight == nullptr)
+		{
+			ERROR_BEGIN << "pRight is null in Calculate" << ERROR_END;
+			return false;
+		}
+
 		const T& left = *((const T*)pLeft);
 		const T& right = *((const T*)pRight);
 

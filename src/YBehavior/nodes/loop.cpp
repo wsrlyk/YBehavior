@@ -29,10 +29,14 @@ namespace YBehavior
 			if (m_MainChild != nullptr)
 			{
 				NodeState ns = m_MainChild->Execute(pAgent);
-				if (ns == NS_FAILURE && *m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData()))
+				if (ns == NS_FAILURE)
 				{
-					DEBUG_LOG_INFO("ExitWhenFailure at " << loopTimes << " times; ");
-					break;
+					const BOOL* bExit = m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData());
+					if (bExit && *bExit)
+					{
+						DEBUG_LOG_INFO("ExitWhenFailure at " << loopTimes << " times; ");
+						break;
+					}
 				}
 			}
 
@@ -43,14 +47,16 @@ namespace YBehavior
 		return NS_SUCCESS;
 	}
 
-	void For::OnLoaded(const pugi::xml_node& data)
+	bool For::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data, true);
 		if (type != GetClassTypeNumberId<Bool>())
 		{
 			ERROR_BEGIN << "Invalid type for ExitWhenFailure in For: " << type << ERROR_END;
-			return;
+			return false;
 		}
+
+		return true;
 	}
 
 	void For::OnAddChild(BehaviorNode * child, const STRING & connection)
@@ -122,10 +128,14 @@ namespace YBehavior
 			if (m_Child != nullptr)
 			{
 				NodeState ns = m_Child->Execute(pAgent);
-				if (ns == NS_FAILURE && *m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData()))
+				if (ns == NS_FAILURE)
 				{
-					DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
-					break;
+					const BOOL* bExit = m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData());
+					if (bExit && *bExit)
+					{
+						DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
+						break;
+					}
 				}
 			}
 		}
@@ -133,21 +143,23 @@ namespace YBehavior
 		return NS_SUCCESS;
 	}
 
-	void ForEach::OnLoaded(const pugi::xml_node& data)
+	bool ForEach::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID collectionType = CreateVariable(m_Collection, "Collection", data, false);
 		TYPEID currentType = CreateVariable(m_Current, "Current", data, true);
 		if (!Utility::IsElement(currentType, collectionType))
 		{
 			ERROR_BEGIN << "Types not match in ForEach: " << currentType << " and " << collectionType << ERROR_END;
-			return;
+			return false;
 		}
 
 		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data, true);
 		if (type != GetClassTypeNumberId<Bool>())
 		{
 			ERROR_BEGIN << "Invalid type for ExitWhenFailure in For: " << type << ERROR_END;
-			return;
+			return false;
 		}
+
+		return true;
 	}
 }

@@ -89,9 +89,9 @@ namespace YBehavior
 		DEBUG_RETURN(dbgHelper, state);
 	}
 
-	void BehaviorNode::Load(const pugi::xml_node& data)
+	bool BehaviorNode::Load(const pugi::xml_node& data)
 	{
-		OnLoaded(data);
+		return OnLoaded(data);
 	}
 
 	void BehaviorNode::LoadFinish()
@@ -99,22 +99,30 @@ namespace YBehavior
 		OnLoadFinish();
 	}
 
-	void BehaviorNode::AddChild(BehaviorNode* child, const STRING& connection)
+	bool BehaviorNode::AddChild(BehaviorNode* child, const STRING& connection)
 	{
 		if (connection == "condition")
 		{
-			m_Condition = child;
-			child->SetParent(this);
+			if (m_Condition == nullptr)
+			{
+				m_Condition = child;
+				child->SetParent(this);
+				return true;
+			}
+
+			ERROR_BEGIN << "Too many Condition Node for node " << this->GetNodeInfoForPrint() << ERROR_END;
+			return false;
 		}
 		else
 		{
-			_AddChild(child, connection);
+			return _AddChild(child, connection);
 		}
 	}
 
-	void BehaviorNode::_AddChild(BehaviorNode* child, const STRING& connection)
+	bool BehaviorNode::_AddChild(BehaviorNode* child, const STRING& connection)
 	{
 		ERROR_BEGIN << "Cant add child to this node: " << ERROR_END;
+		return false;
 	}
 
 	bool BehaviorNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single, char variableType)
@@ -236,7 +244,7 @@ namespace YBehavior
 		//delete m_NameKeyMgr;
 	}
 
-	void BehaviorTree::OnLoaded(const pugi::xml_node& data)
+	bool BehaviorTree::OnLoaded(const pugi::xml_node& data)
 	{
 		std::vector<STRING> buffer;
 
@@ -245,13 +253,15 @@ namespace YBehavior
 			if (KEY_WORDS.count(it->name()))
 				continue;
 			if (!ParseVariable(*it, data, buffer, -1))
-				continue;
+				return false;
 			ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
 			if (helper == nullptr)
 				continue;
 
 			helper->SetSharedData(m_SharedData, it->name(), buffer[1]);
 		}
+
+		return true;
 	}
 
 	void BehaviorTree::CloneData(SharedDataEx& destination)
@@ -308,10 +318,10 @@ namespace YBehavior
 	}
 
 
-	void BranchNode::_AddChild(BehaviorNode* child, const STRING& connection)
+	bool BranchNode::_AddChild(BehaviorNode* child, const STRING& connection)
 	{
 		if (child == nullptr)
-			return;
+			return false;
 
 		if (!m_Childs)
 			m_Childs = new std::vector<BehaviorNodePtr>();
@@ -320,6 +330,8 @@ namespace YBehavior
 		child->SetParent(this);
 
 		OnAddChild(child, connection);
+
+		return true;
 	}
 
 	void BranchNode::_DestroyChilds()

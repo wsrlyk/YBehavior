@@ -79,7 +79,7 @@ YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 	LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Target, true);
 
 	const YBehavior::EntityWrapper* currentTarget = m_Target->GetCastedValue(pAgent->GetSharedData());
-	if (currentTarget->IsValid())
+	if (currentTarget && currentTarget->IsValid())
 	{
 		YBehavior::EntityWrapper wrapper;
 		m_Target->SetCastedValue(pAgent->GetSharedData(), &wrapper);
@@ -95,20 +95,22 @@ YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 	return YBehavior::NS_SUCCESS;
 }
 
-void SelectTargetAction::OnLoaded(const pugi::xml_node& data)
+bool SelectTargetAction::OnLoaded(const pugi::xml_node& data)
 {
 	YBehavior::TYPEID typeID = CreateVariable(m_Target, "Target", data, true, YBehavior::Utility::POINTER_CHAR);
 	if (typeID != YBehavior::GetClassTypeNumberId<YBehavior::EntityWrapper>())
 	{
 		ERROR_BEGIN << "Type of [Target] Error in SelectTargetAction" << ERROR_END;
+		return false;
 	}
 
+	return true;
 }
 
 YBehavior::NodeState GetTargetNameAction::Update(YBehavior::AgentPtr pAgent)
 {
 	const YBehavior::EntityWrapper* currentTarget = m_Target->GetCastedValue(pAgent->GetSharedData());
-	if (currentTarget->IsValid())
+	if (currentTarget && currentTarget->IsValid())
 	{
 		LOG_BEGIN << ((XAgent*)currentTarget->Get())->GetEntity()->ToString() << LOG_END;
 	}
@@ -120,11 +122,14 @@ YBehavior::NodeState GetTargetNameAction::Update(YBehavior::AgentPtr pAgent)
 	return YBehavior::NS_SUCCESS;
 }
 
-void GetTargetNameAction::OnLoaded(const pugi::xml_node& data)
+bool GetTargetNameAction::OnLoaded(const pugi::xml_node& data)
 {
 	YBehavior::TYPEID typeID = CreateVariable(m_Target, "Target", data, true, YBehavior::Utility::POINTER_CHAR);
 	if (typeID != YBehavior::GetClassTypeNumberId<YBehavior::EntityWrapper>())
 	{
 		ERROR_BEGIN << "Type of [Target] Error in SelectTargetAction" << ERROR_END;
+		return false;
 	}
+
+	return true;
 }

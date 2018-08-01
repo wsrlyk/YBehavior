@@ -38,6 +38,8 @@ namespace YBehavior
 
 		void _SetCastedValue(SharedDataEx* pData, const ElementType* src)
 		{
+			if (src == nullptr)
+				return;
 			INT index = *(m_VectorIndex->GetCastedValue(pData));
 			if (index < 0)
 				return;

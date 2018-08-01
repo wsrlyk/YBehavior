@@ -47,6 +47,7 @@ namespace YBehavior
 		if (!_LoadOneNode(tree, rootData.first_child(), uid, tree))
 		{
 			ERROR_BEGIN << "Load xml failed: " << name << ERROR_END;
+			delete tree;
 			return nullptr;
 		}
 
@@ -65,7 +66,8 @@ namespace YBehavior
 			return false;
 
 		node->SetRoot(root);
-		node->Load(data);
+		if (!node->Load(data))
+			return false;
 		node->SetUID(++parentUID);
 		for (auto it = data.begin(); it != data.end(); ++it)
 		{
@@ -75,19 +77,24 @@ namespace YBehavior
 				if (className.empty())
 				{
 					ERROR_BEGIN << "Cant Find Class Name in: " << data.name() << ERROR_END;
-					continue;
+					return false;
 				}
 				BehaviorNode* childNode = BehaviorNode::CreateNodeByName(className.value());
 				if (childNode == nullptr)
 				{
 					ERROR_BEGIN << "Cant create node " << className.value() << " cause its not registered;" << ERROR_END;
-					continue;
+					return false;
 				}
 
 				auto connectionName = it->attribute("Connection");
-				node->AddChild(childNode, connectionName.value());
+				if (!node->AddChild(childNode, connectionName.value()))
+				{
+					delete childNode;
+					return false;
+				}
 
-				_LoadOneNode(childNode, *it, parentUID, root);
+				if (!_LoadOneNode(childNode, *it, parentUID, root))
+					return false;
 			}
 			else
 			{
@@ -139,12 +146,15 @@ namespace YBehavior
 
 		
 		tree = _LoadTree(name);
+		if (!tree)
+			return true;
 		info->SetLatestTree(tree);
 		info->ChangeReferenceCount(true, bToAgent);
 
 		bool bNoChildren = true;
 		if (m_ToBeLoadedTree.size() > 0)
 		{
+			bool bLoadChidrenFailed = false;
 			std::unordered_set<STRING> tobeload;
 			tobeload.swap(m_ToBeLoadedTree);
 			for (auto it2 = tobeload.begin(); it2 != tobeload.end(); ++it2)
@@ -152,10 +162,21 @@ namespace YBehavior
 				BehaviorTree* subTree;
 				
 				_GetTree(*it2, subTree, false);
-
-				tree->AddSubTree(subTree);
+				if (subTree)
+					tree->AddSubTree(subTree);
+				else
+				{
+					bLoadChidrenFailed = true;
+					break;
+				}
 			}
-
+			if (bLoadChidrenFailed)
+			{
+				info->ChangeReferenceCount(false, bToAgent);
+				info->RevertVersion();
+				tree = nullptr;
+				return true;
+			}
 			bNoChildren = false;
 		}
 
@@ -335,6 +356,7 @@ namespace YBehavior
 
 	TreeInfo::TreeInfo()
 		: m_LatestVersion(nullptr)
+		, m_PreviousVersion(nullptr)
 	{
 		CreateVersion();
 	}
@@ -358,6 +380,7 @@ namespace YBehavior
 
 	void TreeInfo::RemoveVersion(TreeVersion* version)
 	{
+		if (version)
 		{
 			if (version->tree->GetSubTrees().size() > 0)
 			{
@@ -366,12 +389,18 @@ namespace YBehavior
 					TreeMgr::Instance()->ReturnTree(*it, false);
 				}
 			}
+
+			m_TreeVersions.erase(version->version);
+
+			if (version->tree)
+				delete version->tree;
+
+			if (m_PreviousVersion == version)
+				m_PreviousVersion = nullptr;
+			if (m_LatestVersion == version)
+				m_LatestVersion = nullptr;
+			delete version;
 		}
-
-		m_TreeVersions.erase(version->version);
-
-		delete version->tree;
-		delete version;
 	}
 
 	TreeVersion* TreeInfo::CreateVersion()
@@ -390,10 +419,18 @@ namespace YBehavior
 				TryRemoveVersion(m_LatestVersion);
 			}
 		}
+		m_PreviousVersion = m_LatestVersion;
 		m_LatestVersion = pVersion;
 		m_TreeVersions[pVersion->version] = pVersion;
 
 		return pVersion;
+	}
+
+	void TreeInfo::RevertVersion()
+	{
+		TryRemoveVersion(m_LatestVersion);
+		m_LatestVersion = m_PreviousVersion;
+		m_PreviousVersion = nullptr;
 	}
 
 	void TreeInfo::IncreaseLatestVesion()

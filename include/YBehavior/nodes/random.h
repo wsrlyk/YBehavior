@@ -11,7 +11,7 @@ namespace YBehavior
 		STRING GetClassName() const override { return "Random"; }
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
-		virtual void OnLoaded(const pugi::xml_node& data);
+		virtual bool OnLoaded(const pugi::xml_node& data);
 
 	private:
 		ISharedVariableEx* m_Opr1;

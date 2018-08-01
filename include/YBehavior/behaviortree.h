@@ -75,18 +75,18 @@ namespace YBehavior
 
 		virtual STRING GetClassName() const = 0;
 
-		void Load(const pugi::xml_node& data);
+		bool Load(const pugi::xml_node& data);
 		void LoadFinish();
 		NodeState Execute(AgentPtr pAgent);
 		static BehaviorNode* CreateNodeByName(const STRING& name);
-		void AddChild(BehaviorNode* child, const STRING& connection);
+		bool AddChild(BehaviorNode* child, const STRING& connection);
 
 		virtual STRING GetNodeInfoForPrint() { return "";}
 
 	protected:
-		virtual void _AddChild(BehaviorNode* child, const STRING& connection);
+		virtual bool _AddChild(BehaviorNode* child, const STRING& connection);
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
-		virtual void OnLoaded(const pugi::xml_node& data) {}
+		virtual bool OnLoaded(const pugi::xml_node& data) { return true; }
 		virtual void OnLoadFinish() {}
 		virtual void OnAddChild(BehaviorNode* child, const STRING& connection) {}
 		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
@@ -124,7 +124,7 @@ namespace YBehavior
 	protected:
 		std::vector<BehaviorNodePtr>* m_Childs;
 
-		void _AddChild(BehaviorNode* child, const STRING& connection) override;
+		bool _AddChild(BehaviorNode* child, const STRING& connection) override;
 		void _DestroyChilds();
 	};
 
@@ -185,7 +185,7 @@ namespace YBehavior
 		///> CAUTION: this function can only be called in garbage collection
 		void ClearSubTree() { m_SubTrees.clear(); }
 	protected:
-		virtual void OnLoaded(const pugi::xml_node& data);
+		virtual bool OnLoaded(const pugi::xml_node& data);
 	};
 }
 

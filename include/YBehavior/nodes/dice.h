@@ -12,7 +12,7 @@ namespace YBehavior
 		STRING GetClassName() const override { return "Dice"; }
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
-		virtual void OnLoaded(const pugi::xml_node& data);
+		virtual bool OnLoaded(const pugi::xml_node& data);
 
 		ISharedVariableEx* m_Distribution;
 		ISharedVariableEx* m_Values;

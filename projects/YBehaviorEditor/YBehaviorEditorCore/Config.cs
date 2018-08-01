@@ -12,6 +12,8 @@ namespace YBehavior.Editor.Core
         public string WorkingDir { get; set; }
         public string ExportingDir { get; set; }
 
+        public bool PrintIntermediateInfo { get; set; }
+
         private string m_DebugIP;
         public string DebugIP
         {
@@ -69,6 +71,8 @@ namespace YBehavior.Editor.Core
             configFile = new IniFile(Environment.CurrentDirectory + "\\user.ini");
             m_DebugIP = configFile.ReadString("Debug", "IP", "127.0.0.1");
             m_DebugPort = configFile.ReadString("Debug", "Port", "444");
+
+            PrintIntermediateInfo = configFile.ReadInt("Debug", "PrintIntermediateInfo", 0) != 0;
         }
     }
 }

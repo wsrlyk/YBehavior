@@ -66,25 +66,28 @@ namespace YBehavior
 		return ns;
 	}
 
-	void SwitchCase::OnLoaded(const pugi::xml_node& data)
+	bool SwitchCase::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID switchType = CreateVariable(m_Switch, "Switch", data, true);
 		if (s_ValidTypes.find(switchType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Switch in SwitchCase: " << switchType << ERROR_END;
-			return;
+			return false;
 		}
 		TYPEID casesType = CreateVariable(m_Cases, "Cases", data, false);
 		if (s_ValidVecTypes.find(casesType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Cases in SwitchCase: " << casesType << ERROR_END;
-			return;
+			return false;
 		}
 
 		if (!Utility::IsElement(switchType, casesType))
 		{
 			ERROR_BEGIN << "Different types in SwitchCase:  " << switchType << " and " << casesType << ERROR_END;
+			return false;
 		}
+
+		return true;
 	}
 
 	void SwitchCase::OnAddChild(BehaviorNode * child, const STRING & connection)

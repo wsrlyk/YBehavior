@@ -12,7 +12,7 @@ namespace YBehavior
 		STRING GetClassName() const override { return "ReadRegister"; }
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
-		virtual void OnLoaded(const pugi::xml_node& data);
+		virtual bool OnLoaded(const pugi::xml_node& data);
 
 	private:
 		SharedVariableEx<STRING>* m_Event;
@@ -29,7 +29,7 @@ namespace YBehavior
 		STRING GetClassName() const override { return "WriteRegister"; }
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
-		virtual void OnLoaded(const pugi::xml_node& data);
+		virtual bool OnLoaded(const pugi::xml_node& data);
 
 	private:
 		SharedVariableEx<STRING>* m_Event;

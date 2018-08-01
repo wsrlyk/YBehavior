@@ -33,6 +33,7 @@ namespace YBehavior
 		void TryRemoveVersion(TreeVersion* version);
 		void RemoveVersion(TreeVersion* version);
 		TreeVersion* CreateVersion();
+		void RevertVersion();
 		BehaviorTree* GetLatestTree() { return m_LatestVersion ? m_LatestVersion->tree : nullptr; }
 		inline TreeVersion* GetLatestVersion() { return m_LatestVersion; }
 		void IncreaseLatestVesion();
@@ -43,7 +44,8 @@ namespace YBehavior
 
 		inline std::unordered_map<int, TreeVersion*>& GetVersions() { return m_TreeVersions; }
 	private:
-		TreeVersion* m_LatestVersion;
+		TreeVersion * m_LatestVersion;
+		TreeVersion* m_PreviousVersion;
 		std::unordered_map<int, TreeVersion*> m_TreeVersions;
 	};
 

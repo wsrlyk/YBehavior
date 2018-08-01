@@ -21,20 +21,20 @@ namespace YBehavior
 		GetClassTypeNumberId<Uint64>()
 	};
 
-	void Comparer::OnLoaded(const pugi::xml_node& data)
+	bool Comparer::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Operator
 		auto attrOptr = data.attribute("Operator");
 		if (attrOptr.empty())
 		{
 			ERROR_BEGIN << "Cant Find Comparer Operator: " << data.name() << ERROR_END;
-			return;
+			return false;
 		}
 		STRING tempChar = GetValue("Operator", data);
 		if (!IVariableOperationHelper::s_OperatorMap.TryGetKey(tempChar, m_Operator))
 		{
 			ERROR_BEGIN << "Operator Error: " << tempChar << ERROR_END;
-			return;
+			return false;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -43,15 +43,17 @@ namespace YBehavior
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
-			return;
+			return false;
 		}
 		///> Right
 		TYPEID dataType = CreateVariable(m_Opr, "Opr", data, true);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
-			return;
+			return false;
 		}
+
+		return true;
 	}
 
 	YBehavior::NodeState Comparer::Update(AgentPtr pAgent)

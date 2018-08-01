@@ -12,7 +12,7 @@ namespace YBehavior
 		STRING GetClassName() const override { return "SwitchCase"; }
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
-		virtual void OnLoaded(const pugi::xml_node& data);
+		virtual bool OnLoaded(const pugi::xml_node& data);
 		void OnAddChild(BehaviorNode * child, const STRING & connection) override;
 
 		ISharedVariableEx* m_Switch;

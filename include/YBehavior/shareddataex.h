@@ -163,7 +163,8 @@ namespace YBehavior
 			//	m_Datas[key] = *((T*)src);
 			//}
 			//return true;
-			m_Datas[key] = *((T*)src);
+			if (src != nullptr)
+				m_Datas[key] = *((T*)src);
 			return true;
 		}
 	};

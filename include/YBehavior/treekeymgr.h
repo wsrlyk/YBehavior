@@ -139,7 +139,9 @@ namespace YBehavior
 		if (mpCurActiveNameKeyInfo == &mCommonNameKeyInfo || curActiveNameKeyInfo.Get(name) == Utility::INVALID_KEY)
 		{
 			KEY key = curActiveNameKeyInfo.mKeyCounter++;
+#ifdef PRINT_INTERMEDIATE_INFO
 			LOG_BEGIN << "ADD node: " << name << "key: " << key << LOG_END;
+#endif
 			curActiveNameKeyInfo.mNameHash[name] = key;
 
 #ifdef DEBUGGER

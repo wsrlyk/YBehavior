@@ -152,8 +152,9 @@ namespace YBehavior
 		if (ms_sendBuffer.length() > 0)
 		{
 			ScopedLock lock(m_Mutex);
-
+#ifdef PRINT_INTERMEDIATE_INFO
 			LOG_BEGIN << "Try Send: " << ms_sendBuffer << LOG_END;
+#endif
 			size_t len;
 			if (Socket::Write(m_WriteSocket, ms_sendBuffer.c_str(), ms_sendBuffer.length(), len) && len != ms_sendBuffer.length())
 			{
