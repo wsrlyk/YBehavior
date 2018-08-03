@@ -9,6 +9,7 @@ namespace YBehavior
 	public:
 		virtual void RegisterActions() const;
 		virtual int StartWithDebugListeningPort() const { return 0; }
+		virtual STRING WorkingDir() const { return ""; }
 	protected:
 		template<typename T>
 		void _Register() const;

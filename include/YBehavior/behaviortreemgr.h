@@ -59,7 +59,7 @@ namespace YBehavior
 		void ReturnTree(BehaviorTree* tree, bool bFromAgent);
 		static TreeMgr* Instance();
 		void Print();
-
+		void SetWorkingDir(const STRING& dir);
 		void PushToBeLoadedTree(const STRING& name) { m_ToBeLoadedTree.insert(name); }
 		void GarbageCollection();
 	protected:
@@ -76,6 +76,8 @@ namespace YBehavior
 		std::unordered_map<STRING, TreeInfo*> m_Trees;
 
 		std::unordered_set<STRING> m_ToBeLoadedTree;
+
+		STRING m_WorkingDir;
 	};
 }
 

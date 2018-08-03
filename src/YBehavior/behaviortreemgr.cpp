@@ -29,7 +29,7 @@ namespace YBehavior
 	{
 		pugi::xml_document doc;
 
-		pugi::xml_parse_result result = doc.load_file((name + ".xml").c_str());
+		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + ".xml").c_str());
 		LOG_BEGIN << "Loading: " << name << ".xml" << LOG_END;
 		if (result.status)
 		{
@@ -281,6 +281,20 @@ namespace YBehavior
 			it->second->Print();
 		}
 		std::cout << "Print all trees end." << std::endl;
+	}
+
+	void TreeMgr::SetWorkingDir(const STRING& dir)
+	{
+		m_WorkingDir = dir;
+
+		if (m_WorkingDir == "")
+			return;
+
+		size_t len = m_WorkingDir.length();
+		if (m_WorkingDir[len - 1] != '\\' && m_WorkingDir[len - 1] != '/')
+		{
+			m_WorkingDir.append(1, '/');
+		}
 	}
 
 	void TreeMgr::GarbageCollection()
