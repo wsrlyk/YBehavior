@@ -39,9 +39,10 @@ void YBehavior::Agent::ProcessRegister()
 		m_RegisterData->GetSendData().Clear();
 }
 
-YBehavior::Agent::Agent()
+YBehavior::Agent::Agent(Entity* entity)
 	: m_Tree(nullptr)
 	, m_RegisterData(nullptr)
+	, m_Entity(entity)
 {
 	m_UID = ++s_UID;
 	m_SharedData = new SharedDataEx();

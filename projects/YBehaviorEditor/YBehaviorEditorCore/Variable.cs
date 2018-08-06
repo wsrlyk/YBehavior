@@ -190,6 +190,8 @@ namespace YBehavior.Editor.Core
         public IVariableDataSource SharedDataSource { get; set; } = null;
         public SharedData Container { get; set; } = null;
 
+        public string Description { get; set; }
+
         public Variable(IVariableDataSource sharedData) => SharedDataSource = sharedData;
 
         static List<string> candidatesBuffer = new List<string>();

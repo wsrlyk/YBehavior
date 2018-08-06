@@ -32,7 +32,7 @@ namespace YBehavior
 		RegisterData* m_RegisterData;
 		Entity* m_Entity;
 	public:
-		Agent();
+		Agent(Entity* entity);
 		~Agent();
 		inline SharedDataEx* GetSharedData() { return m_SharedData; }
 		inline BehaviorTree* GetTree() { return m_Tree; }

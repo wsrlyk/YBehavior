@@ -14,7 +14,11 @@ class XAgent : public YBehavior::Agent
 	static YBehavior::KEY isdead;
 
 public:
+	XAgent(YBehavior::Entity* pEntity)
+		: Agent(pEntity)
+	{
 
+	}
 	static void InitData()
 	{
 		//YBehavior::TreeKeyMgr::Instance()->SetActiveTree(nullptr, true);
@@ -46,7 +50,7 @@ public:
 	XEntity(const std::string& name, const std::string& tree)
 	{
 		m_Name = name;
-		pAgent = new XAgent();
+		pAgent = new XAgent(this);
 		pAgent->SetTree(tree);
 		pAgent->SetData();
 	}

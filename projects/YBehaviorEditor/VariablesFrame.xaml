@@ -14,7 +14,7 @@
             <TabItem Header="Variable" Name="VariableTab" Visibility="{Binding IsSelected, ElementName=VariableTab, Converter={StaticResource visibilityConvertor}}">
                 <DockPanel Background="DarkGray">
                     <StackPanel DockPanel.Dock="Top">
-                        <TextBlock Name="Type" Text ="{Binding Name}" FontSize="14" Height="25"/>
+                        <TextBlock Name="Type" Text ="{Binding Name}" FontSize="14" Height="25" ToolTip="{Binding Description}"/>
                         <DockPanel Background="LightBlue" Margin="2,2,2,2">
                             <TextBlock Text="NickName" FontSize="13" Width="90" DockPanel.Dock="Left" Background="LightCyan"/>
                             <TextBox Name="NickName" MinWidth="110" Text="{Binding NickName}"/>

@@ -21,7 +21,7 @@
     </UserControl.Resources>
     <StackPanel>
         <DockPanel Background="LightBlue" Margin="2,2,2,2">
-            <TextBlock Name="VKey" Text="{Binding Name}" FontSize="13" Width="150" DockPanel.Dock="Left" Background="LightCyan"/>
+            <TextBlock Name="VKey" Text="{Binding Name}" FontSize="13" Width="150" DockPanel.Dock="Left" Background="LightCyan" ToolTip="{Binding Description}"/>
             <ComboBox IsEnabled="{Binding IsEditable}" Name="VTypes" Width="55" ItemsSource="{Binding vTypeSet}" SelectedItem="{Binding vType}"
                 IsHitTestVisible="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}">
                 <!--IsEditable="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}"

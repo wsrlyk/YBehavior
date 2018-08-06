@@ -24,6 +24,7 @@ namespace YBehavior.Editor.Core
                 Node node = Activator.CreateInstance(type) as Node;
                 if (node.Type == NodeType.NT_Invalid)
                     continue;
+                node.LoadDescription();
                 m_NodeList.Add(node);
                 m_TypeDic.Add(node.Name, type);
                 Console.WriteLine(type);
@@ -36,15 +37,16 @@ namespace YBehavior.Editor.Core
             if (m_TypeDic.TryGetValue(name, out Type type))
             {
                 node = Activator.CreateInstance(type) as Node;
+                node.CreateBase();
                 node.CreateVariables();
-                node.CreateRenderer();
+                //node.CreateRenderer();
                 return node;
             }
 
             node = ExternalActionMgr.Instance.GetNode(name);
             if (node != null)
             {
-                node.CreateRenderer();
+                //node.CreateRenderer();
             }
             return node;
         }
@@ -278,6 +280,9 @@ namespace YBehavior.Editor.Core
         public virtual string Note => string.Empty;
         public virtual string Icon => Connection.IdentifierParent;
 
+        NodeDescription m_NodeDescripion;
+        public string Description => m_NodeDescripion == null ? string.Empty : m_NodeDescripion.node;
+
         string m_Comment = string.Empty;// "This is a node comment test.";
         public string Comment
         {
@@ -427,17 +432,12 @@ namespace YBehavior.Editor.Core
 
         public Node()
         {
-            if (_HasParentHolder())
-                m_Connections.CreateParentHolder(this);
-
-            m_Variables = new SharedData(this);
-            m_Renderer = new Renderer(this);
-
-            m_ConditonConnection = new ConnectionSingle(this, Connection.IdentifierCondition);
         }
 
         public virtual void Load(System.Xml.XmlNode data)
         {
+            LoadDescription();
+
             foreach (System.Xml.XmlAttribute attr in data.Attributes)
             {
                 if (ReservedAttributes.Contains(attr.Name))
@@ -485,6 +485,7 @@ namespace YBehavior.Editor.Core
                     return false;
                 if (v.CheckValid())
                 {
+                    v.Description = m_NodeDescripion == null ? string.Empty : m_NodeDescripion.GetVariable(v.Name);
                     return true;
                 }
             }
@@ -496,11 +497,26 @@ namespace YBehavior.Editor.Core
             OnInit();
         }
 
+        public void CreateBase()
+        {
+            if (_HasParentHolder())
+                m_Connections.CreateParentHolder(this);
+
+            m_Variables = new SharedData(this);
+            m_Renderer = new Renderer(this);
+
+            m_ConditonConnection = new ConnectionSingle(this, Connection.IdentifierCondition);
+        }
+
         public virtual void CreateVariables()
         {
 
         }
 
+        public void LoadDescription()
+        {
+            m_NodeDescripion = DescriptionMgr.Instance.GetNodeDescription(this.Name);
+        }
         protected virtual void OnInit()
         {
             m_TreeSharedData = null;
@@ -566,11 +582,11 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        public virtual Renderer CreateRenderer()
-        {
-            m_Renderer = new Renderer(this);
-            return m_Renderer;
-        }
+        //public virtual Renderer CreateRenderer()
+        //{
+        //    m_Renderer = new Renderer(this);
+        //    return m_Renderer;
+        //}
 
         protected virtual bool _HasParentHolder()
         {
@@ -621,6 +637,7 @@ namespace YBehavior.Editor.Core
         public virtual Node Clone()
         {
             Node other = Activator.CreateInstance(this.GetType()) as Node;
+            other.CreateBase();
             other.m_Name = this.m_Name;
             other.m_Type = this.m_Type;
             other.m_Hierachy = this.m_Hierachy;

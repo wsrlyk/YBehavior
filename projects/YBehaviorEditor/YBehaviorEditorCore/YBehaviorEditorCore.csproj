@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Comment.cs" />
     <Compile Include="DebugMgr.cs" />
+    <Compile Include="DescriptionMgr.cs" />
     <Compile Include="ExternalActionMgr.cs" />
     <Compile Include="Tools\IniFile.cs" />
     <Compile Include="MessageProcessor.cs" />

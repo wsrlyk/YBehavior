@@ -33,6 +33,7 @@ namespace YBehavior.Editor.Core
                 if (chi.Name == "Action")
                 {
                     ActionNode node = new ActionNode();
+                    node.CreateBase();
                     if (_LoadAction(node, chi))
                     {
                         m_ActionDic[node.ClassName] = node;

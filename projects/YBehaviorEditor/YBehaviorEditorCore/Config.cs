@@ -54,7 +54,10 @@ namespace YBehavior.Editor.Core
             IniFile configFile = new IniFile(Environment.CurrentDirectory + "\\config.ini");
             WorkingDir = configFile.ReadString("Config", "WorkingDir", "");
             ExportingDir = configFile.ReadString("Config", "ExportingDir", "");
+            DescriptionMgr.Instance.Load(Environment.CurrentDirectory + "\\description.xml");
+
             ExternalActionMgr.Instance.Load(configFile.ReadString("Config", "ExternalAction", "actions.xml"));
+
 
             DirectoryInfo workingDir = new DirectoryInfo(WorkingDir);
             WorkingDir = workingDir.FullName;

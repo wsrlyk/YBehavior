@@ -23,10 +23,10 @@ int main(int argc, char** argv)
 		tree = argv[1];
 	std::vector<int> a(1);
 	XEntity* pEntity = new XEntity("Hehe", tree);
-	pEntity->GetAgent()->SetEntity(pEntity);
+	//pEntity->GetAgent()->SetEntity(pEntity);
 
 	XEntity* pEntity1 = new XEntity("Haha", tree);
-	pEntity1->GetAgent()->SetEntity(pEntity1);
+	//pEntity1->GetAgent()->SetEntity(pEntity1);
 
 	LOG_BEGIN << "wrapper begin" << LOG_END;
 	EntityWrapper wrapper = pEntity->GetAgent()->GetEntity()->CreateWrapper();

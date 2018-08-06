@@ -30,6 +30,7 @@ namespace YBehavior.Editor
             Node m_Source;
             NodeHierachy m_Hierachy;
             int m_Level;
+            public string Description { get; set; }
 
             public bool bIsFolder { get { return m_Hierachy != NodeHierachy.NH_None; } }
             ///> Folder
@@ -40,6 +41,7 @@ namespace YBehavior.Editor
                 Name = m_Hierachy.ToString();
                 m_Level = level;
                 Icon = "Resources/ICON__0009_37.png";
+                Description = null;
             }
 
             ///> Node
@@ -49,6 +51,7 @@ namespace YBehavior.Editor
                 m_Hierachy = NodeHierachy.NH_None;
                 Name = data.Name;
                 Icon = "Resources/ICON__0000_46.png";
+                Description = data.Description;
             }
 
             public void Build(Node data)
