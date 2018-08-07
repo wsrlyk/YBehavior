@@ -144,7 +144,13 @@ namespace YBehavior.Editor.Core
                 param = attr.Value;
             }
 
-            // TODO: typeGroup
+            int typeGroup = 0;
+            attr = xml.Attributes.GetNamedItem("TypeGroup");
+            if (attr != null)
+            {
+                int.TryParse(attr.Value, out typeGroup);
+            }
+
             Variable v = action.Variables.CreateVariableInNode(
                 name,
                 value,
@@ -152,7 +158,7 @@ namespace YBehavior.Editor.Core
                 countType,
                 vbType,
                 bLockVBType,
-                0,
+                typeGroup,
                 param
             );
             return true;

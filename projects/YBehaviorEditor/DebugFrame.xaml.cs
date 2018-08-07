@@ -78,16 +78,29 @@ namespace YBehavior.Editor
                 EventMgr.Instance.Send(arg);
                 return;
             }
-            if (bench.CommandMgr.Dirty)
+            foreach (WorkBench openedBench in WorkBenchMgr.Instance.OpenedBenches)
             {
-                ShowSystemTipsArg arg = new ShowSystemTipsArg()
+                if (openedBench.CommandMgr.Dirty)
                 {
-                    Content = "Should Save First.",
-                    TipType = ShowSystemTipsArg.TipsType.TT_Error,
-                };
-                EventMgr.Instance.Send(arg);
-                return;
+                    ShowSystemTipsArg arg = new ShowSystemTipsArg()
+                    {
+                        Content = "Should Save All Opened Files First.",
+                        TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                    };
+                    EventMgr.Instance.Send(arg);
+                    return;
+                }
             }
+            //if (bench.CommandMgr.Dirty)
+            //{
+            //    ShowSystemTipsArg arg = new ShowSystemTipsArg()
+            //    {
+            //        Content = "Should Save First.",
+            //        TipType = ShowSystemTipsArg.TipsType.TT_Error,
+            //    };
+            //    EventMgr.Instance.Send(arg);
+            //    return;
+            //}
             string ip = this.IP.Text;
             string port = this.Port.Text;
 

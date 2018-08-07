@@ -83,9 +83,10 @@ namespace YBehavior.Editor
                 activeTab.Header = oArg.Bench.FileInfo.DisplayName;
                 activeTab.ToolTip = oArg.Bench.FileInfo.DisplayPath;
                 activeTab.Content = oArg.Bench;
-                //activeTab.CloseHandler = _TabCloseClicked;
+                activeTab.CloseHandler = _TabCloseClicked;
                 this.TabController.Items.Add(activeTab);
                 activeTab.PreviewMouseMove += TabItem_PreviewMouseMove;
+                activeTab.PreviewMouseLeftButtonDown += TabItem_PreviewMouseLeftButtonDown;
                 activeTab.Drop += TabItem_Drop;
                 activeTab.AllowDrop = true;
                 m_PageDataDic[activeTab] = new PageData();
@@ -234,15 +235,28 @@ namespace YBehavior.Editor
             return true;
         }
 
+        Point _startPoint;
+        void TabItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _startPoint = e.GetPosition(null);
+        }
+
         private void TabItem_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (Mouse.PrimaryDevice.LeftButton != MouseButtonState.Pressed)
-                return;
-            var tabItem = e.Source as UCTabItemWithClose;
-            if (tabItem == null)
-                return;
+            if (e.LeftButton == MouseButtonState.Pressed/* && !IsDragging*/)
+            {
+                var tabItem = e.Source as UCTabItemWithClose;
+                if (tabItem == null)
+                    return;
 
-            DragDrop.DoDragDrop(tabItem, tabItem, DragDropEffects.All);
+                Point position = e.GetPosition(null);
+
+                if (Math.Abs(position.X - _startPoint.X) > SystemParameters.MinimumHorizontalDragDistance ||
+                        Math.Abs(position.Y - _startPoint.Y) > SystemParameters.MinimumVerticalDragDistance)
+                {
+                    DragDrop.DoDragDrop(tabItem, tabItem, DragDropEffects.All);
+                }
+            }
         }
 
         private void TabItem_Drop(object sender, DragEventArgs e)
