@@ -126,5 +126,15 @@ namespace YBehavior.Editor
         {
             DebugMgr.Instance.Continue();
         }
+
+        private void btnStepInto_Click(object sender, RoutedEventArgs e)
+        {
+            DebugMgr.Instance.StepInto();
+        }
+
+        private void btnStepOver_Click(object sender, RoutedEventArgs e)
+        {
+            DebugMgr.Instance.StepOver();
+        }
     }
 }

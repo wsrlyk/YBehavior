@@ -51,6 +51,15 @@ namespace YBehavior
 		UINT Hash;
 	};
 
+	enum DebugCommand
+	{
+		DC_None,
+		DC_Continue,
+		DC_StepInto,
+		DC_StepOver,
+	};
+
+	class DebugHelper;
 	class DebugMgr: public Singleton<DebugMgr>
 	{
 		UINT m_TargetAgent;
@@ -66,6 +75,9 @@ namespace YBehavior
 		STRING m_SendBuffer;
 
 		bool m_bPaused = false;
+
+		DebugCommand m_Command = DC_None;
+		DebugHelper* m_StepOverHelper = nullptr;
 	public:
 		~DebugMgr();
 		void SetTarget(const STRING& tree, UINT agent);
@@ -91,6 +103,11 @@ namespace YBehavior
 		void AppendSendContent(const STRING& s) { m_SendBuffer += s; }
 		void AppendSendContent(const char c) { m_SendBuffer += c; }
 		void Send(bool bClearRunInfo);
+
+		inline void SetCommand(DebugCommand cmd) { m_Command = cmd; }
+		inline DebugCommand GetCommand() const { return m_Command; }
+		inline void SetStepOverHelper(DebugHelper* helper) { m_StepOverHelper = helper; }
+		inline DebugHelper* GetStepOverHelper() const { return m_StepOverHelper; }
 	};
 
 	class Agent;
@@ -101,7 +118,7 @@ namespace YBehavior
 		NodeRunInfo* m_pRunInfo;
 		NodeLogInfo* m_pLogInfo;
 
-		void _SendInfos();
+		void _SendInfos(bool clear);
 		void _SendCurrentInfos();
 		void _SendPause();
 		void _SendLogPoint();
@@ -111,10 +128,10 @@ namespace YBehavior
 		inline bool IsValid() { return m_Target != nullptr; }
 		void CreateRunInfo();
 		void SetResult(NodeState state);
-		void TryHitBreakPoint();
+		void TestBreaking();
 		bool HasLogPoint();
 		void Breaking();
-
+		void SetBreak();
 	public:
 		void LogSharedData(ISharedVariableEx* pVariable, bool bBefore);
 		

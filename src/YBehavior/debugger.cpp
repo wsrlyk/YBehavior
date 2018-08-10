@@ -42,8 +42,14 @@ namespace YBehavior
 	{
 		ResetTarget();
 		Clear();
-		m_bPaused = false;
 		m_SendBuffer = "";
+		if (m_bPaused)
+		{
+			m_bPaused = false;
+			m_Command = DC_Continue;
+		}
+		else
+			m_Command = DC_None;
 	}
 
 	bool DebugMgr::IsValidTarget(Agent* pAgent, BehaviorTree* pTree)
@@ -245,7 +251,13 @@ namespace YBehavior
 			{
 				BehaviorTree* tree = dynamic_cast<BehaviorTree*>(m_pNode);
 				if (tree && tree->GetTreeName() == DebugMgr::Instance()->GetTargetTree())
-					_SendInfos();
+					_SendInfos(true);
+			}
+
+			if (this == DebugMgr::Instance()->GetStepOverHelper())
+			{
+				DebugMgr::Instance()->SetStepOverHelper(nullptr);
+				DebugMgr::Instance()->TogglePause(true);
 			}
 		}
 
@@ -314,12 +326,12 @@ namespace YBehavior
 		{
 			BehaviorTree* tree = dynamic_cast<BehaviorTree*>(pRoot);
 			if (tree)
-				_SendInfos();
+				_SendInfos(false);
 		}
 
 	}
 
-	void DebugHelper::_SendInfos()
+	void DebugHelper::_SendInfos(bool clear)
 	{
 		DebugMgr::Instance()->AppendSendContent("[TickResult]");
 		DebugMgr::Instance()->AppendSendContent(s_HeadSpliter);
@@ -368,7 +380,7 @@ namespace YBehavior
 
 		//if (DebugMgr::Instance()->IsPaused())
 		//	LOG_BEGIN << "Dont Clear Run Info cause paused" << LOG_END;
-		DebugMgr::Instance()->Send(!DebugMgr::Instance()->IsPaused());
+		DebugMgr::Instance()->Send(clear);
 	}
 
 	void DebugHelper::CreateRunInfo()
@@ -382,12 +394,15 @@ namespace YBehavior
 			m_pRunInfo->runState = state;
 	}
 
-	void DebugHelper::TryHitBreakPoint()
+	void DebugHelper::TestBreaking()
 	{
 		if (!IsValid())
 			return;
-		if (DebugMgr::Instance()->HasBreakPoint(m_pNode->GetRoot()->GetTreeName(), m_pRunInfo->nodeUID))
+
+		if (DebugMgr::Instance()->IsPaused())
 			Breaking();
+		else if (DebugMgr::Instance()->HasBreakPoint(m_pNode->GetRoot()->GetTreeName(), m_pRunInfo->nodeUID))
+			SetBreak();
 	}
 
 	bool DebugHelper::HasLogPoint()
@@ -397,26 +412,41 @@ namespace YBehavior
 		return DebugMgr::Instance()->HasLogPoint(m_pNode->GetRoot()->GetTreeName(), m_pRunInfo->nodeUID);
 	}
 
-	void DebugHelper::Breaking()
+	void DebugHelper::SetBreak()
 	{
-		LOG_BEGIN << "Breaking..." << LOG_END;
-		m_pRunInfo->runState = NS_BREAK;
-
 		///> Send runInfos to editor
 		DebugMgr::Instance()->TogglePause(true);
-
+		DebugMgr::Instance()->SetStepOverHelper(nullptr);
+		LOG_BEGIN << "Breaking..." << LOG_END;
+		m_pRunInfo->runState = NS_BREAK;
 		SetResult(NS_BREAK);
+
+		Breaking();
+	}
+
+	void DebugHelper::Breaking()
+	{
 		_SendPause();
 		_SendCurrentInfos();
 		///> Sleep and wait for removing break
-		int i = 0;
-		while (DebugMgr::Instance()->IsPaused())
+		while (DebugMgr::Instance()->GetCommand() == DC_None)
 		{
 			Thread::SleepMilli(100);
-			//if (++i > 10)
-			//	DebugMgr::Instance()->TogglePause(false);
 		}
-
+		switch (DebugMgr::Instance()->GetCommand())
+		{
+		case DC_Continue:
+			DebugMgr::Instance()->TogglePause(false);
+			break;
+		case DC_StepOver:
+			DebugMgr::Instance()->TogglePause(false);
+			DebugMgr::Instance()->SetStepOverHelper(this);
+			break;
+		default:
+			break;
+		}
+		DebugMgr::Instance()->SetCommand(DC_None);
+		m_pRunInfo->runState = NS_RUNNING;
 		LOG_BEGIN << "Continue." << LOG_END;
 	}
 

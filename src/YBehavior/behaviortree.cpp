@@ -71,7 +71,7 @@ namespace YBehavior
 
 		///> check breakpoint
 #ifdef DEBUGGER
-		dbgHelper.TryHitBreakPoint();
+		dbgHelper.TestBreaking();
 #endif
 
 		//////////////////////////////////////////////////////////////////////////

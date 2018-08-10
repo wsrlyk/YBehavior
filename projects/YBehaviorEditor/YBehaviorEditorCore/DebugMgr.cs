@@ -158,6 +158,18 @@ namespace YBehavior.Editor.Core
             NetworkMgr.Instance.MessageProcessor.DoContinue();
         }
 
+        public void StepInto()
+        {
+            bBreaked = false;
+            NetworkMgr.Instance.MessageProcessor.DoStepInto();
+        }
+
+        public void StepOver()
+        {
+            bBreaked = false;
+            NetworkMgr.Instance.MessageProcessor.DoStepOver();
+        }
+
         public void SetDebugPoint(uint uid, int count)
         {
             string treename = WorkBenchMgr.Instance.ActiveWorkBench.FileInfo.Name;

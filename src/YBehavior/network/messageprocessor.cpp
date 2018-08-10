@@ -37,7 +37,17 @@ namespace YBehavior
 
 	void Continue()
 	{
-		DebugMgr::Instance()->TogglePause(false);
+		DebugMgr::Instance()->SetCommand(DC_Continue);
+	}
+
+	void StepOver()
+	{
+		DebugMgr::Instance()->SetCommand(DC_StepOver);
+	}
+
+	void StepInto()
+	{
+		DebugMgr::Instance()->SetCommand(DC_StepInto);
 	}
 
 	void ProcessDebugPoint(const std::vector<STRING>& datas)
@@ -66,6 +76,14 @@ namespace YBehavior
 		else if (datas[0] == "[Continue]")
 		{
 			Continue();
+		}
+		else if (datas[0] == "[StepInto]")
+		{
+			StepInto();
+		}
+		else if (datas[0] == "[StepOver]")
+		{
+			StepOver();
 		}
 		else if (datas[0] == "[DebugPoint]")
 		{

@@ -24,6 +24,8 @@
                 </StackPanel>
             </Border>
             <Button Name="btnContinue" Click="btnContinue_Click">Continue</Button>
+            <Button Name="btnStepInto" Click="btnStepInto_Click">StepInto</Button>
+            <Button Name="btnStepOver" Click="btnStepOver_Click">StepOver</Button>
         </StackPanel>
     </StackPanel>
 </UserControl>

@@ -81,6 +81,16 @@ namespace YBehavior.Editor.Core
             NetworkMgr.Instance.SendText("[Continue]");
         }
 
+        public void DoStepInto()
+        {
+            NetworkMgr.Instance.SendText("[StepInto]");
+        }
+
+        public void DoStepOver()
+        {
+            NetworkMgr.Instance.SendText("[StepOver]");
+        }
+
         public void SetDebugPoint(string treename, uint uid, int count)
         {
             NetworkMgr.Instance.SendText("[DebugPoint] " + treename + " " + uid.ToString() + " " + count.ToString());
