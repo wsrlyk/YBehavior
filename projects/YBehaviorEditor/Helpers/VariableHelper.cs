@@ -39,6 +39,21 @@ namespace YBehavior.Editor
         }
     }
 
+    [ValueConversion(typeof(Variable.CountType), typeof(Colors))]
+    public class VariableCountTypeColorConvertor : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!(value is Variable.CountType))
+                return new SolidColorBrush(Colors.LightCyan);
+            return new SolidColorBrush((Variable.CountType)value == Variable.CountType.CT_SINGLE ? Colors.LightCyan : Colors.LightBlue);
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return true;
+        }
+    }
+
     [ValueConversion(typeof(Variable.ValueType), typeof(string))]
     public class VariableValueTypeConvertor : IValueConverter
     {
