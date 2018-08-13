@@ -10,13 +10,28 @@ using YBehavior.Editor.Core;
 namespace YBehavior.Editor
 {
     [ValueConversion(typeof(bool), typeof(Colors))]
-    public class VariableValidColorConvertor: IValueConverter
+    public class VariableValidColorConvertor : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (!(value is bool))
                 return new SolidColorBrush(Colors.White);
             return new SolidColorBrush((bool)value ? Colors.LightGreen : Colors.Red);
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return true;
+        }
+    }
+
+    [ValueConversion(typeof(bool), typeof(Colors))]
+    public class VariableRefreshColorConvertor : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!(value is bool))
+                return new SolidColorBrush(Color.FromRgb(0xAC, 0xAC, 0xAC));
+            return new SolidColorBrush((bool)value ? Colors.DarkGreen : Color.FromRgb(0xAC, 0xAC, 0xAC));
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {

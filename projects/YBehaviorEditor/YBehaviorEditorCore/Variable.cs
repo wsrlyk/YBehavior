@@ -367,6 +367,17 @@ namespace YBehavior.Editor.Core
             OnPropertyChanged("IsEditable");
         }
 
+        bool m_IsRefreshed = false;
+        public bool IsRefreshed
+        {
+            get { return m_IsRefreshed; }
+            set
+            {
+                m_IsRefreshed = value;
+                OnPropertyChanged("IsRefreshed");
+            }
+        }
+
         public bool IsValid
         {
             get { return CheckValid(); }

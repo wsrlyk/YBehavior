@@ -131,7 +131,8 @@ namespace YBehavior.Editor.Core
                 case "[TickResult]":
                     if (words.Length != 2)
                         return;
-                    _HandleTickResult(words[1]);
+                    m_LatestTickResultData = words[1];
+                    //_HandleTickResult(words[1]);
                     break;
                 case "[Paused]":
                     _HandlePaused();
@@ -153,7 +154,7 @@ namespace YBehavior.Editor.Core
         }
 
         ///////////////////////////////////////////////////////////////////////////
-
+        string m_LatestTickResultData = null;
         uint m_TickResultToken = 0;
         uint m_LastTickResultToken = 0;
         public uint TickResultToken
@@ -162,6 +163,8 @@ namespace YBehavior.Editor.Core
         }
         void _HandleTickResult(string ss)
         {
+            if (ss == null)
+                return;
             string[] data = ss.Split(msgContentSplitter, StringSplitOptions.RemoveEmptyEntries);
             if (data.Length > 1)
             {
@@ -178,7 +181,9 @@ namespace YBehavior.Editor.Core
                         if (v == null)
                             continue;
 
+                        bool isRefreshed = v.Value != strV[1];
                         v.Value = strV[1];
+                        v.IsRefreshed = isRefreshed;
                     }
                 }
                 ++m_TickResultToken;
@@ -212,6 +217,11 @@ namespace YBehavior.Editor.Core
 
         void _FireTickResult()
         {
+            if (m_LatestTickResultData != null)
+            {
+                _HandleTickResult(m_LatestTickResultData);
+                m_LatestTickResultData = null;
+            }
             if (m_LastTickResultToken != m_TickResultToken)
             {
                 //LogMgr.Instance.Log("TickResult bInstant = " + (DebugMgr.Instance.bBreaked ? "False" : "True"));
