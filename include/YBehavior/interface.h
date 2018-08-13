@@ -80,7 +80,7 @@ namespace YBehavior
 
 			Iterator& operator=(const Iterator& other)
 			{
-
+				return *this;
 			}
 		};
 
