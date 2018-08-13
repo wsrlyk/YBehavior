@@ -41,6 +41,23 @@
 namespace YBehavior
 {
 	template<typename T>
+	class DataArrayIterator : public IDataArrayIterator
+	{
+		typename std::unordered_map<KEY, T>::const_iterator m_It;
+		typename std::unordered_map<KEY, T>::const_iterator m_End;
+	public:
+		DataArrayIterator(typename std::unordered_map<KEY, T>::const_iterator begin, typename std::unordered_map<KEY, T>::const_iterator end)
+			: m_It(begin)
+			, m_End(end)
+		{
+		}
+
+		bool IsEnd() override { return m_It == m_End; }
+		IDataArrayIterator& operator ++() override { ++m_It; return *this; }
+		const KEY Value() { return m_It->first; }
+	};
+
+	template<typename T>
 	class DataArray : public IDataArray
 	{
 		std::unordered_map<KEY, T> m_Datas;
@@ -50,6 +67,15 @@ namespace YBehavior
 			DataArray<T>* newArray = new DataArray<T>();
 			newArray->m_Datas = m_Datas;
 			return newArray;
+		}
+
+		Iterator Iter() const override
+		{
+			typename std::unordered_map<KEY, T>::const_iterator itBegin = m_Datas.begin();
+			typename std::unordered_map<KEY, T>::const_iterator itEnd = m_Datas.end();
+			DataArrayIterator<T>* innerIt = new DataArrayIterator<T>(itBegin, itEnd);
+			Iterator it(innerIt);
+			return std::move(it);
 		}
 
 		void Merge(IDataArray* other, bool bOverride) override
@@ -66,6 +92,7 @@ namespace YBehavior
 					m_Datas.insert(std::make_pair<KEY, T>(std::move(key), std::move(val)));
 				}
 			}
+			std::unordered_map<KEY, T>::iterator it2; otherArray->m_Datas.end();
 		}
 
 		TYPEID GetTypeID() const override

@@ -39,9 +39,51 @@ namespace YBehavior
 #endif
 	};
 
+	class IDataArrayIterator
+	{
+	public:
+		virtual bool IsEnd() { return true; }
+		virtual IDataArrayIterator& operator ++() { return *this; }
+		virtual const KEY Value() { return 0; }
+	};
+
 	class IDataArray
 	{
 	public:
+		class Iterator : public IDataArrayIterator
+		{
+			IDataArrayIterator* innerIter = nullptr;
+		public:
+			Iterator(IDataArrayIterator* iter)
+				: innerIter(iter)
+			{
+
+			}
+			Iterator(Iterator&& other)
+			{
+				this->innerIter = other.innerIter;
+				other.innerIter = nullptr;
+			}
+			~Iterator()
+			{
+				if (innerIter != nullptr)
+					delete innerIter;
+			}
+			bool IsEnd() override { return innerIter->IsEnd(); }
+			IDataArrayIterator& operator ++() override { ++(*innerIter); return *this; }
+			const KEY Value() override { return innerIter->Value(); }
+		private:
+			Iterator(const Iterator& other)
+			{
+
+			}
+
+			Iterator& operator=(const Iterator& other)
+			{
+
+			}
+		};
+
 		virtual ~IDataArray() {}
 		virtual const void* Get(KEY key) const = 0;
 		virtual const STRING GetToString(KEY key) const = 0;
@@ -50,6 +92,7 @@ namespace YBehavior
 		virtual void Merge(IDataArray* other, bool bOverride) = 0;
 		virtual SIZE_KEY Length() const = 0;
 		virtual TYPEID GetTypeID() const = 0;
+		virtual Iterator Iter() const = 0;
 	};
 
 }

@@ -345,13 +345,12 @@ namespace YBehavior
 		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
 		{
 			auto iarray = pSharedData->GetDataArray(i);
-			SIZE_KEY length = iarray->Length();
-			for (KEY j = 0; j < length; ++j)
+			for (IDataArray::Iterator it = iarray->Iter(); !it.IsEnd(); ++it)
 			{
-				const STRING& name = TreeKeyMgr::Instance()->GetNameByKey(j, iarray->GetTypeID());
+				const STRING& name = TreeKeyMgr::Instance()->GetNameByKey(it.Value(), iarray->GetTypeID());
 				if (name == Utility::StringEmpty)
 					continue;
-				STRING content(name + "," + iarray->GetToString(j));
+				STRING content(name + "," + iarray->GetToString(it.Value()));
 				if (buffer.length() > 0)
 					buffer += ";";
 				buffer += content;
