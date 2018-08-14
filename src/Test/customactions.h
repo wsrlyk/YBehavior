@@ -36,10 +36,12 @@ public:
 		this->GetSharedData()->Set<YBehavior::FLOAT>(heartrate, 2);
 
 		YBehavior::KEY f = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::FLOAT>("f");
-		YBehavior::KEY ff = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::VecFloat>("ff");
+		fftest = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::VecFloat>("fftest");
 	}
 
 	void Update();
+protected:
+	YBehavior::KEY fftest;
 };
 
 class XEntity : public YBehavior::Entity

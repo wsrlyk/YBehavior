@@ -88,9 +88,9 @@ namespace YBehavior
 		const T& left = *((const T*)pLeft);
 		const T& right = *((const T*)pRight);
 
-		STRING strOp;
-		IVariableOperationHelper::s_OperatorMap.TryGetValue(op, strOp);
-		LOG_BEGIN << left << " " << strOp << " " << right << " ?" << LOG_END;
+		////STRING strOp;
+		////IVariableOperationHelper::s_OperatorMap.TryGetValue(op, strOp);
+		////LOG_BEGIN << left << " " << strOp << " " << right << " ?" << LOG_END;
 
 		switch (op)
 		{
@@ -137,13 +137,13 @@ namespace YBehavior
 			return;
 		}
 
-		STRING strOp;
-		IVariableOperationHelper::s_OperatorMap.TryGetValue(op, strOp);
+		////STRING strOp;
+		////IVariableOperationHelper::s_OperatorMap.TryGetValue(op, strOp);
 
 		const T& right0 = *((const T*)pRight0);
 		const T& right1 = *((const T*)pRight1);
 
-		LOG_BEGIN << right0 << " " << strOp << " " << right1;
+		////LOG_BEGIN << right0 << " " << strOp << " " << right1;
 
 		T& left = *((T*)pLeft);
 		switch (op)
@@ -164,7 +164,7 @@ namespace YBehavior
 			return;
 		}
 
-		LOG_BEGIN << " => " << left << LOG_END;
+		////LOG_BEGIN << " => " << left << LOG_END;
 	}
 
 	template<typename T>
@@ -201,7 +201,7 @@ namespace YBehavior
 		const T& right0 = *((const T*)pRight0);
 		const T& right1 = *((const T*)pRight1);
 
-		LOG_BEGIN << right0 << " " << right1;
+		////LOG_BEGIN << right0 << " " << right1;
 
 		T& left = *((T*)pLeft);
 
@@ -220,7 +220,7 @@ namespace YBehavior
 		}
 		left = Utility::Rand(small, large);
 
-		LOG_BEGIN << " => " << left << LOG_END;
+		////LOG_BEGIN << " => " << left << LOG_END;
 	}
 
 	template<>
