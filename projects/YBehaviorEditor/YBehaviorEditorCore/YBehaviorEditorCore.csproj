@@ -34,6 +34,7 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -47,6 +48,7 @@
     <Compile Include="DebugMgr.cs" />
     <Compile Include="DescriptionMgr.cs" />
     <Compile Include="ExternalActionMgr.cs" />
+    <Compile Include="Tools\DiffMatchPatch.cs" />
     <Compile Include="Tools\IniFile.cs" />
     <Compile Include="MessageProcessor.cs" />
     <Compile Include="NetworkMgr.cs" />
