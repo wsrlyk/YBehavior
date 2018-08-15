@@ -80,9 +80,10 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
 
-            _RefreshWorkingSpace(true);
+            _InitWorkingSpace();
 
             this.Files.ItemsSource = m_FileInfos.Children;
+
         }
 
         void _GetExpandedItems(ItemsControl items, HashSet<string> expandedItems)
@@ -110,6 +111,19 @@ namespace YBehavior.Editor
 
             m_FileInfos.Build(bReload ? TreeFileMgr.Instance.ReloadAndGetAllTrees() : TreeFileMgr.Instance.AllTrees, m_ExpandedItems);
 //            this.Files.ItemsSource = m_FileInfos.Children;
+        }
+
+        private void _InitWorkingSpace()
+        {
+            m_ExpandedItems.Clear();
+            string expandedFolders = Config.Instance.ExpandedFolders;
+            string[] folders = expandedFolders.Split(new char[] { '|' });
+            foreach (string s in folders)
+            {
+                m_ExpandedItems.Add(s);
+            }
+
+            m_FileInfos.Build(TreeFileMgr.Instance.ReloadAndGetAllTrees(), m_ExpandedItems);
         }
 
         private void OnFilesItemDoubleClick(object sender, MouseButtonEventArgs e)
@@ -187,6 +201,20 @@ namespace YBehavior.Editor
         private void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
             _RefreshWorkingSpace(true);
+        }
+
+        private void Files_LostFocus(object sender, RoutedEventArgs e)
+        {
+            m_ExpandedItems.Clear();
+            _GetExpandedItems(this.Files, m_ExpandedItems);
+            StringBuilder sb = new StringBuilder();
+            foreach (string s in m_ExpandedItems)
+            {
+                if (sb.Length > 0)
+                    sb.Append('|');
+                sb.Append(s);
+            }
+            Config.Instance.ExpandedFolders = sb.ToString();
         }
     }
 }

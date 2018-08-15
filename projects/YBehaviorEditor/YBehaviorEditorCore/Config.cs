@@ -44,6 +44,20 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        private string m_ExpandedFolders;
+        public string ExpandedFolders
+        {
+            get { return m_ExpandedFolders; }
+            set
+            {
+                if (m_ExpandedFolders != value)
+                {
+                    m_ExpandedFolders = value;
+                    IniFile configFile = new IniFile(Environment.CurrentDirectory + "\\user.ini");
+                    configFile.WriteString("Editor", "ExpandedFolders", m_ExpandedFolders);
+                }
+            }
+        }
         public Config()
         {
             Load();
@@ -76,6 +90,8 @@ namespace YBehavior.Editor.Core
             m_DebugPort = configFile.ReadString("Debug", "Port", "444");
 
             PrintIntermediateInfo = configFile.ReadInt("Debug", "PrintIntermediateInfo", 0) != 0;
+
+            m_ExpandedFolders = configFile.ReadString("Editor", "ExpandedFolders", "");
         }
     }
 }
