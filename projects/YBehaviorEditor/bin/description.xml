@@ -1,73 +1,83 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Description>
-	<Sequence Content="从左到右运行子节点，一旦有子节点返回失败或无节点则返回失败，否则返回成功。"/>
-	<Sequence Content="从左到右运行子节点，一旦有子节点返回失败或无节点则返回失败，否则返回成功"/>
-	<RandomSelector Content="随机运行子节点，一旦有子节点返回成功或无节点则返回成功，否则返回失败"/>
-	<RandomSelector Content="随机运行子节点，一旦有子节点返回成功或无节点则返回成功，否则返回失败"/>
-  <For Content="循环运行Children节点，注意不要死循环。&#xD;Init，整个循环刚开始时的初始化节点。&#xD;Cond，每次循环前的判断节点，如失败则结束循环。&#xD;Inc，每次循环后的操作节点"/>
-  <ForEach Content="遍历数组，每取出一个值，调用一次子节点。">
-    <Collection Content="数组"/>
-    <Current Content="当前遍历取出的值"/>
-    <ExitWhenFailure Content="子节点返回失败时，是否退出遍历"/>
-  </ForEach>
-	<Calculator Content="计算器">
-		<Opl Content="保存计算结果"/>
-		<Opr1 Content="左边的操作数"/>
-		<Opr2 Content="右边的操作数"/>
-		<Operator Content="操作符号"/>
-	</Calculator>
-	<Comparer Content="比较器。返回比较结果一致与否">
-		<Opl Content="左边的操作数"/>
-		<Opr Content="右边的操作数"/>
-		<Operator Content="操作符号"/>
-	</Comparer>
-	<SetData Content="赋值器">
-		<Opl Content="目标变量"/>
-		<Opr Content="源值"/>
-	</SetData>
-	<Random Content="随机器">
-		<Opl Content="保存计算结果"/>
-		<Opr1 Content="最小值，闭区间"/>
-		<Opr2 Content="最大值，开区间"/>
-	</Random>
-	<AlwaysSuccess Content="总是返回成功"/>
-	<AlwaysFailure Content="总是返回失败"/>
-	<Invertor Content="运行并反转子节点的结果"/>
-	<IfThenElse Content="如果If节点返回成功，则运行并返回Then节点，否则运行并返回Else节点"/>
-	<SwitchCase Content="找到Cases中与Switch相等的值，并运行和返回对应的子节点。没有则运行和返回Default子节点">
-		<Switch Content="比较值"/>
-		<Cases Content="候选值。与子节点数量一致，并一一对应"/>
-	</SwitchCase>
-	<PiecewiseFunction Content="分段函数。函数描述为一系列的坐标关键点，点之间的值为线性插值">
-		<KeyPointX Content="关键点的X坐标数组"/>
-		<KeyPointY Content="关键点的Y坐标数组"/>
-		<InputX Content="输入的X坐标"/>
-		<OutputY Content="输出的Y坐标"/>
-	</PiecewiseFunction>
-	<Dice Content="骰子。可自定义面数，每个面的值，和概率。">
-		<Distribution Content="每个面的概率，可以是任意大的正数值"/>
-		<Values Content="每个面的值，和概率一一对应"/>
-		<Input Content="手动扔骰子的随机值，落在 [0, Distribution的所有数值的和) 之间则返回成功，否则失败"/>
-		<Output Content="输出值"/>
-    <IgnoreInput Content="是否忽略Input。忽略则自动扔骰子"/>
-	</Dice>
-	<SubTree Content="运行并返回子树">
-		<TreeName Content="子树名，如在子文件夹需包含相对路径"/>
-	</SubTree>
-	<ReadRegister Content="读取寄存器，并保存到变量中。如无数据，返回失败；否则返回成功，并清空寄存器">
-		<Event Content="事件名，用于区分寄存器中的值的来源"/>
-		<Int Content="Int型的数据"/>
-		<Float Content="Float型的数据"/>
-		<Bool Content="Bool型的数据"/>
-		<Ulong Content="Ulong型的数据"/>
-		<String Content="String型的数据"/>
-	</ReadRegister>
-	<WriteRegister Content="写入寄存器。写完清空输入数组">
-		<Event Content="事件名，用于区分寄存器中的值的来源"/>
-		<Int Content="Int型的数据"/>
-		<Float Content="Float型的数据"/>
-		<Bool Content="Bool型的数据"/>
-		<Ulong Content="Ulong型的数据"/>
-		<String Content="String型的数据"/>
-	</WriteRegister>
+        <Nodes>
+                <Sequence Content="从左到右运行子节点，一旦有子节点返回失败或无节点则返回失败，否则返回成功。"/>
+                <Sequence Content="从左到右运行子节点，一旦有子节点返回失败或无节点则返回失败，否则返回成功"/>
+                <RandomSelector Content="随机运行子节点，一旦有子节点返回成功或无节点则返回成功，否则返回失败"/>
+                <RandomSelector Content="随机运行子节点，一旦有子节点返回成功或无节点则返回成功，否则返回失败"/>
+                <For Content="循环运行Children节点，注意不要死循环。&#xD;Init，整个循环刚开始时的初始化节点。&#xD;Cond，每次循环前的判断节点，如失败则结束循环。&#xD;Inc，每次循环后的操作节点"/>
+                <ForEach Content="遍历数组，每取出一个值，调用一次子节点。">
+                        <Collection Content="数组"/>
+                        <Current Content="当前遍历取出的值"/>
+                        <ExitWhenFailure Content="子节点返回失败时，是否退出遍历"/>
+                </ForEach>
+                <Calculator Content="计算器">
+                        <Opl Content="保存计算结果"/>
+                        <Opr1 Content="左边的操作数"/>
+                        <Opr2 Content="右边的操作数"/>
+                        <Operator Content="操作符号"/>
+                </Calculator>
+                <Comparer Content="比较器。返回比较结果一致与否">
+                        <Opl Content="左边的操作数"/>
+                        <Opr Content="右边的操作数"/>
+                        <Operator Content="操作符号"/>
+                </Comparer>
+                <SetData Content="赋值器">
+                        <Opl Content="目标变量"/>
+                        <Opr Content="源值"/>
+                </SetData>
+                <Random Content="随机器">
+                        <Opl Content="保存计算结果"/>
+                        <Opr1 Content="最小值，闭区间"/>
+                        <Opr2 Content="最大值，开区间"/>
+                </Random>
+                <AlwaysSuccess Content="总是返回成功"/>
+                <AlwaysFailure Content="总是返回失败"/>
+                <Invertor Content="运行并反转子节点的结果"/>
+                <IfThenElse Content="如果If节点返回成功，则运行并返回Then节点，否则运行并返回Else节点"/>
+                <SwitchCase Content="找到Cases中与Switch相等的值，并运行和返回对应的子节点。没有则运行和返回Default子节点">
+                        <Switch Content="比较值"/>
+                        <Cases Content="候选值。与子节点数量一致，并一一对应"/>
+                </SwitchCase>
+                <PiecewiseFunction Content="分段函数。函数描述为一系列的坐标关键点，点之间的值为线性插值">
+                        <KeyPointX Content="关键点的X坐标数组"/>
+                        <KeyPointY Content="关键点的Y坐标数组"/>
+                        <InputX Content="输入的X坐标"/>
+                        <OutputY Content="输出的Y坐标"/>
+                </PiecewiseFunction>
+                <Dice Content="骰子。可自定义面数，每个面的值，和概率。">
+                        <Distribution Content="每个面的概率，可以是任意大的正数值"/>
+                        <Values Content="每个面的值，和概率一一对应"/>
+                        <Input Content="手动扔骰子的随机值，落在 [0, Distribution的所有数值的和) 之间则返回成功，否则失败"/>
+                        <Output Content="输出值"/>
+                        <IgnoreInput Content="是否忽略Input。忽略则自动扔骰子"/>
+                </Dice>
+                <SubTree Content="运行并返回子树">
+                        <TreeName Content="子树名，如在子文件夹需包含相对路径"/>
+                </SubTree>
+                <ReadRegister Content="读取寄存器，并保存到变量中。如无数据，返回失败；否则返回成功，并清空寄存器">
+                        <Event Content="事件名，用于区分寄存器中的值的来源"/>
+                        <Int Content="Int型的数据"/>
+                        <Float Content="Float型的数据"/>
+                        <Bool Content="Bool型的数据"/>
+                        <Ulong Content="Ulong型的数据"/>
+                        <String Content="String型的数据"/>
+                </ReadRegister>
+                <WriteRegister Content="写入寄存器。写完清空输入数组">
+                        <Event Content="事件名，用于区分寄存器中的值的来源"/>
+                        <Int Content="Int型的数据"/>
+                        <Float Content="Float型的数据"/>
+                        <Bool Content="Bool型的数据"/>
+                        <Ulong Content="Ulong型的数据"/>
+                        <String Content="String型的数据"/>
+                </WriteRegister>
+        </Nodes>
+        <Hierachies>
+                <Hierachy Value = "1">Actions</Hierachy>
+                <Hierachy Value = "2">Decorators</Hierachy>
+                <Hierachy Value = "3">Compositors</Hierachy>
+                <Hierachy Value = "11">GeneralActions</Hierachy>
+                <Hierachy Value = "21">CustomAction1</Hierachy>
+                <Hierachy Value = "121">CustomAction2</Hierachy>
+        </Hierachies>
 </Description>

@@ -6,7 +6,7 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core
 {
-    class NodeDescription
+    public class NodeDescription
     {
         Dictionary<string, string> variables = new Dictionary<string, string>();
         public string node;
@@ -20,9 +20,10 @@ namespace YBehavior.Editor.Core
             return content;
         }
     }
-    class DescriptionMgr : Singleton<DescriptionMgr>
+    public class DescriptionMgr : Singleton<DescriptionMgr>
     {
         Dictionary<string, NodeDescription> m_DescriptionDic = new Dictionary<string, NodeDescription>();
+        Dictionary<int, string> m_HierachyDic = new Dictionary<int, string>();
 
         public NodeDescription GetNodeDescription(string name)
         {
@@ -32,27 +33,55 @@ namespace YBehavior.Editor.Core
             }
             return null;
         }
+
+        public string GetHierachyDescription(int hierachy)
+        {
+            if (m_HierachyDic.TryGetValue(hierachy, out string desc))
+            {
+                return desc;
+            }
+            return string.Empty;
+        }
+
         public void Load(string path)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(path);
             XmlElement root = xmlDoc.DocumentElement;
 
-            foreach (XmlNode node in root.ChildNodes)
+            foreach (XmlNode rootchild in root.ChildNodes)
             {
-                NodeDescription desc = new NodeDescription();
-                var attr = node.Attributes["Content"];
-                if (attr != null)
-                    desc.node = attr.Value;
-
-                foreach (XmlNode chi in node.ChildNodes)
+                if (rootchild.Name == "Nodes")
                 {
-                    var chiattr = chi.Attributes["Content"];
-                    if (chiattr != null)
-                        desc.SetVariable(chi.Name, chiattr.Value);
-                }
+                    foreach (XmlNode node in rootchild.ChildNodes)
+                    {
+                        NodeDescription desc = new NodeDescription();
+                        var attr = node.Attributes["Content"];
+                        if (attr != null)
+                            desc.node = attr.Value;
 
-                m_DescriptionDic[node.Name] = desc;
+                        foreach (XmlNode chi in node.ChildNodes)
+                        {
+                            var chiattr = chi.Attributes["Content"];
+                            if (chiattr != null)
+                                desc.SetVariable(chi.Name, chiattr.Value);
+                        }
+
+                        m_DescriptionDic[node.Name] = desc;
+                    }
+                }
+                else if (rootchild.Name == "Hierachies")
+                {
+                    m_HierachyDic.Clear();
+                    foreach (XmlNode node in rootchild.ChildNodes)
+                    {
+                        var attr = node.Attributes["Value"];
+                        if (attr != null && int.TryParse(attr.Value, out int hierachy))
+                        {
+                            m_HierachyDic.Add(hierachy, node.InnerText);
+                        }
+                    }
+                }
             }
         }
     }

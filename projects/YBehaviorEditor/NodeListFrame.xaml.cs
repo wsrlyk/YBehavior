@@ -38,7 +38,7 @@ namespace YBehavior.Editor
             {
                 m_Hierachy = hierachy;
                 m_Source = null;
-                Name = m_Hierachy.ToString();
+                Name = Core.DescriptionMgr.Instance.GetHierachyDescription((int)hierachy);
                 m_Level = level;
                 Icon = "Resources/ICON__0009_37.png";
                 Description = null;

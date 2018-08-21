@@ -45,18 +45,24 @@ namespace YBehavior.Editor.Core
 
         bool _LoadAction(ActionNode action, XmlNode xml)
         {
-            var attr = xml.Attributes.GetNamedItem("Class");
+            var attr = xml.Attributes["Class"];
             if (attr == null)
                 return false;
             string classname = attr.Value;
             string noteformat = string.Empty;
-            attr = xml.Attributes.GetNamedItem("Note");
+            attr = xml.Attributes["Note"];
             if (attr != null)
                 noteformat = attr.Value;
 
             action.ClassName = classname;
             action.NoteFormat = noteformat;
             action.Type = NodeType.NT_External;
+
+            attr = xml.Attributes["Hierachy"];
+            if (attr != null && int.TryParse(attr.Value, out int hierachy))
+            {
+                action.Hierachy = (NodeHierachy)hierachy;
+            }
 
             foreach (XmlNode chi in xml.ChildNodes)
             {
@@ -71,12 +77,12 @@ namespace YBehavior.Editor.Core
 
         bool _LoadVariable(ActionNode action, XmlNode xml)
         {
-            var attr = xml.Attributes.GetNamedItem("Name");
+            var attr = xml.Attributes["Name"];
             if (attr == null)
                 return false;
             string name = attr.Value;
 
-            attr = xml.Attributes.GetNamedItem("ValueType");
+            attr = xml.Attributes["ValueType"];
             if (attr == null)
                 return false;
             string valueTypes = attr.Value;
@@ -96,7 +102,7 @@ namespace YBehavior.Editor.Core
             }
             else
             {
-                attr = xml.Attributes.GetNamedItem("VariableType");
+                attr = xml.Attributes["VariableType"];
                 if (attr != null)
                 {
                     string strVariableType = attr.Value;
@@ -123,7 +129,7 @@ namespace YBehavior.Editor.Core
 
 
             bool isArray = false;
-            attr = xml.Attributes.GetNamedItem("IsArray");
+            attr = xml.Attributes["IsArray"];
             if (attr != null)
             {
                 isArray = attr.Value == "True";
@@ -131,21 +137,21 @@ namespace YBehavior.Editor.Core
             Variable.CountType countType = isArray ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE;
 
             string value = string.Empty;
-            attr = xml.Attributes.GetNamedItem("Value");
+            attr = xml.Attributes["Value"];
             if (attr != null)
             {
                 value = attr.Value;
             }
 
             string param = null;
-            attr = xml.Attributes.GetNamedItem("Param");
+            attr = xml.Attributes["Param"];
             if (attr != null)
             {
                 param = attr.Value;
             }
 
             int typeGroup = 0;
-            attr = xml.Attributes.GetNamedItem("TypeGroup");
+            attr = xml.Attributes["TypeGroup"];
             if (attr != null)
             {
                 int.TryParse(attr.Value, out typeGroup);

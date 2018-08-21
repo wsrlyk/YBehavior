@@ -191,7 +191,7 @@ namespace YBehavior.Editor.Core
             {
                 if (chi.Name == "Node")
                 {
-                    var attr = chi.Attributes.GetNamedItem("Class");
+                    var attr = chi.Attributes["Class"];
                     if (attr == null)
                         continue;
                     if (attr.Value == "Root")
@@ -242,10 +242,10 @@ namespace YBehavior.Editor.Core
                     //var attr = chi.Attributes.GetNamedItem("Title");
                     //if (attr != null)
                     //    comment.Name = attr.Value;
-                    var attr = chi.Attributes.GetNamedItem("Content");
+                    var attr = chi.Attributes["Content"];
                     if (attr != null)
                         comment.Content = attr.Value;
-                    attr = chi.Attributes.GetNamedItem("Rect");
+                    attr = chi.Attributes["Rect"];
                     if (attr != null)
                         comment.Geo.Rec = System.Windows.Rect.Parse(attr.Value);
 
@@ -265,7 +265,7 @@ namespace YBehavior.Editor.Core
             {
                 if (chi.Name == "Node")
                 {
-                    var attr = chi.Attributes.GetNamedItem("Class");
+                    var attr = chi.Attributes["Class"];
                     if (attr == null)
                         continue;
                     Node childNode = NodeMgr.Instance.CreateNodeByName(attr.Value);
@@ -276,7 +276,7 @@ namespace YBehavior.Editor.Core
                     }
 
                     string connectionIdentifier = null;
-                    attr = chi.Attributes.GetNamedItem("Connection");
+                    attr = chi.Attributes["Connection"];
                     if (attr != null)
                         connectionIdentifier = attr.Value;
 
