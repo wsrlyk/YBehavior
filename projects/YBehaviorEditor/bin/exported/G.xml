@@ -1,6 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <G>
-  <Node Class="Root">
-    <Node Class="SubTree" Tree="_SC G" />
-  </Node>
+  <Node Class="Root" />
 </G>

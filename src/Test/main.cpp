@@ -5,6 +5,7 @@
 
 #ifdef MSVC
 #include <windows.h>
+#include <timeapi.h>
 #else
 #include <unistd.h>
 #endif
@@ -42,6 +43,28 @@ int main(int argc, char** argv)
 	EntityWrapper wrapper1 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
 	LOG_BEGIN << "wrapper_1" << LOG_END;
 	EntityWrapper wrapper_1 = wrapper;
+
+	YBehavior::KEY f = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::INT>("b");
+
+	unsigned long t1, t2;
+
+#if _MSC_VER
+#pragma comment(lib, "winmm.lib ")
+	t1 = (unsigned long)timeGetTime();
+#else
+#endif
+
+	for (int i = 0; i < 10000; ++i)
+	{
+		pEntity->GetAgent()->GetSharedData()->Get<YBehavior::INT>(f);
+	}
+#if _MSC_VER
+	t2 = (unsigned long)timeGetTime();
+#else
+#endif
+
+	unsigned long res = t2 - t1;
+	LOG_BEGIN << "cost: " << res << LOG_END;
 
 	//LOG_BEGIN << "delete entity" << LOG_END;
 	//delete pEntity;
