@@ -30,17 +30,22 @@ namespace YBehavior
 	class DebugHelper;
 #endif
 	class BehaviorTree;
+	class RunningContext;
+	class IContextCreator;
+	class BehaviorNode;
+	typedef BehaviorNode* BehaviorNodePtr;
+
 	class YBEHAVIOR_API BehaviorNode
 	{
 	protected:
-		typedef BehaviorNode* BehaviorNodePtr;
 		BehaviorNodePtr m_Parent;
 		BehaviorNodePtr m_Condition;
-		NodeState m_State;
 		UINT m_UID;	// Unique in a tree
 		std::vector<ISharedVariableEx*> m_Variables;	///> Just for destructions of variables
 		static std::unordered_set<STRING> KEY_WORDS;
 		BehaviorTree* m_Root;
+		RunningContext* m_RunningContext;
+		IContextCreator* m_ContextCreator;
 #ifdef DEBUGGER
 	protected:
 		std::stringstream m_DebugLogInfo;
@@ -77,12 +82,15 @@ namespace YBehavior
 
 		bool Load(const pugi::xml_node& data);
 		void LoadFinish();
-		NodeState Execute(AgentPtr pAgent);
+		NodeState Execute(AgentPtr pAgent, NodeState parentState);
 		static BehaviorNode* CreateNodeByName(const STRING& name);
 		bool AddChild(BehaviorNode* child, const STRING& connection);
 
 		virtual STRING GetNodeInfoForPrint() { return "";}
 
+		void TryCreateRC();
+		RunningContext* GetRC() { return m_RunningContext; }
+		void SetRCCreator(IContextCreator* rcc) { m_ContextCreator = rcc; }
 	protected:
 		virtual bool _AddChild(BehaviorNode* child, const STRING& connection);
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
@@ -96,6 +104,10 @@ namespace YBehavior
 		///>
 		/// single: 1, single; 0, vector; -1, dont care
 		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single = -1, char variableType = 0);
+		RunningContext* _CreateRC() const;
+		void _TryDeleteRC();
+		void _TryPushRC(AgentPtr agent);
+		void _TryPopRC(AgentPtr agent);
 	};
 
 	template <typename T>
@@ -115,7 +127,7 @@ namespace YBehavior
 		return typeID;
 	}
 
-	class YBEHAVIOR_API BranchNode: public BehaviorNode
+	class YBEHAVIOR_API BranchNode : public BehaviorNode
 	{
 	public:
 		BranchNode();

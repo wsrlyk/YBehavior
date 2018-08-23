@@ -9,6 +9,7 @@ namespace YBehavior
 		, m_Then(nullptr)
 		, m_Else(nullptr)
 	{
+		SetRCCreator(&m_RCContainer);
 	}
 
 
@@ -21,25 +22,48 @@ namespace YBehavior
 		if (m_If == nullptr)
 			return NS_FAILURE;
 
-		NodeState state = m_If->Execute(pAgent);
-		if (state == NS_SUCCESS)
+		NodeState ns = NS_INVALID;
+		IfThenElsePhase itep = ITE_Normal;
+
+		m_RCContainer.ConvertRC(this);
+
+		if (m_RCContainer.GetRC())
+		{
+			ns = NS_RUNNING;
+			itep = m_RCContainer.GetRC()->Current;
+		}
+
+		if (itep == ITE_Normal || itep == ITE_If)
+		{
+			ns = m_If->Execute(pAgent, ns);
+			if (_CheckRunningNodeState(ITE_If, ns))
+				return ns;
+			itep = ITE_Normal;
+		}
+
+		if (ns == NS_SUCCESS || itep == ITE_Then)
 		{
 			if (m_Then)
 			{
 				DEBUG_LOG_INFO("Run [THEN]; ");
-				return m_Then->Execute(pAgent);
+				ns = m_Then->Execute(pAgent, ns);
+				_CheckRunningNodeState(ITE_Then, ns);
+				return ns;
 			}
 			return NS_FAILURE;
 		}
-		else
+		else if (ns == NS_FAILURE || itep == ITE_Else)
 		{
 			if (m_Else)
 			{
 				DEBUG_LOG_INFO("Run [ELSE]; ");
-				return m_Else->Execute(pAgent);
+				ns = m_Else->Execute(pAgent, ns);
+				_CheckRunningNodeState(ITE_Else, ns);
+				return ns;
 			}
 			return NS_FAILURE;
 		}
+		return NS_FAILURE;
 	}
 
 	void IfThenElse::OnAddChild(BehaviorNode * child, const STRING & connection)
@@ -69,6 +93,16 @@ namespace YBehavior
 		{
 			ERROR_BEGIN << "Unknown connection for this ifthenelse node: " << GetNodeInfoForPrint() << "with connection: " << connection << ERROR_END;
 		}
+	}
+
+	bool IfThenElse::_CheckRunningNodeState(IfThenElsePhase current, NodeState ns)
+	{
+		if (ns != NS_RUNNING)
+			return false;
+
+		m_RCContainer.CreateRC(this);
+		m_RCContainer.GetRC()->Current = current;
+		return true;
 	}
 
 }

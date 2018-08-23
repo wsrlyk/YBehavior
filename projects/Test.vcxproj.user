@@ -3,6 +3,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerWorkingDirectory>YBehaviorEditor\bin\exported\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>A</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>Monster_BlackCrystal</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

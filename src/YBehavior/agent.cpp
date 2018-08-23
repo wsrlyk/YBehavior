@@ -4,6 +4,7 @@
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/registerdata.h"
 #include "YBehavior/nodefactory.h"
+#include "YBehavior/runningcontext.h"
 
 YBehavior::UINT YBehavior::Agent::s_UID = 0;
 
@@ -29,7 +30,7 @@ void YBehavior::Agent::Tick()
 	if (m_Tree)
 	{
 		//TreeKeyMgr::Instance()->SetActiveTree(m_Tree->GetNameKeyMgr(), false);
-		m_Tree->Execute(this);
+		m_Tree->Execute(this, m_RunningContexts.empty() ? NS_INVALID : NS_RUNNING);
 	}
 }
 
@@ -37,6 +38,32 @@ void YBehavior::Agent::ProcessRegister()
 {
 		_OnProcessRegister();
 		m_RegisterData->GetSendData().Clear();
+}
+
+YBehavior::RunningContext* YBehavior::Agent::PopRC()
+{
+	RunningContext* context = nullptr;
+	if (!m_RunningContexts.empty())
+	{
+		context = m_RunningContexts.top();
+		m_RunningContexts.pop();
+	}
+	return context;
+}
+
+void YBehavior::Agent::PushRC(RunningContext* context)
+{
+	m_RunningContexts.push(context);
+}
+
+void YBehavior::Agent::ClearRC()
+{
+	while (!m_RunningContexts.empty())
+	{
+		RunningContext* context = m_RunningContexts.top();
+		m_RunningContexts.pop();
+		delete context;
+	}
 }
 
 YBehavior::Agent::Agent(Entity* entity)
@@ -59,7 +86,7 @@ YBehavior::Agent::~Agent()
 		delete m_RegisterData;
 
 	delete m_SharedData;
-
+	ClearRC();
 }
 
 YBehavior::Entity::Entity()

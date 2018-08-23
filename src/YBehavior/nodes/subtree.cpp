@@ -53,8 +53,9 @@ namespace YBehavior
 		}
 
 		if (m_Tree != nullptr)
-			return m_Tree->Execute(pAgent);
-
+		{
+			return m_Tree->Execute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID);
+		}
 		return NS_FAILURE;
 	}
 }

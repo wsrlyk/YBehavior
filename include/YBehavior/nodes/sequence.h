@@ -3,6 +3,7 @@
 
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/tools/common.h"
+#include "YBehavior/runningcontext.h"
 
 namespace YBehavior
 {
@@ -10,18 +11,31 @@ namespace YBehavior
 	{
 	public:
 		STRING GetClassName() const override { return "Sequence"; }
+		Sequence()
+		{
+			SetRCCreator(&m_RCContainer);
+		}
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
+		IndexIterator m_Iterator;
+		ContextContainer<VectorTraversalContext> m_RCContainer;
 	};
 
 	class RandomSequence : public CompositeNode
 	{
 	public:
 		STRING GetClassName() const override { return "RandomSequence"; }
+		RandomSequence()
+		{
+			SetRCCreator(&m_RCContainer);
+		}
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
 		void OnAddChild(BehaviorNode* child, const STRING& connection) override;
+
+		IndexIterator m_Iterator;
 		RandomIndex m_RandomIndex;
+		ContextContainer<RandomVectorTraversalContext> m_RCContainer;
 	};
 
 }

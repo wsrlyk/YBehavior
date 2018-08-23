@@ -177,6 +177,9 @@
     <ClInclude Include="..\include\YBehavior\tools\treemgrhelper.hpp">
       <Filter>头文件\tools</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\runningcontext.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -277,6 +280,9 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodes\subtree.cpp">
       <Filter>源文件\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\runningcontext.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

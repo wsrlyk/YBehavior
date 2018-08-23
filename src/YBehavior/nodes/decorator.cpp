@@ -4,19 +4,21 @@ namespace YBehavior
 {
 	NodeState AlwaysSuccess::Update(AgentPtr pAgent)
 	{
-		SingleChildNode::Update(pAgent);
-		return NS_SUCCESS;
+		NodeState ns = SingleChildNode::Update(pAgent);
+		return ns == NS_RUNNING ? NS_RUNNING : NS_SUCCESS;
 	}
 	NodeState AlwaysFailure::Update(AgentPtr pAgent)
 	{
-		SingleChildNode::Update(pAgent);
-		return NS_FAILURE;
+		NodeState ns = SingleChildNode::Update(pAgent);
+		return ns == NS_RUNNING ? NS_RUNNING : NS_FAILURE;
 	}
 
 	YBehavior::NodeState Invertor::Update(AgentPtr pAgent)
 	{
-		NodeState state = SingleChildNode::Update(pAgent);
-		if (state == NS_SUCCESS)
+		NodeState ns = SingleChildNode::Update(pAgent);
+		if (ns == NS_RUNNING)
+			return NS_RUNNING;
+		if (ns == NS_SUCCESS)
 			return NS_FAILURE;
 		return NS_SUCCESS;
 	}

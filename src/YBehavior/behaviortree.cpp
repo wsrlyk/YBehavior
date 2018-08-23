@@ -8,6 +8,8 @@
 #include "YBehavior/sharedvariableex.h"
 #include "YBehavior/debugger.h"
 #include "YBehavior/shareddataex.h"
+#include "YBehavior/agent.h"
+#include "YBehavior/runningcontext.h"
 
 namespace YBehavior
 {
@@ -33,6 +35,8 @@ namespace YBehavior
 	{
 		m_Parent = nullptr;
 		m_Condition = nullptr;
+		m_RunningContext = nullptr;
+		m_ContextCreator = nullptr;
 	}
 
 
@@ -46,6 +50,7 @@ namespace YBehavior
 			delete *it;
 		}
 		m_Variables.clear();
+		_TryDeleteRC();
 	}
 
 	std::unordered_set<STRING> BehaviorNode::KEY_WORDS = { "Class", "Pos", "NickName" };
@@ -55,18 +60,37 @@ namespace YBehavior
 		return NodeFactory::Instance()->Get(name);
 	}
 
-	YBehavior::NodeState BehaviorNode::Execute(AgentPtr pAgent)
+	YBehavior::NodeState BehaviorNode::Execute(AgentPtr pAgent, NodeState parentState)
 	{
 #ifdef DEBUGGER
 		DebugHelper dbgHelper(pAgent, this);
 		m_pDebugHelper = &dbgHelper;
 #endif
+		if (parentState == NS_RUNNING)
+			m_RunningContext = pAgent->PopRC();
+		else
+			m_RunningContext = nullptr;
 		///> check condition
 		if (m_Condition != nullptr)
 		{
-			NodeState res = m_Condition->Execute(pAgent);
-			if (res == NS_FAILURE)
+			NodeState res = m_Condition->Execute(pAgent, m_RunningContext && m_RunningContext->IsRunningInCondition() ? NS_RUNNING : NS_INVALID);
+			switch (res)
+			{
+			case YBehavior::NS_FAILURE:
+				_TryDeleteRC();
 				DEBUG_RETURN(dbgHelper, res);
+				break;
+			case YBehavior::NS_RUNNING:
+				TryCreateRC();
+				m_RunningContext->SetRunningInCondition(true);
+				_TryPushRC(pAgent);
+				DEBUG_RETURN(dbgHelper, res);
+				break;
+			default:
+				break;
+			}
+			if (m_RunningContext)
+				m_RunningContext->SetRunningInCondition(false);
 		}
 
 		///> check breakpoint
@@ -78,7 +102,18 @@ namespace YBehavior
 
 
 		NodeState state = this->Update(pAgent);
-		m_State = state;
+
+		switch (state)
+		{
+		case YBehavior::NS_RUNNING:
+			TryCreateRC();
+			m_RunningContext->SetRunningInCondition(false);
+			_TryPushRC(pAgent);
+			break;
+		default:
+			_TryDeleteRC();
+			break;
+		}
 
 		///> postprocessing
 #ifdef DEBUGGER
@@ -158,6 +193,49 @@ namespace YBehavior
 			buffer.push_back("");
 
 		return true;
+	}
+
+	YBehavior::RunningContext* BehaviorNode::_CreateRC() const
+	{
+		if (m_ContextCreator)
+			return m_ContextCreator->NewRC();
+		return new RunningContext();
+	}
+
+	void BehaviorNode::TryCreateRC()
+	{
+		if (!m_RunningContext)
+		{
+			m_RunningContext = _CreateRC();
+			m_RunningContext->SetUID(m_UID);
+		}
+	}
+
+	void BehaviorNode::_TryDeleteRC()
+	{
+		if (m_RunningContext)
+		{
+			delete m_RunningContext;
+			m_RunningContext = nullptr;
+		}
+	}
+
+	void BehaviorNode::_TryPushRC(AgentPtr agent)
+	{
+		if (m_RunningContext && agent)
+		{
+			agent->PushRC(m_RunningContext);
+			m_RunningContext = nullptr;
+		}
+	}
+
+	void BehaviorNode::_TryPopRC(AgentPtr agent)
+	{
+		_TryDeleteRC();
+		if (agent)
+		{
+			m_RunningContext = agent->PopRC();
+		}
 	}
 
 	STRING BehaviorNode::GetValue(const STRING& attriName, const pugi::xml_node& data)
@@ -293,7 +371,7 @@ namespace YBehavior
 	YBehavior::NodeState SingleChildNode::Update(AgentPtr pAgent)
 	{
 		if (m_Child)
-			return m_Child->Execute(pAgent);
+			return m_Child->Execute(pAgent, m_RunningContext ? NS_RUNNING : NS_INVALID);
 
 		return NS_FAILURE;
 	}
@@ -309,7 +387,7 @@ namespace YBehavior
 		_DestroyChilds();
 	}
 
-	BehaviorNode::BehaviorNodePtr BranchNode::GetChild(UINT index)
+	BehaviorNodePtr BranchNode::GetChild(UINT index)
 	{
 		if (m_Childs && index < m_Childs->size())
 			return (*m_Childs)[index];

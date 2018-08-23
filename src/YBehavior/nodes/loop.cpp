@@ -10,25 +10,51 @@ namespace YBehavior
 {
 	NodeState For::Update(AgentPtr pAgent)
 	{
+		NodeState ns = NS_INVALID;
+		ForPhase fp = FP_Normal;
 		int loopTimes = 0;
-		if (m_InitChild != nullptr)
+
+		m_RCContainer.ConvertRC(this);
+
+		if (m_RCContainer.GetRC())
 		{
-			m_InitChild->Execute(pAgent);
+			ns = NS_RUNNING;
+			loopTimes = m_RCContainer.GetRC()->LoopTimes;
+			fp = m_RCContainer.GetRC()->Current;
+		}
+
+		if (m_InitChild != nullptr && (fp == FP_Normal || fp == FP_Init))
+		{
+			ns = m_InitChild->Execute(pAgent, ns);
+			if (_CheckRunningNodeState(FP_Init, ns, loopTimes))
+				return ns;
+			fp = FP_Normal;
 		}
 
 		while (true)
 		{
-			if (m_CondChild != nullptr && m_CondChild->Execute(pAgent) == NS_FAILURE)
+			if (m_CondChild != nullptr && (fp == FP_Normal || fp == FP_Cond))
 			{
-				DEBUG_LOG_INFO("End For at " << loopTimes << " times; ");
-				break;
+				ns = m_CondChild->Execute(pAgent, ns);
+				if (_CheckRunningNodeState(FP_Cond, ns, loopTimes))
+					return ns;
+				fp = FP_Normal;
+
+				if (ns == NS_FAILURE)
+				{
+					DEBUG_LOG_INFO("End For at " << loopTimes << " times; ");
+					break;
+				}
 			}
 
 			++loopTimes;
 
-			if (m_MainChild != nullptr)
+			if (m_MainChild != nullptr && (fp == FP_Normal || fp == FP_Main))
 			{
-				NodeState ns = m_MainChild->Execute(pAgent);
+				ns = m_MainChild->Execute(pAgent, ns);
+				if (_CheckRunningNodeState(FP_Cond, ns, loopTimes))
+					return ns;
+				fp = FP_Normal;
 				if (ns == NS_FAILURE)
 				{
 					const BOOL* bExit = m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData());
@@ -40,11 +66,27 @@ namespace YBehavior
 				}
 			}
 
-			if (m_IncChild != nullptr)
-				m_IncChild->Execute(pAgent);
+			if (m_IncChild != nullptr && (fp == FP_Normal || fp == FP_Inc))
+			{
+				ns = m_IncChild->Execute(pAgent, ns);
+				if (_CheckRunningNodeState(FP_Cond, ns, loopTimes))
+					return ns;
+				fp = FP_Normal;
+			}
 		}
 
 		return NS_SUCCESS;
+	}
+
+	bool For::_CheckRunningNodeState(ForPhase current, NodeState ns, int looptimes)
+	{
+		if (ns != NS_RUNNING)
+			return false;
+
+		m_RCContainer.CreateRC(this);
+		m_RCContainer.GetRC()->Current = current;
+		m_RCContainer.GetRC()->LoopTimes = looptimes;
+		return true;
 	}
 
 	bool For::OnLoaded(const pugi::xml_node& data)
@@ -114,10 +156,20 @@ namespace YBehavior
 	NodeState ForEach::Update(AgentPtr pAgent)
 	{
 		INT size = m_Collection->VectorSize(pAgent->GetSharedData());
+		INT start = 0;
+		NodeState ns = NS_INVALID;
 
 		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Collection, true);
 
-		for (INT i = 0; i < size; ++i)
+		m_RCContainer.ConvertRC(this);
+
+		if (m_RCContainer.GetRC())
+		{
+			start = m_RCContainer.GetRC()->Current;
+			ns = NS_RUNNING;
+		}
+
+		for (INT i = start; i < size; ++i)
 		{
 			const void* element = m_Collection->GetElement(pAgent->GetSharedData(), i);
 			if (element == nullptr)
@@ -127,15 +179,25 @@ namespace YBehavior
 
 			if (m_Child != nullptr)
 			{
-				NodeState ns = m_Child->Execute(pAgent);
-				if (ns == NS_FAILURE)
+				ns = m_Child->Execute(pAgent, ns);
+				switch (ns)
+				{
+				case YBehavior::NS_FAILURE:
 				{
 					const BOOL* bExit = m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData());
 					if (bExit && *bExit)
 					{
 						DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
-						break;
+						return NS_SUCCESS;
 					}
+					break;
+				}
+				case YBehavior::NS_RUNNING:
+					m_RCContainer.CreateRC(this);
+					m_RCContainer.GetRC()->Current = i;
+					return ns;
+				default:
+					break;
 				}
 			}
 		}

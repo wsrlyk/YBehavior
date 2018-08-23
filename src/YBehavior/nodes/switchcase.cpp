@@ -38,32 +38,72 @@ namespace YBehavior
 		}
 
 		NodeState ns = NS_FAILURE;
+		int current = -2;
+		m_RCContainer.ConvertRC(this);
+
+		if (m_RCContainer.GetRC())
+		{
+			ns = NS_RUNNING;
+			current = m_RCContainer.GetRC()->Current;
+		}
 
 		INT size = m_CasesChilds.size();
-
-		IVariableOperationHelper* pHelper = m_Switch->GetOperation();
-
-		for (INT i = 0; i < size; ++i)
+		BehaviorNodePtr targetNode = nullptr;
+		switch (current)
 		{
-			const void* onecase = m_Cases->GetElement(pAgent->GetSharedData(), i);
-			if (onecase == nullptr)
-				continue;
+		case -2:
+		{
+			IVariableOperationHelper* pHelper = m_Switch->GetOperation();
 
-			if (pHelper->Compare(m_Switch->GetValue(pAgent->GetSharedData()), onecase, OT_EQUAL))
+			for (INT i = 0; i < size; ++i)
 			{
-				DEBUG_LOG_INFO("Switch to case " << Utility::ToString(m_CasesChilds[i]->GetUID()) << "; ");
+				const void* onecase = m_Cases->GetElement(pAgent->GetSharedData(), i);
+				if (onecase == nullptr)
+					continue;
 
-				ns = m_CasesChilds[i]->Execute(pAgent);
-				return ns;
+				if (pHelper->Compare(m_Switch->GetValue(pAgent->GetSharedData()), onecase, OT_EQUAL))
+				{
+					DEBUG_LOG_INFO("Switch to case " << Utility::ToString(m_CasesChilds[i]->GetUID()) << "; ");
+					targetNode = m_CasesChilds[i];
+					current = i;
+					break;
+				}
 			}
+			if (targetNode == nullptr)
+			{
+				targetNode = m_DefaultChild;
+				current = -1;
+			}
+			break;
 		}
-
-		if (m_DefaultChild != nullptr)
+		case -1:
 		{
 			DEBUG_LOG_INFO("Switch to default; ");
-			ns = m_DefaultChild->Execute(pAgent);
+			targetNode = m_DefaultChild;
+			break;
 		}
-		return ns;
+		default:
+		{
+			if (0 <= current && current < size)
+			{
+				DEBUG_LOG_INFO("Switch to case " << Utility::ToString(m_CasesChilds[current]->GetUID()) << "; ");
+				targetNode = m_CasesChilds[current];
+			}
+			break;
+		}
+		}
+
+		if (targetNode)
+		{
+			ns = targetNode->Execute(pAgent, ns);
+			if (ns == NS_RUNNING)
+			{
+				m_RCContainer.CreateRC(this);
+				m_RCContainer.GetRC()->Current = current;
+			}
+			return ns;
+		}
+		return NS_FAILURE;
 	}
 
 	bool SwitchCase::OnLoaded(const pugi::xml_node& data)

@@ -4,11 +4,13 @@
 #include "YBehavior/define.h"
 #include "YBehavior/types.h"
 #include "tools/linkedlist.h"
+#include <stack>
 namespace YBehavior
 {
 	class BehaviorTree;
 	class SharedDataEx;
 	class RegisterData;
+	class RunningContext;
 
 	class YBEHAVIOR_API Entity
 	{
@@ -31,6 +33,8 @@ namespace YBehavior
 		BehaviorTree* m_Tree;
 		RegisterData* m_RegisterData;
 		Entity* m_Entity;
+
+		std::stack<RunningContext*> m_RunningContexts;
 	public:
 		Agent(Entity* entity);
 		~Agent();
@@ -44,6 +48,9 @@ namespace YBehavior
 
 		void ProcessRegister();
 		inline UINT GetUID() { return m_UID; }
+		RunningContext* PopRC();
+		void PushRC(RunningContext* context);
+		void ClearRC();
 	protected:
 		virtual void _OnProcessRegister() {}
 	};

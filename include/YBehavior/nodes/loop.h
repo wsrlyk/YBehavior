@@ -3,15 +3,38 @@
 
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/sharedvariableex.h"
+#include "YBehavior/runningcontext.h"
 
 namespace YBehavior
 {
+	enum ForPhase
+	{
+		FP_Normal,
+		FP_Init,
+		FP_Cond,
+		FP_Inc,
+		FP_Main,
+	};
+
+	class YBEHAVIOR_API ForContext : public RunningContext
+	{
+	public:
+		int LoopTimes = 0;
+
+		ForPhase Current = FP_Normal;
+	};
+
 	class For : public CompositeNode
 	{
 	public:
 		STRING GetClassName() const override { return "For"; }
+		For()
+		{
+			SetRCCreator(&m_RCContainer);
+		}
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
+		bool _CheckRunningNodeState(ForPhase current, NodeState ns, int looptimes);
 		bool OnLoaded(const pugi::xml_node& data) override;
 		void OnAddChild(BehaviorNode * child, const STRING & connection) override;
 
@@ -20,12 +43,18 @@ namespace YBehavior
 		BehaviorNodePtr m_CondChild = nullptr;
 		BehaviorNodePtr m_IncChild = nullptr;
 		BehaviorNodePtr m_MainChild = nullptr;
+
+		ContextContainer<ForContext> m_RCContainer;
 	};
 
 	class ForEach : public SingleChildNode
 	{
 	public:
 		STRING GetClassName() const override { return "ForEach"; }
+		ForEach()
+		{
+			SetRCCreator(&m_RCContainer);
+		}
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;
@@ -33,6 +62,7 @@ namespace YBehavior
 		SharedVariableEx<BOOL>* m_ExitWhenFailure = nullptr;
 		ISharedVariableEx* m_Collection = nullptr;
 		ISharedVariableEx* m_Current = nullptr;
+		ContextContainer<VectorTraversalContext> m_RCContainer;
 	};
 }
 

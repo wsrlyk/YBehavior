@@ -27,4 +27,18 @@ namespace YBehavior
 
 		return m_IndexList[index];
 	}
+
+	void IndexIterator::Init(int start)
+	{
+		m_Start = start;
+		m_IndexList.clear();
+	}
+
+	int IndexIterator::GetIndex(int input) const
+	{
+		if (input >= m_IndexList.size() || input < 0)
+			return input;
+		return m_IndexList[input];
+	}
+
 }
