@@ -213,6 +213,12 @@ namespace YBehavior
 
 			return (const T*)pData->Get<T>(m_Key);
 		}
+		void GetCastedValue(SharedDataEx* pData, T& t)
+		{
+			const T* v = GetCastedValue(pData);
+			if (v != nullptr)
+				t = *v;
+		}
 
 		void SetCastedValue(SharedDataEx* pData, const T* src)
 		{

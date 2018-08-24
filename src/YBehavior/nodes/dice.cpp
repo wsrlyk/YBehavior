@@ -55,8 +55,9 @@ namespace YBehavior
 		const void* input;
 		void* randRes;
 		
-		const BOOL* bIgnoreInput = m_IgnoreInput->GetCastedValue(pAgent->GetSharedData());
-		if (bIgnoreInput && *bIgnoreInput)
+		BOOL bIgnoreInput = false;
+		m_IgnoreInput->GetCastedValue(pAgent->GetSharedData(), bIgnoreInput);
+		if (bIgnoreInput)
 		{
 			void* pSum = pHelper->AllocData();
 			pHelper->Set(pSum, pZero);

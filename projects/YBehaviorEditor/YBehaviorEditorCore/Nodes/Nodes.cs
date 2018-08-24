@@ -83,7 +83,11 @@ namespace YBehavior.Editor.Core
         public string NoteFormat { get; set; }
         public string ClassName { get; set; }
         public override string Name => ClassName;
-        public override string Icon => "▶";
+
+        protected static string s_Icon = "▶";
+        public override string Icon => m_Icon;
+        protected string m_Icon = s_Icon;
+        public void SetIcon(string icon) { m_Icon = icon; }
 
         public ActionNode()
         {
@@ -97,7 +101,7 @@ namespace YBehavior.Editor.Core
             ActionNode node = base.Clone() as ActionNode;
             node.NoteFormat = this.NoteFormat;
             node.ClassName = this.ClassName;
-
+            node.m_Icon = this.m_Icon;
 
             return node;
         }
@@ -401,7 +405,7 @@ namespace YBehavior.Editor.Core
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} <= {{ {1} ~ {2} }}",
+                sb.AppendFormat("{0} <= [ {1} ~ {2} )",
                     Variables.GetVariable("Target").NoteValue,
                     Variables.GetVariable("Bound1").NoteValue,
                     Variables.GetVariable("Bound2").NoteValue);
@@ -799,7 +803,7 @@ namespace YBehavior.Editor.Core
 
     class DiceNode : LeafNode
     {
-        public override string Icon => "⚄";
+        public override string Icon => "🎲";
 
         public DiceNode()
         {
@@ -907,4 +911,38 @@ namespace YBehavior.Editor.Core
             }
         }
     }
+
+
+    class WaitNode : LeafNode
+    {
+        public override string Icon => "⏰";
+
+        public WaitNode()
+        {
+            m_Name = "Wait";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_DefaultAction;
+        }
+
+        public override void CreateVariables()
+        {
+            Variables.CreateVariableInNode(
+                "TickCount",
+                "1",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                false
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                return Variables.GetVariable("TickCount").NoteValue;
+            }
+        }
+    }
+
 }

@@ -45,6 +45,7 @@ namespace YBehavior
 		virtual bool IsEnd() { return true; }
 		virtual IDataArrayIterator& operator ++() { return *this; }
 		virtual const KEY Value() { return 0; }
+		virtual ~IDataArrayIterator(){}
 	};
 
 	class IDataArray

@@ -123,6 +123,7 @@ namespace YBehavior
 		{
 			op = nullptr;
 			ERROR_BEGIN << "Invalid type for " << attriName << " with type: " << typeID << ERROR_END;
+			delete pTemp;
 		}
 		return typeID;
 	}

@@ -57,8 +57,9 @@ namespace YBehavior
 				fp = FP_Normal;
 				if (ns == NS_FAILURE)
 				{
-					const BOOL* bExit = m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData());
-					if (bExit && *bExit)
+					BOOL bExit;
+					m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData(), bExit);
+					if (bExit)
 					{
 						DEBUG_LOG_INFO("ExitWhenFailure at " << loopTimes << " times; ");
 						break;
@@ -184,8 +185,9 @@ namespace YBehavior
 				{
 				case YBehavior::NS_FAILURE:
 				{
-					const BOOL* bExit = m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData());
-					if (bExit && *bExit)
+					BOOL bExit;
+					m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData(), bExit);
+					if (bExit)
 					{
 						DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
 						return NS_SUCCESS;

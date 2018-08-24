@@ -14,6 +14,7 @@
 #include "YBehavior/nodes/piecewisefunction.h"
 #include "YBehavior/nodes/dice.h"
 #include "YBehavior/nodes/subtree.h"
+#include "YBehavior/nodes/wait.h"
 namespace YBehavior
 {
 	NodeFactory* CreateNodeFactory()
@@ -39,6 +40,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, PiecewiseFunction);
 		REGISTER_TYPE(factory, Dice);
 		REGISTER_TYPE(factory, SubTree);
+		REGISTER_TYPE(factory, Wait);
 
 		return factory;
 	}

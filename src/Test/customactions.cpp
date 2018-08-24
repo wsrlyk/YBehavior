@@ -83,8 +83,9 @@ YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 {
 	LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Target, true);
 
-	const YBehavior::EntityWrapper* currentTarget = m_Target->GetCastedValue(pAgent->GetSharedData());
-	if (currentTarget && currentTarget->IsValid())
+	YBehavior::EntityWrapper currentTarget;
+	m_Target->GetCastedValue(pAgent->GetSharedData(), currentTarget);
+	if (currentTarget.IsValid())
 	{
 		YBehavior::EntityWrapper wrapper;
 		m_Target->SetCastedValue(pAgent->GetSharedData(), &wrapper);

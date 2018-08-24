@@ -16,6 +16,8 @@ namespace YBehavior
 		inline bool IsRunningInCondition() const { return m_bRunningInCondition; }
 		inline void SetUID(UINT uid) { m_UID = uid; }
 		inline UINT GetUID() const { return m_UID; }
+
+		virtual ~RunningContext(){}
 	};
 
 	class YBEHAVIOR_API IContextCreator

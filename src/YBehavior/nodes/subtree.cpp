@@ -22,15 +22,16 @@ namespace YBehavior
 			return false;
 		}
 
-		const STRING* treeName = (const STRING*)m_TreeName->GetCastedValue(nullptr);
-		if (treeName == nullptr || *treeName == Utility::StringEmpty)
+		STRING treeName;
+		m_TreeName->GetCastedValue(nullptr, treeName);
+		if (treeName == Utility::StringEmpty)
 		{
 			ERROR_BEGIN << "Null Value for Tree in SubTree: " << typeID << ERROR_END;
 			return false;
 		}
 
-		if (m_Root == nullptr || m_Root->GetTreeNameWithPath() != *treeName)
-			TreeMgr::Instance()->PushToBeLoadedTree(*treeName);
+		if (m_Root == nullptr || m_Root->GetTreeNameWithPath() != treeName)
+			TreeMgr::Instance()->PushToBeLoadedTree(treeName);
 
 		return true;
 	}
@@ -39,16 +40,17 @@ namespace YBehavior
 	{
 		if (m_Tree == nullptr && m_Root != nullptr)
 		{
-			const STRING* treeName = (const STRING*)m_TreeName->GetCastedValue(nullptr);
+			STRING treeName;
+			m_TreeName->GetCastedValue(nullptr, treeName);
 			for (auto it = m_Root->GetSubTrees().begin(); it != m_Root->GetSubTrees().end(); ++it)
 			{
-				if ((*it)->GetTreeNameWithPath() == *treeName)
+				if ((*it)->GetTreeNameWithPath() == treeName)
 				{
 					m_Tree = *it;
 					break;
 				}
 			}
-			if (m_Tree == nullptr && m_Root->GetTreeNameWithPath() == *treeName)
+			if (m_Tree == nullptr && m_Root->GetTreeNameWithPath() == treeName)
 				m_Tree = m_Root;
 		}
 

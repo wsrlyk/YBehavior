@@ -53,6 +53,9 @@ namespace YBehavior.Editor.Core
             attr = xml.Attributes["Note"];
             if (attr != null)
                 noteformat = attr.Value;
+            attr = xml.Attributes["Icon"];
+            if (attr != null)
+                action.SetIcon(attr.Value);
 
             action.ClassName = classname;
             action.NoteFormat = noteformat;

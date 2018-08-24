@@ -41,8 +41,9 @@ namespace YBehavior.Editor.Core
         {
             m_ReceiveBuffer.Clear();
             m_KeyFrameTickResultData = null;
-            m_PreviosTickResultData = null;
-            m_DiffScore = 0;
+            m_PreviousTickResultData = null;
+            m_PreviousDiffScore = 0.0f;
+            m_DiffScore = 0.0f;
             m_LastTickResultToken = 0;
             m_TickResultToken = 0;
         }
@@ -170,7 +171,8 @@ namespace YBehavior.Editor.Core
 
         ///////////////////////////////////////////////////////////////////////////
         string m_KeyFrameTickResultData = null;
-        string m_PreviosTickResultData = null;
+        string m_PreviousTickResultData = null;
+        float m_PreviousDiffScore = 0.0f;
         float m_DiffScore = 0.0f;
 
         uint m_TickResultToken = 0;
@@ -182,16 +184,15 @@ namespace YBehavior.Editor.Core
 
         void _CompareTickResult(string ss)
         {
-            if (m_PreviosTickResultData == null)
+            if (m_PreviousTickResultData == null)
             {
-                m_PreviosTickResultData = ss;
+                m_PreviousTickResultData = ss;
                 m_KeyFrameTickResultData = ss;
                 return;
             }
 
             DiffMatchPatch.diff_match_patch dmp = new DiffMatchPatch.diff_match_patch();
-            List<DiffMatchPatch.Diff> diffs = dmp.diff_main(m_PreviosTickResultData, ss);
-            m_PreviosTickResultData = ss;
+            List<DiffMatchPatch.Diff> diffs = dmp.diff_main(m_PreviousTickResultData, ss);
 
             float diff = 0.0f;
             for (int i = 0; i < diffs.Count; ++i)
@@ -201,11 +202,16 @@ namespace YBehavior.Editor.Core
                 diff += (float)Math.Sqrt(diffs[i].text.Length);
             }
 
-            if(m_DiffScore <= diff)
+            float avgDiff = (diff + m_PreviousDiffScore) * 0.5f;
+            if(m_DiffScore <= avgDiff)
             {
-                m_DiffScore = diff;
-                m_KeyFrameTickResultData = ss;
+                m_DiffScore = avgDiff;
+                m_KeyFrameTickResultData = m_PreviousTickResultData;
+                LogMgr.Instance.Log("Larger Content ^ " + avgDiff);
             }
+            m_PreviousDiffScore = diff;
+            m_PreviousTickResultData = ss;
+            LogMgr.Instance.Log(ss);
         }
 
         void _HandleTickResult(string ss)
