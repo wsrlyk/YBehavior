@@ -25,6 +25,9 @@
         <Button Name="btnDelete" Width="50" Click="btnDelete_Click">
             <TextBlock Text ="Delete&#x0a;Delete&#x0a;(shift)" HorizontalAlignment="Center"/>
         </Button>
+        <Button Name="btnCenter" Width="50" Click="btnCenter_Click">
+            <TextBlock Text ="Center&#x0a;    F1"/>
+        </Button>
         <Button Name="btnLog" Width="60" Click="btnLog_Click">
             <TextBlock Text ="LogPoint&#x0a;    F8"/>
         </Button>

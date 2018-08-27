@@ -50,6 +50,7 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.CommentCreated, _OnCommentCreated);
+            EventMgr.Instance.Register(EventType.MakeCenter, _OnMakeCenter);
             Focus();
 
             DraggingConnection.Instance.SetCanvas(this.canvas);
@@ -381,6 +382,78 @@ namespace YBehavior.Editor
             m_CurPageData.ScaleTransform.ScaleY = 0;
             m_CurPageData.TranslateTransform.X = 0;
             m_CurPageData.TranslateTransform.Y = 0;
+        }
+
+        private void _OnMakeCenter(EventArg arg)
+        {
+            m_MakingCenterDes.X = 0;
+            m_MakingCenterDes.Y = 0;
+
+            CompositionTarget.Rendering -= MakingCenter;
+            CompositionTarget.Rendering += MakingCenter;
+        }
+
+        Point m_MakingCenterDes;
+        private void MakingCenter(object sender, EventArgs e)
+        {
+            Point newDes = new Point();
+            if (_MakeCenter(ref newDes))
+            {
+                m_MakingCenterDes = newDes;
+            }
+
+            Point curPos = new Point(m_CurPageData.TranslateTransform.X, m_CurPageData.TranslateTransform.Y);
+            if ((curPos - m_MakingCenterDes).LengthSquared < 1)
+            {
+                CompositionTarget.Rendering -= MakingCenter;
+                return;
+            }
+
+            Vector delta = m_MakingCenterDes - curPos;
+            double sqrLength = delta.LengthSquared;
+            double speed = 30.0;
+            if (sqrLength > speed * speed)
+            {
+                delta = delta / Math.Sqrt(sqrLength) * speed;
+            }
+            m_CurPageData.TranslateTransform.X += delta.X;
+            m_CurPageData.TranslateTransform.Y += delta.Y;
+        }
+
+        bool _MakeCenter(ref Point newDes)
+        {
+            Vector halfcanvas = new Vector(this.CanvasBoard.ActualWidth / 2, this.CanvasBoard.ActualHeight / 2);
+            Point curPos = new Point(0, 0) + halfcanvas;
+            Point nodesPos = new Point(m_CurPageData.TranslateTransform.X, m_CurPageData.TranslateTransform.Y);
+            double nodesScale = m_CurPageData.ScaleTransform.ScaleX;
+            double sqrradius = Math.Max(halfcanvas.X, halfcanvas.Y);
+            sqrradius *= sqrradius;
+
+            Point nextPos = new Point(0, 0);
+            int count = 0;
+            foreach (Renderer renderer in WorkBenchMgr.Instance.ActiveWorkBench.NodeList)
+            {
+                Point pos = new Vector(renderer.Geo.Pos.X * nodesScale, renderer.Geo.Pos.Y * nodesScale) + nodesPos;
+                if ((pos - curPos).LengthSquared < sqrradius)
+                {
+                    ++count;
+                    nextPos.X += pos.X;
+                    nextPos.Y += pos.Y;
+                }
+            }
+
+            if (count > 0)
+            {
+                nextPos.X /= count;
+                nextPos.Y /= count;
+
+                Vector delta = nextPos - curPos;
+
+                newDes.X = m_CurPageData.TranslateTransform.X - delta.X;
+                newDes.Y = m_CurPageData.TranslateTransform.Y - delta.Y;
+                return true;
+            }
+            return false;
         }
     }
 }

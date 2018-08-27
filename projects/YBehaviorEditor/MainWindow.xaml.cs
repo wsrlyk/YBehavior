@@ -120,9 +120,19 @@ namespace YBehavior.Editor
                         break;
                     Core.SelectionMgr.Instance.TryToggleCondition();
                     break;
+                case Key.F1:
+                    {
+                        MakeCenterArg oArg = new MakeCenterArg();
+                        EventMgr.Instance.Send(oArg);
+                    }
+                    break;
                 case Key.T:
                     ///> Test....
-                    WorkBenchMgr.Instance.OpenAllRelated();
+                    //WorkBenchMgr.Instance.OpenAllRelated();
+                    {
+                        MakeCenterArg oArg = new MakeCenterArg();
+                        EventMgr.Instance.Send(oArg);
+                    }
                     break;
             }
         }

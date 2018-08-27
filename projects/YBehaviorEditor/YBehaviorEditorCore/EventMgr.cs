@@ -22,6 +22,7 @@ namespace YBehavior.Editor.Core
         TickResult,
         CommentCreated,
         ShowSystemTips,
+        MakeCenter,
     }
 
     public class EventMgr : Singleton<EventMgr>
@@ -150,5 +151,10 @@ namespace YBehavior.Editor.Core
         public string Content { get; set; }
         public TipsType TipType { get; set; } = TipsType.TT_Success;
         public override EventType Type => EventType.ShowSystemTips;
+    }
+
+    public class MakeCenterArg : EventArg
+    {
+        public override EventType Type => EventType.MakeCenter;
     }
 }
