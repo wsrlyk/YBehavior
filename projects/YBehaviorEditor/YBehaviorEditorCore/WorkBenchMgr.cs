@@ -398,7 +398,7 @@ namespace YBehavior.Editor.Core
             if (ActiveWorkBench == null || CommandLocker.IsLocked)
                 return;
 
-            ActiveWorkBench.CommandMgr.PushDoneCommand(command);
+            ActiveWorkBench.PushDoneCommand(command);
         }
 
         public void Undo()

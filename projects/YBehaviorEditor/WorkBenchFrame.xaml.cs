@@ -80,7 +80,7 @@ namespace YBehavior.Editor
             if (activeTab == null)
             {
                 activeTab = new UCTabItemWithClose();
-                activeTab.Header = oArg.Bench.FileInfo.DisplayName;
+                //activeTab.Header = oArg.Bench.FileInfo.DisplayName;
                 activeTab.ToolTip = oArg.Bench.FileInfo.DisplayPath;
                 activeTab.Content = oArg.Bench;
                 activeTab.CloseHandler = _TabCloseClicked;
@@ -90,6 +90,13 @@ namespace YBehavior.Editor
                 activeTab.Drop += TabItem_Drop;
                 activeTab.AllowDrop = true;
                 m_PageDataDic[activeTab] = new PageData();
+
+                activeTab.DataContext = oArg.Bench;
+                activeTab.SetBinding(UCTabItemWithClose.HeaderProperty, new Binding()
+                {
+                    Path = new PropertyPath("DisplayName"),
+                    Mode = BindingMode.OneWay
+                });
             }
 
             activeTab.IsSelected = WorkBenchMgr.Instance.ActiveWorkBench == oArg.Bench;

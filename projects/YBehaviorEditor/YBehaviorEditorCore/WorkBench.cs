@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core
 {
-    public class WorkBench
+    public class WorkBench : System.ComponentModel.INotifyPropertyChanged
     {
         List<Node> m_Forest = new List<Node>();
         public List<Node> Forest { get { return m_Forest; } }
@@ -20,6 +20,8 @@ namespace YBehavior.Editor.Core
         public DelayableNotificationCollection<ConnectionRenderer> ConnectionList { get; } = new DelayableNotificationCollection<ConnectionRenderer>();
 
         public string FilePath { get; set; }
+
+        public string DisplayName { get { return FileInfo.DisplayName + (CommandMgr.Dirty ? " *" : ""); } }
 
         private TreeFileMgr.TreeFileInfo m_UntitledFileInfo = null;
         public TreeFileMgr.TreeFileInfo FileInfo
@@ -41,6 +43,14 @@ namespace YBehavior.Editor.Core
             m_UID = ++g_ID_inc;
         }
 
+        public void PushDoneCommand(ICommand command)
+        {
+            bool bOldDirty = CommandMgr.Dirty;
+            CommandMgr.PushDoneCommand(command);
+
+            if (!bOldDirty)
+                OnPropertyChanged("DisplayName");
+        }
         public void ConnectNodes(ConnectionHolder holder0, ConnectionHolder holder1)
         {
             ConnectionHolder parent;
@@ -65,7 +75,7 @@ namespace YBehavior.Editor.Core
                     Parent = parent,
                     Child = child
                 };
-                CommandMgr.PushDoneCommand(connectNodeCommand);
+                PushDoneCommand(connectNodeCommand);
             }
             else
             {
@@ -98,7 +108,7 @@ namespace YBehavior.Editor.Core
                     Parent = conn.Holder,
                     Child = childHolder
                 };
-                CommandMgr.PushDoneCommand(disconnectNodeCommand);
+                PushDoneCommand(disconnectNodeCommand);
             }
             else
             {
@@ -114,7 +124,7 @@ namespace YBehavior.Editor.Core
             {
                 Node = node
             };
-            CommandMgr.PushDoneCommand(removeNodeCommand);
+            PushDoneCommand(removeNodeCommand);
         }
 
         public void AddNode(Node node)
@@ -125,7 +135,7 @@ namespace YBehavior.Editor.Core
             {
                 Node = node
             };
-            CommandMgr.PushDoneCommand(addNodeCommand);
+            PushDoneCommand(addNodeCommand);
         }
 
         public void OnNodeMoved(EventArg arg)
@@ -147,7 +157,7 @@ namespace YBehavior.Editor.Core
             {
                 Comment = comment
             };
-            CommandMgr.PushDoneCommand(removeCommentCommand);
+            PushDoneCommand(removeCommentCommand);
         }
 
         public void AddComment(Comment comment)
@@ -159,7 +169,7 @@ namespace YBehavior.Editor.Core
             {
                 Comment = comment
             };
-            CommandMgr.PushDoneCommand(addCommentCommand);
+            PushDoneCommand(addCommentCommand);
         }
 
         public void CreateComment()
@@ -180,7 +190,6 @@ namespace YBehavior.Editor.Core
             m_Tree = NodeMgr.Instance.CreateNodeByName("Root") as Tree;
             AddRenderers(m_Tree);
             CommandMgr.Blocked = false;
-            CommandMgr.Dirty = true;
         }
 
         public bool Load(XmlElement data)
@@ -304,6 +313,8 @@ namespace YBehavior.Editor.Core
 
             CommandMgr.Dirty = false;
             m_ExportFileHash = 0;
+
+            OnPropertyChanged("DisplayName");
         }
 
         void _SaveNode(Node node, XmlElement data, XmlDocument xmlDoc)
@@ -527,6 +538,15 @@ namespace YBehavior.Editor.Core
             m_ExportFileHash = hash;
 
             return m_ExportFileHash;
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        internal protected void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }
