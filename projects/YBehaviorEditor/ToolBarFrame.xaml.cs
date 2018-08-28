@@ -90,5 +90,10 @@ namespace YBehavior.Editor
         {
             MainWindow.ProcessKeyDown(Key.F1, ModifierKeys.None);
         }
+
+        private void btnFold_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.ProcessKeyDown(Key.F7, ModifierKeys.None);
+        }
     }
 }

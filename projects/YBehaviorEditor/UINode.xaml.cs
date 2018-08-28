@@ -19,7 +19,7 @@ namespace YBehavior.Editor
     /// <summary>
     /// BehaviorNode.xaml 的交互逻辑
     /// </summary>
-    public partial class UINode : YUserControl, ISelectable, IDeletable, IDuplicatable, IDebugPointable, ICanDisable, IHasCondition
+    public partial class UINode : YUserControl, ISelectable, IDeletable, IDuplicatable, IDebugPointable, ICanDisable, IHasCondition, ICanFold
     {
         static SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
@@ -341,6 +341,11 @@ namespace YBehavior.Editor
         public void ToggleCondition()
         {
             Node.EnableCondition = !Node.EnableCondition;
+        }
+
+        public void ToggleFold()
+        {
+            Node.Folded = !Node.Folded;
         }
     }
 }

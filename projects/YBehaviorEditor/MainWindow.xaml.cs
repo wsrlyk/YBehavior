@@ -120,6 +120,11 @@ namespace YBehavior.Editor
                         break;
                     Core.SelectionMgr.Instance.TryToggleCondition();
                     break;
+                case Key.F7:
+                    if (DebugMgr.Instance.IsDebugging())
+                        break;
+                    Core.SelectionMgr.Instance.TryToggleFold();
+                    break;
                 case Key.F1:
                     {
                         MakeCenterArg oArg = new MakeCenterArg();

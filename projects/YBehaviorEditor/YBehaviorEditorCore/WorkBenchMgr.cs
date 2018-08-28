@@ -46,10 +46,22 @@ namespace YBehavior.Editor.Core
                 m_ActiveWorkBench.RemoveNode(node);
         }
 
+        public void RemoveRenderers(Node node, bool excludeRoot)
+        {
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.RemoveRenderers(node, excludeRoot);
+        }
+
         public void AddNode(Node node)
         {
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.AddNode(node);
+        }
+
+        public void AddRenderers(Node node, bool batchAdd, bool excludeRoot)
+        {
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.AddRenderers(node, batchAdd, excludeRoot);
         }
 
         public void RemoveComment(Comment comment)

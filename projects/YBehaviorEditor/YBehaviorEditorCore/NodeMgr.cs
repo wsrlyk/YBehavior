@@ -84,7 +84,7 @@ namespace YBehavior.Editor.Core
         NH_DefaultAction = 11,
         NH_Custom = 21,
     }
-
+    #region NodeBase
     public class NodeBase
     {
         protected Connections m_Connections = new Connections();
@@ -135,7 +135,9 @@ namespace YBehavior.Editor.Core
 
         }
     }
+    #endregion
 
+    #region Geometry
     public class Geometry
     {
         Rect m_Rect;
@@ -244,7 +246,7 @@ namespace YBehavior.Editor.Core
             m_Rect = other.m_Rect;
         }
     }
-
+    #endregion
     public class Node : NodeBase, System.ComponentModel.INotifyPropertyChanged, IVariableDataSource
     {
         protected string m_Name;
@@ -303,6 +305,28 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        bool m_Folded = false;
+        public bool Folded
+        {
+            get { return m_Folded; }
+            set
+            {
+                if (m_Folded != value)
+                {
+                    m_Folded = value;
+
+                    if (value)
+                        WorkBenchMgr.Instance.RemoveRenderers(this, true);
+                    else
+                        WorkBenchMgr.Instance.AddRenderers(this, false, true);
+
+                    OnPropertyChanged("Folded");
+                }
+            }
+        }
+        public bool IsChildrenRendering { get { return !Folded; } }
+
+        #region DISABLE
         int m_DisableCount = 0;
         int m_SelfDisabled = 0;
         public bool Disabled
@@ -356,6 +380,7 @@ namespace YBehavior.Editor.Core
             else
                 node.m_DisableCount = node.m_SelfDisabled + parent.DisableCount;
         }
+        #endregion
 
         protected NodeType m_Type = NodeType.NT_Invalid;
         public NodeType Type { get { return m_Type; } set { m_Type = value; } }
@@ -402,6 +427,7 @@ namespace YBehavior.Editor.Core
             return m_TreeSharedData;
         }
 
+        #region CONDITION
         Connection m_ConditonConnection;
         bool m_bEnableConditionConnection = false;
         public bool HasConditionConnection { get { return m_ConditonConnection.NodeCount > 0; } }
@@ -429,6 +455,7 @@ namespace YBehavior.Editor.Core
                 OnPropertyChanged("EnableCondition");
             }
         }
+        #endregion
 
         public Node()
         {
@@ -658,6 +685,10 @@ namespace YBehavior.Editor.Core
             if (Type == NodeType.NT_Root)
                 return;
 
+            ///> If folded but remove only this, unfold first
+            if (Folded && param == 0)
+                Folded = !Folded;
+
             ///> Disconnect all the connection
             WorkBenchMgr.Instance.DisconnectNodes(Conns.ParentHolder);
 
@@ -702,6 +733,7 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    #region BASIC NODE
     public class BranchNode : Node
     {
         protected Connection m_ChildConn;
@@ -731,4 +763,5 @@ namespace YBehavior.Editor.Core
             m_ChildConn = new ConnectionMultiple(this, Connection.IdentifierChildren);
         }
     }
+    #endregion
 }

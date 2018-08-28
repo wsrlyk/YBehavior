@@ -129,7 +129,7 @@ namespace YBehavior.Editor.Core
 
         public void AddNode(Node node)
         {
-            AddForestTree(node);
+            AddForestTree(node, true);
 
             AddNodeCommand addNodeCommand = new AddNodeCommand()
             {
@@ -188,7 +188,7 @@ namespace YBehavior.Editor.Core
         {
             CommandMgr.Blocked = true;
             m_Tree = NodeMgr.Instance.CreateNodeByName("Root") as Tree;
-            AddRenderers(m_Tree);
+            AddRenderers(m_Tree, false);
             CommandMgr.Blocked = false;
         }
 
@@ -207,7 +207,7 @@ namespace YBehavior.Editor.Core
                     {
                         m_Tree = NodeMgr.Instance.CreateNodeByName("Root") as Tree;
                         _LoadTree(m_Tree, chi);
-                        AddRenderers(m_Tree);
+                        AddRenderers(m_Tree, true);
                     }
                     else
                     {
@@ -218,7 +218,7 @@ namespace YBehavior.Editor.Core
                             return false;
                         }
                         _LoadTree(node, chi);
-                        AddForestTree(node);
+                        AddForestTree(node, true);
                     }
                 }
                 else if (chi.Name == "Comments")
@@ -415,36 +415,48 @@ namespace YBehavior.Editor.Core
             m_Forest.Remove(root);
         }
 
-        public void AddForestTree(Node root, bool bAddRenderer = true)
+        public void AddForestTree(Node root, bool bAddRenderer)
         {
             if (root == null)
                 return;
             m_Forest.Add(root);
 
             if (bAddRenderer)
-                AddRenderers(root);
+                AddRenderers(root, true);
 
             _RefreshNodeUIDFromRoot(root);
         }
 
-        public void AddRenderers(Node node)
+        public void AddRenderers(Node node, bool batchAdd, bool excludeRoot = false)
         {
-            using (var v1 = ConnectionList.Delay())
+            if (batchAdd)
             {
-                using (var v2 = NodeList.Delay())
+                using (var v1 = ConnectionList.Delay())
                 {
-                    _AddRenderers(node);
+                    using (var v2 = NodeList.Delay())
+                    {
+                        _AddRenderers(node, excludeRoot);
+                    }
                 }
+                SelectionMgr.Instance.Clear();
+            }
+            else
+            {
+                _AddRenderers(node, excludeRoot);
             }
         }
 
-        void _AddRenderers(Node node)
+        void _AddRenderers(Node node, bool excludeRoot)
         {
-            NodeList.Add(node.Renderer);
+            if (!excludeRoot)
+                NodeList.Add(node.Renderer);
+
+            if (!node.IsChildrenRendering)
+                return;
 
             foreach (Node chi in node.Conns)
             {
-                _AddRenderers(chi);
+                _AddRenderers(chi, false);
             }
 
             foreach (ConnectionHolder conn in node.Conns.ConnectionsList)
@@ -456,18 +468,18 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        public void RemoveRenderers(Node node)
+        public void RemoveRenderers(Node node, bool excludeRoot = false)
         {
             //using (var v1 = ConnectionList.Delay())
             {
                 //using (var v2 = NodeList.Delay())
                 {
-                    _RemoveRenderers(node);
+                    _RemoveRenderers(node, excludeRoot);
                 }
             }
         }
 
-        void _RemoveRenderers(Node node)
+        void _RemoveRenderers(Node node, bool excludeRoot)
         {
             foreach (ConnectionHolder conn in node.Conns.ConnectionsList)
             {
@@ -477,12 +489,17 @@ namespace YBehavior.Editor.Core
                 }
             }
 
-            foreach (Node chi in node.Conns)
-            {
-                _RemoveRenderers(chi);
-            }
+            bool bNeedRemoveChildren = true;
+            if (!excludeRoot)
+                bNeedRemoveChildren = NodeList.Remove(node.Renderer);
 
-            NodeList.Remove(node.Renderer);
+            if (bNeedRemoveChildren)
+            {
+                foreach (Node chi in node.Conns)
+                {
+                    _RemoveRenderers(chi, false);
+                }
+            }
         }
 
         public bool CheckError()

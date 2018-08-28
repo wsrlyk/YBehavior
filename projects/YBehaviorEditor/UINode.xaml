@@ -69,6 +69,9 @@
                         <SolidColorBrush Color="Purple" Opacity="0.6" />
                     </Ellipse.Fill>
                 </Ellipse>
+                <TextBlock Name="folded" HorizontalAlignment="Right"  VerticalAlignment="Bottom" Text="+" FontSize="20" FontWeight="Bold" Foreground="#FF615A5A"
+                            Visibility="{Binding Path=Owner.Folded, Converter={StaticResource visibilityConvertor}}">
+                </TextBlock>
             </Grid>
         </Border>
     </DockPanel>

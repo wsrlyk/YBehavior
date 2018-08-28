@@ -37,6 +37,11 @@ namespace YBehavior.Editor.Core
         void ToggleCondition();
     }
 
+    public interface ICanFold
+    {
+        void ToggleFold();
+    }
+
     public delegate void SelectionStateChangeHandler(ISelectable obj, bool bState);
     public delegate void DeleteHandler(IDeletable obj);
 
@@ -210,6 +215,18 @@ namespace YBehavior.Editor.Core
             if (condition != null)
             {
                 condition.ToggleCondition();
+            }
+        }
+
+        public void TryToggleFold()
+        {
+            if (m_SingleSelection == null)
+                return;
+
+            ICanFold fold = m_SingleSelection as ICanFold;
+            if (fold != null)
+            {
+                fold.ToggleFold();
             }
         }
     }
