@@ -492,6 +492,9 @@ namespace YBehavior.Editor.Core
                 case "Disabled":
                     Disabled = bool.Parse(attr.Value);
                     break;
+                case "Folded":
+                    m_Folded = bool.Parse(attr.Value);
+                    break;
                 default:
                     return LoadOtherAttr(attr);
             }
@@ -587,6 +590,11 @@ namespace YBehavior.Editor.Core
             if (SelfDisabled)
             {
                 data.SetAttribute("Disabled", "true");
+            }
+
+            if (Folded)
+            {
+                data.SetAttribute("Folded", "true");
             }
 
             foreach (VariableHolder v in Variables.Datas)

@@ -345,7 +345,8 @@ namespace YBehavior.Editor
 
         public void ToggleFold()
         {
-            Node.Folded = !Node.Folded;
+            if(Node.Conns.NodeCount > 0)
+                Node.Folded = !Node.Folded;
         }
     }
 }
