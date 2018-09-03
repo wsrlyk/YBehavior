@@ -29,7 +29,12 @@ namespace YBehavior
 	{
 		pugi::xml_document doc;
 
-		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + ".xml").c_str());
+		pugi::xml_parse_result result;
+		if (m_LoadDataCallback != nullptr)
+			result = doc.load_string(m_LoadDataCallback((m_WorkingDir + name + ".xml").c_str()));
+		else
+			result = doc.load_file((m_WorkingDir + name + ".xml").c_str());
+
 		LOG_BEGIN << "Loading: " << name << ".xml" << LOG_END;
 		if (result.status)
 		{

@@ -49,6 +49,8 @@ namespace YBehavior
 		std::unordered_map<int, TreeVersion*> m_TreeVersions;
 	};
 
+	typedef const char* (_stdcall *LoadDataDelegate)(const char* treeName);
+
 	class YBEHAVIOR_API TreeMgr
 	{
 	public:
@@ -62,6 +64,7 @@ namespace YBehavior
 		void SetWorkingDir(const STRING& dir);
 		void PushToBeLoadedTree(const STRING& name) { m_ToBeLoadedTree.insert(name); }
 		void GarbageCollection();
+		void SetLoadDataCallback(LoadDataDelegate callback) { m_LoadDataCallback = callback; }
 	protected:
 		bool _GetTree(const STRING& name, BehaviorTree * &tree, bool bToAgent);
 		void _CheckSubTree(const STRING& name, BehaviorTree* current, std::unordered_set<BehaviorTree*>& visited, std::list<BehaviorTree*>& visitedStack);
@@ -78,6 +81,8 @@ namespace YBehavior
 		std::unordered_set<STRING> m_ToBeLoadedTree;
 
 		STRING m_WorkingDir;
+
+		LoadDataDelegate m_LoadDataCallback = nullptr;
 	};
 }
 

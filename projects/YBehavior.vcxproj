@@ -46,6 +46,8 @@
     <ClInclude Include="..\include\YBehavior\shareddataex.h" />
     <ClInclude Include="..\include\YBehavior\sharedvariablecreatehelper.h" />
     <ClInclude Include="..\include\YBehavior\sharedvariableex.h" />
+    <ClInclude Include="..\include\YBehavior\sharp\sharp.h" />
+    <ClInclude Include="..\include\YBehavior\sharp\sharpnode.h" />
     <ClInclude Include="..\include\YBehavior\singleton.h" />
     <ClInclude Include="..\include\YBehavior\tools\bimap.h" />
     <ClInclude Include="..\include\YBehavior\tools\common.h" />
@@ -89,6 +91,8 @@
     <ClCompile Include="..\src\YBehavior\registerdata.cpp" />
     <ClCompile Include="..\src\YBehavior\runningcontext.cpp" />
     <ClCompile Include="..\src\YBehavior\shareddataex.cpp" />
+    <ClCompile Include="..\src\YBehavior\sharp\sharp.cpp" />
+    <ClCompile Include="..\src\YBehavior\sharp\sharpnode.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\common.cpp" />
     <ClCompile Include="..\src\YBehavior\treekeymgr.cpp" />
     <ClCompile Include="..\src\YBehavior\types.cpp" />
@@ -102,7 +106,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v141</PlatformToolset>
@@ -134,7 +138,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>YBEHAVIOR_EXPORTS;DEBUGGER;PRINT_INTERMEDIATE_INFO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>YBEHAVIOR_EXPORTS;DEBUGGER;YBEHAVIOR_DLL;PRINT_INTERMEDIATE_INFO;SHARP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

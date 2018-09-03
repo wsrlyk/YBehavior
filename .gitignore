@@ -53,3 +53,5 @@
 *.iobj
 *.ipdb
 projects/YBehaviorEditor/bin/user.ini
+/projects/YBehaviorSharp/obj
+/projects/TestSharp/obj

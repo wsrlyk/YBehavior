@@ -45,6 +45,41 @@ namespace YBehavior
 		return factory;
 	}
 
+#ifdef SHARP
+	BehaviorNode* NodeFactory::Get(const STRING& name)
+	{
+		auto it = m_SharpCallbacks.find(name);
+		if (it != m_SharpCallbacks.end())
+		{
+			SharpNode* pSharpNode = new SharpNode();
+			pSharpNode->SetName(name);
+			pSharpNode->SetOnLoadCallback(it->second.onload);
+			pSharpNode->SetOnUpdateCallback(it->second.onupdate);
+			return pSharpNode;
+		}
+
+		return Factory<BehaviorNode>::Get(name);
+	}
+
+	void NodeFactory::SetSharpCallback(const STRING& name, OnSharpNodeLoadedDelegate onload, OnSharpNodeUpdateDelegate onupdate)
+	{
+		auto it = m_SharpCallbacks.find(name);
+		if (it != m_SharpCallbacks.end())
+		{
+			it->second.onload = onload;
+			it->second.onupdate = onupdate;
+		}
+		else
+		{
+			SharpCallbacks callbacks;
+			callbacks.onload = onload;
+			callbacks.onupdate = onupdate;
+			m_SharpCallbacks[name] = callbacks;
+		}
+	}
+
+#endif // SHARP
+
 	NodeFactory* NodeFactory::Instance()
 	{
 		if (s_NodeFactory == nullptr)

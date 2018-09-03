@@ -36,7 +36,7 @@ namespace YBehavior
 
 	int IndexIterator::GetIndex(int input) const
 	{
-		if (input >= m_IndexList.size() || input < 0)
+		if (input >= (int)m_IndexList.size() || input < 0)
 			return input;
 		return m_IndexList[input];
 	}
