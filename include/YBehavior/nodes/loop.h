@@ -64,6 +64,25 @@ namespace YBehavior
 		ISharedVariableEx* m_Current = nullptr;
 		ContextContainer<VectorTraversalContext> m_RCContainer;
 	};
+
+	class Loop : public SingleChildNode
+	{
+	public:
+		STRING GetClassName() const override { return "Loop"; }
+		Loop()
+		{
+			SetRCCreator(&m_RCContainer);
+		}
+	protected:
+		NodeState Update(AgentPtr pAgent) override;
+		bool OnLoaded(const pugi::xml_node& data) override;
+
+		SharedVariableEx<BOOL>* m_ExitWhenFailure = nullptr;
+		SharedVariableEx<INT>* m_Count = nullptr;
+		SharedVariableEx<INT>* m_Current = nullptr;
+		ContextContainer<VectorTraversalContext> m_RCContainer;
+	};
+
 }
 
 #endif

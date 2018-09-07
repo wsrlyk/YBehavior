@@ -220,10 +220,90 @@ namespace YBehavior
 		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data, true);
 		if (type != GetClassTypeNumberId<Bool>())
 		{
-			ERROR_BEGIN << "Invalid type for ExitWhenFailure in For: " << type << ERROR_END;
+			ERROR_BEGIN << "Invalid type for ExitWhenFailure in ForEach: " << type << ERROR_END;
 			return false;
 		}
 
 		return true;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////
+
+	bool Loop::OnLoaded(const pugi::xml_node& data)
+	{
+		TYPEID type = CreateVariable(m_Current, "Current", data, true);
+		if (type != GetClassTypeNumberId<INT>())
+		{
+			ERROR_BEGIN << "Invalid type for Current in Loop: " << type << ERROR_END;
+			return false;
+		}
+		type = CreateVariable(m_Count, "Count", data, true);
+		if (type != GetClassTypeNumberId<INT>())
+		{
+			ERROR_BEGIN << "Invalid type for Count in Loop: " << type << ERROR_END;
+			return false;
+		}
+
+		type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data, true);
+		if (type != GetClassTypeNumberId<Bool>())
+		{
+			ERROR_BEGIN << "Invalid type for ExitWhenFailure in Loop: " << type << ERROR_END;
+			return false;
+		}
+
+		return true;
+	}
+
+	YBehavior::NodeState Loop::Update(AgentPtr pAgent)
+	{
+		INT size = 0;
+		m_Count->GetCastedValue(pAgent->GetSharedData(), size);
+
+		INT start = 0;
+		NodeState ns = NS_INVALID;
+
+		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Count, true);
+
+		m_RCContainer.ConvertRC(this);
+
+		if (m_RCContainer.GetRC())
+		{
+			start = m_RCContainer.GetRC()->Current;
+			ns = NS_RUNNING;
+		}
+
+		for (INT i = start; i < size; ++i)
+		{
+			m_Current->SetCastedValue(pAgent->GetSharedData(), &i);
+
+			if (m_Child != nullptr)
+			{
+				ns = m_Child->Execute(pAgent, ns);
+				switch (ns)
+				{
+				case YBehavior::NS_FAILURE:
+				{
+					BOOL bExit;
+					m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData(), bExit);
+					if (bExit)
+					{
+						DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
+						return NS_SUCCESS;
+					}
+					break;
+				}
+				case YBehavior::NS_RUNNING:
+					m_RCContainer.CreateRC(this);
+					m_RCContainer.GetRC()->Current = i;
+					return ns;
+				default:
+					break;
+				}
+			}
+		}
+
+		return NS_SUCCESS;
 	}
 }

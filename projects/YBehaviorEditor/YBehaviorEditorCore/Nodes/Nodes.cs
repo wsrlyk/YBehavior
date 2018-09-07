@@ -733,6 +733,60 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    class LoopNode : SingleChildNode
+    {
+        public override string Icon => "↺";
+
+        public LoopNode()
+        {
+            m_Name = "Loop";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_Compositor;
+        }
+
+        public override void CreateVariables()
+        {
+            Variables.CreateVariableInNode(
+                "Count",
+                "",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                false,
+                1
+            );
+            Variables.CreateVariableInNode(
+                "Current",
+                "",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                1
+            );
+            Variables.CreateVariableInNode(
+                "ExitWhenFailure",
+                "false",
+                Variable.CreateParams_Bool,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                false
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} at [0, {1})",
+                    Variables.GetVariable("Current").NoteValue,
+                    Variables.GetVariable("Count").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
+
     class PiecewiseFunctionNode : LeafNode
     {
         public override string Icon => "_|￣";

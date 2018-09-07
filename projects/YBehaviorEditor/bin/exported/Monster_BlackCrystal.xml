@@ -2,7 +2,6 @@
 <Monster_BlackCrystal>
   <Node Class="Root" target="_AC " add0="_IC 0" add1="_IC 1" fftest="FFC 1.0|2.0|3.0" bbtest="BBC true|false|true|false" iitest="IIC 1|2|3|4" btest="_BC true" pos="_VC 100=200=300">
     <Node Class="Sequence">
-      <Node Class="Wait" TickCount="_IC 7" />
       <Node Class="IfThenElse">
         <Node Class="Comparer" Connection="if" Operator="_EC &lt;" Opl="_IP iitest VI P add0" Opr="_IC 0" />
         <Node Class="Calculator" Connection="then" Operator="_EC ADD" Opl="_IP add1" Opr1="_IC 0" Opr2="_IC 1" />
@@ -12,13 +11,8 @@
           <Node Class="AlwaysSuccess" Connection="else" />
         </Node>
       </Node>
-      <Node Class="Calculator" Operator="_EC ADD" Opl="_IP iitest VI P add0" Opr1="_IP iitest VI P add0" Opr2="_IP add1">
-        <Node Class="Wait" Connection="condition" TickCount="_IC 3">
-          <Node Class="Sequence" Connection="condition">
-            <Node Class="Random" Target="_IP iitest VI C 2" Bound1="_IC 0" Bound2="_IC 2" />
-            <Node Class="Comparer" Operator="_EC ==" Opl="_IP iitest VI C 2" Opr="_IC 0" />
-          </Node>
-        </Node>
+      <Node Class="Loop" Count="_IC 3" Current="_IP iitest VI C 3" ExitWhenFailure="_BC false">
+        <Node Class="Calculator" Operator="_EC ADD" Opl="_IP iitest VI P add0" Opr1="_IP iitest VI P add0" Opr2="_IP add1" />
       </Node>
     </Node>
   </Node>

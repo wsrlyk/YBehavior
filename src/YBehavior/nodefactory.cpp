@@ -37,6 +37,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, SwitchCase);
 		REGISTER_TYPE(factory, For);
 		REGISTER_TYPE(factory, ForEach);
+		REGISTER_TYPE(factory, Loop);
 		REGISTER_TYPE(factory, PiecewiseFunction);
 		REGISTER_TYPE(factory, Dice);
 		REGISTER_TYPE(factory, SubTree);

@@ -11,6 +11,11 @@
                         <Current Content="当前遍历取出的值"/>
                         <ExitWhenFailure Content="子节点返回失败时，是否退出遍历"/>
                 </ForEach>
+                <Loop Content="运行子节点若干次。For的简化版">
+                        <Count Content="次数"/>
+                        <Current Content="当前次数，从0开始"/>
+                        <ExitWhenFailure Content="子节点返回失败时，是否退出遍历"/>
+                </Loop>
                 <Calculator Content="计算器">
                         <Opl Content="保存计算结果"/>
                         <Opr1 Content="左边的操作数"/>
@@ -71,6 +76,9 @@
                         <Ulong Content="Ulong型的数据"/>
                         <String Content="String型的数据"/>
                 </WriteRegister>
+                <Wait Content="等待若干次心跳后继续">
+                        <TickCount Content="等待心跳次数"/>
+                </Wait>
         </Nodes>
         <Hierachies>
                 <Hierachy Value = "1">Actions</Hierachy>
