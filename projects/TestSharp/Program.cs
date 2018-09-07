@@ -9,16 +9,16 @@ namespace TestSharp
 {
     public class SharpHelper
     {
-        [DllImport("YBehavior.dll")]
+        [DllImport(VERSION.dll)]
         static public extern IntPtr CreateEntity();
 
-        [DllImport("YBehavior.dll")]
+        [DllImport(VERSION.dll)]
         static public extern void DeleteEntity(IntPtr pEntity);
 
-        [DllImport("YBehavior.dll")]
+        [DllImport(VERSION.dll)]
         static public extern IntPtr CreateAgent(IntPtr pEntity);
 
-        [DllImport("YBehavior.dll")]
+        [DllImport(VERSION.dll)]
         static public extern void DeleteAgent(IntPtr pAgent);
     }
 
@@ -32,7 +32,7 @@ namespace TestSharp
             YBehaviorSharp.SEntity entity = new YBehaviorSharp.SEntity();
 
             YBehaviorSharp.SAgent agent = new YBehaviorSharp.SAgent(entity);
-            YBehaviorSharp.SharpHelper.SetTree(agent.Core, "Monster_BlackCrystal3");
+            YBehaviorSharp.SharpHelper.SetTree(agent.Core, "Test0");
 
             int i = 0;
             while(++i < 3)

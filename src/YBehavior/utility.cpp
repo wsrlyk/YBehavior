@@ -5,14 +5,6 @@
 
 namespace YBehavior
 {
-
-	const STRING Utility::StringEmpty("");
-	const VecInt Utility::VecIntEmpty;
-	const VecFloat Utility::VecFloatEmpty;
-	const VecBool Utility::VecBoolEmpty;
-	const VecString Utility::VecStringEmpty;
-	const VecUlong Utility::VecUlongEmpty;
-
 	const char Utility::POINTER_CHAR = 'P';
 	const char Utility::CONST_CHAR = 'C';
 	const BOOL Utility::TRUE_VALUE = 1;

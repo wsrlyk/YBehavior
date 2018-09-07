@@ -86,6 +86,8 @@ namespace YBehavior
 		static BehaviorNode* CreateNodeByName(const STRING& name);
 		bool AddChild(BehaviorNode* child, const STRING& connection);
 
+		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType = 0);
+
 		virtual STRING GetNodeInfoForPrint() { return "";}
 
 		void TryCreateRC();
@@ -98,7 +100,6 @@ namespace YBehavior
 		virtual void OnLoadFinish() {}
 		virtual void OnAddChild(BehaviorNode* child, const STRING& connection) {}
 		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
-		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType = 0);
 		template <typename T> 
 		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType = 0);
 		///>

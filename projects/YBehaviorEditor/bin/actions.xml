@@ -11,4 +11,8 @@
 	<Action Class="SelectTargetAction" Note="{0}" Hierachy="121">
 		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" Value="0"/>
 	</Action>
+	<Action Class="SetVector3Action" Note="{0}" Hierachy="121">
+		<Variable Name="Src" ValueType="V" IsArray="False" VariableType="P" Value=""/>
+		<Variable Name="Des" ValueType="V" IsArray="False" VariableType="P" Value=""/>
+	</Action>
 </Actions>

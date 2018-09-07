@@ -42,7 +42,7 @@ namespace YBehavior
 			auto it = mReverseNameHash.find(key);
 			if (it != mReverseNameHash.end())
 				return it->second;
-			return Utility::StringEmpty;
+			return Types::StringEmpty;
 		}
 #endif
 	};

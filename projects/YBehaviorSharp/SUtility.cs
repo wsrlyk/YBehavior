@@ -22,5 +22,8 @@ namespace YBehaviorSharp
             return false;
         }
 
+        public static char POINTER_CHAR = 'P';
+        public static char CONST_CHAR = 'C';
+
     }
 }

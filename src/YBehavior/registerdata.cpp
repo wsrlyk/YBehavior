@@ -17,5 +17,5 @@ void YBehavior::RegisterData::Clear()
 	FOR_EACH_REGISTER_TYPE(VARIABLE_CLEAR);
 
 	m_bDirty = false;
-	m_Event = Utility::StringEmpty;
+	m_Event = Types::StringEmpty;
 }

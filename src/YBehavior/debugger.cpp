@@ -35,7 +35,7 @@ namespace YBehavior
 
 	void DebugMgr::ResetTarget()
 	{
-		SetTarget(Utility::StringEmpty, 0);
+		SetTarget(Types::StringEmpty, 0);
 	}
 
 	void DebugMgr::Stop()
@@ -348,7 +348,7 @@ namespace YBehavior
 			for (IDataArray::Iterator it = iarray->Iter(); !it.IsEnd(); ++it)
 			{
 				const STRING& name = TreeKeyMgr::Instance()->GetNameByKey(it.Value(), iarray->GetTypeID());
-				if (name == Utility::StringEmpty)
+				if (name == Types::StringEmpty)
 					continue;
 				STRING content(name + "," + iarray->GetToString(it.Value()));
 				if (buffer.length() > 0)

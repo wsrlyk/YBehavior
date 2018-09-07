@@ -7,6 +7,8 @@ namespace YBehaviorSharp
 {
     public class SEntity : IDisposable
     {
+        bool m_bReference = false;
+
         IntPtr m_Core;
         public IntPtr Core { get { return m_Core; } }
 
@@ -15,9 +17,16 @@ namespace YBehaviorSharp
             m_Core = SharpHelper.CreateEntity();
         }
 
+        public SEntity(IntPtr core)
+        {
+            m_Core = core;
+            m_bReference = true;
+        }
+
         public void Dispose()
         {
-            SharpHelper.DeleteEntity(m_Core);
+            if (!m_bReference)
+                SharpHelper.DeleteEntity(m_Core);
         }
     }
 

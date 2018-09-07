@@ -8,7 +8,7 @@
 
 #define FOR_EACH_SINGLE_NORMAL_TYPE(func)	\
 	func(Int);	\
-	func(Uint64);	\
+	func(Ulong);	\
 	func(Bool);	\
 	func(Float);	\
 	func(String);	\
@@ -16,7 +16,7 @@
 	func(EntityWrapper);	
 #define FOR_EACH_VECTOR_NORMAL_TYPE(func)	\
 	func(VecInt);\
-	func(VecUint64);\
+	func(VecUlong);\
 	func(VecBool);\
 	func(VecFloat);\
 	func(VecString);\
@@ -24,14 +24,14 @@
 	func(VecEntityWrapper);
 #define FOR_EACH_TYPE(func)    \
     func(Int);    \
-    func(Uint64);    \
+    func(Ulong);    \
     func(Bool);    \
     func(Float);    \
     func(String);    \
     func(EntityWrapper);    \
     func(Vector3);\
     func(VecInt);\
-    func(VecUint64);\
+    func(VecUlong);\
     func(VecBool);\
     func(VecFloat);\
     func(VecString);\
@@ -108,7 +108,7 @@ namespace YBehavior
 
 		SIZE_KEY Length() const override { return (SIZE_KEY)m_Datas.size(); }
 
-		bool Get(KEY key, const T& res) const
+		bool Get(KEY key, T& res) const
 		{
 			//if (key < 0 || key >= (KEY)m_Datas.size())
 			//	return false;
@@ -136,12 +136,12 @@ namespace YBehavior
 		virtual const STRING GetToString(KEY key) const override
 		{
 			//if (key < 0 || key >= (KEY)m_Datas.size())
-			//	return Utility::StringEmpty;
+			//	return Types::StringEmpty;
 			//const T& data = m_Datas[key];
 			//return Utility::ToString(data);
 			auto it = m_Datas.find(key);
 			if (it == m_Datas.end())
-				return Utility::StringEmpty;
+				return Types::StringEmpty;
 			const T& data = it->second;
 			return Utility::ToString(data);
 		}
@@ -257,7 +257,7 @@ namespace YBehavior
 		template<typename T>
 		bool Set(KEY key, T&& src);
 
-		bool Set(KEY key, KEY typeKey, void* src)
+		bool Set(KEY key, KEY typeKey, const void* src)
 		{
 			IDataArray* iarray = m_Datas[typeKey];
 			return iarray->Set(key, src);
@@ -277,7 +277,7 @@ namespace YBehavior
 
 
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(Int, 0);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(Uint64, 1);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(Ulong, 1);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(Bool, 2);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(Float, 3);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(String, 4);
@@ -285,7 +285,7 @@ namespace YBehavior
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(Vector3, 6);
 
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecInt, 7);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecUint64, 8);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecUlong, 8);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecBool, 9);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecFloat, 10);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecString, 11);

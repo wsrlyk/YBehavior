@@ -110,7 +110,7 @@ YBehavior::Entity::~Entity()
 
 YBehavior::STRING YBehavior::Entity::ToString() const
 {
-	return Utility::StringEmpty;
+	return Types::StringEmpty;
 }
 
 YBehavior::EntityWrapper YBehavior::Entity::CreateWrapper()

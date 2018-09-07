@@ -39,10 +39,10 @@ namespace YBehavior
 	{
 		NameKeyInfo& info = mCommonNameKeyInfo.Get(typeID);
 		const STRING& name = info.Get(key);
-		if (name != Utility::StringEmpty)
+		if (name != Types::StringEmpty)
 			return name;
 		if (mpCurActiveNameKeyInfo == NULL)
-			return Utility::StringEmpty;
+			return Types::StringEmpty;
 		info = mpCurActiveNameKeyInfo->Get(typeID);
 		return info.Get(key);
 	}

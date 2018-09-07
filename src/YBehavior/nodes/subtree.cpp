@@ -24,7 +24,7 @@ namespace YBehavior
 
 		STRING treeName;
 		m_TreeName->GetCastedValue(nullptr, treeName);
-		if (treeName == Utility::StringEmpty)
+		if (treeName == Types::StringEmpty)
 		{
 			ERROR_BEGIN << "Null Value for Tree in SubTree: " << typeID << ERROR_END;
 			return false;

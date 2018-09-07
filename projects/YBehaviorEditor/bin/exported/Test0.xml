@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Test0>
+  <Node Class="Root" Vec="_VC 0=0=0">
+    <Node Class="SetVector3Action" Src="_VP Vec" Des="_VP Vec" />
+  </Node>
+</Test0>

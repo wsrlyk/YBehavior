@@ -13,12 +13,7 @@ namespace YBehavior
 		static const char SequenceSpliter = '=';
 		static const char ListSpliter = '|';
 		static const char SpaceSpliter = ' ';
-		static const STRING StringEmpty;
-		static const VecInt VecIntEmpty;
-		static const VecFloat VecFloatEmpty;
-		static const VecBool VecBoolEmpty;
-		static const VecString VecStringEmpty;
-		static const VecUlong VecUlongEmpty;
+
 		static const char POINTER_CHAR;
 		static const char CONST_CHAR;
 		static const BOOL TRUE_VALUE;

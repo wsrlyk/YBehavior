@@ -16,26 +16,6 @@ namespace YBehavior
 		float y;
 		float z;
 
-		Vector3()
-			: x(0)
-			, y(0)
-			, z(0)
-		{
-
-		}
-		Vector3(float _x, float _y, float _z)
-			: x(_x)
-			, y(_y)
-			, z(_z)
-		{
-		}
-		Vector3(const Vector3& other)
-			: x(other.x)
-			, y(other.y)
-			, z(other.z)
-		{
-		}
-
 		friend std::stringstream & operator<<(std::stringstream &out, const Vector3 &obj)
 		{
 			out << obj.x << '=' << obj.y << '=' << obj.z;
@@ -74,13 +54,13 @@ namespace YBehavior
 
 		Vector3 operator + (const Vector3& other) const
 		{
-			Vector3 res(x + other.x, y + other.y, z + other.z);
+			Vector3 res = { x + other.x, y + other.y, z + other.z };
 			return res;
 		}
 
 		Vector3 operator - (const Vector3& other) const
 		{
-			Vector3 res(x - other.x, y - other.y, z - other.z);
+			Vector3 res = { x - other.x, y - other.y, z - other.z };
 			return res;
 		}
 
@@ -182,6 +162,7 @@ namespace YBehavior
 
 
 	typedef std::string			STRING;
+	typedef const char*			CSTRING;
 	typedef int					INT;
 	typedef unsigned int		UINT;
 	typedef unsigned long		UINT64;
@@ -212,6 +193,21 @@ namespace YBehavior
 	typedef std::vector<EntityWrapper>	VecEntityWrapper;
 	typedef std::vector<Vector3>	VecVector3;
 
+	class Types
+	{
+	public:
+		static const BOOL DefaultBool;
+		static const INT DefaultInt;
+		static const ULONG DefaultUlong;
+		static const FLOAT DefaultFloat;
+		static const STRING StringEmpty;
+		static const VecInt VecIntEmpty;
+		static const VecFloat VecFloatEmpty;
+		static const VecBool VecBoolEmpty;
+		static const VecString VecStringEmpty;
+		static const VecUlong VecUlongEmpty;
+	};
+
 #define YBEHAVIOR_BASICTYPE_NUMBER_ID(type, id)			\
 	template<> inline TYPEID GetClassTypeNumberId<type>() \
 	{\
@@ -229,7 +225,7 @@ namespace YBehavior
 
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Bool, 1);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Int, 2);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(Uint64, 3);
+	YBEHAVIOR_BASICTYPE_NUMBER_ID(Ulong, 3);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Float, 4);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(String, 5);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(EntityWrapper, 6);
@@ -237,11 +233,34 @@ namespace YBehavior
 
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecBool, 101);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecInt, 102);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecUint64, 103);
+	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecUlong, 103);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecFloat, 104);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecString, 105);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecEntityWrapper, 106);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecVector3, 107);
+
+
+#define YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(type, value)			\
+	template<> inline const type& GetTypeDefaultValue<type>() \
+	{\
+		return value;\
+	}\
+	template<> inline const type& GetTypeDefaultValue<const type>() \
+	{\
+		return value; \
+	}
+
+	template<typename T>
+	inline const T& GetTypeDefaultValue() {
+	}
+
+	YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(Bool, Types::DefaultBool);
+	YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(Int, Types::DefaultInt);
+	YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(Ulong, Types::DefaultUlong);
+	YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(Float, Types::DefaultFloat);
+	YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(String, Types::StringEmpty);
+	YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(Vector3, Vector3::zero);
+
 }
 
 #endif

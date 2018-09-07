@@ -84,14 +84,14 @@ namespace YBehavior
 	SharedVariableCreateHelperMgr::Register<T>(s)
 
 				REGISTER_HELPER(Int, "_I");
-				REGISTER_HELPER(Uint64, "_U");
+				REGISTER_HELPER(Ulong, "_U");
 				REGISTER_HELPER(Bool, "_B");
 				REGISTER_HELPER(Float, "_F");
 				REGISTER_HELPER(String, "_S");
 				REGISTER_HELPER(EntityWrapper, "_A");
 				REGISTER_HELPER(Vector3, "_V");
 				REGISTER_HELPER(VecInt, "II");
-				REGISTER_HELPER(VecUint64, "UU");
+				REGISTER_HELPER(VecUlong, "UU");
 				REGISTER_HELPER(VecBool, "BB");
 				REGISTER_HELPER(VecFloat, "FF");
 				REGISTER_HELPER(VecString, "SS");

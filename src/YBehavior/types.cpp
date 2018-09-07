@@ -3,6 +3,19 @@
 
 namespace YBehavior
 {
+	const Vector3 Vector3::zero = {};
+
+	const INT Types::DefaultInt = 0;
+	const ULONG Types::DefaultUlong = 0;
+	const FLOAT Types::DefaultFloat = 0.0f;
+	const BOOL Types::DefaultBool = 0;
+	const STRING Types::StringEmpty("");
+	const VecInt Types::VecIntEmpty;
+	const VecFloat Types::VecFloatEmpty;
+	const VecBool Types::VecBoolEmpty;
+	const VecString Types::VecStringEmpty;
+	const VecUlong Types::VecUlongEmpty;
+
 	std::stringstream & operator<<(std::stringstream &out, const EntityWrapper &obj)
 	{
 		if (obj.IsValid() && obj.Get() != nullptr)

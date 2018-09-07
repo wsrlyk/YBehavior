@@ -166,11 +166,11 @@ namespace YBehavior
 			LOG_SHARED_DATA(m_Ulong, true);
 		};
 
-		m_Int->SetCastedValue(pAgent->GetSharedData(), &Utility::VecIntEmpty);
-		m_Float->SetCastedValue(pAgent->GetSharedData(), &Utility::VecFloatEmpty);
-		m_Bool->SetCastedValue(pAgent->GetSharedData(), &Utility::VecBoolEmpty);
-		m_Ulong->SetCastedValue(pAgent->GetSharedData(), &Utility::VecUlongEmpty);
-		m_String->SetCastedValue(pAgent->GetSharedData(), &Utility::VecStringEmpty);
+		m_Int->SetCastedValue(pAgent->GetSharedData(), &Types::VecIntEmpty);
+		m_Float->SetCastedValue(pAgent->GetSharedData(), &Types::VecFloatEmpty);
+		m_Bool->SetCastedValue(pAgent->GetSharedData(), &Types::VecBoolEmpty);
+		m_Ulong->SetCastedValue(pAgent->GetSharedData(), &Types::VecUlongEmpty);
+		m_String->SetCastedValue(pAgent->GetSharedData(), &Types::VecStringEmpty);
 
 		pAgent->ProcessRegister();
 
