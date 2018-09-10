@@ -10,8 +10,6 @@
 #include <unistd.h>
 #endif
 
-using namespace YBehavior;
-
 int main(int argc, char** argv)
 {
 	MyLaunchCore core;
@@ -30,19 +28,19 @@ int main(int argc, char** argv)
 	//pEntity1->GetAgent()->SetEntity(pEntity1);
 
 	LOG_BEGIN << "wrapper begin" << LOG_END;
-	EntityWrapper wrapper = pEntity->GetAgent()->GetEntity()->CreateWrapper();
+	YB::EntityWrapper wrapper = pEntity->GetAgent()->GetEntity()->CreateWrapper();
 	LOG_BEGIN << "{" << LOG_END;
 	{
-		EntityWrapper wrapper0 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
+		YB::EntityWrapper wrapper0 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
 		LOG_BEGIN << "wrapper00" << LOG_END;
-		EntityWrapper wrapper00 = wrapper0;
+		YB::EntityWrapper wrapper00 = wrapper0;
 		LOG_BEGIN << "wrapper_0" << LOG_END;
-		EntityWrapper wrapper_0 = wrapper;
+		YB::EntityWrapper wrapper_0 = wrapper;
 	}
 	LOG_BEGIN << "}" << LOG_END;
-	EntityWrapper wrapper1 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
+	YB::EntityWrapper wrapper1 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
 	LOG_BEGIN << "wrapper_1" << LOG_END;
-	EntityWrapper wrapper_1 = wrapper;
+	YB::EntityWrapper wrapper_1 = wrapper;
 
 	YBehavior::KEY f = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::INT>("b");
 

@@ -10,8 +10,6 @@
 
 namespace YBehavior
 {
-	namespace YB = YBehavior;
-
 	struct YBEHAVIOR_API Vector3
 	{
 		float x;
@@ -245,5 +243,7 @@ namespace YBehavior
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecEntityWrapper, 106);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecVector3, 107);
 }
+
+namespace YB = YBehavior;
 
 #endif
