@@ -15,7 +15,7 @@ using namespace YBehavior;
 int main(int argc, char** argv)
 {
 	MyLaunchCore core;
-	YBehavior::Launcher::Launch(core);
+	YB::Launcher::Launch(core);
 
 	XAgent::InitData();
 

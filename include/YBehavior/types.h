@@ -10,6 +10,8 @@
 
 namespace YBehavior
 {
+	namespace YB = YBehavior;
+
 	struct YBEHAVIOR_API Vector3
 	{
 		float x;
