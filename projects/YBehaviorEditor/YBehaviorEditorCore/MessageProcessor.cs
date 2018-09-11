@@ -287,6 +287,8 @@ namespace YBehavior.Editor.Core
         void _HandlePaused()
         {
             LogMgr.Instance.Log("Paused.");
+            ///> Make the next frame become key frame
+            m_PreviousTickResultData = null;
             DebugMgr.Instance.bBreaked = true;
         }
 

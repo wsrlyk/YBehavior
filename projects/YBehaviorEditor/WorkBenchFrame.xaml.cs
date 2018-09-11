@@ -337,6 +337,8 @@ namespace YBehavior.Editor
 
                     LogMgr.Instance.Error("Tab switch failed.");
                 }
+
+                m_CurPageData = null;
             }
         }
 
@@ -386,6 +388,9 @@ namespace YBehavior.Editor
 
         private void _OnMakeCenter(EventArg arg)
         {
+            if (m_CurPageData == null)
+                return;
+
             m_MakingCenterDes.X = 0;
             m_MakingCenterDes.Y = 0;
 
@@ -396,6 +401,9 @@ namespace YBehavior.Editor
         Point m_MakingCenterDes;
         private void MakingCenter(object sender, EventArgs e)
         {
+            if (m_CurPageData == null)
+                return;
+
             Point newDes = new Point();
             if (_MakeCenter(ref newDes))
             {
