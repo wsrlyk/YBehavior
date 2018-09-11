@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 	std::string tree("Monster_BlackCrystal3");
 	if (argc >= 2)
 		tree = argv[1];
-	std::vector<int> a(1);
+	StdVector<int> a(1);
 	XEntity* pEntity = new XEntity("Hehe", tree);
 	//pEntity->GetAgent()->SetEntity(pEntity);
 

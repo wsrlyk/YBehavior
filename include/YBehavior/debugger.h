@@ -23,8 +23,8 @@ namespace YBehavior
 	struct NodeLogInfo
 	{
 		UINT nodeUID;
-		std::vector<STRING> beforeInfo;
-		std::vector<STRING> afterInfo;
+		StdVector<STRING> beforeInfo;
+		StdVector<STRING> afterInfo;
 		STRING otherInfo;
 	};
 

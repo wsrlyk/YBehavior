@@ -22,7 +22,7 @@ namespace YBehavior
 	std::random_device Utility::rd;
 	std::default_random_engine Utility::mt(rd());
 
-	void Utility::SplitString(const STRING& s, std::vector<STRING>& output, CHAR c, int count)
+	void Utility::SplitString(const STRING& s, StdVector<STRING>& output, CHAR c, int count)
 	{
 		int counter = 0;
 		output.clear();
@@ -46,7 +46,7 @@ namespace YBehavior
 	}
 
 
-	void Utility::CreateVector3(const std::vector<STRING>& data, Vector3& vector3)
+	void Utility::CreateVector3(const StdVector<STRING>& data, Vector3& vector3)
 	{
 		if (data.size() < 3)
 		{
@@ -69,7 +69,7 @@ namespace YBehavior
 		vector3.z = static_cast<float>(strtod(data[2].c_str(), 0));
 	}
 
-	YBehavior::Vector3 Utility::CreateVector3(const std::vector<STRING>& data)
+	YBehavior::Vector3 Utility::CreateVector3(const StdVector<STRING>& data)
 	{
 		Vector3 vec;
 		CreateVector3(data, vec);
@@ -102,7 +102,7 @@ namespace YBehavior
 	}
 
 	template<>
-	STRING Utility::ToString(const std::vector<BOOL>& t)
+	STRING Utility::ToString(const StdVector<BOOL>& t)
 	{
 		STRING str;
 		std::stringstream ss;

@@ -160,7 +160,7 @@ namespace YBehavior
 		return false;
 	}
 
-	bool BehaviorNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single, char variableType)
+	bool BehaviorNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, int single, char variableType)
 	{
 		auto tempChar = attri.value();
 		///> split all spaces
@@ -247,7 +247,7 @@ namespace YBehavior
 			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
 			return "";
 		}
-		std::vector<STRING> buffer;
+		StdVector<STRING> buffer;
 		if (!ParseVariable(attrOptr, data, buffer, 1, Utility::CONST_CHAR))
 			return "";
 
@@ -263,7 +263,7 @@ namespace YBehavior
 			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
 			return -1;
 		}
-		std::vector<STRING> buffer;
+		StdVector<STRING> buffer;
 		if (!ParseVariable(attrOptr, data, buffer, bSingle ? 1 : 0, variableType))
 			return -1;
 
@@ -324,7 +324,7 @@ namespace YBehavior
 
 	bool BehaviorTree::OnLoaded(const pugi::xml_node& data)
 	{
-		std::vector<STRING> buffer;
+		StdVector<STRING> buffer;
 
 		for (auto it = data.attributes_begin(); it != data.attributes_end(); ++it)
 		{
@@ -402,7 +402,7 @@ namespace YBehavior
 			return false;
 
 		if (!m_Childs)
-			m_Childs = new std::vector<BehaviorNodePtr>();
+			m_Childs = new StdVector<BehaviorNodePtr>();
 
 		m_Childs->push_back(child);
 		child->SetParent(this);

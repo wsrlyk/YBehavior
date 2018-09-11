@@ -7,7 +7,7 @@ namespace YBehavior
 	struct MergedTreeNode
 	{
 		std::list<BehaviorTree*> trees;
-		std::vector<MergedTreeNode*> children;
+		StdVector<MergedTreeNode*> children;
 
 		~MergedTreeNode()
 		{

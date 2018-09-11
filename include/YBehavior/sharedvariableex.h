@@ -43,9 +43,9 @@ namespace YBehavior
 			INT index = *(m_VectorIndex->GetCastedValue(pData));
 			if (index < 0)
 				return;
-			const std::vector<ElementType>* pVector = (const std::vector<ElementType>*)pData->Get<std::vector<ElementType>>(m_Key);
+			const StdVector<ElementType>* pVector = (const StdVector<ElementType>*)pData->Get<StdVector<ElementType>>(m_Key);
 			if (pVector && (UINT)index < pVector->size())
-				(*const_cast<std::vector<ElementType>*>(pVector))[index] = *src;
+				(*const_cast<StdVector<ElementType>*>(pVector))[index] = *src;
 		}
 
 		const ElementType* _GetCastedValue(SharedDataEx* pData)
@@ -56,7 +56,7 @@ namespace YBehavior
 				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << ERROR_END;
 				return nullptr;
 			}
-			const std::vector<ElementType>* pVector = (const std::vector<ElementType>*)pData->Get<std::vector<ElementType>>(m_Key);
+			const StdVector<ElementType>* pVector = (const StdVector<ElementType>*)pData->Get<StdVector<ElementType>>(m_Key);
 			if (pVector && (UINT)index < pVector->size())
 			{
 				const ElementType* t = &(*pVector)[index];
@@ -82,7 +82,7 @@ namespace YBehavior
 
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
 			{
-				return GetClassTypeNumberId<std::vector<T>>();
+				return GetClassTypeNumberId<StdVector<T>>();
 			}
 
 			return GetClassTypeNumberId<T>();
@@ -101,16 +101,16 @@ namespace YBehavior
 			return m_Key == Utility::INVALID_KEY;
 		}
 
-		const std::vector<ElementType>* _Convert2Vector(SharedDataEx* pData)
+		const StdVector<ElementType>* _Convert2Vector(SharedDataEx* pData)
 		{
 			if (IsVector<T>::Result)
 			{
-				///> would have compile error if directly operate the m_Value when T is not a std::vector<XX>
-				const std::vector<ElementType>* mValue;
+				///> would have compile error if directly operate the m_Value when T is not a StdVector<XX>
+				const StdVector<ElementType>* mValue;
 				if (pData == nullptr || m_Key == Utility::INVALID_KEY)
-					mValue = (const std::vector<ElementType>*)_GetValue();
+					mValue = (const StdVector<ElementType>*)_GetValue();
 				else
-					mValue = (const std::vector<ElementType>*)GetValue(pData);
+					mValue = (const StdVector<ElementType>*)GetValue(pData);
 				
 				return mValue;
 			}
@@ -119,7 +119,7 @@ namespace YBehavior
 		}
 		INT VectorSize(SharedDataEx* pData) override
 		{
-			const std::vector<ElementType>* mValue = _Convert2Vector(pData);
+			const StdVector<ElementType>* mValue = _Convert2Vector(pData);
 
 			if (mValue != nullptr)
 				return (INT)mValue->size();
@@ -136,7 +136,7 @@ namespace YBehavior
 		}
 		const void* GetElement(SharedDataEx* pData, INT index) override
 		{
-			const std::vector<ElementType>* mValue = _Convert2Vector(pData);
+			const StdVector<ElementType>* mValue = _Convert2Vector(pData);
 
 			if (mValue != nullptr)
 			{
@@ -171,10 +171,10 @@ namespace YBehavior
 			{
 				if (IsVector<T>::Result)
 				{
-					///> would have compile error if directly operate the m_Value when T is not a std::vector<XX>
-					std::vector<ElementType>& mValue = *((std::vector<ElementType>*)_GetValue());
+					///> would have compile error if directly operate the m_Value when T is not a StdVector<XX>
+					StdVector<ElementType>& mValue = *((StdVector<ElementType>*)_GetValue());
 					mValue.clear();
-					std::vector<STRING> res;
+					StdVector<STRING> res;
 					Utility::SplitString(str, res, '|');
 					for (auto it = res.begin(); it != res.end(); ++it)
 					{
@@ -193,7 +193,7 @@ namespace YBehavior
 			///> if T is a single type but has vector index, it means this variable is an element of a vector.
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
 			{
-				SetKey(TreeKeyMgr::Instance()->GetKeyByName<std::vector<T>>(s));
+				SetKey(TreeKeyMgr::Instance()->GetKeyByName<StdVector<T>>(s));
 			}
 			else
 			{

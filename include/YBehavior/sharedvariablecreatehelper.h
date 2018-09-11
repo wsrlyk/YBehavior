@@ -32,18 +32,18 @@ namespace YBehavior
 	};
 
 	template<typename elementType>
-	class SharedVariableCreateHelper<std::vector<elementType>> : public ISharedVariableCreateHelper
+	class SharedVariableCreateHelper<StdVector<elementType>> : public ISharedVariableCreateHelper
 	{
 	public:
 		virtual ISharedVariableEx* CreateVariable() override
 		{
-			return new SharedVariableEx<std::vector<elementType>>();
+			return new SharedVariableEx<StdVector<elementType>>();
 		}
 		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) override
 		{
-			KEY key = TreeKeyMgr::Instance()->CreateKeyByName<std::vector<elementType>>(name);
-			std::vector<STRING> splitRes;
-			std::vector<elementType> res;
+			KEY key = TreeKeyMgr::Instance()->CreateKeyByName<StdVector<elementType>>(name);
+			StdVector<STRING> splitRes;
+			StdVector<elementType> res;
 			Utility::SplitString(str, splitRes, '|');
 			for (auto it = splitRes.begin(); it != splitRes.end(); ++it)
 			{

@@ -25,9 +25,9 @@ namespace YBehavior
 		static const BOOL FALSE_VALUE;
 		static const KEY INVALID_KEY;
 
-		static void SplitString(const STRING& s, std::vector<STRING>& v, CHAR c, int count = 0);
-		static Vector3 CreateVector3(const std::vector<STRING>& data);
-		static void CreateVector3(const std::vector<STRING>& data, Vector3& vector3);
+		static void SplitString(const STRING& s, StdVector<STRING>& v, CHAR c, int count = 0);
+		static Vector3 CreateVector3(const StdVector<STRING>& data);
+		static void CreateVector3(const StdVector<STRING>& data, Vector3& vector3);
 
 		static bool IsElement(TYPEID eleType, TYPEID vectorType);
 
@@ -46,9 +46,9 @@ namespace YBehavior
 		//template<>
 		//static STRING Utility::ToString(const BOOL& t);
 		template<typename T>
-		static STRING ToString(const std::vector<T>& t);
+		static STRING ToString(const StdVector<T>& t);
 		//template<>
-		//static STRING ToString(const std::vector<BOOL>& t);
+		//static STRING ToString(const StdVector<BOOL>& t);
 
 		template<typename T>
 		static T Rand(const T& smallNum, const T& largeNum);
@@ -76,7 +76,7 @@ namespace YBehavior
 	STRING Utility::ToString(const BOOL& t);
 
 	template<typename T>
-	STRING Utility::ToString(const std::vector<T>& t)
+	STRING Utility::ToString(const StdVector<T>& t)
 	{
 		STRING str;
 		std::stringstream ss;
@@ -92,7 +92,7 @@ namespace YBehavior
 
 
 	template<>
-	STRING Utility::ToString(const std::vector<BOOL>& t);
+	STRING Utility::ToString(const StdVector<BOOL>& t);
 
 	template<typename T>
 	T Utility::Rand(const T& smallNum, const T& largeNum)

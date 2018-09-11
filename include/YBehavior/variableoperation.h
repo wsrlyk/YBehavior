@@ -318,9 +318,9 @@ namespace YBehavior
 
 	///> Exclude vector
 	template<typename elementType>
-	class VariableOperationHelper<std::vector<elementType>> : public IVariableOperationHelper
+	class VariableOperationHelper<StdVector<elementType>> : public IVariableOperationHelper
 	{
-		static VariableOperationHelper<std::vector<elementType>> s_Instance;
+		static VariableOperationHelper<StdVector<elementType>> s_Instance;
 	public:
 		static IVariableOperationHelper* Get() { return &s_Instance; }
 
@@ -357,20 +357,20 @@ namespace YBehavior
 
 		void Set(void* pLeft, const void* pRight0)
 		{
-			ValueHandler::Set<std::vector<elementType>>(pLeft, pRight0);
+			ValueHandler::Set<StdVector<elementType>>(pLeft, pRight0);
 		}
 
 		void* AllocData()
 		{
-			return ObjectPool<std::vector<elementType>>::Get();
+			return ObjectPool<StdVector<elementType>>::Get();
 		}
 		void RecycleData(void* pData)
 		{
 			if (pData != nullptr)
-				ObjectPool<std::vector<elementType>>::Recycle((std::vector<elementType>*)pData);
+				ObjectPool<StdVector<elementType>>::Recycle((StdVector<elementType>*)pData);
 		}
 	};
-	template<typename elementType> VariableOperationHelper<std::vector<elementType>> VariableOperationHelper<std::vector<elementType>>::s_Instance;
+	template<typename elementType> VariableOperationHelper<StdVector<elementType>> VariableOperationHelper<StdVector<elementType>>::s_Instance;
 
 }
 

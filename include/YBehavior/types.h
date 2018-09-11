@@ -6,10 +6,12 @@
 #include "define.h"
 #include <sstream>
 #include <memory>
-#include "tools/linkedlist.h"
+#include "YBehavior/tools/linkedlist.h"
 
 namespace YBehavior
 {
+#define StdVector std::vector
+
 	struct YBEHAVIOR_API Vector3
 	{
 		float x;
@@ -201,16 +203,16 @@ namespace YBehavior
 	typedef BYTE				Byte;
 	typedef BOOL				Bool;
 	typedef FLOAT				Float;
-	typedef std::vector<STRING>	VecString;
-	typedef std::vector<INT>	VecInt;
-	typedef std::vector<UINT>	VecUint;
-	typedef std::vector<UINT64>	VecUint64;
-	typedef std::vector<ULONG>	VecUlong;
-	typedef std::vector<BYTE>	VecByte;
-	typedef std::vector<BOOL>	VecBool;
-	typedef std::vector<FLOAT>	VecFloat;
-	typedef std::vector<EntityWrapper>	VecEntityWrapper;
-	typedef std::vector<Vector3>	VecVector3;
+	typedef StdVector<STRING>	VecString;
+	typedef StdVector<INT>	VecInt;
+	typedef StdVector<UINT>	VecUint;
+	typedef StdVector<UINT64>	VecUint64;
+	typedef StdVector<ULONG>	VecUlong;
+	typedef StdVector<BYTE>	VecByte;
+	typedef StdVector<BOOL>	VecBool;
+	typedef StdVector<FLOAT>	VecFloat;
+	typedef StdVector<EntityWrapper>	VecEntityWrapper;
+	typedef StdVector<Vector3>	VecVector3;
 
 #define YBEHAVIOR_BASICTYPE_NUMBER_ID(type, id)			\
 	template<> inline TYPEID GetClassTypeNumberId<type>() \

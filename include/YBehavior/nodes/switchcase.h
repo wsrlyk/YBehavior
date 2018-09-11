@@ -30,7 +30,7 @@ namespace YBehavior
 		ISharedVariableEx* m_Switch;
 		ISharedVariableEx* m_Cases;
 
-		std::vector<BehaviorNodePtr> m_CasesChilds;
+		StdVector<BehaviorNodePtr> m_CasesChilds;
 		BehaviorNodePtr m_DefaultChild = nullptr;
 		ContextContainer<SwitchCaseContext> m_RCContainer;
 	};

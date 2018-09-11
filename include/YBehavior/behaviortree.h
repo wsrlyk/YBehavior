@@ -41,7 +41,7 @@ namespace YBehavior
 		BehaviorNodePtr m_Parent;
 		BehaviorNodePtr m_Condition;
 		UINT m_UID;	// Unique in a tree
-		std::vector<ISharedVariableEx*> m_Variables;	///> Just for destructions of variables
+		StdVector<ISharedVariableEx*> m_Variables;	///> Just for destructions of variables
 		static std::unordered_set<STRING> KEY_WORDS;
 		BehaviorTree* m_Root;
 		RunningContext* m_RunningContext;
@@ -103,7 +103,7 @@ namespace YBehavior
 		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType = 0);
 		///>
 		/// single: 1, single; 0, vector; -1, dont care
-		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, std::vector<STRING>& buffer, int single = -1, char variableType = 0);
+		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, int single = -1, char variableType = 0);
 		RunningContext* _CreateRC() const;
 		void _TryDeleteRC();
 		void _TryPushRC(AgentPtr agent);
@@ -135,7 +135,7 @@ namespace YBehavior
 		~BranchNode();
 		BehaviorNodePtr GetChild(UINT index);
 	protected:
-		std::vector<BehaviorNodePtr>* m_Childs;
+		StdVector<BehaviorNodePtr>* m_Childs;
 
 		bool _AddChild(BehaviorNode* child, const STRING& connection) override;
 		void _DestroyChilds();
@@ -182,7 +182,7 @@ namespace YBehavior
 		UINT m_Hash;
 #endif
 
-		std::vector<BehaviorTree*> m_SubTrees;
+		StdVector<BehaviorTree*> m_SubTrees;
 	public:
 		BehaviorTree(const STRING& name);
 		~BehaviorTree();
@@ -193,7 +193,7 @@ namespace YBehavior
 		void CloneData(SharedDataEx& destination);
 
 		void AddSubTree(BehaviorTree* sub) { m_SubTrees.push_back(sub); }
-		inline std::vector<BehaviorTree*>& GetSubTrees() { return m_SubTrees; }
+		inline StdVector<BehaviorTree*>& GetSubTrees() { return m_SubTrees; }
 
 		///> CAUTION: this function can only be called in garbage collection
 		void ClearSubTree() { m_SubTrees.clear(); }

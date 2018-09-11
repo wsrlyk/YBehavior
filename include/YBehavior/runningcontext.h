@@ -74,7 +74,7 @@ namespace YBehavior
 	class YBEHAVIOR_API RandomVectorTraversalContext : public VectorTraversalContext
 	{
 	public:
-		std::vector<int> IndexList;
+		StdVector<int> IndexList;
 	};
 }
 

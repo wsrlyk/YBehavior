@@ -6,11 +6,11 @@
 
 namespace YBehavior
 {
-	void DebugTreeWithAgent(const std::vector<STRING>& datas)
+	void DebugTreeWithAgent(const StdVector<STRING>& datas)
 	{
 		DebugMgr::Instance()->SetTarget(datas[1], Utility::ToType<UINT>(datas[2]));
 
-		std::vector<STRING> treedata;
+		StdVector<STRING> treedata;
 		DebugMgr::Instance()->ClearTreeDebugInfo();
 		for (unsigned i = 3; i < datas.size(); ++i)
 		{
@@ -50,7 +50,7 @@ namespace YBehavior
 		DebugMgr::Instance()->SetCommand(DC_StepInto);
 	}
 
-	void ProcessDebugPoint(const std::vector<STRING>& datas)
+	void ProcessDebugPoint(const StdVector<STRING>& datas)
 	{
 		const STRING& treeName = datas[1];
 		UINT uid = Utility::ToType<UINT>(datas[2]);
@@ -66,7 +66,7 @@ namespace YBehavior
 
 	void MessageProcessor::ProcessOne(const STRING& s)
 	{
-		std::vector<STRING> datas;
+		StdVector<STRING> datas;
 		Utility::SplitString(s, datas, ' ');
 
 		if (datas[0] == "[DebugTreeWithAgent]")

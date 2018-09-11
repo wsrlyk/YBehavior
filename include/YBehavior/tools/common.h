@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_COMMON_H_
 #define _YBEHAVIOR_COMMON_H_
 
-#include <vector>
+#include "YBehavior/types.h"
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 
 namespace YBehavior
@@ -12,9 +12,9 @@ namespace YBehavior
 		void Rand();
 		void Append() { m_IndexList.push_back(m_IndexList.size()); }
 		int operator[] (int index);
-		const std::vector<int>& GetIndexList() { return m_IndexList; }
+		const StdVector<int>& GetIndexList() { return m_IndexList; }
 	protected:
-		std::vector<int> m_IndexList;
+		StdVector<int> m_IndexList;
 	};
 
 	class IndexIterator
@@ -22,12 +22,12 @@ namespace YBehavior
 	private:
 		int m_Length;
 		int m_Start;
-		std::vector<int> m_IndexList;
+		StdVector<int> m_IndexList;
 	public:
 		void Init(int start);
 		inline int GetStart() const { return m_Start; }
 		int GetIndex(int input) const;
-		void SetIndexList(const std::vector<int>& indexlist) { m_IndexList = indexlist; }
+		void SetIndexList(const StdVector<int>& indexlist) { m_IndexList = indexlist; }
 	};
 	struct xml_string_writer : pugi::xml_writer
 	{
