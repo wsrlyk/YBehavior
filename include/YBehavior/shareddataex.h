@@ -98,7 +98,7 @@ namespace YBehavior
 					m_Datas.insert(std::make_pair<KEY, T>(std::move(key), std::move(val)));
 				}
 			}
-			DataArrayMapDef<KEY, T>::type::iterator it2; otherArray->m_Datas.end();
+			typename DataArrayMapDef<KEY, T>::type::iterator it2; otherArray->m_Datas.end();
 		}
 
 		TYPEID GetTypeID() const override
