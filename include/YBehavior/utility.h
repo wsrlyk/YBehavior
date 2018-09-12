@@ -19,6 +19,7 @@ namespace YBehavior
 		static const VecBool VecBoolEmpty;
 		static const VecString VecStringEmpty;
 		static const VecUlong VecUlongEmpty;
+		static const VecVector3 VecVector3Empty;
 		static const char POINTER_CHAR;
 		static const char CONST_CHAR;
 		static const BOOL TRUE_VALUE;

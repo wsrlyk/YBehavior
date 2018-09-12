@@ -12,6 +12,7 @@ namespace YBehavior
 	const VecBool Utility::VecBoolEmpty;
 	const VecString Utility::VecStringEmpty;
 	const VecUlong Utility::VecUlongEmpty;
+	const VecVector3 Utility::VecVector3Empty;
 
 	const char Utility::POINTER_CHAR = 'P';
 	const char Utility::CONST_CHAR = 'C';

@@ -186,8 +186,8 @@ namespace YBehavior
 	typedef std::string			STRING;
 	typedef int					INT;
 	typedef unsigned int		UINT;
-	typedef unsigned long		UINT64;
-	typedef unsigned long		ULONG;
+	typedef unsigned long long	UINT64;
+	typedef unsigned long long	ULONG;
 	typedef unsigned char       BYTE;
 	typedef bool				BOOL_REAL;
 	typedef unsigned short		BOOL;	///> WARNING: bool is defined by short. Cause bool in vector is specialized and has quite different behaviors with others.
