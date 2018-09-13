@@ -290,5 +290,8 @@
     <ClCompile Include="..\src\YBehavior\nodes\wait.cpp">
       <Filter>源文件\nodes</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\YBehavior\logger.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
