@@ -8,7 +8,7 @@ SET(ENV{Platform} x64)
 SET(ENV{Configuration} Debug)  
  
 SET(EXECUTABLE_OUTPUT_PATH  bin/)  
-SET(LINK_LIBPATH lib/)  
+SET(LINK_LIBPATH ${CMAKE_CURRENT_SOURCE_DIR}/lib/)  
 
 add_subdirectory(src/YBehavior)  
 add_Subdirectory(src/Test)

@@ -4,7 +4,7 @@ PROJECT(${ProjectName})
 INCLUDE_DIRECTORIES(../../include)
 
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
-list(REMOVE_ITEM DIR_SRCS ./main-reload.cpp)
+list(REMOVE_ITEM DIR_SRCS ./main-reload.cpp ./main-benchmark.cpp)
 
 SET(CMAKE_CXX_COMPILER ${CompilerSetting})
 
@@ -14,7 +14,7 @@ ELSE()
     SET(CMAKE_BUILD_TYPE Release)
 ENDIF()
 
-LINK_DIRECTORIES(../lib/)
+LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/lib/)
 SET(EXECUTABLE_OUTPUT_PATH  ../../../bin/)
 
 ADD_DEFINITIONS(-DDEBUGGER)  

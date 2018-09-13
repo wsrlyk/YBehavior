@@ -79,6 +79,7 @@ namespace YBehavior
 			return info.Get(name);
 		}
 
+#ifdef DEBUGGER
 		template<typename T>
 		const STRING& GetName(const KEY& key)
 		{
@@ -86,6 +87,7 @@ namespace YBehavior
 			NameKeyInfo& info = Get(typeNumberId);
 			return info.Get(key);
 		}
+#endif
 	};
 
 	class YBEHAVIOR_API TreeKeyMgr: public Singleton<TreeKeyMgr>
