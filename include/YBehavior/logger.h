@@ -14,10 +14,10 @@ namespace YBehavior
 	{
 	public:
 		LogMgr();
-		void SetProcessor(LogProcessDelegate* pLog, ErrorProcessDelegate* pError);
+		void SetProcessor(LogProcessDelegate pLog, ErrorProcessDelegate pError);
 	protected:
-		LogProcessDelegate * m_LogProcessor;
-		ErrorProcessDelegate* m_ErrorProcessor;
+		LogProcessDelegate m_LogProcessor;
+		ErrorProcessDelegate m_ErrorProcessor;
 
 		std::stringstream m_Stream;
 	public:

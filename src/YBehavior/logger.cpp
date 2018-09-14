@@ -10,7 +10,7 @@ namespace YBehavior
 		m_ErrorProcessor = nullptr;
 	}
 
-	void LogMgr::SetProcessor(LogProcessDelegate* pLog, ErrorProcessDelegate* pError)
+	void LogMgr::SetProcessor(LogProcessDelegate pLog, ErrorProcessDelegate pError)
 	{
 		m_LogProcessor = pLog;
 		m_ErrorProcessor = pError;

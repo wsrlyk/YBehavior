@@ -9,8 +9,8 @@ namespace YBehavior
 	}
 	bool Launcher::Launch(const LaunchCore& core)
 	{
-		LogProcessDelegate* pLog = nullptr;
-		ErrorProcessDelegate* pError = nullptr;
+		LogProcessDelegate pLog = nullptr;
+		ErrorProcessDelegate pError = nullptr;
 		core.GetLogProcessor(pLog, pError);
 		LogMgr::Instance()->SetProcessor(pLog, pError);
 
