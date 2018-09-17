@@ -17,12 +17,26 @@ YBehavior::RegisterData* YBehavior::Agent::GetRegister()
 
 bool YBehavior::Agent::SetTree(const STRING& name)
 {
+	UnloadTree();
+
 	m_Tree = TreeMgr::Instance()->GetTree(name);
 	if (!m_Tree)
 		return false;
 	m_Tree->CloneData(*m_SharedData);
 	return true;
 	//TreeKeyMgr::Instance()->SetActiveTree(m_Tree->GetNameKeyMgr(), false);
+}
+
+void YBehavior::Agent::UnloadTree()
+{
+	if (m_Tree)
+	{
+		ClearRC();
+		TreeMgr::Instance()->ReturnTree(m_Tree, true);
+		m_Tree = nullptr;
+
+		///> m_SharedData will be written by new tree, or be deleted at destruction
+	}
 }
 
 void YBehavior::Agent::Tick()
@@ -36,8 +50,8 @@ void YBehavior::Agent::Tick()
 
 void YBehavior::Agent::ProcessRegister()
 {
-		_OnProcessRegister();
-		m_RegisterData->GetSendData().Clear();
+	_OnProcessRegister();
+	m_RegisterData->GetSendData().Clear();
 }
 
 YBehavior::RunningContext* YBehavior::Agent::PopRC()

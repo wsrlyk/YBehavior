@@ -32,15 +32,17 @@ namespace YBehavior
 	{
 		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
 		{
+			if (m_Datas[i] != nullptr)
+				delete m_Datas[i];
+
 			if (other.m_Datas[i] == nullptr)
 			{
 				m_Datas[i] = nullptr;
-				continue;
 			}
-
-			if (m_Datas[i] != nullptr)
-				delete m_Datas[i];
-			m_Datas[i] = other.m_Datas[i]->Clone();
+			else
+			{
+				m_Datas[i] = other.m_Datas[i]->Clone();
+			}
 		}
 	}
 
@@ -53,7 +55,10 @@ namespace YBehavior
 				continue;
 			}
 
-			m_Datas[i]->Merge(other.m_Datas[i], bOverride);
+			if (m_Datas[i] == nullptr)
+				m_Datas[i] = other.m_Datas[i]->Clone();
+			else
+				m_Datas[i]->Merge(other.m_Datas[i], bOverride);
 		}
 	}
 

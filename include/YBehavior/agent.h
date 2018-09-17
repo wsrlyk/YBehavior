@@ -44,6 +44,7 @@ namespace YBehavior
 		inline void SetEntity(Entity* entity) { m_Entity = entity; }
 		RegisterData* GetRegister();
 		bool SetTree(const STRING& name);
+		void UnloadTree();
 		void Tick();
 
 		void ProcessRegister();
