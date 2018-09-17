@@ -108,7 +108,7 @@ namespace YBehavior
 
 		SIZE_KEY Length() const override { return (SIZE_KEY)m_Datas.size(); }
 
-		bool Get(KEY key, const T& res) const
+		bool Get(KEY key, T& res) const
 		{
 			//if (key < 0 || key >= (KEY)m_Datas.size())
 			//	return false;
