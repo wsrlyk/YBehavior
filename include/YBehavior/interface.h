@@ -21,7 +21,6 @@ namespace YBehavior
 		virtual void SetVectorIndex(const STRING& vbType, const STRING& s) { }
 		virtual void SetKeyFromString(const STRING& s) = 0;
 		virtual const void* GetValue(SharedDataEx* pData) = 0;
-		virtual const void* GetElement(SharedDataEx* pData, INT index) = 0;
 		virtual void SetValue(SharedDataEx* pData, const void* src) = 0;
 		virtual void SetValueFromString(const STRING& str) = 0;
 		virtual TYPEID GetTypeID() = 0;
@@ -31,7 +30,13 @@ namespace YBehavior
 		virtual IVariableOperationHelper* GetOperation() = 0;
 		virtual ISharedVariableEx* GetVectorIndex() = 0;
 		virtual STRING GetValueToSTRING(SharedDataEx* pData) = 0;
+
+		///> Belows are functions for vector
 		virtual INT VectorSize(SharedDataEx* pData) = 0;
+		virtual void Clear(SharedDataEx* pData) = 0;
+		virtual const void* GetElement(SharedDataEx* pData, INT index) = 0;
+		virtual void SetElement(SharedDataEx* pData, const void* v, INT index) = 0;
+		virtual void PushBackElement(SharedDataEx* pData, const void* v) = 0;
 	protected:
 		KEY m_Key;
 #ifdef DEBUGGER

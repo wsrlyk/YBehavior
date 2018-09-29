@@ -999,4 +999,186 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    class SetArrayNode : LeafNode
+    {
+        public override string Icon => "xx<<yy";
+
+        public SetArrayNode()
+        {
+            m_Name = "SetArray";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_DefaultAction;
+
+        }
+
+        public override void CreateVariables()
+        {
+            Variable opl = Variables.CreateVariableInNode(
+                "Target",
+                "0",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                1
+            );
+
+            Variable opr = Variables.CreateVariableInNode(
+                "Source",
+                "0",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Const,
+                false,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} << {1}",
+                    Variables.GetVariable("Target").NoteValue,
+                    Variables.GetVariable("Source").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
+    class ClearArrayNode : LeafNode
+    {
+        public override string Icon => "[ ]";
+
+        public ClearArrayNode()
+        {
+            m_Name = "ClearArray";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_Array;
+
+        }
+
+        public override void CreateVariables()
+        {
+            Variable opl = Variables.CreateVariableInNode(
+                "Array",
+                "0",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                true
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0}",
+                    Variables.GetVariable("Array").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
+    class GetArrayLengthNode : LeafNode
+    {
+        public override string Icon => "[].Length";
+
+        public GetArrayLengthNode()
+        {
+            m_Name = "GetArrayLength";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_Array;
+
+        }
+
+        public override void CreateVariables()
+        {
+            Variable array = Variables.CreateVariableInNode(
+                "Array",
+                "0",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                false
+            );
+
+            Variable length = Variables.CreateVariableInNode(
+                "Length",
+                "0",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                true
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} <= [{1}].Length",
+                    Variables.GetVariable("Length").NoteValue,
+                    Variables.GetVariable("Array").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
+    class ArrayPushElementNode : LeafNode
+    {
+        public override string Icon => "[x] <= y";
+
+        public ArrayPushElementNode()
+        {
+            m_Name = "ArrayPushElement";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_Array;
+
+        }
+
+        public override void CreateVariables()
+        {
+            Variable array = Variables.CreateVariableInNode(
+                "Array",
+                "0",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                1
+            );
+
+            Variable element = Variables.CreateVariableInNode(
+                "Element",
+                "0",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                false,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("[{0}] add {1}",
+                    Variables.GetVariable("Array").NoteValue,
+                    Variables.GetVariable("Element").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
 }

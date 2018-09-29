@@ -11,30 +11,21 @@
 
 namespace YBehavior
 {
-	static std::unordered_set<TYPEID> s_ValidTypes = {
-		GetClassTypeNumberId<Int>(),
-		GetClassTypeNumberId<Float>(),
-		GetClassTypeNumberId<Bool>(),
-		GetClassTypeNumberId<String>(),
-		GetClassTypeNumberId<Vector3>(),
-		GetClassTypeNumberId<Uint64>()
-	};
-
 	bool SetData::OnLoaded(const pugi::xml_node& data)
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = CreateVariable(m_Opl, "Target", data, true, Utility::POINTER_CHAR);
-		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
+		TYPEID leftType = CreateVariable(m_Opl, "Target", data, true, Utility::POINTER_CHAR);
+		if (leftType != Utility::INVALID_TYPE)
 		{
-			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
+			ERROR_BEGIN << "Invalid type for Opl in SetData: " << leftType << ERROR_END;
 			return false;
 		}
 		///> Right
-		TYPEID dataType = CreateVariable(m_Opr, "Source", data, true);
-		if (m_DataType != dataType)
+		TYPEID rightType = CreateVariable(m_Opr, "Source", data, true);
+		if (leftType != rightType)
 		{
-			ERROR_BEGIN << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
+			ERROR_BEGIN << "Different types:  " << leftType << " and " << rightType << ERROR_END;
 			return false;
 		}
 
@@ -51,4 +42,36 @@ namespace YBehavior
 
 		return NS_SUCCESS;
 	}
+
+	bool SetArray::OnLoaded(const pugi::xml_node& data)
+	{
+		///> Left
+		TYPEID leftType = CreateVariable(m_Opl, "Target", data, false, Utility::POINTER_CHAR);
+		if (leftType == Utility::INVALID_TYPE)
+		{
+			ERROR_BEGIN << "Invalid type for Target in SetArray: " << leftType << ERROR_END;
+			return false;
+		}
+		///> Right
+		TYPEID rightType = CreateVariable(m_Opr, "Source", data, false);
+		if (leftType != rightType)
+		{
+			ERROR_BEGIN << "Different types:  " << leftType << " and " << rightType << ERROR_END;
+			return false;
+		}
+
+		return true;
+	}
+
+	YBehavior::NodeState SetArray::Update(AgentPtr pAgent)
+	{
+		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Opl, true);
+
+		m_Opl->SetValue(pAgent->GetSharedData(), m_Opr->GetValue(pAgent->GetSharedData()));
+
+		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Opl, false);
+
+		return NS_SUCCESS;
+	}
+
 }

@@ -39,6 +39,7 @@ namespace YBehavior.Editor.Core
                 node = Activator.CreateInstance(type) as Node;
                 node.CreateBase();
                 node.CreateVariables();
+                node.LoadDescription();
                 //node.CreateRenderer();
                 return node;
             }
@@ -80,7 +81,8 @@ namespace YBehavior.Editor.Core
         NH_Action = 1,
         NH_Decorator = 2,
         NH_Compositor = 3,
-        
+        NH_Array = 4,
+
         NH_DefaultAction = 11,
         NH_Custom = 21,
     }
@@ -463,8 +465,6 @@ namespace YBehavior.Editor.Core
 
         public virtual void Load(System.Xml.XmlNode data)
         {
-            LoadDescription();
-
             foreach (System.Xml.XmlAttribute attr in data.Attributes)
             {
                 if (ReservedAttributes.Contains(attr.Name))

@@ -28,9 +28,13 @@
                         <Operator Content="操作符号"/>
                 </Comparer>
                 <SetData Content="赋值器">
-                        <Opl Content="目标变量"/>
-                        <Opr Content="源值"/>
+                        <Target Content="目标变量"/>
+                        <Source Content="源值"/>
                 </SetData>
+                <SetArray Content="赋值器">
+                        <Target Content="目标变量"/>
+                        <Source Content="源值"/>
+                </SetArray>
                 <Random Content="随机器">
                         <Opl Content="保存计算结果"/>
                         <Opr1 Content="最小值，闭区间"/>
@@ -79,11 +83,23 @@
                 <Wait Content="等待若干次心跳后继续">
                         <TickCount Content="等待心跳次数"/>
                 </Wait>
+                <ClearArray Content="清空数组">
+                        <Array Content="目标数组"/>
+                </ClearArray>
+                <GetArrayLength Content="获取数组长度">
+                        <Array Content="目标数组"/>
+                        <Length Content="存储数组的长度"/>
+                </GetArrayLength>
+                <ArrayPushElement Content="数组尾部添加元素">
+                        <Array Content="目标数组"/>
+                        <Element Content="新元素"/>
+                </ArrayPushElement>
         </Nodes>
         <Hierachies>
                 <Hierachy Value = "1">Actions</Hierachy>
                 <Hierachy Value = "2">Decorators</Hierachy>
                 <Hierachy Value = "3">Compositors</Hierachy>
+                <Hierachy Value = "4">Arrays</Hierachy>
                 <Hierachy Value = "11">GeneralActions</Hierachy>
                 <Hierachy Value = "21">CustomAction1</Hierachy>
                 <Hierachy Value = "121">CustomAction2</Hierachy>

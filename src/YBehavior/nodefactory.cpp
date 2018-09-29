@@ -15,6 +15,7 @@
 #include "YBehavior/nodes/dice.h"
 #include "YBehavior/nodes/subtree.h"
 #include "YBehavior/nodes/wait.h"
+#include "YBehavior/nodes/array.h"
 namespace YBehavior
 {
 	NodeFactory* CreateNodeFactory()
@@ -42,6 +43,10 @@ namespace YBehavior
 		REGISTER_TYPE(factory, Dice);
 		REGISTER_TYPE(factory, SubTree);
 		REGISTER_TYPE(factory, Wait);
+		REGISTER_TYPE(factory, ClearArray);
+		REGISTER_TYPE(factory, SetArray);
+		REGISTER_TYPE(factory, GetArrayLength);
+		REGISTER_TYPE(factory, ArrayPushElement);
 
 		return factory;
 	}

@@ -101,16 +101,16 @@ namespace YBehavior
 			return m_Key == Utility::INVALID_KEY;
 		}
 
-		const StdVector<ElementType>* _Convert2Vector(SharedDataEx* pData)
+		StdVector<ElementType>* _Convert2Vector(SharedDataEx* pData)
 		{
 			if (IsVector<T>::Result)
 			{
 				///> would have compile error if directly operate the m_Value when T is not a StdVector<XX>
-				const StdVector<ElementType>* mValue;
+				StdVector<ElementType>* mValue;
 				if (pData == nullptr || m_Key == Utility::INVALID_KEY)
-					mValue = (const StdVector<ElementType>*)_GetValue();
+					mValue = (StdVector<ElementType>*)_GetValue();
 				else
-					mValue = (const StdVector<ElementType>*)GetValue(pData);
+					mValue = (StdVector<ElementType>*)const_cast<void*>(GetValue(pData));
 				
 				return mValue;
 			}
@@ -125,6 +125,14 @@ namespace YBehavior
 				return (INT)mValue->size();
 
 			return 0;
+		}
+
+		void Clear(SharedDataEx* pData) override
+		{
+			StdVector<ElementType>* mValue = _Convert2Vector(pData);
+
+			if (mValue != nullptr)
+				mValue->clear();
 		}
 
 		STRING GetValueToSTRING(SharedDataEx* pData) override
@@ -153,6 +161,31 @@ namespace YBehavior
 			else
 			{
 				return nullptr;
+			}
+		}
+		void SetElement(SharedDataEx* pData, const void* v, INT index) override
+		{
+			StdVector<ElementType>* mValue = _Convert2Vector(pData);
+
+			if (mValue != nullptr && v != nullptr)
+			{
+				if ((INT)mValue->size() <= index)
+				{
+					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << ERROR_END;
+				}
+				else
+				{
+					(*mValue)[index] = *((const ElementType*)v);
+				}
+			}
+		}
+		void PushBackElement(SharedDataEx* pData, const void* v) override
+		{
+			StdVector<ElementType>* mValue = _Convert2Vector(pData);
+
+			if (mValue != nullptr && v != nullptr)
+			{
+				mValue->push_back(*((const ElementType*)v));
 			}
 		}
 

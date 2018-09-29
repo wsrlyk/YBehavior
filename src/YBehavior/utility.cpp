@@ -19,6 +19,7 @@ namespace YBehavior
 	const BOOL Utility::TRUE_VALUE = 1;
 	const BOOL Utility::FALSE_VALUE = 0;
 	const KEY Utility::INVALID_KEY = -1;
+	const YBehavior::TYPEID Utility::INVALID_TYPE = -1;
 
 	std::random_device Utility::rd;
 	std::default_random_engine Utility::mt(rd());
