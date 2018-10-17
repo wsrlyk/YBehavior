@@ -113,7 +113,7 @@ namespace YBehavior
 	template <typename T>
 	TYPEID BehaviorNode::CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType)
 	{
-		ISharedVariableEx* pTemp;
+		ISharedVariableEx* pTemp = nullptr;
 		TYPEID typeID = CreateVariable(pTemp, attriName, data, bSingle, variableType);
 		if (typeID == GetClassTypeNumberId<T>())
 		{
@@ -122,8 +122,7 @@ namespace YBehavior
 		else
 		{
 			op = nullptr;
-			ERROR_BEGIN << "Invalid type for " << attriName << " with type: " << typeID << ERROR_END;
-			delete pTemp;
+			ERROR_BEGIN << "Invalid type for " << attriName << " with type " << typeID << " in Node " << this->GetClassName() << ERROR_END;
 		}
 		return typeID;
 	}

@@ -162,9 +162,8 @@ namespace YBehavior
 		}
 
 		TYPEID bType = CreateVariable(m_IgnoreInput, "IgnoreInput", data, true);
-		if (bType != GetClassTypeNumberId<BOOL>())
+		if (!m_IgnoreInput)
 		{
-			ERROR_BEGIN << "Invalid type for IgnoreInput in Dice: " << yType << ERROR_END;
 			return false;
 		}
 

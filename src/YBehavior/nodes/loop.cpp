@@ -93,9 +93,8 @@ namespace YBehavior
 	bool For::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data, true);
-		if (type != GetClassTypeNumberId<Bool>())
+		if (!m_ExitWhenFailure)
 		{
-			ERROR_BEGIN << "Invalid type for ExitWhenFailure in For: " << type << ERROR_END;
 			return false;
 		}
 
@@ -218,9 +217,8 @@ namespace YBehavior
 		}
 
 		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data, true);
-		if (type != GetClassTypeNumberId<Bool>())
+		if (!m_ExitWhenFailure)
 		{
-			ERROR_BEGIN << "Invalid type for ExitWhenFailure in ForEach: " << type << ERROR_END;
 			return false;
 		}
 
@@ -234,22 +232,19 @@ namespace YBehavior
 	bool Loop::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID type = CreateVariable(m_Current, "Current", data, true);
-		if (type != GetClassTypeNumberId<INT>())
+		if (!m_Current)
 		{
-			ERROR_BEGIN << "Invalid type for Current in Loop: " << type << ERROR_END;
 			return false;
 		}
 		type = CreateVariable(m_Count, "Count", data, true);
-		if (type != GetClassTypeNumberId<INT>())
+		if (!m_Count)
 		{
-			ERROR_BEGIN << "Invalid type for Count in Loop: " << type << ERROR_END;
 			return false;
 		}
 
 		type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data, true);
-		if (type != GetClassTypeNumberId<Bool>())
+		if (!m_ExitWhenFailure)
 		{
-			ERROR_BEGIN << "Invalid type for ExitWhenFailure in Loop: " << type << ERROR_END;
 			return false;
 		}
 

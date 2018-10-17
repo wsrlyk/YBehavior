@@ -15,9 +15,8 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		TYPEID type = CreateVariable(m_TickCount, "TickCount", data, true);
-		if (type != GetClassTypeNumberId<INT>())
+		if (!m_TickCount)
 		{
-			ERROR_BEGIN << "Invalid type for TickCount in Wait: " << type << ERROR_END;
 			return false;
 		}
 

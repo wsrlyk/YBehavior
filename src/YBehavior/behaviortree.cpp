@@ -167,7 +167,7 @@ namespace YBehavior
 		Utility::SplitString(tempChar, buffer, Utility::SpaceSpliter);
 		if (buffer.size() == 0 || buffer[0].length() != 3)
 		{
-			ERROR_BEGIN << "Format Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
+			ERROR_BEGIN << "Format Error, " << attri.name() << " in " << data.name() << " in Node " << this->GetClassName() << ": " << tempChar << ERROR_END;
 			return false;
 		}
 
@@ -175,7 +175,7 @@ namespace YBehavior
 		{
 			if (!((single == 1) ^ (buffer[0][0] == buffer[0][1])))
 			{
-				ERROR_BEGIN << "Single or Vector Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
+				ERROR_BEGIN << "Single or Vector Error, " << attri.name() << " in " << data.name() << " in Node " << this->GetClassName() << ": " << tempChar << ERROR_END;
 				return false;
 			}
 		}
@@ -184,7 +184,7 @@ namespace YBehavior
 		{
 			if (buffer[0][2] != variableType)
 			{
-				ERROR_BEGIN << "VariableType Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
+				ERROR_BEGIN << "VariableType Error, " << attri.name() << " in " << data.name() << " in Node " << this->GetClassName() << ": " << tempChar << ERROR_END;
 				return false;
 			}
 		}
@@ -244,7 +244,7 @@ namespace YBehavior
 
 		if (attrOptr.empty())
 		{
-			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
+			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << " in Node " << this->GetClassName() << ERROR_END;
 			return "";
 		}
 		StdVector<STRING> buffer;
@@ -260,7 +260,7 @@ namespace YBehavior
 
 		if (attrOptr.empty())
 		{
-			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
+			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << " in Node " << this->GetClassName() << ERROR_END;
 			return -1;
 		}
 		StdVector<STRING> buffer;
@@ -290,6 +290,7 @@ namespace YBehavior
 		}
 		else
 		{
+			ERROR_BEGIN << "Get VariableCreateHelper Failed in Node " << this->GetClassName() << ": " << buffer[0].substr(0, 2) << ERROR_END;
 			return -1;
 		}
 	}

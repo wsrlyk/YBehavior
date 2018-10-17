@@ -24,16 +24,10 @@ namespace YBehavior
 	bool Comparer::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Operator
-		auto attrOptr = data.attribute("Operator");
-		if (attrOptr.empty())
-		{
-			ERROR_BEGIN << "Cant Find Comparer Operator: " << data.name() << ERROR_END;
-			return false;
-		}
 		STRING tempChar = GetValue("Operator", data);
 		if (!IVariableOperationHelper::s_OperatorMap.TryGetKey(tempChar, m_Operator))
 		{
-			ERROR_BEGIN << "Operator Error: " << tempChar << ERROR_END;
+			ERROR_BEGIN << "Operator Error: " << tempChar << " in Node " << this->GetClassName() << ERROR_END;
 			return false;
 		}
 

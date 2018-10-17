@@ -16,9 +16,8 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		TYPEID typeID = CreateVariable(m_TreeName, "Tree", data, true, Utility::CONST_CHAR);
-		if (typeID != GetClassTypeNumberId<STRING>())
+		if (!m_TreeName)
 		{
-			ERROR_BEGIN << "Invalid type for Tree in SubTree: " << typeID << ERROR_END;
 			return false;
 		}
 

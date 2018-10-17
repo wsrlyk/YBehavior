@@ -14,14 +14,12 @@ namespace YBehavior
 		CreateVariable(m_Array, "Array", data, false);
 		if (m_Array == nullptr)
 		{
-			ERROR_BEGIN << "GetArrayLength Cant Find Array" << ERROR_END;
 			return false;
 		}
 
 		TYPEID typeID = CreateVariable(m_Length, "Length", data, true, Utility::POINTER_CHAR);
-		if (typeID != GetClassTypeNumberId<INT>())
+		if (!m_Length)
 		{
-			ERROR_BEGIN << "GetArrayLength Length type error " << typeID << ERROR_END;
 			return false;
 		}
 		return true;
@@ -49,7 +47,6 @@ namespace YBehavior
 		CreateVariable(m_Array, "Array", data, false);
 		if (m_Array == nullptr)
 		{
-			ERROR_BEGIN << "ClearArray Cant Find Array" << ERROR_END;
 			return false;
 		}
 		return true;
@@ -66,7 +63,6 @@ namespace YBehavior
 		TYPEID typeIDArray = CreateVariable(m_Array, "Array", data, false);
 		if (m_Array == nullptr)
 		{
-			ERROR_BEGIN << "ArrayPushElement Cant Find Array" << ERROR_END;
 			return false;
 		}
 
