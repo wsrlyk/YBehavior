@@ -221,7 +221,7 @@ namespace YBehavior.Editor.Core
             Variable opl = Variables.CreateVariableInNode(
                 "Opl",
                 "0",
-                Variable.CreateParams_AllNumbers,
+                Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
                 true,
@@ -231,7 +231,7 @@ namespace YBehavior.Editor.Core
             Variable opr = Variables.CreateVariableInNode(
                 "Opr",
                 "0",
-                Variable.CreateParams_AllNumbers,
+                Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
                 false,

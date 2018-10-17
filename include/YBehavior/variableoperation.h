@@ -224,10 +224,6 @@ namespace YBehavior
 	}
 
 	template<>
-	bool ValueHandler::Compare<EntityWrapper>(const void* pLeft, const void* pRight, OperationType op);
-
-
-	template<>
 	void ValueHandler::Calculate<String>(void* pLeft, const void* pRight0, const void* pRight1, OperationType op);
 
 	template<>

@@ -161,6 +161,25 @@ namespace YBehavior
 			return *this;
 		}
 
+		bool operator ==(const EntityWrapper& other) const
+		{
+			if (!IsValid() || !other.IsValid())
+				return false;
+			return Get() == other.Get();
+		}
+
+		bool operator !=(const EntityWrapper& other) const
+		{
+			if (!IsValid() || !other.IsValid())
+				return true;
+			return Get() != other.Get();
+		}
+
+		bool operator >(const EntityWrapper& other) const { return false; }
+		bool operator <(const EntityWrapper& other) const { return false; }
+		bool operator >=(const EntityWrapper& other) const { return false; }
+		bool operator <=(const EntityWrapper& other) const { return false; }
+
 		~EntityWrapper();
 
 		void Reset();
