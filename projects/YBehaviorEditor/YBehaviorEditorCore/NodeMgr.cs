@@ -515,7 +515,6 @@ namespace YBehavior.Editor.Core
                     return false;
                 if (v.CheckValid())
                 {
-                    v.Description = m_NodeDescripion == null ? string.Empty : m_NodeDescripion.GetVariable(v.Name);
                     return true;
                 }
             }
@@ -546,6 +545,13 @@ namespace YBehavior.Editor.Core
         public void LoadDescription()
         {
             m_NodeDescripion = DescriptionMgr.Instance.GetNodeDescription(this.Name);
+            if (m_NodeDescripion != null && m_Variables != null)
+            {
+                foreach (var v in m_Variables.Datas)
+                {
+                    v.Variable.Description = m_NodeDescripion == null ? string.Empty : m_NodeDescripion.GetVariable(v.Variable.Name);
+                }
+            }
         }
         protected virtual void OnInit()
         {

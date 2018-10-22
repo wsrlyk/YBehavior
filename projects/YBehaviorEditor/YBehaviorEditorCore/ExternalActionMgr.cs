@@ -36,6 +36,7 @@ namespace YBehavior.Editor.Core
                     node.CreateBase();
                     if (_LoadAction(node, chi))
                     {
+                        node.LoadDescription();
                         m_ActionDic[node.ClassName] = node;
                         NodeMgr.Instance.NodeList.Add(node);
                     }

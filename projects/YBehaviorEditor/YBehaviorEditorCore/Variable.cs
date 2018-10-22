@@ -610,6 +610,7 @@ namespace YBehavior.Editor.Core
             v.m_bCanbeRemoved = m_bCanbeRemoved;
             v.m_bInited = m_bInited;
             v.m_Params = m_Params;
+            v.Description = Description;
             if (m_VectorIndex != null && m_bVectorIndexEnabled)
             {
                 v.m_VectorIndex = m_VectorIndex.Clone(newDataSource);
