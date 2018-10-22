@@ -82,12 +82,14 @@ namespace YBehavior
 	{
 		STRING str;
 		std::stringstream ss;
+		ss << "{";
 		for (unsigned i = 0; i < t.size(); ++i)
 		{
 			if (i != 0)
 				ss << '|';
 			ss << t[i];
 		}
+		ss << "}(size=" << t.size() << ")";
 		ss >> str;
 		return str;
 	}
