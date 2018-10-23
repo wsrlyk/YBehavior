@@ -70,7 +70,7 @@ namespace YBehavior
 
 	void LogMgr::_Format(const char* fmt, va_list ap)
 	{
-		int len = vsprintf_s(m_Buffer, 1024, fmt, ap);
+		int len = vsnprintf(m_Buffer, sizeof(m_Buffer), fmt, ap);
 
 		if (len <= 0)
 			return;
