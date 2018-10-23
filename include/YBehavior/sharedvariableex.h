@@ -281,7 +281,7 @@ namespace YBehavior
 
 		void SetCastedValue(SharedDataEx* pData, const T& src)
 		{
-			SetCastedValue(pData, &t);
+			SetCastedValue(pData, &src);
 		}
 
 		///> This function must be called BEFORE SetIndexFromString
