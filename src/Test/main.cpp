@@ -26,6 +26,7 @@ int main(int argc, char** argv)
 
 	XEntity* pEntity1 = new XEntity("Haha", tree);
 	//pEntity1->GetAgent()->SetEntity(pEntity1);
+	LOG_FORMAT("te%dst%s abc", 1, "++");
 
 	LOG_BEGIN << "wrapper begin" << LOG_END;
 	YB::EntityWrapper wrapper = pEntity->GetAgent()->GetEntity()->CreateWrapper();

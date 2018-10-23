@@ -1,6 +1,6 @@
 #include "YBehavior/logger.h"
 #include <iostream>
-
+#include "stdarg.h"
 namespace YBehavior
 {
 
@@ -44,6 +44,36 @@ namespace YBehavior
 		{
 			std::cout << res << std::endl;
 		}
+	}
+
+	void LogMgr::Log(const char* fmt, ...)
+	{
+		va_list ap;
+		va_start(ap, fmt);
+		_Format(fmt, ap);
+		va_end(ap);
+
+		LogEnd();
+	}
+
+	void LogMgr::Error(const char* fmt, ...)
+	{
+		va_list ap;
+		va_start(ap, fmt);
+		_Format(fmt, ap);
+		va_end(ap);
+
+		ErrorEnd();
+	}
+
+	void LogMgr::_Format(const char* fmt, va_list ap)
+	{
+		int len = vsprintf_s(m_Buffer, 1024, fmt, ap);
+
+		if (len <= 0)
+			return;
+		std::string s(m_Buffer, len);
+		m_Stream << s;
 	}
 
 	std::ostream& ProcessLogEnd(std::ostream& ss)
