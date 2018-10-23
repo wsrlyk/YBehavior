@@ -253,6 +253,17 @@ namespace YBehavior
 				t = *v;
 		}
 
+		void SetCastedValue(SharedDataEx* pData, const T&& src)
+		{
+			T t(src);
+			SetCastedValue(pData, &t);
+		}
+
+		void SetCastedValue(SharedDataEx* pData, const T& src)
+		{
+			SetCastedValue(pData, &t);
+		}
+
 		void SetCastedValue(SharedDataEx* pData, const T* src)
 		{
 			if (pData == nullptr || m_Key == Utility::INVALID_KEY)
