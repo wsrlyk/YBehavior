@@ -11,6 +11,7 @@
           <Node Class="AlwaysSuccess" Connection="else" />
         </Node>
       </Node>
+      <Node Class="RandomSelect" Input="IIP iitest" Output="_IP add1" />
       <Node Class="Loop" Count="_IC 3" Current="_IP iitest VI C 3" ExitWhenFailure="_BC false">
         <Node Class="Calculator" Operator="_EC ADD" Opl="_IP iitest VI P add0" Opr1="_IP iitest VI P add0" Opr2="_IP add1" />
       </Node>

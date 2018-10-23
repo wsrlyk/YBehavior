@@ -139,7 +139,7 @@ namespace YBehavior
 		{
 			const T* v = GetCastedValue(pData);
 			if (v != nullptr)
-				return Utility::ToString(*v);
+				return Utility::ToStringWithLength(*v);
 			return Utility::StringEmpty;
 		}
 		const void* GetElement(SharedDataEx* pData, INT index) override

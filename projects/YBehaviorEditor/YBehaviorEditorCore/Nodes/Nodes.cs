@@ -414,6 +414,54 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    class RandomSelectNode : LeafNode
+    {
+        public override string Icon => "～";
+
+        public RandomSelectNode()
+        {
+            m_Name = "RandomSelect";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_DefaultAction;
+
+        }
+
+        public override void CreateVariables()
+        {
+            Variable opl = Variables.CreateVariableInNode(
+                "Input",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                false,
+                1
+            );
+
+            Variable opr1 = Variables.CreateVariableInNode(
+                "Output",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{1} <~= {0}",
+                    Variables.GetVariable("Input").NoteValue,
+                    Variables.GetVariable("Output").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
+
     class ReadRegisterNode : LeafNode
     {
         public override string Icon => "[_↓_]";

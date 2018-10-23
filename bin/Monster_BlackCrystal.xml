@@ -11,6 +11,7 @@
           <Node Class="AlwaysSuccess" Connection="else" Pos="593,739" />
         </Node>
       </Node>
+      <Node Class="RandomSelect" Pos="478,346" Input="IIP iitest" Output="_IP add1" />
       <Node Class="Loop" Pos="856,475" Count="_IC 3" Current="_IP iitest VI C 3" ExitWhenFailure="_BC false">
         <Node Class="Calculator" Pos="857,734" DebugPoint="-1" Operator="_EC ADD" Opl="_IP iitest VI P add0" Opr1="_IP iitest VI P add0" Opr2="_IP add1">
           <Node Class="Wait" Connection="condition" Pos="749,682" DebugPoint="-1" Disabled="true" TickCount="_IC 3">

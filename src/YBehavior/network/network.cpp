@@ -234,6 +234,9 @@ namespace YBehavior
 			HalfWord halfword(text.size());
 			ms_sendBuffer += halfword.ToString();
 			ms_sendBuffer += text;
+#ifdef PRINT_INTERMEDIATE_INFO
+			LOG_BEGIN << "Message: " << text.size() << ": " << ms_sendBuffer << LOG_END;
+#endif
 
 			return true;
 		}

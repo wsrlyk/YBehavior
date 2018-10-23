@@ -49,6 +49,10 @@ namespace YBehavior
 		//static STRING Utility::ToString(const BOOL& t);
 		template<typename T>
 		static STRING ToString(const StdVector<T>& t);
+		template<typename T>
+		static STRING ToStringWithLength(const T& t);
+		template<typename T>
+		static STRING ToStringWithLength(const StdVector<T>& t);
 		//template<>
 		//static STRING ToString(const StdVector<BOOL>& t);
 
@@ -82,6 +86,25 @@ namespace YBehavior
 	{
 		STRING str;
 		std::stringstream ss;
+		for (unsigned i = 0; i < t.size(); ++i)
+		{
+			if (i != 0)
+				ss << '|';
+			ss << t[i];
+		}
+		ss >> str;
+		return str;
+	}
+
+
+	template<>
+	STRING Utility::ToString(const StdVector<BOOL>& t);
+
+	template<typename T>
+	STRING Utility::ToStringWithLength(const StdVector<T>& t)
+	{
+		STRING str;
+		std::stringstream ss;
 		ss << "{";
 		for (unsigned i = 0; i < t.size(); ++i)
 		{
@@ -94,9 +117,11 @@ namespace YBehavior
 		return str;
 	}
 
-
-	template<>
-	STRING Utility::ToString(const StdVector<BOOL>& t);
+	template<typename T>
+	STRING Utility::ToStringWithLength(const T& t)
+	{
+		return ToString(t);
+	}
 
 	template<typename T>
 	T Utility::Rand(const T& smallNum, const T& largeNum)

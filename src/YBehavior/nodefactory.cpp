@@ -33,6 +33,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, Invertor);
 		REGISTER_TYPE(factory, SetData);
 		REGISTER_TYPE(factory, Random);
+		REGISTER_TYPE(factory, RandomSelect);
 		REGISTER_TYPE(factory, ReadRegister);
 		REGISTER_TYPE(factory, WriteRegister);
 		REGISTER_TYPE(factory, SwitchCase);

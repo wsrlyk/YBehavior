@@ -64,4 +64,38 @@ namespace YBehavior
 
 		return NS_SUCCESS;
 	}
+
+	bool RandomSelect::OnLoaded(const pugi::xml_node& data)
+	{
+		TYPEID typeIDArray = CreateVariable(m_Input, "Input", data, false);
+		if (m_Input == nullptr)
+		{
+			return false;
+		}
+
+		TYPEID typeID = CreateVariable(m_Output, "Output", data, true);
+		if (!Utility::IsElement(typeID, typeIDArray))
+		{
+			ERROR_BEGIN << "RandomSelect types not match " << typeID << " and " << typeIDArray << ERROR_END;
+			return false;
+		}
+		return true;
+	}
+
+	YBehavior::NodeState RandomSelect::Update(AgentPtr pAgent)
+	{
+		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Input, true);
+
+		INT size = m_Input->VectorSize(pAgent->GetSharedData());
+		if (size == 0)
+		{
+			return NS_FAILURE;
+		}
+		INT idx = Utility::Rand(0, size);
+
+		m_Output->SetValue(pAgent->GetSharedData(), m_Input->GetElement(pAgent->GetSharedData(), idx));
+
+		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Output, false);
+		return NS_SUCCESS;
+	}
 }

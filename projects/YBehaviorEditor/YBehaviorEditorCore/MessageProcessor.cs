@@ -131,7 +131,7 @@ namespace YBehavior.Editor.Core
 
             m_ProcessingMsgs.Clear();
 
-            LogMgr.Instance.Log("KeyFrameScore: " + m_DiffScore);
+            //LogMgr.Instance.Log("KeyFrameScore: " + m_DiffScore);
             _FireTickResult();
         }
 
@@ -207,11 +207,11 @@ namespace YBehavior.Editor.Core
             {
                 m_DiffScore = avgDiff;
                 m_KeyFrameTickResultData = m_PreviousTickResultData;
-                LogMgr.Instance.Log("Larger Content ^ " + avgDiff);
+                //LogMgr.Instance.Log("Larger Content ^ " + avgDiff);
             }
             m_PreviousDiffScore = diff;
             m_PreviousTickResultData = ss;
-            LogMgr.Instance.Log(ss);
+            //LogMgr.Instance.Log(ss);
         }
 
         void _HandleTickResult(string ss)

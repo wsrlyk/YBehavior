@@ -20,7 +20,7 @@ namespace YBehavior.Editor.Core
 
         public int ToInt()
         {
-            return (int)(byte0 << 4 | byte1);
+            return (int)(byte0 << 8 | byte1);
         }
     }
     public class MsgReceiver
