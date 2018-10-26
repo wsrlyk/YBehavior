@@ -59,6 +59,20 @@ namespace YBehavior.Editor
             if (v == null)
                 return;
 
+            _RefreshVType(v);
+        }
+
+        private void VTypes_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Core.Variable v = DataContext as Core.Variable;
+            if (v == null)
+                return;
+
+            _RefreshVType(v);
+        }
+
+        void _RefreshVType(Core.Variable v)
+        {
             if (v.vType == Core.Variable.ValueType.VT_ENUM)
             {
                 this.VConst.Visibility = Visibility.Collapsed;
