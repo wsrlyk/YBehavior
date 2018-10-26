@@ -145,12 +145,12 @@ namespace YBehavior.Editor
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             string s = value as string;
-            return s == "true";
+            return s == "T";
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             bool b = (bool)value;
-            return b ? "true" : "false";
+            return b ? "T" : "F";
             //string s = (string)value;
             //return ValueTypeDic.GetKey(s, Variable.ValueType.VT_NONE);
         }

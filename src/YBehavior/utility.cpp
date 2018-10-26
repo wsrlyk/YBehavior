@@ -86,21 +86,23 @@ namespace YBehavior
 	template<>
 	BOOL Utility::ToType(const STRING& str)
 	{
-		bool t;
-		std::stringstream ss;
-		ss << str;
-		ss >> std::boolalpha >> t;
-		return t ? 1 : 0;
+		return str == "T" ? 1 : 0;
+		//bool t;
+		//std::stringstream ss;
+		//ss << str;
+		//ss >> std::boolalpha >> t;
+		//return t ? 1 : 0;
 	}
 
 	template<>
 	STRING Utility::ToString(const BOOL& t)
 	{
-		STRING str;
-		std::stringstream ss;
-		ss << std::boolalpha << (t > 0);
-		ss >> str;
-		return str;
+		return t > 0 ? "T" : "F";
+		//STRING str;
+		//std::stringstream ss;
+		//ss << std::boolalpha << (t > 0);
+		//ss >> str;
+		//return str;
 	}
 
 	template<>

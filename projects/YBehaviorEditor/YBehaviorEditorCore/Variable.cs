@@ -464,8 +464,10 @@ namespace YBehavior.Editor.Core
                     break;
                 case ValueType.VT_BOOL:
                     {
-                        if (bool.TryParse(v, out bool a) && System.Text.RegularExpressions.Regex.IsMatch(v, "[a-z]"))
+                        if (v == "F" || v == "T")
                             return true;
+                        //if (bool.TryParse(v, out bool a) && System.Text.RegularExpressions.Regex.IsMatch(v, "[a-z]"))
+                        //    return true;
                         LogMgr.Instance.Log(string.Format("Variable parse error: bool {0} == {1}", Name, v));
                     }
                     break;
