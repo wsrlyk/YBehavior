@@ -139,6 +139,23 @@ namespace YBehavior.Editor
         }
     }
 
+    [ValueConversion(typeof(string), typeof(bool))]
+    public class StringBoolConvertor : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string s = value as string;
+            return s == "true";
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool b = (bool)value;
+            return b ? "true" : "false";
+            //string s = (string)value;
+            //return ValueTypeDic.GetKey(s, Variable.ValueType.VT_NONE);
+        }
+    }
+
 
     public class ValueConverterGroup : List<IValueConverter>, IValueConverter
     {

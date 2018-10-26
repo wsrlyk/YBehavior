@@ -59,15 +59,23 @@ namespace YBehavior.Editor
             if (v == null)
                 return;
 
-            if (v.vType != Core.Variable.ValueType.VT_ENUM)
+            if (v.vType == Core.Variable.ValueType.VT_ENUM)
             {
-                this.VConst.Visibility = Visibility.Visible;
+                this.VConst.Visibility = Visibility.Collapsed;
+                this.VBool.Visibility = Visibility.Collapsed;
+                this.VEnum.Visibility = Visibility.Visible;
+            }
+            else if (v.vType == Core.Variable.ValueType.VT_BOOL && v.cType == Core.Variable.CountType.CT_SINGLE)
+            {
+                this.VConst.Visibility = Visibility.Collapsed;
+                this.VBool.Visibility = Visibility.Visible;
                 this.VEnum.Visibility = Visibility.Collapsed;
             }
             else
             {
-                this.VConst.Visibility = Visibility.Collapsed;
-                this.VEnum.Visibility = Visibility.Visible;
+                this.VConst.Visibility = Visibility.Visible;
+                this.VBool.Visibility = Visibility.Collapsed;
+                this.VEnum.Visibility = Visibility.Collapsed;
             }
         }
     }

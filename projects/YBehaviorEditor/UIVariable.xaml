@@ -14,6 +14,7 @@
         <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
         <local:VariableValueTypeConvertor x:Key="valueTypeConvertor"/>
         <local:VariableVariableTypeConvertor x:Key="variableTypeConvertor"/>
+        <local:StringBoolConvertor x:Key="stringBoolConvertor"/>
         <local:VariableTypeCountConvertor x:Key="typeCountConvertor"/>
         <local:InvertBoolConverter x:Key="invertBoolConvertor"/>
         <local:ValueConverterGroup x:Key="invertBoolAndVisibilityConvertor">
@@ -59,6 +60,7 @@
                              Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}" 
                              BorderBrush="{Binding Path = IsRefreshed, Converter={StaticResource refreshConvertor}}" BorderThickness="2"/>
                     <ComboBox IsEnabled="{Binding IsEditable}" Name="VEnum" SelectedItem="{Binding Value}" ItemsSource="{Binding Enums}" Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}"/>
+                    <CheckBox IsEnabled="{Binding IsEditable}" Name="VBool" IsChecked="{Binding Value, Converter={StaticResource stringBoolConvertor}}" Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}" VerticalAlignment="Center"/>
                 </Grid>
             </Grid>
         </DockPanel>
