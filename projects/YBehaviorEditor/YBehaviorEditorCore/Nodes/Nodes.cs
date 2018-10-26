@@ -718,7 +718,7 @@ namespace YBehavior.Editor.Core
         {
             Variables.CreateVariableInNode(
                 "ExitWhenFailure",
-                "false",
+                "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
@@ -760,7 +760,7 @@ namespace YBehavior.Editor.Core
             );
             Variables.CreateVariableInNode(
                 "ExitWhenFailure",
-                "false",
+                "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
@@ -814,7 +814,7 @@ namespace YBehavior.Editor.Core
             );
             Variables.CreateVariableInNode(
                 "ExitWhenFailure",
-                "false",
+                "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
@@ -958,7 +958,7 @@ namespace YBehavior.Editor.Core
 
             Variables.CreateVariableInNode(
                 "IgnoreInput",
-                "true",
+                "T",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
