@@ -16,7 +16,7 @@ namespace YBehavior
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
 		TYPEID leftType = CreateVariable(m_Opl, "Target", data, true, Utility::POINTER_CHAR);
-		if (leftType != Utility::INVALID_TYPE)
+		if (leftType == Utility::INVALID_TYPE)
 		{
 			ERROR_BEGIN << "Invalid type for Opl in SetData: " << leftType << ERROR_END;
 			return false;
