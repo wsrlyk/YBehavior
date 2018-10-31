@@ -292,6 +292,10 @@ namespace YBehavior.Editor.Core
                     node.Conns.Connect(childNode, connectionIdentifier);
                     _LoadOneNode(childNode, chi);
                 }
+                else
+                {
+                    node.LoadChild(chi);
+                }
             }
             node.Conns.Sort(Node.SortByPosX);
             if (node.HasConditionConnection)
@@ -323,7 +327,7 @@ namespace YBehavior.Editor.Core
             data.AppendChild(nodeEl);
 
             nodeEl.SetAttribute("Class", node.Name);
-            node.Save(nodeEl);
+            node.Save(nodeEl, xmlDoc);
 
             foreach (Node chi in node.Conns)
             {
@@ -366,7 +370,7 @@ namespace YBehavior.Editor.Core
             data.AppendChild(nodeEl);
 
             nodeEl.SetAttribute("Class", node.Name);
-            node.Export(nodeEl);
+            node.Export(nodeEl, xmlDoc);
 
             foreach (Node chi in node.Conns)
             {

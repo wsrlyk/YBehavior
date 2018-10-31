@@ -9,7 +9,7 @@ namespace YBehavior.Editor.Core
 {
     public interface IVariableDataSource
     {
-        SharedData SharedData { get; }
+        IVariableCollection SharedData { get; }
     }
     public class Variable : System.ComponentModel.INotifyPropertyChanged
     {
@@ -107,7 +107,25 @@ namespace YBehavior.Editor.Core
             {VariableType.VBT_Const, CONST },
             {VariableType.VBT_Pointer, POINTER },
         };
+        public static VariableType GetVariableType(char c, VariableType defaultType)
+        {
+            c = Char.ToUpper(c);
+            return VariableTypeDic.GetKey(c, defaultType);
+        }
 
+        public static char GetVariableChar(VariableType type, char defaultChar, bool isLocal)
+        {
+            char c = VariableTypeDic.GetValue(type, defaultChar);
+            if (isLocal)
+                c = Char.ToLower(c);
+            else
+                c = Char.ToUpper(c);
+            return c;
+        }
+        public static bool GetLocal(char c)
+        {
+            return Char.IsLower(c);
+        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -182,13 +200,19 @@ namespace YBehavior.Editor.Core
         //List<CountType> m_cTypeSet = new List<CountType>();
         public List<ValueType> vTypeSet { get { return m_vTypeSet; } }
         //public List<CountType> cTypeSet { get { return m_cTypeSet; } }
+        bool m_bIsLocal = false;
+        public bool IsLocal { get { return m_bIsLocal; } set { m_bIsLocal = value; } }
 
+        /// <summary>
+        /// To tell if it's local or not. Local: aaa L      Shared: aaa
+        /// </summary>
+        string m_DisplayValue;
         string m_Value;
         string m_Name;
         string m_Params = null;
         bool m_bCanbeRemoved = false;
         public IVariableDataSource SharedDataSource { get; set; } = null;
-        public SharedData Container { get; set; } = null;
+        public VariableCollection Container { get; set; } = null;
 
         public string Description { get; set; }
 
@@ -216,13 +240,16 @@ namespace YBehavior.Editor.Core
                     {
                         if (v.Variable.vType == vType)
                         {
+                            string s = v.Variable.Name;
+                            if (v.Variable.IsLocal)
+                                s = s + " L";
                             if (v.Variable.cType == cType)
-                                Candidates.Add(v.Variable.Name);
+                                Candidates.Add(s);
                             ///> List can also be added to the candidates if the target is single
                             else if (v.Variable.cType == CountType.CT_LIST && !IsIndex)
                             {
-                                Candidates.Add(v.Variable.Name);
-                                m_VectorCandidates.Add(v.Variable.Name);
+                                Candidates.Add(s);
+                                m_VectorCandidates.Add(s);
                             }
                         }
                     }
@@ -264,6 +291,29 @@ namespace YBehavior.Editor.Core
                 return Value;
             }
         }
+        public string DisplayValue
+        {
+            get { return m_DisplayValue; }
+            set
+            {
+                //m_DisplayValue = value;
+
+                if (vbType == VariableType.VBT_Pointer)
+                {
+                    int p = value.IndexOf(" L");
+                    if (p >= 0)
+                    {
+                        value = value.Substring(0, p);
+                        IsLocal = true;
+                    }
+                    else
+                    {
+                        IsLocal = false;
+                    }
+                }
+                Value = value;
+            }
+        }
         public string Value
         {
             get { return m_Value; }
@@ -278,6 +328,11 @@ namespace YBehavior.Editor.Core
                 };
                 m_Value = value;
 
+                if (vbType == VariableType.VBT_Pointer && IsLocal)
+                    m_DisplayValue = value + " L";
+                else
+                    m_DisplayValue = value;
+
                 if (!IsIndex)
                 {
                     if (vbType == VariableType.VBT_Pointer)
@@ -288,7 +343,7 @@ namespace YBehavior.Editor.Core
                             {
                                 m_VectorIndex = new Variable(SharedDataSource);
                                 m_VectorIndex.m_Parent = this;
-                                m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, "0");
+                                m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, true, "0");
                                 OnPropertyChanged("VectorIndex");
                             }
                             m_bVectorIndexEnabled = true;
@@ -345,13 +400,13 @@ namespace YBehavior.Editor.Core
             {
                 char _vtype = ValueTypeDic.GetValue(m_vType, INT);
                 char _ctype = m_cType == CountType.CT_LIST ? _vtype : SINGLE;
-                char _vbtype = VariableTypeDic.GetValue(m_vbType, CONST);
+                char _vbtype = GetVariableChar(m_vbType, CONST, IsLocal);
                 StringBuilder sb = new StringBuilder();
                 sb.Append(_ctype).Append(_vtype).Append(_vbtype).Append(' ').Append(Value);
 
                 if (m_VectorIndex != null)
                 {
-                    sb.Append(" VI ").Append(VariableTypeDic.GetValue(m_VectorIndex.vbType, CONST)).Append(' ').Append(m_VectorIndex.Value);
+                    sb.Append(" VI ").Append(GetVariableChar(m_VectorIndex.vbType, CONST, m_VectorIndex.IsLocal)).Append(' ').Append(m_VectorIndex.Value);
                 }
                 return sb.ToString();
             }
@@ -548,7 +603,12 @@ namespace YBehavior.Editor.Core
             m_bVectorIndexEnabled = true;
             m_VectorIndex = new Variable(SharedDataSource);
             m_VectorIndex.m_Parent = this;
-            m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableTypeDic.GetKey(variableType[0],VariableType.VBT_NONE), value);
+            m_VectorIndex.SetVariable(
+                ValueType.VT_INT, 
+                CountType.CT_SINGLE, 
+                GetVariableType(variableType[0],VariableType.VBT_NONE),
+                GetLocal(variableType[0]), 
+                value);
             return true;
         }
         public bool SetVariable(char valueType, char countType, char variableType, string value, string param = null)
@@ -562,10 +622,11 @@ namespace YBehavior.Editor.Core
 
             if (!LockVBType)
             {
-                vbType = VariableTypeDic.GetKey(variableType, VariableType.VBT_NONE);
+                vbType = GetVariableType(variableType, VariableType.VBT_NONE);
                 if (vbType == VariableType.VBT_NONE)
                     return false;
             }
+            IsLocal = Char.IsLower(variableType);
 
             m_Value = value;
             if (param != null)
@@ -574,7 +635,7 @@ namespace YBehavior.Editor.Core
             RefreshCandidates(true);
             return true;
         }
-        public bool SetVariable(ValueType vtype, CountType ctype, VariableType vbtype, string value, string param = null, string newName = null)
+        public bool SetVariable(ValueType vtype, CountType ctype, VariableType vbtype, bool isLocal, string value, string param = null, string newName = null)
         {
             m_bInited = false;
             if (newName != null)
@@ -589,6 +650,8 @@ namespace YBehavior.Editor.Core
             vbType = vbtype;
             if (vbType == VariableType.VBT_NONE)
                 return false;
+
+            IsLocal = isLocal;
 
             m_Value = value;
             if (param != null)

@@ -49,7 +49,7 @@ namespace YBehavior.Editor
             {
 
                 if (v.SharedDataSource.SharedData != null)
-                    v.SharedDataSource.SharedData.RemoveVariable(v);
+                    (v.SharedDataSource.SharedData as Core.TreeMemory).RemoveVariable(v);
             }
         }
 

@@ -78,7 +78,7 @@ namespace YBehavior.Editor
             if (node == null)
                 return;
 
-            node.Variables.RefreshVariables();
+            node.NodeMemory.RefreshVariables();
         }
 
         private void _OnDebugTargetChanged(EventArg arg)

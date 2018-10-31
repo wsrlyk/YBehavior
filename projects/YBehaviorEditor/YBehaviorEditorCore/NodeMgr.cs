@@ -408,12 +408,16 @@ namespace YBehavior.Editor.Core
 
         public DebugPointInfo DebugPointInfo { get; } = new DebugPointInfo();
 
-        protected SharedData m_Variables;
-        public SharedData Variables { get { return m_Variables; } }
+        protected TreeMemory m_TreeMemory;
+        public TreeMemory TreeMemory { get { return m_TreeMemory; } }
+        protected NodeMemory m_NodeMemory;
+        public NodeMemory NodeMemory { get { return m_NodeMemory; } }
+        protected IVariableCollection m_Variables;
+        public IVariableCollection Variables { get { return m_Variables; } }
 
-        public SharedData SharedData { get { return GetTreeSharedData(); } }
-        protected SharedData m_TreeSharedData = null;
-        public SharedData GetTreeSharedData()
+        public IVariableCollection SharedData { get { return GetTreeSharedData(); } }
+        protected IVariableCollection m_TreeSharedData = null;
+        public IVariableCollection GetTreeSharedData()
         {
             if (m_TreeSharedData != null)
                 return m_TreeSharedData;
@@ -473,6 +477,15 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        public void LoadChild(System.Xml.XmlNode data)
+        {
+            _OnLoadChild(data);
+        }
+
+        protected virtual void _OnLoadChild(System.Xml.XmlNode data)
+        {
+
+        }
         protected bool ProcessAttrWhenLoad(System.Xml.XmlAttribute attr)
         {
             switch (attr.Name)
@@ -531,9 +544,19 @@ namespace YBehavior.Editor.Core
             if (_HasParentHolder())
                 m_Connections.CreateParentHolder(this);
 
-            m_Variables = new SharedData(this);
-            m_Renderer = new Renderer(this);
+            if (this is Tree)
+            {
+                m_Variables = new TreeMemory(this);
+                m_TreeMemory = m_Variables as TreeMemory;
+            }
+            else
+            {
+                m_Variables = new NodeMemory(this);
+                m_NodeMemory = m_Variables as NodeMemory;
+            }
 
+            m_Renderer = new Renderer(this);
+            if (m_Renderer is Renderer) { }
             m_ConditonConnection = new ConnectionSingle(this, Connection.IdentifierCondition);
         }
 
@@ -572,7 +595,7 @@ namespace YBehavior.Editor.Core
                 v.Variable.RefreshCandidates(true);
             }
         }
-        public virtual void Save(System.Xml.XmlElement data)
+        public void Save(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
         {
             if (Conns.ParentHolder != null && Conns.ParentHolder.Conn != null)
             {
@@ -603,13 +626,21 @@ namespace YBehavior.Editor.Core
                 data.SetAttribute("Folded", "true");
             }
 
-            foreach (VariableHolder v in Variables.Datas)
+            _OnSaveVariables(data, xmlDoc);
+        }
+
+        protected void _WriteVariables(IVariableCollection collection, System.Xml.XmlElement data)
+        {
+            foreach (VariableHolder v in collection.Datas)
             {
                 data.SetAttribute(v.Variable.Name, v.Variable.ValueInXml);
             }
         }
-
-        public virtual void Export(System.Xml.XmlElement data)
+        protected virtual void _OnSaveVariables(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
+        {
+            _WriteVariables(Variables, data);
+        }
+        public void Export(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
         {
             if (Conns.ParentHolder != null && Conns.ParentHolder.Conn != null)
             {
@@ -617,10 +648,11 @@ namespace YBehavior.Editor.Core
                     data.SetAttribute("Connection", Conns.ParentHolder.Conn.Identifier);
             }
 
-            foreach (VariableHolder v in Variables.Datas)
-            {
-                data.SetAttribute(v.Variable.Name, v.Variable.ValueInXml);
-            }
+            _OnExportVariables(data, xmlDoc);
+        }
+        protected virtual void _OnExportVariables(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
+        {
+            _WriteVariables(Variables, data);
         }
 
         //public virtual Renderer CreateRenderer()
@@ -650,15 +682,20 @@ namespace YBehavior.Editor.Core
 
         public bool CheckValid()
         {
-            if (m_Variables.SameTypeGroup == null)
+            if (!(m_Variables is NodeMemory))
+                return true;
+
+            NodeMemory memory = m_Variables as NodeMemory;
+            SameTypeGroup sameTypeGroup = memory.SameTypeGroup;
+            if (sameTypeGroup == null)
                 return true;
             bool bRes = true;
-            foreach (HashSet<string> group in m_Variables.SameTypeGroup)
+            foreach (HashSet<string> group in sameTypeGroup)
             {
                 Variable.ValueType valueType = Variable.ValueType.VT_NONE;
                 foreach (string vName in group)
                 {
-                    Variable v = m_Variables.GetVariable(vName);
+                    Variable v = memory.GetVariable(vName);
                     if (v == null)
                         continue;
 
@@ -687,8 +724,10 @@ namespace YBehavior.Editor.Core
             other.Renderer.Geo.Pos = other.Renderer.Geo.Pos + new Vector(5, 5);
             other.m_TreeSharedData = this.m_TreeSharedData;
 
-            this.Variables.CloneTo(other.Variables);
-
+            if (this.Variables is NodeMemory)
+            {
+                (this.Variables as NodeMemory).CloneTo(other.Variables as NodeMemory);
+            }
 
             return other;
         }

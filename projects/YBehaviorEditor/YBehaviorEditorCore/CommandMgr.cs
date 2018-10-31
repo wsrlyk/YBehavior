@@ -148,14 +148,14 @@ namespace YBehavior.Editor.Core
         {
             if (WorkBenchMgr.Instance.ActiveWorkBench != null && WorkBenchMgr.Instance.ActiveWorkBench.MainTree != null)
             {
-                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.SharedData.AddBackVariable(VariableHolder);
+                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.TreeMemory.AddBackVariable(VariableHolder);
             }
         }
         public void Undo()
         {
             if (WorkBenchMgr.Instance.ActiveWorkBench != null && WorkBenchMgr.Instance.ActiveWorkBench.MainTree != null)
             {
-                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.SharedData.RemoveVariable(VariableHolder.Variable);
+                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.TreeMemory.RemoveVariable(VariableHolder.Variable);
             }
         }
     }
@@ -168,14 +168,14 @@ namespace YBehavior.Editor.Core
         {
             if (WorkBenchMgr.Instance.ActiveWorkBench != null && WorkBenchMgr.Instance.ActiveWorkBench.MainTree != null)
             {
-                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.SharedData.RemoveVariable(VariableHolder.Variable);
+                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.TreeMemory.RemoveVariable(VariableHolder.Variable);
             }
         }
         public void Undo()
         {
             if (WorkBenchMgr.Instance.ActiveWorkBench != null && WorkBenchMgr.Instance.ActiveWorkBench.MainTree != null)
             {
-                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.SharedData.AddBackVariable(VariableHolder);
+                WorkBenchMgr.Instance.ActiveWorkBench.MainTree.TreeMemory.AddBackVariable(VariableHolder);
             }
         }
     }

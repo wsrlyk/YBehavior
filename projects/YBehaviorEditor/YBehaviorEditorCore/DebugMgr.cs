@@ -27,7 +27,7 @@ namespace YBehavior.Editor.Core
     {
         public Dictionary<uint, int> info = new Dictionary<uint, int>();
         public string treeName;
-        public SharedData sharedData;
+        public TreeMemory sharedData;
 
         public void Clear()
         {
@@ -42,12 +42,12 @@ namespace YBehavior.Editor.Core
         string m_TargetTreeName;
 
         uint m_UID;
-        SharedData m_EmptySharedData = new SharedData(null);
+        TreeMemory m_EmptySharedData = new TreeMemory(null);
         public string TargetTreeName { get { return m_TargetTreeName; } }
 
         public bool bBreaked { get; set; }
 
-        public SharedData DebugSharedData
+        public IVariableCollection DebugSharedData
         {
             get
             {
@@ -182,7 +182,7 @@ namespace YBehavior.Editor.Core
             foreach (WorkBench bench in benches)
             {
                 RunInfo runInfo = GetRunInfo(bench.FileInfo.Name);
-                runInfo.sharedData = bench.MainTree.SharedData.Clone();
+                runInfo.sharedData = bench.MainTree.TreeMemory.Clone() as TreeMemory;
             }
         }
     }

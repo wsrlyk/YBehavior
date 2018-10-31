@@ -46,7 +46,7 @@
                 </Button>
             </Grid>
             <Grid>
-                <ComboBox IsEnabled="{Binding IsEditable}" SelectedItem="{Binding Value}" ItemsSource="{Binding Candidates}" x:Name="VPointer" MinWidth="110" MaxDropDownHeight ="150"
+                <ComboBox IsEnabled="{Binding IsEditable}" SelectedItem="{Binding DisplayValue}" ItemsSource="{Binding Candidates}" x:Name="VPointer" MinWidth="110" MaxDropDownHeight ="150"
                       Visibility="{Binding Path=IsChecked, ElementName=Switcher, Converter={StaticResource visibilityConvertor}}" 
                       Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}">
                     <ComboBox.ItemsPanel>

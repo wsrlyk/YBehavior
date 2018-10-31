@@ -99,11 +99,12 @@ namespace YBehavior.Editor
             bool isarray = this.VIsArray.IsChecked ?? false;
             bool islocal = this.VIsLocal.IsChecked ?? false;
 
-            if (m_CurTree.Variables.TryCreateVariable(
+            if ((m_CurTree.Variables as Core.TreeMemory).TryCreateVariable(
                 name, 
                 value, 
                 Variable.ValueTypeDic2.GetKey(type, Variable.ValueType.VT_NONE),
-                isarray ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE))
+                isarray ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE,
+                islocal))
             {
                 this.VName.Text = string.Empty;
                 ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()

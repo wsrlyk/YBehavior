@@ -5,52 +5,7 @@ using System.Text;
 
 namespace YBehavior.Editor.Core
 {
-    public class SameTypeGroup : System.Collections.IEnumerable
-    {
-        Dictionary<int, HashSet<string>> m_Groups = new Dictionary<int, HashSet<string>>();
-
-        public void Add(string key, int group)
-        {
-            HashSet<string> groupSet;
-            if (!m_Groups.TryGetValue(group, out groupSet))
-            {
-                groupSet = new HashSet<string>();
-                m_Groups[group] = groupSet;
-            }
-
-            groupSet.Add(key);
-        }
-
-        public System.Collections.IEnumerator GetEnumerator()
-        {
-            return m_Groups.Values.GetEnumerator();
-        }
-
-        public SameTypeGroup Clone()
-        {
-            SameTypeGroup other = new SameTypeGroup();
-            
-            foreach (var keypair in m_Groups)
-            {
-                HashSet<string> groupSet = new HashSet<string>();
-
-                foreach (var groups in keypair.Value)
-                {
-                    groupSet.Add(groups);
-                }
-
-                other.m_Groups[keypair.Key] = groupSet;
-            }
-
-            return other;
-        }
-    }
-
-    public class VariableHolder
-    {
-        public Variable Variable { get; set; }
-        public int Index;
-    }
+    /*
     public class SharedData
     {
         ObservableDictionary<string, VariableHolder> m_Variables = new ObservableDictionary<string, VariableHolder>();
@@ -312,7 +267,7 @@ namespace YBehavior.Editor.Core
                 foreach (VariableHolder v in m_VariableList)
                 {
                     Variable vv = v.Variable.Clone();
-                    other.AddVariable(vv);
+                    other._AddVariable(vv);
                 }
 
                 if (SameTypeGroup != null)
@@ -320,4 +275,5 @@ namespace YBehavior.Editor.Core
             }
         }
     }
+    */
 }

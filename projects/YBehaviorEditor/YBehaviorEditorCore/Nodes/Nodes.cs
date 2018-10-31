@@ -26,9 +26,51 @@ namespace YBehavior.Editor.Core
             return false;
         }
 
+        protected override void _OnLoadChild(XmlNode data)
+        {
+            if (data.Name != "Shared" && data.Name != "Local")
+                return;
+
+            foreach (System.Xml.XmlAttribute attr in data.Attributes)
+            {
+                if (ReservedAttributes.Contains(attr.Name))
+                    continue;
+                TreeMemory.TryAddData(attr.Name, attr.Value);
+            }
+        }
+
         protected override bool LoadOtherAttr(XmlAttribute attr)
         {
-            return m_Variables.TryAddData(attr.Name, attr.Value);
+            ///> These shareddatas are moved to sub child nodes
+            //return TreeMemory.TryAddData(attr.Name, attr.Value);
+            return true;
+        }
+
+        protected override void _OnSaveVariables(XmlElement data, XmlDocument xmlDoc)
+        {
+            _WriteMemory(data, xmlDoc);
+        }
+        protected override void _OnExportVariables(XmlElement data, XmlDocument xmlDoc)
+        {
+            _WriteMemory(data, xmlDoc);
+        }
+
+        void _WriteMemory(XmlElement data, XmlDocument xmlDoc)
+        {
+            if (TreeMemory.SharedMemory.Datas.Count > 0)
+            {
+                XmlElement nodeEl = xmlDoc.CreateElement("Shared");
+                data.AppendChild(nodeEl);
+
+                _WriteVariables(TreeMemory.SharedMemory, nodeEl);
+            }
+            if (TreeMemory.LocalMemory.Datas.Count > 0)
+            {
+                XmlElement nodeEl = xmlDoc.CreateElement("Local");
+                data.AppendChild(nodeEl);
+
+                _WriteVariables(TreeMemory.LocalMemory, nodeEl);
+            }
         }
     }
 
@@ -135,7 +177,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable optr = Variables.CreateVariableInNode(
+            Variable optr = NodeMemory.CreateVariable(
                 "Operator",
                 "ADD",
                 Variable.CreateParams_Enum,
@@ -146,7 +188,7 @@ namespace YBehavior.Editor.Core
                 "ADD|SUB|MUL|DIV"
             );
 
-            Variable opl = Variables.CreateVariableInNode(
+            Variable opl = NodeMemory.CreateVariable(
                 "Opl",
                 "0",
                 Variable.CreateParams_AllNumbers,
@@ -156,7 +198,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variable opr1 = Variables.CreateVariableInNode(
+            Variable opr1 = NodeMemory.CreateVariable(
                 "Opr1",
                 "0",
                 Variable.CreateParams_AllNumbers,
@@ -166,7 +208,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variable opr2 = Variables.CreateVariableInNode(
+            Variable opr2 = NodeMemory.CreateVariable(
                 "Opr2",
                 "0",
                 Variable.CreateParams_AllNumbers,
@@ -207,7 +249,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable optr = Variables.CreateVariableInNode(
+            Variable optr = NodeMemory.CreateVariable(
                 "Operator",
                 "==",
                 Variable.CreateParams_Enum,
@@ -218,7 +260,7 @@ namespace YBehavior.Editor.Core
                 "==|!=|>|<|>=|<="
             );
 
-            Variable opl = Variables.CreateVariableInNode(
+            Variable opl = NodeMemory.CreateVariable(
                 "Opl",
                 "0",
                 Variable.CreateParams_AllTypes,
@@ -228,7 +270,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variable opr = Variables.CreateVariableInNode(
+            Variable opr = NodeMemory.CreateVariable(
                 "Opr",
                 "0",
                 Variable.CreateParams_AllTypes,
@@ -268,7 +310,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable opl = Variables.CreateVariableInNode(
+            Variable opl = NodeMemory.CreateVariable(
                 "Target",
                 "0",
                 Variable.CreateParams_AllTypes,
@@ -278,7 +320,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variable opr = Variables.CreateVariableInNode(
+            Variable opr = NodeMemory.CreateVariable(
                 "Source",
                 "0",
                 Variable.CreateParams_AllTypes,
@@ -369,7 +411,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable opl = Variables.CreateVariableInNode(
+            Variable opl = NodeMemory.CreateVariable(
                 "Target",
                 "0",
                 Variable.CreateParams_RandomTypes,
@@ -379,7 +421,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variable opr1 = Variables.CreateVariableInNode(
+            Variable opr1 = NodeMemory.CreateVariable(
                 "Bound1",
                 "0",
                 Variable.CreateParams_RandomTypes,
@@ -389,7 +431,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variable opr2 = Variables.CreateVariableInNode(
+            Variable opr2 = NodeMemory.CreateVariable(
                 "Bound2",
                 "0",
                 Variable.CreateParams_RandomTypes,
@@ -428,7 +470,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable opl = Variables.CreateVariableInNode(
+            Variable opl = NodeMemory.CreateVariable(
                 "Input",
                 "",
                 Variable.CreateParams_AllTypes,
@@ -438,7 +480,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variable opr1 = Variables.CreateVariableInNode(
+            Variable opr1 = NodeMemory.CreateVariable(
                 "Output",
                 "",
                 Variable.CreateParams_AllTypes,
@@ -476,7 +518,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable name = Variables.CreateVariableInNode(
+            Variable name = NodeMemory.CreateVariable(
                 "Event",
                 "",
                 Variable.CreateParams_String,
@@ -486,7 +528,7 @@ namespace YBehavior.Editor.Core
                 0
             );
 
-            Variable ints = Variables.CreateVariableInNode(
+            Variable ints = NodeMemory.CreateVariable(
                 "Int",
                 "",
                 Variable.CreateParams_Int,
@@ -496,7 +538,7 @@ namespace YBehavior.Editor.Core
                 0
             );
 
-            Variable floats = Variables.CreateVariableInNode(
+            Variable floats = NodeMemory.CreateVariable(
                 "Float",
                 "",
                 Variable.CreateParams_Float,
@@ -506,7 +548,7 @@ namespace YBehavior.Editor.Core
                 0
             );
 
-            Variable strings = Variables.CreateVariableInNode(
+            Variable strings = NodeMemory.CreateVariable(
                 "String",
                 "",
                 Variable.CreateParams_String,
@@ -516,7 +558,7 @@ namespace YBehavior.Editor.Core
                 0
             );
 
-            Variable ulongs = Variables.CreateVariableInNode(
+            Variable ulongs = NodeMemory.CreateVariable(
                 "Ulong",
                 "",
                 Variable.CreateParams_Ulong,
@@ -526,7 +568,7 @@ namespace YBehavior.Editor.Core
                 0
             );
 
-            Variable bools = Variables.CreateVariableInNode(
+            Variable bools = NodeMemory.CreateVariable(
                 "Bool",
                 "",
                 Variable.CreateParams_Bool,
@@ -569,7 +611,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable name = Variables.CreateVariableInNode(
+            Variable name = NodeMemory.CreateVariable(
                 "Event",
                 "",
                 Variable.CreateParams_String,
@@ -579,7 +621,7 @@ namespace YBehavior.Editor.Core
                 0
             );
 
-            Variable ints = Variables.CreateVariableInNode(
+            Variable ints = NodeMemory.CreateVariable(
                 "Int",
                 "",
                 Variable.CreateParams_Int,
@@ -589,7 +631,7 @@ namespace YBehavior.Editor.Core
                 0
             );
 
-            Variable floats = Variables.CreateVariableInNode(
+            Variable floats = NodeMemory.CreateVariable(
                 "Float",
                 "",
                 Variable.CreateParams_Float,
@@ -599,7 +641,7 @@ namespace YBehavior.Editor.Core
                 0
             );
 
-            Variable strings = Variables.CreateVariableInNode(
+            Variable strings = NodeMemory.CreateVariable(
                 "String",
                 "",
                 Variable.CreateParams_String,
@@ -609,7 +651,7 @@ namespace YBehavior.Editor.Core
                 0
             );
 
-            Variable ulongs = Variables.CreateVariableInNode(
+            Variable ulongs = NodeMemory.CreateVariable(
                 "Ulong",
                 "",
                 Variable.CreateParams_Ulong,
@@ -619,7 +661,7 @@ namespace YBehavior.Editor.Core
                 0
             );
 
-            Variable bools = Variables.CreateVariableInNode(
+            Variable bools = NodeMemory.CreateVariable(
                 "Bool",
                 "",
                 Variable.CreateParams_Bool,
@@ -662,7 +704,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "Switch",
                 "0",
                 Variable.CreateParams_SwitchTypes,
@@ -672,7 +714,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "Cases",
                 "",
                 Variable.CreateParams_SwitchTypes,
@@ -716,7 +758,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "ExitWhenFailure",
                 "F",
                 Variable.CreateParams_Bool,
@@ -740,7 +782,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "Collection",
                 "",
                 Variable.CreateParams_AllTypes,
@@ -749,7 +791,7 @@ namespace YBehavior.Editor.Core
                 false,
                 1
             );
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "Current",
                 "",
                 Variable.CreateParams_AllTypes,
@@ -758,7 +800,7 @@ namespace YBehavior.Editor.Core
                 true,
                 1
             );
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "ExitWhenFailure",
                 "F",
                 Variable.CreateParams_Bool,
@@ -794,7 +836,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "Count",
                 "",
                 Variable.CreateParams_Int,
@@ -803,7 +845,7 @@ namespace YBehavior.Editor.Core
                 false,
                 1
             );
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "Current",
                 "",
                 Variable.CreateParams_Int,
@@ -812,7 +854,7 @@ namespace YBehavior.Editor.Core
                 true,
                 1
             );
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "ExitWhenFailure",
                 "F",
                 Variable.CreateParams_Bool,
@@ -848,7 +890,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "KeyPointX",
                 "",
                 Variable.CreateParams_AllNumbers,
@@ -858,7 +900,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "KeyPointY",
                 "",
                 Variable.CreateParams_AllNumbers,
@@ -868,7 +910,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "InputX",
                 "",
                 Variable.CreateParams_AllNumbers,
@@ -878,7 +920,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "OutputY",
                 "",
                 Variable.CreateParams_AllNumbers,
@@ -916,7 +958,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "Distribution",
                 "",
                 Variable.CreateParams_AllNumbers,
@@ -926,7 +968,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "Values",
                 "",
                 Variable.CreateParams_AllTypes,
@@ -936,7 +978,7 @@ namespace YBehavior.Editor.Core
                 2
             );
 
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "Input",
                 "0",
                 Variable.CreateParams_AllNumbers,
@@ -946,7 +988,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "Output",
                 "",
                 Variable.CreateParams_AllTypes,
@@ -956,7 +998,7 @@ namespace YBehavior.Editor.Core
                 2
             );
 
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "IgnoreInput",
                 "T",
                 Variable.CreateParams_Bool,
@@ -995,7 +1037,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "Tree",
                 "",
                 Variable.CreateParams_String,
@@ -1028,7 +1070,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variables.CreateVariableInNode(
+            NodeMemory.CreateVariable(
                 "TickCount",
                 "1",
                 Variable.CreateParams_Int,
@@ -1061,7 +1103,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable opl = Variables.CreateVariableInNode(
+            Variable opl = NodeMemory.CreateVariable(
                 "Target",
                 "0",
                 Variable.CreateParams_AllTypes,
@@ -1071,7 +1113,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variable opr = Variables.CreateVariableInNode(
+            Variable opr = NodeMemory.CreateVariable(
                 "Source",
                 "0",
                 Variable.CreateParams_AllTypes,
@@ -1110,7 +1152,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable opl = Variables.CreateVariableInNode(
+            Variable opl = NodeMemory.CreateVariable(
                 "Array",
                 "0",
                 Variable.CreateParams_AllTypes,
@@ -1147,7 +1189,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable array = Variables.CreateVariableInNode(
+            Variable array = NodeMemory.CreateVariable(
                 "Array",
                 "0",
                 Variable.CreateParams_AllTypes,
@@ -1156,7 +1198,7 @@ namespace YBehavior.Editor.Core
                 false
             );
 
-            Variable length = Variables.CreateVariableInNode(
+            Variable length = NodeMemory.CreateVariable(
                 "Length",
                 "0",
                 Variable.CreateParams_Int,
@@ -1194,7 +1236,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            Variable array = Variables.CreateVariableInNode(
+            Variable array = NodeMemory.CreateVariable(
                 "Array",
                 "0",
                 Variable.CreateParams_AllTypes,
@@ -1204,7 +1246,7 @@ namespace YBehavior.Editor.Core
                 1
             );
 
-            Variable element = Variables.CreateVariableInNode(
+            Variable element = NodeMemory.CreateVariable(
                 "Element",
                 "0",
                 Variable.CreateParams_AllTypes,

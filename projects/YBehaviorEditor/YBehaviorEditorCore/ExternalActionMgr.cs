@@ -96,7 +96,7 @@ namespace YBehavior.Editor.Core
                 valueType[i] = Variable.ValueTypeDic.GetKey(valueTypes[i], Variable.ValueType.VT_NONE);
             }
 
-
+            bool bIsLocal = false;
             Variable.VariableType vbType = Variable.VariableType.VBT_Const;
             bool bLockVBType = false;
             ///> Is Enum, always const
@@ -112,7 +112,7 @@ namespace YBehavior.Editor.Core
                     string strVariableType = attr.Value;
                     if (strVariableType.Length == 1)
                     {
-                        vbType = Variable.VariableTypeDic.GetKey(strVariableType[0], Variable.VariableType.VBT_NONE);
+                        vbType = Variable.GetVariableType(strVariableType[0], Variable.VariableType.VBT_NONE);
                         if (vbType == Variable.VariableType.VBT_NONE)
                         {
                             LogMgr.Instance.Error("VariableType format error: " + strVariableType);
@@ -122,6 +122,8 @@ namespace YBehavior.Editor.Core
                         {
                             bLockVBType = true;
                         }
+
+                        bIsLocal = Char.IsLower(strVariableType[0]);
                     }
                     else
                     {
@@ -161,7 +163,7 @@ namespace YBehavior.Editor.Core
                 int.TryParse(attr.Value, out typeGroup);
             }
 
-            Variable v = action.Variables.CreateVariableInNode(
+            Variable v = action.NodeMemory.CreateVariable(
                 name,
                 value,
                 valueType,
@@ -171,6 +173,7 @@ namespace YBehavior.Editor.Core
                 typeGroup,
                 param
             );
+            v.IsLocal = bIsLocal;
             return true;
         }
     }
