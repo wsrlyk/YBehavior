@@ -32,8 +32,8 @@ namespace YBehavior
 			LOG_SHARED_DATA(m_IgnoreInput, true);
 		}
 
-		INT sizeX = m_Distribution->VectorSize(pAgent->GetSharedData());
-		INT sizeY = m_Values->VectorSize(pAgent->GetSharedData());
+		INT sizeX = m_Distribution->VectorSize(pAgent->GetMemory());
+		INT sizeY = m_Values->VectorSize(pAgent->GetMemory());
 		if (sizeX != sizeY)
 		{
 			DEBUG_LOG_INFO("Different length of X and Y; ");
@@ -47,7 +47,7 @@ namespace YBehavior
 
 		IVariableOperationHelper* pHelper = m_Input->GetOperation();
 
-		const void* x0 = m_Distribution->GetElement(pAgent->GetSharedData(), 0);
+		const void* x0 = m_Distribution->GetElement(pAgent->GetMemory(), 0);
 		void* pZero = pHelper->AllocData();
 		pHelper->Set(pZero, x0);
 		pHelper->Calculate(pZero, pZero, pZero, OT_SUB);
@@ -56,14 +56,14 @@ namespace YBehavior
 		void* randRes;
 		
 		BOOL bIgnoreInput = false;
-		m_IgnoreInput->GetCastedValue(pAgent->GetSharedData(), bIgnoreInput);
+		m_IgnoreInput->GetCastedValue(pAgent->GetMemory(), bIgnoreInput);
 		if (bIgnoreInput)
 		{
 			void* pSum = pHelper->AllocData();
 			pHelper->Set(pSum, pZero);
 			for (INT i = 0; i < sizeX; ++i)
 			{
-				const void* x1 = m_Distribution->GetElement(pAgent->GetSharedData(), i);
+				const void* x1 = m_Distribution->GetElement(pAgent->GetMemory(), i);
 				pHelper->Calculate(pSum, pSum, x1, OT_ADD);
 			}
 			randRes = pHelper->AllocData();
@@ -73,7 +73,7 @@ namespace YBehavior
 		}
 		else
 		{
-			input = m_Input->GetValue(pAgent->GetSharedData());
+			input = m_Input->GetValue(pAgent->GetMemory());
 		}
 		///>   y = y0 + (y1 - y0) * (x - x0) / (x1 - x0)
 		///>   y = y0 + pDeltaY * pOffsetX / pDeltaX
@@ -91,14 +91,14 @@ namespace YBehavior
 
 		for (INT i = 0; i < sizeX; ++i)
 		{
-			const void* x0 = m_Distribution->GetElement(pAgent->GetSharedData(), i);
+			const void* x0 = m_Distribution->GetElement(pAgent->GetMemory(), i);
 			pHelper->Calculate(pCurrent, pCurrent, x0, OT_ADD);
 
 			///> in the range of this (x0, x1)
 			if (pHelper->Compare(input, pCurrent, OT_LESS))
 			{
 				ns = NS_SUCCESS;
-				m_Output->SetValue(pAgent->GetSharedData(), m_Values->GetElement(pAgent->GetSharedData(), i));
+				m_Output->SetValue(pAgent->GetMemory(), m_Values->GetElement(pAgent->GetMemory(), i));
 				break;
 			}
 		}

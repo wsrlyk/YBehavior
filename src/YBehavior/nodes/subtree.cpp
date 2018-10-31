@@ -35,6 +35,19 @@ namespace YBehavior
 		return true;
 	}
 
+	bool SubTree::OnLoadChild(const pugi::xml_node& data)
+	{
+		if (strcmp(data.name(), "In") == 0)
+		{
+
+		}
+		else if (strcmp(data.name(), "Out") == 0)
+		{
+
+		}
+		return true;
+	}
+
 	YBehavior::NodeState SubTree::Update(AgentPtr pAgent)
 	{
 		if (m_Tree == nullptr && m_Root != nullptr)
@@ -55,7 +68,7 @@ namespace YBehavior
 
 		if (m_Tree != nullptr)
 		{
-			return m_Tree->Execute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID);
+			return m_Tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID);
 		}
 		return NS_FAILURE;
 	}

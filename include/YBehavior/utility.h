@@ -32,7 +32,8 @@ namespace YBehavior
 		static void CreateVector3(const StdVector<STRING>& data, Vector3& vector3);
 
 		static bool IsElement(TYPEID eleType, TYPEID vectorType);
-
+		static char ToLower(char c);
+		static bool IsLower(char c);
 		template<typename T>
 		static T ToType(const STRING& str)
 		{

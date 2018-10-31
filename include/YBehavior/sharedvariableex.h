@@ -5,6 +5,7 @@
 #include "YBehavior/variableoperation.h"
 #include "YBehavior/interface.h"
 #include "treekeymgr.h"
+#include "memory.h"
 
 namespace YBehavior
 {
@@ -17,6 +18,7 @@ namespace YBehavior
 		{
 			m_VectorIndex = nullptr;
 			m_Key = Utility::INVALID_KEY;
+			m_IsLocal = false;
 		}
 		~SharedVariableEx()
 		{
@@ -36,24 +38,49 @@ namespace YBehavior
 			return &m_Value;
 		}
 
-		void _SetCastedValue(SharedDataEx* pData, const ElementType* src)
+		void _SetCastedValue(Memory* pMemory, const ElementType* src)
 		{
 			if (src == nullptr)
 				return;
-			INT index = *(m_VectorIndex->GetCastedValue(pData));
+			INT index = -1;
+			m_VectorIndex->GetCastedValue(pMemory, index);
 			if (index < 0)
+			{
+				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << ERROR_END;
 				return;
+			}
+			SharedDataEx* pData;
+			if (!IsLocal())
+				pData = pMemory->GetMainData();
+			else
+				pData = pMemory->GetStackTop();
+			if (!pData)
+			{
+				ERROR_BEGIN << "SharedData NULL at " << this->GetName() << ERROR_END;
+			}
+
 			const StdVector<ElementType>* pVector = (const StdVector<ElementType>*)pData->Get<StdVector<ElementType>>(m_Key);
 			if (pVector && (UINT)index < pVector->size())
 				(*const_cast<StdVector<ElementType>*>(pVector))[index] = *src;
 		}
 
-		const ElementType* _GetCastedValue(SharedDataEx* pData)
+		const ElementType* _GetCastedValue(Memory* pMemory)
 		{
-			INT index = *(m_VectorIndex->GetCastedValue(pData));
+			INT index = -1;
+			m_VectorIndex->GetCastedValue(pMemory, index);
 			if (index < 0)
 			{
 				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << ERROR_END;
+				return nullptr;
+			}
+			SharedDataEx* pData;
+			if (!IsLocal())
+				pData = pMemory->GetMainData();
+			else
+				pData = pMemory->GetStackTop();
+			if (!pData)
+			{
+				ERROR_BEGIN << "SharedData NULL at " << this->GetName() << ERROR_END;
 				return nullptr;
 			}
 			const StdVector<ElementType>* pVector = (const StdVector<ElementType>*)pData->Get<StdVector<ElementType>>(m_Key);
@@ -101,25 +128,25 @@ namespace YBehavior
 			return m_Key == Utility::INVALID_KEY;
 		}
 
-		StdVector<ElementType>* _Convert2Vector(SharedDataEx* pData)
+		StdVector<ElementType>* _Convert2Vector(Memory* pMemory)
 		{
 			if (IsVector<T>::Result)
 			{
 				///> would have compile error if directly operate the m_Value when T is not a StdVector<XX>
 				StdVector<ElementType>* mValue;
-				if (pData == nullptr || m_Key == Utility::INVALID_KEY)
+				if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
 					mValue = (StdVector<ElementType>*)_GetValue();
 				else
-					mValue = (StdVector<ElementType>*)const_cast<void*>(GetValue(pData));
+					mValue = (StdVector<ElementType>*)const_cast<void*>(GetValue(pMemory));
 				
 				return mValue;
 			}
 			else
 				return nullptr;
 		}
-		INT VectorSize(SharedDataEx* pData) override
+		INT VectorSize(Memory* pMemory) override
 		{
-			const StdVector<ElementType>* mValue = _Convert2Vector(pData);
+			const StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
 
 			if (mValue != nullptr)
 				return (INT)mValue->size();
@@ -127,24 +154,24 @@ namespace YBehavior
 			return 0;
 		}
 
-		void Clear(SharedDataEx* pData) override
+		void Clear(Memory* pMemory) override
 		{
-			StdVector<ElementType>* mValue = _Convert2Vector(pData);
+			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
 
 			if (mValue != nullptr)
 				mValue->clear();
 		}
 
-		STRING GetValueToSTRING(SharedDataEx* pData) override
+		STRING GetValueToSTRING(Memory* pMemory) override
 		{
-			const T* v = GetCastedValue(pData);
+			const T* v = GetCastedValue(pMemory);
 			if (v != nullptr)
 				return Utility::ToStringWithLength(*v);
 			return Utility::StringEmpty;
 		}
-		const void* GetElement(SharedDataEx* pData, INT index) override
+		const void* GetElement(Memory* pMemory, INT index) override
 		{
-			const StdVector<ElementType>* mValue = _Convert2Vector(pData);
+			const StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
 
 			if (mValue != nullptr)
 			{
@@ -163,9 +190,9 @@ namespace YBehavior
 				return nullptr;
 			}
 		}
-		void SetElement(SharedDataEx* pData, const void* v, INT index) override
+		void SetElement(Memory* pMemory, const void* v, INT index) override
 		{
-			StdVector<ElementType>* mValue = _Convert2Vector(pData);
+			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
 
 			if (mValue != nullptr && v != nullptr)
 			{
@@ -179,9 +206,9 @@ namespace YBehavior
 				}
 			}
 		}
-		void PushBackElement(SharedDataEx* pData, const void* v) override
+		void PushBackElement(Memory* pMemory, const void* v) override
 		{
-			StdVector<ElementType>* mValue = _Convert2Vector(pData);
+			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
 
 			if (mValue != nullptr && v != nullptr)
 			{
@@ -189,13 +216,13 @@ namespace YBehavior
 			}
 		}
 
-		const void* GetValue(SharedDataEx* pData)
+		const void* GetValue(Memory* pMemory)
 		{
-			return GetCastedValue(pData);
+			return GetCastedValue(pMemory);
 		}
-		void SetValue(SharedDataEx* pData, const void* src)
+		void SetValue(Memory* pMemory, const void* src)
 		{
-			SetCastedValue(pData, (const T*)src);
+			SetCastedValue(pMemory, (const T*)src);
 		}
 
 		void SetValueFromString(const STRING& str)
@@ -234,28 +261,40 @@ namespace YBehavior
 			}
 		}
 
-		const T* GetCastedValue(SharedDataEx* pData)
+		const T* GetCastedValue(Memory* pMemory)
 		{
-			if (pData == nullptr || m_Key == Utility::INVALID_KEY)
+			if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
 				return &m_Value;
 			///> It's an element of a vector
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
 			{
-				return (const T*)_GetCastedValue(pData);
+				return (const T*)_GetCastedValue(pMemory);
 			}
 
+			SharedDataEx* pData;
+			if (!IsLocal())
+				pData = pMemory->GetMainData();
+			else
+				pData = pMemory->GetStackTop();
+
+			if (!pData)
+			{
+				ERROR_BEGIN << "SharedData NULL at " << this->GetName() << ERROR_END;
+				return nullptr;
+			}
 			return (const T*)pData->Get<T>(m_Key);
 		}
-		void GetCastedValue(SharedDataEx* pData, T& t)
+
+		void GetCastedValue(Memory* pMemory, T& t)
 		{
-			const T* v = GetCastedValue(pData);
+			const T* v = GetCastedValue(pMemory);
 			if (v != nullptr)
 				t = *v;
 		}
 
-		void SetCastedValue(SharedDataEx* pData, const T* src)
+		void SetCastedValue(Memory* pMemory, const T* src)
 		{
-			if (pData == nullptr || m_Key == Utility::INVALID_KEY)
+			if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
 			{
 				///> Currently, we treat the non-pointer as CONST, then this function wont change their values.
 				//m_Value = *((T*)src);
@@ -265,21 +304,33 @@ namespace YBehavior
 			///> It's an element of a vector
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
 			{
-				_SetCastedValue(pData, (const ElementType*)src);
+				_SetCastedValue(pMemory, (const ElementType*)src);
 			}
 			else
 			{
-				pData->Set<T>(m_Key, src);
+				SharedDataEx* pData;
+				if (IsLocal())
+				{
+					pData = pMemory->GetStackTop();
+				}
+				else
+				{
+					pData = pMemory->GetMainData();
+				}
+				if (pData)
+					pData->Set<T>(m_Key, src);
+				else
+					ERROR_BEGIN << "SharedData NULL at " << this->GetName() << ERROR_END;
 			}
 		}
 
-		void SetCastedValue(SharedDataEx* pData, const T&& src)
+		void SetCastedValue(Memory* pData, const T&& src)
 		{
 			T t(src);
 			SetCastedValue(pData, &t);
 		}
 
-		void SetCastedValue(SharedDataEx* pData, const T& src)
+		void SetCastedValue(Memory* pData, const T& src)
 		{
 			SetCastedValue(pData, &src);
 		}

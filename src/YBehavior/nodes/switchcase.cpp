@@ -31,7 +31,7 @@ namespace YBehavior
 			LOG_SHARED_DATA(m_Cases, true);
 		}
 
-		if (m_CasesChilds.size() != m_Cases->VectorSize(pAgent->GetSharedData()))
+		if (m_CasesChilds.size() != m_Cases->VectorSize(pAgent->GetMemory()))
 		{
 			ERROR_BEGIN << "Cases size not match in SwitchCase" << ERROR_END;
 			return NS_FAILURE;
@@ -57,11 +57,11 @@ namespace YBehavior
 
 			for (INT i = 0; i < size; ++i)
 			{
-				const void* onecase = m_Cases->GetElement(pAgent->GetSharedData(), i);
+				const void* onecase = m_Cases->GetElement(pAgent->GetMemory(), i);
 				if (onecase == nullptr)
 					continue;
 
-				if (pHelper->Compare(m_Switch->GetValue(pAgent->GetSharedData()), onecase, OT_EQUAL))
+				if (pHelper->Compare(m_Switch->GetValue(pAgent->GetMemory()), onecase, OT_EQUAL))
 				{
 					DEBUG_LOG_INFO("Switch to case " << Utility::ToString(m_CasesChilds[i]->GetUID()) << "; ");
 					targetNode = m_CasesChilds[i];

@@ -11,6 +11,7 @@ namespace YBehavior
 	class SharedDataEx;
 	class RegisterData;
 	class RunningContext;
+	class Memory;
 
 	class YBEHAVIOR_API Entity
 	{
@@ -29,7 +30,8 @@ namespace YBehavior
 		static UINT s_UID;
 		Uint m_UID;
 
-		SharedDataEx* m_SharedData;
+		Memory* m_Memory;
+		//SharedDataEx* m_SharedData;
 		BehaviorTree* m_Tree;
 		RegisterData* m_RegisterData;
 		Entity* m_Entity;
@@ -38,7 +40,8 @@ namespace YBehavior
 	public:
 		Agent(Entity* entity);
 		~Agent();
-		inline SharedDataEx* GetSharedData() { return m_SharedData; }
+		inline Memory* GetMemory() { return m_Memory; }
+		//inline SharedDataEx* GetSharedData() { return m_SharedData; }
 		inline BehaviorTree* GetTree() { return m_Tree; }
 		inline Entity* GetEntity() { return m_Entity; }
 		inline void SetEntity(Entity* entity) { m_Entity = entity; }

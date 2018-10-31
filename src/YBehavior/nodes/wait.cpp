@@ -31,7 +31,7 @@ namespace YBehavior
 		}
 
 		INT tickCount = 0;
-		m_TickCount->GetCastedValue(pAgent->GetSharedData(), tickCount);
+		m_TickCount->GetCastedValue(pAgent->GetMemory(), tickCount);
 		m_RCContainer.CreateRC(this);
 
 		if (++m_RCContainer.GetRC()->Current > tickCount)

@@ -36,7 +36,7 @@ namespace YBehavior
 	{
 		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Opl, true);
 
-		m_Opl->SetValue(pAgent->GetSharedData(), m_Opr->GetValue(pAgent->GetSharedData()));
+		m_Opl->SetValue(pAgent->GetMemory(), m_Opr->GetValue(pAgent->GetMemory()));
 
 		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Opl, false);
 
@@ -67,7 +67,7 @@ namespace YBehavior
 	{
 		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Opl, true);
 
-		m_Opl->SetValue(pAgent->GetSharedData(), m_Opr->GetValue(pAgent->GetSharedData()));
+		m_Opl->SetValue(pAgent->GetMemory(), m_Opr->GetValue(pAgent->GetMemory()));
 
 		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Opl, false);
 

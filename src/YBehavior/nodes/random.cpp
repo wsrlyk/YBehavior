@@ -55,7 +55,7 @@ namespace YBehavior
 		}
 
 		IVariableOperationHelper* pHelper = m_Opl->GetOperation();
-		pHelper->Random(pAgent->GetSharedData(), m_Opl, m_Opr1, m_Opr2);
+		pHelper->Random(pAgent->GetMemory(), m_Opl, m_Opr1, m_Opr2);
 
 		IF_HAS_LOG_POINT
 		{
@@ -86,14 +86,14 @@ namespace YBehavior
 	{
 		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Input, true);
 
-		INT size = m_Input->VectorSize(pAgent->GetSharedData());
+		INT size = m_Input->VectorSize(pAgent->GetMemory());
 		if (size == 0)
 		{
 			return NS_FAILURE;
 		}
 		INT idx = Utility::Rand(0, size);
 
-		m_Output->SetValue(pAgent->GetSharedData(), m_Input->GetElement(pAgent->GetSharedData(), idx));
+		m_Output->SetValue(pAgent->GetMemory(), m_Input->GetElement(pAgent->GetMemory(), idx));
 
 		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Output, false);
 		return NS_SUCCESS;

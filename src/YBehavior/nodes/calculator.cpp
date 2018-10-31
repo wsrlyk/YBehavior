@@ -67,7 +67,7 @@ namespace YBehavior
 		}
 
 		IVariableOperationHelper* pHelper = m_Opl->GetOperation();
-		pHelper->Calculate(pAgent->GetSharedData(), m_Opl, m_Opr1, m_Opr2, m_Operator);
+		pHelper->Calculate(pAgent->GetMemory(), m_Opl, m_Opr1, m_Opr2, m_Operator);
 
 		IF_HAS_LOG_POINT
 		{

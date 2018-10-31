@@ -58,7 +58,7 @@ namespace YBehavior
 				if (ns == NS_FAILURE)
 				{
 					BOOL bExit;
-					m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData(), bExit);
+					m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
 					if (bExit)
 					{
 						DEBUG_LOG_INFO("ExitWhenFailure at " << loopTimes << " times; ");
@@ -155,7 +155,7 @@ namespace YBehavior
 
 	NodeState ForEach::Update(AgentPtr pAgent)
 	{
-		INT size = m_Collection->VectorSize(pAgent->GetSharedData());
+		INT size = m_Collection->VectorSize(pAgent->GetMemory());
 		INT start = 0;
 		NodeState ns = NS_INVALID;
 
@@ -171,11 +171,11 @@ namespace YBehavior
 
 		for (INT i = start; i < size; ++i)
 		{
-			const void* element = m_Collection->GetElement(pAgent->GetSharedData(), i);
+			const void* element = m_Collection->GetElement(pAgent->GetMemory(), i);
 			if (element == nullptr)
 				continue;
 
-			m_Current->SetValue(pAgent->GetSharedData(), element);
+			m_Current->SetValue(pAgent->GetMemory(), element);
 
 			if (m_Child != nullptr)
 			{
@@ -185,10 +185,10 @@ namespace YBehavior
 				case YBehavior::NS_FAILURE:
 				{
 					BOOL bExit;
-					m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData(), bExit);
+					m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
 					if (bExit)
 					{
-						DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
+						DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetMemory()) << "; ");
 						return NS_SUCCESS;
 					}
 					break;
@@ -254,7 +254,7 @@ namespace YBehavior
 	YBehavior::NodeState Loop::Update(AgentPtr pAgent)
 	{
 		INT size = 0;
-		m_Count->GetCastedValue(pAgent->GetSharedData(), size);
+		m_Count->GetCastedValue(pAgent->GetMemory(), size);
 
 		INT start = 0;
 		NodeState ns = NS_INVALID;
@@ -271,7 +271,7 @@ namespace YBehavior
 
 		for (INT i = start; i < size; ++i)
 		{
-			m_Current->SetCastedValue(pAgent->GetSharedData(), &i);
+			m_Current->SetCastedValue(pAgent->GetMemory(), &i);
 
 			if (m_Child != nullptr)
 			{
@@ -281,10 +281,10 @@ namespace YBehavior
 				case YBehavior::NS_FAILURE:
 				{
 					BOOL bExit;
-					m_ExitWhenFailure->GetCastedValue(pAgent->GetSharedData(), bExit);
+					m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
 					if (bExit)
 					{
-						DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetSharedData()) << "; ");
+						DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetMemory()) << "; ");
 						return NS_SUCCESS;
 					}
 					break;

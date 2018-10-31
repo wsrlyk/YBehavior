@@ -60,14 +60,11 @@
                     </Grid>
                     <Grid>
                         <TextBlock Text="IsArray" HorizontalAlignment="Left"/>
-                        <ComboBox Name="VIsArray" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0" Width="150" SelectedIndex="0">
-                            <ComboBoxItem>
-                                <TextBlock Text="False" FontSize="10"/>
-                            </ComboBoxItem>
-                            <ComboBoxItem>
-                                <TextBlock Text="True" FontSize="10"/>
-                            </ComboBoxItem>
-                        </ComboBox>
+                        <CheckBox Name="VIsArray" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0"/>
+                    </Grid>
+                    <Grid>
+                        <TextBlock Text="IsLocal" HorizontalAlignment="Left"/>
+                        <CheckBox Name="VIsLocal" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0"/>
                     </Grid>
                     <Button Name="Add" Width="100" Margin="20,20" Click="Add_Click">
                         <TextBlock Text="Add"/>

@@ -83,6 +83,18 @@ namespace YBehavior
 		return ((vectorType % 10) == eleType) && (eleType != vectorType);
 	}
 
+	char Utility::ToLower(char c)
+	{
+		if ('A' <= c && c <= 'Z')
+			return c - 'A' + 'a';
+		return c;
+	}
+
+	bool Utility::IsLower(char c)
+	{
+		return 'a' <= c && c <= 'z';
+	}
+
 	template<>
 	BOOL Utility::ToType(const STRING& str)
 	{

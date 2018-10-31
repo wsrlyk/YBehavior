@@ -31,8 +31,8 @@ namespace YBehavior
 		{
 			LOG_SHARED_DATA(m_Array, true);
 		}
-		INT size = m_Array->VectorSize(pAgent->GetSharedData());
-		m_Length->SetCastedValue(pAgent->GetSharedData(), &size);
+		INT size = m_Array->VectorSize(pAgent->GetMemory());
+		m_Length->SetCastedValue(pAgent->GetMemory(), &size);
 
 		IF_HAS_LOG_POINT
 		{
@@ -54,7 +54,7 @@ namespace YBehavior
 
 	YBehavior::NodeState ClearArray::Update(AgentPtr pAgent)
 	{
-		m_Array->Clear(pAgent->GetSharedData());
+		m_Array->Clear(pAgent->GetMemory());
 		return NS_SUCCESS;
 	}
 
@@ -81,7 +81,7 @@ namespace YBehavior
 		{
 			LOG_SHARED_DATA(m_Element, true);
 		}
-		m_Array->PushBackElement(pAgent->GetSharedData(), m_Element->GetValue(pAgent->GetSharedData()));
+		m_Array->PushBackElement(pAgent->GetMemory(), m_Element->GetValue(pAgent->GetMemory()));
 
 		IF_HAS_LOG_POINT
 		{

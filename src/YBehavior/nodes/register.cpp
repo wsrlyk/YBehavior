@@ -62,12 +62,12 @@ namespace YBehavior
 			DEBUG_LOG_INFO("No Event.");
 			return NS_FAILURE;
 		}
-		m_Event->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pEvent);
-		m_Int->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecInt);
-		m_Float->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecFloat);
-		m_Bool->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecBool);
-		m_Ulong->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecUlong);
-		m_String->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecString);
+		m_Event->SetValue(pAgent->GetMemory(), pRegister->GetReceiveData().pEvent);
+		m_Int->SetValue(pAgent->GetMemory(), pRegister->GetReceiveData().pVecInt);
+		m_Float->SetValue(pAgent->GetMemory(), pRegister->GetReceiveData().pVecFloat);
+		m_Bool->SetValue(pAgent->GetMemory(), pRegister->GetReceiveData().pVecBool);
+		m_Ulong->SetValue(pAgent->GetMemory(), pRegister->GetReceiveData().pVecUlong);
+		m_String->SetValue(pAgent->GetMemory(), pRegister->GetReceiveData().pVecString);
 
 		pRegister->Clear();
 
@@ -137,12 +137,12 @@ namespace YBehavior
 	{
 		RegisterData* pRegister = pAgent->GetRegister();
 
-		pRegister->GetSendData().pEvent = m_Event->GetCastedValue(pAgent->GetSharedData());
-		pRegister->GetSendData().pVecInt = m_Int->GetCastedValue(pAgent->GetSharedData());
-		pRegister->GetSendData().pVecFloat = m_Float->GetCastedValue(pAgent->GetSharedData());
-		pRegister->GetSendData().pVecBool = m_Bool->GetCastedValue(pAgent->GetSharedData());
-		pRegister->GetSendData().pVecUlong = m_Ulong->GetCastedValue(pAgent->GetSharedData());
-		pRegister->GetSendData().pVecString = m_String->GetCastedValue(pAgent->GetSharedData());
+		pRegister->GetSendData().pEvent = m_Event->GetCastedValue(pAgent->GetMemory());
+		pRegister->GetSendData().pVecInt = m_Int->GetCastedValue(pAgent->GetMemory());
+		pRegister->GetSendData().pVecFloat = m_Float->GetCastedValue(pAgent->GetMemory());
+		pRegister->GetSendData().pVecBool = m_Bool->GetCastedValue(pAgent->GetMemory());
+		pRegister->GetSendData().pVecUlong = m_Ulong->GetCastedValue(pAgent->GetMemory());
+		pRegister->GetSendData().pVecString = m_String->GetCastedValue(pAgent->GetMemory());
 
 		IF_HAS_LOG_POINT
 		{
@@ -154,11 +154,11 @@ namespace YBehavior
 			LOG_SHARED_DATA(m_Ulong, true);
 		};
 
-		m_Int->SetCastedValue(pAgent->GetSharedData(), &Utility::VecIntEmpty);
-		m_Float->SetCastedValue(pAgent->GetSharedData(), &Utility::VecFloatEmpty);
-		m_Bool->SetCastedValue(pAgent->GetSharedData(), &Utility::VecBoolEmpty);
-		m_Ulong->SetCastedValue(pAgent->GetSharedData(), &Utility::VecUlongEmpty);
-		m_String->SetCastedValue(pAgent->GetSharedData(), &Utility::VecStringEmpty);
+		m_Int->SetCastedValue(pAgent->GetMemory(), &Utility::VecIntEmpty);
+		m_Float->SetCastedValue(pAgent->GetMemory(), &Utility::VecFloatEmpty);
+		m_Bool->SetCastedValue(pAgent->GetMemory(), &Utility::VecBoolEmpty);
+		m_Ulong->SetCastedValue(pAgent->GetMemory(), &Utility::VecUlongEmpty);
+		m_String->SetCastedValue(pAgent->GetMemory(), &Utility::VecStringEmpty);
 
 		pAgent->ProcessRegister();
 

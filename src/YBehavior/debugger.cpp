@@ -7,6 +7,7 @@
 #include "YBehavior/nodefactory.h"
 #include <sstream>
 #include "YBehavior/shareddataex.h"
+#include "YBehavior/memory.h"
 
 #ifdef DEBUGGER
 namespace YBehavior
@@ -338,7 +339,7 @@ namespace YBehavior
 
 		///> SharedDatas:
 		STRING buffer;
-		SharedDataEx* pSharedData = m_Target->GetSharedData();
+		SharedDataEx* pSharedData = m_Target->GetMemory()->GetMainData();
 
 		const STRING& treeName = DebugMgr::Instance()->GetTargetTree();
 
@@ -465,7 +466,7 @@ namespace YBehavior
 
 		///>  Like:      Int0 <CONST> 44
 		if (pVariable->IsConst())
-			ss << "<CONST> " << pVariable->GetValueToSTRING(m_Target->GetSharedData());
+			ss << "<CONST> " << pVariable->GetValueToSTRING(m_Target->GetMemory());
 		else
 		{
 			ISharedVariableEx* pVectorIndex = pVariable->GetVectorIndex();
@@ -474,14 +475,14 @@ namespace YBehavior
 			if (pVectorIndex)
 			{
 
-				ss << sharedDataVariableName << "[" << pVectorIndex->GetValueToSTRING(m_Target->GetSharedData()) << "] ";
+				ss << sharedDataVariableName << "[" << pVectorIndex->GetValueToSTRING(m_Target->GetMemory()) << "] ";
 			}
 			///>  Like:      Int0 IntC 4
 			else
 			{
 				ss << sharedDataVariableName << " ";
 			}
-			ss << pVariable->GetValueToSTRING(m_Target->GetSharedData());
+			ss << pVariable->GetValueToSTRING(m_Target->GetMemory());
 		}
 
 		STRING res(ss.str());

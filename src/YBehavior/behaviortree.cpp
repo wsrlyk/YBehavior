@@ -129,6 +129,11 @@ namespace YBehavior
 		return OnLoaded(data);
 	}
 
+	bool BehaviorNode::LoadChild(const pugi::xml_node& data)
+	{
+		return OnLoadChild(data);
+	}
+
 	void BehaviorNode::LoadFinish()
 	{
 		OnLoadFinish();
@@ -182,7 +187,7 @@ namespace YBehavior
 
 		if (variableType != 0)
 		{
-			if (buffer[0][2] != variableType)
+			if (Utility::ToLower(buffer[0][2]) != Utility::ToLower(variableType))
 			{
 				ERROR_BEGIN << "VariableType Error, " << attri.name() << " in " << data.name() << " in Node " << this->GetClassName() << ": " << tempChar << ERROR_END;
 				return false;
@@ -281,8 +286,11 @@ namespace YBehavior
 				op->SetVectorIndex(buffer[3], buffer[4]);
 			}
 
-			if (buffer[0][2] == Utility::POINTER_CHAR)
+			if (Utility::ToLower(buffer[0][2]) == Utility::POINTER_CHAR)
+			{
 				op->SetKeyFromString(buffer[1]);
+				op->SetIsLocal(Utility::IsLower(buffer[0][2]));
+			}
 			else
 				op->SetValueFromString(buffer[1]);
 
@@ -314,17 +322,28 @@ namespace YBehavior
 				m_TreeName = m_TreeName.substr(it + 1);
 		}
 		m_SharedData = new SharedDataEx();
+		m_LocalData = nullptr;
 		//m_NameKeyMgr = new NameKeyMgr();
 	}
 
 	BehaviorTree::~BehaviorTree()
 	{
 		delete m_SharedData;
+		if (m_LocalData)
+		{
+			delete m_LocalData;
+			m_LocalData = nullptr;
+		}
 		//delete m_NameKeyMgr;
 	}
 
-	bool BehaviorTree::OnLoaded(const pugi::xml_node& data)
+	bool BehaviorTree::OnLoadChild(const pugi::xml_node& data)
 	{
+		if (strcmp(data.name(), "Shared") != 0 && strcmp(data.name(), "Local") != 0)
+		{
+			return true;
+		}
+
 		StdVector<STRING> buffer;
 
 		for (auto it = data.attributes_begin(); it != data.attributes_end(); ++it)
@@ -337,10 +356,20 @@ namespace YBehavior
 			if (helper == nullptr)
 				continue;
 
-			helper->SetSharedData(m_SharedData, it->name(), buffer[1]);
+			if (buffer[0][2] == Utility::CONST_CHAR)
+				helper->SetSharedData(m_SharedData, it->name(), buffer[1]);
+			else
+				helper->SetSharedData(GetLocalData(), it->name(), buffer[1]);
 		}
 
 		return true;
+	}
+
+	YBehavior::SharedDataEx* BehaviorTree::GetLocalData()
+	{
+		if (!m_LocalData)
+			m_LocalData = new SharedDataEx();
+		return m_LocalData;
 	}
 
 	void BehaviorTree::CloneData(SharedDataEx& destination)
@@ -348,6 +377,18 @@ namespace YBehavior
 		destination.Clone(*m_SharedData);
 	}
 
+
+	YBehavior::NodeState BehaviorTree::RootExecute(AgentPtr pAgent, NodeState parentState)
+	{
+		///> Push the local data to the stack of the agent memory
+		pAgent->GetMemory()->Push(this->m_LocalData);
+		
+		NodeState res = Execute(pAgent, parentState);
+
+		///> Pop the local data
+		pAgent->GetMemory()->Pop();
+		return res;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////

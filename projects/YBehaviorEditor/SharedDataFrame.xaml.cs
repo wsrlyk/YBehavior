@@ -96,13 +96,14 @@ namespace YBehavior.Editor
             string name = this.VName.Text;
             string value = this.VValue.Text;
             string type = this.VType.SelectedValue as string;
-            int isarray = this.VIsArray.SelectedIndex;
+            bool isarray = this.VIsArray.IsChecked ?? false;
+            bool islocal = this.VIsLocal.IsChecked ?? false;
 
             if (m_CurTree.Variables.TryCreateVariable(
                 name, 
                 value, 
                 Variable.ValueTypeDic2.GetKey(type, Variable.ValueType.VT_NONE),
-                isarray == 1 ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE))
+                isarray ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE))
             {
                 this.VName.Text = string.Empty;
                 ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()

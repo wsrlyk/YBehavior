@@ -31,8 +31,8 @@ namespace YBehavior
 			LOG_SHARED_DATA(m_OutputY, true);
 		}
 
-		INT sizeX = m_KeyPointX->VectorSize(pAgent->GetSharedData());
-		INT sizeY = m_KeyPointY->VectorSize(pAgent->GetSharedData());
+		INT sizeX = m_KeyPointX->VectorSize(pAgent->GetMemory());
+		INT sizeY = m_KeyPointY->VectorSize(pAgent->GetMemory());
 		if (sizeX != sizeY)
 		{
 			DEBUG_LOG_INFO("Different length of X and Y; ");
@@ -46,7 +46,7 @@ namespace YBehavior
 		else if (sizeX == 1)
 		{
 			DEBUG_LOG_INFO("Only one key point, return it; ");
-			m_OutputY->SetValue(pAgent->GetSharedData(), m_KeyPointY->GetValue(pAgent->GetSharedData()));
+			m_OutputY->SetValue(pAgent->GetMemory(), m_KeyPointY->GetValue(pAgent->GetMemory()));
 			return NS_SUCCESS;
 		}
 
@@ -64,17 +64,17 @@ namespace YBehavior
 		void* pDeltaYxpOffsetX = pHelper->AllocData();
 		void* pOffsetY = pHelper->AllocData();
 
-		const void* x = m_InputX->GetValue(pAgent->GetSharedData());
+		const void* x = m_InputX->GetValue(pAgent->GetMemory());
 		for (INT i = 0; i < sizeX - 1; ++i)
 		{
-			const void* x0 = m_KeyPointX->GetElement(pAgent->GetSharedData(), i);
-			const void* x1 = m_KeyPointX->GetElement(pAgent->GetSharedData(), i + 1);
+			const void* x0 = m_KeyPointX->GetElement(pAgent->GetMemory(), i);
+			const void* x1 = m_KeyPointX->GetElement(pAgent->GetMemory(), i + 1);
 
 			///> Not in the range of this (x0, x1]
 			if (pHelper->Compare(x, x1, OT_GREATER) && i < sizeX - 2)
 				continue;
-			const void* y0 = m_KeyPointY->GetElement(pAgent->GetSharedData(), i);
-			const void* y1 = m_KeyPointY->GetElement(pAgent->GetSharedData(), i + 1);
+			const void* y0 = m_KeyPointY->GetElement(pAgent->GetMemory(), i);
+			const void* y1 = m_KeyPointY->GetElement(pAgent->GetMemory(), i + 1);
 
 			if (x0 == nullptr || x1 == nullptr || y0 == nullptr || y1 == nullptr)
 			{
@@ -89,7 +89,7 @@ namespace YBehavior
 			pHelper->Calculate(pOffsetY, pDeltaYxpOffsetX, pDeltaX, OT_DIV);
 			const void* res = pHelper->Calculate(y0, pOffsetY, OT_ADD);
 
-			m_OutputY->SetValue(pAgent->GetSharedData(), res);
+			m_OutputY->SetValue(pAgent->GetMemory(), res);
 			ns = NS_SUCCESS;
 			break;
 			//if (onecase == nullptr)

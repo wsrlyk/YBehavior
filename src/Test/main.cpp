@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 
 	for (int i = 0; i < 10000; ++i)
 	{
-		pEntity->GetAgent()->GetSharedData()->Get<YBehavior::INT>(f);
+		pEntity->GetAgent()->GetMemory()->GetMainData()->Get<YBehavior::INT>(f);
 	}
 #if _MSC_VER
 	t2 = (unsigned long)timeGetTime();

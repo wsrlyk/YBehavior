@@ -7,12 +7,15 @@ namespace YBehavior
 {
 	class IVariableOperationHelper;
 	class SharedDataEx;
+	class Memory;
 	class ISharedVariableEx
 	{
 	public:
 		virtual ~ISharedVariableEx() {}
 		inline void SetKey(KEY key) { m_Key = key; }
 		inline KEY GetKey() { return m_Key; }
+		inline void SetIsLocal(bool local) { m_IsLocal = local; }
+		inline bool IsLocal() { return m_IsLocal; }
 		virtual bool IsConst() = 0;
 #ifdef DEBUGGER
 		inline void SetName(const STRING& name) { m_Name = name; }
@@ -20,8 +23,8 @@ namespace YBehavior
 #endif
 		virtual void SetVectorIndex(const STRING& vbType, const STRING& s) { }
 		virtual void SetKeyFromString(const STRING& s) = 0;
-		virtual const void* GetValue(SharedDataEx* pData) = 0;
-		virtual void SetValue(SharedDataEx* pData, const void* src) = 0;
+		virtual const void* GetValue(Memory* pMemory) = 0;
+		virtual void SetValue(Memory* pMemory, const void* src) = 0;
 		virtual void SetValueFromString(const STRING& str) = 0;
 		virtual TYPEID GetTypeID() = 0;
 		///> if this variable is an INT, and it refers to an element of an INT[], this method will return the type of INT[] instead of INT;   Used in log..
@@ -29,16 +32,17 @@ namespace YBehavior
 
 		virtual IVariableOperationHelper* GetOperation() = 0;
 		virtual ISharedVariableEx* GetVectorIndex() = 0;
-		virtual STRING GetValueToSTRING(SharedDataEx* pData) = 0;
+		virtual STRING GetValueToSTRING(Memory* pMemory) = 0;
 
 		///> Belows are functions for vector
-		virtual INT VectorSize(SharedDataEx* pData) = 0;
-		virtual void Clear(SharedDataEx* pData) = 0;
-		virtual const void* GetElement(SharedDataEx* pData, INT index) = 0;
-		virtual void SetElement(SharedDataEx* pData, const void* v, INT index) = 0;
-		virtual void PushBackElement(SharedDataEx* pData, const void* v) = 0;
+		virtual INT VectorSize(Memory* pMemory) = 0;
+		virtual void Clear(Memory* pMemory) = 0;
+		virtual const void* GetElement(Memory* pMemory, INT index) = 0;
+		virtual void SetElement(Memory* pMemory, const void* v, INT index) = 0;
+		virtual void PushBackElement(Memory* pMemory, const void* v) = 0;
 	protected:
 		KEY m_Key;
+		bool m_IsLocal;
 #ifdef DEBUGGER
 		STRING m_Name;
 #endif

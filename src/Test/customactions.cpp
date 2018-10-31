@@ -66,10 +66,10 @@ void XAgent::Update()
 	}
 	b = !b;
 
-	YBehavior::VecFloat fftestdata;
-	fftestdata.push_back(1.0f);
-	fftestdata.push_back(2.0f);
-	GetSharedData()->Set<YBehavior::VecFloat>(fftest, fftestdata);
+	//YBehavior::VecFloat fftestdata;
+	//fftestdata.push_back(1.0f);
+	//fftestdata.push_back(2.0f);
+	//GetMemory()->GetMainData()->Set<YBehavior::VecFloat>(fftest, fftestdata);
 
 	this->Tick();
 }
@@ -84,16 +84,16 @@ YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 	LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Target, true);
 
 	YBehavior::EntityWrapper currentTarget;
-	m_Target->GetCastedValue(pAgent->GetSharedData(), currentTarget);
+	m_Target->GetCastedValue(pAgent->GetMemory(), currentTarget);
 	if (currentTarget.IsValid())
 	{
 		YBehavior::EntityWrapper wrapper;
-		m_Target->SetCastedValue(pAgent->GetSharedData(), &wrapper);
+		m_Target->SetCastedValue(pAgent->GetMemory(), &wrapper);
 	}
 	else
 	{
 		YBehavior::EntityWrapper wrapper(pAgent->GetEntity()->CreateWrapper());
-		m_Target->SetCastedValue(pAgent->GetSharedData(), &wrapper);
+		m_Target->SetCastedValue(pAgent->GetMemory(), &wrapper);
 	}
 
 	LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Target, false);
@@ -114,7 +114,7 @@ bool SelectTargetAction::OnLoaded(const pugi::xml_node& data)
 
 YBehavior::NodeState GetTargetNameAction::Update(YBehavior::AgentPtr pAgent)
 {
-	const YBehavior::EntityWrapper* currentTarget = m_Target->GetCastedValue(pAgent->GetSharedData());
+	const YBehavior::EntityWrapper* currentTarget = m_Target->GetCastedValue(pAgent->GetMemory());
 	if (currentTarget && currentTarget->IsValid())
 	{
 		LOG_BEGIN << ((XAgent*)currentTarget->Get())->GetEntity()->ToString() << LOG_END;

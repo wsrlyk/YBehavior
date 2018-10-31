@@ -5,6 +5,7 @@
 #include "YBehavior/registerdata.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/runningcontext.h"
+#include "YBehavior/memory.h"
 
 YBehavior::UINT YBehavior::Agent::s_UID = 0;
 
@@ -22,7 +23,8 @@ bool YBehavior::Agent::SetTree(const STRING& name)
 	m_Tree = TreeMgr::Instance()->GetTree(name);
 	if (!m_Tree)
 		return false;
-	m_Tree->CloneData(*m_SharedData);
+	//m_Tree->CloneData(*m_SharedData);
+	m_Tree->CloneData(*m_Memory->GetMainData());
 	return true;
 	//TreeKeyMgr::Instance()->SetActiveTree(m_Tree->GetNameKeyMgr(), false);
 }
@@ -44,7 +46,7 @@ void YBehavior::Agent::Tick()
 	if (m_Tree)
 	{
 		//TreeKeyMgr::Instance()->SetActiveTree(m_Tree->GetNameKeyMgr(), false);
-		m_Tree->Execute(this, m_RunningContexts.empty() ? NS_INVALID : NS_RUNNING);
+		m_Tree->RootExecute(this, m_RunningContexts.empty() ? NS_INVALID : NS_RUNNING);
 	}
 }
 
@@ -86,7 +88,8 @@ YBehavior::Agent::Agent(Entity* entity)
 	, m_Entity(entity)
 {
 	m_UID = ++s_UID;
-	m_SharedData = new SharedDataEx();
+	//m_SharedData = new SharedDataEx();
+	m_Memory = new Memory();
 }
 
 YBehavior::Agent::~Agent()
@@ -99,7 +102,8 @@ YBehavior::Agent::~Agent()
 	if (m_RegisterData)
 		delete m_RegisterData;
 
-	delete m_SharedData;
+	delete m_Memory;
+	//delete m_SharedData;
 	ClearRC();
 }
 

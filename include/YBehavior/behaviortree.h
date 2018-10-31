@@ -85,6 +85,7 @@ namespace YBehavior
 		virtual STRING GetClassName() const = 0;
 
 		bool Load(const pugi::xml_node& data);
+		bool LoadChild(const pugi::xml_node& data);
 		void LoadFinish();
 		NodeState Execute(AgentPtr pAgent, NodeState parentState);
 		static BehaviorNode* CreateNodeByName(const STRING& name);
@@ -99,6 +100,7 @@ namespace YBehavior
 		virtual bool _AddChild(BehaviorNode* child, const STRING& connection);
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
 		virtual bool OnLoaded(const pugi::xml_node& data) { return true; }
+		virtual bool OnLoadChild(const pugi::xml_node& data) { return true; }
 		virtual void OnLoadFinish() {}
 		virtual void OnAddChild(BehaviorNode* child, const STRING& connection) {}
 		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
@@ -177,6 +179,7 @@ namespace YBehavior
 #endif
 	private:
 		SharedDataEx* m_SharedData;	///> Original data, copied to each agent using this tree
+		SharedDataEx* m_LocalData;	///> Original local data, pushed to the memory of an agent once run this tree
 		//NameKeyMgr* m_NameKeyMgr;
 		STRING m_TreeNameWithPath;	///> Full Path
 		STRING m_TreeName;	///> Only File
@@ -192,16 +195,18 @@ namespace YBehavior
 		inline const STRING& GetTreeNameWithPath() { return m_TreeNameWithPath; }
 		inline const STRING& GetTreeName() { return m_TreeName; }
 		inline SharedDataEx* GetSharedData() { return m_SharedData; }
+		SharedDataEx* GetLocalData();
 		//inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }
 		void CloneData(SharedDataEx& destination);
 
 		void AddSubTree(BehaviorTree* sub) { m_SubTrees.push_back(sub); }
 		inline StdVector<BehaviorTree*>& GetSubTrees() { return m_SubTrees; }
+		NodeState RootExecute(AgentPtr pAgent, NodeState parentState);
 
 		///> CAUTION: this function can only be called in garbage collection
 		void ClearSubTree() { m_SubTrees.clear(); }
 	protected:
-		virtual bool OnLoaded(const pugi::xml_node& data);
+		bool OnLoadChild(const pugi::xml_node& data) override;
 	};
 }
 

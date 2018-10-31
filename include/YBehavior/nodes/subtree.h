@@ -12,7 +12,7 @@ namespace YBehavior
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
 		virtual bool OnLoaded(const pugi::xml_node& data);
-
+		bool OnLoadChild(const pugi::xml_node& data) override;
 	private:
 		SharedVariableEx<STRING>* m_TreeName;
 

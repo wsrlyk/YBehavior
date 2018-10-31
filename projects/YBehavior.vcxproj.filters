@@ -186,6 +186,9 @@
     <ClInclude Include="..\include\YBehavior\nodes\array.h">
       <Filter>头文件\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\memory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -298,6 +301,9 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodes\array.cpp">
       <Filter>源文件\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\memory.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
