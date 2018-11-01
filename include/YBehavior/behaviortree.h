@@ -196,6 +196,7 @@ namespace YBehavior
 		inline const STRING& GetTreeName() { return m_TreeName; }
 		inline SharedDataEx* GetSharedData() { return m_SharedData; }
 		SharedDataEx* GetLocalData();
+		inline SharedDataEx* GetLocalDataIfExists() { return m_LocalData; }
 		//inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }
 		void CloneData(SharedDataEx& destination);
 

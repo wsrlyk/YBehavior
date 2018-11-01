@@ -60,7 +60,7 @@ namespace YBehavior.Editor.Core
                 return m_EmptySharedData;
             }
         }
-
+        public Dictionary<string, RunInfo> GetRunInfos { get { return m_RunInfo; } }
         Dictionary<string, RunInfo> m_RunInfo = new Dictionary<string, RunInfo>();
         public NodeState GetRunState(uint uid)
         {
@@ -99,6 +99,12 @@ namespace YBehavior.Editor.Core
                 runInfo.treeName = treeName;
                 m_RunInfo[treeName] = runInfo;
             }
+            return runInfo;
+        }
+        public RunInfo GetRunInfoIfExists(string treeName)
+        {
+            RunInfo runInfo = null;
+            m_RunInfo.TryGetValue(treeName, out runInfo);
             return runInfo;
         }
 

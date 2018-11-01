@@ -6,6 +6,19 @@
 
 namespace YBehavior
 {
+	class BehaviorTree;
+	struct YBEHAVIOR_API StackInfo
+	{
+		StackInfo();
+		StackInfo(BehaviorTree* pTree);
+		StackInfo(StackInfo&& other);
+		StackInfo(const StackInfo& other);
+		~StackInfo();
+		BehaviorTree* Owner;
+		SharedDataEx* Data;
+	};
+
+	typedef std::list<StackInfo> MemoryStack;
 	class YBEHAVIOR_API Memory
 	{
 	public:
@@ -13,12 +26,15 @@ namespace YBehavior
 		~Memory();
 		inline SharedDataEx* GetMainData() { return m_pMainData; }
 		SharedDataEx* GetStackTop();
+		const StackInfo* GetStackTopInfo();
 
-		void Push(SharedDataEx* pTemplate);
+		inline MemoryStack& GetStack() { return m_Stack; }
+
+		void Push(BehaviorTree* pTree);
 		void Pop();
 	protected:
 		SharedDataEx* m_pMainData;
-		std::stack<SharedDataEx*> m_Stack;
+		MemoryStack m_Stack;
 	};
 }
 

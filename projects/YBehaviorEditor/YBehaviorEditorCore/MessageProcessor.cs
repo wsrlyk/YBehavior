@@ -137,7 +137,9 @@ namespace YBehavior.Editor.Core
 
         char[] msgHeadSplitter = { (char)(3) };
         char[] msgContentSplitter = { cContentSplitter };
+        char[] msgSectionSplitter = { cSectionSplitter };
         static readonly char cContentSplitter = (char)4;
+        static readonly char cSectionSplitter = (char)5;
         void _ProcessMsg(string msg)
         {
             string[] words = msg.Split(msgHeadSplitter, StringSplitOptions.RemoveEmptyEntries);
@@ -214,52 +216,66 @@ namespace YBehavior.Editor.Core
             //LogMgr.Instance.Log(ss);
         }
 
+        void _HandleMemory(IVariableCollection variableCollection, string datas)
+        {
+            if (variableCollection == null || datas == null)
+                return;
+            using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
+            {
+                {
+                    string[] sharedDatas = datas.Split(';');
+                    foreach (string s in sharedDatas)
+                    {
+                        string[] strV = s.Split(',');
+                        if (strV.Length != 2)
+                            continue;
+
+                        Variable v = variableCollection.GetVariable(strV[0]);
+                        if (v == null)
+                            continue;
+
+                        bool isRefreshed = v.Value != strV[1];
+                        v.Value = strV[1];
+                        v.IsRefreshed = isRefreshed;
+                    }
+                }
+            }
+        }
         void _HandleTickResult(string ss)
         {
             if (ss == null)
                 return;
             string[] data = ss.Split(msgContentSplitter);
-            if (data.Length >= 2)
+            if (data.Length >= 1)
             {
-                using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
-                {
-                    for (int i = 0; i < 2; ++i)
-                    {
-                        string[] sharedDatas = data[0].Split(';');
-                        foreach (string s in sharedDatas)
-                        {
-                            string[] strV = s.Split(',');
-                            if (strV.Length != 2)
-                                continue;
+                ///> MainData
+                ///> Copied to each subtrees
+                foreach(var v in DebugMgr.Instance.GetRunInfos.Values)
+                    _HandleMemory(v.sharedData.SharedMemory, data[0]);
 
-                            Variable v = null;
-                            if (i == 0)
-                                v = DebugMgr.Instance.DebugSharedData.SharedMemory.GetVariable(strV[0]);
-                            else
-                                v = DebugMgr.Instance.DebugSharedData.LocalMemory.GetVariable(strV[0]);
-                            if (v == null)
-                                continue;
-
-                            bool isRefreshed = v.Value != strV[1];
-                            v.Value = strV[1];
-                            v.IsRefreshed = isRefreshed;
-                        }
-                    }
-                }
                 ++m_TickResultToken;
 
-                if (data.Length % 2 == 0)
+                if ((data.Length - 1) % 3 == 0)
                 {
                     DebugMgr.Instance.ClearRunState();
                     RunInfo runInfo = null;
-                    for (int i = 2; i < data.Length; ++i)
+                    for (int i = 1; i < data.Length; ++i)
                     {
-                        if (i % 2 == 0)
+                        ///> TreeName
+                        if (i % 3 == 1)
                         {
                             runInfo = DebugMgr.Instance.GetRunInfo(data[i]);
                             runInfo.info.Clear();
                             continue;
                         }
+                        ///> LocalData
+                        ///> Only copied to the specified subtree
+                        if (i % 3 == 2)
+                        {
+                            _HandleMemory(runInfo.sharedData.LocalMemory, data[i]);
+                        }
+
+                        ///> RunInfo
                         string[] runInfos = data[i].Split(';');
                         foreach (string s in runInfos)
                         {

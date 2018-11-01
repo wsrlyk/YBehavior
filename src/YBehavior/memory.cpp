@@ -1,7 +1,58 @@
 #include "YBehavior/memory.h"
+#include "YBehavior/behaviortree.h"
 
 namespace YBehavior
 {
+	StackInfo::StackInfo()
+		: Owner(nullptr)
+		, Data(nullptr)
+	{
+
+	}
+
+
+	StackInfo::StackInfo(BehaviorTree* pTree)
+	{
+		Owner = pTree;
+		if (pTree && pTree->GetLocalDataIfExists())
+		{
+			Data = new SharedDataEx();
+			Data->Clone(*pTree->GetLocalDataIfExists());
+		}
+		else
+		{
+			Data = nullptr;
+		}
+	}
+
+	StackInfo::StackInfo(StackInfo&& other)
+	{
+		Owner = other.Owner;
+		Data = other.Data;
+
+		other.Data = nullptr;
+		other.Owner = nullptr;
+	}
+
+	StackInfo::StackInfo(const StackInfo& other)
+	{
+		Owner = other.Owner;
+		if (other.Data)
+		{
+			Data = new SharedDataEx();
+			Data->Clone(*other.Data);
+		}
+		else
+		{
+			Data = nullptr;
+		}
+	}
+
+	StackInfo::~StackInfo()
+	{
+		if (Data)
+			delete Data;
+	}
 
 	Memory::Memory()
 	{
@@ -16,12 +67,7 @@ namespace YBehavior
 			m_pMainData = nullptr;
 		}
 
-		while (!m_Stack.empty())
-		{
-			auto it = m_Stack.top();
-			delete it;
-			m_Stack.pop();
-		}
+		m_Stack.clear();
 	}
 
 	YBehavior::SharedDataEx* Memory::GetStackTop()
@@ -29,18 +75,21 @@ namespace YBehavior
 		if (m_Stack.empty())
 			return nullptr;
 
-		return m_Stack.top();
+		return m_Stack.back().Data;
 	}
 
-	void Memory::Push(SharedDataEx* pTemplate)
+	const YBehavior::StackInfo* Memory::GetStackTopInfo()
 	{
-		SharedDataEx* cloned = nullptr;
-		if (pTemplate)
-		{
-			cloned = new SharedDataEx();
-			cloned->Clone(*pTemplate);
-		}
-		m_Stack.push(cloned);
+		if (m_Stack.empty())
+			return nullptr;
+
+		return &m_Stack.back();
+	}
+
+	void Memory::Push(BehaviorTree* pTree)
+	{
+		StackInfo info(pTree);
+		m_Stack.push_back(std::move(info));
 	}
 
 	void Memory::Pop()
@@ -48,9 +97,9 @@ namespace YBehavior
 		if (m_Stack.empty())
 			return;
 
-		auto it = m_Stack.top();
-		delete it;
-		m_Stack.pop();
+		//auto it = m_Stack.top();
+		//delete it.Data;
+		m_Stack.pop_back();
 	}
 
 }

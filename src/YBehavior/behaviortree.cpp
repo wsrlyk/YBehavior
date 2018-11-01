@@ -381,7 +381,7 @@ namespace YBehavior
 	YBehavior::NodeState BehaviorTree::RootExecute(AgentPtr pAgent, NodeState parentState)
 	{
 		///> Push the local data to the stack of the agent memory
-		pAgent->GetMemory()->Push(this->m_LocalData);
+		pAgent->GetMemory()->Push(this);
 		
 		NodeState res = Execute(pAgent, parentState);
 

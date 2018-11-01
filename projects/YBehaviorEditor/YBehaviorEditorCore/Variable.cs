@@ -328,10 +328,7 @@ namespace YBehavior.Editor.Core
                 };
                 m_Value = value;
 
-                if (vbType == VariableType.VBT_Pointer && IsLocal)
-                    m_DisplayValue = value + " L";
-                else
-                    m_DisplayValue = value;
+                _RefreshDisplayValue();
 
                 if (!IsIndex)
                 {
@@ -367,6 +364,13 @@ namespace YBehavior.Editor.Core
             }
         }
 
+        private void _RefreshDisplayValue()
+        {
+            if (vbType == VariableType.VBT_Pointer && IsLocal)
+                m_DisplayValue = Value + " L";
+            else
+                m_DisplayValue = Value;
+        }
         private void _OnValueChanged()
         {
             OnPropertyChanged("Value");
@@ -629,6 +633,8 @@ namespace YBehavior.Editor.Core
             IsLocal = Char.IsLower(variableType);
 
             m_Value = value;
+            _RefreshDisplayValue();
+
             if (param != null)
                 m_Params = param;
 
@@ -654,6 +660,8 @@ namespace YBehavior.Editor.Core
             IsLocal = isLocal;
 
             m_Value = value;
+            _RefreshDisplayValue();
+
             if (param != null)
                 m_Params = param;
 
@@ -671,6 +679,8 @@ namespace YBehavior.Editor.Core
             v.vbType = vbType;
             v.m_Name = m_Name;
             v.m_Value = m_Value;
+            v.m_bIsLocal = m_bIsLocal;
+            v.m_DisplayValue = m_DisplayValue;
             v.LockVBType = LockVBType;
             v.m_bCanbeRemoved = m_bCanbeRemoved;
             v.m_bInited = m_bInited;

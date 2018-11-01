@@ -332,6 +332,27 @@ namespace YBehavior
 
 	}
 
+	void _OutputMemoryInfo(SharedDataEx* pSharedData, STRING& buffer)
+	{
+		if (pSharedData == nullptr)
+			return;
+
+		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
+		{
+			auto iarray = pSharedData->GetDataArray(i);
+			for (IDataArray::Iterator it = iarray->Iter(); !it.IsEnd(); ++it)
+			{
+				const STRING& name = TreeKeyMgr::Instance()->GetNameByKey(it.Value(), iarray->GetTypeID());
+				if (name == Utility::StringEmpty)
+					continue;
+				STRING content(name + "," + iarray->GetToString(it.Value()));
+				if (buffer.length() > 0)
+					buffer += ";";
+				buffer += content;
+			}
+		}
+	}
+
 	void DebugHelper::_SendInfos(bool clear)
 	{
 		DebugMgr::Instance()->AppendSendContent("[TickResult]");
@@ -340,47 +361,35 @@ namespace YBehavior
 		///> SharedDatas:
 
 		///> MainData
-
-		for (int i = 0 ; i < 2; ++i)
 		{
 			STRING buffer;
-			SharedDataEx* pSharedData;
-			if ( i == 0)
-				pSharedData = m_Target->GetMemory()->GetMainData();
-			else
-			{
-				pSharedData = m_Target->GetMemory()->GetStackTop();
-				buffer += s_ContentSpliter;
-			}
+			SharedDataEx* pSharedData = m_Target->GetMemory()->GetMainData();
 
-			if (pSharedData == nullptr)
-				continue;
-
-			for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
-			{
-				auto iarray = pSharedData->GetDataArray(i);
-				for (IDataArray::Iterator it = iarray->Iter(); !it.IsEnd(); ++it)
-				{
-					const STRING& name = TreeKeyMgr::Instance()->GetNameByKey(it.Value(), iarray->GetTypeID());
-					if (name == Utility::StringEmpty)
-						continue;
-					STRING content(name + "," + iarray->GetToString(it.Value()));
-					if (buffer.length() > 0)
-						buffer += ";";
-					buffer += content;
-				}
-			}
+			_OutputMemoryInfo(pSharedData, buffer);
 			DebugMgr::Instance()->AppendSendContent(buffer);
 		}
 
 
-		///> Run Info:
+		std::unordered_map<BehaviorTree*, std::pair<STRING, STRING>> treeBuffer;
 
+		///> LocalData
+		{
+			MemoryStack& localStack = m_Target->GetMemory()->GetStack();
+			for (auto it = localStack.rbegin(); it != localStack.rend(); ++it)
+			{
+				STRING& buf = treeBuffer[it->Owner].first;
+				///> this node has run twice or more, only use the deepest data
+				if (buf.length() > 0)
+					continue;
+				_OutputMemoryInfo(it->Data, buf);
+			}
+		}
+
+		///> Run Info:
 		const std::list<NodeRunInfo*>& runInfos = DebugMgr::Instance()->GetRunInfos();
-		std::unordered_map<BehaviorTree*, STRING> treeBuffer;
 		for (auto it = runInfos.begin(); it != runInfos.end(); ++it)
 		{
-			STRING& buf = treeBuffer[(*it)->tree];
+			STRING& buf = treeBuffer[(*it)->tree].second;
 			if (buf.length() > 0)
 				buf += ";";
 			buf += (*it)->ToString();
@@ -390,7 +399,9 @@ namespace YBehavior
 			DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
 			DebugMgr::Instance()->AppendSendContent(it->first->GetTreeName());
 			DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
-			DebugMgr::Instance()->AppendSendContent(it->second);
+			DebugMgr::Instance()->AppendSendContent(it->second.first);
+			DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
+			DebugMgr::Instance()->AppendSendContent(it->second.second);
 		}
 
 		//if (DebugMgr::Instance()->IsPaused())
