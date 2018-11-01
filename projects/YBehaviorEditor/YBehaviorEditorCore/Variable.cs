@@ -9,7 +9,7 @@ namespace YBehavior.Editor.Core
 {
     public interface IVariableDataSource
     {
-        IVariableCollection SharedData { get; }
+        TreeMemory SharedData { get; }
     }
     public class Variable : System.ComponentModel.INotifyPropertyChanged
     {
@@ -451,7 +451,7 @@ namespace YBehavior.Editor.Core
                 //}
                 if (string.IsNullOrEmpty(Value))
                     return false;
-                Variable other = SharedDataSource.SharedData.GetVariable(Value);
+                Variable other = SharedDataSource.SharedData.GetVariable(Value, IsLocal);
                 if (other == null)
                 {
                     LogMgr.Instance.Log(string.Format("Pointer doesnt exist for variable {0}, while the pointer is {1} ", Name, Value));

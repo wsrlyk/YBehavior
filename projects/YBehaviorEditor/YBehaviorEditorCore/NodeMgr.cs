@@ -415,20 +415,20 @@ namespace YBehavior.Editor.Core
         protected IVariableCollection m_Variables;
         public IVariableCollection Variables { get { return m_Variables; } }
 
-        public IVariableCollection SharedData { get { return GetTreeSharedData(); } }
-        protected IVariableCollection m_TreeSharedData = null;
-        public IVariableCollection GetTreeSharedData()
+        public TreeMemory SharedData { get { return GetTreeSharedData(); } }
+        protected TreeMemory m_TreeSharedData = null;
+        public TreeMemory GetTreeSharedData()
         {
             if (m_TreeSharedData != null)
                 return m_TreeSharedData;
             Tree root = Root as Tree;
             if (root != null)
-                m_TreeSharedData = root.Variables;
+                m_TreeSharedData = root.TreeMemory;
             else
             {
                 Tree globalTree = Tree.GlobalTree;
                 if (globalTree != null)
-                    return globalTree.Variables;
+                    return globalTree.TreeMemory;
             }
             return m_TreeSharedData;
         }

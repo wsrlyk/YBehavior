@@ -1,13 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <A>
   <Node Class="Root" Pos="297,61">
-    <Shared a="_IC 11"/>
+    <Shared a="_IC 11" />
     <Local a="_Ic 1" />
-    <Node Class="SubTree" Pos="251,290" Tree="_SC B">
-        <In To="_Ip b" From="_IP a"/>
-        <In To="_IP b" From="_IC 3"/>
-        <Out From="_Ip b" to="_Ip a"/>
-        <Out From="_IP b" to="_IP a"/>
+    <Node Class="Sequence" Pos="138,177">
+      <Node Class="Calculator" Pos="18,406" Operator="_EC ADD" Opl="_IP a" Opr1="_IP a" Opr2="_IC 1" />
+      <Node Class="Calculator" Pos="176,433" Operator="_EC ADD" Opl="_Ip a" Opr1="_Ip a" Opr2="_IC 1" />
+      <Node Class="SubTree" Pos="305,339" Tree="_SC B" />
     </Node>
   </Node>
 </A>

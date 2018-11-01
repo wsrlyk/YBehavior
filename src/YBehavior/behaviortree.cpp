@@ -286,7 +286,7 @@ namespace YBehavior
 				op->SetVectorIndex(buffer[3], buffer[4]);
 			}
 
-			if (Utility::ToLower(buffer[0][2]) == Utility::POINTER_CHAR)
+			if (Utility::ToUpper(buffer[0][2]) == Utility::POINTER_CHAR)
 			{
 				op->SetKeyFromString(buffer[1]);
 				op->SetIsLocal(Utility::IsLower(buffer[0][2]));

@@ -338,26 +338,41 @@ namespace YBehavior
 		DebugMgr::Instance()->AppendSendContent(s_HeadSpliter);
 
 		///> SharedDatas:
-		STRING buffer;
-		SharedDataEx* pSharedData = m_Target->GetMemory()->GetMainData();
 
-		const STRING& treeName = DebugMgr::Instance()->GetTargetTree();
+		///> MainData
 
-		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
+		for (int i = 0 ; i < 2; ++i)
 		{
-			auto iarray = pSharedData->GetDataArray(i);
-			for (IDataArray::Iterator it = iarray->Iter(); !it.IsEnd(); ++it)
+			STRING buffer;
+			SharedDataEx* pSharedData;
+			if ( i == 0)
+				pSharedData = m_Target->GetMemory()->GetMainData();
+			else
 			{
-				const STRING& name = TreeKeyMgr::Instance()->GetNameByKey(it.Value(), iarray->GetTypeID());
-				if (name == Utility::StringEmpty)
-					continue;
-				STRING content(name + "," + iarray->GetToString(it.Value()));
-				if (buffer.length() > 0)
-					buffer += ";";
-				buffer += content;
+				pSharedData = m_Target->GetMemory()->GetStackTop();
+				buffer += s_ContentSpliter;
 			}
+
+			if (pSharedData == nullptr)
+				continue;
+
+			for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
+			{
+				auto iarray = pSharedData->GetDataArray(i);
+				for (IDataArray::Iterator it = iarray->Iter(); !it.IsEnd(); ++it)
+				{
+					const STRING& name = TreeKeyMgr::Instance()->GetNameByKey(it.Value(), iarray->GetTypeID());
+					if (name == Utility::StringEmpty)
+						continue;
+					STRING content(name + "," + iarray->GetToString(it.Value()));
+					if (buffer.length() > 0)
+						buffer += ";";
+					buffer += content;
+				}
+			}
+			DebugMgr::Instance()->AppendSendContent(buffer);
 		}
-		DebugMgr::Instance()->AppendSendContent(buffer);
+
 
 		///> Run Info:
 

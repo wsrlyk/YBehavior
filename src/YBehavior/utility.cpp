@@ -90,6 +90,13 @@ namespace YBehavior
 		return c;
 	}
 
+	char Utility::ToUpper(char c)
+	{
+		if ('a' <= c && c <= 'z')
+			return c + 'A' - 'a';
+		return c;
+	}
+
 	bool Utility::IsLower(char c)
 	{
 		return 'a' <= c && c <= 'z';

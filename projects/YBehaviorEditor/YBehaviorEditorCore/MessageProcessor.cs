@@ -218,36 +218,43 @@ namespace YBehavior.Editor.Core
         {
             if (ss == null)
                 return;
-            string[] data = ss.Split(msgContentSplitter, StringSplitOptions.RemoveEmptyEntries);
-            if (data.Length > 1)
+            string[] data = ss.Split(msgContentSplitter);
+            if (data.Length >= 2)
             {
                 using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
                 {
-                    string[] sharedDatas = data[0].Split(';');
-                    foreach (string s in sharedDatas)
+                    for (int i = 0; i < 2; ++i)
                     {
-                        string[] strV = s.Split(',');
-                        if (strV.Length != 2)
-                            continue;
+                        string[] sharedDatas = data[0].Split(';');
+                        foreach (string s in sharedDatas)
+                        {
+                            string[] strV = s.Split(',');
+                            if (strV.Length != 2)
+                                continue;
 
-                        Variable v = DebugMgr.Instance.DebugSharedData.GetVariable(strV[0]);
-                        if (v == null)
-                            continue;
+                            Variable v = null;
+                            if (i == 0)
+                                v = DebugMgr.Instance.DebugSharedData.SharedMemory.GetVariable(strV[0]);
+                            else
+                                v = DebugMgr.Instance.DebugSharedData.LocalMemory.GetVariable(strV[0]);
+                            if (v == null)
+                                continue;
 
-                        bool isRefreshed = v.Value != strV[1];
-                        v.Value = strV[1];
-                        v.IsRefreshed = isRefreshed;
+                            bool isRefreshed = v.Value != strV[1];
+                            v.Value = strV[1];
+                            v.IsRefreshed = isRefreshed;
+                        }
                     }
                 }
                 ++m_TickResultToken;
 
-                if (data.Length % 2 == 1)
+                if (data.Length % 2 == 0)
                 {
                     DebugMgr.Instance.ClearRunState();
                     RunInfo runInfo = null;
-                    for (int i = 1; i < data.Length; ++i)
+                    for (int i = 2; i < data.Length; ++i)
                     {
-                        if (i % 2 == 1)
+                        if (i % 2 == 0)
                         {
                             runInfo = DebugMgr.Instance.GetRunInfo(data[i]);
                             runInfo.info.Clear();

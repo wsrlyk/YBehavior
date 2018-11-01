@@ -47,7 +47,7 @@ namespace YBehavior.Editor.Core
 
         public bool bBreaked { get; set; }
 
-        public IVariableCollection DebugSharedData
+        public TreeMemory DebugSharedData
         {
             get
             {

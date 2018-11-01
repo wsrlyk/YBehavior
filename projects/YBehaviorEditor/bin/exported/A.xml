@@ -3,6 +3,10 @@
   <Node Class="Root">
     <Shared a="_IC 11" />
     <Local a="_Ic 1" />
-    <Node Class="SubTree" Tree="_SC B" />
+    <Node Class="Sequence">
+      <Node Class="Calculator" Operator="_EC ADD" Opl="_IP a" Opr1="_IP a" Opr2="_IC 1" />
+      <Node Class="Calculator" Operator="_EC ADD" Opl="_Ip a" Opr1="_Ip a" Opr2="_IC 1" />
+      <Node Class="SubTree" Tree="_SC B" />
+    </Node>
   </Node>
 </A>

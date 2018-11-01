@@ -33,6 +33,7 @@ namespace YBehavior
 
 		static bool IsElement(TYPEID eleType, TYPEID vectorType);
 		static char ToLower(char c);
+		static char ToUpper(char c);
 		static bool IsLower(char c);
 		template<typename T>
 		static T ToType(const STRING& str)
