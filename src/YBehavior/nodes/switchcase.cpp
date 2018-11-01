@@ -108,13 +108,13 @@ namespace YBehavior
 
 	bool SwitchCase::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID switchType = CreateVariable(m_Switch, "Switch", data, true);
+		TYPEID switchType = CreateVariable(m_Switch, "Switch", data, ST_SINGLE);
 		if (s_ValidTypes.find(switchType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Switch in SwitchCase: " << switchType << ERROR_END;
 			return false;
 		}
-		TYPEID casesType = CreateVariable(m_Cases, "Cases", data, false);
+		TYPEID casesType = CreateVariable(m_Cases, "Cases", data, ST_ARRAY);
 		if (s_ValidVecTypes.find(casesType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Cases in SwitchCase: " << casesType << ERROR_END;

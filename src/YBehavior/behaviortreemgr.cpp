@@ -98,7 +98,8 @@ namespace YBehavior
 			}
 			else
 			{
-				node->LoadChild(*it);
+				if (!node->LoadChild(*it))
+					return false;
 			}
 		}
 		node->LoadFinish();

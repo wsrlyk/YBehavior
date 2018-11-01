@@ -22,6 +22,12 @@ namespace YBehavior
 		NS_BREAK,
 		NS_RUNNING,
 	};
+	enum SingleType
+	{
+		ST_NONE,
+		ST_SINGLE,
+		ST_ARRAY,
+	};
 
 	class ISharedVariableEx;
 	class SharedDataEx;
@@ -104,12 +110,12 @@ namespace YBehavior
 		virtual void OnLoadFinish() {}
 		virtual void OnAddChild(BehaviorNode* child, const STRING& connection) {}
 		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
-		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType = 0);
+		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, SingleType single, char variableType = 0);
 		template <typename T> 
-		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType = 0);
+		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, SingleType single, char variableType = 0);
 		///>
 		/// single: 1, single; 0, vector; -1, dont care
-		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, int single = -1, char variableType = 0);
+		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single = ST_NONE, char variableType = 0);
 		RunningContext* _CreateRC() const;
 		void _TryDeleteRC();
 		void _TryPushRC(AgentPtr agent);
@@ -117,10 +123,10 @@ namespace YBehavior
 	};
 
 	template <typename T>
-	TYPEID BehaviorNode::CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType)
+	TYPEID BehaviorNode::CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, SingleType single, char variableType)
 	{
 		ISharedVariableEx* pTemp = nullptr;
-		TYPEID typeID = CreateVariable(pTemp, attriName, data, bSingle, variableType);
+		TYPEID typeID = CreateVariable(pTemp, attriName, data, single, variableType);
 		if (typeID == GetClassTypeNumberId<T>())
 		{
 			op = (SharedVariableEx<T>*)pTemp;
@@ -166,6 +172,13 @@ namespace YBehavior
 
 	};
 
+	class ITreeExecutionHelper
+	{
+	public:
+		virtual void OnPreExecute() {}
+		virtual void OnPostExecute() {}
+	};
+
 	struct TreeVersion;
 	class YBEHAVIOR_API BehaviorTree : public SingleChildNode
 	{
@@ -202,7 +215,7 @@ namespace YBehavior
 
 		void AddSubTree(BehaviorTree* sub) { m_SubTrees.push_back(sub); }
 		inline StdVector<BehaviorTree*>& GetSubTrees() { return m_SubTrees; }
-		NodeState RootExecute(AgentPtr pAgent, NodeState parentState);
+		NodeState RootExecute(AgentPtr pAgent, NodeState parentState, ITreeExecutionHelper* pHelper = nullptr);
 
 		///> CAUTION: this function can only be called in garbage collection
 		void ClearSubTree() { m_SubTrees.clear(); }

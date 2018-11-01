@@ -102,4 +102,11 @@ namespace YBehavior
 		m_Stack.pop_back();
 	}
 
+	TempMemory::TempMemory(SharedDataEx* pMain, SharedDataEx* pLocal)
+		: m_pMainData(pMain)
+		, m_pLocalData(pLocal)
+	{
+
+	}
+
 }

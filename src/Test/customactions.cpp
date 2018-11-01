@@ -103,7 +103,7 @@ YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 
 bool SelectTargetAction::OnLoaded(const pugi::xml_node& data)
 {
-	YBehavior::TYPEID typeID = CreateVariable(m_Target, "Target", data, true, YBehavior::Utility::POINTER_CHAR);
+	YBehavior::TYPEID typeID = CreateVariable(m_Target, "Target", data, YBehavior::ST_SINGLE, YBehavior::Utility::POINTER_CHAR);
 	if (!m_Target)
 	{
 		return false;
@@ -129,7 +129,7 @@ YBehavior::NodeState GetTargetNameAction::Update(YBehavior::AgentPtr pAgent)
 
 bool GetTargetNameAction::OnLoaded(const pugi::xml_node& data)
 {
-	YBehavior::TYPEID typeID = CreateVariable(m_Target, "Target", data, true, YBehavior::Utility::POINTER_CHAR);
+	YBehavior::TYPEID typeID = CreateVariable(m_Target, "Target", data, YBehavior::ST_SINGLE, YBehavior::Utility::POINTER_CHAR);
 	if (!m_Target)
 	{
 		return false;

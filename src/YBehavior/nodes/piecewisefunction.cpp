@@ -121,26 +121,26 @@ namespace YBehavior
 
 	bool PiecewiseFunction::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID xVecType = CreateVariable(m_KeyPointX, "KeyPointX", data, false);
+		TYPEID xVecType = CreateVariable(m_KeyPointX, "KeyPointX", data, ST_ARRAY);
 		if (s_ValidVecTypes.find(xVecType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for KeyPointX in PiecewiseFunction: " << xVecType << ERROR_END;
 			return false;
 		}
-		TYPEID yVecType = CreateVariable(m_KeyPointY, "KeyPointY", data, false);
+		TYPEID yVecType = CreateVariable(m_KeyPointY, "KeyPointY", data, ST_ARRAY);
 		if (s_ValidVecTypes.find(yVecType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for KeyPointY in PiecewiseFunction: " << yVecType << ERROR_END;
 			return false;
 		}
 
-		TYPEID xType = CreateVariable(m_InputX, "InputX", data, true);
+		TYPEID xType = CreateVariable(m_InputX, "InputX", data, ST_SINGLE);
 		if (s_ValidTypes.find(xType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for InputX in PiecewiseFunction: " << xType << ERROR_END;
 			return false;
 		}
-		TYPEID yType = CreateVariable(m_OutputY, "OutputY", data, true);
+		TYPEID yType = CreateVariable(m_OutputY, "OutputY", data, ST_SINGLE);
 		if (s_ValidTypes.find(yType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for OutputY in PiecewiseFunction: " << yType << ERROR_END;

@@ -21,21 +21,21 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = CreateVariable(m_Opl, "Target", data, true, Utility::POINTER_CHAR);
+		m_DataType = CreateVariable(m_Opl, "Target", data, ST_SINGLE, Utility::POINTER_CHAR);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right1
-		TYPEID dataType = CreateVariable(m_Opr1, "Bound1", data, true);
+		TYPEID dataType = CreateVariable(m_Opr1, "Bound1", data, ST_SINGLE);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right2
-		dataType = CreateVariable(m_Opr2, "Bound2", data, true);
+		dataType = CreateVariable(m_Opr2, "Bound2", data, ST_SINGLE);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
@@ -67,13 +67,13 @@ namespace YBehavior
 
 	bool RandomSelect::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeIDArray = CreateVariable(m_Input, "Input", data, false);
+		TYPEID typeIDArray = CreateVariable(m_Input, "Input", data, ST_ARRAY);
 		if (m_Input == nullptr)
 		{
 			return false;
 		}
 
-		TYPEID typeID = CreateVariable(m_Output, "Output", data, true);
+		TYPEID typeID = CreateVariable(m_Output, "Output", data, ST_SINGLE);
 		if (!Utility::IsElement(typeID, typeIDArray))
 		{
 			ERROR_BEGIN << "RandomSelect types not match " << typeID << " and " << typeIDArray << ERROR_END;

@@ -15,37 +15,37 @@ namespace YBehavior
 	bool ReadRegister::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID typeID;
-		typeID = CreateVariable(m_Event, "Event", data, true, Utility::POINTER_CHAR);
+		typeID = CreateVariable(m_Event, "Event", data, ST_SINGLE, Utility::POINTER_CHAR);
 		if (!m_Event)
 		{
 			return false;
 		}
 
-		typeID = CreateVariable(m_Int, "Int", data, false, Utility::POINTER_CHAR);
+		typeID = CreateVariable(m_Int, "Int", data, ST_ARRAY, Utility::POINTER_CHAR);
 		if (!m_Int)
 		{
 			return false;
 		}
 
-		typeID = CreateVariable(m_Float, "Float", data, false, Utility::POINTER_CHAR);
+		typeID = CreateVariable(m_Float, "Float", data, ST_ARRAY, Utility::POINTER_CHAR);
 		if (!m_Float)
 		{
 			return false;
 		}
 
-		typeID = CreateVariable(m_Bool, "Bool", data, false, Utility::POINTER_CHAR);
+		typeID = CreateVariable(m_Bool, "Bool", data, ST_ARRAY, Utility::POINTER_CHAR);
 		if (!m_Bool)
 		{
 			return false;
 		}
 
-		typeID = CreateVariable(m_Ulong, "Ulong", data, false, Utility::POINTER_CHAR);
+		typeID = CreateVariable(m_Ulong, "Ulong", data, ST_ARRAY, Utility::POINTER_CHAR);
 		if (!m_Ulong)
 		{
 			return false;
 		}
 
-		typeID = CreateVariable(m_String, "String", data, false, Utility::POINTER_CHAR);
+		typeID = CreateVariable(m_String, "String", data, ST_ARRAY, Utility::POINTER_CHAR);
 		if (!m_String)
 		{
 			return false;
@@ -94,37 +94,37 @@ namespace YBehavior
 	bool WriteRegister::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID typeID;
-		typeID = CreateVariable(m_Event, "Event", data, true);
+		typeID = CreateVariable(m_Event, "Event", data, ST_SINGLE);
 		if (!m_Event)
 		{
 			return false;
 		}
 
-		typeID = CreateVariable(m_Int, "Int", data, false);
+		typeID = CreateVariable(m_Int, "Int", data, ST_ARRAY);
 		if (!m_Int)
 		{
 			return false;
 		}
 
-		typeID = CreateVariable(m_Float, "Float", data, false);
+		typeID = CreateVariable(m_Float, "Float", data, ST_ARRAY);
 		if (!m_Float)
 		{
 			return false;
 		}
 
-		typeID = CreateVariable(m_Bool, "Bool", data, false);
+		typeID = CreateVariable(m_Bool, "Bool", data, ST_ARRAY);
 		if (!m_Bool)
 		{
 			return false;
 		}
 
-		typeID = CreateVariable(m_Ulong, "Ulong", data, false);
+		typeID = CreateVariable(m_Ulong, "Ulong", data, ST_ARRAY);
 		if (!m_Ulong)
 		{
 			return false;
 		}
 
-		typeID = CreateVariable(m_String, "String", data, false);
+		typeID = CreateVariable(m_String, "String", data, ST_ARRAY);
 		if (!m_String)
 		{
 			return false;

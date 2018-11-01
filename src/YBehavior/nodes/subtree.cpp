@@ -15,7 +15,7 @@ namespace YBehavior
 	bool SubTree::OnLoaded(const pugi::xml_node& data)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		TYPEID typeID = CreateVariable(m_TreeName, "Tree", data, true, Utility::CONST_CHAR);
+		TYPEID typeID = CreateVariable(m_TreeName, "Tree", data, ST_SINGLE, Utility::CONST_CHAR);
 		if (!m_TreeName)
 		{
 			return false;
@@ -39,12 +39,30 @@ namespace YBehavior
 	{
 		if (strcmp(data.name(), "In") == 0)
 		{
-
+			return _TryCreateFromTo(data, m_Inputs);
 		}
 		else if (strcmp(data.name(), "Out") == 0)
 		{
-
+			return _TryCreateFromTo(data, m_Outputs);
 		}
+		return true;
+	}
+
+	bool SubTree::_TryCreateFromTo(const pugi::xml_node& data, std::vector<FromToType>& container)
+	{
+		ISharedVariableEx* pFrom = nullptr;
+		ISharedVariableEx* pTo = nullptr;
+
+		TYPEID typeIDFrom = CreateVariable(pFrom, "From", data, ST_NONE);
+		TYPEID typeIDTo = CreateVariable(pTo, "To", data, ST_NONE);
+
+		if (typeIDFrom != typeIDTo || typeIDFrom == Utility::INVALID_TYPE)
+		{
+			ERROR_BEGIN << "From & To not match in Subtree" << ERROR_END;
+			return false;
+		}
+
+		container.push_back(FromToType(pFrom, pTo));
 		return true;
 	}
 
@@ -68,8 +86,34 @@ namespace YBehavior
 
 		if (m_Tree != nullptr)
 		{
-			return m_Tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID);
+			LocalMemoryCopier copier(pAgent, this);
+			return m_Tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID, &copier);
 		}
 		return NS_FAILURE;
 	}
+
+	LocalMemoryCopier::LocalMemoryCopier(AgentPtr pAgent, SubTree* pSubTree)
+		: m_pAgent(pAgent)
+		, m_pSubTree(pSubTree)
+		, m_TempMemory(pAgent->GetMemory()->GetMainData(), pAgent->GetMemory()->GetStackTop())
+	{
+
+	}
+
+	void LocalMemoryCopier::OnPreExecute()
+	{
+		for (auto it = m_pSubTree->m_Inputs.begin(); it != m_pSubTree->m_Inputs.end(); ++it)
+		{
+			it->second->SetValue(m_pAgent->GetMemory(), it->first->GetValue(&m_TempMemory));
+		}
+	}
+
+	void LocalMemoryCopier::OnPostExecute()
+	{
+		for (auto it = m_pSubTree->m_Inputs.begin(); it != m_pSubTree->m_Inputs.end(); ++it)
+		{
+			it->second->SetValue(&m_TempMemory, it->first->GetValue(m_pAgent->GetMemory()));
+		}
+	}
+
 }

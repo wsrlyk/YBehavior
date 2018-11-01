@@ -165,7 +165,7 @@ namespace YBehavior
 		return false;
 	}
 
-	bool BehaviorNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, int single, char variableType)
+	bool BehaviorNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, char variableType)
 	{
 		auto tempChar = attri.value();
 		///> split all spaces
@@ -176,9 +176,9 @@ namespace YBehavior
 			return false;
 		}
 
-		if (single >= 0)
+		if (single != ST_NONE)
 		{
-			if (!((single == 1) ^ (buffer[0][0] == buffer[0][1])))
+			if (!((single == ST_SINGLE) ^ (buffer[0][0] == buffer[0][1])))
 			{
 				ERROR_BEGIN << "Single or Vector Error, " << attri.name() << " in " << data.name() << " in Node " << this->GetClassName() << ": " << tempChar << ERROR_END;
 				return false;
@@ -253,13 +253,13 @@ namespace YBehavior
 			return "";
 		}
 		StdVector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, 1, Utility::CONST_CHAR))
+		if (!ParseVariable(attrOptr, data, buffer, ST_SINGLE, Utility::CONST_CHAR))
 			return "";
 
 		return buffer[1];
 	}
 
-	TYPEID BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool bSingle, char variableType)
+	TYPEID BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, SingleType single, char variableType)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 
@@ -269,7 +269,7 @@ namespace YBehavior
 			return -1;
 		}
 		StdVector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, bSingle ? 1 : 0, variableType))
+		if (!ParseVariable(attrOptr, data, buffer, single, variableType))
 			return -1;
 
 		ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
@@ -350,7 +350,7 @@ namespace YBehavior
 		{
 			if (KEY_WORDS.count(it->name()))
 				continue;
-			if (!ParseVariable(*it, data, buffer, -1))
+			if (!ParseVariable(*it, data, buffer, ST_NONE))
 				return false;
 			ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
 			if (helper == nullptr)
@@ -378,13 +378,18 @@ namespace YBehavior
 	}
 
 
-	YBehavior::NodeState BehaviorTree::RootExecute(AgentPtr pAgent, NodeState parentState)
+	YBehavior::NodeState BehaviorTree::RootExecute(AgentPtr pAgent, NodeState parentState, ITreeExecutionHelper* pHelper)
 	{
 		///> Push the local data to the stack of the agent memory
 		pAgent->GetMemory()->Push(this);
 		
+		if (pHelper)
+			pHelper->OnPreExecute();
+
 		NodeState res = Execute(pAgent, parentState);
 
+		if (pHelper)
+			pHelper->OnPostExecute();
 		///> Pop the local data
 		pAgent->GetMemory()->Pop();
 		return res;

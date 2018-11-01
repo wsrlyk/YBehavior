@@ -123,26 +123,26 @@ namespace YBehavior
 
 	bool Dice::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID xVecType = CreateVariable(m_Distribution, "Distribution", data, false);
+		TYPEID xVecType = CreateVariable(m_Distribution, "Distribution", data, ST_ARRAY);
 		if (s_ValidVecTypes.find(xVecType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Distribution in Dice: " << xVecType << ERROR_END;
 			return false;
 		}
-		TYPEID yVecType = CreateVariable(m_Values, "Values", data, false);
+		TYPEID yVecType = CreateVariable(m_Values, "Values", data, ST_ARRAY);
 		if (s_ValidVecTypes.find(yVecType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Values in Dice: " << yVecType << ERROR_END;
 			return false;
 		}
 
-		TYPEID xType = CreateVariable(m_Input, "Input", data, true);
+		TYPEID xType = CreateVariable(m_Input, "Input", data, ST_SINGLE);
 		if (s_ValidTypes.find(xType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Input in Dice: " << xType << ERROR_END;
 			return false;
 		}
-		TYPEID yType = CreateVariable(m_Output, "Output", data, true);
+		TYPEID yType = CreateVariable(m_Output, "Output", data, ST_SINGLE);
 		if (s_ValidTypes.find(yType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Output in Dice: " << yType << ERROR_END;
@@ -161,7 +161,7 @@ namespace YBehavior
 			return false;
 		}
 
-		TYPEID bType = CreateVariable(m_IgnoreInput, "IgnoreInput", data, true);
+		TYPEID bType = CreateVariable(m_IgnoreInput, "IgnoreInput", data, ST_SINGLE);
 		if (!m_IgnoreInput)
 		{
 			return false;

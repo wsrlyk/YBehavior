@@ -30,12 +30,12 @@ namespace YBehavior
 	public:
 		static Bimap<OperationType, STRING, EnumClassHash> s_OperatorMap;
 		virtual bool Compare(const void* pLeft, const void* pRight, OperationType op) = 0;
-		virtual bool Compare(Memory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op) = 0;
+		virtual bool Compare(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op) = 0;
 		virtual void Calculate(void* pLeft, const void* pRight0, const void* pRight1, OperationType op) = 0;
 		virtual const void* Calculate(const void* pRight0, const void* pRight1, OperationType op) = 0;
-		virtual void Calculate(Memory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op) = 0;
+		virtual void Calculate(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op) = 0;
 		virtual void Random(void* pLeft, const void* pRight0, const void* pRight1) = 0;
-		virtual void Random(Memory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1) = 0;
+		virtual void Random(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1) = 0;
 		virtual void Set(void* pLeft, const void* pRight0) = 0;
 		virtual void* AllocData() = 0;
 		virtual void RecycleData(void* pData) = 0;
@@ -253,7 +253,7 @@ namespace YBehavior
 	public:
 		static IVariableOperationHelper* Get() { return &s_Instance; }
 
-		bool Compare(Memory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op)
+		bool Compare(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op)
 		{
 			return ValueHandler::Compare<T>(pLeft->GetValue(pMemory), pRight->GetValue(pMemory), op);
 		}
@@ -275,7 +275,7 @@ namespace YBehavior
 			return &left;
 		}
 
-		void Calculate(Memory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op)
+		void Calculate(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op)
 		{
 			T left;
 			ValueHandler::Calculate<T>(&left, pRight0->GetValue(pMemory), pRight1->GetValue(pMemory), op);
@@ -287,7 +287,7 @@ namespace YBehavior
 			ValueHandler::Random<T>(pLeft, pRight0, pRight1);
 		}
 
-		void Random(Memory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
+		void Random(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
 		{
 			T left;
 			ValueHandler::Random<T>(&left, pRight0->GetValue(pMemory), pRight1->GetValue(pMemory));
@@ -325,7 +325,7 @@ namespace YBehavior
 			return false;
 		}
 
-		bool Compare(Memory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op)
+		bool Compare(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op)
 		{
 			return false;
 		}
@@ -339,7 +339,7 @@ namespace YBehavior
 		{
 		}
 
-		void Calculate(Memory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op)
+		void Calculate(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op)
 		{
 		}
 
@@ -347,7 +347,7 @@ namespace YBehavior
 		{
 		}
 
-		void Random(Memory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
+		void Random(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
 		{
 		}
 

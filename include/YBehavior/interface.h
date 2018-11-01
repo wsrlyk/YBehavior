@@ -7,7 +7,12 @@ namespace YBehavior
 {
 	class IVariableOperationHelper;
 	class SharedDataEx;
-	class Memory;
+	class IMemory
+	{
+	public:
+		virtual SharedDataEx* GetMainData() = 0;
+		virtual SharedDataEx* GetStackTop() = 0;
+	};
 	class ISharedVariableEx
 	{
 	public:
@@ -23,8 +28,8 @@ namespace YBehavior
 #endif
 		virtual void SetVectorIndex(const STRING& vbType, const STRING& s) { }
 		virtual void SetKeyFromString(const STRING& s) = 0;
-		virtual const void* GetValue(Memory* pMemory) = 0;
-		virtual void SetValue(Memory* pMemory, const void* src) = 0;
+		virtual const void* GetValue(IMemory* pMemory) = 0;
+		virtual void SetValue(IMemory* pMemory, const void* src) = 0;
 		virtual void SetValueFromString(const STRING& str) = 0;
 		virtual TYPEID GetTypeID() = 0;
 		///> if this variable is an INT, and it refers to an element of an INT[], this method will return the type of INT[] instead of INT;   Used in log..
@@ -32,14 +37,15 @@ namespace YBehavior
 
 		virtual IVariableOperationHelper* GetOperation() = 0;
 		virtual ISharedVariableEx* GetVectorIndex() = 0;
-		virtual STRING GetValueToSTRING(Memory* pMemory) = 0;
+		virtual STRING GetValueToSTRING(IMemory* pMemory) = 0;
 
+		virtual bool IsThisVector() const = 0;
 		///> Belows are functions for vector
-		virtual INT VectorSize(Memory* pMemory) = 0;
-		virtual void Clear(Memory* pMemory) = 0;
-		virtual const void* GetElement(Memory* pMemory, INT index) = 0;
-		virtual void SetElement(Memory* pMemory, const void* v, INT index) = 0;
-		virtual void PushBackElement(Memory* pMemory, const void* v) = 0;
+		virtual INT VectorSize(IMemory* pMemory) = 0;
+		virtual void Clear(IMemory* pMemory) = 0;
+		virtual const void* GetElement(IMemory* pMemory, INT index) = 0;
+		virtual void SetElement(IMemory* pMemory, const void* v, INT index) = 0;
+		virtual void PushBackElement(IMemory* pMemory, const void* v) = 0;
 	protected:
 		KEY m_Key;
 		bool m_IsLocal;
