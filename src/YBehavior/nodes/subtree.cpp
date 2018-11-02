@@ -37,32 +37,37 @@ namespace YBehavior
 
 	bool SubTree::OnLoadChild(const pugi::xml_node& data)
 	{
-		if (strcmp(data.name(), "In") == 0)
+		if (strcmp(data.name(), "Input") == 0)
 		{
 			return _TryCreateFromTo(data, m_Inputs);
 		}
-		else if (strcmp(data.name(), "Out") == 0)
+		else if (strcmp(data.name(), "Output") == 0)
 		{
 			return _TryCreateFromTo(data, m_Outputs);
 		}
 		return true;
 	}
 
-	bool SubTree::_TryCreateFromTo(const pugi::xml_node& data, std::vector<FromToType>& container)
+	bool SubTree::_TryCreateFromTo(const pugi::xml_node& data, std::vector<ISharedVariableEx*>& container)
 	{
-		ISharedVariableEx* pFrom = nullptr;
-		ISharedVariableEx* pTo = nullptr;
-
-		TYPEID typeIDFrom = CreateVariable(pFrom, "From", data, ST_NONE);
-		TYPEID typeIDTo = CreateVariable(pTo, "To", data, ST_NONE);
-
-		if (typeIDFrom != typeIDTo || typeIDFrom == Utility::INVALID_TYPE)
+		for (auto it = data.attributes_begin(); it != data.attributes_end(); ++it)
 		{
-			ERROR_BEGIN << "From & To not match in Subtree" << ERROR_END;
-			return false;
+			ISharedVariableEx* pVariable = nullptr;
+
+			CreateVariable(pVariable, it->name(), data, ST_NONE);
+			if (!pVariable)
+			{
+				ERROR_BEGIN << "Failed to Create " << data.name() << ERROR_END;
+				return false;
+			}
+			//if (container.count(it->name()) > 0)
+			//{
+			//	ERROR_BEGIN << "Duplicate " << data.name() << " Variable: " << it->name() << ERROR_END;
+			//	return false;
+			//}
+			container.push_back(pVariable);
 		}
 
-		container.push_back(FromToType(pFrom, pTo));
 		return true;
 	}
 
@@ -86,34 +91,16 @@ namespace YBehavior
 
 		if (m_Tree != nullptr)
 		{
-			LocalMemoryCopier copier(pAgent, this);
-			return m_Tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID, &copier);
+			if (m_Inputs.size() > 0 || m_Outputs.size() > 0)
+			{
+				LocalMemoryTunnel tunnel(pAgent, m_Inputs.size() > 0 ? &m_Inputs : nullptr, m_Outputs.size() > 0 ? &m_Outputs : nullptr);
+				return m_Tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID, &tunnel);
+			}
+			else
+			{
+				return m_Tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID);
+			}
 		}
 		return NS_FAILURE;
 	}
-
-	LocalMemoryCopier::LocalMemoryCopier(AgentPtr pAgent, SubTree* pSubTree)
-		: m_pAgent(pAgent)
-		, m_pSubTree(pSubTree)
-		, m_TempMemory(pAgent->GetMemory()->GetMainData(), pAgent->GetMemory()->GetStackTop())
-	{
-
-	}
-
-	void LocalMemoryCopier::OnPreExecute()
-	{
-		for (auto it = m_pSubTree->m_Inputs.begin(); it != m_pSubTree->m_Inputs.end(); ++it)
-		{
-			it->second->SetValue(m_pAgent->GetMemory(), it->first->GetValue(&m_TempMemory));
-		}
-	}
-
-	void LocalMemoryCopier::OnPostExecute()
-	{
-		for (auto it = m_pSubTree->m_Inputs.begin(); it != m_pSubTree->m_Inputs.end(); ++it)
-		{
-			it->second->SetValue(&m_TempMemory, it->first->GetValue(m_pAgent->GetMemory()));
-		}
-	}
-
 }

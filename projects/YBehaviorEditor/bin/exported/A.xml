@@ -7,10 +7,8 @@
       <Node Class="Calculator" Operator="_EC ADD" Opl="_IP a" Opr1="_IP a" Opr2="_IC 1" />
       <Node Class="Calculator" Operator="_EC ADD" Opl="_Ip a" Opr1="_Ip a" Opr2="_IC 1" />
       <Node Class="SubTree" Tree="_SC B" >
-        <In To="_Ip b" From="_IP a"/>
-        <In To="_IP b" From="_IC 3"/>
-        <Out From="_Ip b" To="_Ip a"/>
-        <Out From="_IP b" To="_IP a"/>
+        <Input Name="_Ip a" MP="_IC 3"/>
+        <Output Direction="_Ip a" Location="_IP a"/>
        </Node>
     </Node>
   </Node>

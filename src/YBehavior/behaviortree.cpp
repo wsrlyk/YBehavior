@@ -339,29 +339,49 @@ namespace YBehavior
 
 	bool BehaviorTree::OnLoadChild(const pugi::xml_node& data)
 	{
-		if (strcmp(data.name(), "Shared") != 0 && strcmp(data.name(), "Local") != 0)
+		///> Shared & Local Variables
+		if (strcmp(data.name(), "Shared") == 0 || strcmp(data.name(), "Local") == 0)
 		{
-			return true;
+			StdVector<STRING> buffer;
+
+			for (auto it = data.attributes_begin(); it != data.attributes_end(); ++it)
+			{
+				if (KEY_WORDS.count(it->name()))
+					continue;
+				if (!ParseVariable(*it, data, buffer, ST_NONE))
+					return false;
+				ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
+				if (helper == nullptr)
+					continue;
+
+				if (buffer[0][2] == Utility::CONST_CHAR)
+					helper->SetSharedData(m_SharedData, it->name(), buffer[1]);
+				else
+					helper->SetSharedData(GetLocalData(), it->name(), buffer[1]);
+			}
 		}
-
-		StdVector<STRING> buffer;
-
-		for (auto it = data.attributes_begin(); it != data.attributes_end(); ++it)
+		///> Inputs & Outputs
+		else if (strcmp(data.name(), "Input") == 0 || strcmp(data.name(), "Output") == 0)
 		{
-			if (KEY_WORDS.count(it->name()))
-				continue;
-			if (!ParseVariable(*it, data, buffer, ST_NONE))
-				return false;
-			ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
-			if (helper == nullptr)
-				continue;
+			std::unordered_map<STRING, ISharedVariableEx*>& container = data.name()[0] == 'I' ? m_Inputs : m_Outputs;
+			for (auto it = data.attributes_begin(); it != data.attributes_end(); ++it)
+			{
+				ISharedVariableEx* pVariable = nullptr;
 
-			if (buffer[0][2] == Utility::CONST_CHAR)
-				helper->SetSharedData(m_SharedData, it->name(), buffer[1]);
-			else
-				helper->SetSharedData(GetLocalData(), it->name(), buffer[1]);
+				CreateVariable(pVariable, it->name(), data, ST_NONE);
+				if (!pVariable)
+				{
+					ERROR_BEGIN << "Failed to Create " << data.name() << ERROR_END;
+					return false;
+				}
+				if (container.count(it->name()) > 0)
+				{
+					ERROR_BEGIN << "Duplicate "<< data.name() << " Variable: " << it->name() << ERROR_END;
+					return false;
+				}
+				container[it->name()] = pVariable;
+			}
 		}
-
 		return true;
 	}
 
@@ -378,21 +398,72 @@ namespace YBehavior
 	}
 
 
-	YBehavior::NodeState BehaviorTree::RootExecute(AgentPtr pAgent, NodeState parentState, ITreeExecutionHelper* pHelper)
+	YBehavior::NodeState BehaviorTree::RootExecute(AgentPtr pAgent, NodeState parentState, LocalMemoryTunnel* pTunnel)
 	{
 		///> Push the local data to the stack of the agent memory
 		pAgent->GetMemory()->Push(this);
 		
-		if (pHelper)
-			pHelper->OnPreExecute();
+		if (pTunnel)
+			pTunnel->OnInput(&m_Inputs);
 
 		NodeState res = Execute(pAgent, parentState);
 
-		if (pHelper)
-			pHelper->OnPostExecute();
+		if (pTunnel)
+			pTunnel->OnOutput(&m_Outputs);
 		///> Pop the local data
 		pAgent->GetMemory()->Pop();
 		return res;
+	}
+
+	LocalMemoryTunnel::LocalMemoryTunnel(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo)
+		: m_pAgent(pAgent)
+		, m_pInputsFrom(pInputsFrom)
+		, m_pOutputsTo(pOutputsTo)
+		, m_TempMemory(pAgent->GetMemory()->GetMainData(), pAgent->GetMemory()->GetStackTop())
+	{
+	}
+
+
+	void LocalMemoryTunnel::OnInput(std::unordered_map<STRING, ISharedVariableEx*>* pInputsTo)
+	{
+		if (m_pInputsFrom && pInputsTo)
+		{
+			for (auto it = m_pInputsFrom->begin(); it != m_pInputsFrom->end(); ++it)
+			{
+				ISharedVariableEx* pFrom = *it;
+				auto it2 = pInputsTo->find(pFrom->GetName());
+				if (it2 == pInputsTo->end())
+					continue;
+				ISharedVariableEx* pTo = it2->second;
+				if (pFrom->GetTypeID() != pTo->GetTypeID())
+				{
+					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetName() << ", at main tree: " << m_pAgent->GetTree()->GetTreeName() << ERROR_END;
+					continue;
+				}
+				pTo->SetValue(m_pAgent->GetMemory(), pFrom->GetValue(&m_TempMemory));
+			}
+		}
+	}
+
+	void LocalMemoryTunnel::OnOutput(std::unordered_map<STRING, ISharedVariableEx*>* pOutputsFrom)
+	{
+		if (m_pOutputsTo && pOutputsFrom)
+		{
+			for (auto it = m_pOutputsTo->begin(); it != m_pOutputsTo->end(); ++it)
+			{
+				ISharedVariableEx* pTo = *it;
+				auto it2 = pOutputsFrom->find(pTo->GetName());
+				if (it2 == pOutputsFrom->end())
+					continue;
+				ISharedVariableEx* pFrom = it2->second;
+				if (pFrom->GetTypeID() != pTo->GetTypeID())
+				{
+					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetName() << ", at main tree: " << m_pAgent->GetTree()->GetTreeName() << ERROR_END;
+					continue;
+				}
+				pTo->SetValue(&m_TempMemory, pFrom->GetValue(m_pAgent->GetMemory()));
+			}
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -471,4 +542,4 @@ namespace YBehavior
 		}
 	}
 
-}
+	}

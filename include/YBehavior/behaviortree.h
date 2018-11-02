@@ -172,11 +172,17 @@ namespace YBehavior
 
 	};
 
-	class ITreeExecutionHelper
+	class LocalMemoryTunnel
 	{
 	public:
-		virtual void OnPreExecute() {}
-		virtual void OnPostExecute() {}
+		LocalMemoryTunnel(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo);
+		void OnInput(std::unordered_map<STRING, ISharedVariableEx*>* pInputsTo);
+		void OnOutput(std::unordered_map<STRING, ISharedVariableEx*>* pOutputsFrom);
+	private:
+		AgentPtr m_pAgent;
+		std::vector<ISharedVariableEx* >* m_pInputsFrom;
+		std::vector<ISharedVariableEx* >* m_pOutputsTo;
+		TempMemory m_TempMemory;
 	};
 
 	struct TreeVersion;
@@ -202,6 +208,8 @@ namespace YBehavior
 #endif
 
 		StdVector<BehaviorTree*> m_SubTrees;
+		std::unordered_map<STRING, ISharedVariableEx*> m_Inputs;
+		std::unordered_map<STRING, ISharedVariableEx*> m_Outputs;
 	public:
 		BehaviorTree(const STRING& name);
 		~BehaviorTree();
@@ -215,7 +223,7 @@ namespace YBehavior
 
 		void AddSubTree(BehaviorTree* sub) { m_SubTrees.push_back(sub); }
 		inline StdVector<BehaviorTree*>& GetSubTrees() { return m_SubTrees; }
-		NodeState RootExecute(AgentPtr pAgent, NodeState parentState, ITreeExecutionHelper* pHelper = nullptr);
+		NodeState RootExecute(AgentPtr pAgent, NodeState parentState, LocalMemoryTunnel* pTunnel = nullptr);
 
 		///> CAUTION: this function can only be called in garbage collection
 		void ClearSubTree() { m_SubTrees.clear(); }
