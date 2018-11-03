@@ -3,6 +3,7 @@
 
 #include "YBehavior/shareddataex.h"
 #include <stack>
+#include <list>
 
 namespace YBehavior
 {
