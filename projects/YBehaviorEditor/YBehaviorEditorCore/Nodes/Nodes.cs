@@ -109,6 +109,22 @@ namespace YBehavior.Editor.Core
                 _WriteVariables(InOutMemory.OutputMemory, nodeEl);
             }
         }
+
+        protected override bool _OnCheckValid()
+        {
+            bool bRes = true;
+            foreach (var v in m_InOutMemory.InputMemory.Datas)
+            {
+                if (!v.Variable.CheckValid())
+                    bRes = false; ;
+            }
+            foreach (var v in m_InOutMemory.OutputMemory.Datas)
+            {
+                if (!v.Variable.CheckValid())
+                    bRes = false; ;
+            }
+            return bRes;
+        }
     }
 
     class SequenceNode : CompositeNode
@@ -1102,6 +1118,10 @@ namespace YBehavior.Editor.Core
                 return Variables.GetVariable("Tree").NoteValue;
             }
         }
+        protected override void _OnLoaded()
+        {
+            m_LoadedTree = m_Tree.Value;
+        }
 
         public void LoadInOut()
         {
@@ -1171,6 +1191,22 @@ namespace YBehavior.Editor.Core
 
                 _WriteVariables(InOutMemory.OutputMemory, nodeEl);
             }
+        }
+
+        protected override bool _OnCheckValid()
+        {
+            bool bRes = true;
+            foreach (var v in m_InOutMemory.InputMemory.Datas)
+            {
+                if (!v.Variable.CheckValid())
+                    bRes = false; ;
+            }
+            foreach (var v in m_InOutMemory.OutputMemory.Datas)
+            {
+                if (!v.Variable.CheckValid())
+                    bRes = false; ;
+            }
+            return bRes;
         }
     }
 

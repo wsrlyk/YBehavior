@@ -696,34 +696,40 @@ namespace YBehavior.Editor.Core
 
         public bool CheckValid()
         {
-            if (!(m_Variables is NodeMemory))
-                return true;
-
-            NodeMemory memory = m_Variables as NodeMemory;
-            SameTypeGroup sameTypeGroup = memory.SameTypeGroup;
-            if (sameTypeGroup == null)
-                return true;
             bool bRes = true;
-            foreach (HashSet<string> group in sameTypeGroup)
+            if (m_Variables is NodeMemory)
             {
-                Variable.ValueType valueType = Variable.ValueType.VT_NONE;
-                foreach (string vName in group)
+                NodeMemory memory = m_Variables as NodeMemory;
+                SameTypeGroup sameTypeGroup = memory.SameTypeGroup;
+                if (sameTypeGroup != null)
                 {
-                    Variable v = memory.GetVariable(vName);
-                    if (v == null)
-                        continue;
-
-                    if (valueType == Variable.ValueType.VT_NONE)
-                        valueType = v.vType;
-                    else if (valueType != v.vType)
+                    foreach (HashSet<string> group in sameTypeGroup)
                     {
-                        LogMgr.Instance.Log("ValueType not match in Node: " + UITitle + "." + vName);
-                        bRes = false;
+                        Variable.ValueType valueType = Variable.ValueType.VT_NONE;
+                        foreach (string vName in group)
+                        {
+                            Variable v = memory.GetVariable(vName);
+                            if (v == null)
+                                continue;
+
+                            if (valueType == Variable.ValueType.VT_NONE)
+                                valueType = v.vType;
+                            else if (valueType != v.vType)
+                            {
+                                LogMgr.Instance.Log("ValueType not match in Node: " + UITitle + "." + vName);
+                                bRes = false;
+                            }
+                        }
                     }
                 }
             }
 
-            return bRes;
+            return _OnCheckValid() && bRes;
+        }
+
+        protected virtual bool _OnCheckValid()
+        {
+            return true;
         }
 
         public virtual Node Clone()

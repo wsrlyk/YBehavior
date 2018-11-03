@@ -178,6 +178,8 @@ namespace YBehavior.Editor.Core
             {
                 using (var delay = other.m_VariableList.Delay())
                 {
+                    other.m_VariableList.Clear();
+                    other.m_Variables.Clear();
                     foreach (VariableHolder v in m_VariableList)
                     {
                         Variable vv = v.Variable.Clone();
@@ -194,12 +196,24 @@ namespace YBehavior.Editor.Core
                 using (var delay = m_VariableList.Delay())
                 {
                     List<VariableHolder> tempList = new List<VariableHolder>();
-                    ///> Remove extra ones
+
                     foreach (VariableHolder v in m_VariableList)
                     {
-                        if (other.GetVariableHolder(v.Variable.Name) == null)
+                        VariableHolder otherholder = other.GetVariableHolder(v.Variable.Name);
+                        ///> Remove extra ones
+                        if (otherholder == null)
                             continue;
-                        tempList.Add(v);
+
+                        ///> We just clone the new variable
+                        VariableHolder holder = new VariableHolder()
+                        {
+                            Variable = otherholder.Variable.Clone(),
+                            Index = tempList.Count
+                        };
+                        ///> Keep the original value
+                        if (holder.Variable.Value != v.Variable.Value)
+                            holder.Variable.Value = v.Variable.Value;
+                        tempList.Add(holder);
                     }
                     ///> Add new ones
                     foreach (VariableHolder v in other.m_VariableList)

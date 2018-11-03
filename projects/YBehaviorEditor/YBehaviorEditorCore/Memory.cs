@@ -235,7 +235,19 @@ namespace YBehavior.Editor.Core
                 v.vTypeSet.AddRange(Variable.CreateParams_AllTypes);
             if (!v.SetVariableInNode(value, name))
                 return false;
-            v.LockVBType = false;
+
+            if ((bIsInput && m_bIsCore) || (!bIsInput && !m_bIsCore))
+            {
+                ///> In these two situations, variable can only be pointer
+                if (v.vbType != Variable.VariableType.VBT_Pointer)
+                    v.vbType = Variable.VariableType.VBT_Pointer;
+                v.LockVBType = true;
+            }
+            else
+            {
+                v.LockVBType = false;
+            }
+
             v.CanBeRemoved = true;
             v.IsInput = bIsInput;
 
@@ -259,11 +271,16 @@ namespace YBehavior.Editor.Core
             using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
             {
                 v = new InOutVariable(m_Owner);
-                v.vTypeSet.AddRange(Variable.CreateParams_AllTypes);
+                if (m_bIsCore)
+                    v.vTypeSet.AddRange(Variable.CreateParams_AllTypes);
                 if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Pointer, false, "", null, name))
                     return false;
 
-                v.LockVBType = false;
+                if ((bIsInput && m_bIsCore) || (!bIsInput && !m_bIsCore))
+                    v.LockVBType = true;
+                else
+                    v.LockVBType = false;
+
                 v.CanBeRemoved = true;
                 v.IsInput = bIsInput;
 
@@ -273,11 +290,11 @@ namespace YBehavior.Editor.Core
             }
 
             {
-                AddSharedVariableCommand addSharedVariableCommand = new AddSharedVariableCommand()
+                AddInOutVariableCommand addInOutVariableCommand = new AddInOutVariableCommand()
                 {
-                    VariableHolder = GetVariableHolder(v.Name, v.IsLocal)
+                    VariableHolder = GetVariableHolder(v.Name, v.IsInput)
                 };
-                WorkBenchMgr.Instance.PushCommand(addSharedVariableCommand);
+                WorkBenchMgr.Instance.PushCommand(addInOutVariableCommand);
             }
             return true;
         }
@@ -344,6 +361,12 @@ namespace YBehavior.Editor.Core
                 if (!m_OutputVariables.DoRemove(holder))
                     return false;
             }
+
+            RemoveInOutVariableCommand removeInOutVariableCommand = new RemoveInOutVariableCommand()
+            {
+                VariableHolder = holder
+            };
+            WorkBenchMgr.Instance.PushCommand(removeInOutVariableCommand);
 
             return true;
         }

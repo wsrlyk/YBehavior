@@ -14,7 +14,7 @@
         </local:ValueConverterGroup>
     </UserControl.Resources>
     <Grid>
-        <TabControl Name="TabController" Grid.Row="0" Tag="200">
+        <TabControl Name="TabController" Grid.Row="0" Tag="200" SelectionChanged="TabController_SelectionChanged">
             <TabItem Header="Variable" Name="VariableTab" Visibility="{Binding IsSelected, ElementName=CommentTab, Converter={StaticResource invertBoolAndVisibilityConvertor}}">
                 <DockPanel Background="DarkGray">
                     <StackPanel DockPanel.Dock="Top">

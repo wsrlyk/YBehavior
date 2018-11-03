@@ -180,6 +180,46 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    public class AddInOutVariableCommand : ICommand
+    {
+        public VariableHolder VariableHolder { get; set; }
+
+        public void Redo()
+        {
+            if (VariableHolder.Variable.SharedDataSource != null && VariableHolder.Variable.SharedDataSource.InOutData != null)
+            {
+                VariableHolder.Variable.SharedDataSource.InOutData.AddBackVariable(VariableHolder);
+            }
+        }
+        public void Undo()
+        {
+            if (VariableHolder.Variable.SharedDataSource != null && VariableHolder.Variable.SharedDataSource.InOutData != null)
+            {
+                VariableHolder.Variable.SharedDataSource.InOutData.RemoveVariable(VariableHolder.Variable);
+            }
+        }
+    }
+
+    public class RemoveInOutVariableCommand : ICommand
+    {
+        public VariableHolder VariableHolder { get; set; }
+
+        public void Redo()
+        {
+            if (VariableHolder.Variable.SharedDataSource != null && VariableHolder.Variable.SharedDataSource.InOutData != null)
+            {
+                VariableHolder.Variable.SharedDataSource.InOutData.RemoveVariable(VariableHolder.Variable);
+            }
+        }
+        public void Undo()
+        {
+            if (VariableHolder.Variable.SharedDataSource != null && VariableHolder.Variable.SharedDataSource.InOutData != null)
+            {
+                VariableHolder.Variable.SharedDataSource.InOutData.AddBackVariable(VariableHolder);
+            }
+        }
+    }
+
     public class MoveNodeCommand : ICommand
     {
         public Node Node { get; set; }

@@ -61,7 +61,6 @@ namespace YBehavior.Editor
                 if (node.Node is Core.SubTreeNode)
                 {
                     this.InOutTab.Visibility = Visibility.Visible;
-                    (node.Node as Core.SubTreeNode).LoadInOut();
                     this.InOutTab.DataContext = node.Node;
                 }
                 else
@@ -126,6 +125,16 @@ namespace YBehavior.Editor
                 return;
 
             node.ReloadInOut();
+        }
+
+        private void TabController_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.Source is TabControl)
+            {
+                if (this.InOutTab.IsSelected)
+                    (this.InOutTab.DataContext as Core.SubTreeNode).LoadInOut();
+            }
+
         }
     }
 }
