@@ -204,16 +204,22 @@ namespace YBehavior.Editor.Core
                         if (otherholder == null)
                             continue;
 
-                        ///> We just clone the new variable
-                        VariableHolder holder = new VariableHolder()
+                        bool bNeedRefresh = false;
+                        if (v.Variable.cType != otherholder.Variable.cType)
                         {
-                            Variable = otherholder.Variable.Clone(),
-                            Index = tempList.Count
-                        };
-                        ///> Keep the original value
-                        if (holder.Variable.Value != v.Variable.Value)
-                            holder.Variable.Value = v.Variable.Value;
-                        tempList.Add(holder);
+                            v.Variable.cType = otherholder.Variable.cType;
+                            bNeedRefresh = true;
+                        }
+                        if (v.Variable.vType != otherholder.Variable.vType)
+                        {
+                            v.Variable.vTypeSet.Clear();
+                            v.Variable.vType = otherholder.Variable.vType;
+                            bNeedRefresh = true;
+                        }
+                        if (bNeedRefresh)
+                            v.Variable.RefreshCandidates(true);
+
+                        tempList.Add(v);
                     }
                     ///> Add new ones
                     foreach (VariableHolder v in other.m_VariableList)
@@ -250,10 +256,12 @@ namespace YBehavior.Editor.Core
                     ///> assign new list to the collection
                     m_VariableList.Clear();
                     m_Variables.Clear();
+                    int index = 0;
                     foreach(var v in tempList)
                     {
                         m_VariableList.Add(v);
                         m_Variables[v.Variable.Name] = v;
+                        v.Index = index++;
                         if (v.Variable.SharedDataSource != m_Owner)
                         {
                             v.Variable.SharedDataSource = m_Owner;

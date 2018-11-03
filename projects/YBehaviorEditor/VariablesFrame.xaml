@@ -15,7 +15,7 @@
     </UserControl.Resources>
     <Grid>
         <TabControl Name="TabController" Grid.Row="0" Tag="200" SelectionChanged="TabController_SelectionChanged">
-            <TabItem Header="Variable" Name="VariableTab" Visibility="{Binding IsSelected, ElementName=CommentTab, Converter={StaticResource invertBoolAndVisibilityConvertor}}">
+            <TabItem Header="Variable" Name="VariableTab" Width="80" Visibility="{Binding IsSelected, ElementName=CommentTab, Converter={StaticResource invertBoolAndVisibilityConvertor}}">
                 <DockPanel Background="DarkGray">
                     <StackPanel DockPanel.Dock="Top">
                         <TextBlock Name="Type" Text ="{Binding Name}" FontSize="14" Height="25" ToolTip="{Binding Description}"/>
@@ -46,7 +46,7 @@
                     </ScrollViewer>
                 </DockPanel>
             </TabItem>
-            <TabItem Header="Comment" Name="CommentTab" Visibility="{Binding IsSelected, ElementName=CommentTab, Converter={StaticResource visibilityConvertor}}">
+            <TabItem Header="Comment" Name="CommentTab" Width="80" Visibility="{Binding IsSelected, ElementName=CommentTab, Converter={StaticResource visibilityConvertor}}">
                 <Grid>
                     <!--<Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100"/>
@@ -63,14 +63,14 @@
                     <TextBox TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Text="{Binding Content}"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="InOut" Name="InOutTab">
+            <TabItem Header="InOut" Name="InOutTab" Width="80">
                 <Grid Name="InOutPanel">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20"/>
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" FlowDirection="RightToLeft">
                         <Button Width="60" Click="RefreshInOutButton_Click" Margin="10,0,0,0">
                             Reload
                         </Button>

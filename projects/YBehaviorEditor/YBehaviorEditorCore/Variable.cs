@@ -380,7 +380,7 @@ namespace YBehavior.Editor.Core
         }
         private void _OnValueChanged()
         {
-            OnPropertyChanged("Value");
+            OnPropertyChanged("DisplayValue");
             OnPropertyChanged("IsElement");
             if (Container != null)
                 Container.OnVariableValueChanged(this);

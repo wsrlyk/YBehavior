@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SubTree>
+  <Node Class="Root">
+    <Local a="_Ic 0" b="_Ic 0" />
+    <Input Input="_Ip b" />
+    <Output Output="_Ip b" />
+    <Node Class="Calculator" Operator="_EC MUL" Opl="_Ip b" Opr1="_Ip b" Opr2="_IC 2" />
+  </Node>
+</SubTree>

@@ -120,11 +120,21 @@ namespace YBehavior.Editor
 
         private void RefreshInOutButton_Click(object sender, RoutedEventArgs e)
         {
+            if (DebugMgr.Instance.IsDebugging())
+                return;
             SubTreeNode node = this.InOutTab.DataContext as SubTreeNode;
             if (node == null)
                 return;
 
-            node.ReloadInOut();
+            if (node.ReloadInOut())
+            {
+                ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
+                {
+                    Content = "SubTree input/output reloaded.",
+                    TipType = ShowSystemTipsArg.TipsType.TT_Success,
+                };
+                EventMgr.Instance.Send(showSystemTipsArg);
+            }
         }
 
         private void TabController_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -132,7 +142,17 @@ namespace YBehavior.Editor
             if (e.Source is TabControl)
             {
                 if (this.InOutTab.IsSelected)
-                    (this.InOutTab.DataContext as Core.SubTreeNode).LoadInOut();
+                {
+                    if((this.InOutTab.DataContext as Core.SubTreeNode).LoadInOut())
+                    {
+                        ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
+                        {
+                            Content = "SubTree input/output auto loaded.",
+                            TipType = ShowSystemTipsArg.TipsType.TT_Success,
+                        };
+                        EventMgr.Instance.Send(showSystemTipsArg);
+                    }
+                }
             }
 
         }

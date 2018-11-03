@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ParentTree>
+  <Node Class="Root">
+    <Shared a="_IC 0" b="_IC 0" />
+    <Node Class="Sequence">
+      <Node Class="Random" Target="_IP a" Bound1="_IC 1" Bound2="_IC 10" />
+      <Node Class="SubTree" Tree="_SC SubTree">
+        <Input Input="_IP a" />
+        <Output Output="_IP b" />
+      </Node>
+    </Node>
+  </Node>
+</ParentTree>

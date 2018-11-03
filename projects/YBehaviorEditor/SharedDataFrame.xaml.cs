@@ -29,6 +29,7 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Register(EventType.SharedVariableChanged, _OnSharedVariableChanged);
 
             foreach (KeyValuePair<Variable.ValueType, string> pair in Variable.ValueTypeDic2)
             {
@@ -82,6 +83,12 @@ namespace YBehavior.Editor
         private void _OnDebugTargetChanged(EventArg arg)
         {
             this.DataContext = DebugMgr.Instance.DebugSharedData;
+        }
+
+        private void _OnSharedVariableChanged(EventArg arg)
+        {
+            if (m_CurTree != null)
+                m_CurTree.InOutMemory.RefreshVariables();
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)

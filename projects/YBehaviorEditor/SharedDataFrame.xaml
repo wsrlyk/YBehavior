@@ -11,7 +11,7 @@
     </UserControl.Resources>
     <Grid>
         <TabControl Name="TabController" Grid.Row="0" Tag="200">
-            <TabItem Header="Datas">
+            <TabItem Header="Datas" Width="60">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition/>
@@ -61,7 +61,7 @@
                     </DockPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Add">
+            <TabItem Header="Add" Width="60">
                 <StackPanel>
                     <Grid>
                         <TextBlock Text="Name" HorizontalAlignment="Left"/>
@@ -112,7 +112,7 @@
                     </StackPanel>
                 </StackPanel>
             </TabItem>
-            <TabItem Header="InOut">
+            <TabItem Header="InOut" Width="60">
                 <Grid Name="InOutPanel">
                     <Grid.RowDefinitions>
                         <RowDefinition/>

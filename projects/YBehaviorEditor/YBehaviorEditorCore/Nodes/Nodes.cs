@@ -1123,27 +1123,34 @@ namespace YBehavior.Editor.Core
             m_LoadedTree = m_Tree.Value;
         }
 
-        public void LoadInOut()
+        public bool LoadInOut()
         {
             if (m_LoadedTree != null && m_LoadedTree != m_Tree.Value)
             {
                 using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
                 {
                     InOutMemory source = InOutMemoryMgr.Instance.Get(m_Tree.Value);
+                    if (source == null)
+                        return false;
                     source.CloneTo(m_InOutMemory);
                 }
                 m_LoadedTree = m_Tree.Value;
+                return true;
             }
+            return false;
         }
 
-        public void ReloadInOut()
+        public bool ReloadInOut()
         {
             using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
             {
                 InOutMemory source = InOutMemoryMgr.Instance.Reload(m_Tree.Value);
+                if (source == null)
+                    return false;
                 m_InOutMemory.DiffReplaceBy(source);
             }
             m_LoadedTree = m_Tree.Value;
+            return true;
         }
 
         protected override void _OnLoadChild(XmlNode data)
