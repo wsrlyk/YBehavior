@@ -10,6 +10,7 @@
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/runningcontext.h"
+#include <string.h>
 
 namespace YBehavior
 {

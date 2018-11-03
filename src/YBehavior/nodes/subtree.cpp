@@ -9,6 +9,7 @@
 #include "YBehavior/debugger.h"
 #endif // DEBUGGER
 #include "YBehavior/behaviortreemgr.h"
+#include <string.h>
 
 namespace YBehavior
 {
