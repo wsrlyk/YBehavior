@@ -39,12 +39,12 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <Grid  DockPanel.Dock="Right">
+            <StackPanel Orientation="Horizontal"  DockPanel.Dock="Right">
                 <CheckBox IsEnabled="{Binding IsEditable}" Width="20" Height="20" Name="Switcher" Background="Orange" Foreground="GreenYellow" IsChecked="{Binding vbType, Converter={StaticResource variableTypeConvertor}}" Visibility="{Binding Path = CanSwitchConst, Converter={StaticResource visibilityConvertor}}"/>
                 <Button Width="20" Height="20" Name="Remover" Background="IndianRed" Visibility="{Binding Path = CanBeRemoved,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="Remover_Click">
                     X
                 </Button>
-            </Grid>
+            </StackPanel>
             <Grid>
                 <ComboBox IsEnabled="{Binding IsEditable}" SelectedItem="{Binding DisplayValue}" ItemsSource="{Binding Candidates}" x:Name="VPointer" MinWidth="110" MaxDropDownHeight ="150"
                       Visibility="{Binding Path=IsChecked, ElementName=Switcher, Converter={StaticResource visibilityConvertor}}" 

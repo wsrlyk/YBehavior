@@ -3,6 +3,8 @@
   <Node Class="Root" Pos="190,71">
     <Shared b="_IC 22" />
     <Local b="_Ic 2" />
+    <Input Name="_IP b" MP="_Ip b" />
+    <Output Direction="_Ip b" Location="_IP b" />
     <Node Class="Sequence" Pos="119,190">
       <Node Class="Calculator" Pos="28,324" Operator="_EC ADD" Opl="_IP b" Opr1="_IP b" Opr2="_IC 2" />
       <Node Class="Calculator" Pos="201,361" Operator="_EC ADD" Opl="_Ip b" Opr1="_Ip b" Opr2="_IC 2" />

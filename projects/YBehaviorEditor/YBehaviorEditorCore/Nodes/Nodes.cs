@@ -7,11 +7,20 @@ namespace YBehavior.Editor.Core
 {
     public class Tree : SingleChildNode
     {
+        InOutMemory m_InOutMemory;
+        public InOutMemory InOutMemory { get { return m_InOutMemory; } }
+        public override InOutMemory InOutData => m_InOutMemory;
+
         public Tree()
         {
             m_Name = "Root";
             m_Type = NodeType.NT_Root;
             m_Hierachy = NodeHierachy.NH_None;
+        }
+
+        protected override void _OnCreateBase()
+        {
+            m_InOutMemory = new InOutMemory(this, true);
         }
 
         public static Tree GlobalTree
@@ -28,14 +37,28 @@ namespace YBehavior.Editor.Core
 
         protected override void _OnLoadChild(XmlNode data)
         {
-            if (data.Name != "Shared" && data.Name != "Local")
-                return;
-
-            foreach (System.Xml.XmlAttribute attr in data.Attributes)
+            if (data.Name == "Shared" || data.Name == "Local")
             {
-                if (ReservedAttributes.Contains(attr.Name))
-                    continue;
-                TreeMemory.TryAddData(attr.Name, attr.Value);
+                foreach (System.Xml.XmlAttribute attr in data.Attributes)
+                {
+                    if (ReservedAttributes.Contains(attr.Name))
+                        continue;
+                    TreeMemory.TryAddData(attr.Name, attr.Value);
+                }
+            }
+            else if (data.Name == "Input" || data.Name == "Output")
+            {
+                foreach (System.Xml.XmlAttribute attr in data.Attributes)
+                {
+                    if (ReservedAttributes.Contains(attr.Name))
+                        continue;
+
+                    if(!m_InOutMemory.TryAddData(attr.Name, attr.Value, data.Name == "Input"))
+                    {
+                        LogMgr.Instance.Error("Error when add Input/Output: " + attr.Name + " " + attr.Value);
+                        continue;
+                    }
+                }
             }
         }
 
@@ -70,6 +93,20 @@ namespace YBehavior.Editor.Core
                 data.AppendChild(nodeEl);
 
                 _WriteVariables(TreeMemory.LocalMemory, nodeEl);
+            }
+            if (InOutMemory.InputMemory.Datas.Count > 0)
+            {
+                XmlElement nodeEl = xmlDoc.CreateElement("Input");
+                data.AppendChild(nodeEl);
+
+                _WriteVariables(InOutMemory.InputMemory, nodeEl);
+            }
+            if (InOutMemory.OutputMemory.Datas.Count > 0)
+            {
+                XmlElement nodeEl = xmlDoc.CreateElement("Output");
+                data.AppendChild(nodeEl);
+
+                _WriteVariables(InOutMemory.OutputMemory, nodeEl);
             }
         }
     }
@@ -1024,9 +1061,20 @@ namespace YBehavior.Editor.Core
         }
     }
 
-    class SubTreeNode : LeafNode
+    public class SubTreeNode : LeafNode
     {
         public override string Icon => "♣";
+
+        InOutMemory m_InOutMemory;
+        public InOutMemory InOutMemory { get { return m_InOutMemory; } }
+        public override InOutMemory InOutData => m_InOutMemory;
+        Variable m_Tree;
+        string m_LoadedTree = null;
+
+        protected override void _OnCreateBase()
+        {
+            m_InOutMemory = new InOutMemory(this, false);
+        }
 
         public SubTreeNode()
         {
@@ -1037,7 +1085,7 @@ namespace YBehavior.Editor.Core
 
         public override void CreateVariables()
         {
-            NodeMemory.CreateVariable(
+            m_Tree = NodeMemory.CreateVariable(
                 "Tree",
                 "",
                 Variable.CreateParams_String,
@@ -1052,6 +1100,76 @@ namespace YBehavior.Editor.Core
             get
             {
                 return Variables.GetVariable("Tree").NoteValue;
+            }
+        }
+
+        public void LoadInOut()
+        {
+            if (m_LoadedTree != null && m_LoadedTree != m_Tree.Value)
+            {
+                using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
+                {
+                    InOutMemory source = InOutMemoryMgr.Instance.Get(m_Tree.Value);
+                    source.CloneTo(m_InOutMemory);
+                }
+                m_LoadedTree = m_Tree.Value;
+            }
+        }
+
+        public void ReloadInOut()
+        {
+            using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
+            {
+                InOutMemory source = InOutMemoryMgr.Instance.Reload(m_Tree.Value);
+                m_InOutMemory.DiffReplaceBy(source);
+            }
+            m_LoadedTree = m_Tree.Value;
+        }
+
+        protected override void _OnLoadChild(XmlNode data)
+        {
+            if (data.Name == "Input" || data.Name == "Output")
+            {
+                foreach (System.Xml.XmlAttribute attr in data.Attributes)
+                {
+                    if (ReservedAttributes.Contains(attr.Name))
+                        continue;
+
+                    if (!m_InOutMemory.TryAddData(attr.Name, attr.Value, data.Name == "Input"))
+                    {
+                        LogMgr.Instance.Error("Error when add Input/Output: " + attr.Name + " " + attr.Value);
+                        continue;
+                    }
+                }
+            }
+        }
+
+        protected override void _OnSaveVariables(XmlElement data, XmlDocument xmlDoc)
+        {
+            _WriteVariables(Variables, data);
+            _WriteMemory(data, xmlDoc);
+        }
+        protected override void _OnExportVariables(XmlElement data, XmlDocument xmlDoc)
+        {
+            _WriteVariables(Variables, data);
+            _WriteMemory(data, xmlDoc);
+        }
+
+        void _WriteMemory(XmlElement data, XmlDocument xmlDoc)
+        {
+            if (InOutMemory.InputMemory.Datas.Count > 0)
+            {
+                XmlElement nodeEl = xmlDoc.CreateElement("Input");
+                data.AppendChild(nodeEl);
+
+                _WriteVariables(InOutMemory.InputMemory, nodeEl);
+            }
+            if (InOutMemory.OutputMemory.Datas.Count > 0)
+            {
+                XmlElement nodeEl = xmlDoc.CreateElement("Output");
+                data.AppendChild(nodeEl);
+
+                _WriteVariables(InOutMemory.OutputMemory, nodeEl);
             }
         }
     }

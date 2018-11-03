@@ -432,6 +432,7 @@ namespace YBehavior.Editor.Core
             }
             return m_TreeSharedData;
         }
+        public virtual InOutMemory InOutData { get { return null; } }
 
         #region CONDITION
         Connection m_ConditonConnection;
@@ -467,7 +468,7 @@ namespace YBehavior.Editor.Core
         {
         }
 
-        public virtual void Load(System.Xml.XmlNode data)
+        public void Load(System.Xml.XmlNode data)
         {
             foreach (System.Xml.XmlAttribute attr in data.Attributes)
             {
@@ -475,6 +476,13 @@ namespace YBehavior.Editor.Core
                     continue;
                 ProcessAttrWhenLoad(attr);
             }
+
+            _OnLoaded();
+        }
+
+        protected virtual void _OnLoaded()
+        {
+
         }
 
         public void LoadChild(System.Xml.XmlNode data)
@@ -558,8 +566,14 @@ namespace YBehavior.Editor.Core
             m_Renderer = new Renderer(this);
             if (m_Renderer is Renderer) { }
             m_ConditonConnection = new ConnectionSingle(this, Connection.IdentifierCondition);
+
+            _OnCreateBase();
         }
 
+        protected virtual void _OnCreateBase()
+        {
+
+        }
         public virtual void CreateVariables()
         {
 

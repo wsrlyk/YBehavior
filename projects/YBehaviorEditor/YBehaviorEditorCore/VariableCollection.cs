@@ -106,6 +106,11 @@ namespace YBehavior.Editor.Core
 
             m_Variables[v.Name] = holder;
             m_VariableList.Add(holder);
+            if (v.SharedDataSource != m_Owner)
+            {
+                v.SharedDataSource = m_Owner;
+                v.RefreshCandidates(true);
+            }
             v.Container = this;
             return holder;
         }
@@ -171,10 +176,77 @@ namespace YBehavior.Editor.Core
         {
             using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
             {
-                foreach (VariableHolder v in m_VariableList)
+                using (var delay = other.m_VariableList.Delay())
                 {
-                    Variable vv = v.Variable.Clone();
-                    other.DoAddVariable(vv);
+                    foreach (VariableHolder v in m_VariableList)
+                    {
+                        Variable vv = v.Variable.Clone();
+                        other.DoAddVariable(vv);
+                    }
+                }
+            }
+        }
+
+        public void DiffReplaceBy(VariableCollection other)
+        {
+            using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
+            {
+                using (var delay = m_VariableList.Delay())
+                {
+                    List<VariableHolder> tempList = new List<VariableHolder>();
+                    ///> Remove extra ones
+                    foreach (VariableHolder v in m_VariableList)
+                    {
+                        if (other.GetVariableHolder(v.Variable.Name) == null)
+                            continue;
+                        tempList.Add(v);
+                    }
+                    ///> Add new ones
+                    foreach (VariableHolder v in other.m_VariableList)
+                    {
+                        if (GetVariableHolder(v.Variable.Name) == null)
+                        {
+                            VariableHolder holder = new VariableHolder()
+                            {
+                                Variable = v.Variable.Clone(),
+                                Index = tempList.Count
+                            };
+
+                            tempList.Add(holder);
+                        }
+                    }
+                    ///> Keep the orders the same
+                    foreach (VariableHolder v in tempList)
+                    {
+                        VariableHolder ov = other.GetVariableHolder(v.Variable.Name);
+                        if (ov == null)
+                        {
+                            LogMgr.Instance.Error("Something is wrong with the list. It Shouldnt happen.");
+                            continue;
+                        }
+                        v.Index = ov.Index;
+                    }
+                    tempList.Sort(
+                        (VariableHolder left, VariableHolder right) =>
+                            {
+                                return left.Index.CompareTo(right.Index);
+                            }
+                    );
+
+                    ///> assign new list to the collection
+                    m_VariableList.Clear();
+                    m_Variables.Clear();
+                    foreach(var v in tempList)
+                    {
+                        m_VariableList.Add(v);
+                        m_Variables[v.Variable.Name] = v;
+                        if (v.Variable.SharedDataSource != m_Owner)
+                        {
+                            v.Variable.SharedDataSource = m_Owner;
+                            v.Variable.RefreshCandidates(true);
+                        }
+                        v.Variable.Container = this;
+                    }
                 }
             }
         }

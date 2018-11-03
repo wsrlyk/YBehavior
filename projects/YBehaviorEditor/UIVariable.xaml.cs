@@ -48,8 +48,16 @@ namespace YBehavior.Editor
             if (dr == MessageBoxResult.Yes)
             {
 
-                if (v.SharedDataSource.SharedData != null)
-                    (v.SharedDataSource.SharedData as Core.TreeMemory).RemoveVariable(v);
+                if (v is Core.InOutVariable)
+                {
+                    if (v.SharedDataSource.InOutData != null)
+                        v.SharedDataSource.InOutData.RemoveVariable(v);
+                }
+                else
+                {
+                    if (v.SharedDataSource.SharedData != null)
+                        v.SharedDataSource.SharedData.RemoveVariable(v);
+                }
             }
         }
 

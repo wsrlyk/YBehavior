@@ -6,6 +6,9 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
+    </UserControl.Resources>
     <Grid>
         <TabControl Name="TabController" Grid.Row="0" Tag="200">
             <TabItem Header="Datas">
@@ -64,7 +67,7 @@
                         <TextBlock Text="Name" HorizontalAlignment="Left"/>
                         <TextBox Name="VName" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0" Width="150"/>
                     </Grid>
-                    <Grid>
+                    <Grid Visibility="{Binding ElementName=IsDatasSelected, Path=IsChecked, Converter={StaticResource visibilityConvertor}}">
                         <TextBlock Text="Value" HorizontalAlignment="Left"/>
                         <TextBox Name="VValue" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0" Width="150"/>
                     </Grid>
@@ -90,14 +93,78 @@
                         <TextBlock Text="IsArray" HorizontalAlignment="Left"/>
                         <CheckBox Name="VIsArray" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0"/>
                     </Grid>
-                    <Grid>
+                    <Grid Visibility="{Binding ElementName=IsDatasSelected, Path=IsChecked, Converter={StaticResource visibilityConvertor}}">
                         <TextBlock Text="IsLocal" HorizontalAlignment="Left"/>
                         <CheckBox Name="VIsLocal" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0"/>
                     </Grid>
-                    <Button Name="Add" Width="100" Margin="20,20" Click="Add_Click">
-                        <TextBlock Text="Add"/>
-                    </Button>
+                    <Grid Visibility="{Binding ElementName=IsInOutSelected, Path=IsChecked, Converter={StaticResource visibilityConvertor}}">
+                        <TextBlock Text="IsInput" HorizontalAlignment="Left"/>
+                        <CheckBox Name="VIsInput" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0"/>
+                    </Grid>
+                    <Grid>
+                        <Button Name="Add" Width="100" Margin="20,20" Click="Add_Click">
+                            <TextBlock Text="Add"/>
+                        </Button>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Name="IsDatasSelected" Margin="10, 0, 10, 0" IsChecked="True">Datas</RadioButton>
+                        <RadioButton Name="IsInOutSelected" Margin="10, 0, 10, 0">InOut</RadioButton>
+                    </StackPanel>
                 </StackPanel>
+            </TabItem>
+            <TabItem Header="InOut">
+                <Grid Name="InOutPanel">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <DockPanel Background="DarkGray" Grid.Row="0">
+                        <!--<StackPanel DockPanel.Dock="Top">
+                        <TextBlock Name="Type" Text ="{Binding Path=Datas.Count}" FontSize="14" Height="25"/>
+                    </StackPanel>-->
+                        <Grid DockPanel.Dock="Top">
+                            <TextBlock Text ="Inputs" FontSize="14" Height="20" DockPanel.Dock="Top" HorizontalAlignment="Center"/>
+                        </Grid>
+                        <ScrollViewer VerticalScrollBarVisibility ="Auto">
+                            <ItemsControl Name="InputContainer" ItemsSource="{Binding InputMemory.Datas}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <local:UIVariable DataContext="{Binding Variable}"/>
+                                        <!--TextBlock Text = "{Binding Name}"/-->
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </DockPanel>
+                    <DockPanel Background="DarkGray" Grid.Row="1">
+                        <!--<StackPanel DockPanel.Dock="Top">
+                        <TextBlock Name="Type" Text ="{Binding Path=Datas.Count}" FontSize="14" Height="25"/>
+                    </StackPanel>-->
+                        <Grid DockPanel.Dock="Top">
+                            <TextBlock Text ="Outputs" FontSize="14" Height="20" DockPanel.Dock="Top" HorizontalAlignment="Center"/>
+                        </Grid>
+                        <ScrollViewer VerticalScrollBarVisibility ="Auto">
+                            <ItemsControl Name="OutputContainer" ItemsSource="{Binding OutputMemory.Datas}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <local:UIVariable DataContext="{Binding Variable}"/>
+                                        <!--TextBlock Text = "{Binding Name}"/-->
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </DockPanel>
+                </Grid>
             </TabItem>
         </TabControl>
     </Grid>

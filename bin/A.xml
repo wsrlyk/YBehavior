@@ -1,13 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <A>
   <Node Class="Root" Pos="297,61">
-    <Shared a="_IC 11"/>
+    <Shared a="_IC 11" />
     <Local a="_Ic 1" />
     <Node Class="SubTree" Pos="251,290" Tree="_SC B">
-        <In To="_Ip b" From="_IP a"/>
-        <In To="_IP b" From="_IC 3"/>
-        <Out From="_Ip b" To="_Ip a"/>
-        <Out From="_IP b" To="_IP a"/>
+      <Input Name="_IP a" MP="_Ip a" />
+      <Output Direction="_Ip a" Location="_IC 321" />
     </Node>
   </Node>
 </A>

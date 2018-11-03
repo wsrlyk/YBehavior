@@ -48,6 +48,8 @@ namespace YBehavior.Editor
                 // Clear
                 this.VariableContainer.ItemsSource = null;
                 this.VariableTab.DataContext = null;
+                this.InOutTab.Visibility = Visibility.Collapsed;
+                this.InOutTab.DataContext = null;
             }
             else
             {
@@ -55,6 +57,18 @@ namespace YBehavior.Editor
                 this.VariableContainer.ItemsSource = node.Node.Variables.Datas;
 
                 this.VariableTab.IsSelected = true;
+
+                if (node.Node is Core.SubTreeNode)
+                {
+                    this.InOutTab.Visibility = Visibility.Visible;
+                    (node.Node as Core.SubTreeNode).LoadInOut();
+                    this.InOutTab.DataContext = node.Node;
+                }
+                else
+                {
+                    this.InOutTab.Visibility = Visibility.Collapsed;
+                    this.InOutTab.DataContext = null;
+                }
             }
 
             UIComment comment = oArg.Target as UIComment;
@@ -79,6 +93,10 @@ namespace YBehavior.Editor
                 return;
 
             node.NodeMemory.RefreshVariables();
+            if (node is SubTreeNode)
+            {
+                (node as SubTreeNode).InOutMemory.RefreshVariables();
+            }
         }
 
         private void _OnDebugTargetChanged(EventArg arg)
@@ -99,6 +117,15 @@ namespace YBehavior.Editor
                     this.Comment.IsReadOnly = DebugMgr.Instance.IsDebugging();
                 })
             );
+        }
+
+        private void RefreshInOutButton_Click(object sender, RoutedEventArgs e)
+        {
+            SubTreeNode node = this.InOutTab.DataContext as SubTreeNode;
+            if (node == null)
+                return;
+
+            node.ReloadInOut();
         }
     }
 }

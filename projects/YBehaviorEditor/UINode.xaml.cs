@@ -289,6 +289,10 @@ namespace YBehavior.Editor
             {
                 this.selectCover.Visibility = Visibility.Visible;
                 this.Node.NodeMemory.RefreshVariables();
+                if (this.Node is SubTreeNode)
+                {
+                    (this.Node as SubTreeNode).InOutMemory.RefreshVariables();
+                }
             }
             else
                 this.selectCover.Visibility = Visibility.Collapsed;

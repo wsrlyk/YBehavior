@@ -43,11 +43,13 @@ namespace YBehavior.Editor
             WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
             if (oArg.Bench == null)
             {
+                this.InOutPanel.DataContext = null;
                 this.DataContext = null;
                 return;
             }
             m_CurTree = oArg.Bench.MainTree;
-            //this.VariableContainer.SetBinding(ComboBox.ItemsSourceProperty, new Binding("Datas"));
+            this.InOutPanel.DataContext = m_CurTree.InOutMemory;
+
             if (DebugMgr.Instance.IsDebugging())
                 this.DataContext = DebugMgr.Instance.DebugSharedData;
             else
@@ -98,13 +100,30 @@ namespace YBehavior.Editor
             string type = this.VType.SelectedValue as string;
             bool isarray = this.VIsArray.IsChecked ?? false;
             bool islocal = this.VIsLocal.IsChecked ?? false;
+            bool isinput = this.VIsInput.IsChecked ?? false;
 
-            if ((m_CurTree.Variables as Core.TreeMemory).TryCreateVariable(
-                name, 
-                value, 
-                Variable.ValueTypeDic2.GetKey(type, Variable.ValueType.VT_NONE),
-                isarray ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE,
-                islocal))
+            bool isdata = this.IsDatasSelected.IsChecked ?? false;
+            bool isinout = this.IsInOutSelected.IsChecked ?? false;
+
+            bool res = false;
+            if (isdata)
+            {
+                res = (m_CurTree.Variables as Core.TreeMemory).TryCreateVariable(
+                    name,
+                    value,
+                    Variable.ValueTypeDic2.GetKey(type, Variable.ValueType.VT_NONE),
+                    isarray ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE,
+                    islocal);
+            }
+            else
+            {
+                res = m_CurTree.InOutMemory.TryCreateVariable(
+                    name,
+                    Variable.ValueTypeDic2.GetKey(type, Variable.ValueType.VT_NONE),
+                    isarray ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE,
+                    isinput);
+            }
+            if (res)
             {
                 this.VName.Text = string.Empty;
                 ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()

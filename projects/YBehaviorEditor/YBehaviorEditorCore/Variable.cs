@@ -10,6 +10,7 @@ namespace YBehavior.Editor.Core
     public interface IVariableDataSource
     {
         TreeMemory SharedData { get; }
+        InOutMemory InOutData { get; }
     }
     public class Variable : System.ComponentModel.INotifyPropertyChanged
     {
@@ -297,6 +298,12 @@ namespace YBehavior.Editor.Core
             set
             {
                 //m_DisplayValue = value;
+                ///> TODO: properly process this case
+                if (value == null)
+                {
+                    value = string.Empty;
+                    return;
+                }
 
                 if (vbType == VariableType.VBT_Pointer)
                 {

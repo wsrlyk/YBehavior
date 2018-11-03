@@ -48,6 +48,7 @@
     <Compile Include="DebugMgr.cs" />
     <Compile Include="DescriptionMgr.cs" />
     <Compile Include="ExternalActionMgr.cs" />
+    <Compile Include="InOutMemoryMgr.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="VariableCollection.cs" />
     <Compile Include="Tools\DiffMatchPatch.cs" />
