@@ -31,9 +31,9 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.SharedVariableChanged, _OnSharedVariableChanged);
 
-            foreach (KeyValuePair<Variable.ValueType, string> pair in Variable.ValueTypeDic2)
+            foreach (var v in Variable.CreateParams_AllTypes)
             {
-                m_Types.Add(pair.Value);
+                m_Types.Add(Variable.ValueTypeDic2.GetValue(v, ""));
             }
 
             this.VType.ItemsSource = m_Types;

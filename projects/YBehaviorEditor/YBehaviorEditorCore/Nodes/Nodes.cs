@@ -277,7 +277,7 @@ namespace YBehavior.Editor.Core
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} <= {1} {2} {3}",
+                sb.AppendFormat("{0} << {1} {2} {3}",
                     Variables.GetVariable("Opl").NoteValue,
                     Variables.GetVariable("Opr1").NoteValue,
                     s_OperatorDic[Variables.GetVariable("Operator").Value],
@@ -500,7 +500,7 @@ namespace YBehavior.Editor.Core
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} <= [ {1} ~ {2} )",
+                sb.AppendFormat("{0} << [ {1} ~ {2} )",
                     Variables.GetVariable("Target").NoteValue,
                     Variables.GetVariable("Bound1").NoteValue,
                     Variables.GetVariable("Bound2").NoteValue);
@@ -1374,7 +1374,7 @@ namespace YBehavior.Editor.Core
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} <= [{1}].Length",
+                sb.AppendFormat("{0} << [{1}].Length",
                     Variables.GetVariable("Length").NoteValue,
                     Variables.GetVariable("Array").NoteValue
                     );
@@ -1385,7 +1385,7 @@ namespace YBehavior.Editor.Core
 
     class ArrayPushElementNode : LeafNode
     {
-        public override string Icon => "[x] <= y";
+        public override string Icon => "[x] <-- y";
 
         public ArrayPushElementNode()
         {
