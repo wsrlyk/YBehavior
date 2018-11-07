@@ -22,8 +22,8 @@ namespace YBehavior.Editor
     {
         public class NodeInfo
         {
-            private List<NodeInfo> m_children = new List<NodeInfo>();
-            public List<NodeInfo> Children { get { return m_children; } }
+            private DelayableNotificationCollection<NodeInfo> m_children = new DelayableNotificationCollection<NodeInfo>();
+            public DelayableNotificationCollection<NodeInfo> Children { get { return m_children; } }
             public string Name { get; set; }
             public string Icon { get; set; }
             public Node Source { get { return m_Source; } }
@@ -33,6 +33,13 @@ namespace YBehavior.Editor
             public string Description { get; set; }
 
             public bool bIsFolder { get { return m_Hierachy != NodeHierachy.NH_None; } }
+            private bool exp = false;
+            public bool Expanded
+            {
+                get { return exp; }
+                set { exp = value; }
+            }
+
             ///> Folder
             public NodeInfo(NodeHierachy hierachy, int level)
             {
@@ -54,7 +61,7 @@ namespace YBehavior.Editor
                 Description = data.Description;
             }
 
-            public void Build(Node data)
+            public void Build(Node data, HashSet<string> expandedItems)
             {
                 if (data == null || data.Type == NodeType.NT_Root)
                     return;
@@ -81,23 +88,62 @@ namespace YBehavior.Editor
                     if (child == null)
                     {
                         child = new NodeInfo(subHierachy, nextLevel);
+                        child.Expanded = expandedItems.Contains(child.Name);
                         m_children.Add(child);
                     }
-                    child.Build(data);
+                    child.Build(data, expandedItems);
                 }
             }
         }
 
+        HashSet<string> m_ExpandedItems = new HashSet<string>();
         NodeInfo m_NodeInfos;
         public NodeListFrame()
         {
             InitializeComponent();
             m_NodeInfos = new NodeInfo(NodeHierachy.NH_None, 0);
-            foreach(var node in Core.NodeMgr.Instance.NodeList)
-            {
-                m_NodeInfos.Build(node);
-            }
             this.Nodes.ItemsSource = m_NodeInfos.Children;
+            _FilterNodes(null);
+        }
+
+        private void _FilterNodes(string keyword)
+        {
+            _GetExpandedItems(this.Nodes, m_ExpandedItems);
+
+            using (var handler = m_NodeInfos.Children.Delay())
+            {
+                m_NodeInfos.Children.Clear();
+                if (!string.IsNullOrEmpty(keyword))
+                    keyword = keyword.ToLower();
+                foreach (var node in Core.NodeMgr.Instance.NodeList)
+                {
+                    if (!string.IsNullOrEmpty(keyword) && !node.Name.ToLower().Contains(keyword))
+                        continue;
+                    m_NodeInfos.Build(node, m_ExpandedItems);
+                }
+            }
+        }
+
+        void _GetExpandedItems(ItemsControl items, HashSet<string> expandedItems)
+        {
+            foreach (object obj in items.Items)
+            {
+                ItemsControl childControl = items.ItemContainerGenerator.ContainerFromItem(obj) as ItemsControl;
+                if (childControl != null)
+                {
+                    _GetExpandedItems(childControl, expandedItems);
+                }
+                if (childControl is TreeViewItem item)
+                {
+                    if (item.DataContext is NodeInfo info)
+                    {
+                        if (item.IsExpanded)
+                            expandedItems.Add(info.Name);
+                        else
+                            expandedItems.Remove(info.Name);
+                    }
+                }
+            }
         }
 
         private void OnNodesItemDoubleClick(object sender, MouseButtonEventArgs e)
@@ -129,6 +175,16 @@ namespace YBehavior.Editor
             if (DebugMgr.Instance.IsDebugging())
                 return;
             WorkBenchMgr.Instance.CreateComment();
+        }
+
+        private void ClearSearch_Click(object sender, RoutedEventArgs e)
+        {
+            this.SearchText.Text = string.Empty;
+        }
+
+        private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _FilterNodes(this.SearchText.Text);
         }
     }
 
