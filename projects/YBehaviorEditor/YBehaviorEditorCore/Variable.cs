@@ -83,6 +83,17 @@ namespace YBehavior.Editor.Core
             {Variable.ValueType.VT_ULONG, "ULONG" }
         };
 
+        public static Dictionary<Variable.ValueType, string> DefaultValueDic = new Dictionary<ValueType, string>
+        {
+            {Variable.ValueType.VT_INT, "0" },
+            {Variable.ValueType.VT_FLOAT, "0.0" },
+            {Variable.ValueType.VT_BOOL, "F" },
+            {Variable.ValueType.VT_VECTOR3, "0=0=0" },
+            {Variable.ValueType.VT_STRING, "" },
+            {Variable.ValueType.VT_ENTITY, "" },
+            {Variable.ValueType.VT_ULONG, "0" }
+        };
+
         public enum CountType
         {
             CT_NONE,
