@@ -14,6 +14,11 @@ namespace YBehavior
 		core.GetLogProcessor(pLog, pError);
 		LogMgr::Instance()->SetProcessor(pLog, pError);
 
+		pLog = nullptr;
+		pError = nullptr;
+		core.GetThreadLogProcessor(pLog, pError);
+		LogMgr::Instance()->SetProcessorThread(pLog, pError);
+
 
 		core.RegisterActions();
 		TreeMgr::Instance()->SetWorkingDir(core.WorkingDir());

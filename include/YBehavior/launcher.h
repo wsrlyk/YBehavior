@@ -11,6 +11,7 @@ namespace YBehavior
 		virtual int StartWithDebugListeningPort() const { return 0; }
 		virtual STRING WorkingDir() const { return ""; }
 		virtual void GetLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const { return; }
+		virtual void GetThreadLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const { return; }
 	protected:
 		template<typename T>
 		void _Register() const;

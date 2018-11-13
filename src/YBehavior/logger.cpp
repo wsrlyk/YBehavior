@@ -10,6 +10,8 @@ namespace YBehavior
 	{
 		m_LogProcessor = nullptr;
 		m_ErrorProcessor = nullptr;
+		m_LogThreadProcessor = nullptr;
+		m_ErrorThreadProcessor = nullptr;
 	}
 
 	void LogMgr::SetProcessor(LogProcessDelegate pLog, ErrorProcessDelegate pError)
@@ -18,31 +20,61 @@ namespace YBehavior
 		m_ErrorProcessor = pError;
 	}
 
-	void LogMgr::LogEnd()
+	void LogMgr::SetProcessorThread(LogProcessDelegate pLog, ErrorProcessDelegate pError)
+	{
+		m_LogThreadProcessor = pLog;
+		m_ErrorThreadProcessor = pError;
+	}
+
+	void LogMgr::LogEnd(bool bThread)
 	{
 		std::string res(m_Stream.str());
 		m_Stream.str("");
 
-		if (m_LogProcessor)
+		if (bThread)
 		{
-			(*m_LogProcessor)(res);
+			if (m_LogThreadProcessor)
+			{
+				(*m_LogThreadProcessor)(res);
+				return;
+			}
 		}
 		else
+		{
+			if (m_LogProcessor)
+			{
+				(*m_LogProcessor)(res);
+				return;
+			}
+		}
+		
 		{
 			std::cout << res << std::endl;
 		}
 	}
 
-	void LogMgr::ErrorEnd()
+	void LogMgr::ErrorEnd(bool bThread)
 	{
 		std::string res(m_Stream.str());
 		m_Stream.str("");
 
-		if (m_ErrorProcessor)
+		if (bThread)
 		{
-			(*m_ErrorProcessor)(res);
+			if (m_ErrorThreadProcessor)
+			{
+				(*m_ErrorThreadProcessor)(res);
+				return;
+			}
 		}
 		else
+		{
+			if (m_ErrorProcessor)
+			{
+				(*m_ErrorProcessor)(res);
+				return;
+			}
+		}
+
 		{
 			std::cout << res << std::endl;
 		}
@@ -68,6 +100,26 @@ namespace YBehavior
 		ErrorEnd();
 	}
 
+	void LogMgr::LogThread(const char* fmt, ...)
+	{
+		va_list ap;
+		va_start(ap, fmt);
+		_Format(fmt, ap);
+		va_end(ap);
+
+		LogEnd(true);
+	}
+
+	void LogMgr::ErrorThread(const char* fmt, ...)
+	{
+		va_list ap;
+		va_start(ap, fmt);
+		_Format(fmt, ap);
+		va_end(ap);
+
+		ErrorEnd(true);
+	}
+
 	void LogMgr::_Format(const char* fmt, va_list ap)
 	{
 		int len = vsnprintf(m_Buffer, sizeof(m_Buffer), fmt, ap);
@@ -87,6 +139,18 @@ namespace YBehavior
 	std::ostream& ProcessErrorEnd(std::ostream& ss)
 	{
 		LogMgr::Instance()->ErrorEnd();
+		return ss;
+	}
+
+	std::ostream& ProcessLogThreadEnd(std::ostream& ss)
+	{
+		LogMgr::Instance()->LogEnd(true);
+		return ss;
+	}
+
+	std::ostream& ProcessErrorThreadEnd(std::ostream& ss)
+	{
+		LogMgr::Instance()->ErrorEnd(true);
 		return ss;
 	}
 }
