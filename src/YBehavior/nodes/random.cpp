@@ -1,13 +1,9 @@
 #include "YBehavior/nodes/random.h"
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/logger.h"
-#include "YBehavior/utility.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#endif // DEBUGGER
 
 namespace YBehavior
 {

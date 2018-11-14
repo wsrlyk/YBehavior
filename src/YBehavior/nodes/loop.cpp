@@ -1,9 +1,5 @@
 #include "YBehavior/nodes/loop.h"
 #include "YBehavior/nodefactory.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#include "YBehavior/utility.h"
-#endif // DEBUGGER
 #include "YBehavior/agent.h"
 
 namespace YBehavior

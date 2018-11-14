@@ -1,8 +1,4 @@
 #include "YBehavior/nodes/sequence.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#include "YBehavior/utility.h"
-#endif // DEBUGGER
 #include "YBehavior/runningcontext.h"
 
 namespace YBehavior

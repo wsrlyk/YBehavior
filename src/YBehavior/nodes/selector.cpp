@@ -1,8 +1,4 @@
 #include "YBehavior/nodes/selector.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#include "YBehavior/utility.h"
-#endif // DEBUGGER
 
 namespace YBehavior
 {

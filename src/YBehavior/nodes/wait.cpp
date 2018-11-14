@@ -5,9 +5,6 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#endif // DEBUGGER
 
 namespace YBehavior
 {

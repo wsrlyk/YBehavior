@@ -6,7 +6,9 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariablecreatehelper.h"
 #include "YBehavior/sharedvariableex.h"
+#ifdef DEBUGGER
 #include "YBehavior/debugger.h"
+#endif
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/runningcontext.h"
@@ -56,6 +58,17 @@ namespace YBehavior
 
 	std::unordered_set<STRING> BehaviorNode::KEY_WORDS = { "Class", "Pos", "NickName" };
 
+#ifdef DEBUGGER
+	bool BehaviorNode::_HasLogPoint()
+	{
+		return m_pDebugHelper && m_pDebugHelper->HasLogPoint();
+	}
+
+	void BehaviorNode::_LogSharedData(ISharedVariableEx* pVariable, bool bIsBefore)
+	{
+		m_pDebugHelper->LogSharedData(pVariable, bIsBefore);
+	}
+#endif
 	BehaviorNode* BehaviorNode::CreateNodeByName(const STRING& name)
 	{
 		return NodeFactory::Instance()->Get(name);

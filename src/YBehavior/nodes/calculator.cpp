@@ -6,10 +6,6 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
 
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#endif // DEBUGGER
-
 namespace YBehavior
 {
 	///> Too lazy to create a file for just this line. Temporarily put it here

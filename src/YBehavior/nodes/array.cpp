@@ -2,10 +2,6 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/behaviortree.h"
 
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#endif // DEBUGGER
-
 namespace YBehavior
 {
 

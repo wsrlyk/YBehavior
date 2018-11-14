@@ -1,8 +1,4 @@
 #include "YBehavior/nodes/piecewisefunction.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#include "YBehavior/utility.h"
-#endif // DEBUGGER
 #include "YBehavior/agent.h"
 
 namespace YBehavior

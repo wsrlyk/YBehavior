@@ -1,9 +1,6 @@
 #include "customactions.h"
 #include "YBehavior/registerdata.h"
 #include "YBehavior/behaviortree.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#endif // DEBUGGER
 
 void MyLaunchCore::RegisterActions() const
 {

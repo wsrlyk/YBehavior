@@ -1,8 +1,4 @@
 #include "YBehavior/nodes/switchcase.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#include "YBehavior/utility.h"
-#endif // DEBUGGER
 #include "YBehavior/agent.h"
 
 namespace YBehavior

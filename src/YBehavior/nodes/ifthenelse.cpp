@@ -1,6 +1,5 @@
 #include "YBehavior/nodes/ifthenelse.h"
 #include "YBehavior/logger.h"
-#include "YBehavior/debugger.h"
 
 namespace YBehavior
 {
