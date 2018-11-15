@@ -342,7 +342,7 @@ namespace YBehavior
 			auto iarray = pSharedData->GetDataArray(i);
 			for (IDataArray::Iterator it = iarray->Iter(); !it.IsEnd(); ++it)
 			{
-				const STRING& name = TreeKeyMgr::Instance()->GetNameByKey(it.Value(), iarray->GetTypeID());
+				const STRING& name = TreeKeyMgr::Instance()->GetNameByKey(it.Value(), iarray->TypeID());
 				if (name == Utility::StringEmpty)
 					continue;
 				STRING content(name + "," + iarray->GetToString(it.Value()));

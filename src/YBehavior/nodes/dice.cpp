@@ -4,15 +4,15 @@
 namespace YBehavior
 {
 	static std::unordered_set<TYPEID> s_ValidVecTypes = {
-		GetClassTypeNumberId<VecInt>(),
-		GetClassTypeNumberId<VecFloat>(),
-		GetClassTypeNumberId<VecUint64>(),
+		GetTypeID<VecInt>(),
+		GetTypeID<VecFloat>(),
+		GetTypeID<VecUint64>(),
 	};
 
 	static std::unordered_set<TYPEID> s_ValidTypes = {
-		GetClassTypeNumberId<Int>(),
-		GetClassTypeNumberId<Float>(),
-		GetClassTypeNumberId<Uint64>(),
+		GetTypeID<Int>(),
+		GetTypeID<Float>(),
+		GetTypeID<Uint64>(),
 	};
 
 	NodeState Dice::Update(AgentPtr pAgent)

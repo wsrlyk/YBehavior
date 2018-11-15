@@ -100,19 +100,19 @@ namespace YBehavior
 			return nullptr;
 		}
 	public:
-		TYPEID GetTypeID() { return GetClassTypeNumberId<T>(); }
+		TYPEID TypeID() const { return GetTypeID<T>(); }
 		TYPEID GetReferenceSharedDataSelfID()
 		{
 			///> it's const, just return itself
 			if (m_Key == Utility::INVALID_KEY)
-				return GetClassTypeNumberId<T>();
+				return GetTypeID<T>();
 
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
 			{
-				return GetClassTypeNumberId<StdVector<T>>();
+				return GetTypeID<StdVector<T>>();
 			}
 
-			return GetClassTypeNumberId<T>();
+			return GetTypeID<T>();
 		}
 		bool IsThisVector() const override
 		{

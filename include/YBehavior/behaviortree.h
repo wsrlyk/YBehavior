@@ -111,7 +111,11 @@ namespace YBehavior
 		virtual bool OnLoadChild(const pugi::xml_node& data) { return true; }
 		virtual void OnLoadFinish() {}
 		virtual void OnAddChild(BehaviorNode* child, const STRING& connection) {}
+
 		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
+		template<typename T>
+		bool GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T& outValue);
+
 		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, SingleType single, char variableType = 0);
 		template <typename T> 
 		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, SingleType single, char variableType = 0);
@@ -124,12 +128,24 @@ namespace YBehavior
 		void _TryPopRC(AgentPtr agent);
 	};
 
+	template<typename T>
+	bool BehaviorNode::GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T& outValue)
+	{
+		STRING s(GetValue(attriName, data));
+
+		if (strMap.TryGetKey(s, outValue))
+			return true;
+
+		ERROR_BEGIN << attriName << " Error: " << s << " in " << this->GetClassName() << ERROR_END;
+		return false;
+	}
+
 	template <typename T>
 	TYPEID BehaviorNode::CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, SingleType single, char variableType)
 	{
 		ISharedVariableEx* pTemp = nullptr;
 		TYPEID typeID = CreateVariable(pTemp, attriName, data, single, variableType);
-		if (typeID == GetClassTypeNumberId<T>())
+		if (typeID == GetTypeID<T>())
 		{
 			op = (SharedVariableEx<T>*)pTemp;
 		}

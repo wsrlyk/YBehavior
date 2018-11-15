@@ -5,27 +5,24 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
+#include "YBehavior/tools/common.h"
 
 namespace YBehavior
 {
 	static std::unordered_set<TYPEID> s_ValidTypes = {
-		GetClassTypeNumberId<Int>(),
-		GetClassTypeNumberId<Float>(),
-		GetClassTypeNumberId<Bool>(),
-		GetClassTypeNumberId<String>(),
-		GetClassTypeNumberId<Vector3>(),
-		GetClassTypeNumberId<Uint64>()
+		GetTypeID<Int>(),
+		GetTypeID<Float>(),
+		GetTypeID<Bool>(),
+		GetTypeID<String>(),
+		GetTypeID<Vector3>(),
+		GetTypeID<Uint64>()
 	};
 
 	bool Comparer::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Operator
-		STRING tempChar = GetValue("Operator", data);
-		if (!IVariableOperationHelper::s_OperatorMap.TryGetKey(tempChar, m_Operator))
-		{
-			ERROR_BEGIN << "Operator Error: " << tempChar << " in Node " << this->GetClassName() << ERROR_END;
+		if (!GetValue("Operator", data, IVariableOperationHelper::s_OperatorMap, m_Operator))
 			return false;
-		}
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left

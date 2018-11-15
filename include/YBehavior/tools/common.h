@@ -3,6 +3,7 @@
 
 #include "YBehavior/types.h"
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
+#include <set>
 
 namespace YBehavior
 {
@@ -45,6 +46,25 @@ namespace YBehavior
 
 			return writer.result;
 		}
+	};
+
+	template<typename T1, typename T2>  
+	class TypeTypeMap
+	{
+	public:
+		typedef std::pair<T1, T2> Pair;
+		TypeTypeMap() {}
+		TypeTypeMap(const std::initializer_list<Pair>& list)
+			: m_Datas(list)
+		{
+		}
+
+		bool Contains(T1 t1, T2 t2)
+		{
+			return m_Datas.count(Pair(t1, t2)) > 0;
+		}
+	protected:
+		std::set<Pair> m_Datas;
 	};
 }
 

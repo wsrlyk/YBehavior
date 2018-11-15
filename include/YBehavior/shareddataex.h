@@ -101,9 +101,9 @@ namespace YBehavior
 			typename DataArrayMapDef<KEY, T>::type::iterator it2; otherArray->m_Datas.end();
 		}
 
-		TYPEID GetTypeID() const override
+		TYPEID TypeID() const override
 		{
-			return GetClassTypeNumberId<T>();
+			return GetTypeID<T>();
 		}
 
 		SIZE_KEY Length() const override { return (SIZE_KEY)m_Datas.size(); }

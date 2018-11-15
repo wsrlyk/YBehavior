@@ -31,7 +31,7 @@ namespace YBehavior
 		virtual const void* GetValue(IMemory* pMemory) = 0;
 		virtual void SetValue(IMemory* pMemory, const void* src) = 0;
 		virtual void SetValueFromString(const STRING& str) = 0;
-		virtual TYPEID GetTypeID() = 0;
+		virtual TYPEID TypeID() const = 0;
 		///> if this variable is an INT, and it refers to an element of an INT[], this method will return the type of INT[] instead of INT;   Used in log..
 		virtual TYPEID GetReferenceSharedDataSelfID() = 0;
 
@@ -107,7 +107,7 @@ namespace YBehavior
 		virtual IDataArray* Clone() const = 0;
 		virtual void Merge(IDataArray* other, bool bOverride) = 0;
 		virtual SIZE_KEY Length() const = 0;
-		virtual TYPEID GetTypeID() const = 0;
+		virtual TYPEID TypeID() const = 0;
 		virtual Iterator Iter() const = 0;
 	};
 

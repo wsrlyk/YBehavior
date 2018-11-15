@@ -308,7 +308,7 @@ namespace YBehavior
 			else
 				op->SetValueFromString(buffer[1]);
 
-			return op->GetTypeID();
+			return op->TypeID();
 		}
 		else
 		{
@@ -449,7 +449,7 @@ namespace YBehavior
 				if (it2 == pInputsTo->end())
 					continue;
 				ISharedVariableEx* pTo = it2->second;
-				if (pFrom->GetTypeID() != pTo->GetTypeID())
+				if (pFrom->TypeID() != pTo->TypeID())
 				{
 					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetName() << ", at main tree: " << m_pAgent->GetTree()->GetTreeName() << ERROR_END;
 					continue;
@@ -470,7 +470,7 @@ namespace YBehavior
 				if (it2 == pOutputsFrom->end())
 					continue;
 				ISharedVariableEx* pFrom = it2->second;
-				if (pFrom->GetTypeID() != pTo->GetTypeID())
+				if (pFrom->TypeID() != pTo->TypeID())
 				{
 					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetName() << ", at main tree: " << m_pAgent->GetTree()->GetTreeName() << ERROR_END;
 					continue;

@@ -74,7 +74,7 @@ namespace YBehavior
 		template<typename T>
 		KEY GetKey(const STRING& name)
 		{
-			TYPEID typeNumberId = GetClassTypeNumberId<T>();
+			TYPEID typeNumberId = GetTypeID<T>();
 			NameKeyInfo& info = Get(typeNumberId);
 			return info.Get(name);
 		}
@@ -83,7 +83,7 @@ namespace YBehavior
 		template<typename T>
 		const STRING& GetName(const KEY& key)
 		{
-			TYPEID typeNumberId = GetClassTypeNumberId<T>();
+			TYPEID typeNumberId = GetTypeID<T>();
 			NameKeyInfo& info = Get(typeNumberId);
 			return info.Get(key);
 		}
@@ -115,14 +115,14 @@ namespace YBehavior
 	template<typename T>
 	KEY TreeKeyMgr::GetKeyByName(const STRING& name)
 	{
-		return GetKeyByName(name, GetClassTypeNumberId<T>());
+		return GetKeyByName(name, GetTypeID<T>());
 	}
 
 #ifdef DEBUGGER
 	template<typename T>
 	const STRING& TreeKeyMgr::GetNameByKey(KEY key)
 	{
-		return GetNameByKey(key, GetClassTypeNumberId<T>());
+		return GetNameByKey(key, GetTypeID<T>());
 	}
 #endif
 
@@ -135,7 +135,7 @@ namespace YBehavior
 		if (mpCurActiveNameKeyInfo == NULL)
 			return Utility::INVALID_KEY;
 
-		TYPEID typeNumberId = GetClassTypeNumberId<T>();
+		TYPEID typeNumberId = GetTypeID<T>();
 		NameKeyInfo& curActiveNameKeyInfo = mpCurActiveNameKeyInfo->Get(typeNumberId);
 
 		if (mpCurActiveNameKeyInfo == &mCommonNameKeyInfo || curActiveNameKeyInfo.Get(name) == Utility::INVALID_KEY)

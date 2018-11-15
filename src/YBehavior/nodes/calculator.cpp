@@ -15,17 +15,13 @@ namespace YBehavior
 	};
 
 	//////////////////////////////////////////////////////////////////////////////////////////
-	static std::unordered_set<TYPEID> s_ValidTypes = { GetClassTypeNumberId<Int>(), GetClassTypeNumberId<Float>() };
+	static std::unordered_set<TYPEID> s_ValidTypes = { GetTypeID<Int>(), GetTypeID<Float>() };
 
 	bool Calculator::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Operator
-		STRING tempChar = GetValue("Operator", data);
-		if (!IVariableOperationHelper::s_OperatorMap.TryGetKey(tempChar, m_Operator))
-		{
-			ERROR_BEGIN << "Operator Error: " << tempChar << " in Node " << this->GetClassName() << ERROR_END;
+		if (!GetValue("Operator", data, IVariableOperationHelper::s_OperatorMap, m_Operator))
 			return false;
-		}
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left

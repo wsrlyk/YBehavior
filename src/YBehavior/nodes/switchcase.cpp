@@ -4,19 +4,19 @@
 namespace YBehavior
 {
 	static std::unordered_set<TYPEID> s_ValidTypes = {
-		GetClassTypeNumberId<Int>(),
-		GetClassTypeNumberId<Float>(),
-		GetClassTypeNumberId<Bool>(),
-		GetClassTypeNumberId<String>(),
-		GetClassTypeNumberId<Uint64>(),
+		GetTypeID<Int>(),
+		GetTypeID<Float>(),
+		GetTypeID<Bool>(),
+		GetTypeID<String>(),
+		GetTypeID<Uint64>(),
 	};
 
 	static std::unordered_set<TYPEID> s_ValidVecTypes = {
-		GetClassTypeNumberId<VecInt>(),
-		GetClassTypeNumberId<VecFloat>(),
-		GetClassTypeNumberId<VecBool>(),
-		GetClassTypeNumberId<VecString>(),
-		GetClassTypeNumberId<VecUint64>(),
+		GetTypeID<VecInt>(),
+		GetTypeID<VecFloat>(),
+		GetTypeID<VecBool>(),
+		GetTypeID<VecString>(),
+		GetTypeID<VecUint64>(),
 	};
 
 	NodeState SwitchCase::Update(AgentPtr pAgent)

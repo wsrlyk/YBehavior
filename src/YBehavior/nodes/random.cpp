@@ -8,9 +8,9 @@
 namespace YBehavior
 {
 	static std::unordered_set<TYPEID> s_ValidTypes = {
-		GetClassTypeNumberId<Int>(),
-		GetClassTypeNumberId<Float>(),
-		GetClassTypeNumberId<Bool>(),
+		GetTypeID<Int>(),
+		GetTypeID<Float>(),
+		GetTypeID<Bool>(),
 	};
 
 	bool Random::OnLoaded(const pugi::xml_node& data)
