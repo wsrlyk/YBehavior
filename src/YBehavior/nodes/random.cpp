@@ -94,4 +94,74 @@ namespace YBehavior
 		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Output, false);
 		return NS_SUCCESS;
 	}
+
+	bool MessUp::OnLoaded(const pugi::xml_node& data)
+	{
+		TYPEID typeIDInput = CreateVariable(m_Input, "Input", data, ST_ARRAY);
+		if (m_Input == nullptr)
+		{
+			return false;
+		}
+
+		TYPEID typeIDOutput = CreateVariable(m_Output, "Output", data, ST_ARRAY, Utility::POINTER_CHAR);
+		if (typeIDOutput != typeIDInput)
+		{
+			ERROR_BEGIN << "Permulation types not match " << typeIDOutput << " and " << typeIDInput << ERROR_END;
+			return false;
+		}
+
+		m_bSameArray = m_Input->GetKey() == m_Output->GetKey();
+		return true;
+	}
+
+	YBehavior::NodeState MessUp::Update(AgentPtr pAgent)
+	{
+		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Input, true);
+
+		int length = m_Input->VectorSize(pAgent->GetMemory());
+		if (length == 0)
+			return NS_SUCCESS;
+
+		ISharedVariableEx* pTargetVariable = nullptr;
+		if (!m_bSameArray)
+		{
+			m_Output->Clear(pAgent->GetMemory());
+			for (int i = 0; i < length - 1; ++i)
+			{
+				m_Output->PushBackElement(pAgent->GetMemory(), m_Input->GetElement(pAgent->GetMemory(), i));
+			}
+			pTargetVariable = m_Output;
+		}
+		else
+		{
+			pTargetVariable = m_Input;
+		}
+
+		void* pTemp = nullptr;
+		IVariableOperationHelper* pHelper = m_Input->GetElementOperation();
+		if (m_bSameArray)
+			pTemp = pHelper->AllocData();
+
+		for (int i = length - 1; i > 0; --i)
+		{
+			int j = Utility::Rand(0, i + 1);
+
+			if (j == i)
+			{
+				continue;
+			}
+
+			pHelper->Set(pTemp, pTargetVariable->GetElement(pAgent->GetMemory(), j));
+			pHelper->Set(const_cast<void*>(pTargetVariable->GetElement(pAgent->GetMemory(), j)), pTargetVariable->GetElement(pAgent->GetMemory(), i));
+			pHelper->Set(const_cast<void*>(pTargetVariable->GetElement(pAgent->GetMemory(), i)), pTemp);
+		}
+
+		if (!pTemp)
+			pHelper->RecycleData(pTemp);
+
+		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Output, false);
+
+		return NS_SUCCESS;
+	}
+
 }

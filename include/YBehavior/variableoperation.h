@@ -312,7 +312,7 @@ namespace YBehavior
 	};
 	template<typename T> VariableOperationHelper<T> VariableOperationHelper<T>::s_Instance;
 
-	///> Exclude vector
+	///> vector
 	template<typename elementType>
 	class VariableOperationHelper<StdVector<elementType>> : public IVariableOperationHelper
 	{

@@ -95,6 +95,7 @@
     <ClCompile Include="..\src\YBehavior\runningcontext.cpp" />
     <ClCompile Include="..\src\YBehavior\shareddataex.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\common.cpp" />
+    <ClCompile Include="..\src\YBehavior\tools\objectpool.cpp" />
     <ClCompile Include="..\src\YBehavior\treekeymgr.cpp" />
     <ClCompile Include="..\src\YBehavior\types.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />

@@ -305,5 +305,8 @@
     <ClCompile Include="..\src\YBehavior\memory.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\YBehavior\tools\objectpool.cpp">
+      <Filter>源文件\tools</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

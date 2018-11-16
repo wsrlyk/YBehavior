@@ -2,8 +2,8 @@
 <Description>
         <Nodes>
                 <Sequence Content="从左到右运行子节点，一旦有子节点返回失败或无节点则返回失败，否则返回成功。"/>
-                <Sequence Content="从左到右运行子节点，一旦有子节点返回失败或无节点则返回失败，否则返回成功"/>
-                <RandomSelector Content="随机运行子节点，一旦有子节点返回成功或无节点则返回成功，否则返回失败"/>
+                <Selector Content="从左到右运行子节点，一旦有子节点返回成功或无节点则返回成功，否则返回失败"/>
+                <RandomSequence Content="随机运行子节点，一旦有子节点返回失败或无节点则返回失败，否则返回成功"/>
                 <RandomSelector Content="随机运行子节点，一旦有子节点返回成功或无节点则返回成功，否则返回失败"/>
                 <For Content="循环运行Children节点，注意不要死循环。&#xD;Init，整个循环刚开始时的初始化节点。&#xD;Cond，每次循环前的判断节点，如失败则结束循环。&#xD;Inc，每次循环后的操作节点"/>
                 <ForEach Content="遍历数组，每取出一个值，调用一次子节点。">
@@ -40,6 +40,14 @@
                         <Opr1 Content="最小值，闭区间"/>
                         <Opr2 Content="最大值，开区间"/>
                 </Random>
+                <RandomSelect Content="随机选一个">
+                        <Input Content="输入"/>
+                        <Output Content="输出"/>
+                </RandomSelect>
+                <MessUp Content="乱序">
+                        <Input Content="输入"/>
+                        <Output Content="输出"/>
+                </MessUp>
                 <AlwaysSuccess Content="总是返回成功"/>
                 <AlwaysFailure Content="总是返回失败"/>
                 <Invertor Content="运行并反转子节点的结果"/>

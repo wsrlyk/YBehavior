@@ -1252,7 +1252,7 @@ namespace YBehavior.Editor.Core
 
     class SetArrayNode : LeafNode
     {
-        public override string Icon => "xx<<yy";
+        public override string Icon => "[x]<<[y]";
 
         public SetArrayNode()
         {
@@ -1266,7 +1266,7 @@ namespace YBehavior.Editor.Core
         {
             Variable opl = NodeMemory.CreateVariable(
                 "Target",
-                "0",
+                "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
@@ -1276,7 +1276,7 @@ namespace YBehavior.Editor.Core
 
             Variable opr = NodeMemory.CreateVariable(
                 "Source",
-                "0",
+                "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Const,
@@ -1315,7 +1315,7 @@ namespace YBehavior.Editor.Core
         {
             Variable opl = NodeMemory.CreateVariable(
                 "Array",
-                "0",
+                "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
@@ -1352,7 +1352,7 @@ namespace YBehavior.Editor.Core
         {
             Variable array = NodeMemory.CreateVariable(
                 "Array",
-                "0",
+                "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
@@ -1399,7 +1399,7 @@ namespace YBehavior.Editor.Core
         {
             Variable array = NodeMemory.CreateVariable(
                 "Array",
-                "0",
+                "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
@@ -1426,6 +1426,55 @@ namespace YBehavior.Editor.Core
                 sb.AppendFormat("[{0}] add {1}",
                     Variables.GetVariable("Array").NoteValue,
                     Variables.GetVariable("Element").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
+    class MessUpNode : LeafNode
+    {
+        public override string Icon => "[x]<??<[y]";
+
+        public MessUpNode()
+        {
+            m_Name = "MessUp";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_DefaultAction;
+
+        }
+
+        public override void CreateVariables()
+        {
+            Variable input = NodeMemory.CreateVariable(
+                "Input",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Const,
+                false,
+                1
+            );
+
+            Variable output = NodeMemory.CreateVariable(
+                "Output",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                true,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("[{0}] <??< [{1}]",
+                    Variables.GetVariable("Output").NoteValue,
+                    Variables.GetVariable("Input").NoteValue
                     );
                 return sb.ToString();
             }

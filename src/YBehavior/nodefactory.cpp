@@ -48,6 +48,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, SetArray);
 		REGISTER_TYPE(factory, GetArrayLength);
 		REGISTER_TYPE(factory, ArrayPushElement);
+		REGISTER_TYPE(factory, MessUp);
 
 		return factory;
 	}

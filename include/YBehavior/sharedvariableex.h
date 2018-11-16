@@ -118,7 +118,9 @@ namespace YBehavior
 		{
 			return IsVector<T>::Result;
 		}
-		IVariableOperationHelper* GetOperation() { return VariableOperationHelper<T>::Get(); }
+		IVariableOperationHelper* GetOperation() const { return VariableOperationHelper<T>::Get(); }
+		IVariableOperationHelper* GetElementOperation() const { return VariableOperationHelper<ElementType>::Get(); }
+
 		ISharedVariableEx* GetVectorIndex() override
 		{
 			if (!IsVector<T>::Result)

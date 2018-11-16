@@ -2,6 +2,7 @@
 #define _YBEHAVIOR_RANDOM_H_
 
 #include "YBehavior/behaviortree.h"
+#include "YBehavior/tools/common.h"
 
 namespace YBehavior
 {
@@ -35,6 +36,22 @@ namespace YBehavior
 
 		TYPEID m_DataType;
 	};
+
+	class MessUp : public LeafNode
+	{
+	public:
+		STRING GetClassName() const override { return "MessUp"; }
+	protected:
+		bool OnLoaded(const pugi::xml_node& data) override;
+		NodeState Update(AgentPtr pAgent) override;
+
+	private:
+		ISharedVariableEx* m_Input;
+		ISharedVariableEx* m_Output;
+
+		bool m_bSameArray;
+	};
+
 }
 
 #endif

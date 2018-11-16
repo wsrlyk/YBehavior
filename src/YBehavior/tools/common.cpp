@@ -18,6 +18,20 @@ namespace YBehavior
 		}
 	}
 
+	void RandomIndex::Clear()
+	{
+		m_IndexList.clear();
+	}
+
+	void RandomIndex::Set(int length)
+	{
+		m_IndexList.clear();
+		for (int i = 0; i < length; ++i)
+		{
+			m_IndexList.push_back(i);
+		}
+	}
+
 	int RandomIndex::operator[](int index)
 	{
 		if (index < 0 || (size_t)index >= m_IndexList.size())

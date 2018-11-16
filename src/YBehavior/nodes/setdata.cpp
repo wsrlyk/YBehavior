@@ -31,8 +31,6 @@ namespace YBehavior
 
 	YBehavior::NodeState SetData::Update(AgentPtr pAgent)
 	{
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Opl, true);
-
 		m_Opl->SetValue(pAgent->GetMemory(), m_Opr->GetValue(pAgent->GetMemory()));
 
 		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Opl, false);
@@ -62,8 +60,6 @@ namespace YBehavior
 
 	YBehavior::NodeState SetArray::Update(AgentPtr pAgent)
 	{
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Opl, true);
-
 		m_Opl->SetValue(pAgent->GetMemory(), m_Opr->GetValue(pAgent->GetMemory()));
 
 		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Opl, false);
