@@ -4,6 +4,7 @@
 #include "YBehavior/types.h"
 #include "utility.h"
 #include "singleton.h"
+#include <unordered_map>
 
 namespace YBehavior
 {

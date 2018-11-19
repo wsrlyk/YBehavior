@@ -6,7 +6,6 @@
 #include "define.h"
 #include <sstream>
 #include <memory>
-#include "YBehavior/tools/linkedlist.h"
 
 namespace YBehavior
 {

@@ -5,6 +5,7 @@
 #include "YBehavior/utility.h"
 #include "YBehavior/tools/meta.h"
 #include "YBehavior/interface.h"
+#include <unordered_map>
 
 #define FOR_EACH_SINGLE_NORMAL_TYPE(func)	\
 	func(Int);	\
