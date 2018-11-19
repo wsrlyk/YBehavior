@@ -190,10 +190,10 @@ namespace YBehavior
 
 	};
 
-	class LocalMemoryTunnel
+	class LocalMemoryInOut
 	{
 	public:
-		LocalMemoryTunnel(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo);
+		LocalMemoryInOut(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo);
 		void OnInput(std::unordered_map<STRING, ISharedVariableEx*>* pInputsTo);
 		void OnOutput(std::unordered_map<STRING, ISharedVariableEx*>* pOutputsFrom);
 	private:
@@ -241,7 +241,7 @@ namespace YBehavior
 
 		void AddSubTree(BehaviorTree* sub) { m_SubTrees.push_back(sub); }
 		inline StdVector<BehaviorTree*>& GetSubTrees() { return m_SubTrees; }
-		NodeState RootExecute(AgentPtr pAgent, NodeState parentState, LocalMemoryTunnel* pTunnel = nullptr);
+		NodeState RootExecute(AgentPtr pAgent, NodeState parentState, LocalMemoryInOut* pTunnel = nullptr);
 
 		///> CAUTION: this function can only be called in garbage collection
 		void ClearSubTree() { m_SubTrees.clear(); }

@@ -412,24 +412,31 @@ namespace YBehavior
 	}
 
 
-	YBehavior::NodeState BehaviorTree::RootExecute(AgentPtr pAgent, NodeState parentState, LocalMemoryTunnel* pTunnel)
+	YBehavior::NodeState BehaviorTree::RootExecute(AgentPtr pAgent, NodeState parentState, LocalMemoryInOut* pInOut)
 	{
 		///> Push the local data to the stack of the agent memory
-		pAgent->GetMemory()->Push(this);
-		
-		if (pTunnel)
-			pTunnel->OnInput(&m_Inputs);
+		if (parentState != NS_RUNNING)
+		{
+			pAgent->GetMemory()->Push(this);
+
+			if (pInOut)
+				pInOut->OnInput(&m_Inputs);
+		}
 
 		NodeState res = Execute(pAgent, parentState);
 
-		if (pTunnel)
-			pTunnel->OnOutput(&m_Outputs);
-		///> Pop the local data
-		pAgent->GetMemory()->Pop();
+		if (res != NS_RUNNING)
+		{
+			if (pInOut)
+				pInOut->OnOutput(&m_Outputs);
+			///> Pop the local data
+			pAgent->GetMemory()->Pop();
+		}
+
 		return res;
 	}
 
-	LocalMemoryTunnel::LocalMemoryTunnel(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo)
+	LocalMemoryInOut::LocalMemoryInOut(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo)
 		: m_pAgent(pAgent)
 		, m_pInputsFrom(pInputsFrom)
 		, m_pOutputsTo(pOutputsTo)
@@ -438,7 +445,7 @@ namespace YBehavior
 	}
 
 
-	void LocalMemoryTunnel::OnInput(std::unordered_map<STRING, ISharedVariableEx*>* pInputsTo)
+	void LocalMemoryInOut::OnInput(std::unordered_map<STRING, ISharedVariableEx*>* pInputsTo)
 	{
 		if (m_pInputsFrom && pInputsTo)
 		{
@@ -459,7 +466,7 @@ namespace YBehavior
 		}
 	}
 
-	void LocalMemoryTunnel::OnOutput(std::unordered_map<STRING, ISharedVariableEx*>* pOutputsFrom)
+	void LocalMemoryInOut::OnOutput(std::unordered_map<STRING, ISharedVariableEx*>* pOutputsFrom)
 	{
 		if (m_pOutputsTo && pOutputsFrom)
 		{

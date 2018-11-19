@@ -91,8 +91,8 @@ namespace YBehavior
 		{
 			if (m_Inputs.size() > 0 || m_Outputs.size() > 0)
 			{
-				LocalMemoryTunnel tunnel(pAgent, m_Inputs.size() > 0 ? &m_Inputs : nullptr, m_Outputs.size() > 0 ? &m_Outputs : nullptr);
-				return m_Tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID, &tunnel);
+				LocalMemoryInOut inout(pAgent, m_Inputs.size() > 0 ? &m_Inputs : nullptr, m_Outputs.size() > 0 ? &m_Outputs : nullptr);
+				return m_Tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID, &inout);
 			}
 			else
 			{
