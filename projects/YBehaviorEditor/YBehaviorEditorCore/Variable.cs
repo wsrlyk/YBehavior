@@ -199,7 +199,7 @@ namespace YBehavior.Editor.Core
                 m_vbType = value;
                 RefreshCandidates();
 
-                Value = null;
+                SetValue(null, IsLocal);
 
                 OnPropertyChanged("vbType");
                 _OnConditionChanged();
@@ -254,7 +254,7 @@ namespace YBehavior.Editor.Core
                         {
                             string s = v.Variable.Name;
                             if (v.Variable.IsLocal)
-                                s = s + " L";
+                                s = s + "'";
                             if (v.Variable.cType == cType)
                                 Candidates.Add(s);
                             ///> List can also be added to the candidates if the target is single
@@ -299,8 +299,8 @@ namespace YBehavior.Editor.Core
             get
             {
                 if (IsElement)
-                    return Value + '[' + m_VectorIndex.Value + ']';
-                return Value;
+                    return DisplayValue + '[' + m_VectorIndex.DisplayValue + ']';
+                return DisplayValue;
             }
         }
         public string DisplayValue
@@ -316,35 +316,38 @@ namespace YBehavior.Editor.Core
                     return;
                 }
 
+                bool isLocal = false;
                 if (vbType == VariableType.VBT_Pointer)
                 {
-                    int p = value.IndexOf(" L");
+                    int p = value.IndexOf("'");
                     if (p >= 0)
                     {
                         value = value.Substring(0, p);
-                        IsLocal = true;
-                    }
-                    else
-                    {
-                        IsLocal = false;
+                        isLocal = true;
                     }
                 }
-                Value = value;
+                SetValue(value, isLocal);
             }
         }
         public string Value
         {
             get { return m_Value; }
-            set
+        }
+
+        public void SetValue(string value, bool isLocal)
+        {
             {
                 ChangeVariableValueCommand command = new ChangeVariableValueCommand()
                 {
                     OldValue = m_Value,
                     NewValue = value,
+                    OldIsLocal = IsLocal,
+                    NewIsLocal = isLocal,
                     Variable = this,
                     //OldVectorIndex = m_VectorIndex
                 };
                 m_Value = value;
+                IsLocal = isLocal;
 
                 _RefreshDisplayValue();
 
@@ -385,7 +388,7 @@ namespace YBehavior.Editor.Core
         private void _RefreshDisplayValue()
         {
             if (vbType == VariableType.VBT_Pointer && IsLocal)
-                m_DisplayValue = Value + " L";
+                m_DisplayValue = Value + "'";
             else
                 m_DisplayValue = Value;
         }
@@ -476,7 +479,7 @@ namespace YBehavior.Editor.Core
                 Variable other = SharedDataSource.SharedData.GetVariable(Value, IsLocal);
                 if (other == null)
                 {
-                    LogMgr.Instance.Log(string.Format("Pointer doesnt exist for variable {0}, while the pointer is {1} ", Name, Value));
+                    LogMgr.Instance.Log(string.Format("Pointer doesnt exist for variable {0}, while the pointer is {1} ", Name, DisplayValue));
                     return false;
                 }
 
@@ -497,7 +500,7 @@ namespace YBehavior.Editor.Core
                         }
                         else if (!m_VectorIndex.CheckValid())
                         {
-                            LogMgr.Instance.Log(string.Format("VectorIndex invalid: {0}.Index == {1}", Name, m_VectorIndex.Value));
+                            LogMgr.Instance.Log(string.Format("VectorIndex invalid: {0}.Index == {1}", Name, m_VectorIndex.DisplayValue));
                             return false;
                         }
                     }

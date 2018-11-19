@@ -235,7 +235,7 @@ namespace YBehavior.Editor.Core
                             continue;
 
                         bool isRefreshed = v.Value != strV[1];
-                        v.Value = strV[1];
+                        v.SetValue(strV[1], v.IsLocal);
                         v.IsRefreshed = isRefreshed;
                     }
                 }

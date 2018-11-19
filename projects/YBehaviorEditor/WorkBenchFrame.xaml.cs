@@ -444,9 +444,17 @@ namespace YBehavior.Editor
                 Point pos = new Vector(renderer.Geo.Pos.X * nodesScale, renderer.Geo.Pos.Y * nodesScale) + nodesPos;
                 if ((pos - curPos).LengthSquared < sqrradius)
                 {
+                    ///> Much Larger Weight
+                    count += 50;
+                    nextPos.X += (pos.X * 50);
+                    nextPos.Y += (pos.Y * 50);
+                }
+                else
+                {
+                    ///> Normal Weight
                     ++count;
-                    nextPos.X += pos.X;
-                    nextPos.Y += pos.Y;
+                    nextPos.X += (pos.X);
+                    nextPos.Y += (pos.Y);
                 }
             }
 

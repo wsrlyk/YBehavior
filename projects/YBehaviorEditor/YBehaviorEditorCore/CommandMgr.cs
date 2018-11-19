@@ -352,16 +352,18 @@ namespace YBehavior.Editor.Core
         public Variable Variable { get; set; }
         public string OldValue { get; set; }
         public string NewValue { get; set; }
+        public bool OldIsLocal { get; set; }
+        public bool NewIsLocal { get; set; }
 
         //public Variable OldVectorIndex { get; set; }
 
         public void Redo()
         {
-            Variable.Value = NewValue;
+            Variable.SetValue(NewValue, NewIsLocal);
         }
         public void Undo()
         {
-            Variable.Value = OldValue;
+            Variable.SetValue(OldValue, OldIsLocal);
             //if (OldVectorIndex != null)
             //{
             //    Variable.VectorIndex = OldVectorIndex;
