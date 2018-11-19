@@ -89,7 +89,7 @@ YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 	}
 	else
 	{
-		YBehavior::EntityWrapper wrapper(pAgent->GetEntity()->CreateWrapper());
+		YBehavior::EntityWrapper wrapper(pAgent->GetEntity()->GetWrapper());
 		m_Target->SetCastedValue(pAgent->GetMemory(), &wrapper);
 	}
 

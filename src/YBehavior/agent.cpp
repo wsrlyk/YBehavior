@@ -109,20 +109,15 @@ YBehavior::Agent::~Agent()
 
 YBehavior::Entity::Entity()
 {
-	m_WrapperList = nullptr;
+	m_Wrapper = nullptr;
 }
 
 YBehavior::Entity::~Entity()
 {
-	if (m_WrapperList != nullptr)
+	if (m_Wrapper)
 	{
-		LinkedListNode<EntityWrapper>* node = m_WrapperList->GetNext();
-		while (node != nullptr)
-		{
-			node->GetValue().SetValid(false);
-			node = node->GetNext();
-		}
-		delete m_WrapperList;
+		m_Wrapper->SetValid(false);
+		delete m_Wrapper;
 	}
 }
 
@@ -131,20 +126,11 @@ YBehavior::STRING YBehavior::Entity::ToString() const
 	return Utility::StringEmpty;
 }
 
-YBehavior::EntityWrapper YBehavior::Entity::CreateWrapper()
+const YBehavior::EntityWrapper& YBehavior::Entity::GetWrapper()
 {
-	EntityWrapper wrapper(this);
+	if (m_Wrapper == nullptr)
+		m_Wrapper = new EntityWrapper(this);
 
-	if (m_WrapperList == nullptr)
-		m_WrapperList = new	LinkedList<EntityWrapper>();
-
-	LinkedListNode<EntityWrapper>* node = m_WrapperList->Append(wrapper);
-	wrapper.SetReference(node);
-	return wrapper;
+	return *m_Wrapper;
 }
 
-void YBehavior::Entity::DeleteWrapper(LinkedListNode<EntityWrapper>* node)
-{
-	if (m_WrapperList != nullptr)
-		m_WrapperList->Remove(node);
-}

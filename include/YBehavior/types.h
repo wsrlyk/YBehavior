@@ -123,41 +123,39 @@ namespace YBehavior
 	protected:
 		Entity* m_Data;
 		std::shared_ptr<bool> m_IsValid;
-		LinkedListNode<EntityWrapper>* m_Reference;
 
-	protected:
-		bool _CheckValidAndReset();
 	public:
 		EntityWrapper()
 			: m_Data(nullptr)
 			, m_IsValid(new bool(false))
-			, m_Reference(nullptr)
 		{
 		}
 		EntityWrapper(Entity* pEntity)
 			: m_Data(pEntity)
-			, m_IsValid(new bool(true))
-			, m_Reference(nullptr)
+			, m_IsValid(new bool(pEntity != nullptr))
 		{
 		}
 
 		EntityWrapper(const EntityWrapper& other)
 			: m_Data(other.m_Data)
 			, m_IsValid(other.m_IsValid)
-			, m_Reference(other.m_Reference)
 		{
 			//LOG_BEGIN << "Copy Construct" << LOG_END;
 		}
 
+		EntityWrapper(EntityWrapper&& other)
+			: m_Data(other.m_Data)
+			, m_IsValid(other.m_IsValid)
+		{
+			//LOG_BEGIN << "Move Construct" << LOG_END;
+			other.m_Data = nullptr;
+			other.m_IsValid.reset();
+		}
+
 		EntityWrapper& operator = (const EntityWrapper& other)
 		{
-			if (m_Reference != other.m_Reference)
-			{
-				_CheckValidAndReset();
-			}
 			m_Data = other.m_Data;
 			m_IsValid = other.m_IsValid;
-			m_Reference = other.m_Reference;
 			return *this;
 		}
 
@@ -194,7 +192,6 @@ namespace YBehavior
 		inline Entity* Get() const { return m_Data; }
 		inline bool IsValid() const { return *m_IsValid; }
 		inline void SetValid(bool b) { *m_IsValid = b; }
-		inline void SetReference(LinkedListNode<EntityWrapper>* r) { m_Reference = r; }
 	};
 
 	typedef int					KEY;	///> Key to get value from the shareddata

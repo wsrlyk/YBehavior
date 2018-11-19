@@ -3,8 +3,8 @@
 
 #include "YBehavior/define.h"
 #include "YBehavior/types.h"
-#include "tools/linkedlist.h"
 #include <stack>
+
 namespace YBehavior
 {
 	class BehaviorTree;
@@ -16,12 +16,11 @@ namespace YBehavior
 	class YBEHAVIOR_API Entity
 	{
 	protected:
-		LinkedList<EntityWrapper>* m_WrapperList;
+		EntityWrapper* m_Wrapper;
 	public:
 		Entity();
 		~Entity();
-		EntityWrapper CreateWrapper();
-		void DeleteWrapper(LinkedListNode<EntityWrapper>* node);
+		const EntityWrapper& GetWrapper();
 		virtual STRING ToString() const;
 	};
 

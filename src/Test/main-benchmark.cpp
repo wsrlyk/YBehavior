@@ -31,17 +31,17 @@ int main(int argc, char** argv)
 	//pEntity1->GetAgent()->SetEntity(pEntity1);
 
 	LOG_BEGIN << "wrapper begin" << LOG_END;
-	EntityWrapper wrapper = pEntity->GetAgent()->GetEntity()->CreateWrapper();
+	EntityWrapper wrapper = pEntity->GetAgent()->GetEntity()->GetWrapper();
 	LOG_BEGIN << "{" << LOG_END;
 	{
-		EntityWrapper wrapper0 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
+		EntityWrapper wrapper0 = pEntity->GetAgent()->GetEntity()->GetWrapper();
 		LOG_BEGIN << "wrapper00" << LOG_END;
 		EntityWrapper wrapper00 = wrapper0;
 		LOG_BEGIN << "wrapper_0" << LOG_END;
 		EntityWrapper wrapper_0 = wrapper;
 	}
 	LOG_BEGIN << "}" << LOG_END;
-	EntityWrapper wrapper1 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
+	EntityWrapper wrapper1 = pEntity->GetAgent()->GetEntity()->GetWrapper();
 	LOG_BEGIN << "wrapper_1" << LOG_END;
 	EntityWrapper wrapper_1 = wrapper;
 

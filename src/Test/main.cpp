@@ -29,17 +29,17 @@ int main(int argc, char** argv)
 	LOG_FORMAT("te%dst%s abc", 1, "++");
 
 	LOG_BEGIN << "wrapper begin" << LOG_END;
-	YB::EntityWrapper wrapper = pEntity->GetAgent()->GetEntity()->CreateWrapper();
+	YB::EntityWrapper wrapper = pEntity->GetAgent()->GetEntity()->GetWrapper();
 	LOG_BEGIN << "{" << LOG_END;
 	{
-		YB::EntityWrapper wrapper0 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
+		YB::EntityWrapper wrapper0 = pEntity->GetAgent()->GetEntity()->GetWrapper();
 		LOG_BEGIN << "wrapper00" << LOG_END;
 		YB::EntityWrapper wrapper00 = wrapper0;
 		LOG_BEGIN << "wrapper_0" << LOG_END;
 		YB::EntityWrapper wrapper_0 = wrapper;
 	}
 	LOG_BEGIN << "}" << LOG_END;
-	YB::EntityWrapper wrapper1 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
+	YB::EntityWrapper wrapper1 = pEntity->GetAgent()->GetEntity()->GetWrapper();
 	LOG_BEGIN << "wrapper_1" << LOG_END;
 	YB::EntityWrapper wrapper_1 = wrapper;
 
