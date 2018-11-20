@@ -294,6 +294,18 @@ namespace YBehavior.Editor.Core
             }
         }
         public string Name { get { return m_Name; } }
+        public string DisplayName
+        {
+            get
+            {
+                return 
+                    m_bIsLocal && 
+                    SharedDataSource != null && SharedDataSource is Tree &&
+                    !(this is InOutVariable)
+                    ? m_Name + "'" : m_Name;
+            }
+        }
+
         public string NoteValue
         {
             get

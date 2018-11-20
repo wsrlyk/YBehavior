@@ -37,30 +37,30 @@ namespace YBehavior
 		{
 		}
 
-		friend std::stringstream & operator<<(std::stringstream &out, const Vector3 &obj)
+		friend std::stringstream & operator<<(std::stringstream &outstream, const Vector3 &obj)
 		{
-			out << obj.x << '=' << obj.y << '=' << obj.z;
-			return out;
+			outstream << obj.x << '=' << obj.y << '=' << obj.z;
+			return outstream;
 		}
 
-		friend std::stringstream & operator >> (std::stringstream &in, Vector3 &obj)
+		friend std::stringstream & operator >> (std::stringstream &instream, Vector3 &obj)
 		{
 			char c;
-			in >> obj.x >> c >> obj.y >> c >> obj.z;
-			return in;
+			instream >> obj.x >> c >> obj.y >> c >> obj.z;
+			return instream;
 		}
 
-		friend std::ostream & operator<<(std::ostream &out, const Vector3 &obj)
+		friend std::ostream & operator<<(std::ostream &outstream, const Vector3 &obj)
 		{
-			out << obj.x << '=' << obj.y << '=' << obj.z;
-			return out;
+			outstream << obj.x << '=' << obj.y << '=' << obj.z;
+			return outstream;
 		}
 
-		friend std::istream & operator >> (std::istream &in, Vector3 &obj)
+		friend std::istream & operator >> (std::istream &instream, Vector3 &obj)
 		{
 			char c;
-			in >> obj.x >> c >> obj.y >> c >> obj.z;
-			return in;
+			instream >> obj.x >> c >> obj.y >> c >> obj.z;
+			return instream;
 		}
 
 		bool operator == (const Vector3& other) const

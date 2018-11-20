@@ -212,7 +212,7 @@ namespace YBehavior
 			return false;
 		}
 
-		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data, ST_SINGLE);
+		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
 		if (!m_ExitWhenFailure)
 		{
 			return false;
@@ -238,7 +238,7 @@ namespace YBehavior
 			return false;
 		}
 
-		type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data, ST_SINGLE);
+		type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
 		if (!m_ExitWhenFailure)
 		{
 			return false;

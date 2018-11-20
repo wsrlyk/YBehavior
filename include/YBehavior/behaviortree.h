@@ -6,11 +6,13 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "sharedvariableex.h"
-namespace pugi
-{
-	class xml_node;
-	class xml_attribute;
-}
+#include "3rd/pugixml/pugixml.hpp"
+
+//namespace pugi
+//{
+//	class xml_node;
+//	class xml_attribute;
+//}
 
 namespace YBehavior
 {
@@ -118,7 +120,8 @@ namespace YBehavior
 
 		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, SingleType single, char variableType = 0);
 		template <typename T> 
-		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, SingleType single, char variableType = 0);
+		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0);
+		TYPEID _CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, SingleType single, char variableType);
 		///>
 		/// single: 1, single; 0, vector; -1, dont care
 		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single = ST_NONE, char variableType = 0);
@@ -141,10 +144,28 @@ namespace YBehavior
 	}
 
 	template <typename T>
-	TYPEID BehaviorNode::CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, SingleType single, char variableType)
+	TYPEID BehaviorNode::CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType)
 	{
+		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
+
+		if (attrOptr.empty())
+		{
+			if (variableType != Utility::POINTER_CHAR)
+			{
+				op = new SharedVariableEx<T>();
+				m_Variables.push_back(op);
+#ifdef DEBUGGER
+				op->SetName(attrOptr.name());
+#endif
+				return GetTypeID<T>();
+			}
+
+			ERROR_BEGIN << "Cant create default variable for " << attriName << " with typeid = " << GetTypeID<T>() << ERROR_END;
+			return -1;
+		}
+
 		ISharedVariableEx* pTemp = nullptr;
-		TYPEID typeID = CreateVariable(pTemp, attriName, data, single, variableType);
+		TYPEID typeID = _CreateVariable(pTemp, attrOptr, data, GetTypeID<T>() < 100 ? ST_SINGLE : ST_ARRAY, variableType);
 		if (typeID == GetTypeID<T>())
 		{
 			op = (SharedVariableEx<T>*)pTemp;

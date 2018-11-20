@@ -282,6 +282,11 @@ namespace YBehavior
 			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << " in Node " << this->GetClassName() << ERROR_END;
 			return -1;
 		}
+		return _CreateVariable(op, attrOptr, data, single, variableType);
+	}
+
+	TYPEID BehaviorNode::_CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, SingleType single, char variableType)
+	{
 		StdVector<STRING> buffer;
 		if (!ParseVariable(attrOptr, data, buffer, single, variableType))
 			return -1;
@@ -292,7 +297,7 @@ namespace YBehavior
 			op = helper->CreateVariable();
 			m_Variables.push_back(op);
 #ifdef DEBUGGER
-			op->SetName(attriName);
+			op->SetName(attrOptr.name());
 #endif
 			///> Vector Index
 			if (buffer.size() >= 5 && buffer[2] == "VI")

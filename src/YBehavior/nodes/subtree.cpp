@@ -13,7 +13,7 @@ namespace YBehavior
 	bool SubTree::OnLoaded(const pugi::xml_node& data)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		TYPEID typeID = CreateVariable(m_TreeName, "Tree", data, ST_SINGLE, Utility::CONST_CHAR);
+		TYPEID typeID = CreateVariable(m_TreeName, "Tree", data, Utility::CONST_CHAR);
 		if (!m_TreeName)
 		{
 			return false;

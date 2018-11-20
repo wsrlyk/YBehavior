@@ -157,7 +157,7 @@ namespace YBehavior
 			return false;
 		}
 
-		TYPEID bType = CreateVariable(m_IgnoreInput, "IgnoreInput", data, ST_SINGLE);
+		TYPEID bType = CreateVariable(m_IgnoreInput, "IgnoreInput", data);
 		if (!m_IgnoreInput)
 		{
 			return false;
