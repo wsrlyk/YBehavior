@@ -17,19 +17,6 @@ namespace YBehavior
 		ISharedVariableEx* m_Opl;
 		ISharedVariableEx* m_Opr;
 	};
-
-	class SetArray : public LeafNode
-	{
-	public:
-		STRING GetClassName() const override { return "SetArray"; }
-	protected:
-		virtual NodeState Update(AgentPtr pAgent);
-		virtual bool OnLoaded(const pugi::xml_node& data);
-
-	private:
-		ISharedVariableEx* m_Opl;
-		ISharedVariableEx* m_Opr;
-	};
 }
 
 #endif

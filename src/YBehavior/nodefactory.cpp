@@ -45,7 +45,6 @@ namespace YBehavior
 		REGISTER_TYPE(factory, SubTree);
 		REGISTER_TYPE(factory, Wait);
 		REGISTER_TYPE(factory, ClearArray);
-		REGISTER_TYPE(factory, SetArray);
 		REGISTER_TYPE(factory, GetArrayLength);
 		REGISTER_TYPE(factory, ArrayPushElement);
 		REGISTER_TYPE(factory, MessUp);

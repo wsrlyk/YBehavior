@@ -37,6 +37,7 @@ namespace YBehavior.Editor.Core
                 return false;
 
             v.LockVBType = true;
+            v.LockCType = true;
             v.CanBeRemoved = true;
 
             if (!v.CheckValid())
@@ -57,6 +58,7 @@ namespace YBehavior.Editor.Core
                     return false;
 
                 v.LockVBType = true;
+                v.LockCType = true;
                 v.CanBeRemoved = true;
 
                 if (!v.CheckValid())
@@ -247,6 +249,7 @@ namespace YBehavior.Editor.Core
             {
                 v.LockVBType = false;
             }
+            v.LockCType = true;
 
             v.CanBeRemoved = true;
             v.IsInput = bIsInput;
@@ -280,6 +283,7 @@ namespace YBehavior.Editor.Core
                     v.LockVBType = true;
                 else
                     v.LockVBType = false;
+                v.LockCType = true;
 
                 v.CanBeRemoved = true;
                 v.IsInput = bIsInput;
@@ -448,16 +452,13 @@ namespace YBehavior.Editor.Core
             Variable.ValueType[] valueType,
             Variable.CountType countType,
             Variable.VariableType vbType,
-            bool bLockVBType,
             int typeGroup = 0,
             string param = null)
         {
             Variable v = new Variable(m_Owner);
             v.vTypeSet.AddRange(valueType);
-            v.cType = countType;
-            v.vbType = vbType;
+
             v.SetVariable(valueType[0], countType, vbType, false, defaultValue, param, name);
-            v.LockVBType = bLockVBType;
 
             if (AddVariable(v, typeGroup))
                 return v;

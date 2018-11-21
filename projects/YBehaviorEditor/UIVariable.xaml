@@ -21,10 +21,37 @@
             <local:InvertBoolConverter/>
             <BooleanToVisibilityConverter/>
         </local:ValueConverterGroup>
+
+        <Style x:Key="TransparentHoverStyle" TargetType="{x:Type Button}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border>
+                            <Border.Style>
+                                <Style TargetType="{x:Type Border}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#66EEEEEE"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Grid Background="Transparent">
+                                <ContentPresenter></ContentPresenter>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <StackPanel>
         <DockPanel Background="LightBlue" Margin="2,2,2,2">
-            <TextBlock Name="VKey" Text="{Binding DisplayName}" FontSize="13" Width="150" DockPanel.Dock="Left" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}"/>
+            <Grid DockPanel.Dock="Left">
+                <TextBlock Name="VKey" Text="{Binding DisplayName}" FontSize="13" Width="150" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}"/>
+                <Button Style="{StaticResource TransparentHoverStyle}" Name="CSwitcher" Click="CSwitcher_Click" IsEnabled="{Binding IsEditable}" Visibility="{Binding Path = CanSwitchList, Converter={StaticResource visibilityConvertor}}" ToolTip="{Binding Description}">
+                </Button>
+            </Grid>
             <ComboBox IsEnabled="{Binding IsEditable}" Name="VTypes" Width="55" ItemsSource="{Binding vTypeSet}" SelectedItem="{Binding vType}"
                 IsHitTestVisible="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}" SelectionChanged="VTypes_SelectionChanged">
                 <!--IsEditable="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}"
@@ -40,14 +67,14 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
             <StackPanel Orientation="Horizontal"  DockPanel.Dock="Right">
-                <CheckBox IsEnabled="{Binding IsEditable}" Width="20" Height="20" Name="Switcher" Background="Orange" Foreground="GreenYellow" IsChecked="{Binding vbType, Converter={StaticResource variableTypeConvertor}}" Visibility="{Binding Path = CanSwitchConst, Converter={StaticResource visibilityConvertor}}"/>
+                <CheckBox IsEnabled="{Binding IsEditable}" Width="20" Height="20" Name="VBSwitcher" Background="Orange" Foreground="GreenYellow" IsChecked="{Binding vbType, Converter={StaticResource variableTypeConvertor}}" Visibility="{Binding Path = CanSwitchConst, Converter={StaticResource visibilityConvertor}}"/>
                 <Button Width="20" Height="20" Name="Remover" Background="IndianRed" Visibility="{Binding Path = CanBeRemoved,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="Remover_Click">
                     X
                 </Button>
             </StackPanel>
             <Grid>
                 <ComboBox IsEnabled="{Binding IsEditable}" SelectedItem="{Binding DisplayValue}" ItemsSource="{Binding Candidates}" x:Name="VPointer" MinWidth="110" MaxDropDownHeight ="150"
-                      Visibility="{Binding Path=IsChecked, ElementName=Switcher, Converter={StaticResource visibilityConvertor}}" 
+                      Visibility="{Binding Path=IsChecked, ElementName=VBSwitcher, Converter={StaticResource visibilityConvertor}}" 
                       Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}">
                     <ComboBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -55,7 +82,7 @@
                         </ItemsPanelTemplate>
                     </ComboBox.ItemsPanel>
                 </ComboBox>
-                <Grid Visibility="{Binding Path=IsChecked, ElementName=Switcher, Converter={StaticResource invertBoolAndVisibilityConvertor}}">
+                <Grid Visibility="{Binding Path=IsChecked, ElementName=VBSwitcher, Converter={StaticResource invertBoolAndVisibilityConvertor}}">
                     <TextBox ToolTip="{Binding DisplayValue}"  IsReadOnly="{Binding IsEditable, Converter={StaticResource invertBoolConvertor}}" Name="VConst" Text="{Binding DisplayValue}" 
                              Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}" 
                              BorderBrush="{Binding Path = IsRefreshed, Converter={StaticResource refreshConvertor}}" BorderThickness="2"/>

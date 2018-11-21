@@ -27,7 +27,6 @@
                             <TextBlock Text="Comment" FontSize="13" Width="90" DockPanel.Dock="Left" Background="LightCyan"/>
                             <TextBox Name="Comment" MinWidth="110" Text="{Binding Comment}" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible"/>
                         </DockPanel>
-                        <!--local:UIVariable x:Name = "NickName" VariableKey = "NickName" VValue ="{Binding NickName}"  ShowSwitcher ="False"/-->
                     </StackPanel>
                     <ScrollViewer VerticalScrollBarVisibility ="Auto">
                         <ItemsControl Name="VariableContainer">

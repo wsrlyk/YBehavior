@@ -256,15 +256,22 @@ namespace YBehavior
 		}
 		void SetKeyFromString(const STRING& s)
 		{
+			KEY key = Utility::INVALID_KEY;
 			///> if T is a single type but has vector index, it means this variable is an element of a vector.
 			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
 			{
-				SetKey(TreeKeyMgr::Instance()->GetKeyByName<StdVector<T>>(s));
+				key = (TreeKeyMgr::Instance()->GetKeyByName<StdVector<T>>(s));
 			}
 			else
 			{
-				SetKey(TreeKeyMgr::Instance()->GetKeyByName<T>(s));
+				key = (TreeKeyMgr::Instance()->GetKeyByName<T>(s));
 			}
+
+			if (key == Utility::INVALID_KEY)
+			{
+				ERROR_BEGIN << "Cant Get Key for " << s << " with typeid = " << GetTypeID<T>() << ERROR_END;
+			}
+			SetKey(key);
 		}
 
 		const T* GetCastedValue(IMemory* pMemory)
@@ -346,12 +353,13 @@ namespace YBehavior
 		{
 			if (vbType.length() < 1)
 				return;
-			if (vbType[0] == Utility::POINTER_CHAR)
+			const char t = Utility::ToUpper(vbType[0]);
+			if (t == Utility::POINTER_CHAR)
 			{
 				m_VectorIndex = new SharedVariableEx<INT>();
 				m_VectorIndex->SetKeyFromString(s);
 			}
-			else if (vbType[0] == Utility::CONST_CHAR)
+			else if (t == Utility::CONST_CHAR)
 			{
 				m_VectorIndex = new SharedVariableEx<INT>();
 				m_VectorIndex->SetValueFromString(s);

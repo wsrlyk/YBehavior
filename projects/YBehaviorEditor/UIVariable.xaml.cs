@@ -19,17 +19,6 @@ namespace YBehavior.Editor
     /// </summary>
     public partial class UIVariable : UserControl
     {
-        public string VariableKey
-        {
-            get { return VKey.Text; }
-            set { VKey.Text = value; }
-        }
-
-        public bool ShowSwitcher
-        {
-            get { return Switcher.Visibility == Visibility.Visible; }
-            set { Switcher.Visibility = value ? Visibility.Visible : Visibility.Collapsed; }
-        }
         public UIVariable()
         {
             InitializeComponent();
@@ -99,6 +88,15 @@ namespace YBehavior.Editor
                 this.VBool.Visibility = Visibility.Collapsed;
                 this.VEnum.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void CSwitcher_Click(object sender, RoutedEventArgs e)
+        {
+            Core.Variable v = DataContext as Core.Variable;
+            if (v == null)
+                return;
+
+            v.cType = v.cType == Core.Variable.CountType.CT_LIST ? Core.Variable.CountType.CT_SINGLE : Core.Variable.CountType.CT_LIST;
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ParentTree>
   <Node Class="Root" Pos="216,34">
-    <Shared a="_IC 0" b="_IC 0" />
+    <Shared a="_IC 0" b="_IC 0" aa="IIC 1" bb="IIC 1" />
     <Node Class="Sequence" Pos="138,200">
-      <Node Class="Random" Pos="69,374" Target="_IP a" Bound1="_IC 1" Bound2="_IC 10" />
+      <Node Class="Random" Pos="10,375" Target="_IP a" Bound1="_IC 1" Bound2="_IC 10" />
+      <Node Class="SetData" Pos="89,448" Target="_IP bb VI c 0" Source="_IP a" />
+      <Node Class="SetData" Pos="181,416" Target="IIP aa" Source="IIP bb" />
       <Node Class="SubTree" Pos="302,386" Tree="_SC SubTree">
         <Input Input="_IP a" />
         <Output Output="_IP b" />

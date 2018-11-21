@@ -97,12 +97,11 @@ namespace YBehavior.Editor.Core
             }
 
             bool bIsLocal = false;
-            Variable.VariableType vbType = Variable.VariableType.VBT_Const;
-            bool bLockVBType = false;
+            Variable.VariableType vbType = Variable.VariableType.VBT_NONE;
             ///> Is Enum, always const
             if (valueType.Length == 1 && valueType[0] == Variable.ValueType.VT_ENUM)
             {
-                bLockVBType = true;
+                vbType = Variable.VariableType.VBT_Const;
             }
             else
             {
@@ -118,10 +117,6 @@ namespace YBehavior.Editor.Core
                             LogMgr.Instance.Error("VariableType format error: " + strVariableType);
                             return false;
                         }
-                        else
-                        {
-                            bLockVBType = true;
-                        }
 
                         bIsLocal = Char.IsLower(strVariableType[0]);
                     }
@@ -133,14 +128,14 @@ namespace YBehavior.Editor.Core
                 }
             }
 
-
             bool isArray = false;
+            Variable.CountType countType = Variable.CountType.CT_NONE;
             attr = xml.Attributes["IsArray"];
             if (attr != null)
             {
                 isArray = attr.Value == "True";
+                countType = attr.Value == "True" ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE;
             }
-            Variable.CountType countType = isArray ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE;
 
             string value = string.Empty;
             attr = xml.Attributes["Value"];
@@ -169,7 +164,6 @@ namespace YBehavior.Editor.Core
                 valueType,
                 countType,
                 vbType,
-                bLockVBType,
                 typeGroup,
                 param
             );

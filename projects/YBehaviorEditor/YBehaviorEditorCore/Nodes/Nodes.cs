@@ -236,7 +236,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_Enum,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
-                true,
                 0,
                 "ADD|SUB|MUL|DIV"
             );
@@ -247,7 +246,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 1
             );
 
@@ -256,8 +254,7 @@ namespace YBehavior.Editor.Core
                 "0",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
 
@@ -266,8 +263,7 @@ namespace YBehavior.Editor.Core
                 "0",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
         }
@@ -308,7 +304,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_Enum,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
-                true,
                 0,
                 "==|!=|>|<|>=|<="
             );
@@ -319,7 +314,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 1
             );
 
@@ -328,8 +322,7 @@ namespace YBehavior.Editor.Core
                 "0",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
         }
@@ -367,9 +360,8 @@ namespace YBehavior.Editor.Core
                 "Target",
                 "0",
                 Variable.CreateParams_AllTypes,
-                Variable.CountType.CT_SINGLE,
+                Variable.CountType.CT_NONE,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 1
             );
 
@@ -377,9 +369,8 @@ namespace YBehavior.Editor.Core
                 "Source",
                 "0",
                 Variable.CreateParams_AllTypes,
-                Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.CountType.CT_NONE,
+                Variable.VariableType.VBT_NONE,
                 1
             );
         }
@@ -470,7 +461,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_RandomTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 1
             );
 
@@ -479,8 +469,7 @@ namespace YBehavior.Editor.Core
                 "0",
                 Variable.CreateParams_RandomTypes,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
 
@@ -489,8 +478,7 @@ namespace YBehavior.Editor.Core
                 "0",
                 Variable.CreateParams_RandomTypes,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
         }
@@ -528,8 +516,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Pointer,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
 
@@ -539,7 +526,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 1
             );
         }
@@ -577,7 +563,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_String,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 0
             );
 
@@ -587,7 +572,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 0
             );
 
@@ -597,7 +581,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_Float,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 0
             );
 
@@ -607,7 +590,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_String,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 0
             );
 
@@ -617,7 +599,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_Ulong,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 0
             );
 
@@ -627,7 +608,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 0
             );
         }
@@ -669,8 +649,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_String,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 0
             );
 
@@ -679,8 +658,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 0
             );
 
@@ -689,8 +667,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_Float,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 0
             );
 
@@ -699,8 +676,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_String,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 0
             );
 
@@ -709,8 +685,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_Ulong,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 0
             );
 
@@ -719,8 +694,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 0
             );
         }
@@ -763,7 +737,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_SwitchTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 1
             );
 
@@ -772,8 +745,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_SwitchTypes,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
         }
@@ -816,8 +788,7 @@ namespace YBehavior.Editor.Core
                 "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false
+                Variable.VariableType.VBT_NONE
             );
         }
     }
@@ -840,8 +811,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
             NodeMemory.CreateVariable(
@@ -850,7 +820,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 1
             );
             NodeMemory.CreateVariable(
@@ -858,8 +827,7 @@ namespace YBehavior.Editor.Core
                 "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false
+                Variable.VariableType.VBT_NONE
             );
         }
 
@@ -894,8 +862,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
             NodeMemory.CreateVariable(
@@ -904,7 +871,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 1
             );
             NodeMemory.CreateVariable(
@@ -912,8 +878,7 @@ namespace YBehavior.Editor.Core
                 "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false
+                Variable.VariableType.VBT_NONE
             );
         }
 
@@ -948,8 +913,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
 
@@ -958,8 +922,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
 
@@ -968,8 +931,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
 
@@ -979,7 +941,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 1
             );
 
@@ -1016,8 +977,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
 
@@ -1026,8 +986,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 2
             );
 
@@ -1036,8 +995,7 @@ namespace YBehavior.Editor.Core
                 "0",
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
 
@@ -1047,7 +1005,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 2
             );
 
@@ -1056,8 +1013,7 @@ namespace YBehavior.Editor.Core
                 "T",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 0
             );
 
@@ -1106,8 +1062,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_String,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                true
+                Variable.VariableType.VBT_Const
             );
         }
 
@@ -1236,8 +1191,7 @@ namespace YBehavior.Editor.Core
                 "1",
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false
+                Variable.VariableType.VBT_NONE
             );
         }
 
@@ -1270,7 +1224,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 1
             );
 
@@ -1279,8 +1232,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
         }
@@ -1318,8 +1270,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Pointer,
-                true
+                Variable.VariableType.VBT_Pointer
             );
         }
 
@@ -1355,8 +1306,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Pointer,
-                false
+                Variable.VariableType.VBT_NONE
             );
 
             Variable length = NodeMemory.CreateVariable(
@@ -1364,8 +1314,7 @@ namespace YBehavior.Editor.Core
                 "0",
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Pointer,
-                true
+                Variable.VariableType.VBT_Pointer
             );
         }
 
@@ -1403,7 +1352,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 1
             );
 
@@ -1412,8 +1360,7 @@ namespace YBehavior.Editor.Core
                 "0",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
         }
@@ -1451,8 +1398,7 @@ namespace YBehavior.Editor.Core
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Const,
-                false,
+                Variable.VariableType.VBT_NONE,
                 1
             );
 
@@ -1462,7 +1408,6 @@ namespace YBehavior.Editor.Core
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
-                true,
                 1
             );
         }

@@ -387,6 +387,22 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    public class ChangeVariableCTypeCommand : ICommand
+    {
+        public Variable Variable { get; set; }
+        public Variable.CountType OldType { get; set; }
+        public Variable.CountType NewType { get; set; }
+
+        public void Redo()
+        {
+            Variable.cType = NewType;
+        }
+        public void Undo()
+        {
+            Variable.cType = OldType;
+        }
+    }
+
     public class ChangeVariableVTypeCommand : ICommand
     {
         public Variable Variable { get; set; }

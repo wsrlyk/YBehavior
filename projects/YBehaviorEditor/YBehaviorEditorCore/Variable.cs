@@ -179,9 +179,20 @@ namespace YBehavior.Editor.Core
             get { return m_cType; }
             set
             {
+                ChangeVariableCTypeCommand command = new ChangeVariableCTypeCommand()
+                {
+                    OldType = m_cType,
+                    NewType = value,
+                    Variable = this
+                };
+
                 m_cType = value;
                 RefreshCandidates();
+                SetValue(null, IsLocal);
+                OnPropertyChanged("cType");
                 _OnConditionChanged();
+
+                WorkBenchMgr.Instance.PushCommand(command);
             }
         }
         public VariableType vbType
@@ -419,8 +430,10 @@ namespace YBehavior.Editor.Core
         }
 
         public bool LockVBType { get; set; } = false;
+        public bool LockCType { get; set; } = false;
         public bool CanBeRemoved { get { return m_bCanbeRemoved; } set { m_bCanbeRemoved = value; } }
         public bool CanSwitchConst { get { return !LockVBType; } }
+        public bool CanSwitchList { get { return !LockCType; } }
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
@@ -655,14 +668,20 @@ namespace YBehavior.Editor.Core
             if (vType == ValueType.VT_NONE)
                 return false;
 
-            cType = GetCountType(valueType, countType);
-
             if (!LockVBType)
             {
                 vbType = GetVariableType(variableType, VariableType.VBT_NONE);
                 if (vbType == VariableType.VBT_NONE)
                     return false;
             }
+
+            if (!LockCType)
+            {
+                cType = GetCountType(valueType, countType);
+                if (cType == CountType.CT_NONE)
+                    return false;
+            }
+
             IsLocal = Char.IsLower(variableType);
 
             m_Value = value;
@@ -685,10 +704,26 @@ namespace YBehavior.Editor.Core
                 return false;
 
             cType = ctype;
+            if (cType == CountType.CT_NONE)
+            {
+                cType = CountType.CT_SINGLE;
+                LockCType = false;
+            }
+            else
+            {
+                LockCType = true;
+            }
 
             vbType = vbtype;
             if (vbType == VariableType.VBT_NONE)
-                return false;
+            {
+                vbType = VariableType.VBT_Const;
+                LockVBType = false;
+            }
+            else
+            {
+                LockVBType = true;
+            }
 
             IsLocal = isLocal;
 
@@ -715,6 +750,7 @@ namespace YBehavior.Editor.Core
             v.m_bIsLocal = m_bIsLocal;
             v.m_DisplayValue = m_DisplayValue;
             v.LockVBType = LockVBType;
+            v.LockCType = LockCType;
             v.m_bCanbeRemoved = m_bCanbeRemoved;
             v.m_bInited = m_bInited;
             v.m_Params = m_Params;

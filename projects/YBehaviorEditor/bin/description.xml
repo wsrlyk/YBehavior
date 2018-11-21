@@ -36,9 +36,9 @@
                         <Source Content="源值"/>
                 </SetArray>
                 <Random Content="随机器">
-                        <Opl Content="保存计算结果"/>
-                        <Opr1 Content="最小值，闭区间"/>
-                        <Opr2 Content="最大值，开区间"/>
+                        <Target Content="保存计算结果"/>
+                        <Bound1 Content="最小值，闭区间"/>
+                        <Bound2 Content="最大值，开区间"/>
                 </Random>
                 <RandomSelect Content="随机选一个">
                         <Input Content="输入"/>
