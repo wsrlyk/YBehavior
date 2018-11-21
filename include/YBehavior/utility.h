@@ -172,7 +172,7 @@ namespace YBehavior
 
 #define DEFAULT_DECLARE(type)\
 	template<>\
-	static const type& Utility::Default();
+	const type& Utility::Default();
 
 	FOR_EACH_TYPE(DEFAULT_DECLARE);
 }
