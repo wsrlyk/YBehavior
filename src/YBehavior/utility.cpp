@@ -6,13 +6,20 @@
 namespace YBehavior
 {
 
+	const INT Utility::IntEmpty(0);
+	const FLOAT Utility::FloatEmpty(0.0f);
+	const BOOL Utility::BoolEmpty(Utility::FALSE_VALUE);
+	const ULONG Utility::UlongEmpty(0);
 	const STRING Utility::StringEmpty("");
+	const EntityWrapper Utility::EntityWrapperEmpty;
+	const Vector3 Utility::Vector3Empty;
 	const VecInt Utility::VecIntEmpty;
 	const VecFloat Utility::VecFloatEmpty;
 	const VecBool Utility::VecBoolEmpty;
 	const VecString Utility::VecStringEmpty;
 	const VecUlong Utility::VecUlongEmpty;
 	const VecVector3 Utility::VecVector3Empty;
+	const VecEntityWrapper Utility::VecEntityWrapperEmpty;
 
 	const char Utility::POINTER_CHAR = 'P';
 	const char Utility::CONST_CHAR = 'C';
@@ -163,4 +170,11 @@ namespace YBehavior
 		std::uniform_int_distribution<Int> dist(small, large);
 		return dist(mt);
 	}
+
+#define DEFAULT_DEFINE(type)\
+	template<>\
+	static const type& Utility::Default() { return Utility::##type##Empty; }
+
+	FOR_EACH_TYPE(DEFAULT_DEFINE)
+
 }

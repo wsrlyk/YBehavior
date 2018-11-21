@@ -7,19 +7,47 @@
 #include <random>
 namespace YBehavior
 {
+#define FOR_EACH_SINGLE_NORMAL_TYPE(func)	\
+	func(Int);	\
+	func(Ulong);	\
+	func(Bool);	\
+	func(Float);	\
+	func(String);	\
+	func(Vector3);	\
+	func(EntityWrapper);	
+#define FOR_EACH_VECTOR_NORMAL_TYPE(func)	\
+	func(VecInt);\
+	func(VecUlong);\
+	func(VecBool);\
+	func(VecFloat);\
+	func(VecString);\
+	func(VecVector3);\
+	func(VecEntityWrapper);
+#define FOR_EACH_TYPE(func)    \
+    func(Int);    \
+    func(Ulong);    \
+    func(Bool);    \
+    func(Float);    \
+    func(String);    \
+    func(EntityWrapper);    \
+    func(Vector3);\
+    func(VecInt);\
+    func(VecUlong);\
+    func(VecBool);\
+    func(VecFloat);\
+    func(VecString);\
+    func(VecEntityWrapper);\
+    func(VecVector3);
+
 	class Utility
 	{
 	public:
 		static const char SequenceSpliter = '=';
 		static const char ListSpliter = '|';
 		static const char SpaceSpliter = ' ';
-		static const STRING StringEmpty;
-		static const VecInt VecIntEmpty;
-		static const VecFloat VecFloatEmpty;
-		static const VecBool VecBoolEmpty;
-		static const VecString VecStringEmpty;
-		static const VecUlong VecUlongEmpty;
-		static const VecVector3 VecVector3Empty;
+#define EMPTY_TYPES(T) static const T T##Empty;
+		FOR_EACH_TYPE(EMPTY_TYPES)
+
 		static const char POINTER_CHAR;
 		static const char CONST_CHAR;
 		static const BOOL TRUE_VALUE;
@@ -62,6 +90,9 @@ namespace YBehavior
 		static T Rand(const T& smallNum, const T& largeNum);
 
 		static UINT Hash(const STRING& str);
+
+		template<typename T>
+		static const T& Default() { return 0; }
 	private:
 		static std::random_device rd;
 		static std::default_random_engine mt;
@@ -138,6 +169,12 @@ namespace YBehavior
 	template<>
 	Bool Utility::Rand<Bool>(const Bool& smallNum, const Bool& largeNum);
 
+
+#define DEFAULT_DECLARE(type)\
+	template<>\
+	static const type& Utility::Default();
+
+	FOR_EACH_TYPE(DEFAULT_DECLARE);
 }
 
 #endif

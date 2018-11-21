@@ -16,6 +16,7 @@ namespace YBehavior
 		typedef typename IsVector<T>::ElementType ElementType;
 		SharedVariableEx()
 		{
+			m_Value = Utility::Default<T>();
 			m_VectorIndex = nullptr;
 			m_Key = Utility::INVALID_KEY;
 			m_IsLocal = false;

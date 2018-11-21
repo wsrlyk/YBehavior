@@ -276,7 +276,7 @@ namespace YBehavior
 	TYPEID BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
-
+		op = nullptr;
 		if (attrOptr.empty())
 		{
 			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << " in Node " << this->GetClassName() << ERROR_END;

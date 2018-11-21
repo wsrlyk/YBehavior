@@ -147,7 +147,7 @@ namespace YBehavior
 	TYPEID BehaviorNode::CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
-
+		op = nullptr;
 		if (attrOptr.empty())
 		{
 			if (variableType != Utility::POINTER_CHAR)
@@ -155,7 +155,7 @@ namespace YBehavior
 				op = new SharedVariableEx<T>();
 				m_Variables.push_back(op);
 #ifdef DEBUGGER
-				op->SetName(attrOptr.name());
+				op->SetName(attriName);
 #endif
 				return GetTypeID<T>();
 			}

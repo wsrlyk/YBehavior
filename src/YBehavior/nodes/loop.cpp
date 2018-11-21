@@ -88,7 +88,7 @@ namespace YBehavior
 
 	bool For::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data, ST_SINGLE);
+		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
 		if (!m_ExitWhenFailure)
 		{
 			return false;
@@ -204,8 +204,8 @@ namespace YBehavior
 
 	bool ForEach::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID collectionType = CreateVariable(m_Collection, "Collection", data, ST_ARRAY);
-		TYPEID currentType = CreateVariable(m_Current, "Current", data, ST_SINGLE);
+		TYPEID collectionType = CreateVariable(m_Collection, "Collection", data);
+		TYPEID currentType = CreateVariable(m_Current, "Current", data);
 		if (!Utility::IsElement(currentType, collectionType))
 		{
 			ERROR_BEGIN << "Types not match in ForEach: " << currentType << " and " << collectionType << ERROR_END;
@@ -227,12 +227,12 @@ namespace YBehavior
 
 	bool Loop::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID type = CreateVariable(m_Current, "Current", data, ST_SINGLE);
+		TYPEID type = CreateVariable(m_Current, "Current", data);
 		if (!m_Current)
 		{
 			return false;
 		}
-		type = CreateVariable(m_Count, "Count", data, ST_SINGLE);
+		type = CreateVariable(m_Count, "Count", data);
 		if (!m_Count)
 		{
 			return false;

@@ -63,13 +63,13 @@ namespace YBehavior
 
 	bool RandomSelect::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeIDArray = CreateVariable(m_Input, "Input", data, ST_ARRAY);
+		TYPEID typeIDArray = CreateVariable(m_Input, "Input", data);
 		if (m_Input == nullptr)
 		{
 			return false;
 		}
 
-		TYPEID typeID = CreateVariable(m_Output, "Output", data, ST_SINGLE);
+		TYPEID typeID = CreateVariable(m_Output, "Output", data);
 		if (!Utility::IsElement(typeID, typeIDArray))
 		{
 			ERROR_BEGIN << "RandomSelect types not match " << typeID << " and " << typeIDArray << ERROR_END;

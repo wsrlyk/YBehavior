@@ -7,38 +7,6 @@
 #include "YBehavior/interface.h"
 #include <unordered_map>
 
-#define FOR_EACH_SINGLE_NORMAL_TYPE(func)	\
-	func(Int);	\
-	func(Uint64);	\
-	func(Bool);	\
-	func(Float);	\
-	func(String);	\
-	func(Vector3);	\
-	func(EntityWrapper);	
-#define FOR_EACH_VECTOR_NORMAL_TYPE(func)	\
-	func(VecInt);\
-	func(VecUint64);\
-	func(VecBool);\
-	func(VecFloat);\
-	func(VecString);\
-	func(VecVector3);\
-	func(VecEntityWrapper);
-#define FOR_EACH_TYPE(func)    \
-    func(Int);    \
-    func(Uint64);    \
-    func(Bool);    \
-    func(Float);    \
-    func(String);    \
-    func(EntityWrapper);    \
-    func(Vector3);\
-    func(VecInt);\
-    func(VecUint64);\
-    func(VecBool);\
-    func(VecFloat);\
-    func(VecString);\
-    func(VecEntityWrapper);\
-    func(VecVector3);
-
 namespace YBehavior
 {
 	template<typename K, typename T>

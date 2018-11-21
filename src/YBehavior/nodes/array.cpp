@@ -7,7 +7,7 @@ namespace YBehavior
 
 	bool GetArrayLength::OnLoaded(const pugi::xml_node& data)
 	{
-		CreateVariable(m_Array, "Array", data, ST_ARRAY);
+		CreateVariable(m_Array, "Array", data);
 		if (m_Array == nullptr)
 		{
 			return false;
@@ -40,7 +40,7 @@ namespace YBehavior
 
 	bool ClearArray::OnLoaded(const pugi::xml_node& data)
 	{
-		CreateVariable(m_Array, "Array", data, ST_ARRAY);
+		CreateVariable(m_Array, "Array", data);
 		if (m_Array == nullptr)
 		{
 			return false;
@@ -56,13 +56,13 @@ namespace YBehavior
 
 	bool ArrayPushElement::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeIDArray = CreateVariable(m_Array, "Array", data, ST_ARRAY);
+		TYPEID typeIDArray = CreateVariable(m_Array, "Array", data);
 		if (m_Array == nullptr)
 		{
 			return false;
 		}
 
-		TYPEID typeID = CreateVariable(m_Element, "Element", data, ST_SINGLE);
+		TYPEID typeID = CreateVariable(m_Element, "Element", data);
 		if (!Utility::IsElement(typeID, typeIDArray))
 		{
 			ERROR_BEGIN << "ArrayPushElement types not match " << typeID << " and " << typeIDArray << ERROR_END;
