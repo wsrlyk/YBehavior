@@ -118,13 +118,13 @@ namespace YBehavior
 		template<typename T>
 		bool GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T& outValue);
 
-		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, SingleType single, char variableType = 0);
+		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0);
 		template <typename T> 
 		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0);
-		TYPEID _CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, SingleType single, char variableType);
+		TYPEID _CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, char variableType);
 		///>
 		/// single: 1, single; 0, vector; -1, dont care
-		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single = ST_NONE, char variableType = 0);
+		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, char variableType = 0);
 		RunningContext* _CreateRC() const;
 		void _TryDeleteRC();
 		void _TryPushRC(AgentPtr agent);
@@ -165,7 +165,7 @@ namespace YBehavior
 		}
 
 		ISharedVariableEx* pTemp = nullptr;
-		TYPEID typeID = _CreateVariable(pTemp, attrOptr, data, GetTypeID<T>() < 100 ? ST_SINGLE : ST_ARRAY, variableType);
+		TYPEID typeID = _CreateVariable(pTemp, attrOptr, data, variableType);
 		if (typeID == GetTypeID<T>())
 		{
 			op = (SharedVariableEx<T>*)pTemp;

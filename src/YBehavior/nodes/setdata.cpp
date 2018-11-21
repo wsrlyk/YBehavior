@@ -12,14 +12,14 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		TYPEID leftType = CreateVariable(m_Opl, "Target", data, ST_SINGLE, Utility::POINTER_CHAR);
+		TYPEID leftType = CreateVariable(m_Opl, "Target", data, Utility::POINTER_CHAR);
 		if (leftType == Utility::INVALID_TYPE)
 		{
 			ERROR_BEGIN << "Invalid type for Opl in SetData: " << leftType << ERROR_END;
 			return false;
 		}
 		///> Right
-		TYPEID rightType = CreateVariable(m_Opr, "Source", data, ST_SINGLE);
+		TYPEID rightType = CreateVariable(m_Opr, "Source", data);
 		if (leftType != rightType)
 		{
 			ERROR_BEGIN << "Different types:  " << leftType << " and " << rightType << ERROR_END;
@@ -41,14 +41,14 @@ namespace YBehavior
 	bool SetArray::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Left
-		TYPEID leftType = CreateVariable(m_Opl, "Target", data, ST_ARRAY, Utility::POINTER_CHAR);
+		TYPEID leftType = CreateVariable(m_Opl, "Target", data, Utility::POINTER_CHAR);
 		if (leftType == Utility::INVALID_TYPE)
 		{
 			ERROR_BEGIN << "Invalid type for Target in SetArray: " << leftType << ERROR_END;
 			return false;
 		}
 		///> Right
-		TYPEID rightType = CreateVariable(m_Opr, "Source", data, ST_ARRAY);
+		TYPEID rightType = CreateVariable(m_Opr, "Source", data);
 		if (leftType != rightType)
 		{
 			ERROR_BEGIN << "Different types:  " << leftType << " and " << rightType << ERROR_END;

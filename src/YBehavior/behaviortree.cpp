@@ -273,7 +273,7 @@ namespace YBehavior
 		return buffer[1];
 	}
 
-	TYPEID BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, SingleType single, char variableType)
+	TYPEID BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 
@@ -282,13 +282,13 @@ namespace YBehavior
 			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << " in Node " << this->GetClassName() << ERROR_END;
 			return -1;
 		}
-		return _CreateVariable(op, attrOptr, data, single, variableType);
+		return _CreateVariable(op, attrOptr, data, variableType);
 	}
 
-	TYPEID BehaviorNode::_CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, SingleType single, char variableType)
+	TYPEID BehaviorNode::_CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, char variableType)
 	{
 		StdVector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, single, variableType))
+		if (!ParseVariable(attrOptr, data, buffer, ST_NONE, variableType))
 			return -1;
 
 		ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));

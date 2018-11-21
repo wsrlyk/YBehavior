@@ -17,21 +17,21 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = CreateVariable(m_Opl, "Target", data, ST_SINGLE, Utility::POINTER_CHAR);
+		m_DataType = CreateVariable(m_Opl, "Target", data, Utility::POINTER_CHAR);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right1
-		TYPEID dataType = CreateVariable(m_Opr1, "Bound1", data, ST_SINGLE);
+		TYPEID dataType = CreateVariable(m_Opr1, "Bound1", data);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right2
-		dataType = CreateVariable(m_Opr2, "Bound2", data, ST_SINGLE);
+		dataType = CreateVariable(m_Opr2, "Bound2", data);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
@@ -97,13 +97,13 @@ namespace YBehavior
 
 	bool MessUp::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeIDInput = CreateVariable(m_Input, "Input", data, ST_ARRAY);
+		TYPEID typeIDInput = CreateVariable(m_Input, "Input", data);
 		if (m_Input == nullptr)
 		{
 			return false;
 		}
 
-		TYPEID typeIDOutput = CreateVariable(m_Output, "Output", data, ST_ARRAY, Utility::POINTER_CHAR);
+		TYPEID typeIDOutput = CreateVariable(m_Output, "Output", data, Utility::POINTER_CHAR);
 		if (typeIDOutput != typeIDInput)
 		{
 			ERROR_BEGIN << "Permulation types not match " << typeIDOutput << " and " << typeIDInput << ERROR_END;
