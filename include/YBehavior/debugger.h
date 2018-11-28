@@ -62,7 +62,7 @@ namespace YBehavior
 	class DebugHelper;
 	class DebugMgr: public Singleton<DebugMgr>
 	{
-		UINT m_TargetAgent;
+		UINT64 m_TargetAgent;
 		//UINT m_TargetHash;
 		STRING m_TargetTree;
 		bool m_bTargetDirty = false;
@@ -85,10 +85,11 @@ namespace YBehavior
 		void Stop();
 		bool IsValidTarget(Agent* pAgent, BehaviorTree* pTree);
 		inline const STRING& GetTargetTree() { return m_TargetTree; }
-		inline UINT GetTargetAgent() { return m_TargetAgent; }
+		inline UINT64 GetTargetAgent() { return m_TargetAgent; }
 		inline const std::list<NodeRunInfo*>& GetRunInfos() { return m_RunInfos; }
 		bool HasBreakPoint(const STRING& treeName, UINT nodeUID);
 		bool HasLogPoint(const STRING& treeName, UINT nodeUID);
+		bool HasDebugPoint(const STRING& treeName, UINT nodeUID);
 		void ClearTreeDebugInfo() { m_TreeDebugInfo.clear(); }
 		void AddBreakPoint(const STRING& treeName, UINT nodeUID);
 		void AddLogPoint(const STRING& treeName, UINT nodeUID);
@@ -130,6 +131,7 @@ namespace YBehavior
 		void SetResult(NodeState state);
 		void TestBreaking();
 		bool HasLogPoint();
+		bool HasDebugPoint();
 		void Breaking();
 		void SetBreak();
 	public:

@@ -60,7 +60,7 @@ namespace YBehavior
 
 		if (m_bTargetDirty)
 		{
-			if (m_TargetAgent == 0 || m_TargetAgent == pAgent->GetUID())
+			if (m_TargetAgent == 0 || m_TargetAgent == pAgent->GetDebugUID())
 			{
 				if (pAgent->GetTree()->GetTreeName() == m_TargetTree)
 				{
@@ -97,13 +97,13 @@ namespace YBehavior
 						}
 						else
 						{
-							LOG_BEGIN << "Agent " << pAgent->GetUID() <<"with tree " << pCurTree->GetTreeName() << " has diffrent VERSION of tree with Editor" << LOG_END;
+							LOG_BEGIN << "Agent " << pAgent->GetDebugUID() <<"with tree " << pCurTree->GetTreeName() << " has diffrent VERSION of tree with Editor" << LOG_END;
 							return false;
 						}
 					}
 
 					m_bTargetDirty = false;
-					m_TargetAgent = pAgent->GetUID();
+					m_TargetAgent = pAgent->GetDebugUID();
 					return true;
 				}
 				else
@@ -123,7 +123,7 @@ namespace YBehavior
 		}
 		else
 		{
-			return m_TargetAgent == pAgent->GetUID();
+			return m_TargetAgent == pAgent->GetDebugUID();
 		}
 	}
 
@@ -147,6 +147,17 @@ namespace YBehavior
 		if (it2 == it->second.DebugPointInfos.end())
 			return false;
 		return it2->second.HasLogPoint();
+	}
+
+	bool DebugMgr::HasDebugPoint(const STRING& treeName, UINT nodeUID)
+	{
+		auto it = m_TreeDebugInfo.find(treeName);
+		if (it == m_TreeDebugInfo.end())
+			return false;
+		auto it2 = it->second.DebugPointInfos.find(nodeUID);
+		if (it2 == it->second.DebugPointInfos.end())
+			return false;
+		return !it2->second.NoDebugPoint();
 	}
 
 	void DebugMgr::AddBreakPoint(const STRING& treeName, UINT nodeUID)
@@ -436,6 +447,13 @@ namespace YBehavior
 		if (!IsValid())
 			return false;
 		return DebugMgr::Instance()->HasLogPoint(m_pNode->GetRoot()->GetTreeName(), m_pRunInfo->nodeUID);
+	}
+
+	bool DebugHelper::HasDebugPoint()
+	{
+		if (!IsValid())
+			return false;
+		return DebugMgr::Instance()->HasDebugPoint(m_pNode->GetRoot()->GetTreeName(), m_pRunInfo->nodeUID);
 	}
 
 	void DebugHelper::SetBreak()

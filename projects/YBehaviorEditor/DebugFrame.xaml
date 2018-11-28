@@ -20,7 +20,7 @@
             <Border BorderBrush="Blue" BorderThickness="1">
                 <StackPanel Orientation="Horizontal">
                     <Button Name="btnDebugThisTree" Click="btnDebugThisTree_Click">DebugThisAgentID:</Button>
-                    <TextBox Name="debugAgentUID" Text="0" Width="50"/>
+                    <TextBox Name="debugAgentUID" Text="0" Width="150" MaxLines="1"/>
                 </StackPanel>
             </Border>
             <Button Name="btnContinue" Click="btnContinue_Click">Continue</Button>

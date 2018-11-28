@@ -26,8 +26,8 @@ namespace YBehavior
 
 	class YBEHAVIOR_API Agent
 	{
-		static UINT s_UID;
-		Uint m_UID;
+		static UINT64 s_UID;
+		UINT64 m_UID;
 
 		Memory* m_Memory;
 		//SharedDataEx* m_SharedData;
@@ -50,7 +50,8 @@ namespace YBehavior
 		void Tick();
 
 		void ProcessRegister();
-		inline UINT GetUID() { return m_UID; }
+		inline UINT64 GetUID() { return m_UID; }
+		virtual UINT64 GetDebugUID() { return GetUID(); }
 		RunningContext* PopRC();
 		void PushRC(RunningContext* context);
 		void ClearRC();

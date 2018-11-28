@@ -61,7 +61,7 @@ namespace YBehavior
 #ifdef DEBUGGER
 	bool BehaviorNode::_HasLogPoint()
 	{
-		return m_pDebugHelper && m_pDebugHelper->HasLogPoint();
+		return m_pDebugHelper && m_pDebugHelper->HasDebugPoint();
 	}
 
 	void BehaviorNode::_LogSharedData(ISharedVariableEx* pVariable, bool bIsBefore)

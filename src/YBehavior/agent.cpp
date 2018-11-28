@@ -7,7 +7,7 @@
 #include "YBehavior/runningcontext.h"
 #include "YBehavior/memory.h"
 
-YBehavior::UINT YBehavior::Agent::s_UID = 0;
+YBehavior::UINT64 YBehavior::Agent::s_UID = 0;
 
 YBehavior::RegisterData* YBehavior::Agent::GetRegister()
 {
