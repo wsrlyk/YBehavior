@@ -454,7 +454,7 @@ namespace YBehavior.Editor.Core
                 StringBuilder sb = new StringBuilder();
                 sb.Append(_ctype).Append(_vtype).Append(_vbtype).Append(' ').Append(Value);
 
-                if (m_VectorIndex != null)
+                if (m_bVectorIndexEnabled && m_VectorIndex != null)
                 {
                     sb.Append(" VI ").Append(GetVariableChar(m_VectorIndex.vbType, CONST, m_VectorIndex.IsLocal)).Append(' ').Append(m_VectorIndex.Value);
                 }

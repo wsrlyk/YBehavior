@@ -237,14 +237,14 @@ namespace YBehavior.Editor.Core
 
             if (!bench.CheckError())
             {
-                LogMgr.Instance.Error("Something wrong in tree. Save Failed.");
+                LogMgr.Instance.Error("Something wrong in tree.");
                 ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
                 {
-                    Content = "Saved Failed.",
+                    Content = "Saved With Errors.",
                     TipType = ShowSystemTipsArg.TipsType.TT_Error,
                 };
                 EventMgr.Instance.Send(showSystemTipsArg);
-                return -2;
+                //return -2;
             }
 
             bool bNewFile = false;
