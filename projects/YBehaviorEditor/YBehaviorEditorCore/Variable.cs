@@ -378,7 +378,7 @@ namespace YBehavior.Editor.Core
                 {
                     if (vbType == VariableType.VBT_Pointer)
                     {
-                        if (cType == CountType.CT_SINGLE && m_VectorCandidates.Contains(m_Value))
+                        if (cType == CountType.CT_SINGLE && m_VectorCandidates.Contains(DisplayValue))
                         {
                             if (m_VectorIndex == null)
                             {
