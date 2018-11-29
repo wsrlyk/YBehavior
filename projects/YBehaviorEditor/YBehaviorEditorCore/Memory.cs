@@ -5,6 +5,14 @@ using System.Text;
 
 namespace YBehavior.Editor.Core
 {
+    public class TreeVariable : Variable
+    {
+        public TreeVariable(IVariableDataSource source) : base(source)
+        {
+
+        }
+    }
+
     public class TreeMemory : IVariableCollection
     {
         protected Node m_Owner;
@@ -32,16 +40,17 @@ namespace YBehavior.Editor.Core
         {
             if (!VariableCollection.IsValidVariableName(name))
                 return false;
-            Variable v = new Variable(m_Owner);
+            TreeVariable v = new TreeVariable(m_Owner);
+            v.vTypeSet.AddRange(Variable.CreateParams_AllTypes);
             if (!v.SetVariableInNode(value, name))
                 return false;
 
             v.LockVBType = true;
-            v.LockCType = true;
+            v.LockCType = false;
             v.CanBeRemoved = true;
 
-            if (!v.CheckValid())
-                return false;
+            //if (!v.CheckValid())
+            //    return false;
 
             return AddVariable(v);
         }
@@ -53,16 +62,17 @@ namespace YBehavior.Editor.Core
             Variable v;
             using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
             {
-                v = new Variable(m_Owner);
+                v = new TreeVariable(m_Owner);
+                v.vTypeSet.AddRange(Variable.CreateParams_AllTypes);
                 if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, isLocal, value, null, name))
                     return false;
 
                 v.LockVBType = true;
-                v.LockCType = true;
+                v.LockCType = false;
                 v.CanBeRemoved = true;
 
-                if (!v.CheckValid())
-                    return false;
+                //if (!v.CheckValid())
+                //    return false;
 
                 bool res = AddVariable(v);
                 if (!res)
@@ -249,7 +259,11 @@ namespace YBehavior.Editor.Core
             {
                 v.LockVBType = false;
             }
-            v.LockCType = true;
+
+            if (m_bIsCore)
+                v.LockCType = false;
+            else
+                v.LockCType = true;
 
             v.CanBeRemoved = true;
             v.IsInput = bIsInput;
@@ -283,7 +297,10 @@ namespace YBehavior.Editor.Core
                     v.LockVBType = true;
                 else
                     v.LockVBType = false;
-                v.LockCType = true;
+                if (m_bIsCore)
+                    v.LockCType = false;
+                else
+                    v.LockCType = true;
 
                 v.CanBeRemoved = true;
                 v.IsInput = bIsInput;

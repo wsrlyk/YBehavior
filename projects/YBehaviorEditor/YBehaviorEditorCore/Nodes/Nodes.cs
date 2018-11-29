@@ -1204,53 +1204,6 @@ namespace YBehavior.Editor.Core
         }
     }
 
-    class SetArrayNode : LeafNode
-    {
-        public override string Icon => "[x]<<[y]";
-
-        public SetArrayNode()
-        {
-            m_Name = "SetArray";
-            m_Type = NodeType.NT_Default;
-            m_Hierachy = NodeHierachy.NH_DefaultAction;
-
-        }
-
-        public override void CreateVariables()
-        {
-            Variable opl = NodeMemory.CreateVariable(
-                "Target",
-                "",
-                Variable.CreateParams_AllTypes,
-                Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Pointer,
-                1
-            );
-
-            Variable opr = NodeMemory.CreateVariable(
-                "Source",
-                "",
-                Variable.CreateParams_AllTypes,
-                Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_NONE,
-                1
-            );
-        }
-
-        public override string Note
-        {
-            get
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} << {1}",
-                    Variables.GetVariable("Target").NoteValue,
-                    Variables.GetVariable("Source").NoteValue
-                    );
-                return sb.ToString();
-            }
-        }
-    }
-
     class ClearArrayNode : LeafNode
     {
         public override string Icon => "[ ]";

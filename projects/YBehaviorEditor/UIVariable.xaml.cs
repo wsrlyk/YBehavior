@@ -98,5 +98,20 @@ namespace YBehavior.Editor
 
             v.cType = v.cType == Core.Variable.CountType.CT_LIST ? Core.Variable.CountType.CT_SINGLE : Core.Variable.CountType.CT_LIST;
         }
+
+        public static readonly DependencyProperty CandidatesResetProperty =
+            DependencyProperty.Register("CandidatesReset",
+            typeof(bool), typeof(UIVariable), new FrameworkPropertyMetadata(CandidatesReset_PropertyChanged));
+        private static void CandidatesReset_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            UIVariable v = (UIVariable)d;
+            v.VPointer.SelectedIndex = -1;
+        }
+
+        public bool CandidatesReset
+        {
+            get { return (bool)GetValue(CandidatesResetProperty); }
+            set { SetValue(CandidatesResetProperty, value); }
+        }
     }
 }

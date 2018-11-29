@@ -21,8 +21,14 @@
                         <!--<StackPanel DockPanel.Dock="Top">
                         <TextBlock Name="Type" Text ="{Binding Path=Datas.Count}" FontSize="14" Height="25"/>
                     </StackPanel>-->
-                        <TextBlock Text ="Shared Variables" FontSize="14" Height="20" DockPanel.Dock="Top" HorizontalAlignment="Center"/>
-                        <ScrollViewer VerticalScrollBarVisibility ="Auto">
+                        <Grid DockPanel.Dock="Top">
+                            <TextBlock Text ="Shared Variables" FontSize="14" Height="20" HorizontalAlignment="Left" Margin="40,0,0,0"/>
+                            <TextBox Name="NewSharedVariableName" HorizontalAlignment="Right" Width="80" Margin="0,0,20,0"/>
+                            <Button HorizontalAlignment="Right" Width="20" Click="AddSharedVariable_Click">
+                                +
+                            </Button>
+                        </Grid>
+                        <ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
                             <ItemsControl Name="SharedContainer" ItemsSource="{Binding SharedMemory.Datas}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -42,8 +48,14 @@
                         <!--<StackPanel DockPanel.Dock="Top">
                         <TextBlock Name="Type" Text ="{Binding Path=Datas.Count}" FontSize="14" Height="25"/>
                     </StackPanel>-->
-                        <TextBlock Text ="Local Variables" FontSize="14" Height="20" DockPanel.Dock="Top" HorizontalAlignment="Center"/>
-                        <ScrollViewer VerticalScrollBarVisibility ="Auto">
+                        <Grid DockPanel.Dock="Top">
+                            <TextBlock Text ="Local Variables" FontSize="14" Height="20" HorizontalAlignment="Left" Margin="45,0,0,0"/>
+                            <TextBox Name="NewLocalVariableName" HorizontalAlignment="Right" Width="80" Margin="0,0,20,0"/>
+                            <Button HorizontalAlignment="Right" Width="20" Click="AddLocalVariable_Click">
+                                +
+                            </Button>
+                        </Grid>
+                        <ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
                             <ItemsControl Name="LocalContainer" ItemsSource="{Binding LocalMemory.Datas}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -61,7 +73,7 @@
                     </DockPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Add" Width="60">
+            <!--<TabItem Header="Add" Width="60">
                 <StackPanel>
                     <Grid>
                         <TextBlock Text="Name" HorizontalAlignment="Left"/>
@@ -73,13 +85,13 @@
                     </Grid>
                     <Grid>
                         <TextBlock Text="Type" HorizontalAlignment="Left"/>
-                        <!--ComboBox Name="VType" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0" Width="150" SelectedIndex="0">
+                        --><!--ComboBox Name="VType" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0" Width="150" SelectedIndex="0">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}" FontSize="10"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
-                        </-->
+                        </--><!--
                         <ComboBox Name="VType" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0" Width="150" SelectedIndex="0">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -111,7 +123,7 @@
                         <RadioButton Name="IsInOutSelected" Margin="10, 0, 10, 0">InOut</RadioButton>
                     </StackPanel>
                 </StackPanel>
-            </TabItem>
+            </TabItem>-->
             <TabItem Header="InOut" Width="60">
                 <Grid Name="InOutPanel">
                     <Grid.RowDefinitions>
@@ -123,9 +135,13 @@
                         <TextBlock Name="Type" Text ="{Binding Path=Datas.Count}" FontSize="14" Height="25"/>
                     </StackPanel>-->
                         <Grid DockPanel.Dock="Top">
-                            <TextBlock Text ="Inputs" FontSize="14" Height="20" DockPanel.Dock="Top" HorizontalAlignment="Center"/>
+                            <TextBlock Text ="Inputs" FontSize="14" Height="20" HorizontalAlignment="Left" Margin="70,0,0,0"/>
+                            <TextBox Name="NewInputName" HorizontalAlignment="Right" Width="80" Margin="0,0,20,0"/>
+                            <Button HorizontalAlignment="Right" Width="20" Click="AddInput_Click">
+                                +
+                            </Button>
                         </Grid>
-                        <ScrollViewer VerticalScrollBarVisibility ="Auto">
+                        <ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
                             <ItemsControl Name="InputContainer" ItemsSource="{Binding InputMemory.Datas}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -146,9 +162,13 @@
                         <TextBlock Name="Type" Text ="{Binding Path=Datas.Count}" FontSize="14" Height="25"/>
                     </StackPanel>-->
                         <Grid DockPanel.Dock="Top">
-                            <TextBlock Text ="Outputs" FontSize="14" Height="20" DockPanel.Dock="Top" HorizontalAlignment="Center"/>
+                            <TextBlock Text ="Outputs" FontSize="14" Height="20" HorizontalAlignment="Left" Margin="70,0,0,0"/>
+                            <TextBox Name="NewOutputName" HorizontalAlignment="Right" Width="80" Margin="0,0,20,0"/>
+                            <Button HorizontalAlignment="Right" Width="20" Click="AddOutput_Click">
+                                +
+                            </Button>
                         </Grid>
-                        <ScrollViewer VerticalScrollBarVisibility ="Auto">
+                        <ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
                             <ItemsControl Name="OutputContainer" ItemsSource="{Binding OutputMemory.Datas}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>

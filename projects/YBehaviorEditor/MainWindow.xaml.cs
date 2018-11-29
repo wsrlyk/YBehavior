@@ -80,7 +80,10 @@ namespace YBehavior.Editor
                 case Key.V:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
-                    WorkBenchMgr.Instance.PasteCopiedToBench();
+                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
+                    {
+                        WorkBenchMgr.Instance.PasteCopiedToBench();
+                    }
                     break;
                 case Key.Z:
                     if (DebugMgr.Instance.IsDebugging())

@@ -168,6 +168,7 @@ namespace YBehavior.Editor.Core
                 command.NewType = m_vType;
 
                 RefreshCandidates();
+                SetValue(null, IsLocal);
                 _OnConditionChanged();
 
                 WorkBenchMgr.Instance.PushCommand(command);
@@ -190,11 +191,26 @@ namespace YBehavior.Editor.Core
                 RefreshCandidates();
                 SetValue(null, IsLocal);
                 OnPropertyChanged("cType");
+                CandidatesReset = !CandidatesReset;
                 _OnConditionChanged();
 
                 WorkBenchMgr.Instance.PushCommand(command);
             }
         }
+        /// <summary>
+        /// Only a trigger to UI, meaningless
+        /// </summary>
+        private bool m_bCandidatesReset;
+        public bool CandidatesReset
+        {
+            get { return m_bCandidatesReset; }
+            set
+            {
+                m_bCandidatesReset = value;
+                OnPropertyChanged("CandidatesReset");
+            }
+        }
+
         public VariableType vbType
         {
             get { return m_vbType; }
@@ -250,6 +266,13 @@ namespace YBehavior.Editor.Core
             if (SharedDataSource == null || SharedDataSource.SharedData == null || vbType != VariableType.VBT_Pointer)
             {
                 Candidates.Clear();
+
+                ///> It's shared data. should notify others to refresh candidates instead.
+                if (this is TreeVariable)
+                {
+                    SharedVariableChangedArg arg = new SharedVariableChangedArg();
+                    EventMgr.Instance.Send(arg);
+                }
             }
             //else if (m_bCandidatesDirty)
             else
@@ -360,6 +383,11 @@ namespace YBehavior.Editor.Core
         public void SetValue(string value, bool isLocal)
         {
             {
+                if (value == null && vbType == VariableType.VBT_Const)
+                {
+                    DefaultValueDic.TryGetValue(vType, out value);
+                }
+
                 ChangeVariableValueCommand command = new ChangeVariableValueCommand()
                 {
                     OldValue = m_Value,

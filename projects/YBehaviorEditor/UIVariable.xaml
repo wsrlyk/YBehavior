@@ -7,6 +7,12 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignWidth="400" DataContextChanged="UserControl_DataContextChanged">
+    <UserControl.Style>
+        <Style>
+            <Setter Property="local:UIVariable.CandidatesReset" Value="{Binding Path=CandidatesReset}" />
+            <!--<Setter Property="local:UINode.DebugConstant" Value="{Binding Path=DebugConstant}" />-->
+        </Style>
+    </UserControl.Style>
     <UserControl.Resources>
         <local:VariableValidColorConvertor x:Key="validConvertor"/>
         <local:VariableRefreshColorConvertor x:Key="refreshConvertor"/>
@@ -73,7 +79,7 @@
                 </Button>
             </StackPanel>
             <Grid>
-                <ComboBox IsEnabled="{Binding IsEditable}" SelectedItem="{Binding DisplayValue}" ItemsSource="{Binding Candidates}" x:Name="VPointer" MinWidth="110" MaxDropDownHeight ="150"
+                <ComboBox IsEnabled="{Binding IsEditable}" ItemsSource="{Binding Candidates}" SelectedItem="{Binding DisplayValue}" x:Name="VPointer" MinWidth="110" MaxDropDownHeight ="150"
                       Visibility="{Binding Path=IsChecked, ElementName=VBSwitcher, Converter={StaticResource visibilityConvertor}}" 
                       Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}">
                     <ComboBox.ItemsPanel>
