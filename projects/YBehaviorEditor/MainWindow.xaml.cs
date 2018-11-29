@@ -131,12 +131,10 @@ namespace YBehavior.Editor
                         EventMgr.Instance.Send(oArg);
                     }
                     break;
-                case Key.T:
+                case Key.F2:
                     ///> Test....
-                    //WorkBenchMgr.Instance.OpenAllRelated();
                     {
-                        MakeCenterArg oArg = new MakeCenterArg();
-                        EventMgr.Instance.Send(oArg);
+                        Console.Clear();
                     }
                     break;
             }

@@ -95,5 +95,10 @@ namespace YBehavior.Editor
         {
             MainWindow.ProcessKeyDown(Key.F7, ModifierKeys.None);
         }
+
+        private void btnClear_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.ProcessKeyDown(Key.F2, ModifierKeys.None);
+        }
     }
 }

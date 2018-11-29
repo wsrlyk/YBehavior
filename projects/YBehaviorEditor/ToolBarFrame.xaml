@@ -28,6 +28,9 @@
         <Button Name="btnCenter" Width="50" Click="btnCenter_Click">
             <TextBlock Text ="Center&#x0a;    F1"/>
         </Button>
+        <Button Name="btnClear" Width="50" Click="btnClear_Click">
+            <TextBlock Text ="Clear&#x0a;   F2"/>
+        </Button>
         <Button Name="btnFold" Width="50" Click="btnFold_Click">
             <TextBlock Text ="Fold&#x0a;  F7 "/>
         </Button>
