@@ -173,7 +173,13 @@ namespace YBehavior
 
 #define DEFAULT_DEFINE(type)\
 	template<>\
-	const type& Utility::Default() { return Utility::type##Empty; }
+	const type& Utility::Default() { return Utility::type##Empty; }\
+	template<>\
+	bool Utility::SetDefault(type& t)\
+	{\
+		t = Utility::type##Empty;\
+		return true;\
+	}
 
 	FOR_EACH_TYPE(DEFAULT_DEFINE)
 

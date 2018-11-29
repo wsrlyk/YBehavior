@@ -2,6 +2,7 @@
 #define _YBEHAVIOR_OBJECTPOOL_H_
 #include "YBehavior/types.h"
 #include <list>
+#include "YBehavior/utility.h"
 
 namespace YBehavior
 {
@@ -17,6 +18,7 @@ namespace YBehavior
 				return new T();
 			T* t = s_Pool.front();
 			s_Pool.pop_front();
+			Utility::SetDefault<T>(*t);
 			return t;
 		}
 

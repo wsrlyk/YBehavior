@@ -93,6 +93,8 @@ namespace YBehavior
 
 		template<typename T>
 		static const T& Default() { return 0; }
+		template<typename T>
+		static bool SetDefault(T& t) { return false; }
 	private:
 		static std::random_device rd;
 		static std::default_random_engine mt;
@@ -172,7 +174,9 @@ namespace YBehavior
 
 #define DEFAULT_DECLARE(type)\
 	template<>\
-	const type& Utility::Default();
+	const type& Utility::Default();\
+	template<>\
+	bool Utility::SetDefault(type& t);
 
 	FOR_EACH_TYPE(DEFAULT_DECLARE);
 }

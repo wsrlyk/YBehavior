@@ -288,6 +288,8 @@ namespace YBehavior
 	template<typename T>
 	bool SharedDataEx::Set(KEY key, const T* src)
 	{
+		if (src == nullptr)
+			return false;
 		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
 		DataArray<T>* parray = (DataArray<T>*)iarray;
 		return parray->Set(key, *src);
