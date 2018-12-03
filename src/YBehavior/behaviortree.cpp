@@ -11,8 +11,8 @@
 #endif
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/runningcontext.h"
 #include <string.h>
+#include "YBehavior/runningcontext.h"
 
 namespace YBehavior
 {
@@ -216,9 +216,13 @@ namespace YBehavior
 
 	YBehavior::RunningContext* BehaviorNode::_CreateRC() const
 	{
+		RunningContext* pRC;
 		if (m_ContextCreator)
-			return m_ContextCreator->NewRC();
-		return new RunningContext();
+			pRC = m_ContextCreator->NewRC();
+		else
+			pRC = ObjectPool<RunningContext>::Get();
+		pRC->Reset();
+		return pRC;
 	}
 
 	void BehaviorNode::TryCreateRC()
@@ -234,7 +238,10 @@ namespace YBehavior
 	{
 		if (m_RunningContext)
 		{
-			delete m_RunningContext;
+			if (m_ContextCreator)
+				m_ContextCreator->ReleaseRC(m_RunningContext);
+			else
+				ObjectPool<RunningContext>::Recycle(m_RunningContext);
 			m_RunningContext = nullptr;
 		}
 	}

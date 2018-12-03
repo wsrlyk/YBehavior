@@ -6,6 +6,7 @@
 #include "YBehavior/tools/meta.h"
 #include "YBehavior/interface.h"
 #include <unordered_map>
+#include "tools/objectpool.h"
 
 namespace YBehavior
 {
@@ -21,15 +22,20 @@ namespace YBehavior
 		typename DataArrayMapDef<KEY, T>::type::const_iterator m_It;
 		typename DataArrayMapDef<KEY, T>::type::const_iterator m_End;
 	public:
-		DataArrayIterator(typename DataArrayMapDef<KEY, T>::type::const_iterator begin, typename DataArrayMapDef<KEY, T>::type::const_iterator end)
-			: m_It(begin)
-			, m_End(end)
+		void Set(const typename DataArrayMapDef<KEY, T>::type::const_iterator& begin, const typename DataArrayMapDef<KEY, T>::type::const_iterator& end)
 		{
+			m_It = begin;
+			m_End = end;
 		}
 
 		bool IsEnd() override { return m_It == m_End; }
 		IDataArrayIterator& operator ++() override { ++m_It; return *this; }
 		const KEY Value() { return m_It->first; }
+
+		void Recycle() override
+		{
+			ObjectPool<DataArrayIterator<T>>::Recycle(this);
+		}
 	};
 
 	template<typename T>
@@ -51,7 +57,8 @@ namespace YBehavior
 		{
 			typename DataArrayMapDef<KEY, T>::type::const_iterator itBegin = m_Datas.begin();
 			typename DataArrayMapDef<KEY, T>::type::const_iterator itEnd = m_Datas.end();
-			DataArrayIterator<T>* innerIt = new DataArrayIterator<T>(itBegin, itEnd);
+			DataArrayIterator<T>* innerIt = ObjectPool<DataArrayIterator<T>>::Get();
+			innerIt->Set(itBegin, itEnd);
 			Iterator it(innerIt);
 			return std::move(it);
 		}
@@ -180,7 +187,7 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 
 #define MAX_TYPE_KEY 14
-
+#define DATAARRAY_ONETYPE_DEFINE(type) 		DataArray<type> m_Data##type;
 	class SharedDataEx
 	{
 	public:
@@ -192,9 +199,10 @@ namespace YBehavior
 	protected:
 		IDataArray* m_Datas[MAX_TYPE_KEY];
 
+		FOR_EACH_TYPE(DATAARRAY_ONETYPE_DEFINE)
 	public:
 		SharedDataEx();
-		SharedDataEx(SharedDataEx&& other);
+		SharedDataEx(const SharedDataEx& other);
 
 		~SharedDataEx();
 
@@ -251,7 +259,7 @@ namespace YBehavior
 
 
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(Int, 0);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(Uint64, 1);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(Ulong, 1);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(Bool, 2);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(Float, 3);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(String, 4);
@@ -259,7 +267,7 @@ namespace YBehavior
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(Vector3, 6);
 
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecInt, 7);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecUint64, 8);
+	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecUlong, 8);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecBool, 9);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecFloat, 10);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecString, 11);

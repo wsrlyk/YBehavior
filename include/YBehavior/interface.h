@@ -62,6 +62,7 @@ namespace YBehavior
 		virtual IDataArrayIterator& operator ++() { return *this; }
 		virtual const KEY Value() { return 0; }
 		virtual ~IDataArrayIterator(){}
+		virtual void Recycle() {}
 	};
 
 	class IDataArray
@@ -84,8 +85,12 @@ namespace YBehavior
 			~Iterator()
 			{
 				if (innerIter != nullptr)
-					delete innerIter;
+				{
+					innerIter->Recycle();
+					innerIter = nullptr;
+				}
 			}
+
 			bool IsEnd() override { return innerIter->IsEnd(); }
 			IDataArrayIterator& operator ++() override { ++(*innerIter); return *this; }
 			const KEY Value() override { return innerIter->Value(); }

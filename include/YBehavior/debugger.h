@@ -26,6 +26,14 @@ namespace YBehavior
 		StdVector<STRING> beforeInfo;
 		StdVector<STRING> afterInfo;
 		STRING otherInfo;
+
+		void Reset()
+		{
+			nodeUID = 0;
+			beforeInfo.clear();
+			afterInfo.clear();
+			otherInfo = Utility::StringEmpty;
+		}
 	};
 
 	struct SharedVariableInfo

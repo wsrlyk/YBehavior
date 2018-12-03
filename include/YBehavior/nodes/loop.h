@@ -22,6 +22,12 @@ namespace YBehavior
 		int LoopTimes = 0;
 
 		ForPhase Current = FP_Normal;
+	protected:
+		void _OnReset() override
+		{
+			LoopTimes = 0;
+			Current = FP_Normal;
+		}
 	};
 
 	class For : public CompositeNode

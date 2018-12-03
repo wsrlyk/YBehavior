@@ -12,6 +12,11 @@ namespace YBehavior
 	public:
 		///> -2: normal: -1: default; 0~size-1: cases
 		int Current = -2;
+	protected:
+		void _OnReset() override
+		{
+			Current = -2;
+		}
 	};
 
 	class SwitchCase : public CompositeNode

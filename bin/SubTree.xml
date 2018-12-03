@@ -4,6 +4,9 @@
     <Local a="_Ic 0" b="_Ic 0" />
     <Input Input="_Ip b" />
     <Output Output="_Ip b" />
-    <Node Class="Calculator" Pos="-6,-90" Operator="_EC MUL" Opl="_Ip b" Opr1="_Ip b" Opr2="_IC 2" />
+    <Node Class="Sequence" Pos="51,-87">
+      <Node Class="Wait" Pos="-101,141" TickCount="_IC 15" />
+      <Node Class="Calculator" Pos="217,142" Operator="_EC MUL" Opl="_Ip b" Opr1="_Ip b" Opr2="_IC 2" />
+    </Node>
   </Node>
 </SubTree>

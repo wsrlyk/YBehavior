@@ -247,7 +247,8 @@ namespace YBehavior
 
 		if (DebugMgr::Instance()->HasDebugPoint(pNode->GetRoot()->GetTreeName(), pNode->GetUID()))
 		{
-			m_pLogInfo = new NodeLogInfo();
+			m_pLogInfo = ObjectPool<NodeLogInfo>::Get();
+			m_pLogInfo->Reset();
 			pNode->GetDebugLogInfo().str("");
 		}
 	}
@@ -274,7 +275,7 @@ namespace YBehavior
 		}
 
 		if (m_pLogInfo)
-			delete m_pLogInfo;
+			ObjectPool<NodeLogInfo>::Recycle(m_pLogInfo);
 	}
 
 	void DebugHelper::_SendLogPoint()

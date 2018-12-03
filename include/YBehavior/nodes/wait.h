@@ -10,6 +10,11 @@ namespace YBehavior
 	{
 	public:
 		int Current = 0;
+	protected:
+		void _OnReset() override
+		{
+			Current = 0;
+		}
 	};
 	class Wait : public LeafNode
 	{
