@@ -44,10 +44,10 @@
                         <Input Content="输入"/>
                         <Output Content="输出"/>
                 </RandomSelect>
-                <MessUp Content="乱序">
+                <Shuffle Content="乱序">
                         <Input Content="输入"/>
                         <Output Content="输出"/>
-                </MessUp>
+                </Shuffle>
                 <AlwaysSuccess Content="总是返回成功"/>
                 <AlwaysFailure Content="总是返回失败"/>
                 <Invertor Content="运行并反转子节点的结果"/>

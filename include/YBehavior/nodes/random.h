@@ -37,10 +37,10 @@ namespace YBehavior
 		TYPEID m_DataType;
 	};
 
-	class MessUp : public LeafNode
+	class Shuffle : public LeafNode
 	{
 	public:
-		STRING GetClassName() const override { return "MessUp"; }
+		STRING GetClassName() const override { return "Shuffle"; }
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		NodeState Update(AgentPtr pAgent) override;

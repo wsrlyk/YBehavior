@@ -1332,13 +1332,13 @@ namespace YBehavior.Editor.Core
         }
     }
 
-    class MessUpNode : LeafNode
+    class ShuffleNode : LeafNode
     {
         public override string Icon => "[x]<??<[y]";
 
-        public MessUpNode()
+        public ShuffleNode()
         {
-            m_Name = "MessUp";
+            m_Name = "Shuffle";
             m_Type = NodeType.NT_Default;
             m_Hierachy = NodeHierachy.NH_DefaultAction;
 

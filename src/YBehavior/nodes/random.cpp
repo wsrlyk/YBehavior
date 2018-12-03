@@ -95,7 +95,7 @@ namespace YBehavior
 		return NS_SUCCESS;
 	}
 
-	bool MessUp::OnLoaded(const pugi::xml_node& data)
+	bool Shuffle::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID typeIDInput = CreateVariable(m_Input, "Input", data);
 		if (m_Input == nullptr)
@@ -114,7 +114,7 @@ namespace YBehavior
 		return true;
 	}
 
-	YBehavior::NodeState MessUp::Update(AgentPtr pAgent)
+	YBehavior::NodeState Shuffle::Update(AgentPtr pAgent)
 	{
 		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Input, true);
 
