@@ -37,11 +37,14 @@ namespace YBehavior
 	{
 		typename DataArrayMapDef<KEY, T>::type m_Datas;
 	public:
-		IDataArray * Clone() const override
+		void CloneFrom(const IDataArray* pOther) override
 		{
-			DataArray<T>* newArray = new DataArray<T>();
-			newArray->m_Datas = m_Datas;
-			return newArray;
+			if (pOther == nullptr)
+				return;
+
+			const DataArray<T>* other = static_cast<const DataArray<T>*>(pOther);
+
+			m_Datas = other->m_Datas;
 		}
 
 		Iterator Iter() const override
@@ -53,9 +56,12 @@ namespace YBehavior
 			return std::move(it);
 		}
 
-		void Merge(IDataArray* other, bool bOverride) override
+		void MergeFrom(const IDataArray* other, bool bOverride) override
 		{
-			DataArray<T>* otherArray = (DataArray<T>*) other;
+			if (other == nullptr)
+				return;
+
+			const DataArray<T>* otherArray = (const DataArray<T>*) other;
 			for (auto it = otherArray->m_Datas.begin(); it != otherArray->m_Datas.end(); ++it)
 			{
 				if (!bOverride)
@@ -67,7 +73,6 @@ namespace YBehavior
 					m_Datas.insert(std::make_pair<KEY, T>(std::move(key), std::move(val)));
 				}
 			}
-			typename DataArrayMapDef<KEY, T>::type::iterator it2; otherArray->m_Datas.end();
 		}
 
 		TYPEID TypeID() const override
@@ -195,9 +200,9 @@ namespace YBehavior
 
 		inline const IDataArray* GetDataArray(KEY typeKey) { return m_Datas[typeKey]; }
 
-		void Clone(const SharedDataEx& other);
+		void CloneFrom(const SharedDataEx& other);
 
-		void Merge(const SharedDataEx& other, bool bOverride);
+		void MergeFrom(const SharedDataEx& other, bool bOverride);
 
 		template<typename T>
 		bool Get(KEY key, T& res);

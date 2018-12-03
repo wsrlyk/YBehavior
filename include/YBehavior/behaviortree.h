@@ -258,7 +258,7 @@ namespace YBehavior
 		SharedDataEx* GetLocalData();
 		inline SharedDataEx* GetLocalDataIfExists() { return m_LocalData; }
 		//inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }
-		void CloneData(SharedDataEx& destination);
+		void CloneDataTo(SharedDataEx& destination);
 
 		void AddSubTree(BehaviorTree* sub) { m_SubTrees.push_back(sub); }
 		inline StdVector<BehaviorTree*>& GetSubTrees() { return m_SubTrees; }

@@ -245,7 +245,7 @@ namespace YBehavior
 		m_pRunInfo->runState = NS_RUNNING;
 		m_pRunInfo->tree = pNode->GetRoot();
 
-		if (DebugMgr::Instance()->HasLogPoint(pNode->GetRoot()->GetTreeName(), pNode->GetUID()))
+		if (DebugMgr::Instance()->HasDebugPoint(pNode->GetRoot()->GetTreeName(), pNode->GetUID()))
 		{
 			m_pLogInfo = new NodeLogInfo();
 			pNode->GetDebugLogInfo().str("");

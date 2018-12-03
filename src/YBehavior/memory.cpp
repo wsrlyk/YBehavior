@@ -16,8 +16,8 @@ namespace YBehavior
 		Owner = pTree;
 		if (pTree && pTree->GetLocalDataIfExists())
 		{
-			Data = new SharedDataEx();
-			Data->Clone(*pTree->GetLocalDataIfExists());
+			Data = ObjectPool<SharedDataEx>::Get();
+			Data->CloneFrom(*pTree->GetLocalDataIfExists());
 		}
 		else
 		{
@@ -39,8 +39,8 @@ namespace YBehavior
 		Owner = other.Owner;
 		if (other.Data)
 		{
-			Data = new SharedDataEx();
-			Data->Clone(*other.Data);
+			Data = ObjectPool<SharedDataEx>::Get();
+			Data->CloneFrom(*other.Data);
 		}
 		else
 		{
@@ -51,7 +51,7 @@ namespace YBehavior
 	StackInfo::~StackInfo()
 	{
 		if (Data)
-			delete Data;
+			ObjectPool<SharedDataEx>::Recycle(Data);;
 	}
 
 	Memory::Memory()

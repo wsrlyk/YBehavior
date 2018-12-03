@@ -411,9 +411,9 @@ namespace YBehavior
 		return m_LocalData;
 	}
 
-	void BehaviorTree::CloneData(SharedDataEx& destination)
+	void BehaviorTree::CloneDataTo(SharedDataEx& destination)
 	{
-		destination.Clone(*m_SharedData);
+		destination.CloneFrom(*m_SharedData);
 	}
 
 

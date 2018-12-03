@@ -24,7 +24,7 @@ bool YBehavior::Agent::SetTree(const STRING& name)
 	if (!m_Tree)
 		return false;
 	//m_Tree->CloneData(*m_SharedData);
-	m_Tree->CloneData(*m_Memory->GetMainData());
+	m_Tree->CloneDataTo(*m_Memory->GetMainData());
 	return true;
 	//TreeKeyMgr::Instance()->SetActiveTree(m_Tree->GetNameKeyMgr(), false);
 }
