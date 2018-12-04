@@ -122,6 +122,9 @@ namespace YBehavior
 	class Agent;
 	class DebugHelper
 	{
+		static unsigned s_Token;
+
+		unsigned m_Token;
 		Agent* m_Target;
 		BehaviorNode* m_pNode;
 		NodeRunInfo* m_pRunInfo;
@@ -138,6 +141,7 @@ namespace YBehavior
 		void CreateRunInfo();
 		void SetResult(NodeState state);
 		void TestBreaking();
+		void TestPause();
 		bool HasLogPoint();
 		bool HasDebugPoint();
 		void Breaking();

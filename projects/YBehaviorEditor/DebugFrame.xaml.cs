@@ -124,17 +124,17 @@ namespace YBehavior.Editor
 
         private void btnContinue_Click(object sender, RoutedEventArgs e)
         {
-            DebugMgr.Instance.Continue();
+            MainWindow.ProcessKeyDown(Key.F5, ModifierKeys.None);
         }
 
         private void btnStepInto_Click(object sender, RoutedEventArgs e)
         {
-            DebugMgr.Instance.StepInto();
+            MainWindow.ProcessKeyDown(Key.F11, ModifierKeys.None);
         }
 
         private void btnStepOver_Click(object sender, RoutedEventArgs e)
         {
-            DebugMgr.Instance.StepOver();
+            MainWindow.ProcessKeyDown(Key.F10, ModifierKeys.None);
         }
     }
 }

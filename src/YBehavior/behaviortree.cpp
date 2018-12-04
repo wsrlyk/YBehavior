@@ -132,6 +132,8 @@ namespace YBehavior
 		///> postprocessing
 #ifdef DEBUGGER
 		DEBUG_LOG_INFO(" Return" << " " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
+
+		dbgHelper.TestPause();
 		m_pDebugHelper = nullptr;
 #endif
 

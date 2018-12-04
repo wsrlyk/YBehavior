@@ -118,7 +118,7 @@ namespace YBehavior.Editor
                         break;
                     Core.SelectionMgr.Instance.TryToggleDisable();
                     break;
-                case Key.F11:
+                case Key.F6:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
                     Core.SelectionMgr.Instance.TryToggleCondition();
@@ -140,11 +140,35 @@ namespace YBehavior.Editor
                         Console.Clear();
                     }
                     break;
+                case Key.F5:
+                    {
+                        if (DebugMgr.Instance.IsDebugging())
+                            DebugMgr.Instance.Continue();
+                    }
+                    break;
+                case Key.F10:
+                    {
+                        if (DebugMgr.Instance.IsDebugging())
+                            DebugMgr.Instance.StepOver();
+                    }
+                    break;
+                case Key.F11:
+                    {
+                        if (DebugMgr.Instance.IsDebugging())
+                            DebugMgr.Instance.StepInto();
+                    }
+                    break;
             }
         }
         private void _KeyDown(object sender, KeyEventArgs e)
         {
-            ProcessKeyDown(e.Key, Keyboard.Modifiers);
+            Key key = e.Key;
+            if (e.Key == Key.System && e.SystemKey == Key.F10)
+            {
+                e.Handled = true;
+                key = Key.F10;
+            }
+            ProcessKeyDown(key, Keyboard.Modifiers);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

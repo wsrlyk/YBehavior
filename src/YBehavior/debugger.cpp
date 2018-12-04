@@ -227,6 +227,7 @@ namespace YBehavior
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////
 
+	unsigned DebugHelper::s_Token = 0;
 
 	DebugHelper::DebugHelper(Agent* pAgent, BehaviorNode* pNode)
 		: m_pLogInfo(nullptr)
@@ -251,6 +252,8 @@ namespace YBehavior
 			m_pLogInfo->Reset();
 			pNode->GetDebugLogInfo().str("");
 		}
+
+		m_Token = ++s_Token;
 	}
 
 	DebugHelper::~DebugHelper()
@@ -441,6 +444,19 @@ namespace YBehavior
 			Breaking();
 		else if (DebugMgr::Instance()->HasBreakPoint(m_pNode->GetRoot()->GetTreeName(), m_pRunInfo->nodeUID))
 			SetBreak();
+	}
+
+	void DebugHelper::TestPause()
+	{
+		if (!IsValid())
+			return;
+
+		///> No sub nodes have run. No need to pause
+		if (m_Token == s_Token)
+			return;
+
+		if (DebugMgr::Instance()->IsPaused())
+			Breaking();
 	}
 
 	bool DebugHelper::HasLogPoint()

@@ -83,7 +83,7 @@ namespace YBehavior.Editor
 
         private void btnCondition_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.ProcessKeyDown(Key.F11, ModifierKeys.None);
+            MainWindow.ProcessKeyDown(Key.F6, ModifierKeys.None);
         }
 
         private void btnCenter_Click(object sender, RoutedEventArgs e)
