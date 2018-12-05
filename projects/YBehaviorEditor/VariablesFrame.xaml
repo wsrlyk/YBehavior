@@ -62,7 +62,7 @@
                     <TextBox TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Text="{Binding Content}"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="InOut" Name="InOutTab" Width="80">
+            <TabItem Header="InOut" Name="InOutTab" Width="80" Visibility="Collapsed">
                 <Grid Name="InOutPanel">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20"/>
