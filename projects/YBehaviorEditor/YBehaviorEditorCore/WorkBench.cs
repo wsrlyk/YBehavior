@@ -280,7 +280,7 @@ namespace YBehavior.Editor.Core
                     Node childNode = NodeMgr.Instance.CreateNodeByName(attr.Value);
                     if (childNode == null)
                     {
-                        LogMgr.Instance.Error("Cant create node: " + chi.Name);
+                        LogMgr.Instance.Error("Cant create node: " + attr.Value);
                         return false;
                     }
 
