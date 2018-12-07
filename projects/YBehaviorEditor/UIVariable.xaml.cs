@@ -97,6 +97,7 @@ namespace YBehavior.Editor
                 return;
 
             v.cType = v.cType == Core.Variable.CountType.CT_LIST ? Core.Variable.CountType.CT_SINGLE : Core.Variable.CountType.CT_LIST;
+            _RefreshVType(v);
         }
 
         public static readonly DependencyProperty CandidatesResetProperty =
