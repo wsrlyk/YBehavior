@@ -189,10 +189,16 @@ namespace YBehavior.Editor.Core
                 SaveAndExport(bench);
 
         }
+
+        public static readonly int SaveResultFlag_None = 0;
+        public static readonly int SaveResultFlag_WithError = 1;
+        public static readonly int SaveResultFlag_NewFile = 1 << 1;
+        public static readonly int SaveResultFlag_Saved = 1 << 2;
+
         public int SaveAndExport(WorkBench bench = null)
         {
             int res = SaveWorkBench(bench);
-            if (res >= 0)
+            if ((res & SaveResultFlag_Saved) != 0)
             {
                 ExportWorkBench(bench);
 
@@ -204,22 +210,29 @@ namespace YBehavior.Editor.Core
 
                 WorkBenchSavedArg arg = new WorkBenchSavedArg()
                 {
-                    bCreate = res == 1,
+                    bCreate = (res & SaveResultFlag_NewFile) != 0,
                     Bench = bench
                 };
                 EventMgr.Instance.Send(arg);
 
-                ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
+                ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg();
+                if ((res & SaveResultFlag_WithError) != 0)
                 {
-                    Content = "Saved successfully.",
-                    TipType = ShowSystemTipsArg.TipsType.TT_Success,
-                };
+                    showSystemTipsArg.Content = "Saved with some errors.";
+                    showSystemTipsArg.TipType = ShowSystemTipsArg.TipsType.TT_Error;
+                }
+                else
+                {
+                    showSystemTipsArg.Content = "Saved successfully.";
+                    showSystemTipsArg.TipType = ShowSystemTipsArg.TipsType.TT_Success;
+                }
                 EventMgr.Instance.Send(showSystemTipsArg);
 
             }
 
             return res;
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -227,12 +240,13 @@ namespace YBehavior.Editor.Core
         /// <returns> 0: normal; 1: new file created; -1: cancel; -2: error</returns>
         public int SaveWorkBench(WorkBench bench = null)
         {
+            int res = SaveResultFlag_None;
             if (bench == null)
                 bench = ActiveWorkBench;
             if (bench == null)
             {
                 LogMgr.Instance.Error("Save Failed: bench == null");
-                return -2;
+                return res;
             }
 
             if (!bench.CheckError())
@@ -244,10 +258,8 @@ namespace YBehavior.Editor.Core
                     TipType = ShowSystemTipsArg.TipsType.TT_Error,
                 };
                 EventMgr.Instance.Send(showSystemTipsArg);
-                //return -2;
+                res |= SaveResultFlag_WithError;
             }
-
-            bool bNewFile = false;
 
             if (string.IsNullOrEmpty(bench.FilePath))
             {
@@ -260,11 +272,11 @@ namespace YBehavior.Editor.Core
                     bench.FileInfo.Path = sfd.FileName;
                     bench.FileInfo.Name = sfd.SafeFileName.Remove(sfd.SafeFileName.LastIndexOf(".xml"));
 
-                    bNewFile = true;
+                    res |= SaveResultFlag_NewFile;
                 }
                 else
                 {
-                    return -1;
+                    return res;
                 }
             }
             
@@ -277,7 +289,8 @@ namespace YBehavior.Editor.Core
             xmlDoc.Save(bench.FileInfo.Path);
 
             LogMgr.Instance.Log("Saved to " + bench.FileInfo.Path);
-            return bNewFile ? 1 : 0;
+            res |= SaveResultFlag_Saved;
+            return res;
         }
 
         public bool ExportWorkBench(WorkBench bench = null)

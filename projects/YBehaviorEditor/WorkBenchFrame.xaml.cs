@@ -213,7 +213,7 @@ namespace YBehavior.Editor
                     if (dr == MessageBoxResult.Yes)
                     {
                         int res = WorkBenchMgr.Instance.SaveAndExport(bench);
-                        if (res < 0)
+                        if ((res & WorkBenchMgr.SaveResultFlag_Saved) == 0)
                         {
                             return false;
                         }
