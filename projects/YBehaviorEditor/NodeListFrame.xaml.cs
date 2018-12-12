@@ -20,7 +20,7 @@ namespace YBehavior.Editor
     /// </summary>
     public partial class NodeListFrame : UserControl
     {
-        public class NodeInfo
+        public class NodeInfo : IComparable<NodeInfo>, IEquatable<NodeInfo>
         {
             private DelayableNotificationCollection<NodeInfo> m_children = new DelayableNotificationCollection<NodeInfo>();
             public DelayableNotificationCollection<NodeInfo> Children { get { return m_children; } }
@@ -38,6 +38,25 @@ namespace YBehavior.Editor
             {
                 get { return exp; }
                 set { exp = value; }
+            }
+
+            public int CompareTo(NodeInfo other)
+            {
+                if (other.bIsFolder == bIsFolder)
+                    return 0;
+                if (bIsFolder)
+                    return -1;
+                return 1;
+            }
+
+            /// <summary>
+            /// Just for sort
+            /// </summary>
+            /// <param name="other"></param>
+            /// <returns></returns>
+            public bool Equals(NodeInfo other)
+            {
+                return this == other;
             }
 
             ///> Folder
@@ -94,6 +113,15 @@ namespace YBehavior.Editor
                     child.Build(data, expandedItems);
                 }
             }
+
+            public void Sort()
+            {
+                m_children.Sort();
+                foreach (var i in m_children)
+                {
+                    i.Sort();
+                }
+            }
         }
 
         HashSet<string> m_ExpandedItems = new HashSet<string>();
@@ -122,6 +150,8 @@ namespace YBehavior.Editor
                     m_NodeInfos.Build(node, m_ExpandedItems);
                 }
             }
+
+            m_NodeInfos.Sort();
         }
 
         void _GetExpandedItems(ItemsControl items, HashSet<string> expandedItems)
