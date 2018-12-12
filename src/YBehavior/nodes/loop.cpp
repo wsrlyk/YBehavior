@@ -7,6 +7,7 @@ namespace YBehavior
 	NodeState For::Update(AgentPtr pAgent)
 	{
 		NodeState ns = NS_INVALID;
+		NodeState res = NS_SUCCESS;
 		ForPhase fp = FP_Normal;
 		int loopTimes = 0;
 
@@ -58,6 +59,7 @@ namespace YBehavior
 					if (bExit)
 					{
 						DEBUG_LOG_INFO("ExitWhenFailure at " << loopTimes << " times; ");
+						res = NS_FAILURE;
 						break;
 					}
 				}
@@ -72,7 +74,7 @@ namespace YBehavior
 			}
 		}
 
-		return NS_SUCCESS;
+		return res;
 	}
 
 	bool For::_CheckRunningNodeState(ForPhase current, NodeState ns, int looptimes)
@@ -185,7 +187,7 @@ namespace YBehavior
 					if (bExit)
 					{
 						DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetMemory()) << "; ");
-						return NS_SUCCESS;
+						return NS_FAILURE;
 					}
 					break;
 				}
@@ -281,7 +283,7 @@ namespace YBehavior
 					if (bExit)
 					{
 						DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetMemory()) << "; ");
-						return NS_SUCCESS;
+						return NS_FAILURE;
 					}
 					break;
 				}
