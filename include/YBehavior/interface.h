@@ -23,21 +23,19 @@ namespace YBehavior
 		inline bool IsLocal() { return m_IsLocal; }
 		virtual bool IsConst() = 0;
 #ifdef DEBUGGER
-		void SetReferenceName(const STRING& name)
-		{
-			m_ReferenceName = name;
-			if (IsLocal())
-			{
-				m_ReferenceName += "'";
-			}
-		}
+		inline void SetReferenceName(const STRING& name) { m_ReferenceName = name; }
 		void SetName(const STRING& name)
 		{
 			m_Name = name;
 			if (m_ReferenceName.size() > 0)
 			{
-				m_Name += "(";
-				m_Name += (m_ReferenceName + ")");
+				m_Name += " (";
+				m_Name += m_ReferenceName;
+				if (IsLocal())
+				{
+					m_ReferenceName += "'";
+				}
+				m_Name += ")";
 			}
 		}
 		inline const STRING& GetName() { return m_Name; }
