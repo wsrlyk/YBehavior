@@ -23,7 +23,14 @@ namespace YBehavior
 		inline bool IsLocal() { return m_IsLocal; }
 		virtual bool IsConst() = 0;
 #ifdef DEBUGGER
-		inline void SetName(const STRING& name) { m_Name = name; }
+		void SetName(const STRING& name) 
+		{
+			m_Name = name; 
+			if (IsLocal())
+			{
+				m_Name += "'";
+			}
+		}
 		inline const STRING& GetName() { return m_Name; }
 #endif
 		virtual void SetVectorIndex(const STRING& vbType, const STRING& s) { }

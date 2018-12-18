@@ -47,7 +47,7 @@ namespace YBehavior
 			m_VectorIndex->GetCastedValue(pMemory, index);
 			if (index < 0)
 			{
-				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << ERROR_END;
+				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << " at " << this->GetName() << ERROR_END;
 				return;
 			}
 			SharedDataEx* pData;
@@ -71,7 +71,7 @@ namespace YBehavior
 			m_VectorIndex->GetCastedValue(pMemory, index);
 			if (index < 0)
 			{
-				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << ERROR_END;
+				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << " at " << this->GetName() << ERROR_END;
 				return nullptr;
 			}
 			SharedDataEx* pData;
@@ -92,11 +92,11 @@ namespace YBehavior
 			}
 			if (pVector)
 			{
-				ERROR_BEGIN << "VectorIndex out of range: " << index << ", Total " << pVector->size() << ERROR_END;
+				ERROR_BEGIN << "VectorIndex out of range: " << index << ", Total " << pVector->size() << " at " << this->GetName() << ERROR_END;
 			}
 			else
 			{
-				ERROR_BEGIN << "Invalid SharedData: " << m_Key << ERROR_END;
+				ERROR_BEGIN << "Invalid SharedData: " << m_Key << " at " << this->GetName() << ERROR_END;
 			}
 			return nullptr;
 		}
@@ -183,7 +183,7 @@ namespace YBehavior
 			{
 				if ((INT)mValue->size() <= index)
 				{
-					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << ERROR_END;
+					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << " at " << this->GetName() << ERROR_END;
 					return nullptr;
 				}
 				else
@@ -204,7 +204,7 @@ namespace YBehavior
 			{
 				if ((INT)mValue->size() <= index)
 				{
-					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << ERROR_END;
+					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << " at " << this->GetName() << ERROR_END;
 				}
 				else
 				{
@@ -269,7 +269,7 @@ namespace YBehavior
 
 			if (key == Utility::INVALID_KEY)
 			{
-				ERROR_BEGIN << "Cant Get Key for " << s << " with typeid = " << GetTypeID<T>() << ERROR_END;
+				ERROR_BEGIN << "Cant Get Key for " << s << " with typeid = " << GetTypeID<T>() << " at " << this->GetName() << ERROR_END;
 			}
 			SetKey(key);
 		}
