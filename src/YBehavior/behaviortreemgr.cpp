@@ -63,11 +63,16 @@ namespace YBehavior
 	bool TreeMgr::_LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID, BehaviorTree* root)
 	{
 		if (node == nullptr)
+		{
+			ERROR_BEGIN << "NULL node when load " << data.name() << ", uid " << (parentUID + 1) << ERROR_END;
 			return false;
-
+		}
 		node->SetRoot(root);
 		if (!node->Load(data))
+		{
+			ERROR_BEGIN << "Failed when load " << data.name() << ", uid " << (parentUID + 1) << ERROR_END;
 			return false;
+		}
 		node->SetUID(++parentUID);
 		for (auto it = data.begin(); it != data.end(); ++it)
 		{
@@ -89,6 +94,7 @@ namespace YBehavior
 				auto connectionName = it->attribute("Connection");
 				if (!node->AddChild(childNode, connectionName.value()))
 				{
+					ERROR_BEGIN << "Failed when add child at " << connectionName.value() << ", uid " << (parentUID) << ERROR_END;
 					delete childNode;
 					return false;
 				}
@@ -99,7 +105,10 @@ namespace YBehavior
 			else
 			{
 				if (!node->LoadChild(*it))
+				{
+					ERROR_BEGIN << "Failed when load child (not node) " << it->name() << ", uid " << (parentUID) << ERROR_END;
 					return false;
+				}
 			}
 		}
 		node->LoadFinish();
