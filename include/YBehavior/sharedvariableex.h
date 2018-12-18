@@ -271,6 +271,7 @@ namespace YBehavior
 			{
 				ERROR_BEGIN << "Cant Get Key for " << s << " with typeid = " << GetTypeID<T>() << " at " << this->GetName() << ERROR_END;
 			}
+			m_ReferenceName = s;
 			SetKey(key);
 		}
 

@@ -321,7 +321,7 @@ namespace YBehavior
 				op->SetValueFromString(buffer[1]);
 
 #ifdef DEBUGGER
-			op->SetName(attrOptr.name());
+			op->SetName(this->GetClassName() + "." + attrOptr.name());
 #endif
 
 			return op->TypeID();

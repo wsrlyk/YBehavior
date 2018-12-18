@@ -23,12 +23,21 @@ namespace YBehavior
 		inline bool IsLocal() { return m_IsLocal; }
 		virtual bool IsConst() = 0;
 #ifdef DEBUGGER
-		void SetName(const STRING& name) 
+		void SetReferenceName(const STRING& name)
 		{
-			m_Name = name; 
+			m_ReferenceName = name;
 			if (IsLocal())
 			{
-				m_Name += "'";
+				m_ReferenceName += "'";
+			}
+		}
+		void SetName(const STRING& name)
+		{
+			m_Name = name;
+			if (m_ReferenceName.size() > 0)
+			{
+				m_Name += "(";
+				m_Name += (m_ReferenceName + ")");
 			}
 		}
 		inline const STRING& GetName() { return m_Name; }
@@ -59,6 +68,7 @@ namespace YBehavior
 		bool m_IsLocal;
 #ifdef DEBUGGER
 		STRING m_Name;
+		STRING m_ReferenceName;
 #endif
 	};
 
