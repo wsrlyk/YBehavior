@@ -358,7 +358,7 @@ namespace YBehavior
 			{
 				m_VectorIndex = new SharedVariableEx<INT>();
 				m_VectorIndex->SetKeyFromString(s);
-				op->SetIsLocal(Utility::IsLower(vbType[0]));
+				m_VectorIndex->SetIsLocal(Utility::IsLower(vbType[0]));
 			}
 			else if (t == Utility::CONST_CHAR)
 			{
