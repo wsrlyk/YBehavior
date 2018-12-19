@@ -33,7 +33,7 @@ namespace YBehavior
 				m_Name += m_ReferenceName;
 				if (IsLocal())
 				{
-					m_ReferenceName += "'";
+					m_Name += "'";
 				}
 				m_Name += ")";
 			}
