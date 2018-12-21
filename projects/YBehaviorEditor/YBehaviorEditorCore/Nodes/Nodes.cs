@@ -243,7 +243,7 @@ namespace YBehavior.Editor.Core
             Variable opl = NodeMemory.CreateVariable(
                 "Opl",
                 "0",
-                Variable.CreateParams_AllNumbers,
+                Variable.CreateParams_CalculatorTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
                 1
@@ -252,7 +252,7 @@ namespace YBehavior.Editor.Core
             Variable opr1 = NodeMemory.CreateVariable(
                 "Opr1",
                 "0",
-                Variable.CreateParams_AllNumbers,
+                Variable.CreateParams_CalculatorTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
                 1
@@ -261,7 +261,7 @@ namespace YBehavior.Editor.Core
             Variable opr2 = NodeMemory.CreateVariable(
                 "Opr2",
                 "0",
-                Variable.CreateParams_AllNumbers,
+                Variable.CreateParams_CalculatorTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
                 1

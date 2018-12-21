@@ -15,7 +15,7 @@ namespace YBehavior
 	};
 
 	//////////////////////////////////////////////////////////////////////////////////////////
-	static std::unordered_set<TYPEID> s_ValidTypes = { GetTypeID<Int>(), GetTypeID<Float>() };
+	static std::unordered_set<TYPEID> s_ValidTypes = { GetTypeID<Int>(), GetTypeID<Float>(), GetTypeID<String>()};
 
 	bool Calculator::OnLoaded(const pugi::xml_node& data)
 	{

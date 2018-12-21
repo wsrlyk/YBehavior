@@ -69,6 +69,15 @@ namespace YBehavior
 	private:
 		template<typename T>
 		static void _DoRandom(void* pLeft, const void* pRight0, const void* pRight1);
+
+		template<typename T>
+		static void _Add(const T& left, const T& right, T& output);
+		template<typename T>
+		static void _Sub(const T& left, const T& right, T& output);
+		template<typename T>
+		static void _Mul(const T& left, const T& right, T& output);
+		template<typename T>
+		static void _Div(const T& left, const T& right, T& output);
 	};
 
 	template<typename T>
@@ -149,16 +158,20 @@ namespace YBehavior
 		switch (op)
 		{
 		case YBehavior::OT_ADD:
-			left = right0 + right1;
+			_Add(right0, right1, left);
+			//left = right0 + right1;
 			break;
 		case YBehavior::OT_SUB:
-			left = right0 - right1;
+			_Sub(right0, right1, left);
+			//left = right0 - right1;
 			break;
 		case YBehavior::OT_MUL:
-			left = right0 * right1;
+			_Mul(right0, right1, left);
+			//left = right0 * right1;
 			break;
 		case YBehavior::OT_DIV:
-			left = right0 / right1;
+			_Div(right0, right1, left);
+			//left = right0 / right1;
 			break;
 		default:
 			return;
@@ -223,8 +236,29 @@ namespace YBehavior
 		////LOG_BEGIN << " => " << left << LOG_END;
 	}
 
-	template<>
-	void ValueHandler::Calculate<String>(void* pLeft, const void* pRight0, const void* pRight1, OperationType op);
+	template<typename T>
+	void ValueHandler::_Add(const T& left, const T& right, T& output)
+	{
+		output = left + right;
+	}
+
+	template<typename T>
+	void ValueHandler::_Sub(const T& left, const T& right, T& output)
+	{
+		output = left - right;
+	}
+
+	template<typename T>
+	void ValueHandler::_Mul(const T& left, const T& right, T& output)
+	{
+		output = left * right;
+	}
+
+	template<typename T>
+	void ValueHandler::_Div(const T& left, const T& right, T& output)
+	{
+		output = left / right;
+	}
 
 	template<>
 	void ValueHandler::Calculate<EntityWrapper>(void* pLeft, const void* pRight0, const void* pRight1, OperationType op);
@@ -241,6 +275,13 @@ namespace YBehavior
 
 	template<>
 	void ValueHandler::Random<Bool>(void* pLeft, const void* pRight0, const void* pRight1);
+
+	template<>
+	void ValueHandler::_Sub<String>(const String& left, const String& right, String& output);
+	template<>
+	void ValueHandler::_Mul<String>(const String& left, const String& right, String& output);
+	template<>
+	void ValueHandler::_Div<String>(const String& left, const String& right, String& output);
 
 	/////////////////////////////////////
 	/////////////////////////////////////
