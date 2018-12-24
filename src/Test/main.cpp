@@ -9,6 +9,7 @@
 #else
 #include <unistd.h>
 #endif
+#include "YBehavior/sharedvariablecreatehelper.h"
 
 int main(int argc, char** argv)
 {
@@ -44,6 +45,12 @@ int main(int argc, char** argv)
 	YB::EntityWrapper wrapper_1 = wrapper;
 
 	YBehavior::KEY f = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::INT>("b");
+	const YB::SharedVariableCreateHelperMgr::HelperMapType& maps = YB::SharedVariableCreateHelperMgr::GetAllHelpers();
+	for (auto it = maps.begin(); it != maps.end(); ++it)
+	{
+		if (it->second->TrySetSharedData(pEntity->GetAgent()->GetMemory()->GetMainData(), "a", "444"))
+			break;
+	}
 
 	unsigned long t1, t2;
 

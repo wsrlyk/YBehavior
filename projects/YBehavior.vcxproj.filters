@@ -308,5 +308,8 @@
     <ClCompile Include="..\src\YBehavior\tools\objectpool.cpp">
       <Filter>源文件\tools</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\YBehavior\SharedVariableCreateHelper.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
