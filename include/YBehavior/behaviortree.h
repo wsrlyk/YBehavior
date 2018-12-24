@@ -24,6 +24,15 @@ namespace YBehavior
 		NS_BREAK,
 		NS_RUNNING,
 	};
+
+	enum ReturnType
+	{
+		RT_DEFAULT,
+		RT_INVERT,
+		RT_SUCCESS,
+		RT_FAILURE,
+	};
+
 	enum SingleType
 	{
 		ST_NONE,
@@ -54,6 +63,7 @@ namespace YBehavior
 		BehaviorTree* m_Root;
 		RunningContext* m_RunningContext;
 		IContextCreator* m_ContextCreator;
+		ReturnType m_ReturnType;
 #ifdef DEBUGGER
 	protected:
 		std::stringstream m_DebugLogInfo;

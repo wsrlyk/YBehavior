@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <SubTree>
   <Node Class="Root" Pos="85,-251">
-    <Local a="_Ic 0" b="_Ic 0" />
+    <Local a="_Ic 0" b="_Ic 0" s="_Sc " />
     <Input Input="_Ip b" />
     <Output Output="_Ip b" />
     <Node Class="Sequence" Pos="51,-87">
       <Node Class="Wait" Pos="-101,141" TickCount="_IC 15" />
+      <Node Class="Calculator" Return="Invert" Pos="40,201" Operator="_EC ADD" Opl="_Sp s" Opr1="_Sp s" Opr2="_SC b" />
       <Node Class="Calculator" Pos="217,142" Operator="_EC MUL" Opl="_Ip b" Opr1="_Ip b" Opr2="_IC 2" />
     </Node>
   </Node>

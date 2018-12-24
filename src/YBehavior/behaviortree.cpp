@@ -40,6 +40,8 @@ namespace YBehavior
 		m_Condition = nullptr;
 		m_RunningContext = nullptr;
 		m_ContextCreator = nullptr;
+		m_Root = nullptr;
+		m_ReturnType = RT_DEFAULT;
 	}
 
 
@@ -131,17 +133,51 @@ namespace YBehavior
 
 		///> postprocessing
 #ifdef DEBUGGER
-		DEBUG_LOG_INFO(" Return" << " " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
+		DEBUG_LOG_INFO(" Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 
 		dbgHelper.TestPause();
 		m_pDebugHelper = nullptr;
 #endif
 
+		switch (m_ReturnType)
+		{
+		case YBehavior::RT_INVERT:
+			if (state == NS_SUCCESS)
+				state = NS_FAILURE;
+			else if (state == NS_FAILURE)
+				state = NS_SUCCESS;
+			DEBUG_LOG_INFO(", Force Invert to " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
+			break;
+		case YBehavior::RT_SUCCESS:
+			state = NS_SUCCESS;
+			DEBUG_LOG_INFO(", Force Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
+			break;
+		case YBehavior::RT_FAILURE:
+			state = NS_FAILURE;
+			DEBUG_LOG_INFO(", Force Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
+			break;
+		default:
+			break;
+		}
 		DEBUG_RETURN(dbgHelper, state);
 	}
 
 	bool BehaviorNode::Load(const pugi::xml_node& data)
 	{
+		auto returnType = data.attribute("Return");
+		if (!returnType.empty())
+		{
+			STRING s(returnType.value());
+			if (s == "Invert")
+				m_ReturnType = RT_INVERT;
+			else if (s == "Success")
+				m_ReturnType = RT_SUCCESS;
+			else if (s == "Failure")
+				m_ReturnType = RT_FAILURE;
+			else
+				m_ReturnType = RT_DEFAULT;
+		}
+
 		return OnLoaded(data);
 	}
 

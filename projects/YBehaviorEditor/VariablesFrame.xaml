@@ -20,6 +20,15 @@
                     <StackPanel DockPanel.Dock="Top">
                         <TextBlock Name="Type" Text ="{Binding Name}" FontSize="14" Height="25" ToolTip="{Binding Description}"/>
                         <DockPanel Background="LightBlue" Margin="2,2,2,2">
+                            <TextBlock Text="Return" FontSize="13" Width="90" DockPanel.Dock="Left" Background="LightCyan"/>
+                            <ComboBox Name="ReturnType" SelectedValue="{Binding ReturnType}" SelectedValuePath="Tag">
+                                <ComboBoxItem Content="Default" Tag="Default"/>
+                                <ComboBoxItem Content="Invert" Tag="Invert"/>
+                                <ComboBoxItem Content="Success" Tag="Success"/>
+                                <ComboBoxItem Content="Failure" Tag="Failure"/>
+                            </ComboBox>
+                        </DockPanel>
+                        <DockPanel Background="LightBlue" Margin="2,2,2,2">
                             <TextBlock Text="NickName" FontSize="13" Width="90" DockPanel.Dock="Left" Background="LightCyan"/>
                             <TextBox Name="NickName" MinWidth="110" Text="{Binding NickName}"/>
                         </DockPanel>

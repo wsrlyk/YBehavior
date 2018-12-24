@@ -389,6 +389,8 @@ namespace YBehavior.Editor.Core
         protected NodeHierachy m_Hierachy = NodeHierachy.NH_None;
         public NodeHierachy Hierachy { get { return m_Hierachy; } set { m_Hierachy = value; } }
 
+        public string ReturnType { get; set; } = "Default";
+
         public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class", "Connection" });
         public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName", "Connection", "DebugPoint", "Comment" });
 
@@ -516,6 +518,9 @@ namespace YBehavior.Editor.Core
                 case "Folded":
                     m_Folded = bool.Parse(attr.Value);
                     break;
+                case "Return":
+                    ReturnType = attr.Value;
+                    break;
                 default:
                     return LoadOtherAttr(attr);
             }
@@ -617,6 +622,9 @@ namespace YBehavior.Editor.Core
                     data.SetAttribute("Connection", Conns.ParentHolder.Conn.Identifier);
             }
 
+            if (ReturnType != "Default")
+                data.SetAttribute("Return", ReturnType);
+
             Point intPos = new Point((int)Renderer.Geo.Pos.X, (int)Renderer.Geo.Pos.Y);
             data.SetAttribute("Pos", intPos.ToString());
             if (!string.IsNullOrEmpty(m_NickName))
@@ -661,6 +669,9 @@ namespace YBehavior.Editor.Core
                 if (Conns.ParentHolder.Conn.Identifier != Connection.IdentifierChildren)
                     data.SetAttribute("Connection", Conns.ParentHolder.Conn.Identifier);
             }
+
+            if (ReturnType != "Default")
+                data.SetAttribute("Return", ReturnType);
 
             _OnExportVariables(data, xmlDoc);
         }

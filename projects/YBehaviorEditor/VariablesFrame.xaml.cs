@@ -112,8 +112,10 @@ namespace YBehavior.Editor
                         v.Variable.DebugStateChanged();
                     }
 
-                    this.NickName.IsReadOnly = DebugMgr.Instance.IsDebugging();
-                    this.Comment.IsReadOnly = DebugMgr.Instance.IsDebugging();
+                    bool isReadOnly = DebugMgr.Instance.IsDebugging();
+                    this.NickName.IsReadOnly = isReadOnly;
+                    this.Comment.IsReadOnly = isReadOnly;
+                    this.ReturnType.IsReadOnly = isReadOnly;
                 })
             );
         }
