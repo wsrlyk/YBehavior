@@ -39,7 +39,7 @@ namespace YBehavior
 
 		friend std::stringstream & operator<<(std::stringstream &outstream, const Vector3 &obj)
 		{
-			outstream << obj.x << '=' << obj.y << '=' << obj.z;
+			outstream << obj.x << ',' << obj.y << ',' << obj.z;
 			return outstream;
 		}
 
@@ -52,7 +52,7 @@ namespace YBehavior
 
 		friend std::ostream & operator<<(std::ostream &outstream, const Vector3 &obj)
 		{
-			outstream << obj.x << '=' << obj.y << '=' << obj.z;
+			outstream << obj.x << ',' << obj.y << ',' << obj.z;
 			return outstream;
 		}
 

@@ -16,6 +16,7 @@ namespace YBehavior.Editor.Core
     {
         public static readonly char[] ListSpliter = new char[] { '|' };
         public static readonly char[] SequenceSpliter = new char[] { '=' };
+        public static readonly char[] Vector3Spliter = new char[] { ',' };
         public static readonly char SpaceSpliter = ' ';
 
         public static readonly char NONE = (char)0;
@@ -89,7 +90,7 @@ namespace YBehavior.Editor.Core
             {Variable.ValueType.VT_INT, "0" },
             {Variable.ValueType.VT_FLOAT, "0.0" },
             {Variable.ValueType.VT_BOOL, "F" },
-            {Variable.ValueType.VT_VECTOR3, "0=0=0" },
+            {Variable.ValueType.VT_VECTOR3, "0,0,0" },
             {Variable.ValueType.VT_STRING, "" },
             {Variable.ValueType.VT_ENTITY, "" },
             {Variable.ValueType.VT_ULONG, "0" }
@@ -611,7 +612,7 @@ namespace YBehavior.Editor.Core
                     }
                 case ValueType.VT_VECTOR3:
                     {
-                        string[] ss = v.Split(SequenceSpliter);
+                        string[] ss = v.Split(Vector3Spliter);
                         if (ss.Length == 3)
                         {
                             foreach (string s in ss)
