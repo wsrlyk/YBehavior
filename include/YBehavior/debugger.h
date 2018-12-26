@@ -152,6 +152,8 @@ namespace YBehavior
 		static const char s_HeadSpliter = (char)3;
 		static const char s_ContentSpliter = (char)4;
 		static const char s_SectionSpliter = (char)5;
+		static const char s_SequenceSpliter = (char)6;
+		static const char s_ListSpliter = (char)7;
 	};
 }
 

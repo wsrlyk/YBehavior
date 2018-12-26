@@ -138,8 +138,12 @@ namespace YBehavior.Editor.Core
         char[] msgHeadSplitter = { (char)(3) };
         char[] msgContentSplitter = { cContentSplitter };
         char[] msgSectionSplitter = { cSectionSplitter };
+        char[] msgSequenceSplitter = { cSequenceSplitter };
+        char[] msgListSplitter = { cListSplitter };
         static readonly char cContentSplitter = (char)4;
         static readonly char cSectionSplitter = (char)5;
+        static readonly char cSequenceSplitter = (char)6;
+        static readonly char cListSplitter = (char)7;
         void _ProcessMsg(string msg)
         {
             string[] words = msg.Split(msgHeadSplitter, StringSplitOptions.RemoveEmptyEntries);
@@ -223,10 +227,10 @@ namespace YBehavior.Editor.Core
             using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
             {
                 {
-                    string[] sharedDatas = datas.Split(';');
+                    string[] sharedDatas = datas.Split(msgListSplitter);
                     foreach (string s in sharedDatas)
                     {
-                        string[] strV = s.Split(',');
+                        string[] strV = s.Split(msgSequenceSplitter);
                         if (strV.Length != 2)
                             continue;
 
@@ -273,13 +277,14 @@ namespace YBehavior.Editor.Core
                         if (i % 3 == 2)
                         {
                             _HandleMemory(runInfo.sharedData.LocalMemory, data[i]);
+                            continue;
                         }
 
                         ///> RunInfo
-                        string[] runInfos = data[i].Split(';');
+                        string[] runInfos = data[i].Split(msgListSplitter);
                         foreach (string s in runInfos)
                         {
-                            string[] strR = s.Split('=');
+                            string[] strR = s.Split(msgSequenceSplitter);
                             if (strR.Length != 2)
                                 continue;
 

@@ -16,7 +16,7 @@ namespace YBehavior
 	{
 		STRING str;
 		std::stringstream ss;
-		ss << nodeUID << '=' << (INT)runState;
+		ss << nodeUID << DebugHelper::s_SequenceSpliter << (INT)runState;
 		ss >> str;
 		return str;
 	}
@@ -360,9 +360,9 @@ namespace YBehavior
 				const STRING& name = TreeKeyMgr::Instance()->GetNameByKey(it.Value(), iarray->TypeID());
 				if (name == Utility::StringEmpty)
 					continue;
-				STRING content(name + "," + iarray->GetToString(it.Value()));
+				STRING content(name + DebugHelper::s_SequenceSpliter + iarray->GetToString(it.Value()));
 				if (buffer.length() > 0)
-					buffer += ";";
+					buffer += DebugHelper::s_ListSpliter;
 				buffer += content;
 			}
 		}
@@ -406,7 +406,7 @@ namespace YBehavior
 		{
 			STRING& buf = treeBuffer[(*it)->tree].second;
 			if (buf.length() > 0)
-				buf += ";";
+				buf += s_ListSpliter;
 			buf += (*it)->ToString();
 		}
 		for (auto it = treeBuffer.begin(); it != treeBuffer.end(); ++it)
