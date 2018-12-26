@@ -16,6 +16,7 @@ namespace YBehavior
 {
 	class BehaviorNode;
 	class BehaviorTree;
+	class TreeID;
 	struct TreeVersion
 	{
 		int version = -1;
@@ -52,7 +53,7 @@ namespace YBehavior
 	class YBEHAVIOR_API TreeMgr
 	{
 	public:
-		BehaviorTree * GetTree(const STRING& name);
+		BehaviorTree * GetTree(const STRING& name, const std::vector<STRING>* subs);
 		///> Mark this tree dirty to reload it when GetTree
 		void ReloadTree(const STRING& name);
 		void ReloadAll();
@@ -61,21 +62,23 @@ namespace YBehavior
 		void Print();
 		void SetWorkingDir(const STRING& dir);
 		void PushToBeLoadedTree(const STRING& name) { m_ToBeLoadedTree.insert(name); }
+		inline const std::vector<STRING>* GetToBeReplacedSubs() const { return m_ToBeReplacedSubs; }
 		void GarbageCollection();
 	protected:
 		bool _GetTree(const STRING& name, BehaviorTree * &tree, bool bToAgent);
 		void _CheckSubTree(const STRING& name, BehaviorTree* current, std::unordered_set<BehaviorTree*>& visited, std::list<BehaviorTree*>& visitedStack);
-		BehaviorTree * _LoadTree(const STRING& name);
-		BehaviorTree* _LoadOneTree(const STRING& name);
+		BehaviorTree * _LoadTree(TreeID* id);
 		bool _LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID, BehaviorTree* root);
 	private:
 		static TreeMgr* s_Instance;
 		TreeMgr() {}
 		~TreeMgr();
 
-		std::unordered_map<STRING, TreeInfo*> m_Trees;
+		std::unordered_map<TreeID*, TreeInfo*> m_Trees;
+		std::unordered_map<STRING, std::vector<TreeID*>> m_TreeIDs;
 
 		std::unordered_set<STRING> m_ToBeLoadedTree;
+		const std::vector<STRING>* m_ToBeReplacedSubs;
 
 		STRING m_WorkingDir;
 	};

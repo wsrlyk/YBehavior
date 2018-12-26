@@ -16,11 +16,14 @@ namespace YBehavior
 		bool _TryCreateFromTo(const pugi::xml_node& data, std::vector<ISharedVariableEx*>& container);
 	private:
 		SharedVariableEx<STRING>* m_TreeName;
+		SharedVariableEx<STRING>* m_Identification;
 
 		BehaviorTree* m_Tree = nullptr;
 
 		std::vector<ISharedVariableEx* > m_Inputs;
 		std::vector<ISharedVariableEx* > m_Outputs;
+
+		STRING m_FinalTreeName;
 	};
 }
 

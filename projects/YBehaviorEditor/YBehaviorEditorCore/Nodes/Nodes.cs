@@ -1064,13 +1064,24 @@ namespace YBehavior.Editor.Core
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const
             );
+
+            NodeMemory.CreateVariable(
+                "Identification",
+                "",
+                Variable.CreateParams_String,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const
+            );
         }
 
         public override string Note
         {
             get
             {
-                return Variables.GetVariable("Tree").NoteValue;
+                string s = Variables.GetVariable("Identification").NoteValue;
+                if (string.IsNullOrEmpty(s))
+                    return Variables.GetVariable("Tree").NoteValue;
+                return s;
             }
         }
         protected override void _OnLoaded()

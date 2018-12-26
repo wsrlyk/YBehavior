@@ -49,11 +49,11 @@ class XEntity : public YBehavior::Entity
 	XAgent* pAgent;
 	std::string m_Name;
 public:
-	XEntity(const std::string& name, const std::string& tree)
+	XEntity(const std::string& name, const std::string& tree, const std::vector<std::string>* subs = nullptr)
 	{
 		m_Name = name;
 		pAgent = new XAgent(this);
-		pAgent->SetTree(tree);
+		pAgent->SetTree(tree, subs);
 		pAgent->SetData();
 	}
 	~XEntity()

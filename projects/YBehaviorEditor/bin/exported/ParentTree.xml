@@ -6,7 +6,7 @@
       <Node Class="Random" Target="_IP a" Bound1="_IC 1" Bound2="_IC 10" />
       <Node Class="SetData" Target="_IP bb VI c 0" Source="_IP a" />
       <Node Class="SetData" Target="IIP aa" Source="IIP bb" />
-      <Node Class="SubTree" Tree="_SC SubTree">
+      <Node Class="SubTree" Tree="_SC SubTree" Identification="_SC SubTreeID">
         <Input Input="_IP a" />
         <Output Output="_IP b" />
       </Node>

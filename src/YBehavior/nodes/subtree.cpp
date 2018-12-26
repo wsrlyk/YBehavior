@@ -7,28 +7,45 @@
 #include "YBehavior/sharedvariableex.h"
 #include "YBehavior/behaviortreemgr.h"
 #include <string.h>
+#include "YBehavior/treeid.h"
 
 namespace YBehavior
 {
 	bool SubTree::OnLoaded(const pugi::xml_node& data)
 	{
-		//////////////////////////////////////////////////////////////////////////
-		TYPEID typeID = CreateVariable(m_TreeName, "Tree", data, Utility::CONST_CHAR);
+		if (!m_Root)
+		{
+			ERROR_BEGIN << "No Root" << ERROR_END;
+			return false;
+		}
+
+		CreateVariable(m_Identification, "Identification", data, Utility::CONST_CHAR);
+		if (!m_Identification)
+		{
+			return false;
+		}
+		
+		CreateVariable(m_TreeName, "Tree", data, Utility::CONST_CHAR);
 		if (!m_TreeName)
 		{
 			return false;
 		}
 
-		STRING treeName;
-		m_TreeName->GetCastedValue(nullptr, treeName);
-		if (treeName == Utility::StringEmpty)
+		STRING defaultTreeName;
+		m_TreeName->GetCastedValue(nullptr, defaultTreeName);
+		STRING id;
+		m_Identification->GetCastedValue(nullptr, id);
+
+		m_Root->GetTreeID()->TryGetSubTreeName(id, defaultTreeName, m_FinalTreeName);
+		
+		if (m_FinalTreeName == Utility::StringEmpty)
 		{
-			ERROR_BEGIN << "Null Value for Tree in SubTree: " << typeID << ERROR_END;
+			ERROR_BEGIN << "Null Value for Tree in " << this->GetClassName() << ERROR_END;
 			return false;
 		}
 
-		if (m_Root == nullptr || m_Root->GetTreeNameWithPath() != treeName)
-			TreeMgr::Instance()->PushToBeLoadedTree(treeName);
+		if (m_Root->GetTreeNameWithPath() != m_FinalTreeName)
+			TreeMgr::Instance()->PushToBeLoadedTree(m_FinalTreeName);
 
 		return true;
 	}
@@ -73,17 +90,15 @@ namespace YBehavior
 	{
 		if (m_Tree == nullptr && m_Root != nullptr)
 		{
-			STRING treeName;
-			m_TreeName->GetCastedValue(nullptr, treeName);
 			for (auto it = m_Root->GetSubTrees().begin(); it != m_Root->GetSubTrees().end(); ++it)
 			{
-				if ((*it)->GetTreeNameWithPath() == treeName)
+				if ((*it)->GetTreeNameWithPath() == m_FinalTreeName)
 				{
 					m_Tree = *it;
 					break;
 				}
 			}
-			if (m_Tree == nullptr && m_Root->GetTreeNameWithPath() == treeName)
+			if (m_Tree == nullptr && m_Root->GetTreeNameWithPath() == m_FinalTreeName)
 				m_Tree = m_Root;
 		}
 

@@ -55,6 +55,7 @@
     <ClInclude Include="..\include\YBehavior\tools\meta.h" />
     <ClInclude Include="..\include\YBehavior\tools\objectpool.h" />
     <ClInclude Include="..\include\YBehavior\tools\treemgrhelper.hpp" />
+    <ClInclude Include="..\include\YBehavior\treeid.h" />
     <ClInclude Include="..\include\YBehavior\treekeymgr.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />
@@ -97,6 +98,7 @@
     <ClCompile Include="..\src\YBehavior\SharedVariableCreateHelper.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\common.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\objectpool.cpp" />
+    <ClCompile Include="..\src\YBehavior\treeid.cpp" />
     <ClCompile Include="..\src\YBehavior\treekeymgr.cpp" />
     <ClCompile Include="..\src\YBehavior\types.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />

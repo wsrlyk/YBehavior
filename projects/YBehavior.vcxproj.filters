@@ -189,6 +189,9 @@
     <ClInclude Include="..\include\YBehavior\memory.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\treeid.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -309,6 +312,9 @@
       <Filter>源文件\tools</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\SharedVariableCreateHelper.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\treeid.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

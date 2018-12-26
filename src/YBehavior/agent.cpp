@@ -16,11 +16,11 @@ YBehavior::RegisterData* YBehavior::Agent::GetRegister()
 	return m_RegisterData;
 }
 
-bool YBehavior::Agent::SetTree(const STRING& name)
+bool YBehavior::Agent::SetTree(const STRING& name, const std::vector<STRING>* subs)
 {
 	UnloadTree();
 
-	m_Tree = TreeMgr::Instance()->GetTree(name);
+	m_Tree = TreeMgr::Instance()->GetTree(name, subs);
 	if (!m_Tree)
 		return false;
 	//m_Tree->CloneData(*m_SharedData);

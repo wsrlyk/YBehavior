@@ -22,10 +22,14 @@ int main(int argc, char** argv)
 	if (argc >= 2)
 		tree = argv[1];
 	StdVector<int> a(1);
-	XEntity* pEntity = new XEntity("Hehe", tree);
+	std::vector<std::string> subtest{ "SubTreeID", "A" };
+	XEntity* pEntity = new XEntity("Hehe", tree, &subtest);
 	//pEntity->GetAgent()->SetEntity(pEntity);
 
-	XEntity* pEntity1 = new XEntity("Haha", tree);
+	XEntity* pEntity1 = new XEntity("Haha", tree, &subtest);
+
+	XEntity* pEntity2 = new XEntity("Haha", "A");
+
 	//pEntity1->GetAgent()->SetEntity(pEntity1);
 	LOG_FORMAT("te%dst%s abc", 1, "++");
 

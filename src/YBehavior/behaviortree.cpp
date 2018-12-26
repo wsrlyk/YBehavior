@@ -13,6 +13,7 @@
 #include "YBehavior/agent.h"
 #include <string.h>
 #include "YBehavior/runningcontext.h"
+#include "YBehavior/treeid.h"
 
 namespace YBehavior
 {
@@ -374,15 +375,16 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 
 
-	BehaviorTree::BehaviorTree(const STRING& name)
+	BehaviorTree::BehaviorTree(TreeID* id)
 	{
-		m_TreeNameWithPath = name;
+		m_ID = id;
+		m_TreeNameWithPath = id->GetName();
 		{
-			auto it = name.find_last_of('/');
+			auto it = id->GetName().find_last_of('/');
 			if (it != STRING::npos)
-				m_TreeName = name.substr(it + 1);
+				m_TreeName = id->GetName().substr(it + 1);
 			else
-				m_TreeName = name;
+				m_TreeName = id->GetName();
 			it = m_TreeName.find_last_of('\\');
 			if (it != STRING::npos)
 				m_TreeName = m_TreeName.substr(it + 1);

@@ -235,12 +235,14 @@ namespace YBehavior
 	};
 
 	struct TreeVersion;
+	class TreeID;
 	class YBEHAVIOR_API BehaviorTree : public SingleChildNode
 	{
 	public:
 		STRING GetClassName() const override { return "Tree"; }
 		inline void SetVersion(TreeVersion* v) { m_Version = v; }
 		inline TreeVersion* GetVersion() const { return m_Version; }
+		inline TreeID* GetTreeID() const { return m_ID; }
 #ifdef DEBUGGER
 		inline UINT GetHash() { return m_Hash; }
 		inline void SetHash(UINT hash) { m_Hash = hash; }
@@ -252,6 +254,7 @@ namespace YBehavior
 		STRING m_TreeNameWithPath;	///> Full Path
 		STRING m_TreeName;	///> Only File
 		TreeVersion* m_Version;
+		TreeID* m_ID;
 #ifdef DEBUGGER
 		UINT m_Hash;
 #endif
@@ -260,7 +263,7 @@ namespace YBehavior
 		std::unordered_map<STRING, ISharedVariableEx*> m_Inputs;
 		std::unordered_map<STRING, ISharedVariableEx*> m_Outputs;
 	public:
-		BehaviorTree(const STRING& name);
+		BehaviorTree(TreeID* id);
 		~BehaviorTree();
 		inline const STRING& GetTreeNameWithPath() { return m_TreeNameWithPath; }
 		inline const STRING& GetTreeName() { return m_TreeName; }

@@ -7,6 +7,7 @@
 #include <string.h>
 #include "YBehavior/tools/common.h"
 #include "YBehavior/tools/treemgrhelper.hpp"
+#include "YBehavior/treeid.h"
 
 namespace YBehavior
 {
@@ -20,17 +21,12 @@ namespace YBehavior
 		return s_Instance;
 	}
 
-	BehaviorTree * TreeMgr::_LoadTree(const STRING& name)
-	{
-		return _LoadOneTree(name);
-	}
-
-	BehaviorTree* TreeMgr::_LoadOneTree(const STRING& name)
+	BehaviorTree * TreeMgr::_LoadTree(TreeID* id)
 	{
 		pugi::xml_document doc;
 
-		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + ".xml").c_str());
-		LOG_BEGIN << "Loading: " << name << ".xml" << LOG_END;
+		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + id->GetName() + ".xml").c_str());
+		LOG_BEGIN << "Loading: " << id->GetName() << ".xml" << LOG_END;
 		if (result.status)
 		{
 			ERROR_BEGIN << "Load result: " << result.description() << ERROR_END;
@@ -41,12 +37,12 @@ namespace YBehavior
 		if (rootData == nullptr)
 			return nullptr;
 
-		BehaviorTree* tree = new BehaviorTree(name);
+		BehaviorTree* tree = new BehaviorTree(id);
 
 		UINT uid = 0;
 		if (!_LoadOneNode(tree, rootData.first_child(), uid, tree))
 		{
-			ERROR_BEGIN << "Load xml failed: " << name << ERROR_END;
+			ERROR_BEGIN << "Load xml failed: " << id->GetName() << ERROR_END;
 			delete tree;
 			return nullptr;
 		}
@@ -115,11 +111,17 @@ namespace YBehavior
 		return true;
 	}
 
-	BehaviorTree * TreeMgr::GetTree(const STRING& name)
+	BehaviorTree * TreeMgr::GetTree(const STRING& name, const std::vector<STRING>* subs)
 	{
 		BehaviorTree *tree;
+		m_ToBeReplacedSubs = subs;
 		if (_GetTree(name, tree, true))
+		{
+			m_ToBeReplacedSubs = nullptr;
 			return tree;
+		}
+
+		m_ToBeReplacedSubs = nullptr;
 
 		CurrentBuildingInfo buildingInfo;
 		if (!_BuildSharedData(tree, nullptr, buildingInfo))
@@ -135,27 +137,46 @@ namespace YBehavior
 
 	bool TreeMgr::_GetTree(const STRING& name, BehaviorTree* &tree, bool bToAgent)
 	{
-		TreeInfo* info;
-		auto it = m_Trees.find(name);
-		if (it != m_Trees.end())
+		TreeInfo* info = nullptr;
+		TreeID* id = nullptr;
+		auto it = m_TreeIDs.find(name);
+		if (it != m_TreeIDs.end())
 		{
-			tree = it->second->GetLatestTree();
-			if (tree)
+			for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2)
 			{
-				it->second->ChangeReferenceCount(true, bToAgent);
-				return true;
+				id = *it2;
+				if (!id->IsSameTree(name, m_ToBeReplacedSubs))
+					continue;
+				auto it3 = m_Trees.find(id);
+				if (it3 != m_Trees.end())
+				{
+					tree = it3->second->GetLatestTree();
+					if (tree)
+					{
+						it3->second->ChangeReferenceCount(true, bToAgent);
+						return true;
+					}
+					else
+						info = it3->second;
+
+					break;
+				}
 			}
-			else
-				info = it->second;
 		}
-		else
+		
+		if (info == nullptr)
 		{
 			info = new TreeInfo();
-			m_Trees[name] = info;
+			id = new TreeID(name);
+			if (m_ToBeReplacedSubs != nullptr)
+				id->SetSubTrees(*m_ToBeReplacedSubs);
+			m_TreeIDs[name].push_back(id);
+			m_Trees[id] = info;
 		}
 
-		
-		tree = _LoadTree(name);
+
+		tree = _LoadTree(id);
+		id->BuildID();
 		if (!tree)
 			return true;
 		info->SetLatestTree(tree);
@@ -170,7 +191,7 @@ namespace YBehavior
 			for (auto it2 = tobeload.begin(); it2 != tobeload.end(); ++it2)
 			{
 				BehaviorTree* subTree;
-				
+
 				_GetTree(*it2, subTree, false);
 				if (subTree)
 					tree->AddSubTree(subTree);
@@ -206,7 +227,7 @@ namespace YBehavior
 				///> increase all the ancestors's version
 				for (auto it2 = visitedStack.rbegin(); it2 != visitedStack.rend(); ++it2)
 				{
-					auto it3 = m_Trees.find((*it2)->GetTreeNameWithPath());
+					auto it3 = m_Trees.find((*it2)->GetTreeID());
 					if (it3 != m_Trees.end())
 					{
 						it3->second->IncreaseLatestVesion();
@@ -224,10 +245,16 @@ namespace YBehavior
 
 	void TreeMgr::ReloadTree(const STRING& name)
 	{
-		auto it = m_Trees.find(name);
-		if (it != m_Trees.end())
+		auto it = m_TreeIDs.find(name);
+		if (it != m_TreeIDs.end())
 		{
-			it->second->IncreaseLatestVesion();
+			for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+			{
+				auto it3 = m_Trees.find(*it2);
+				if (it3 == m_Trees.end())
+					continue;
+				it3->second->IncreaseLatestVesion();
+			}
 		}
 
 		///> find all trees reference to this tree, and inc their version
@@ -266,7 +293,7 @@ namespace YBehavior
 		if (tree == nullptr)
 			return;
 
-		auto it = m_Trees.find(tree->GetTreeNameWithPath());
+		auto it = m_Trees.find(tree->GetTreeID());
 		if (it != m_Trees.end())
 		{
 			it->second->ChangeReferenceCount(false, bFromAgent, tree->GetVersion());
@@ -275,9 +302,13 @@ namespace YBehavior
 
 	TreeMgr::~TreeMgr()
 	{
-		for(auto it = m_Trees.begin(); it != m_Trees.end(); ++it)
+		for (auto it = m_Trees.begin(); it != m_Trees.end(); ++it)
+		{
+			delete it->first;
 			delete it->second;
+		}
 		m_Trees.clear();
+		m_TreeIDs.clear();
 	}
 
 	TreeMgr* TreeMgr::s_Instance;
@@ -355,7 +386,7 @@ namespace YBehavior
 		{
 			(*it)->ClearSubTree();
 
-			auto it2 = m_Trees.find((*it)->GetTreeNameWithPath());
+			auto it2 = m_Trees.find((*it)->GetTreeID());
 			if (it2 == m_Trees.end())
 			{
 				ERROR_BEGIN << "Cant find info about tree: " << (*it)->GetTreeNameWithPath() << ERROR_END;

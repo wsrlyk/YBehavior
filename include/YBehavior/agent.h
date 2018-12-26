@@ -45,7 +45,7 @@ namespace YBehavior
 		inline Entity* GetEntity() { return m_Entity; }
 		inline void SetEntity(Entity* entity) { m_Entity = entity; }
 		RegisterData* GetRegister();
-		bool SetTree(const STRING& name);
+		bool SetTree(const STRING& name, const std::vector<STRING>* subs = nullptr);
 		void UnloadTree();
 		void Tick();
 
