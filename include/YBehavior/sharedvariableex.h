@@ -47,7 +47,7 @@ namespace YBehavior
 			m_VectorIndex->GetCastedValue(pMemory, index);
 			if (index < 0)
 			{
-				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << " at " << this->GetName() << ERROR_END;
+				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << " at " << this->GetLogName() << ERROR_END;
 				return;
 			}
 			SharedDataEx* pData;
@@ -57,7 +57,7 @@ namespace YBehavior
 				pData = pMemory->GetStackTop();
 			if (!pData)
 			{
-				ERROR_BEGIN << "SharedData NULL at " << this->GetName() << ERROR_END;
+				ERROR_BEGIN << "SharedData NULL at " << this->GetLogName() << ERROR_END;
 			}
 
 			const StdVector<ElementType>* pVector = (const StdVector<ElementType>*)pData->Get<StdVector<ElementType>>(m_Key);
@@ -71,7 +71,7 @@ namespace YBehavior
 			m_VectorIndex->GetCastedValue(pMemory, index);
 			if (index < 0)
 			{
-				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << " at " << this->GetName() << ERROR_END;
+				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << " at " << this->GetLogName() << ERROR_END;
 				return nullptr;
 			}
 			SharedDataEx* pData;
@@ -81,7 +81,7 @@ namespace YBehavior
 				pData = pMemory->GetStackTop();
 			if (!pData)
 			{
-				ERROR_BEGIN << "SharedData NULL at " << this->GetName() << ERROR_END;
+				ERROR_BEGIN << "SharedData NULL at " << this->GetLogName() << ERROR_END;
 				return nullptr;
 			}
 			const StdVector<ElementType>* pVector = (const StdVector<ElementType>*)pData->Get<StdVector<ElementType>>(m_Key);
@@ -92,11 +92,11 @@ namespace YBehavior
 			}
 			if (pVector)
 			{
-				ERROR_BEGIN << "VectorIndex out of range: " << index << ", Total " << pVector->size() << " at " << this->GetName() << ERROR_END;
+				ERROR_BEGIN << "VectorIndex out of range: " << index << ", Total " << pVector->size() << " at " << this->GetLogName() << ERROR_END;
 			}
 			else
 			{
-				ERROR_BEGIN << "Invalid SharedData: " << m_Key << " at " << this->GetName() << ERROR_END;
+				ERROR_BEGIN << "Invalid SharedData: " << m_Key << " at " << this->GetLogName() << ERROR_END;
 			}
 			return nullptr;
 		}
@@ -183,7 +183,7 @@ namespace YBehavior
 			{
 				if ((INT)mValue->size() <= index)
 				{
-					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << " at " << this->GetName() << ERROR_END;
+					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << " at " << this->GetLogName() << ERROR_END;
 					return nullptr;
 				}
 				else
@@ -204,7 +204,7 @@ namespace YBehavior
 			{
 				if ((INT)mValue->size() <= index)
 				{
-					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << " at " << this->GetName() << ERROR_END;
+					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << " at " << this->GetLogName() << ERROR_END;
 				}
 				else
 				{
@@ -269,7 +269,7 @@ namespace YBehavior
 
 			if (key == Utility::INVALID_KEY)
 			{
-				ERROR_BEGIN << "Cant Get Key for " << s << " with typeid = " << GetTypeID<T>() << " at " << this->GetName() << ERROR_END;
+				ERROR_BEGIN << "Cant Get Key for " << s << " with typeid = " << GetTypeID<T>() << " at " << this->GetLogName() << ERROR_END;
 			}
 			m_ReferenceName = s;
 			SetKey(key);
@@ -293,7 +293,7 @@ namespace YBehavior
 
 			if (!pData)
 			{
-				ERROR_BEGIN << "SharedData NULL at " << this->GetName() << ERROR_END;
+				ERROR_BEGIN << "SharedData NULL at " << this->GetLogName() << ERROR_END;
 				return nullptr;
 			}
 			return (const T*)pData->Get<T>(m_Key);
@@ -334,7 +334,7 @@ namespace YBehavior
 				if (pData)
 					pData->Set<T>(m_Key, src);
 				else
-					ERROR_BEGIN << "SharedData NULL at " << this->GetName() << ERROR_END;
+					ERROR_BEGIN << "SharedData NULL at " << this->GetLogName() << ERROR_END;
 			}
 		}
 

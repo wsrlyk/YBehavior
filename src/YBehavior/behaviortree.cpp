@@ -357,7 +357,7 @@ namespace YBehavior
 				op->SetValueFromString(buffer[1]);
 
 #ifdef DEBUGGER
-			op->SetName(this->GetClassName() + "." + attrOptr.name());
+			op->SetName(attrOptr.name(), this->GetClassName());
 #endif
 
 			return op->TypeID();
@@ -510,7 +510,7 @@ namespace YBehavior
 				ISharedVariableEx* pTo = it2->second;
 				if (pFrom->TypeID() != pTo->TypeID())
 				{
-					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetName() << ", at main tree: " << m_pAgent->GetTree()->GetTreeName() << ERROR_END;
+					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetTree()->GetTreeName() << ERROR_END;
 					continue;
 				}
 				pTo->SetValue(m_pAgent->GetMemory(), pFrom->GetValue(&m_TempMemory));
@@ -531,7 +531,7 @@ namespace YBehavior
 				ISharedVariableEx* pFrom = it2->second;
 				if (pFrom->TypeID() != pTo->TypeID())
 				{
-					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetName() << ", at main tree: " << m_pAgent->GetTree()->GetTreeName() << ERROR_END;
+					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetTree()->GetTreeName() << ERROR_END;
 					continue;
 				}
 				pTo->SetValue(&m_TempMemory, pFrom->GetValue(m_pAgent->GetMemory()));

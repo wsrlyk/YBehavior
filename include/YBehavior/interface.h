@@ -24,21 +24,23 @@ namespace YBehavior
 		virtual bool IsConst() = 0;
 #ifdef DEBUGGER
 		inline void SetReferenceName(const STRING& name) { m_ReferenceName = name; }
-		void SetName(const STRING& name)
+		void SetName(const STRING& name, const STRING& nodeName)
 		{
 			m_Name = name;
+			m_LogName = nodeName + "." + name;
 			if (m_ReferenceName.size() > 0)
 			{
-				m_Name += " (";
-				m_Name += m_ReferenceName;
+				m_LogName += " (";
+				m_LogName += m_ReferenceName;
 				if (IsLocal())
 				{
-					m_Name += "'";
+					m_LogName += "'";
 				}
-				m_Name += ")";
+				m_LogName += ")";
 			}
 		}
 		inline const STRING& GetName() { return m_Name; }
+		inline const STRING& GetLogName() { return m_LogName; }
 #endif
 		virtual void SetVectorIndex(const STRING& vbType, const STRING& s) { }
 		virtual void SetKeyFromString(const STRING& s) = 0;
@@ -66,6 +68,7 @@ namespace YBehavior
 		bool m_IsLocal;
 #ifdef DEBUGGER
 		STRING m_Name;
+		STRING m_LogName;
 		STRING m_ReferenceName;
 #endif
 	};
