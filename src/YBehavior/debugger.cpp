@@ -532,16 +532,20 @@ namespace YBehavior
 		{
 			ISharedVariableEx* pVectorIndex = pVariable->GetVectorIndex();
 			const STRING& sharedDataVariableName = TreeKeyMgr::Instance()->GetNameByKey(pVariable->GetKey(), pVariable->GetReferenceSharedDataSelfID());
+			ss << sharedDataVariableName;
+			if (pVariable->IsLocal())
+				ss << "'";
+
 			///>  Like:      Int0 IntArrayM[7] 44
 			if (pVectorIndex)
 			{
 
-				ss << sharedDataVariableName << "[" << pVectorIndex->GetValueToSTRING(m_Target->GetMemory()) << "] ";
+				ss << "[" << pVectorIndex->GetValueToSTRING(m_Target->GetMemory()) << "] ";
 			}
 			///>  Like:      Int0 IntC 4
 			else
 			{
-				ss << sharedDataVariableName << " ";
+				ss << " ";
 			}
 			ss << pVariable->GetValueToSTRING(m_Target->GetMemory());
 		}
