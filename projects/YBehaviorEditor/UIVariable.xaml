@@ -37,12 +37,18 @@
                                 <Style TargetType="{x:Type Border}">
                                     <Style.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#66EEEEEE"/>
+                                            <Setter Property="Background" Value="#66424242"/>
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
-                            <Grid Background="Transparent">
+                            <Grid>
+                                <Grid.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Offset="0.0" Color="#00EEEEEE"/>
+                                        <GradientStop Offset="1.0" Color="#FFEEEEEE"/>
+                                    </LinearGradientBrush>
+                                </Grid.Background>
                                 <ContentPresenter></ContentPresenter>
                             </Grid>
                         </Border>
@@ -55,7 +61,7 @@
         <DockPanel Background="LightBlue" Margin="2,2,2,2">
             <Grid DockPanel.Dock="Left">
                 <TextBlock Name="VKey" Text="{Binding DisplayName}" FontSize="13" Width="150" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}"/>
-                <Button Style="{StaticResource TransparentHoverStyle}" Name="CSwitcher" Click="CSwitcher_Click" IsEnabled="{Binding IsEditable}" Visibility="{Binding Path = CanSwitchList, Converter={StaticResource visibilityConvertor}}" ToolTip="{Binding Description}">
+                <Button Style="{StaticResource TransparentHoverStyle}" Name="CSwitcher" Click="CSwitcher_Click" IsEnabled="{Binding IsEditable}" Visibility="{Binding Path = CanSwitchList, Converter={StaticResource visibilityConvertor}}" ToolTip="{Binding Description}" Margin="126,0,0,0">
                 </Button>
             </Grid>
             <ComboBox IsEnabled="{Binding IsEditable}" Name="VTypes" Width="55" ItemsSource="{Binding vTypeSet}" SelectedItem="{Binding vType}"

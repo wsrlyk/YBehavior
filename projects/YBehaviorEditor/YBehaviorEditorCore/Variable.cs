@@ -391,7 +391,10 @@ namespace YBehavior.Editor.Core
             {
                 if (value == null && vbType == VariableType.VBT_Const)
                 {
-                    DefaultValueDic.TryGetValue(vType, out value);
+                    if (cType == CountType.CT_LIST)
+                        value = "";
+                    else
+                        DefaultValueDic.TryGetValue(vType, out value);
                 }
 
                 ChangeVariableValueCommand command = new ChangeVariableValueCommand()
