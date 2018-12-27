@@ -40,6 +40,11 @@ namespace YBehavior.Editor
             this.Str.Text = oArg.Content;
             this.Border.Background = new SolidColorBrush(oArg.TipType == ShowSystemTipsArg.TipsType.TT_Success ? m_SuccessColor : m_ErrorColor);
             m_InstantAnim.Begin(this.Bg, true);
+
+            if (oArg.TipType == ShowSystemTipsArg.TipsType.TT_Success)
+                LogMgr.Instance.Log(oArg.Content);
+            else
+                LogMgr.Instance.Error(oArg.Content);
         }
     }
 }

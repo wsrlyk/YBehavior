@@ -28,10 +28,10 @@
 <!--            <DoubleAnimation Storyboard.TargetProperty="Opacity"
                              From="0.0" To="1.0" Duration="0:0:0.1"/>   -->
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             From="1.0" To="0.0" Duration="0:0:0.1" BeginTime="0:0:0.5"/>
+                             From="1.0" To="0.0" Duration="0:0:0.1" BeginTime="0:0:0.8"/>
             <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
                 <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
-                <DiscreteObjectKeyFrame KeyTime="0:0:0.6" Value="{x:Static Visibility.Collapsed}"/>
+                <!--<DiscreteObjectKeyFrame KeyTime="0:0:0.8" Value="{x:Static Visibility.Collapsed}"/> -->
             </ObjectAnimationUsingKeyFrames>
         </Storyboard>
         <Storyboard x:Key="ConstantShowAnim">

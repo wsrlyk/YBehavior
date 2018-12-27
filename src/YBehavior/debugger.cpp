@@ -26,12 +26,21 @@ namespace YBehavior
 		Clear();
 	}
 
-	void DebugMgr::SetTarget(const STRING& tree, UINT agent)
+	void DebugMgr::SetTarget(const STRING& tree, UINT64 agent)
 	{
 		m_TargetTree = tree;
 		//m_TargetHash = hash;
-		m_TargetAgent = agent;
+		m_TargetAgent = 0;
 		m_bTargetDirty = true;
+		m_TryTarget = agent;
+	}
+
+	void DebugMgr::Begin()
+	{
+		if (m_TryTarget != 0 && !m_bTargetDirty)
+		{
+			m_TargetAgent = m_TryTarget;
+		}
 	}
 
 	void DebugMgr::ResetTarget()
@@ -53,6 +62,74 @@ namespace YBehavior
 			m_Command = DC_None;
 	}
 
+	bool DebugMgr::IsValidTarget(Agent* pAgent, BehaviorTree* pTree)
+	{
+		if (pAgent == nullptr)
+			return false;
+
+		if (m_TargetAgent != 0)
+		{
+			return m_TargetAgent == pAgent->GetDebugUID();
+		}
+		else
+		{
+			if (m_bTargetDirty)
+			{
+				if (m_TryTarget == 0 || m_TryTarget == pAgent->GetDebugUID())
+				{
+					if (pAgent->GetTree()->GetTreeName() == m_TargetTree)
+					{
+						std::list<BehaviorTree*> toVisit;
+						std::unordered_set<BehaviorTree*> visited;
+
+						toVisit.push_back(pAgent->GetTree());
+						visited.insert(pAgent->GetTree());
+						while (!toVisit.empty())
+						{
+							BehaviorTree* pCurTree = toVisit.front();
+							toVisit.pop_front();
+
+							for (auto it : pCurTree->GetSubTrees())
+							{
+								if (visited.count(it) == 0)
+								{
+									toVisit.push_back(it);
+									visited.insert(it);
+								}
+							}
+						}
+
+						STRING buffer("[SubTrees]");
+						buffer += DebugHelper::s_HeadSpliter;
+						bool bFirst = true;
+						for (auto it : visited)
+						{
+							if (bFirst)
+							{
+								bFirst = false;
+							}
+							else
+							{
+								buffer += DebugHelper::s_ListSpliter;
+							}
+							buffer += it->GetTreeNameWithPath();
+							buffer += DebugHelper::s_SequenceSpliter;
+							buffer += Utility::ToString(it->GetHash());
+						}
+						Network::Instance()->SendText(buffer);
+
+						m_bTargetDirty = false;
+						m_TryTarget = pAgent->GetDebugUID();
+					}
+				}
+			}
+			else
+				return false;
+		}
+
+		return false;
+	}
+	/*  Old IsValidTarget
 	bool DebugMgr::IsValidTarget(Agent* pAgent, BehaviorTree* pTree)
 	{
 		if (pAgent == nullptr)
@@ -126,7 +203,7 @@ namespace YBehavior
 			return m_TargetAgent == pAgent->GetDebugUID();
 		}
 	}
-
+	*/
 	bool DebugMgr::HasBreakPoint(const STRING& treeName, UINT nodeUID)
 	{
 		auto it = m_TreeDebugInfo.find(treeName);

@@ -206,8 +206,6 @@ namespace YBehavior.Editor
             }
             else
             {
-                LogMgr.Instance.Error("Variable creation failed. Check the params.");
-
                 ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
                 {
                     Content = "Variable creation failed. Check the params.",

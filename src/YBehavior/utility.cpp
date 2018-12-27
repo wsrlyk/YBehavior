@@ -31,7 +31,7 @@ namespace YBehavior
 	std::random_device Utility::rd;
 	std::default_random_engine Utility::mt(rd());
 
-	void Utility::SplitString(const STRING& s, StdVector<STRING>& output, CHAR c, int count)
+	void Utility::SplitString(const STRING& s, StdVector<STRING>& output, CHAR c, bool RemoveEmptyEntries, int count)
 	{
 		int counter = 0;
 		output.clear();
@@ -40,8 +40,11 @@ namespace YBehavior
 		pos1 = 0;
 		while(STRING::npos != pos2)
 		{
-			output.push_back(s.substr(pos1, pos2-pos1));
-			++counter;
+			if (!RemoveEmptyEntries || pos2 > pos1)
+			{
+				output.push_back(s.substr(pos1, pos2 - pos1));
+				++counter;
+			}
 
 			pos1 = pos2 + 1;
 

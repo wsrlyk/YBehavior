@@ -11,7 +11,7 @@ namespace YBehavior.Editor.Core
         Queue<string> m_ReceiveBuffer = new Queue<string>();
         List<string> m_ProcessingMsgs = new List<string>();
 
-        System.Threading.Timer m_Timer;
+        System.Windows.Threading.DispatcherTimer m_Timer;
         delegate void DebugTreeWithAgentAppendOneNode(Node node, StringBuilder stringBuilder);
         
         public void OnNetworkConnectionChanged(bool bConnected)
@@ -19,20 +19,23 @@ namespace YBehavior.Editor.Core
             if (bConnected)
             {
                 if (m_Timer != null)
-                    m_Timer.Dispose();
-                m_Timer = new System.Threading.Timer(_MessageTimerCallback, null, 0, 1000);
+                    m_Timer.Stop();
+                m_Timer = new System.Windows.Threading.DispatcherTimer();
+                m_Timer.Tick += new EventHandler(_MessageTimerCallback);
+                m_Timer.Interval = new TimeSpan(0, 0, 0, 1, 0);
+                m_Timer.Start();
                 Clear();
             }
             else
             {
                 if (m_Timer != null)
-                    m_Timer.Dispose();
+                    m_Timer.Stop();
                 m_Timer = null;
                 Clear();
             }
         }
 
-        void _MessageTimerCallback(object state)
+        void _MessageTimerCallback(object state, System.EventArgs arg)
         {
             Update();
         }
@@ -47,46 +50,54 @@ namespace YBehavior.Editor.Core
             m_LastTickResultToken = 0;
             m_TickResultToken = 0;
         }
-        public void DebugTreeWithAgent(string treename, uint agentUID, List<WorkBench> benches)
+        public void DebugTreeWithAgent(string treename, ulong agentUID)
         {
-            if (benches == null || benches.Count == 0)
-            {
-                LogMgr.Instance.Error("No Active Tree");
-                return;
-            }
-
-            Action<Node, StringBuilder> appendOneNode = null;
-            appendOneNode = delegate (Node node, StringBuilder stringBuilder)
-            {
-                if (!node.DebugPointInfo.NoDebugPoint)
-                {
-                    stringBuilder.Append(cContentSplitter).Append(node.UID).Append(cContentSplitter).Append(node.DebugPointInfo.HitCount);
-                }
-
-                foreach (Node chi in node.Conns)
-                {
-                    appendOneNode(chi, stringBuilder);
-                }
-            };
-
-
             StringBuilder sb = new StringBuilder();
-            sb.Append("[DebugTreeWithAgent] ").Append(treename);
-            sb.Append(" ").Append(agentUID);
-
-            foreach (WorkBench workBench in benches)
-            {
-                sb.Append(" ");
-                sb.Append(workBench.FileInfo.Name).Append(cContentSplitter).Append(workBench.ExportFileHash);
-
-                appendOneNode(workBench.MainTree, sb);
-            }
-
-
+            sb.Append("[DebugTreeWithAgent]").Append(msgContentSplitter).Append(treename);
+            sb.Append(msgContentSplitter).Append(agentUID);
             NetworkMgr.Instance.SendText(sb.ToString());
-
             Clear();
         }
+        //public void DebugTreeWithAgent(string treename, ulong agentUID, List<WorkBench> benches)
+        //{
+        //    if (benches == null || benches.Count == 0)
+        //    {
+        //        LogMgr.Instance.Error("No Active Tree");
+        //        return;
+        //    }
+
+        //    Action<Node, StringBuilder> appendOneNode = null;
+        //    appendOneNode = delegate (Node node, StringBuilder stringBuilder)
+        //    {
+        //        if (!node.DebugPointInfo.NoDebugPoint)
+        //        {
+        //            stringBuilder.Append(cContentSplitter).Append(node.UID).Append(cContentSplitter).Append(node.DebugPointInfo.HitCount);
+        //        }
+
+        //        foreach (Node chi in node.Conns)
+        //        {
+        //            appendOneNode(chi, stringBuilder);
+        //        }
+        //    };
+
+
+        //    StringBuilder sb = new StringBuilder();
+        //    sb.Append("[DebugTreeWithAgent] ").Append(treename);
+        //    sb.Append(" ").Append(agentUID);
+
+        //    foreach (WorkBench workBench in benches)
+        //    {
+        //        sb.Append(" ");
+        //        sb.Append(workBench.FileInfo.Name).Append(cContentSplitter).Append(workBench.ExportFileHash);
+
+        //        appendOneNode(workBench.MainTree, sb);
+        //    }
+
+
+        //    NetworkMgr.Instance.SendText(sb.ToString());
+
+        //    Clear();
+        //}
 
         public void DoContinue()
         {
@@ -105,7 +116,10 @@ namespace YBehavior.Editor.Core
 
         public void SetDebugPoint(string treename, uint uid, int count)
         {
-            NetworkMgr.Instance.SendText("[DebugPoint] " + treename + " " + uid.ToString() + " " + count.ToString());
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[DebugPoint]").Append(msgContentSplitter).Append(treename).Append(msgContentSplitter).Append(uid).Append(msgContentSplitter).Append(count);
+            NetworkMgr.Instance.SendText(sb.ToString());
+            //NetworkMgr.Instance.SendText("[DebugPoint]" + msgContentSplitter + treename + msgContentSplitter + uid.ToString() + msgContentSplitter + count.ToString());
         }
 
         public void Update()
@@ -163,6 +177,11 @@ namespace YBehavior.Editor.Core
                     if (words.Length != 2)
                         return;
                     _HandleLogPoint(words[1]);
+                    break;
+                case "[SubTrees]":
+                    if (words.Length != 2)
+                        return;
+                    _HandleSubTrees(words[1]);
                     break;
             }
         }
@@ -371,6 +390,103 @@ namespace YBehavior.Editor.Core
                 LogMgr.Instance.LogEnd();
                 LogMgr.Instance.LogLineWithColor("-------</LogPoint>-------", ConsoleColor.Cyan);
             }
+        }
+
+        void _HandleSubTrees(string ss)
+        {
+            if (Config.Instance.PrintIntermediateInfo)
+                LogMgr.Instance.Log(ss);
+
+            string[] data = ss.Split(msgListSplitter, StringSplitOptions.RemoveEmptyEntries);
+            if (data.Length > 0)
+            {
+                List<string> treeName = new List<string>();
+                List<uint> hashes = new List<uint>();
+
+                foreach (string s in data)
+                {
+                    string[] sub = s.Split(msgSequenceSplitter, StringSplitOptions.RemoveEmptyEntries);
+                    if (sub.Length != 2)
+                        continue;
+
+                    if (uint.TryParse(sub[1], out uint hash))
+                    {
+                        treeName.Add(sub[0]);
+                        hashes.Add(hash);
+                    }
+                }
+
+                if (hashes.Count > 0)
+                {
+                    List<WorkBench> res = WorkBenchMgr.Instance.OpenAList(treeName);
+                    if (res.Count != hashes.Count)
+                    {
+                        LogMgr.Instance.Error("Open some files failed.");
+                    }
+                    else
+                    {
+                        for (int i = 0; i < res.Count; i++)
+                        {
+                            if (res[i].ExportFileHash != hashes[i])
+                            {
+                                ShowSystemTipsArg arg = new ShowSystemTipsArg
+                                {
+                                    Content = res[i].DisplayName + " version is different with RunTime.",
+                                    TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                                };
+                                EventMgr.Instance.Send(arg);
+                                break;
+                            }
+                        }
+
+                        DebugMgr.Instance.BuildRunInfo(res);
+                        _DoDebugBegin(res);
+
+                        {
+                            ShowSystemTipsArg arg = new ShowSystemTipsArg
+                            {
+                                Content = "Start Debug",
+                                TipType = ShowSystemTipsArg.TipsType.TT_Success,
+                            };
+                            EventMgr.Instance.Send(arg);
+                        }
+                    }
+                }
+            }
+        }
+
+        void _DoDebugBegin(List<WorkBench> benches)
+        {
+            Action<Node, StringBuilder> appendOneNode = null;
+            appendOneNode = delegate (Node node, StringBuilder stringBuilder)
+            {
+                if (!node.DebugPointInfo.NoDebugPoint)
+                {
+                    stringBuilder.Append(cSequenceSplitter).Append(node.UID).Append(cSequenceSplitter).Append(node.DebugPointInfo.HitCount);
+                }
+
+                foreach (Node chi in node.Conns)
+                {
+                    appendOneNode(chi, stringBuilder);
+                }
+            };
+
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[DebugBegin]");
+            sb.Append(cContentSplitter);
+
+            foreach (WorkBench workBench in benches)
+            {
+                sb.Append(cContentSplitter);
+                sb.Append(workBench.FileInfo.Name);
+
+                appendOneNode(workBench.MainTree, sb);
+            }
+
+
+            NetworkMgr.Instance.SendText(sb.ToString());
+
         }
     }
 }

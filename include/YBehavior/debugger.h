@@ -70,7 +70,8 @@ namespace YBehavior
 	class DebugHelper;
 	class DebugMgr: public Singleton<DebugMgr>
 	{
-		UINT64 m_TargetAgent;
+		UINT64 m_TargetAgent = 0;
+		UINT64 m_TryTarget = 0;
 		//UINT m_TargetHash;
 		STRING m_TargetTree;
 		bool m_bTargetDirty = false;
@@ -88,7 +89,8 @@ namespace YBehavior
 		DebugHelper* m_StepOverHelper = nullptr;
 	public:
 		~DebugMgr();
-		void SetTarget(const STRING& tree, UINT agent);
+		void SetTarget(const STRING& tree, UINT64 agent);
+		void Begin();
 		void ResetTarget();
 		void Stop();
 		bool IsValidTarget(Agent* pAgent, BehaviorTree* pTree);

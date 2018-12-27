@@ -41,7 +41,7 @@ namespace YBehavior.Editor.Core
     {
         string m_TargetTreeName;
 
-        uint m_UID;
+        ulong m_UID;
         TreeMemory m_EmptySharedData = new TreeMemory(null);
         public string TargetTreeName { get { return m_TargetTreeName; } }
 
@@ -141,15 +141,14 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        public void StartDebugTreeWithAgent(uint uid)
+        public void StartDebugTreeWithAgent(ulong uid)
         {
             m_TargetTreeName = WorkBenchMgr.Instance.ActiveWorkBench.FileInfo.Name;
             m_UID = uid;
-            //m_SharedData = WorkBenchMgr.Instance.ActiveWorkBench.MainTree.GetTreeSharedData().Clone();
 
-            List<WorkBench> benches = WorkBenchMgr.Instance.OpenAllRelated();
-            BuildRunInfo(benches);
-            NetworkMgr.Instance.MessageProcessor.DebugTreeWithAgent(m_TargetTreeName, m_UID, benches);
+            //List<WorkBench> benches = WorkBenchMgr.Instance.OpenAllRelated();
+            //BuildRunInfo(benches);
+            NetworkMgr.Instance.MessageProcessor.DebugTreeWithAgent(m_TargetTreeName, m_UID);
 
             DebugTargetChangedArg arg = new DebugTargetChangedArg
             {
@@ -182,7 +181,7 @@ namespace YBehavior.Editor.Core
             NetworkMgr.Instance.MessageProcessor.SetDebugPoint(treename, uid, count);
         }
 
-        void BuildRunInfo(List<WorkBench> benches)
+        public void BuildRunInfo(List<WorkBench> benches)
         {
             ClearRunInfo();
             foreach (WorkBench bench in benches)

@@ -490,5 +490,28 @@ namespace YBehavior.Editor.Core
 
             return res;
         }
+        public List<WorkBench> OpenAList(IEnumerable<string> list)
+        {
+            List<WorkBench> res = new List<WorkBench>();
+
+            foreach (string treename in list)
+            {
+                System.IO.FileInfo file = new System.IO.FileInfo(Config.Instance.WorkingDir + treename + ".xml");
+                if (!file.Exists)
+                    continue;
+
+                TreeFileMgr.TreeFileInfo fileInfo = TreeFileMgr.Instance.GetFileInfo(file.FullName);
+                WorkBench newBench = OpenWorkBenchInBackGround(fileInfo);
+
+                WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
+                arg.Bench = newBench;
+                EventMgr.Instance.Send(arg);
+
+                res.Add(newBench);
+            }
+
+            return res;
+        }
+
     }
 }

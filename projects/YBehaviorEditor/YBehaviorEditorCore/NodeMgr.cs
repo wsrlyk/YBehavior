@@ -450,7 +450,6 @@ namespace YBehavior.Editor.Core
                     ///> Check if has connection
                     if (m_ConditonConnection.NodeCount > 0)
                     {
-                        LogMgr.Instance.Error("Should remove connection first");
                         ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
                         {
                             Content = "Should remove connection first.",
