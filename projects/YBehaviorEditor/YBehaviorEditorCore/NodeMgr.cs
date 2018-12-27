@@ -389,7 +389,16 @@ namespace YBehavior.Editor.Core
         protected NodeHierachy m_Hierachy = NodeHierachy.NH_None;
         public NodeHierachy Hierachy { get { return m_Hierachy; } set { m_Hierachy = value; } }
 
-        public string ReturnType { get; set; } = "Default";
+        private string m_ReturnType = "Default";
+        public string ReturnType
+        {
+            get { return m_ReturnType; }
+            set
+            {
+                m_ReturnType = value;
+                OnPropertyChanged("ReturnType");
+            }
+        } 
 
         public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class", "Connection" });
         public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName", "Connection", "DebugPoint", "Comment" });

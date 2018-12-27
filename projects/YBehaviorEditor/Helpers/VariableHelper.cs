@@ -156,6 +156,22 @@ namespace YBehavior.Editor
         }
     }
 
+    [ValueConversion(typeof(string), typeof(string))]
+    public class ReturnTypeConvertor : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string s = value as string;
+            if (string.IsNullOrEmpty(s))
+                return "D";
+            return s.ToUpper()[0];
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+    }
 
     public class ValueConverterGroup : List<IValueConverter>, IValueConverter
     {
