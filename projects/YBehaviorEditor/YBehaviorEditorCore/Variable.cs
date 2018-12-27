@@ -364,7 +364,7 @@ namespace YBehavior.Editor.Core
                     return;
                 }
 
-                bool isLocal = false;
+                bool isLocal = IsLocal;
                 if (vbType == VariableType.VBT_Pointer)
                 {
                     int p = value.IndexOf("'");
@@ -372,6 +372,10 @@ namespace YBehavior.Editor.Core
                     {
                         value = value.Substring(0, p);
                         isLocal = true;
+                    }
+                    else
+                    {
+                        isLocal = false;
                     }
                 }
                 SetValue(value, isLocal);
