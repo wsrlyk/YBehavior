@@ -117,7 +117,7 @@ namespace YBehavior.Editor
             if (WorkBenchMgr.Instance.ActiveWorkBench == null || WorkBenchMgr.Instance.ActiveWorkBench.FileInfo == null)
                 return;
 
-            if (!uint.TryParse(this.debugAgentUID.Text, out uint uid))
+            if (!ulong.TryParse(this.debugAgentUID.Text, out ulong uid))
             {
                 ShowSystemTipsArg arg = new ShowSystemTipsArg()
                 {
