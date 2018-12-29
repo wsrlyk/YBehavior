@@ -273,8 +273,11 @@ namespace YBehavior.Editor.Core
             {
                 ///> MainData
                 ///> Copied to each subtrees
-                foreach(var v in DebugMgr.Instance.GetRunInfos.Values)
-                    _HandleMemory(v.sharedData.SharedMemory, data[0]);
+                foreach (var v in DebugMgr.Instance.GetRunInfos.Values)
+                {
+                    if (v.sharedData != null)
+                        _HandleMemory(v.sharedData.SharedMemory, data[0]);
+                }
 
                 ++m_TickResultToken;
 
@@ -295,7 +298,8 @@ namespace YBehavior.Editor.Core
                         ///> Only copied to the specified subtree
                         if (i % 3 == 2)
                         {
-                            _HandleMemory(runInfo.sharedData.LocalMemory, data[i]);
+                            if (runInfo.sharedData != null)
+                                _HandleMemory(runInfo.sharedData.LocalMemory, data[i]);
                             continue;
                         }
 
