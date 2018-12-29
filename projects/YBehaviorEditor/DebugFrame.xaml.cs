@@ -117,9 +117,20 @@ namespace YBehavior.Editor
             if (WorkBenchMgr.Instance.ActiveWorkBench == null || WorkBenchMgr.Instance.ActiveWorkBench.FileInfo == null)
                 return;
 
-            uint.TryParse(this.debugAgentUID.Text, out uint uid);
-            DebugMgr.Instance.StartDebugTreeWithAgent(
+            if (!uint.TryParse(this.debugAgentUID.Text, out uint uid))
+            {
+                ShowSystemTipsArg arg = new ShowSystemTipsArg()
+                {
+                    Content = "Failed parsing the ID.",
+                    TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                };
+                EventMgr.Instance.Send(arg);
+            }
+            else
+            {
+                DebugMgr.Instance.StartDebugTreeWithAgent(
                 uid);
+            }
         }
 
         private void btnContinue_Click(object sender, RoutedEventArgs e)

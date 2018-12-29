@@ -15,7 +15,7 @@ namespace YBehavior
 
 		std::unordered_map<STRING, STRING> m_SubsMap;
 		std::vector<STRING> m_SubsList;
-		std::unordered_set<STRING> m_DontHave;
+		std::unordered_map<STRING, STRING> m_UseDefault;
 
 		UINT m_ID;
 

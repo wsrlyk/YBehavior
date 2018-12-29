@@ -33,14 +33,6 @@ void YBehavior::TreeID::SetSubTrees(const std::vector<STRING>& inputs)
 
 bool YBehavior::TreeID::TryGetSubTreeName(const STRING& id, const STRING& defaultName, STRING& outName)
 {
-	outName = defaultName;
-	///> No replaced subs
-	if (!m_pAllSubs)
-	{
-		m_DontHave.insert(id);
-		return false;
-	}
-
 	auto it = m_SubsMap.find(id);
 	///> Already added.
 	if (it != m_SubsMap.end())
@@ -49,17 +41,27 @@ bool YBehavior::TreeID::TryGetSubTreeName(const STRING& id, const STRING& defaul
 		return true;
 	}
 
+	outName = defaultName;
+	///> No replaced subs
+	if (!m_pAllSubs)
+	{
+		m_UseDefault[id] = defaultName;
+		return false;
+	}
+
+
 	it = m_pAllSubs->find(id);
 	///> No such an id
 	if (it == m_pAllSubs->end())
 	{
-		m_DontHave.insert(id);
+		m_UseDefault[id] = defaultName;
 		return false;
 	}
 
 	///> Same as DefaultName
 	if (it->second == defaultName)
 	{
+		m_UseDefault[id] = defaultName;
 		return false;
 	}
 
@@ -123,10 +125,10 @@ bool YBehavior::TreeID::IsSameTree(const STRING& name, const std::vector<STRING>
 		const STRING& name = (*subs)[i + 1];
 
 		auto it = m_SubsMap.find(id);
-		///> Shouldnt exist in Donthave
 		if (it == m_SubsMap.end())
 		{
-			if (m_DontHave.find(id) == m_DontHave.end())
+			auto it2 = m_UseDefault.find(id);
+			if (it2 == m_UseDefault.end() || it2->second == name)
 			{
 				continue;
 			}
