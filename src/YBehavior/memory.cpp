@@ -48,6 +48,21 @@ namespace YBehavior
 		}
 	}
 
+	StackInfo& StackInfo::operator=(const StackInfo& other)
+	{
+		Owner = other.Owner;
+		if (other.Data)
+		{
+			Data = ObjectPool<SharedDataEx>::Get();
+			Data->CloneFrom(*other.Data);
+		}
+		else
+		{
+			Data = nullptr;
+		}
+		return *this;
+	}
+
 	StackInfo::~StackInfo()
 	{
 		if (Data)

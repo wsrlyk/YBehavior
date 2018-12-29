@@ -14,6 +14,7 @@ namespace YBehavior
 		StackInfo(BehaviorTree* pTree);
 		StackInfo(StackInfo&& other);
 		StackInfo(const StackInfo& other);
+		StackInfo& operator=(const StackInfo& other);
 		~StackInfo();
 		BehaviorTree* Owner;
 		SharedDataEx* Data;
