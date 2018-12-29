@@ -37,6 +37,7 @@ bool YBehavior::TreeID::TryGetSubTreeName(const STRING& id, const STRING& defaul
 	///> No replaced subs
 	if (!m_pAllSubs)
 	{
+		m_DontHave.insert(id);
 		return false;
 	}
 
