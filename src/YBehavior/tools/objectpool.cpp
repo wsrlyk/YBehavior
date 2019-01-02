@@ -10,4 +10,7 @@ namespace YBehavior
 		t->Reset();
 		s_Pool.push_back(t);
 	}
+
+	std::unordered_set<void*> ObjectPoolHelper::s_UnRecycled;
+
 }
