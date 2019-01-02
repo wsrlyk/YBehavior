@@ -9,6 +9,7 @@
 
 #include <list>
 #include <unordered_map>
+#include "YBehavior/network/network.h"
 
 namespace YBehavior
 {
@@ -76,6 +77,7 @@ namespace YBehavior
 		STRING m_TargetTree;
 		bool m_bTargetDirty = false;
 
+		Mutex m_Mutex;
 		std::list<NodeRunInfo*> m_RunInfos;
 		//std::unordered_map<UINT, DebugPointInfo> m_DebugPointInfos;
 
@@ -97,6 +99,7 @@ namespace YBehavior
 		inline const STRING& GetTargetTree() { return m_TargetTree; }
 		inline UINT64 GetTargetAgent() { return m_TargetAgent; }
 		inline const std::list<NodeRunInfo*>& GetRunInfos() { return m_RunInfos; }
+		inline Mutex& GetMutex() { return m_Mutex; }
 		bool HasBreakPoint(const STRING& treeName, UINT nodeUID);
 		bool HasLogPoint(const STRING& treeName, UINT nodeUID);
 		bool HasDebugPoint(const STRING& treeName, UINT nodeUID);

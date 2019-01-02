@@ -1,7 +1,6 @@
 #include "YBehavior/debugger.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/tools/objectpool.h"
-#include "YBehavior/network/network.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/interface.h"
 #include "YBehavior/nodefactory.h"
@@ -275,6 +274,7 @@ namespace YBehavior
 
 	NodeRunInfo* DebugMgr::CreateAndAppendRunInfo()
 	{
+		ScopedLock lock(m_Mutex);
 		NodeRunInfo* pInfo = ObjectPool<NodeRunInfo>::Get();
 		m_RunInfos.push_back(pInfo);
 		return pInfo;
@@ -282,6 +282,7 @@ namespace YBehavior
 
 	void DebugMgr::Clear()
 	{
+		ScopedLock lock(m_Mutex);
 		for (auto it = m_RunInfos.begin(); it != m_RunInfos.end(); ++it)
 		{
 			ObjectPool<NodeRunInfo>::Recycle(*it);
@@ -478,13 +479,16 @@ namespace YBehavior
 		}
 
 		///> Run Info:
-		const std::list<NodeRunInfo*>& runInfos = DebugMgr::Instance()->GetRunInfos();
-		for (auto it = runInfos.begin(); it != runInfos.end(); ++it)
 		{
-			STRING& buf = treeBuffer[(*it)->tree].second;
-			if (buf.length() > 0)
-				buf += s_ListSpliter;
-			buf += (*it)->ToString();
+			ScopedLock lock(DebugMgr::Instance()->GetMutex());
+			const std::list<NodeRunInfo*>& runInfos = DebugMgr::Instance()->GetRunInfos();
+			for (auto it = runInfos.begin(); it != runInfos.end(); ++it)
+			{
+				STRING& buf = treeBuffer[(*it)->tree].second;
+				if (buf.length() > 0)
+					buf += s_ListSpliter;
+				buf += (*it)->ToString();
+			}
 		}
 		for (auto it = treeBuffer.begin(); it != treeBuffer.end(); ++it)
 		{

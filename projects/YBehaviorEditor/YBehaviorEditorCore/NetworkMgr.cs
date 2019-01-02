@@ -103,7 +103,7 @@ namespace YBehavior.Editor.Core
         }
 
 
-        private const int kMaxTextLength = 4228 + 1 + 1;
+        private const int kMaxTextLength = 16382 + 1 + 1;
         private const int BUFFER_SIZE = 16384 * 10;
 
         private uint m_packetsReceived = 0;
