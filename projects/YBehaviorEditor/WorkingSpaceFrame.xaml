@@ -23,7 +23,7 @@
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="20" Height="20" Stretch="Fill" Source="{Binding Icon}" ></Image>
-                        <TextBlock FontSize="14" Text="{Binding Name}" Margin="2,0,0,0"></TextBlock>
+                        <TextBlock FontSize="14" Text="{Binding Name}" Margin="2,0,0,0" ToolTip="{Binding Name}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
