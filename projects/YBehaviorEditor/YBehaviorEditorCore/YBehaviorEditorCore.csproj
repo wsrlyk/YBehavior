@@ -50,6 +50,7 @@
     <Compile Include="ExternalActionMgr.cs" />
     <Compile Include="InOutMemoryMgr.cs" />
     <Compile Include="Memory.cs" />
+    <Compile Include="TypeMap.cs" />
     <Compile Include="VariableCollection.cs" />
     <Compile Include="Tools\DiffMatchPatch.cs" />
     <Compile Include="Tools\IniFile.cs" />

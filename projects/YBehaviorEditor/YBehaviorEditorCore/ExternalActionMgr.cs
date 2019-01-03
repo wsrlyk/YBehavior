@@ -71,11 +71,23 @@ namespace YBehavior.Editor.Core
             foreach (XmlNode chi in xml.ChildNodes)
             {
                 ///> New Variable
-                if (chi.Name == "Variable")
+                switch (chi.Name)
                 {
-                    _LoadVariable(action, chi);
+                    case "Variable":
+                        {
+                            _LoadVariable(action, chi);
+                        }
+                        break;
+                    case "TypeMap":
+                        {
+                            _LoadTypeMap(action, chi);
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
+
             return true;
         }
 
@@ -169,6 +181,11 @@ namespace YBehavior.Editor.Core
             );
             v.IsLocal = bIsLocal;
             return true;
+        }
+
+        bool _LoadTypeMap(ActionNode action, XmlNode xml)
+        {
+            return action.TypeMap.TryAdd(xml);
         }
     }
 }

@@ -152,6 +152,9 @@ namespace YBehavior.Editor.Core
             get { return m_vType; }
             set
             {
+                if (m_vType == value)
+                    return;
+
                 ChangeVariableVTypeCommand command = new ChangeVariableVTypeCommand()
                 {
                     OldType = m_vType,
@@ -171,6 +174,7 @@ namespace YBehavior.Editor.Core
 
                 RefreshCandidates();
                 SetValue(null, IsLocal);
+                OnPropertyChanged("vType");
                 _OnConditionChanged();
 
                 WorkBenchMgr.Instance.PushCommand(command);
@@ -182,6 +186,9 @@ namespace YBehavior.Editor.Core
             get { return m_cType; }
             set
             {
+                if (m_cType == value)
+                    return;
+
                 ChangeVariableCTypeCommand command = new ChangeVariableCTypeCommand()
                 {
                     OldType = m_cType,
@@ -218,6 +225,9 @@ namespace YBehavior.Editor.Core
             get { return m_vbType; }
             set
             {
+                if (m_vbType == value)
+                    return;
+
                 ChangeVariableVBTypeCommand command = new ChangeVariableVBTypeCommand()
                 {
                     OldType = m_vbType,

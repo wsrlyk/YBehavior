@@ -1,9 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Actions>
 	<Action Class="GetNameAction" Note="{0} has {1} in {2}" Hierachy="21" Icon="🎀">
-		<Variable Name="Var0" ValueType="IF" IsArray="False" VariableType="P" Value="1" TypeGroup="1"/>
-		<Variable Name="Var1" ValueType="E" IsArray="False" Value="Enum2" Param="Enum0|Enum1|Enum2" TypeGroup="1"/>
+		<Variable Name="Var0" ValueType="IF" VariableType="P" Value="1" TypeGroup="1"/>
+		<Variable Name="Var1" ValueType="E" IsArray="False" Value="" Param="Enum0|Enum1|Enum2" TypeGroup="1"/>
 		<Variable Name="Var2" ValueType="S" IsArray="True" Value="1|2|3|4" />
+		<TypeMap SrcVariable="Var1" SrcValue="Enum0" DesVariable="Var0" DesType="_I" />
+		<TypeMap SrcVariable="Var1" SrcValue="Enum1" DesVariable="Var0" DesType="_F" />
+		<TypeMap SrcVariable="Var1" SrcValue="Enum2" DesVariable="Var0" DesType="FF" />
 	</Action>
 	<Action Class="GetTargetNameAction" Note="{0}" Hierachy="21">
 		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" Value="0"/>

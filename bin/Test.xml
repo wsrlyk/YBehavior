@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Test>
+  <Node Class="Root" Pos="0,0">
+    <Shared f="_FC 0.0" />
+    <Node Class="GetNameAction" Pos="51,174" Var0="FFP " Var1="_EC Enum2" Var2="SSC 1|2|3|4" />
+  </Node>
+</Test>

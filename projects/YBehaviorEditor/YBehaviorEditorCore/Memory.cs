@@ -198,8 +198,8 @@ namespace YBehavior.Editor.Core
         {
             TreeMemory memory = new TreeMemory(owner ?? m_Owner);
 
-            m_LocalVariables.CloneTo(memory.m_LocalVariables);
-            m_SharedVariables.CloneTo(memory.m_SharedVariables);
+            memory.m_LocalVariables.CloneFrom(m_LocalVariables);
+            memory.m_SharedVariables.CloneFrom(m_SharedVariables);
 
             foreach (var v in m_DataList)
                 memory.m_DataList.Add(v);
@@ -429,16 +429,16 @@ namespace YBehavior.Editor.Core
         {
             InOutMemory memory = new InOutMemory(owner ?? m_Owner, m_bIsCore);
 
-            m_InputVariables.CloneTo(memory.m_InputVariables);
-            m_OutputVariables.CloneTo(memory.m_OutputVariables);
+            memory.m_InputVariables.CloneFrom(m_InputVariables);
+            memory.m_OutputVariables.CloneFrom(m_OutputVariables);
 
             return memory;
         }
 
-        public void CloneTo(InOutMemory other)
+        public void CloneFrom(InOutMemory other)
         {
-            m_InputVariables.CloneTo(other.m_InputVariables);
-            m_OutputVariables.CloneTo(other.m_OutputVariables);
+            m_InputVariables.CloneFrom(other.m_InputVariables);
+            m_OutputVariables.CloneFrom(other.m_OutputVariables);
         }
 
         /// <summary>
@@ -516,14 +516,11 @@ namespace YBehavior.Editor.Core
             }
         }
 
-        public NodeMemory Clone(Node owner = null)
+        public void CloneFrom(NodeMemory other)
         {
-            NodeMemory nodeMemory = new NodeMemory(owner ?? m_Owner);
-            base.CloneTo(nodeMemory);
-            if (SameTypeGroup != null)
-                nodeMemory.SameTypeGroup = this.SameTypeGroup.Clone();
-
-            return nodeMemory;
+            base.CloneFrom(other);
+            if (other.SameTypeGroup != null)
+                SameTypeGroup = other.SameTypeGroup.Clone();
         }
     }
 }

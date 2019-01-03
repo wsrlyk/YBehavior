@@ -445,6 +445,9 @@ namespace YBehavior.Editor.Core
         }
         public virtual InOutMemory InOutData { get { return null; } }
 
+        TypeMap m_TypeMap = new TypeMap();
+        public TypeMap TypeMap { get { return m_TypeMap; } }
+
         #region CONDITION
         Connection m_ConditonConnection;
         bool m_bEnableConditionConnection = false;
@@ -741,6 +744,35 @@ namespace YBehavior.Editor.Core
                         }
                     }
                 }
+
+                if (TypeMap.Items.Count > 0)
+                {
+                    Variable vCache = null;
+                    foreach (var mapItem in TypeMap.Items)
+                    {
+                        if (vCache == null || vCache.Name != mapItem.SrcVariable)
+                            vCache = memory.GetVariable(mapItem.SrcVariable);
+                        if (vCache == null)
+                            continue;
+                        if (vCache.Value != mapItem.SrcValue)
+                            continue;
+                        Variable des = memory.GetVariable(mapItem.DesVariable);
+                        if (des == null)
+                            continue;
+
+                        if (mapItem.DesVType != Variable.ValueType.VT_NONE && mapItem.DesVType != des.vType)
+                        {
+                            LogMgr.Instance.Log("Value Type not match in Node: " + UITitle + "." + mapItem.DesVariable);
+                            bRes = false;
+                        }
+
+                        if (mapItem.DesCType != Variable.CountType.CT_NONE && mapItem.DesCType != des.cType)
+                        {
+                            LogMgr.Instance.Log("Count Type not match in Node: " + UITitle + "." + mapItem.DesVariable);
+                            bRes = false;
+                        }
+                    }
+                }
             }
 
             return _OnCheckValid() && bRes;
@@ -765,9 +797,9 @@ namespace YBehavior.Editor.Core
 
             if (this.Variables is NodeMemory)
             {
-                (this.Variables as NodeMemory).CloneTo(other.Variables as NodeMemory);
+                (other.Variables as NodeMemory).CloneFrom(this.Variables as NodeMemory);
             }
-
+            other.TypeMap.CloneFrom(this.TypeMap);
             return other;
         }
 
@@ -812,6 +844,22 @@ namespace YBehavior.Editor.Core
             Node parent = Parent as Node;
             if ((parent == null && m_DisableCount - m_SelfDisabled > 0) || (parent != null && parent.Disabled))
                 Utility.OperateNode(this, true, _SetDisableBasedOnParent);
+        }
+
+        public void OnVariableValueChanged(Variable v)
+        {
+            if (TypeMap.TryGet(v, out TypeMap.Item item))
+            {
+                Variable des = this.Variables.GetVariable(item.DesVariable);
+                if (des != null)
+                {
+                    if (item.DesCType != Variable.CountType.CT_NONE)
+                        des.cType = item.DesCType;
+                    if (item.DesVType != Variable.ValueType.VT_NONE)
+                        des.vType = item.DesVType;
+                }
+            }
+            OnPropertyChanged("Note");
         }
 
         public static int SortByPosX(NodeBase aa, NodeBase bb)

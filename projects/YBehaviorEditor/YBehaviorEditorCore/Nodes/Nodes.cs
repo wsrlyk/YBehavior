@@ -1098,7 +1098,7 @@ namespace YBehavior.Editor.Core
                     InOutMemory source = InOutMemoryMgr.Instance.Get(m_Tree.Value);
                     if (source == null)
                         return false;
-                    source.CloneTo(m_InOutMemory);
+                    m_InOutMemory.CloneFrom(source);
                 }
                 m_LoadedTree = m_Tree.Value;
                 return true;

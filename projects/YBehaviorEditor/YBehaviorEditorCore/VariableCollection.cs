@@ -169,21 +169,21 @@ namespace YBehavior.Editor.Core
         public void OnVariableValueChanged(Variable v)
         {
             if (m_Owner != null)
-                m_Owner.OnPropertyChanged("Note");
+                m_Owner.OnVariableValueChanged(v);
         }
 
-        public void CloneTo(VariableCollection other)
+        public void CloneFrom(VariableCollection other)
         {
             using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
             {
-                using (var delay = other.m_VariableList.Delay())
+                using (var delay = m_VariableList.Delay())
                 {
-                    other.m_VariableList.Clear();
-                    other.m_Variables.Clear();
-                    foreach (VariableHolder v in m_VariableList)
+                    m_VariableList.Clear();
+                    m_Variables.Clear();
+                    foreach (VariableHolder v in other.m_VariableList)
                     {
                         Variable vv = v.Variable.Clone();
-                        other.DoAddVariable(vv);
+                        DoAddVariable(vv);
                     }
                 }
             }

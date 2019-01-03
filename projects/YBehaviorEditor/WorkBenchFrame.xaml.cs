@@ -344,6 +344,9 @@ namespace YBehavior.Editor
 
         private void _MouseWheel(object sender, MouseWheelEventArgs e)
         {
+            if (m_CurPageData == null)
+                return;
+
             Point pos = e.GetPosition(this.CanvasBoard);
             Point oldPos = new Point(m_CurPageData.TranslateTransform.X, m_CurPageData.TranslateTransform.Y);
 
@@ -370,6 +373,9 @@ namespace YBehavior.Editor
 
         void _OnDrag(Vector delta, Point pos)
         {
+            if (m_CurPageData == null)
+                return;
+
             m_CurPageData.TranslateTransform.X += delta.X;
             m_CurPageData.TranslateTransform.Y += delta.Y;
         }
@@ -380,6 +386,8 @@ namespace YBehavior.Editor
         }
         public void ResetTransform()
         {
+            if (m_CurPageData == null)
+                return;
             m_CurPageData.ScaleTransform.ScaleX = 0;
             m_CurPageData.ScaleTransform.ScaleY = 0;
             m_CurPageData.TranslateTransform.X = 0;
