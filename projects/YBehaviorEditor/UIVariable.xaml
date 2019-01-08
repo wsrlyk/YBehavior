@@ -27,6 +27,18 @@
             <local:InvertBoolConverter/>
             <BooleanToVisibilityConverter/>
         </local:ValueConverterGroup>
+        <LinearGradientBrush x:Key="normalBrush"  StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0.0" Color="#00E0FFFF"/>
+            <GradientStop Offset="0.33" Color="#AAE0FFFF"/>
+            <GradientStop Offset="0.66" Color="#AAADD8E6"/>
+            <GradientStop Offset="1.0" Color="#00ADD8E6"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="hormalBrush"  StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0.0" Color="#00E0FFFF"/>
+            <GradientStop Offset="0.33" Color="#EEE0FFFF"/>
+            <GradientStop Offset="0.66" Color="#EEADD8E6"/>
+            <GradientStop Offset="1.0" Color="#00ADD8E6"/>
+        </LinearGradientBrush>
 
         <Style x:Key="TransparentHoverStyle" TargetType="{x:Type Button}">
             <Setter Property="Template">
@@ -37,18 +49,12 @@
                                 <Style TargetType="{x:Type Border}">
                                     <Style.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#66424242"/>
+                                            <Setter Property="Background" Value="{StaticResource hormalBrush}"/>
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
-                            <Grid>
-                                <Grid.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                        <GradientStop Offset="0.0" Color="#00EEEEEE"/>
-                                        <GradientStop Offset="1.0" Color="#FFEEEEEE"/>
-                                    </LinearGradientBrush>
-                                </Grid.Background>
+                            <Grid Background="{StaticResource normalBrush}">
                                 <ContentPresenter></ContentPresenter>
                             </Grid>
                         </Border>
