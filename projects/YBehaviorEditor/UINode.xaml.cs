@@ -82,11 +82,11 @@ namespace YBehavior.Editor
             {
                 ConnectorGeometry geo = Node.Conns.GetConnHolder(identifier).Geo;
                 uiConnector.DataContext = geo;
-                uiConnector.SetBinding(UIConnector.HotspotProperty, new Binding()
-                {
-                    Path = new PropertyPath("Pos"),
-                    Mode = BindingMode.OneWayToSource
-                });
+                //uiConnector.SetBinding(UIConnector.HotspotProperty, new Binding()
+                //{
+                //    Path = new PropertyPath("Pos"),
+                //    Mode = BindingMode.OneWayToSource
+                //});
             }
         }
         private void _CreateConnectors()

@@ -36,6 +36,8 @@ namespace YBehavior.Editor
 
         public static readonly DependencyProperty HotspotProperty =
             DependencyProperty.Register("Hotspot", typeof(Point), typeof(UIConnector));
+        public static readonly DependencyProperty OwnerNodeProperty =
+            DependencyProperty.Register("OwnerNode", typeof(UINode), typeof(UIConnector));
 
         #endregion Dependency Property/Event Definitions
 
@@ -51,6 +53,20 @@ namespace YBehavior.Editor
             }
         }
 
+        public UINode OwnerNode
+        {
+            get
+            {
+                return (UINode)GetValue(OwnerNodeProperty);
+            }
+            set
+            {
+                SetValue(OwnerNodeProperty, value);
+            }
+        }
+
+        Vector m_RelativePos = new Vector(double.MaxValue, double.MaxValue);
+
         public UIConnector()
         {
             InitializeComponent();
@@ -65,6 +81,16 @@ namespace YBehavior.Editor
             m_Operation.RegisterDragDrop(_OnDragged, _OnStartDragged, _OnFinishDragged);
 
             this.LayoutUpdated += _OnLayoutUpdated;
+
+            this.SetBinding(OwnerNodeProperty, new Binding()
+            {
+                RelativeSource = new RelativeSource()
+                {
+                    Mode = RelativeSourceMode.FindAncestor,
+                    AncestorLevel = 1,
+                    AncestorType = typeof(UINode)
+                }
+            });
         }
 
         void _OnLayoutUpdated(object sender, EventArgs e)
@@ -74,16 +100,22 @@ namespace YBehavior.Editor
 
         private void _UpdateHotspot()
         {
-            if (this.Ancestor != null && !this.Ancestor.IsAncestorOf(this))
+            if (OwnerNode != null)
             {
-                this.Ancestor = null;
-                return;
+                if (m_RelativePos.X == double.MaxValue && m_RelativePos.Y == double.MaxValue)
+                {
+                    m_RelativePos = TransformToAncestor(OwnerNode).Transform(new Point(ActualWidth / 2, ActualHeight / 2)) - new Point();
+                }
+
+                if (OwnerNode.DataContext is Renderer)
+                {
+                    Point pos = (OwnerNode.DataContext as Renderer).Geo.Pos + m_RelativePos;
+                    //Hotspot = pos;
+                    (this.DataContext as ConnectorGeometry).Pos = pos;
+                }
             }
 
-            if (Ancestor == null)
-                return;
-
-            Hotspot = GetPos(Ancestor);
+            //Hotspot = GetPos(Ancestor);
         }
 
         public string Title
@@ -102,7 +134,7 @@ namespace YBehavior.Editor
             {
                 return TransformToAncestor(visual).Transform(new Point(ActualWidth / 2, ActualHeight / 2));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 LogMgr.Instance.Log(e.ToString());
                 return new Point();
@@ -146,19 +178,19 @@ namespace YBehavior.Editor
             foreach (var o in objs)
             {
                 var obj = o;
-//                LogMgr.Instance.Log("Drag HitTest: " + obj.ToString());
+                //                LogMgr.Instance.Log("Drag HitTest: " + obj.ToString());
                 while (obj != null && obj.GetType() != typeof(Canvas))
                 {
                     if (obj is IDropable && obj != this)
                     {
-//                        LogMgr.Instance.Log("Drag FinalHit: " + obj.ToString());
+                        //                        LogMgr.Instance.Log("Drag FinalHit: " + obj.ToString());
                         return obj as IDropable;
                     }
 
                     obj = VisualTreeHelper.GetParent(obj);
                 }
             }
-//            LogMgr.Instance.Log("Drag FinalHit: NULL");
+            //            LogMgr.Instance.Log("Drag FinalHit: NULL");
             return null;
         }
 
