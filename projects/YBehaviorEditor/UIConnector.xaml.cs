@@ -118,6 +118,12 @@ namespace YBehavior.Editor
             //Hotspot = GetPos(Ancestor);
         }
 
+        public void ResetPos()
+        {
+            m_RelativePos.X = double.MaxValue;
+            m_RelativePos.Y = double.MaxValue;
+        }
+
         public string Title
         {
             get { return title.Text; }

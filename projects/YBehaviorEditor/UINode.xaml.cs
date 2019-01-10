@@ -47,6 +47,16 @@ namespace YBehavior.Editor
             this.DataContextChanged += _DataContextChangedEventHandler;
         }
 
+        protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
+        {
+            base.OnRenderSizeChanged(sizeInfo);
+
+            foreach (UIConnector c in m_uiConnectors.Values)
+            {
+                c.ResetPos();
+            }
+        }
+
         void _DataContextChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e)
         {
             Node = (DataContext as Renderer).Owner;
