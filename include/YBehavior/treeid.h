@@ -24,6 +24,7 @@ namespace YBehavior
 		void SetSubTrees(const std::vector<STRING>& inputs);
 		bool TryGetSubTreeName(const STRING& id, const STRING& defaultName, STRING& outName);
 		void BuildID();
+		void Merge(const YBehavior::TreeID& other);
 		inline UINT GetID() const { return m_ID; }
 		inline const STRING& GetName() const { return m_TreeName; }
 

@@ -176,7 +176,6 @@ namespace YBehavior
 
 
 		tree = _LoadTree(id);
-		id->BuildID();
 		if (!tree)
 			return true;
 		info->SetLatestTree(tree);
@@ -194,7 +193,10 @@ namespace YBehavior
 
 				_GetTree(*it2, subTree, false);
 				if (subTree)
+				{
 					tree->AddSubTree(subTree);
+					id->Merge(*subTree->GetTreeID());
+				}
 				else
 				{
 					bLoadChidrenFailed = true;
@@ -211,6 +213,7 @@ namespace YBehavior
 			bNoChildren = false;
 		}
 
+		id->BuildID();
 		return bNoChildren;
 	}
 

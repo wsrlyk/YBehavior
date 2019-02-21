@@ -4,10 +4,6 @@
     <Local a="_Ic 0" b="_Ic 0" s="_Sc " />
     <Input Input="_Ip b" />
     <Output Output="_Ip b" />
-    <Node Class="Sequence">
-      <Node Class="Wait" TickCount="_IC 15" />
-      <Node Class="Calculator" Return="Invert" Operator="_EC ADD" Opl="_Sp s" Opr1="_Sp s" Opr2="_SC b" />
-      <Node Class="Calculator" Operator="_EC MUL" Opl="_Ip b" Opr1="_Ip b" Opr2="_IC 2" />
-    </Node>
+    <Node Class="SubTree" Tree="_SC Test" Identification="_SC Sub1" />
   </Node>
 </SubTree>

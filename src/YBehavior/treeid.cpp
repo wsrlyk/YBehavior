@@ -94,6 +94,26 @@ void YBehavior::TreeID::BuildID()
 	m_ID = Utility::Hash(s);
 }
 
+void YBehavior::TreeID::Merge(const YBehavior::TreeID& other)
+{
+	for (auto it = other.m_SubsMap.begin(); it != other.m_SubsMap.end(); ++it)
+	{
+		if (m_SubsMap.find(it->first) == m_SubsMap.end())
+		{
+			m_SubsMap[it->first] = it->second;
+			m_SubsList.push_back(it->first);
+		}
+	}
+	///> TODO: There's a bug here if different subtree have different UseDefault with same key
+	for (auto it = other.m_UseDefault.begin(); it != other.m_UseDefault.end(); ++it)
+	{
+		if (m_UseDefault.find(it->first) == m_UseDefault.end())
+		{
+			m_UseDefault[it->first] = it->second;
+		}
+	}
+}
+
 bool YBehavior::TreeID::operator<(const TreeID& other) const
 {
 	return m_ID < other.m_ID;
