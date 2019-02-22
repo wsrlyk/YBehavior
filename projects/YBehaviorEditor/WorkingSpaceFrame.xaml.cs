@@ -52,8 +52,8 @@ namespace YBehavior.Editor
 
                     source = data;
                     Name = data.Name;
-                    Icon = !data.bIsFolder ? "Resources/ICON__0000_46.png"
-                                            : "Resources/ICON__0009_37.png";
+                    Icon = !data.bIsFolder ? "📃"
+                                            : "📁";
 
                     if (Name == null)
                         Expanded = true;

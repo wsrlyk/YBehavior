@@ -66,7 +66,7 @@ namespace YBehavior.Editor
                 m_Source = null;
                 Name = Core.DescriptionMgr.Instance.GetHierachyDescription((int)hierachy);
                 m_Level = level;
-                Icon = "Resources/ICON__0009_37.png";
+                Icon = "📁";
                 Description = null;
             }
 
@@ -76,7 +76,7 @@ namespace YBehavior.Editor
                 m_Source = data;
                 m_Hierachy = NodeHierachy.NH_None;
                 Name = data.Name;
-                Icon = "Resources/ICON__0000_46.png";
+                Icon = "▶";
                 Description = data.Description;
             }
 
