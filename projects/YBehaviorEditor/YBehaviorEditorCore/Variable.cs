@@ -420,34 +420,7 @@ namespace YBehavior.Editor.Core
                 IsLocal = isLocal;
 
                 _RefreshDisplayValue();
-
-                if (!IsIndex)
-                {
-                    if (vbType == VariableType.VBT_Pointer)
-                    {
-                        if (cType == CountType.CT_SINGLE && m_VectorCandidates.Contains(DisplayValue))
-                        {
-                            if (m_VectorIndex == null)
-                            {
-                                m_VectorIndex = new Variable(SharedDataSource);
-                                m_VectorIndex.m_Parent = this;
-                                m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, true, "0");
-                                OnPropertyChanged("VectorIndex");
-                            }
-                            m_bVectorIndexEnabled = true;
-                        }
-                        else
-                        {
-                            m_bVectorIndexEnabled = false;
-                            //m_VectorIndex = null;
-                        }
-                    }
-                    else
-                    {
-                        m_bVectorIndexEnabled = false;
-                        //m_VectorIndex = null;
-                    }
-                }
+                _RefreshIndex();
                 _OnValueChanged();
                 _OnConditionChanged();
 
@@ -462,6 +435,38 @@ namespace YBehavior.Editor.Core
             else
                 m_DisplayValue = Value;
         }
+
+        private void _RefreshIndex()
+        {
+            if (!IsIndex)
+            {
+                if (vbType == VariableType.VBT_Pointer)
+                {
+                    if (cType == CountType.CT_SINGLE && m_VectorCandidates.Contains(DisplayValue))
+                    {
+                        if (m_VectorIndex == null)
+                        {
+                            m_VectorIndex = new Variable(SharedDataSource);
+                            m_VectorIndex.m_Parent = this;
+                            m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, true, "0");
+                            OnPropertyChanged("VectorIndex");
+                        }
+                        m_bVectorIndexEnabled = true;
+                    }
+                    else
+                    {
+                        m_bVectorIndexEnabled = false;
+                        //m_VectorIndex = null;
+                    }
+                }
+                else
+                {
+                    m_bVectorIndexEnabled = false;
+                    //m_VectorIndex = null;
+                }
+            }
+        }
+
         private void _OnValueChanged()
         {
             OnPropertyChanged("DisplayValue");
@@ -517,6 +522,16 @@ namespace YBehavior.Editor.Core
         public void DebugStateChanged()
         {
             OnPropertyChanged("IsEditable");
+        }
+
+        public void OnCandidatesChange()
+        {
+            RefreshCandidates(true);
+            _RefreshIndex();
+            if (m_VectorIndex != null)
+                m_VectorIndex.RefreshCandidates(true);
+            _OnValueChanged();
+            _OnConditionChanged();
         }
 
         bool m_IsRefreshed = false;
@@ -575,6 +590,11 @@ namespace YBehavior.Editor.Core
                             LogMgr.Instance.Log(string.Format("VectorIndex invalid: {0}.Index == {1}", Name, m_VectorIndex.DisplayValue));
                             return false;
                         }
+                    }
+                    else
+                    {
+                        LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", Name, cType, other.Name, other.cType));
+                        return false;
                     }
                 }
                 return true;

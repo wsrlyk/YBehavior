@@ -510,9 +510,10 @@ namespace YBehavior.Editor.Core
         {
             foreach (var v in m_Variables.Values)
             {
-                v.Variable.RefreshCandidates(true);
-                if (v.Variable.VectorIndex != null)
-                    v.Variable.VectorIndex.RefreshCandidates(true);
+                v.Variable.OnCandidatesChange();
+                //v.Variable.RefreshCandidates(true);
+                //if (v.Variable.VectorIndex != null)
+                //    v.Variable.VectorIndex.RefreshCandidates(true);
             }
         }
 
