@@ -454,6 +454,14 @@ namespace YBehavior.Editor.Core
                             };
                             EventMgr.Instance.Send(arg);
                         }
+
+                        {
+                            WorkBenchSelectedArg arg = new WorkBenchSelectedArg
+                            {
+                                Bench = res[0],
+                            };
+                            EventMgr.Instance.Send(arg);
+                        }
                     }
                 }
             }

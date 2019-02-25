@@ -149,12 +149,6 @@ namespace YBehavior.Editor.Core
             //List<WorkBench> benches = WorkBenchMgr.Instance.OpenAllRelated();
             //BuildRunInfo(benches);
             NetworkMgr.Instance.MessageProcessor.DebugTreeWithAgent(m_TargetTreeName, m_UID);
-
-            DebugTargetChangedArg arg = new DebugTargetChangedArg
-            {
-                Treename = m_TargetTreeName
-            };
-            EventMgr.Instance.Send(arg);
         }
 
         public void Continue()
