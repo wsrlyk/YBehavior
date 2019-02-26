@@ -456,11 +456,23 @@ namespace YBehavior.Editor.Core
                         }
 
                         {
-                            WorkBenchSelectedArg arg = new WorkBenchSelectedArg
+                            bool bOpened = false;
+                            foreach (WorkBench bench in res)
                             {
-                                Bench = res[0],
-                            };
-                            EventMgr.Instance.Send(arg);
+                                if (WorkBenchMgr.Instance.ActiveWorkBench == bench)
+                                {
+                                    bOpened = true;
+                                    break;
+                                }
+                            }
+                            if (!bOpened)
+                            {
+                                SelectWorkBenchArg arg = new SelectWorkBenchArg
+                                {
+                                    Bench = res[0],
+                                };
+                                EventMgr.Instance.Send(arg);
+                            }
                         }
                     }
                 }
@@ -486,7 +498,6 @@ namespace YBehavior.Editor.Core
 
             StringBuilder sb = new StringBuilder();
             sb.Append("[DebugBegin]");
-            sb.Append(cContentSplitter);
 
             foreach (WorkBench workBench in benches)
             {

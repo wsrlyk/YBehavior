@@ -71,7 +71,7 @@ namespace YBehavior
 	void MessageProcessor::ProcessOne(const STRING& s)
 	{
 		StdVector<STRING> datas;
-		Utility::SplitString(s, datas, DebugHelper::s_ContentSpliter, true);
+		Utility::SplitString(s, datas, DebugHelper::s_ContentSpliter, false);
 
 		if (datas[0] == "[DebugTreeWithAgent]")
 		{

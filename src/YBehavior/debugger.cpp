@@ -74,10 +74,10 @@ namespace YBehavior
 		{
 			if (m_bTargetDirty)
 			{
-				if (m_TryTarget == 0 || m_TryTarget == pAgent->GetDebugUID())
+				if ((m_TryTarget == 0 && pAgent->GetTree()->GetTreeName() == m_TargetTree) || m_TryTarget == pAgent->GetDebugUID())
 				{
-					if (pAgent->GetTree()->GetTreeName() == m_TargetTree)
 					{
+						m_TargetTree = pAgent->GetTree()->GetTreeName();
 						std::list<BehaviorTree*> toVisit;
 						std::unordered_set<BehaviorTree*> visited;
 

@@ -67,17 +67,17 @@ namespace YBehavior.Editor
 
         private void btnStartDebug_Click(object sender, RoutedEventArgs e)
         {
-            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            if (bench == null)
-            {
-                ShowSystemTipsArg arg = new ShowSystemTipsArg()
-                {
-                    Content = "Should Open A Tree.",
-                    TipType = ShowSystemTipsArg.TipsType.TT_Error,
-                };
-                EventMgr.Instance.Send(arg);
-                return;
-            }
+            //WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
+            //if (bench == null)
+            //{
+            //    ShowSystemTipsArg arg = new ShowSystemTipsArg()
+            //    {
+            //        Content = "Should Open A Tree.",
+            //        TipType = ShowSystemTipsArg.TipsType.TT_Error,
+            //    };
+            //    EventMgr.Instance.Send(arg);
+            //    return;
+            //}
             foreach (WorkBench openedBench in WorkBenchMgr.Instance.OpenedBenches)
             {
                 if (openedBench.CommandMgr.Dirty)
@@ -114,10 +114,10 @@ namespace YBehavior.Editor
 
         private void btnDebugThisTree_Click(object sender, RoutedEventArgs e)
         {
-            if (WorkBenchMgr.Instance.ActiveWorkBench == null || WorkBenchMgr.Instance.ActiveWorkBench.FileInfo == null)
-                return;
-
-            if (!ulong.TryParse(this.debugAgentUID.Text, out ulong uid))
+            //if (WorkBenchMgr.Instance.ActiveWorkBench == null || WorkBenchMgr.Instance.ActiveWorkBench.FileInfo == null)
+            //    return;
+            ulong uid = 0;
+            if (!string.IsNullOrEmpty(this.debugAgentUID.Text) && !ulong.TryParse(this.debugAgentUID.Text, out uid))
             {
                 ShowSystemTipsArg arg = new ShowSystemTipsArg()
                 {

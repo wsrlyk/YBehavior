@@ -45,6 +45,7 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.WorkBenchLoaded, _OnWorkBenchLoaded);
             EventMgr.Instance.Register(EventType.WorkBenchSaved, _OnWorkBenchSaved);
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
+            EventMgr.Instance.Register(EventType.SelectWorkBench, _OnSelectWorkBench);
             EventMgr.Instance.Register(EventType.NewNodeAdded, _OnNewNodeAdded);
             EventMgr.Instance.Register(EventType.TickResult, _OnTickResult);
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
@@ -154,6 +155,20 @@ namespace YBehavior.Editor
                 this.nodeLayer.ItemsSource = null;
                 this.commentLayer.ItemsSource = null;
                 this.connectionLayer.ItemsSource = null;
+            }
+        }
+
+        private void _OnSelectWorkBench(EventArg arg)
+        {
+            SelectWorkBenchArg oArg = arg as SelectWorkBenchArg;
+
+            foreach (UCTabItemWithClose tab in this.TabController.Items)
+            {
+                if (tab.Content == oArg.Bench)
+                {
+                    tab.IsSelected = true;
+                    break;
+                }
             }
         }
 

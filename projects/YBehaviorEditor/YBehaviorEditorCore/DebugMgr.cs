@@ -39,11 +39,7 @@ namespace YBehavior.Editor.Core
 
     public class DebugMgr : Singleton<DebugMgr>
     {
-        string m_TargetTreeName;
-
-        ulong m_UID;
         TreeMemory m_EmptySharedData = new TreeMemory(null);
-        public string TargetTreeName { get { return m_TargetTreeName; } }
 
         public bool bBreaked { get; set; }
 
@@ -110,8 +106,6 @@ namespace YBehavior.Editor.Core
 
         public void Clear()
         {
-            m_TargetTreeName = string.Empty;
-            m_UID = 0;
             ClearRunInfo();
         }
 
@@ -143,12 +137,15 @@ namespace YBehavior.Editor.Core
 
         public void StartDebugTreeWithAgent(ulong uid)
         {
-            m_TargetTreeName = WorkBenchMgr.Instance.ActiveWorkBench.FileInfo.Name;
-            m_UID = uid;
+            string targetTreeName;
+            if (WorkBenchMgr.Instance.ActiveWorkBench != null && WorkBenchMgr.Instance.ActiveWorkBench.FileInfo != null)
+                targetTreeName = WorkBenchMgr.Instance.ActiveWorkBench.FileInfo.Name;
+            else
+                targetTreeName = string.Empty;
 
             //List<WorkBench> benches = WorkBenchMgr.Instance.OpenAllRelated();
             //BuildRunInfo(benches);
-            NetworkMgr.Instance.MessageProcessor.DebugTreeWithAgent(m_TargetTreeName, m_UID);
+            NetworkMgr.Instance.MessageProcessor.DebugTreeWithAgent(targetTreeName, uid);
         }
 
         public void Continue()

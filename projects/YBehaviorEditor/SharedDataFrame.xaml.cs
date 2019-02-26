@@ -71,7 +71,7 @@ namespace YBehavior.Editor
                         }
                         else
                         {
-                            this.DataContext = m_CurTree.Variables;
+                            this.DataContext = m_CurTree == null ? null : m_CurTree.Variables;
                         }
                     }
                 ),
