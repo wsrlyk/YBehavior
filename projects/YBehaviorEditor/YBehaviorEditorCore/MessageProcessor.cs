@@ -435,7 +435,7 @@ namespace YBehavior.Editor.Core
                             {
                                 ShowSystemTipsArg arg = new ShowSystemTipsArg
                                 {
-                                    Content = res[i].DisplayName + " version is different with RunTime.",
+                                    Content = res[i].DisplayName + " version is different from RunTime.",
                                     TipType = ShowSystemTipsArg.TipsType.TT_Error,
                                 };
                                 EventMgr.Instance.Send(arg);
