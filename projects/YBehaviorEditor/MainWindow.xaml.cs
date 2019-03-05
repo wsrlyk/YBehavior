@@ -23,6 +23,7 @@ namespace YBehavior.Editor
         public MainWindow()
         {
             InitializeComponent();
+            EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
         }
 
         public static void ProcessKeyDown(Key key, ModifierKeys modifier)
@@ -177,6 +178,24 @@ namespace YBehavior.Editor
             if (dr == MessageBoxResult.No)
             {
                 e.Cancel = true;
+            }
+        }
+
+        private void _OnWorkBenchSelected(EventArg arg)
+        {
+            WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
+
+            if (oArg.Bench != null)
+            {
+                //if (DebugMgr.Instance.IsDebugging(oArg.Bench.FileInfo.Name) && DebugMgr.Instance.bBreaked)
+                //{
+                //    _RefreshMainTreeDebug(false, NetworkMgr.Instance.MessageProcessor.TickResultToken);
+                //}
+                this.Title = oArg.Bench.DisplayName + " - YBehaviorEditor";
+            }
+            else
+            {
+                this.Title = "YBehaviorEditor";
             }
         }
     }
