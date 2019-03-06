@@ -15,7 +15,7 @@ namespace YBehavior
 	{
 		STRING str;
 		std::stringstream ss;
-		ss << nodeUID << DebugHelper::s_SequenceSpliter << (INT)runState;
+		ss << nodeUID << DebugHelper::s_SequenceSpliter << (INT)finalRunState;
 		ss >> str;
 		return str;
 	}
@@ -321,7 +321,8 @@ namespace YBehavior
 
 		CreateRunInfo();
 		m_pRunInfo->nodeUID = pNode->GetUID();
-		m_pRunInfo->runState = NS_RUNNING;
+		m_pRunInfo->rawRunState = NS_RUNNING;
+		m_pRunInfo->finalRunState = NS_RUNNING;
 		m_pRunInfo->tree = pNode->GetRoot();
 
 		if (DebugMgr::Instance()->HasDebugPoint(pNode->GetRoot()->GetTreeName(), pNode->GetUID()))
@@ -374,6 +375,10 @@ namespace YBehavior
 		DebugMgr::Instance()->AppendSendContent(Utility::ToString(m_pNode->GetUID()));
 		DebugMgr::Instance()->AppendSendContent(".");
 		DebugMgr::Instance()->AppendSendContent(m_pNode->GetClassName());
+		DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
+		DebugMgr::Instance()->AppendSendContent(Utility::ToString<INT>((INT)m_pRunInfo->rawRunState));
+		DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
+		DebugMgr::Instance()->AppendSendContent(Utility::ToString<INT>((INT)m_pRunInfo->finalRunState));
 		DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
 
 		if (m_pLogInfo->beforeInfo.size() > 0)
@@ -510,10 +515,13 @@ namespace YBehavior
 		m_pRunInfo = DebugMgr::Instance()->CreateAndAppendRunInfo();
 	}
 
-	void DebugHelper::SetResult(NodeState state)
+	void DebugHelper::SetResult(NodeState rawState, NodeState finalState)
 	{
 		if (IsValid())
-			m_pRunInfo->runState = state;
+		{
+			m_pRunInfo->rawRunState = rawState;
+			m_pRunInfo->finalRunState = finalState;
+		}
 	}
 
 	void DebugHelper::TestBreaking()
@@ -560,8 +568,7 @@ namespace YBehavior
 		DebugMgr::Instance()->TogglePause(true);
 		DebugMgr::Instance()->SetStepOverHelper(nullptr);
 		LOG_BEGIN << "Breaking..." << LOG_END;
-		m_pRunInfo->runState = NS_BREAK;
-		SetResult(NS_BREAK);
+		SetResult(NS_BREAK, NS_BREAK);
 
 		Breaking();
 	}
@@ -588,7 +595,7 @@ namespace YBehavior
 			break;
 		}
 		DebugMgr::Instance()->SetCommand(DC_None);
-		m_pRunInfo->runState = NS_RUNNING;
+		SetResult(NS_RUNNING, NS_RUNNING);
 		LOG_BEGIN << "Continue." << LOG_END;
 	}
 

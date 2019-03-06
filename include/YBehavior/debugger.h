@@ -16,7 +16,8 @@ namespace YBehavior
 	struct NodeRunInfo
 	{
 		UINT nodeUID;
-		NodeState runState;
+		NodeState rawRunState;
+		NodeState finalRunState;
 		BehaviorTree* tree;
 
 		const STRING ToString() const;
@@ -27,6 +28,7 @@ namespace YBehavior
 		StdVector<STRING> beforeInfo;
 		StdVector<STRING> afterInfo;
 		STRING otherInfo;
+		NodeState state;
 
 		void Reset()
 		{
@@ -34,6 +36,7 @@ namespace YBehavior
 			beforeInfo.clear();
 			afterInfo.clear();
 			otherInfo = Utility::StringEmpty;
+			state = NS_INVALID;
 		}
 	};
 
@@ -144,7 +147,7 @@ namespace YBehavior
 		~DebugHelper();
 		inline bool IsValid() { return m_Target != nullptr; }
 		void CreateRunInfo();
-		void SetResult(NodeState state);
+		void SetResult(NodeState rawState, NodeState finalState);
 		void TestBreaking();
 		void TestPause();
 		bool HasLogPoint();

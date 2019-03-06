@@ -18,11 +18,10 @@
 namespace YBehavior
 {
 #ifdef DEBUGGER
-#define DEBUG_RETURN(helper, res)\
+#define DEBUG_RETURN(helper, rawres, finalres)\
 	{\
-		NodeState eRes = res;\
-		helper.SetResult(eRes);\
-		return (eRes);\
+		helper.SetResult(rawres, finalres);\
+		return (finalres);\
 	}
 #else
 #define DEBUG_RETURN(helper, res)\
@@ -31,9 +30,9 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
-	Bimap<NodeState, STRING, EnumClassHash> s_NodeStateMap = {
-		{ NS_SUCCESS, "SUCCESS" },{ NS_FAILURE, "FAILURE" },{ NS_RUNNING, "RUNNING" },{ NS_BREAK, "BREAK" },{ NS_INVALID, "INVALID" }
-	};
+	//Bimap<NodeState, STRING, EnumClassHash> s_NodeStateMap = {
+	//	{ NS_SUCCESS, "SUCCESS" },{ NS_FAILURE, "FAILURE" },{ NS_RUNNING, "RUNNING" },{ NS_BREAK, "BREAK" },{ NS_INVALID, "INVALID" }
+	//};
 
 	BehaviorNode::BehaviorNode()
 	{
@@ -83,84 +82,97 @@ namespace YBehavior
 		DebugHelper dbgHelper(pAgent, this);
 		m_pDebugHelper = &dbgHelper;
 #endif
-		if (parentState == NS_RUNNING)
-			m_RunningContext = pAgent->PopRC();
-		else
-			m_RunningContext = nullptr;
-		///> check condition
-		if (m_Condition != nullptr)
+		NodeState state = NS_INVALID;
+		do
 		{
-			NodeState res = m_Condition->Execute(pAgent, m_RunningContext && m_RunningContext->IsRunningInCondition() ? NS_RUNNING : NS_INVALID);
-			switch (res)
+
+			if (parentState == NS_RUNNING)
+				m_RunningContext = pAgent->PopRC();
+			else
+				m_RunningContext = nullptr;
+			///> check condition
+			if (m_Condition != nullptr)
 			{
-			case YBehavior::NS_FAILURE:
-				_TryDeleteRC();
-				DEBUG_RETURN(dbgHelper, res);
-				break;
+				bool bBreak = false;
+				state = m_Condition->Execute(pAgent, m_RunningContext && m_RunningContext->IsRunningInCondition() ? NS_RUNNING : NS_INVALID);
+				switch (state)
+				{
+				case YBehavior::NS_FAILURE:
+					_TryDeleteRC();
+					//DEBUG_RETURN(dbgHelper, res);
+					bBreak = true;
+					break;
+				case YBehavior::NS_RUNNING:
+					TryCreateRC();
+					m_RunningContext->SetRunningInCondition(true);
+					_TryPushRC(pAgent);
+					//DEBUG_RETURN(dbgHelper, res);
+					bBreak = true;
+					break;
+				default:
+					break;
+				}
+				if (m_RunningContext)
+					m_RunningContext->SetRunningInCondition(false);
+
+				if (bBreak)
+					break;
+			}
+
+			///> check breakpoint
+#ifdef DEBUGGER
+			dbgHelper.TestBreaking();
+#endif
+
+			//////////////////////////////////////////////////////////////////////////
+
+
+			state = this->Update(pAgent);
+
+			switch (state)
+			{
 			case YBehavior::NS_RUNNING:
 				TryCreateRC();
-				m_RunningContext->SetRunningInCondition(true);
+				m_RunningContext->SetRunningInCondition(false);
 				_TryPushRC(pAgent);
-				DEBUG_RETURN(dbgHelper, res);
 				break;
 			default:
+				_TryDeleteRC();
 				break;
 			}
-			if (m_RunningContext)
-				m_RunningContext->SetRunningInCondition(false);
-		}
 
-		///> check breakpoint
+			///> postprocessing
 #ifdef DEBUGGER
-		dbgHelper.TestBreaking();
+			//DEBUG_LOG_INFO(" Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
+
+			dbgHelper.TestPause();
+			m_pDebugHelper = nullptr;
 #endif
+		} while (false);
 
-		//////////////////////////////////////////////////////////////////////////
-
-
-		NodeState state = this->Update(pAgent);
-
-		switch (state)
-		{
-		case YBehavior::NS_RUNNING:
-			TryCreateRC();
-			m_RunningContext->SetRunningInCondition(false);
-			_TryPushRC(pAgent);
-			break;
-		default:
-			_TryDeleteRC();
-			break;
-		}
-
-		///> postprocessing
-#ifdef DEBUGGER
-		DEBUG_LOG_INFO(" Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
-
-		dbgHelper.TestPause();
-		m_pDebugHelper = nullptr;
-#endif
+		NodeState finalState = state;
 
 		switch (m_ReturnType)
 		{
 		case YBehavior::RT_INVERT:
 			if (state == NS_SUCCESS)
-				state = NS_FAILURE;
+				finalState = NS_FAILURE;
 			else if (state == NS_FAILURE)
-				state = NS_SUCCESS;
-			DEBUG_LOG_INFO(", Force Invert to " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
+				finalState = NS_SUCCESS;
+			//DEBUG_LOG_INFO(", Force Invert to " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 			break;
 		case YBehavior::RT_SUCCESS:
-			state = NS_SUCCESS;
-			DEBUG_LOG_INFO(", Force Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
+			finalState = NS_SUCCESS;
+			//DEBUG_LOG_INFO(", Force Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 			break;
 		case YBehavior::RT_FAILURE:
-			state = NS_FAILURE;
-			DEBUG_LOG_INFO(", Force Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
+			finalState = NS_FAILURE;
+			//DEBUG_LOG_INFO(", Force Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 			break;
 		default:
 			break;
 		}
-		DEBUG_RETURN(dbgHelper, state);
+		DEBUG_RETURN(dbgHelper, state, finalState);
 	}
 
 	bool BehaviorNode::Load(const pugi::xml_node& data)

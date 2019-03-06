@@ -352,15 +352,33 @@ namespace YBehavior.Editor.Core
             if (data.Length > 0)
             {
                 ///> Head
-                LogMgr.Instance.LogWordWithColor("-------<LogPoint ", ConsoleColor.Cyan);
+                LogMgr.Instance.LogWordWithColor("-------<LogPoint ", ConsoleColor.DarkGreen);
 
                 int index = 0;
                 if (index < data.Length)
                 {
-                    LogMgr.Instance.LogWordWithColor(data[index], ConsoleColor.Cyan);
+                    LogMgr.Instance.LogWordWithColor(data[index], ConsoleColor.DarkGreen);
                 }
 
-                LogMgr.Instance.LogLineWithColor(">-------", ConsoleColor.Cyan);
+                LogMgr.Instance.LogLineWithColor(">-------", ConsoleColor.DarkGreen);
+
+                ///> State
+                ++index;
+                NodeState rawState = NodeState.NS_INVALID;
+                NodeState finalState = NodeState.NS_INVALID;
+                if (index + 1 < data.Length)
+                {
+                    int v;
+                    if (int.TryParse(data[index], out v))
+                    {
+                        rawState = (NodeState)v;
+                    }
+                    ++index;
+                    if (int.TryParse(data[index], out v))
+                    {
+                        finalState = (NodeState)v;
+                    }
+                }
 
                 ///> Before
                 ++index;
@@ -368,18 +386,18 @@ namespace YBehavior.Editor.Core
                 {
                     if (data[index] == "BEFORE" || data[index] == "AFTER")
                     {
-                        LogMgr.Instance.LogLineWithColor(data[index], ConsoleColor.Cyan);
+                        LogMgr.Instance.LogLineWithColor(data[index], ConsoleColor.DarkYellow);
                         ++index;
                         if (index < data.Length)
                         {
                             int vCount = int.Parse(data[index]);
                             ++index;
-                            if (vCount + index < data.Length)
+                            if (vCount + index <= data.Length)
                             {
                                 for (int i = 0; i < vCount; ++i)
                                 {
-                                    LogMgr.Instance.LogWordWithColor(data[index + i], ConsoleColor.Magenta);
-                                    LogMgr.Instance.LogWordWithColor("; ", ConsoleColor.Magenta);
+                                    LogMgr.Instance.LogWordWithColor(data[index + i], ConsoleColor.White);
+                                    LogMgr.Instance.LogWordWithColor("; ", ConsoleColor.DarkYellow);
                                 }
                                 index += vCount;
                             }
@@ -388,11 +406,55 @@ namespace YBehavior.Editor.Core
                     }
                     else
                     {
-                        LogMgr.Instance.LogWordWithColor(data[index++], ConsoleColor.Yellow);
+                        LogMgr.Instance.LogWordWithColor(data[index++], ConsoleColor.White);
                     }
                 }
                 LogMgr.Instance.LogEnd();
-                LogMgr.Instance.LogLineWithColor("-------</LogPoint>-------", ConsoleColor.Cyan);
+
+                if (rawState == finalState)
+                    LogMgr.Instance.LogLineWithColor(_GetStateString(rawState), _GetStateColor(rawState));
+                else
+                {
+                    LogMgr.Instance.LogWordWithColor(_GetStateString(finalState), _GetStateColor(finalState));
+                    LogMgr.Instance.LogWordWithColor("(FINAL) ", ConsoleColor.Gray);
+                    LogMgr.Instance.LogWordWithColor(_GetStateString(rawState), _GetStateColor(rawState));
+                    LogMgr.Instance.LogLineWithColor("(RAW)", ConsoleColor.Gray);
+                }
+                LogMgr.Instance.LogLineWithColor("-------</LogPoint>-------", ConsoleColor.DarkGreen);
+            }
+        }
+
+        ConsoleColor _GetStateColor(NodeState state)
+        {
+            switch (state)
+            {
+                case NodeState.NS_SUCCESS:
+                    return ConsoleColor.Green;
+                case NodeState.NS_FAILURE:
+                    return ConsoleColor.Cyan;
+                case NodeState.NS_BREAK:
+                    return ConsoleColor.Red;
+                case NodeState.NS_RUNNING:
+                    return ConsoleColor.Magenta;
+                default:
+                    return ConsoleColor.Gray;
+            }
+        }
+
+        string _GetStateString(NodeState state)
+        {
+            switch (state)
+            {
+                case NodeState.NS_SUCCESS:
+                    return "SUCCESS";
+                case NodeState.NS_FAILURE:
+                    return "FAILURE";
+                case NodeState.NS_BREAK:
+                    return "BREAK";
+                case NodeState.NS_RUNNING:
+                    return "RUNNING";
+                default:
+                    return state.ToString();
             }
         }
 

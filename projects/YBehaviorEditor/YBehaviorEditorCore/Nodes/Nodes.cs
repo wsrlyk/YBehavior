@@ -1251,6 +1251,42 @@ namespace YBehavior.Editor.Core
         }
     }
 
+    class IsArrayEmptyNode : LeafNode
+    {
+        public override string Icon => "[ ]";
+
+        public IsArrayEmptyNode()
+        {
+            m_Name = "IsArrayEmpty";
+            m_Type = NodeType.NT_Default;
+            m_Hierachy = NodeHierachy.NH_Array;
+
+        }
+
+        public override void CreateVariables()
+        {
+            Variable opl = NodeMemory.CreateVariable(
+                "Array",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0}",
+                    Variables.GetVariable("Array").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
     class GetArrayLengthNode : LeafNode
     {
         public override string Icon => "[].Length";

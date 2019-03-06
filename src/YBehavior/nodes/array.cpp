@@ -87,4 +87,25 @@ namespace YBehavior
 		return NS_SUCCESS;
 	}
 
+	bool IsArrayEmpty::OnLoaded(const pugi::xml_node& data)
+	{
+		CreateVariable(m_Array, "Array", data);
+		if (m_Array == nullptr)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	YBehavior::NodeState IsArrayEmpty::Update(AgentPtr pAgent)
+	{
+		IF_HAS_LOG_POINT
+		{
+			LOG_SHARED_DATA(m_Array, true);
+		}
+		INT size = m_Array->VectorSize(pAgent->GetMemory());
+		if (size != 0)
+			return NS_FAILURE;
+		return NS_SUCCESS;
+	}
 }

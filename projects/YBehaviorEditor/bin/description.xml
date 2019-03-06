@@ -94,6 +94,9 @@
                 <ClearArray Content="清空数组">
                         <Array Content="目标数组"/>
                 </ClearArray>
+                <IsArrayEmpty Content="数组是否为空">
+                        <Array Content="目标数组"/>
+                </IsArrayEmpty>
                 <GetArrayLength Content="获取数组长度">
                         <Array Content="目标数组"/>
                         <Length Content="存储数组的长度"/>

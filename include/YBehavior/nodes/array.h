@@ -43,6 +43,18 @@ namespace YBehavior
 		ISharedVariableEx* m_Element;
 	};
 
+	class YBEHAVIOR_API IsArrayEmpty : public LeafNode
+	{
+	public:
+		STRING GetClassName() const override { return "IsArrayEmpty"; }
+	protected:
+		virtual bool OnLoaded(const pugi::xml_node& data);
+		virtual NodeState Update(AgentPtr pAgent);
+
+	private:
+		ISharedVariableEx* m_Array;
+	};
+
 }
 
 #endif
