@@ -535,6 +535,11 @@ namespace YBehavior.Editor.Core
                                 };
                                 EventMgr.Instance.Send(arg);
                             }
+                            else
+                            {
+                                DebugTargetChangedArg arg = new DebugTargetChangedArg();
+                                EventMgr.Instance.Send(arg);
+                            }
                         }
                     }
                 }

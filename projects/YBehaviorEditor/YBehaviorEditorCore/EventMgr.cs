@@ -132,7 +132,6 @@ namespace YBehavior.Editor.Core
     }
     public class DebugTargetChangedArg : EventArg
     {
-        public string Treename { get; set; }
         public override EventType Type => EventType.DebugTargetChanged;
     }
     public class TickResultArg : EventArg
