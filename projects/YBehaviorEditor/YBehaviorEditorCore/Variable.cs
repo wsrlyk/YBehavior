@@ -566,13 +566,13 @@ namespace YBehavior.Editor.Core
                 Variable other = SharedDataSource.SharedData.GetVariable(Value, IsLocal);
                 if (other == null)
                 {
-                    LogMgr.Instance.Log(string.Format("Pointer doesnt exist for variable {0}, while the pointer is {1} ", Name, DisplayValue));
+                    LogMgr.Instance.Log(string.Format("Pointer doesnt exist for variable {0}, while the pointer is {1} ", DisplayName, DisplayValue));
                     return false;
                 }
 
                 if (other.vType != vType)
                 {
-                    LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", Name, vType, other.Name, other.vType));
+                    LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", DisplayName, vType, other.DisplayName, other.vType));
                     return false;
                 }
 
@@ -582,20 +582,25 @@ namespace YBehavior.Editor.Core
                     {
                         if (m_VectorIndex == null)
                         {
-                            LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", Name, cType, other.Name, other.cType));
+                            LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", DisplayName, cType, other.DisplayName, other.cType));
                             return false;
                         }
                         else if (!m_VectorIndex.CheckValid())
                         {
-                            LogMgr.Instance.Log(string.Format("VectorIndex invalid: {0}.Index == {1}", Name, m_VectorIndex.DisplayValue));
+                            LogMgr.Instance.Log(string.Format("VectorIndex invalid: {0}.Index == {1}", DisplayName, m_VectorIndex.DisplayValue));
                             return false;
                         }
                     }
                     else
                     {
-                        LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", Name, cType, other.Name, other.cType));
+                        LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", DisplayName, cType, other.DisplayName, other.cType));
                         return false;
                     }
+                }
+                else if (other.cType == CountType.CT_SINGLE && m_bVectorIndexEnabled)
+                {
+                    LogMgr.Instance.Log(string.Format("Single Variable with VectorIndex: {0} -> {1}", DisplayName, other.DisplayName));
+                    return false;
                 }
                 return true;
             }
