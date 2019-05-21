@@ -186,27 +186,27 @@ namespace YBehavior
 
 	FOR_EACH_TYPE(DEFAULT_DEFINE)
 
-#define TYPES_DEFINE_CREATE_STR_FUNC(type)\
+#define TYPES_DEFINE_CREATE_STR_FUNC(type, str)\
 	template<>\
-	const STRING& Utility::GetCreateStr<type>() { return Utility::type##CreateStr;}
-
-	FOR_EACH_TYPE(TYPES_DEFINE_CREATE_STR_FUNC);
-
-#define TYPES_DEFINE_CREATE_STR(T, str)\
-		const STRING Utility::T##CreateStr = str;
-	TYPES_DEFINE_CREATE_STR(Int, "_I");
-	TYPES_DEFINE_CREATE_STR(Ulong, "_U");
-	TYPES_DEFINE_CREATE_STR(Bool, "_B");
-	TYPES_DEFINE_CREATE_STR(Float, "_F");
-	TYPES_DEFINE_CREATE_STR(String, "_S");
-	TYPES_DEFINE_CREATE_STR(EntityWrapper, "_A");
-	TYPES_DEFINE_CREATE_STR(Vector3, "_V");
-	TYPES_DEFINE_CREATE_STR(VecInt, "II");
-	TYPES_DEFINE_CREATE_STR(VecUlong, "UU");
-	TYPES_DEFINE_CREATE_STR(VecBool, "BB");
-	TYPES_DEFINE_CREATE_STR(VecFloat, "FF");
-	TYPES_DEFINE_CREATE_STR(VecString, "SS");
-	TYPES_DEFINE_CREATE_STR(VecEntityWrapper, "AA");
-	TYPES_DEFINE_CREATE_STR(VecVector3, "VV");
+	const STRING& Utility::GetCreateStr<type>() \
+	{\
+		static const STRING type##CreateStr(str);\
+		return type##CreateStr;\
+	}
+	
+	TYPES_DEFINE_CREATE_STR_FUNC(Int, "_I");
+	TYPES_DEFINE_CREATE_STR_FUNC(Ulong, "_U");
+	TYPES_DEFINE_CREATE_STR_FUNC(Bool, "_B");
+	TYPES_DEFINE_CREATE_STR_FUNC(Float, "_F");
+	TYPES_DEFINE_CREATE_STR_FUNC(String, "_S");
+	TYPES_DEFINE_CREATE_STR_FUNC(EntityWrapper, "_A");
+	TYPES_DEFINE_CREATE_STR_FUNC(Vector3, "_V");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecInt, "II");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecUlong, "UU");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecBool, "BB");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecFloat, "FF");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecString, "SS");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecEntityWrapper, "AA");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecVector3, "VV");
 
 }

@@ -97,12 +97,7 @@ namespace YBehavior
 		static bool SetDefault(T& t) { return false; }
 
 		template<typename T>
-		static const STRING& GetCreateStr() { return StringEmpty; }
-
-#define TYPES_DECLARE_CREATE_STR(T)\
-		static const STRING T##CreateStr;
-		FOR_EACH_TYPE(TYPES_DECLARE_CREATE_STR)
-	
+		static const STRING& GetCreateStr() { return StringEmpty; }	
 	private:
 		static std::random_device rd;
 		static std::default_random_engine mt;
