@@ -331,12 +331,32 @@ namespace YBehavior
 		return buffer[1];
 	}
 
-	TYPEID BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType)
+	TYPEID BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType, const STRING& defaultCreateStr)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
 		if (attrOptr.empty())
 		{
+			if (variableType != Utility::POINTER_CHAR && defaultCreateStr.length() > 0)
+			{
+				ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(defaultCreateStr);
+				if (helper != nullptr)
+				{
+					op = helper->CreateVariable();
+					m_Variables.push_back(op);
+
+#ifdef DEBUGGER
+					op->SetName(attriName, this->GetClassName());
+#endif
+
+					return op->TypeID();
+				}
+				else
+				{
+					ERROR_BEGIN << "DefaultCreateStr " << defaultCreateStr << " ERROR for attribute" << attriName << " in " << data.name() << " in Node " << this->GetClassName() << ERROR_END;
+					return -1;
+				}
+			}
 			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << " in Node " << this->GetClassName() << ERROR_END;
 			return -1;
 		}

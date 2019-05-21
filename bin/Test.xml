@@ -2,5 +2,7 @@
 <Test>
   <Node Class="Root" Pos="0,0">
     <Shared f="_FC 0.0" />
+    <Local fds="_Ac " />
+    <Node Class="GetTargetNameAction" Pos="-11,251" Target="_Ap fds" />
   </Node>
 </Test>

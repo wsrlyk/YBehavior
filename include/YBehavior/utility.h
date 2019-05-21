@@ -47,7 +47,7 @@ namespace YBehavior
 		static const char SpaceSpliter = ' ';
 #define EMPTY_TYPES(T) static const T T##Empty;
 		FOR_EACH_TYPE(EMPTY_TYPES)
-
+		
 		static const char POINTER_CHAR;
 		static const char CONST_CHAR;
 		static const BOOL TRUE_VALUE;
@@ -95,6 +95,14 @@ namespace YBehavior
 		static const T& Default() { return 0; }
 		template<typename T>
 		static bool SetDefault(T& t) { return false; }
+
+		template<typename T>
+		static const STRING& GetCreateStr() { return StringEmpty; }
+
+#define TYPES_DECLARE_CREATE_STR(T)\
+		static const STRING T##CreateStr;
+		FOR_EACH_TYPE(TYPES_DECLARE_CREATE_STR)
+	
 	private:
 		static std::random_device rd;
 		static std::default_random_engine mt;
@@ -179,6 +187,12 @@ namespace YBehavior
 	bool Utility::SetDefault(type& t);
 
 	FOR_EACH_TYPE(DEFAULT_DECLARE);
+
+#define TYPES_DECLARE_CREATE_STR_FUNC(type)\
+	template<>\
+	const STRING& Utility::GetCreateStr<type>();
+
+	FOR_EACH_TYPE(TYPES_DECLARE_CREATE_STR_FUNC);
 }
 
 #endif

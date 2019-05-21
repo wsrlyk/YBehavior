@@ -131,6 +131,9 @@ bool GetTargetNameAction::OnLoaded(const pugi::xml_node& data)
 	{
 		return false;
 	}
+	
+	YBehavior::ISharedVariableEx* pTestVariable = nullptr;
+	typeID = CreateVariable(pTestVariable, "TestVariable", data, 0, YBehavior::Utility::GetCreateStr<YBehavior::INT>());
 
 	return true;
 }
