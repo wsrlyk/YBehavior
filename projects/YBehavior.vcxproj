@@ -19,6 +19,9 @@
     <ClInclude Include="..\include\YBehavior\debugger.h" />
     <ClInclude Include="..\include\YBehavior\define.h" />
     <ClInclude Include="..\include\YBehavior\factory.h" />
+    <ClInclude Include="..\include\YBehavior\fsm\machinestate.h" />
+    <ClInclude Include="..\include\YBehavior\fsm\metastate.h" />
+    <ClInclude Include="..\include\YBehavior\fsm\statemachine.h" />
     <ClInclude Include="..\include\YBehavior\interface.h" />
     <ClInclude Include="..\include\YBehavior\launcher.h" />
     <ClInclude Include="..\include\YBehavior\logger.h" />
@@ -68,6 +71,9 @@
     <ClCompile Include="..\src\YBehavior\behaviortreemgr.cpp" />
     <ClCompile Include="..\src\YBehavior\debugger.cpp" />
     <ClCompile Include="..\src\YBehavior\factory.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\machinestate.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\metastate.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\statemachine.cpp" />
     <ClCompile Include="..\src\YBehavior\launcher.cpp" />
     <ClCompile Include="..\src\YBehavior\logger.cpp" />
     <ClCompile Include="..\src\YBehavior\memory.cpp" />
