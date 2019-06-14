@@ -206,6 +206,7 @@ namespace YBehavior
 	typedef unsigned char       BYTE;
 	typedef bool				BOOL_REAL;
 	typedef unsigned short		BOOL;	///> WARNING: bool is defined by short. Cause bool in vector is specialized and has quite different behaviors with others.
+	typedef unsigned short		USHORT;
 	typedef float				FLOAT;
 	typedef char				CHAR;
 
@@ -217,6 +218,7 @@ namespace YBehavior
 	typedef UINT64				Ulong;
 	typedef BYTE				Byte;
 	typedef BOOL				Bool;
+	typedef USHORT				Ushort;
 	typedef FLOAT				Float;
 	typedef StdVector<STRING>	VecString;
 	typedef StdVector<INT>	VecInt;
@@ -228,6 +230,21 @@ namespace YBehavior
 	typedef StdVector<FLOAT>	VecFloat;
 	typedef StdVector<EntityWrapper>	VecEntityWrapper;
 	typedef StdVector<Vector3>	VecVector3;
+
+	typedef USHORT FSMUIDType;
+	union FSMUID
+	{
+		FSMUIDType Value;
+		///> All Valid values start from 1; If a State == 0, but Machine == 2, it only means the No.2 Machine
+		struct
+		{
+			FSMUIDType Layer : 2;		///> Up to 4 Layers
+			FSMUIDType Level : 3;		///> Up to 8 Levels of SubMachines per Layer
+			FSMUIDType Machine : 5;		///> Up to 32 SubMachines in the same Level
+			FSMUIDType State : 6;		///> Up to 64 State in the same machine
+		};
+	};
+
 
 #define YBEHAVIOR_BASICTYPE_NUMBER_ID(type, id)			\
 	template<> inline TYPEID GetTypeID<type>() \

@@ -7,7 +7,7 @@
 #include "YBehavior/sharedvariableex.h"
 #include "YBehavior/behaviortreemgr.h"
 #include <string.h>
-#include "YBehavior/treeid.h"
+#include "YBehavior/behaviorid.h"
 
 namespace YBehavior
 {
@@ -36,7 +36,7 @@ namespace YBehavior
 		STRING id;
 		m_Identification->GetCastedValue(nullptr, id);
 
-		m_Root->GetTreeID()->TryGetSubTreeName(id, defaultTreeName, m_FinalTreeName);
+		m_Root->GetTreeID()->TryGet(id, defaultTreeName, m_FinalTreeName);
 		
 		if (m_FinalTreeName == Utility::StringEmpty)
 		{

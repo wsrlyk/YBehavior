@@ -17,12 +17,12 @@
 using namespace YBehavior;
 int main(int argc, char** argv)
 {
-	StateMachine* pMain = new StateMachine(0);
+	StateMachine* pMain = new StateMachine(1, 1, 1);
 	{
 		TransitionMapKey k;
 		TransitionMapValue v;
 
-		MachineState* pIdle = new MachineState("IDLE", MST_Normal);
+		MachineState* pIdle = new MachineState("IDLE", MST_Normal, nullptr);
 		k.fromState = nullptr;
 		k.trans = Transition("ToIdle");
 		v.toState = pIdle;
@@ -36,9 +36,9 @@ int main(int argc, char** argv)
 		pMain->InsertTrans(k, v);
 	
 		{
-			StateMachine* pMoveMachine = new StateMachine(1);
+			StateMachine* pMoveMachine = new StateMachine(1, 2, 1);
 			{
-				MachineState* pWalk = new MachineState("WALK", MST_Normal);
+				MachineState* pWalk = new MachineState("WALK", MST_Normal, nullptr);
 				k.fromState = nullptr;
 				k.trans = Transition("ToWalk");
 				v.toState = pWalk;
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 
 				pMoveMachine->SetDefault(pWalk);
 
-				MachineState* pRun = new MachineState("RUN", MST_Normal);
+				MachineState* pRun = new MachineState("RUN", MST_Normal, nullptr);
 				k.fromState = nullptr;
 				k.trans = Transition("ToRun");
 				v.toState = pRun;
@@ -62,15 +62,15 @@ int main(int argc, char** argv)
 		pMain->InsertTrans(k, v);
 
 		{
-			StateMachine* pFightMachine = new StateMachine(1);
+			StateMachine* pFightMachine = new StateMachine(1, 2, 2);
 			{
-				MachineState* pDetect = new MachineState("DETECT", MST_Normal);
+				MachineState* pDetect = new MachineState("DETECT", MST_Normal, nullptr);
 				k.fromState = nullptr;
 				k.trans = Transition("ToDetect");
 				v.toState = pDetect;
 				pFightMachine->InsertTrans(k, v);
 
-				MachineState* pSkill = new MachineState("SKILL", MST_Normal);
+				MachineState* pSkill = new MachineState("SKILL", MST_Normal, nullptr);
 				k.fromState = nullptr;
 				k.trans = Transition("ToSkill");
 				v.toState = pSkill;
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 
 				pFightMachine->SetDefault(pDetect);
 
-				MachineState* pCD = new MachineState("CD", MST_Normal);
+				MachineState* pCD = new MachineState("CD", MST_Normal, nullptr);
 				k.fromState = pSkill;
 				k.trans = Transition("ToCD");
 				v.toState = pCD;

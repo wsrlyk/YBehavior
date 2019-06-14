@@ -7,7 +7,7 @@
 #include <string.h>
 #include "YBehavior/tools/common.h"
 #include "YBehavior/tools/treemgrhelper.hpp"
-#include "YBehavior/treeid.h"
+#include "YBehavior/behaviorid.h"
 
 namespace YBehavior
 {
@@ -21,7 +21,7 @@ namespace YBehavior
 		return s_Instance;
 	}
 
-	BehaviorTree * TreeMgr::_LoadTree(TreeID* id)
+	BehaviorTree * TreeMgr::_LoadTree(BehaviorID* id)
 	{
 		pugi::xml_document doc;
 
@@ -138,14 +138,15 @@ namespace YBehavior
 	bool TreeMgr::_GetTree(const STRING& name, BehaviorTree* &tree, bool bToAgent)
 	{
 		TreeInfo* info = nullptr;
-		TreeID* id = nullptr;
+		BehaviorID* id = nullptr;
 		auto it = m_TreeIDs.find(name);
 		if (it != m_TreeIDs.end())
 		{
 			for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2)
 			{
 				id = *it2;
-				if (!id->IsSameTree(name, m_ToBeReplacedSubs))
+				if ((m_ToBeBuildID.find(id) == m_ToBeBuildID.end()) && 
+				 !id->IsSame(m_ToBeReplacedSubs))
 					continue;
 				auto it3 = m_Trees.find(id);
 				if (it3 != m_Trees.end())
@@ -167,17 +168,25 @@ namespace YBehavior
 		if (info == nullptr)
 		{
 			info = new TreeInfo();
-			id = new TreeID(name);
+			id = new BehaviorID(name);
 			if (m_ToBeReplacedSubs != nullptr)
-				id->SetSubTrees(*m_ToBeReplacedSubs);
+				id->SetMappings(*m_ToBeReplacedSubs);
 			m_TreeIDs[name].push_back(id);
 			m_Trees[id] = info;
 		}
-
+		else
+		{
+			///> Reset the id
+			if (m_ToBeReplacedSubs != nullptr)
+				id->SetMappings(*m_ToBeReplacedSubs);
+		}
 
 		tree = _LoadTree(id);
 		if (!tree)
 			return true;
+
+		m_ToBeBuildID.insert(id);
+
 		info->SetLatestTree(tree);
 		info->ChangeReferenceCount(true, bToAgent);
 
@@ -208,12 +217,16 @@ namespace YBehavior
 				info->ChangeReferenceCount(false, bToAgent);
 				info->RevertVersion();
 				tree = nullptr;
+				///> TODO: currently recover the id
+				///> The id is not reverted.
+				m_ToBeBuildID.erase(id);
 				return true;
 			}
 			bNoChildren = false;
 		}
 
 		id->BuildID();
+		m_ToBeBuildID.erase(id);
 		return bNoChildren;
 	}
 

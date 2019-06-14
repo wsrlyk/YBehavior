@@ -5,11 +5,23 @@
 
 namespace YBehavior
 {
-	StateMachine::StateMachine(UINT level)
+	StateMachine::StateMachine(FSMUIDType layer, FSMUIDType level, FSMUIDType index)
 		: m_pDefaultState(nullptr)
-		, m_Level(level)
+		, m_EntryState(nullptr)
+		, m_ExitState(nullptr)
 	{
+		m_UID.Layer = layer;
+		m_UID.Level = level;
+		m_UID.Machine = index;
+		m_UID.State = 0;
+	}
 
+	StateMachine::~StateMachine()
+	{
+		for (auto it = m_AllStates.begin(); it != m_AllStates.end(); ++it)
+		{
+			delete *it;
+		}
 	}
 
 	void StateMachine::InsertTrans(const TransitionMapKey& k, const TransitionMapValue& v)
@@ -20,8 +32,18 @@ namespace YBehavior
 		if (res.second)
 		{
 			if (k.fromState != nullptr)
-				m_States.insert(k.fromState);
-			m_States.insert(v.toState);
+			{
+				if (m_States.insert(k.fromState).second)
+				{
+					m_AllStates.push_back(k.fromState);
+					k.fromState->GetUID().Value = m_UID.Value;
+				}
+			}
+			if (m_States.insert(v.toState).second)
+			{
+				m_AllStates.push_back(v.toState);
+				v.toState->GetUID().Value = m_UID.Value;
+			}
 		}
 	}
 
@@ -52,9 +74,36 @@ namespace YBehavior
 		return false;
 	}
 
+	void StateMachine::SetSpecialState(MachineState* pState)
+	{
+		if (pState == nullptr)
+			return;
+
+		if (pState->GetType() == MST_Entry)
+		{
+			if (m_EntryState != nullptr)
+			{
+				ERROR_BEGIN << "Duplicated Entry." << ERROR_END;
+				return;
+			}
+			m_EntryState = pState;
+			m_AllStates.push_back(pState);
+		}
+		else if (pState->GetType() == MST_Exit)
+		{
+			if (m_ExitState != nullptr)
+			{
+				ERROR_BEGIN << "Duplicated Exit." << ERROR_END;
+				return;
+			}
+			m_ExitState = pState;
+			m_AllStates.push_back(pState);
+		}
+	}
+
 	void StateMachine::CheckDefault(MachineContext& context)
 	{
-		if (m_pDefaultState != nullptr && m_Level > context.GetCurStateStack().size())
+		if (m_pDefaultState != nullptr && m_UID.Level > context.GetCurStateStack().size())
 		{
 
 		}
@@ -76,6 +125,22 @@ namespace YBehavior
 		{
 			LOG_BEGIN << "Update State In Machine" << LOG_END;
 			(*context.GetCurStateStack().rbegin())->OnUpdate(fDeltaT, context);
+		}
+	}
+
+	bool _CompareState(const MachineState* left, const MachineState* right)
+	{
+		return left->GetName() < right->GetName();
+	}
+
+	void StateMachine::OnLoadFinish()
+	{
+		StdVector<MachineState*> l(m_States.begin(), m_States.end());
+		std::sort(l.begin(), l.end(), _CompareState);
+		int index = 0;
+		for (auto it = l.begin(); it != l.end(); )
+		{
+			(*it)->GetUID().State = ++index;
 		}
 	}
 
@@ -160,7 +225,8 @@ namespace YBehavior
 	MachineRunRes StateMachine::OnEnter(MachineContext& context)
 	{
 		LOG_BEGIN << "EnterMachine" << LOG_END;
-		m_EntryState.OnUpdate(0, context);
+		if (m_EntryState)
+			m_EntryState->OnUpdate(0, context);
 
 		///> Enter default state
 		if (m_pDefaultState)
@@ -177,8 +243,31 @@ namespace YBehavior
 	MachineRunRes StateMachine::OnExit(MachineContext& context)
 	{
 		LOG_BEGIN << "ExitMachine" << LOG_END;
-		m_ExitState.OnUpdate(0, context);
+		if (m_ExitState)
+			m_ExitState->OnUpdate(0, context);
 		return MRR_Normal;
+	}
+
+	FSM::FSM(const STRING& name)
+		: m_Name(name)
+		, m_Version(nullptr)
+		, m_pMachine(nullptr)
+	{
+
+	}
+
+	FSM::~FSM()
+	{
+		if (m_pMachine)
+			delete m_pMachine;
+	}
+
+	YBehavior::StateMachine* FSM::CreateMachine()
+	{
+		if (m_pMachine)
+			delete m_pMachine;
+		m_pMachine = new StateMachine(1, 1, 1);
+		return m_pMachine;
 	}
 
 }

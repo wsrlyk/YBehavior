@@ -77,27 +77,51 @@ namespace YBehavior
 	protected:
 		std::map<TransitionMapKey, TransitionMapValue> m_TransitionMap;
 		std::unordered_set<MachineState*> m_States;
+		std::vector<MachineState*> m_AllStates;
 		MachineState* m_pDefaultState;
-		MachineState m_EntryState;
-		MachineState m_ExitState;
-		UINT m_Level;
+		MachineState* m_EntryState;
+		MachineState* m_ExitState;
+		FSMUID m_UID;
 	public:
-		StateMachine(UINT level);
+		StateMachine(FSMUIDType layer, FSMUIDType level, FSMUIDType index);
+		~StateMachine();
 		void InsertTrans(const TransitionMapKey&, const TransitionMapValue&);
 		bool GetTransition(MachineState* pCurState, const MachineContext& context, TransitionResult& result);
-		inline MachineState* GetEntry() { return &m_EntryState; }
-		inline MachineState* GetExit() { return &m_ExitState; }
-		inline UINT GetLevel() const { return m_Level; }
+		inline MachineState* GetEntry() { return m_EntryState; }
+		inline MachineState* GetExit() { return m_ExitState; }
+		inline FSMUID GetUID() const { return m_UID; }
+		inline std::vector<MachineState*>& GetAllStates() { return m_AllStates; }
 		inline void SetDefault(MachineState* pState) { m_pDefaultState = pState; }
+		void SetSpecialState(MachineState* pState);
 
 		void CheckDefault(MachineContext& context);
 		void Update(float fDeltaT, MachineContext& context);
+
+		void OnLoadFinish();
 
 		MachineRunRes OnEnter(MachineContext& context);
 		MachineRunRes OnExit(MachineContext& context);
 	protected:
 		bool _Trans(CurrentStateType::const_iterator it, MachineContext& context, TransitionResult& res);
 		bool _TryEnterDefault(MachineContext& context);
+	};
+
+	struct MachineVersion;
+	class BehaviorID;
+	class FSM
+	{
+		STRING m_Name;
+		MachineVersion* m_Version;
+		///> TODO: multilayers
+		StateMachine* m_pMachine;
+	public:
+		inline void SetVersion(MachineVersion* v) { m_Version = v; }
+		inline MachineVersion* GetVersion() const { return m_Version; }
+		inline StateMachine* GetMachine() { return m_pMachine; }
+
+		FSM(const STRING& name);
+		~FSM();
+		StateMachine* CreateMachine();
 	};
 }
 

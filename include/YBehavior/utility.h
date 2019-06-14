@@ -119,6 +119,9 @@ namespace YBehavior
 	template<>
 	STRING Utility::ToString(const BOOL& t);
 
+	template<>
+	STRING Utility::ToString(const FSMUID& t);
+
 	template<typename T>
 	STRING Utility::ToString(const StdVector<T>& t)
 	{

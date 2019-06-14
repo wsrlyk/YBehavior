@@ -195,9 +195,6 @@
     <ClInclude Include="..\include\YBehavior\memory.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\YBehavior\treeid.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\YBehavior\fsm\statemachine.h">
       <Filter>头文件\fsm</Filter>
     </ClInclude>
@@ -206,6 +203,21 @@
     </ClInclude>
     <ClInclude Include="..\include\YBehavior\fsm\metastate.h">
       <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\machinemgr.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\machinetreemappingmgr.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\machinetreemapping.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\behaviorprocess.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\behaviorid.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -329,9 +341,6 @@
     <ClCompile Include="..\src\YBehavior\SharedVariableCreateHelper.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\YBehavior\treeid.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\YBehavior\fsm\statemachine.cpp">
       <Filter>源文件\fsm</Filter>
     </ClCompile>
@@ -340,6 +349,21 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\fsm\metastate.cpp">
       <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\machinemgr.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\machinetreemappingmgr.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\machingtreemapping.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\behaviorprocess.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\behaviorid.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

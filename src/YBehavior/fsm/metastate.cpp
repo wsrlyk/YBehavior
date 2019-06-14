@@ -4,9 +4,16 @@
 namespace YBehavior
 {
 	MetaState::MetaState(const STRING& name)
-		: MachineState(name, MST_Meta)
+		: MachineState(name, MST_Meta, nullptr)
+		, m_pMachine(nullptr)
 	{
 
+	}
+
+	MetaState::~MetaState()
+	{
+		if (m_pMachine)
+			delete m_pMachine;
 	}
 
 	MachineRunRes MetaState::OnEnter(MachineContext& context)

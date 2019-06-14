@@ -1,16 +1,16 @@
-#include "YBehavior/treeid.h"
+#include "YBehavior/behaviorid.h"
 #include "YBehavior/logger.h"
 #include <algorithm>
 #include "YBehavior/utility.h"
 #include "YBehavior/tools/objectpool.h"
 
-YBehavior::TreeID::TreeID(const STRING& name)
+YBehavior::BehaviorID::BehaviorID(const STRING& name)
 	: m_TreeName(name)
 	, m_pAllSubs(nullptr)
 {
 }
 
-void YBehavior::TreeID::SetSubTrees(const std::vector<STRING>& inputs)
+void YBehavior::BehaviorID::SetMappings(const std::vector<STRING>& inputs)
 {
 	if (inputs.size() % 2 == 1)
 	{
@@ -31,7 +31,7 @@ void YBehavior::TreeID::SetSubTrees(const std::vector<STRING>& inputs)
 	m_SubsList.clear();
 }
 
-bool YBehavior::TreeID::TryGetSubTreeName(const STRING& id, const STRING& defaultName, STRING& outName)
+bool YBehavior::BehaviorID::TryGet(const STRING& id, const STRING& defaultName, STRING& outName)
 {
 	auto it = m_SubsMap.find(id);
 	///> Already added.
@@ -72,7 +72,7 @@ bool YBehavior::TreeID::TryGetSubTreeName(const STRING& id, const STRING& defaul
 	return true;
 }
 
-void YBehavior::TreeID::BuildID()
+void YBehavior::BehaviorID::BuildID()
 {
 	if (m_pAllSubs)
 	{
@@ -94,7 +94,7 @@ void YBehavior::TreeID::BuildID()
 	m_ID = Utility::Hash(s);
 }
 
-void YBehavior::TreeID::Merge(const YBehavior::TreeID& other)
+void YBehavior::BehaviorID::Merge(const YBehavior::BehaviorID& other)
 {
 	for (auto it = other.m_SubsMap.begin(); it != other.m_SubsMap.end(); ++it)
 	{
@@ -114,17 +114,7 @@ void YBehavior::TreeID::Merge(const YBehavior::TreeID& other)
 	}
 }
 
-bool YBehavior::TreeID::operator<(const TreeID& other) const
-{
-	return m_ID < other.m_ID;
-}
-
-bool YBehavior::TreeID::operator==(const TreeID& other) const
-{
-	return m_ID == other.m_ID;
-}
-
-bool YBehavior::TreeID::IsSameTree(const STRING& name, const std::vector<STRING>* subs) const
+bool YBehavior::BehaviorID::IsSame(const std::vector<STRING>* subs) const
 {
 	///> If there're some subs that have been changed
 	if (subs == nullptr)

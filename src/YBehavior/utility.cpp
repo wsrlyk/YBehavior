@@ -149,6 +149,16 @@ namespace YBehavior
 		return str;
 	}
 
+	template<>
+	STRING Utility::ToString(const FSMUID& t)
+	{
+		STRING str;
+		std::stringstream ss;
+		ss << "FSMUID[" << t.Layer << " " << t.Level << " " << t.Machine << " " << t.State << ": " << t.Value << "]";
+		str = ss.str();
+		return str;
+	}
+
 	UINT Utility::Hash(const STRING& str)
 	{
 		UINT len = str.length();

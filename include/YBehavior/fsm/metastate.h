@@ -13,6 +13,7 @@ namespace YBehavior
 
 	public:
 		MetaState(const STRING& name);
+		~MetaState();
 		inline StateMachine* GetMachine() { return m_pMachine; }
 		inline void SetMachine(StateMachine* sm) { m_pMachine = sm; }
 		MachineRunRes OnEnter(MachineContext& context) override;

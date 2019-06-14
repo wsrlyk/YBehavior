@@ -16,7 +16,7 @@ namespace YBehavior
 {
 	class BehaviorNode;
 	class BehaviorTree;
-	class TreeID;
+	class BehaviorID;
 	struct TreeVersion
 	{
 		int version = -1;
@@ -67,17 +67,22 @@ namespace YBehavior
 	protected:
 		bool _GetTree(const STRING& name, BehaviorTree * &tree, bool bToAgent);
 		void _CheckSubTree(const STRING& name, BehaviorTree* current, std::unordered_set<BehaviorTree*>& visited, std::list<BehaviorTree*>& visitedStack);
-		BehaviorTree * _LoadTree(TreeID* id);
+		BehaviorTree * _LoadTree(BehaviorID* id);
 		bool _LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID, BehaviorTree* root);
 	private:
 		static TreeMgr* s_Instance;
 		TreeMgr() {}
 		~TreeMgr();
 
-		std::unordered_map<TreeID*, TreeInfo*> m_Trees;
-		std::unordered_map<STRING, std::vector<TreeID*>> m_TreeIDs;
+		std::unordered_map<BehaviorID*, TreeInfo*> m_Trees;
+		std::unordered_map<STRING, std::vector<BehaviorID*>> m_TreeIDs;
 
 		std::unordered_set<STRING> m_ToBeLoadedTree;
+		///> When a tree (including its subtrees) is loading, the id is not and cant be built yet.
+		///> So when one or more of its subtrees is just itself, the id cant be found in the map, thus
+		///> another new id would be created, which shouldnot happen. If a buiding id is in this set,
+		///> avoid use IsSame function to determine if two trees are the same.
+		std::unordered_set<BehaviorID*> m_ToBeBuildID;
 		const std::vector<STRING>* m_ToBeReplacedSubs;
 
 		STRING m_WorkingDir;
