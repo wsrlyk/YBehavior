@@ -79,7 +79,7 @@
     <ClCompile Include="..\src\YBehavior\fsm\machinemgr.cpp" />
     <ClCompile Include="..\src\YBehavior\fsm\machinestate.cpp" />
     <ClCompile Include="..\src\YBehavior\fsm\machinetreemappingmgr.cpp" />
-    <ClCompile Include="..\src\YBehavior\fsm\machingtreemapping.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\machinetreemapping.cpp" />
     <ClCompile Include="..\src\YBehavior\fsm\metastate.cpp" />
     <ClCompile Include="..\src\YBehavior\fsm\statemachine.cpp" />
     <ClCompile Include="..\src\YBehavior\launcher.cpp" />

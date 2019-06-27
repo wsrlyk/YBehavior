@@ -3,6 +3,8 @@
 #include "YBehavior/logger.h"
 #include "YBehavior/behaviorprocess.h"
 #include "YBehavior/fsm/machinemgr.h"
+#include "YBehavior/memory.h"
+#include "YBehavior/behaviortree.h"
 
 namespace YBehavior
 {
@@ -41,6 +43,35 @@ namespace YBehavior
 		m_ID = 0;
 		m_pFSMID = nullptr;
 		m_pTreeIDs.clear();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+
+	MachineTreeMapping::MachineTreeMapping()
+	{
+		m_pMemory = new Memory();
+	}
+
+	MachineTreeMapping::~MachineTreeMapping()
+	{
+		delete m_pMemory;
+	}
+
+	void MachineTreeMapping::Build()
+	{
+		for (auto it = m_Mapping.begin(); it != m_Mapping.end(); ++it)
+		{
+			it->second->CloneDataTo(*m_pMemory->GetMainData());
+		}
+	}
+
+	YBehavior::BehaviorTree* MachineTreeMapping::GetTree(FSMUIDType fsmuid)
+	{
+		auto it = m_Mapping.find(fsmuid);
+		if (it == m_Mapping.end())
+			return nullptr;
+		return it->second;
 	}
 
 }

@@ -356,14 +356,14 @@
     <ClCompile Include="..\src\YBehavior\fsm\machinetreemappingmgr.cpp">
       <Filter>源文件\fsm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\YBehavior\fsm\machingtreemapping.cpp">
-      <Filter>源文件\fsm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\YBehavior\behaviorprocess.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\behaviorid.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\machinetreemapping.cpp">
+      <Filter>源文件\fsm</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

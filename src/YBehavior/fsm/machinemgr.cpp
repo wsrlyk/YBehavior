@@ -281,7 +281,7 @@ namespace YBehavior
 		}
 		else
 		{
-			pState = new MachineState(name, type, nullptr);
+			pState = new MachineState(name, type);
 		}
 
 		if (type == MST_Entry || type == MST_Exit)

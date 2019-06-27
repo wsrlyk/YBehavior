@@ -12,6 +12,7 @@ namespace YBehavior
 	class RegisterData;
 	class RunningContext;
 	class Memory;
+	class MachineContext;
 
 	class YBEHAVIOR_API Entity
 	{
@@ -30,6 +31,7 @@ namespace YBehavior
 		UINT64 m_UID;
 
 		Memory* m_Memory;
+		MachineContext* m_pMachineContext;
 		//SharedDataEx* m_SharedData;
 		BehaviorTree* m_Tree;
 		RegisterData* m_RegisterData;
@@ -40,6 +42,7 @@ namespace YBehavior
 		Agent(Entity* entity);
 		~Agent();
 		inline Memory* GetMemory() { return m_Memory; }
+		inline MachineContext* GetMachineContext() { return m_pMachineContext; }
 		//inline SharedDataEx* GetSharedData() { return m_SharedData; }
 		inline BehaviorTree* GetTree() { return m_Tree; }
 		inline Entity* GetEntity() { return m_Entity; }
@@ -55,6 +58,7 @@ namespace YBehavior
 		RunningContext* PopRC();
 		void PushRC(RunningContext* context);
 		void ClearRC();
+		bool IsRCEmpty() { return m_RunningContexts.empty(); }
 	protected:
 		virtual void _OnProcessRegister() {}
 	};

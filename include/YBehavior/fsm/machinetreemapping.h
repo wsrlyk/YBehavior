@@ -49,9 +49,16 @@ namespace YBehavior
 		Memory* m_pMemory;
 
 	public:
+		MachineTreeMapping();
+		~MachineTreeMapping();
 		inline void SetVersion(MachineTreeMappingVersion* version) { m_Version = version; }
 		inline void SetID(MachineTreeMappingID* id) { m_ID = id; }
 		MachineTreeMappingType& GetMapping() { return m_Mapping; }
+		inline void SetFSM(FSM* pFSM) { m_pFSM = pFSM; }
+		inline FSM* GetFSM() { return m_pFSM; }
+		inline Memory* GetMemory() { return m_pMemory; }
+		void Build();
+		BehaviorTree* GetTree(FSMUIDType fsmuid);
 	};
 
 }

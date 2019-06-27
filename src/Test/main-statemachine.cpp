@@ -17,12 +17,18 @@
 using namespace YBehavior;
 int main(int argc, char** argv)
 {
+	MyLaunchCore core;
+	YB::Launcher::Launch(core);
+
+	XAgent::InitData();
+
+
 	StateMachine* pMain = new StateMachine(1, 1, 1);
 	{
 		TransitionMapKey k;
 		TransitionMapValue v;
 
-		MachineState* pIdle = new MachineState("IDLE", MST_Normal, nullptr);
+		MachineState* pIdle = new MachineState("IDLE", MST_Normal);
 		k.fromState = nullptr;
 		k.trans = Transition("ToIdle");
 		v.toState = pIdle;
@@ -38,7 +44,7 @@ int main(int argc, char** argv)
 		{
 			StateMachine* pMoveMachine = new StateMachine(1, 2, 1);
 			{
-				MachineState* pWalk = new MachineState("WALK", MST_Normal, nullptr);
+				MachineState* pWalk = new MachineState("WALK", MST_Normal);
 				k.fromState = nullptr;
 				k.trans = Transition("ToWalk");
 				v.toState = pWalk;
@@ -46,7 +52,7 @@ int main(int argc, char** argv)
 
 				pMoveMachine->SetDefault(pWalk);
 
-				MachineState* pRun = new MachineState("RUN", MST_Normal, nullptr);
+				MachineState* pRun = new MachineState("RUN", MST_Normal);
 				k.fromState = nullptr;
 				k.trans = Transition("ToRun");
 				v.toState = pRun;
@@ -64,13 +70,13 @@ int main(int argc, char** argv)
 		{
 			StateMachine* pFightMachine = new StateMachine(1, 2, 2);
 			{
-				MachineState* pDetect = new MachineState("DETECT", MST_Normal, nullptr);
+				MachineState* pDetect = new MachineState("DETECT", MST_Normal);
 				k.fromState = nullptr;
 				k.trans = Transition("ToDetect");
 				v.toState = pDetect;
 				pFightMachine->InsertTrans(k, v);
 
-				MachineState* pSkill = new MachineState("SKILL", MST_Normal, nullptr);
+				MachineState* pSkill = new MachineState("SKILL", MST_Normal);
 				k.fromState = nullptr;
 				k.trans = Transition("ToSkill");
 				v.toState = pSkill;
@@ -78,7 +84,7 @@ int main(int argc, char** argv)
 
 				pFightMachine->SetDefault(pDetect);
 
-				MachineState* pCD = new MachineState("CD", MST_Normal, nullptr);
+				MachineState* pCD = new MachineState("CD", MST_Normal);
 				k.fromState = pSkill;
 				k.trans = Transition("ToCD");
 				v.toState = pCD;
@@ -89,15 +95,15 @@ int main(int argc, char** argv)
 	}
 
 	STRING s;
-	MachineContext context;
+	XEntity* pEntity = new XEntity("Hehe", nullptr, nullptr);
 
-	pMain->OnEnter(context);
+	pMain->OnEnter(pEntity->GetAgent());
 	while (true)
 	{
-		pMain->Update(0, context);
+		pMain->Update(0, pEntity->GetAgent());
 
 		std::cin >> s;
-		context.GetTransition().Set(s);
+		pEntity->GetAgent()->GetMachineContext()->GetTransition().Set(s);
 	}
 
 	return 0;

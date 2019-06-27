@@ -223,6 +223,10 @@ namespace YBehavior
 		MachineTreeMapping* mapping = new MachineTreeMapping();
 		mapping->SetID(id);
 		mapping->GetMapping() = std::move(machinetreemapping);
+		mapping->SetFSM(pFSM);
+
+		mapping->Build();
 		return mapping;
 	}
+
 }

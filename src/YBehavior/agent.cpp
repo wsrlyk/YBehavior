@@ -6,6 +6,7 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/runningcontext.h"
 #include "YBehavior/memory.h"
+#include "YBehavior/fsm/statemachine.h"
 
 YBehavior::UINT64 YBehavior::Agent::s_UID = 0;
 
@@ -90,6 +91,7 @@ YBehavior::Agent::Agent(Entity* entity)
 	m_UID = ++s_UID;
 	//m_SharedData = new SharedDataEx();
 	m_Memory = new Memory();
+	m_pMachineContext = new MachineContext();
 }
 
 YBehavior::Agent::~Agent()
@@ -103,6 +105,7 @@ YBehavior::Agent::~Agent()
 		delete m_RegisterData;
 
 	delete m_Memory;
+	delete m_pMachineContext;
 	//delete m_SharedData;
 	ClearRC();
 }

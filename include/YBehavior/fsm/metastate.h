@@ -16,8 +16,8 @@ namespace YBehavior
 		~MetaState();
 		inline StateMachine* GetMachine() { return m_pMachine; }
 		inline void SetMachine(StateMachine* sm) { m_pMachine = sm; }
-		MachineRunRes OnEnter(MachineContext& context) override;
-		MachineRunRes OnExit(MachineContext& context) override;
+		MachineRunRes OnEnter(AgentPtr pAgent) override;
+		MachineRunRes OnExit(AgentPtr pAgent) override;
 	};
 }
 
