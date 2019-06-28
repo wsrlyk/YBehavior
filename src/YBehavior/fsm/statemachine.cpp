@@ -37,13 +37,11 @@ namespace YBehavior
 				if (m_States.insert(k.fromState).second)
 				{
 					m_AllStates.push_back(k.fromState);
-					k.fromState->GetUID().Value = m_UID.Value;
 				}
 			}
 			if (m_States.insert(v.toState).second)
 			{
 				m_AllStates.push_back(v.toState);
-				v.toState->GetUID().Value = m_UID.Value;
 			}
 		}
 	}
@@ -134,20 +132,25 @@ namespace YBehavior
 			LOG_BEGIN << "Update State In Machine" << LOG_END;
 			(*context.GetCurStatesStack().rbegin())->OnUpdate(fDeltaT, pAgent);
 		}
+		else
+		{
+			context.GetTransition().transferRunRes = OnEnter(pAgent);
+		}
 	}
 
 	bool _CompareState(const MachineState* left, const MachineState* right)
 	{
-		return left->GetName() < right->GetName();
+		return left->GetSortValue() < right->GetSortValue();
 	}
 
 	void StateMachine::OnLoadFinish()
 	{
-		StdVector<MachineState*> l(m_States.begin(), m_States.end());
+		StdVector<MachineState*> l(m_AllStates.begin(), m_AllStates.end());
 		std::sort(l.begin(), l.end(), _CompareState);
 		int index = 0;
-		for (auto it = l.begin(); it != l.end(); )
+		for (auto it = l.begin(); it != l.end(); ++it)
 		{
+			(*it)->GetUID().Value = m_UID.Value;
 			(*it)->GetUID().State = ++index;
 		}
 	}
@@ -449,6 +452,12 @@ namespace YBehavior
 			delete m_pMachine;
 		m_pMachine = new StateMachine(1, 1, 1);
 		return m_pMachine;
+	}
+
+	void FSM::Update(float fDeltaT, AgentPtr pAgent)
+	{
+		if (m_pMachine)
+			m_pMachine->Update(fDeltaT, pAgent);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

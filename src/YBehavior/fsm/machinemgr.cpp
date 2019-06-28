@@ -238,7 +238,13 @@ namespace YBehavior
 		
 		FSM* pFSM = new FSM(name);
 		StateMachine* pMachine = pFSM->CreateMachine();
-		return nullptr;
+		if (!_LoadMachine(pMachine, rootData.first_child()))
+		{
+			ERROR_BEGIN << "Load FSM Failed: " << name << ERROR_END;
+			delete pFSM;
+			return nullptr;
+		}
+		return pFSM;
 	}
 
 	MachineState* _LoadState(
@@ -382,9 +388,10 @@ namespace YBehavior
 		std::unordered_set<STRING> unusedStates;
 		FSMUIDType subMachineCount = 0;
 		bool bErr = false;
+		int stateNum = 0;
 		for (auto it = data.begin(); it != data.end(); ++it)
 		{
-			if (it->name() == "State")
+			if (strcmp(it->name(), "State") == 0)
 			{
 				MachineState* pState = _LoadState(pMachine, *it, states, unusedStates);
 				if (!pState)
@@ -393,6 +400,8 @@ namespace YBehavior
 					bErr = true;
 					break;
 				}
+
+				pState->SetSortValue(stateNum++);
 
 				if (pState->GetType() == MST_Meta)
 				{
@@ -410,7 +419,7 @@ namespace YBehavior
 					}
 				}
 			}
-			else if (it->name() == "Trans")
+			else if (strcmp(it->name(), "Trans") == 0)
 			{
 				if (!_LoadTrans(pMachine, *it, states, unusedStates))
 				{

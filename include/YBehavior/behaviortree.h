@@ -273,6 +273,7 @@ namespace YBehavior
 		//inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }
 		void CloneDataTo(SharedDataEx& destination);
 
+		void MergeDataTo(SharedDataEx& destination);
 		void AddSubTree(BehaviorTree* sub) { m_SubTrees.push_back(sub); }
 		inline StdVector<BehaviorTree*>& GetSubTrees() { return m_SubTrees; }
 		NodeState RootExecute(AgentPtr pAgent, NodeState parentState, LocalMemoryInOut* pTunnel = nullptr);

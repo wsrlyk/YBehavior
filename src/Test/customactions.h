@@ -56,6 +56,19 @@ public:
 		pAgent->SetTree(tree, subs);
 		pAgent->SetData();
 	}
+
+	XEntity(const YBehavior::STRING& name, const YBehavior::STRING& machineName, const StdVector<YBehavior::STRING>* trees = nullptr, const StdVector<YBehavior::STRING>* subs = nullptr)
+	{
+		m_Name = name;
+		pAgent = new XAgent(this);
+		YBehavior::ProcessKey key;
+		key.machineName = machineName;
+		key.stateTrees = trees;
+		key.subTrees = subs;
+		pAgent->SetBehavior(key);
+		pAgent->SetData();
+	}
+
 	~XEntity()
 	{
 		delete pAgent;

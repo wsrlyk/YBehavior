@@ -62,7 +62,7 @@ namespace YBehavior
 	{
 		for (auto it = m_Mapping.begin(); it != m_Mapping.end(); ++it)
 		{
-			it->second->CloneDataTo(*m_pMemory->GetMainData());
+			it->second->MergeDataTo(*m_pMemory->GetMainData());
 		}
 	}
 

@@ -95,13 +95,13 @@ int main(int argc, char** argv)
 	}
 
 	STRING s;
-	XEntity* pEntity = new XEntity("Hehe", nullptr, nullptr);
+	XEntity* pEntity = new XEntity("Hehe", "StateMachine/MonsterMachine", nullptr, nullptr);
 
-	pMain->OnEnter(pEntity->GetAgent());
+	//pMain->OnEnter(pEntity->GetAgent());
 	while (true)
 	{
-		pMain->Update(0, pEntity->GetAgent());
-
+		//pMain->Update(0, pEntity->GetAgent());
+		pEntity->GetAgent()->Tick();
 		std::cin >> s;
 		pEntity->GetAgent()->GetMachineContext()->GetTransition().Set(s);
 	}

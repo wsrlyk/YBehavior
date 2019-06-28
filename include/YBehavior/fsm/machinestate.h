@@ -40,6 +40,7 @@ namespace YBehavior
 
 		MachineStateType m_Type;
 		FSMUID m_UID;
+		int m_SortValue;
 	public:
 		MachineState();
 		MachineState(const STRING& name, MachineStateType type);
@@ -55,6 +56,8 @@ namespace YBehavior
 		virtual MachineRunRes OnUpdate(float fDeltaT, AgentPtr pAgent);
 		inline void SetTree(const STRING& tree) { m_Tree = tree; }
 		inline const STRING& GetTree() { return m_Tree; }
+		inline int GetSortValue() const { return m_SortValue; }
+		inline void SetSortValue(int v) { m_SortValue = v; }
 
 	protected:
 		MachineRunRes _RunTree(AgentPtr pAgent);

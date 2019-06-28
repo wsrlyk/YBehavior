@@ -85,7 +85,7 @@ namespace YBehavior
 		const Transition& Get() const { return m_Trans; }
 		bool HasTransition() { return m_Trans.IsValid(); }
 		void Set(const STRING& e) { if (!m_bLock) m_Trans.Set(e); }
-		inline void Reset() { m_Trans.Reset(); m_bLock = false; }
+		inline void Reset() { m_Trans.Reset(); m_bLock = false; transferStage = MTS_None; }
 
 		inline void Lock() { m_bLock = true; }
 	};
@@ -163,6 +163,8 @@ namespace YBehavior
 		FSM(const STRING& name);
 		~FSM();
 		StateMachine* CreateMachine();
+
+		void Update(float fDeltaT, AgentPtr pAgent);
 	};
 }
 

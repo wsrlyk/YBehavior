@@ -57,7 +57,7 @@ namespace YBehavior
 		if (pTree)
 		{
 			pAgent->GetMachineContext()->SetCurRunningState(this);
-			NodeState ns = pTree->Execute(pAgent, pAgent->IsRCEmpty() ? NS_INVALID : NS_RUNNING);
+			NodeState ns = pTree->RootExecute(pAgent, pAgent->IsRCEmpty() ? NS_INVALID : NS_RUNNING);
 			switch (ns)
 			{
 			case YBehavior::NS_BREAK:

@@ -146,33 +146,30 @@ namespace YBehavior
 		MachineTreeMapping* pRes = nullptr;
 		MachineTreeMappingInfo* info = nullptr;
 
-		auto it = m_MappingIDs.find(key.machineName);
-		if (it == m_MappingIDs.end())
-		{
-			LOG_BEGIN << "Cant Find MachineTreeMapping with MachineName " << key.machineName << LOG_END;
-			return nullptr;
-		}
-
 		MachineTreeMappingID* targetID = nullptr;
-		for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+		auto it = m_MappingIDs.find(key.machineName);
+		if (it != m_MappingIDs.end())
 		{
-			MachineTreeMappingID* id = *it2;
-			if (!id->IsSame(key))
-				continue;
-			targetID = id;
-			auto it3 = m_Mappings.find(targetID);
-			if (it3 != m_Mappings.end())
+			for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2)
 			{
-				info = it3->second;
-				pRes = info->GetLatest();
-				if (pRes != nullptr)
-					return pRes;
+				MachineTreeMappingID* id = *it2;
+				if (!id->IsSame(key))
+					continue;
+				targetID = id;
+				auto it3 = m_Mappings.find(targetID);
+				if (it3 != m_Mappings.end())
+				{
+					info = it3->second;
+					pRes = info->GetLatest();
+					if (pRes != nullptr)
+						return pRes;
+				}
+				else
+				{
+					ERROR_BEGIN << "Has Mapping ID but no Mapping Info. " << ERROR_END;
+				}
+				break;
 			}
-			else
-			{
-				ERROR_BEGIN << "Has Mapping ID but no Mapping Info. " << ERROR_END;
-			}
-			break;
 		}
 
 		if (targetID == nullptr || info == nullptr)

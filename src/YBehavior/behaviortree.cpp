@@ -497,6 +497,11 @@ namespace YBehavior
 		destination.CloneFrom(*m_SharedData);
 	}
 
+	void BehaviorTree::MergeDataTo(SharedDataEx& destination)
+	{
+		destination.MergeFrom(*m_SharedData, false);
+	}
+
 
 	YBehavior::NodeState BehaviorTree::RootExecute(AgentPtr pAgent, NodeState parentState, LocalMemoryInOut* pInOut)
 	{

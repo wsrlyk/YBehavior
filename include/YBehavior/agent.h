@@ -4,6 +4,7 @@
 #include "YBehavior/define.h"
 #include "YBehavior/types.h"
 #include <stack>
+#include "behaviorprocess.h"
 
 namespace YBehavior
 {
@@ -30,9 +31,10 @@ namespace YBehavior
 		static UINT64 s_UID;
 		UINT64 m_UID;
 
-		Memory* m_Memory;
-		MachineContext* m_pMachineContext;
-		//SharedDataEx* m_SharedData;
+		//Memory* m_Memory;
+		//MachineContext* m_pMachineContext;
+		BehaviorProcess m_Process;
+
 		BehaviorTree* m_Tree;
 		RegisterData* m_RegisterData;
 		Entity* m_Entity;
@@ -41,15 +43,17 @@ namespace YBehavior
 	public:
 		Agent(Entity* entity);
 		~Agent();
-		inline Memory* GetMemory() { return m_Memory; }
-		inline MachineContext* GetMachineContext() { return m_pMachineContext; }
+		inline Memory* GetMemory() { return &m_Process.memory; }
+		inline MachineContext* GetMachineContext() { return &m_Process.machineContext; }
 		//inline SharedDataEx* GetSharedData() { return m_SharedData; }
 		inline BehaviorTree* GetTree() { return m_Tree; }
 		inline Entity* GetEntity() { return m_Entity; }
 		inline void SetEntity(Entity* entity) { m_Entity = entity; }
 		RegisterData* GetRegister();
 		bool SetTree(const STRING& name, const std::vector<STRING>* subs = nullptr);
+		bool SetBehavior(const ProcessKey& key);
 		void UnloadTree();
+		void UnloadBehavior();
 		void Tick();
 
 		void ProcessRegister();
