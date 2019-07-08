@@ -487,4 +487,12 @@ namespace YBehavior
 
 	}
 
+	void MachineContext::Reset()
+	{
+		m_pMapping = nullptr;
+		m_pCurRunningState = nullptr;
+		m_CurStates.clear();
+		m_Trans.Reset();
+	}
+
 }

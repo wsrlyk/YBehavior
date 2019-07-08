@@ -5,6 +5,8 @@
 #include "YBehavior/fsm/machinemgr.h"
 #include "YBehavior/memory.h"
 #include "YBehavior/behaviortree.h"
+#include "YBehavior/behaviortreemgr.h"
+#include "YBehavior/mgrs.h"
 
 namespace YBehavior
 {
@@ -49,6 +51,9 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 
 	MachineTreeMapping::MachineTreeMapping()
+		: m_Version(nullptr)
+		, m_ID(nullptr)
+		, m_pFSM(nullptr)
 	{
 		m_pMemory = new Memory();
 	}
@@ -56,6 +61,18 @@ namespace YBehavior
 	MachineTreeMapping::~MachineTreeMapping()
 	{
 		delete m_pMemory;
+
+		for (auto it = m_Mapping.begin(); it != m_Mapping.end(); ++it)
+		{
+			Mgrs::Instance()->GetTreeMgr()->ReturnTree(it->second, true);
+		}
+		m_Mapping.clear();
+
+		if (m_pFSM)
+		{
+			Mgrs::Instance()->GetMachineMgr()->ReturnFSM(m_pFSM);
+			m_pFSM = nullptr;
+		}
 	}
 
 	void MachineTreeMapping::Build()

@@ -2,6 +2,7 @@
 #include "YBehavior/network/network.h"
 #include "YBehavior/behaviortreemgr.h"
 #include "YBehavior/fsm/machinemgr.h"
+#include "YBehavior/mgrs.h"
 
 namespace YBehavior
 {
@@ -22,8 +23,8 @@ namespace YBehavior
 
 
 		core.RegisterActions();
-		TreeMgr::Instance()->SetWorkingDir(core.WorkingDir());
-		MachineMgr::Instance()->SetWorkingDir(core.WorkingDir());
+		Mgrs::Instance()->GetTreeMgr()->SetWorkingDir(core.WorkingDir());
+		Mgrs::Instance()->GetMachineMgr()->SetWorkingDir(core.WorkingDir());
 #ifdef DEBUGGER
 		if (core.StartWithDebugListeningPort())
 			Network::Instance()->InitAndCreateThread(core.StartWithDebugListeningPort());

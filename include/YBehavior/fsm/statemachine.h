@@ -92,6 +92,7 @@ namespace YBehavior
 
 	typedef std::list<MachineState*> CurrentStatesType;
 	class MachineTreeMapping;
+	class BehaviorTree;
 	class MachineContext
 	{
 	protected:
@@ -99,6 +100,7 @@ namespace YBehavior
 		TransitionContext m_Trans;
 		MachineTreeMapping* m_pMapping;
 		MachineState* m_pCurRunningState;
+		BehaviorTree* m_pCurRunningTree;
 	public:
 		MachineContext();
 		inline TransitionContext& GetTransition() { return m_Trans; }
@@ -106,10 +108,12 @@ namespace YBehavior
 		inline CurrentStatesType& GetCurStatesStack() { return m_CurStates; }
 		inline void SetMapping(MachineTreeMapping* mapping) { m_pMapping = mapping; }
 		inline MachineTreeMapping* GetMapping() { return m_pMapping; }
-		inline void ResetCurRunningState() { m_pCurRunningState = nullptr; }
-		inline void SetCurRunningState(MachineState* pCurRunningState) { m_pCurRunningState = pCurRunningState; }
+		inline void ResetCurRunning() { m_pCurRunningState = nullptr; m_pCurRunningTree = nullptr; }
+		inline void SetCurRunning(MachineState* pCurRunningState, BehaviorTree* pCurRunningTree) { m_pCurRunningState = pCurRunningState; m_pCurRunningTree = pCurRunningTree; }
 		inline MachineState* GetCurRunningState() { return m_pCurRunningState; }
+		inline BehaviorTree* GetCurRunningTree() { return m_pCurRunningTree; }
 		inline bool CanRun(MachineState* pState) { return m_pCurRunningState == nullptr || m_pCurRunningState == pState; }
+		void Reset();
 	};
 
 	class StateMachine
@@ -148,16 +152,19 @@ namespace YBehavior
 	};
 
 	struct MachineVersion;
-	class BehaviorID;
+	class MachineID;
 	class FSM
 	{
 		STRING m_Name;
 		MachineVersion* m_Version;
+		MachineID* m_ID;
 		///> TODO: multilayers
 		StateMachine* m_pMachine;
 	public:
 		inline void SetVersion(MachineVersion* v) { m_Version = v; }
 		inline MachineVersion* GetVersion() const { return m_Version; }
+		inline void SetID(MachineID* id) { m_ID = id; }
+		inline MachineID* GetID() const { return m_ID; }
 		inline StateMachine* GetMachine() { return m_pMachine; }
 
 		FSM(const STRING& name);

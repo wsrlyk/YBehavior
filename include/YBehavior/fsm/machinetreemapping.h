@@ -52,7 +52,9 @@ namespace YBehavior
 		MachineTreeMapping();
 		~MachineTreeMapping();
 		inline void SetVersion(MachineTreeMappingVersion* version) { m_Version = version; }
+		inline MachineTreeMappingVersion* GetVersion() const { return m_Version; }
 		inline void SetID(MachineTreeMappingID* id) { m_ID = id; }
+		inline MachineTreeMappingID* GetID() const { return m_ID; }
 		MachineTreeMappingType& GetMapping() { return m_Mapping; }
 		inline void SetFSM(FSM* pFSM) { m_pFSM = pFSM; }
 		inline FSM* GetFSM() { return m_pFSM; }

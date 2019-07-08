@@ -7,6 +7,7 @@
 #include "YBehavior/behaviorid.h"
 #include "YBehavior/behaviortreemgr.h"
 #include "YBehavior/behaviortree.h"
+#include "YBehavior/mgrs.h"
 
 namespace YBehavior
 {
@@ -188,6 +189,12 @@ namespace YBehavior
 
 		pRes = _LoadNewMappingID(targetID, key);
 
+		if (!pRes)
+			return nullptr;
+
+		info->SetLatest(pRes);
+		info->ChangeReferenceCount(true);
+
 		return pRes;
 	}
 
@@ -195,7 +202,7 @@ namespace YBehavior
 	{
 		FSM* pFSM = nullptr;
 		MachineID* pFSMID = nullptr;
-		if (!MachineMgr::Instance()->GetFSM(key, pFSM, pFSMID))
+		if (!Mgrs::Instance()->GetMachineMgr()->GetFSM(key, pFSM, pFSMID))
 		{
 			ERROR_BEGIN << "Cant Get FSM " << key.machineName << " When Load machinetreemapping." << ERROR_END;
 			return nullptr;
@@ -205,7 +212,7 @@ namespace YBehavior
 		MachineTreeMappingType machinetreemapping;
 		for (auto it = pFSMID->GetStateTreeMap().begin(); it != pFSMID->GetStateTreeMap().end(); ++it)
 		{
-			BehaviorTree* tree = TreeMgr::Instance()->GetTree(it->second, key.subTrees);
+			BehaviorTree* tree = Mgrs::Instance()->GetTreeMgr()->GetTree(it->second, key.subTrees);
 			if (tree == nullptr)
 			{
 				ERROR_BEGIN << "Cant Get Tree " << it->second << " When Load machinetreemapping " << key.machineName << ERROR_END;
@@ -224,6 +231,29 @@ namespace YBehavior
 
 		mapping->Build();
 		return mapping;
+	}
+
+	void MachineTreeMappingMgr::ReturnMapping(MachineTreeMapping* pMapping)
+	{
+		if (pMapping == nullptr)
+			return;
+
+		auto it = m_Mappings.find(pMapping->GetID());
+		if (it != m_Mappings.end())
+		{
+			it->second->ChangeReferenceCount(false, pMapping->GetVersion());
+		}
+	}
+
+	MachineTreeMappingMgr::~MachineTreeMappingMgr()
+	{
+		for (auto it = m_Mappings.begin(); it != m_Mappings.end(); ++it)
+		{
+			delete it->first;
+			delete it->second;
+		}
+		m_Mappings.clear();
+		m_MappingIDs.clear();
 	}
 
 }

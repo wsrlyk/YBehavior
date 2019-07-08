@@ -65,20 +65,21 @@ namespace YBehavior
 
 	struct ProcessKey;
 
-	class YBEHAVIOR_API MachineMgr : public Singleton<MachineMgr>
+	class YBEHAVIOR_API MachineMgr
 	{
-		std::unordered_map<STRING, MachineInfo*> m_Machines;
+		std::unordered_map<MachineID*, MachineInfo*> m_Machines;
 		std::unordered_map<STRING, StdVector<MachineID*>> m_MachineIDs;
 
 		STRING m_WorkingDir;
 
 	public:
+		~MachineMgr();
 		MachineID* GetFSMID(const ProcessKey& key);
 		bool GetFSM(const ProcessKey& key, FSM* &pFSM, MachineID* &id);
 		void SetWorkingDir(const STRING& dir);
-
+		void ReturnFSM(FSM* pFSM);
 	protected:
-		FSM * _LoadFSM(const STRING& name);
+		FSM * _LoadFSM(MachineID* id);
 		bool _LoadMachine(StateMachine* pMachine, const pugi::xml_node& data);
 	};
 }

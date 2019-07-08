@@ -137,6 +137,16 @@ namespace YBehavior
 	///>//////////////////////////////////////////////////////////////////////////////////////////
 	///>//////////////////////////////////////////////////////////////////////////////////////////
 	///>//////////////////////////////////////////////////////////////////////////////////////////
+	MachineMgr::~MachineMgr()
+	{
+		for (auto it = m_Machines.begin(); it != m_Machines.end(); ++it)
+		{
+			delete it->first;
+			delete it->second;
+		}
+		m_Machines.clear();
+		m_MachineIDs.clear();
+	}
 
 	void MachineMgr::SetWorkingDir(const STRING& dir)
 	{
@@ -153,79 +163,82 @@ namespace YBehavior
 	}
 
 
-	bool MachineMgr::GetFSM(const ProcessKey& key, FSM* &pFSM, MachineID* &id)
+	void MachineMgr::ReturnFSM(FSM* pFSM)
 	{
-		id = GetFSMID(key);
-		if (id != nullptr)
+		if (pFSM == nullptr)
+			return;
+
+		auto it = m_Machines.find(pFSM->GetID());
+		if (it != m_Machines.end())
 		{
-			auto it = m_Machines.find(id->GetName());
-			if (it == m_Machines.end())
-				return false;
-			pFSM = it->second->GetLatestFSM();
-			return pFSM != nullptr;
+			it->second->ChangeReferenceCount(false, pFSM->GetVersion());
 		}
-		return false;
+
 	}
 
 	void _BuildID(FSM* pFSM, MachineID* id);
 
-	MachineID* MachineMgr::GetFSMID(const ProcessKey& key)
+	bool MachineMgr::GetFSM(const ProcessKey& key, FSM* &pFSM, MachineID* &id)
 	{
 		MachineInfo* info = nullptr;
-		MachineID* id = nullptr;
-		FSM* pFSM = nullptr;
-		auto it = m_Machines.find(key.machineName);
-		if (it != m_Machines.end())
+		id = nullptr;
+		pFSM = nullptr;
+		auto it = m_MachineIDs.find(key.machineName);
+		if (it != m_MachineIDs.end())
 		{
-			info = it->second;
-			pFSM = info->GetLatestFSM();
-
-			auto it2 = m_MachineIDs.find(key.machineName);
-			if (it2 != m_MachineIDs.end())
+			for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2)
 			{
-				for (auto it3 = it2->second.begin(); it3 != it2->second.end(); ++it3)
+				id = *it2;
+				if (!id->IsSame(key.stateTrees))
+					continue;
+				auto it3 = m_Machines.find(id);
+				if (it3 != m_Machines.end())
 				{
-					id = *it3;
-					if (!id->IsSame(key.stateTrees))
-						continue;
-					return id;
+					pFSM = it3->second->GetLatestFSM();
+					if (pFSM)
+					{
+						it3->second->ChangeReferenceCount(true);
+						return true;
+					}
+					else
+						info = it3->second;
+
+					break;
 				}
 			}
 		}
-		else
+
+		if (info == nullptr)
 		{
-			///> No such a machine, try to load it first.
 			info = new MachineInfo();
-			m_Machines[key.machineName] = info;
+			id = new MachineID(key.machineName);
+			if (key.stateTrees != nullptr)
+				id->SetMappings(*key.stateTrees);
+			m_MachineIDs[key.machineName].push_back(id);
+			m_Machines[id] = info;
 		}
 
-		if (!pFSM)
-		{
-			pFSM = _LoadFSM(key.machineName);
-			if (!pFSM)
-				return nullptr;
-			info->SetLatestFSM(pFSM);
-		}
-
-		id = new MachineID(key.machineName);
 		if (key.stateTrees != nullptr)
 			id->SetMappings(*key.stateTrees);
-		m_MachineIDs[key.machineName].push_back(id);
+	
+		pFSM = _LoadFSM(id);
+		if (!pFSM)
+			return true;
 
-
+		info->SetLatestFSM(pFSM);
 		info->ChangeReferenceCount(true);
 
 		_BuildID(pFSM, id);
 
-		return id;
+		return true;
 	}
 
-	FSM * MachineMgr::_LoadFSM(const STRING& name)
+	FSM * MachineMgr::_LoadFSM(MachineID* id)
 	{
 		pugi::xml_document doc;
 
-		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + ".xml").c_str());
-		LOG_BEGIN << "Loading: " << name << ".xml" << LOG_END;
+		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + id->GetName() + ".xml").c_str());
+		LOG_BEGIN << "Loading: " << id->GetName() << ".xml" << LOG_END;
 		if (result.status)
 		{
 			ERROR_BEGIN << "Load result: " << result.description() << ERROR_END;
@@ -236,11 +249,12 @@ namespace YBehavior
 		if (rootData == nullptr)
 			return nullptr;
 		
-		FSM* pFSM = new FSM(name);
+		FSM* pFSM = new FSM(id->GetName());
+		pFSM->SetID(id);
 		StateMachine* pMachine = pFSM->CreateMachine();
 		if (!_LoadMachine(pMachine, rootData.first_child()))
 		{
-			ERROR_BEGIN << "Load FSM Failed: " << name << ERROR_END;
+			ERROR_BEGIN << "Load FSM Failed: " << id->GetName() << ERROR_END;
 			delete pFSM;
 			return nullptr;
 		}

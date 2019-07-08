@@ -30,6 +30,7 @@ namespace YBehavior
 	{
 	public:
 		static bool GetBehaviorProcess(const ProcessKey& key, BehaviorProcess& behaviorProcess);
+		static void Release(BehaviorProcess& behaviorProcess);
 		static void Execute(AgentPtr pAgent);
 	};
 }

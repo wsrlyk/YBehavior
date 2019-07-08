@@ -74,15 +74,15 @@ namespace YBehavior
 		{
 			if (m_bTargetDirty)
 			{
-				if ((m_TryTarget == 0 && pAgent->GetTree()->GetTreeName() == m_TargetTree) || m_TryTarget == pAgent->GetDebugUID())
+				if ((m_TryTarget == 0 && pAgent->GetRunningTree()->GetTreeName() == m_TargetTree) || m_TryTarget == pAgent->GetDebugUID())
 				{
 					{
-						m_TargetTree = pAgent->GetTree()->GetTreeName();
+						m_TargetTree = pAgent->GetRunningTree()->GetTreeName();
 						std::list<BehaviorTree*> toVisit;
 						std::unordered_set<BehaviorTree*> visited;
 
-						toVisit.push_back(pAgent->GetTree());
-						visited.insert(pAgent->GetTree());
+						toVisit.push_back(pAgent->GetRunningTree());
+						visited.insert(pAgent->GetRunningTree());
 						while (!toVisit.empty())
 						{
 							BehaviorTree* pCurTree = toVisit.front();

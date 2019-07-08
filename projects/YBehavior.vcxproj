@@ -30,6 +30,7 @@
     <ClInclude Include="..\include\YBehavior\launcher.h" />
     <ClInclude Include="..\include\YBehavior\logger.h" />
     <ClInclude Include="..\include\YBehavior\memory.h" />
+    <ClInclude Include="..\include\YBehavior\mgrs.h" />
     <ClInclude Include="..\include\YBehavior\network\messageprocessor.h" />
     <ClInclude Include="..\include\YBehavior\network\network.h" />
     <ClInclude Include="..\include\YBehavior\nodefactory.h" />
@@ -85,6 +86,7 @@
     <ClCompile Include="..\src\YBehavior\launcher.cpp" />
     <ClCompile Include="..\src\YBehavior\logger.cpp" />
     <ClCompile Include="..\src\YBehavior\memory.cpp" />
+    <ClCompile Include="..\src\YBehavior\mgrs.cpp" />
     <ClCompile Include="..\src\YBehavior\network\messageprocessor.cpp" />
     <ClCompile Include="..\src\YBehavior\network\network.cpp" />
     <ClCompile Include="..\src\YBehavior\network\network_msvc.cpp" />

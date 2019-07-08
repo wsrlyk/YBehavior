@@ -8,6 +8,7 @@
 #include "YBehavior/behaviortreemgr.h"
 #include <string.h>
 #include "YBehavior/behaviorid.h"
+#include "YBehavior/mgrs.h"
 
 namespace YBehavior
 {
@@ -45,7 +46,7 @@ namespace YBehavior
 		}
 
 		if (m_Root->GetTreeNameWithPath() != m_FinalTreeName)
-			TreeMgr::Instance()->PushToBeLoadedTree(m_FinalTreeName);
+			Mgrs::Instance()->GetTreeMgr()->PushToBeLoadedTree(m_FinalTreeName);
 
 		return true;
 	}

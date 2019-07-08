@@ -35,7 +35,7 @@ namespace YBehavior
 		//MachineContext* m_pMachineContext;
 		BehaviorProcess m_Process;
 
-		BehaviorTree* m_Tree;
+		//BehaviorTree* m_Tree;
 		RegisterData* m_RegisterData;
 		Entity* m_Entity;
 
@@ -46,13 +46,14 @@ namespace YBehavior
 		inline Memory* GetMemory() { return &m_Process.memory; }
 		inline MachineContext* GetMachineContext() { return &m_Process.machineContext; }
 		//inline SharedDataEx* GetSharedData() { return m_SharedData; }
-		inline BehaviorTree* GetTree() { return m_Tree; }
+		//inline BehaviorTree* GetTree() { return m_Tree; }
+		inline BehaviorTree* GetRunningTree() { return m_Process.machineContext.GetCurRunningTree(); }
 		inline Entity* GetEntity() { return m_Entity; }
 		inline void SetEntity(Entity* entity) { m_Entity = entity; }
 		RegisterData* GetRegister();
-		bool SetTree(const STRING& name, const std::vector<STRING>* subs = nullptr);
+		//bool SetTree(const STRING& name, const std::vector<STRING>* subs = nullptr);
 		bool SetBehavior(const ProcessKey& key);
-		void UnloadTree();
+		//void UnloadTree();
 		void UnloadBehavior();
 		void Tick();
 

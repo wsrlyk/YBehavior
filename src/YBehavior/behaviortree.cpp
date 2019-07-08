@@ -549,7 +549,7 @@ namespace YBehavior
 				ISharedVariableEx* pTo = it2->second;
 				if (pFrom->TypeID() != pTo->TypeID())
 				{
-					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetTree()->GetTreeName() << ERROR_END;
+					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetRunningTree()->GetTreeName() << ERROR_END;
 					continue;
 				}
 				pTo->SetValue(m_pAgent->GetMemory(), pFrom->GetValue(&m_TempMemory));
@@ -570,7 +570,7 @@ namespace YBehavior
 				ISharedVariableEx* pFrom = it2->second;
 				if (pFrom->TypeID() != pTo->TypeID())
 				{
-					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetTree()->GetTreeName() << ERROR_END;
+					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetRunningTree()->GetTreeName() << ERROR_END;
 					continue;
 				}
 				pTo->SetValue(&m_TempMemory, pFrom->GetValue(m_pAgent->GetMemory()));

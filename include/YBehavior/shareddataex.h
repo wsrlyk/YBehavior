@@ -181,6 +181,11 @@ namespace YBehavior
 				m_Datas[key] = *((T*)src);
 			return true;
 		}
+
+		void Clear() override
+		{
+			m_Datas.clear();
+		}
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -244,6 +249,8 @@ namespace YBehavior
 			IDataArray* iarray = m_Datas[typeKey];
 			return iarray->Set(key, src);
 		}
+
+		void Clear();
 	};
 
 	template<typename T>

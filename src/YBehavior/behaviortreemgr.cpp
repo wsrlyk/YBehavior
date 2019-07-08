@@ -8,18 +8,19 @@
 #include "YBehavior/tools/common.h"
 #include "YBehavior/tools/treemgrhelper.hpp"
 #include "YBehavior/behaviorid.h"
+#include "YBehavior/mgrs.h"
 
 namespace YBehavior
 {
 
-	TreeMgr* TreeMgr::Instance()
-	{
-		if (!s_Instance)
-		{
-			s_Instance = new TreeMgr();
-		}
-		return s_Instance;
-	}
+	//TreeMgr* TreeMgr::Instance()
+	//{
+	//	if (!s_Instance)
+	//	{
+	//		s_Instance = new TreeMgr();
+	//	}
+	//	return s_Instance;
+	//}
 
 	BehaviorTree * TreeMgr::_LoadTree(BehaviorID* id)
 	{
@@ -169,17 +170,17 @@ namespace YBehavior
 		{
 			info = new TreeInfo();
 			id = new BehaviorID(name);
-			if (m_ToBeReplacedSubs != nullptr)
-				id->SetMappings(*m_ToBeReplacedSubs);
+
 			m_TreeIDs[name].push_back(id);
 			m_Trees[id] = info;
 		}
 		else
 		{
-			///> Reset the id
-			if (m_ToBeReplacedSubs != nullptr)
-				id->SetMappings(*m_ToBeReplacedSubs);
 		}
+
+		///> Reset the id info
+		if (m_ToBeReplacedSubs != nullptr)
+			id->SetMappings(*m_ToBeReplacedSubs);
 
 		tree = _LoadTree(id);
 		if (!tree)
@@ -327,7 +328,7 @@ namespace YBehavior
 		m_TreeIDs.clear();
 	}
 
-	TreeMgr* TreeMgr::s_Instance;
+	//TreeMgr* TreeMgr::s_Instance;
 
 	void TreeMgr::Print()
 	{
@@ -457,7 +458,7 @@ namespace YBehavior
 			{
 				for (auto it = version->tree->GetSubTrees().begin(); it != version->tree->GetSubTrees().end(); ++it)
 				{
-					TreeMgr::Instance()->ReturnTree(*it, false);
+					Mgrs::Instance()->GetTreeMgr()->ReturnTree(*it, false);
 				}
 			}
 

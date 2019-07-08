@@ -7,6 +7,8 @@
 #include "YBehavior/runningcontext.h"
 #include "YBehavior/memory.h"
 #include "YBehavior/fsm/statemachine.h"
+#include "YBehavior/mgrs.h"
+#include "YBehavior/fsm/machinetreemappingmgr.h"
 
 YBehavior::UINT64 YBehavior::Agent::s_UID = 0;
 
@@ -17,16 +19,16 @@ YBehavior::RegisterData* YBehavior::Agent::GetRegister()
 	return m_RegisterData;
 }
 
-bool YBehavior::Agent::SetTree(const STRING& name, const std::vector<STRING>* subs)
-{
-	//UnloadTree();
-
-	//m_Tree = TreeMgr::Instance()->GetTree(name, subs);
-	//if (!m_Tree)
-	//	return false;
-	//m_Tree->CloneDataTo(*m_Memory->GetMainData());
-	return true;
-}
+//bool YBehavior::Agent::SetTree(const STRING& name, const std::vector<STRING>* subs)
+//{
+//	//UnloadTree();
+//
+//	//m_Tree = TreeMgr::Instance()->GetTree(name, subs);
+//	//if (!m_Tree)
+//	//	return false;
+//	//m_Tree->CloneDataTo(*m_Memory->GetMainData());
+//	return true;
+//}
 
 bool YBehavior::Agent::SetBehavior(const ProcessKey& key)
 {
@@ -38,21 +40,22 @@ bool YBehavior::Agent::SetBehavior(const ProcessKey& key)
 	return true;
 }
 
-void YBehavior::Agent::UnloadTree()
-{
-	if (m_Tree)
-	{
-		ClearRC();
-		TreeMgr::Instance()->ReturnTree(m_Tree, true);
-		m_Tree = nullptr;
-
-		///> m_SharedData will be written by new tree, or be deleted at destruction
-	}
-}
+//void YBehavior::Agent::UnloadTree()
+//{
+//	if (m_Tree)
+//	{
+//		ClearRC();
+//		Mgrs::Instance()->GetTreeMgr()->ReturnTree(m_Tree, true);
+//		m_Tree = nullptr;
+//
+//		///> m_SharedData will be written by new tree, or be deleted at destruction
+//	}
+//}
 
 void YBehavior::Agent::UnloadBehavior()
 {
-
+	ClearRC();
+	BehaviorProcessHelper::Release(m_Process);
 }
 
 void YBehavior::Agent::Tick()
@@ -97,8 +100,8 @@ void YBehavior::Agent::ClearRC()
 }
 
 YBehavior::Agent::Agent(Entity* entity)
-	: m_Tree(nullptr)
-	, m_RegisterData(nullptr)
+	//: m_Tree(nullptr)
+	: m_RegisterData(nullptr)
 	, m_Entity(entity)
 {
 	m_UID = ++s_UID;
@@ -109,11 +112,8 @@ YBehavior::Agent::Agent(Entity* entity)
 
 YBehavior::Agent::~Agent()
 {
-	if (m_Tree)
-	{
-		TreeMgr::Instance()->ReturnTree(m_Tree, true);
-		m_Tree = nullptr;
-	}
+	//UnloadTree();
+	UnloadBehavior();
 	if (m_RegisterData)
 		delete m_RegisterData;
 

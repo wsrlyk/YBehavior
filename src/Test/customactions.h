@@ -53,7 +53,7 @@ public:
 	{
 		m_Name = name;
 		pAgent = new XAgent(this);
-		pAgent->SetTree(tree, subs);
+		//pAgent->SetTree(tree, subs);
 		pAgent->SetData();
 	}
 

@@ -49,13 +49,15 @@ namespace YBehavior
 	};
 
 	struct ProcessKey;
-	class YBEHAVIOR_API MachineTreeMappingMgr : public Singleton<MachineTreeMappingMgr>
+	class YBEHAVIOR_API MachineTreeMappingMgr
 	{
 		std::unordered_map<MachineTreeMappingID*, MachineTreeMappingInfo*> m_Mappings;
 		std::unordered_map<STRING, StdVector<MachineTreeMappingID*>> m_MappingIDs;
 
 	public:
 		MachineTreeMapping* GetMapping(const ProcessKey& key);
+		void ReturnMapping(MachineTreeMapping* pMapping);
+		~MachineTreeMappingMgr();
 	};
 }
 

@@ -53,12 +53,14 @@ namespace YBehavior
 	class YBEHAVIOR_API TreeMgr
 	{
 	public:
+		TreeMgr() {}
+		~TreeMgr();
 		BehaviorTree * GetTree(const STRING& name, const std::vector<STRING>* subs);
 		///> Mark this tree dirty to reload it when GetTree
 		void ReloadTree(const STRING& name);
 		void ReloadAll();
 		void ReturnTree(BehaviorTree* tree, bool bFromAgent);
-		static TreeMgr* Instance();
+		//static TreeMgr* Instance();
 		void Print();
 		void SetWorkingDir(const STRING& dir);
 		void PushToBeLoadedTree(const STRING& name) { m_ToBeLoadedTree.insert(name); }
@@ -70,9 +72,7 @@ namespace YBehavior
 		BehaviorTree * _LoadTree(BehaviorID* id);
 		bool _LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID, BehaviorTree* root);
 	private:
-		static TreeMgr* s_Instance;
-		TreeMgr() {}
-		~TreeMgr();
+		//static TreeMgr* s_Instance;
 
 		std::unordered_map<BehaviorID*, TreeInfo*> m_Trees;
 		std::unordered_map<STRING, std::vector<BehaviorID*>> m_TreeIDs;

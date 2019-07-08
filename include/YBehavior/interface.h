@@ -133,6 +133,7 @@ namespace YBehavior
 		virtual SIZE_KEY Length() const = 0;
 		virtual TYPEID TypeID() const = 0;
 		virtual Iterator Iter() const = 0;
+		virtual void Clear() = 0;
 	};
 
 }

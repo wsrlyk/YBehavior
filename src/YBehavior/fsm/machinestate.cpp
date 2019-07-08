@@ -56,7 +56,7 @@ namespace YBehavior
 		BehaviorTree* pTree = pAgent->GetMachineContext()->GetMapping()->GetTree(this->m_UID.Value);
 		if (pTree)
 		{
-			pAgent->GetMachineContext()->SetCurRunningState(this);
+			pAgent->GetMachineContext()->SetCurRunning(this, pTree);
 			NodeState ns = pTree->RootExecute(pAgent, pAgent->IsRCEmpty() ? NS_INVALID : NS_RUNNING);
 			switch (ns)
 			{
@@ -67,7 +67,7 @@ namespace YBehavior
 			default:
 				break;
 			}
-			pAgent->GetMachineContext()->ResetCurRunningState();
+			pAgent->GetMachineContext()->ResetCurRunning();
 		}
 
 		return MRR_Normal;
