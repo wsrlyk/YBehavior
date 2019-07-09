@@ -39,8 +39,8 @@ namespace YBehavior.Editor
             SelectHandler = defaultSelectHandler;
 
             m_Operation = new Operation(this);
-            m_Operation.RegisterClick(_OnClick);
-            m_Operation.RegisterDrag(_OnDrag, _OnFinishDrag);
+            m_Operation.RegisterLeftClick(_OnClick);
+            m_Operation.RegisterLeftDrag(_OnDrag, null, _OnFinishDrag);
 
             m_InstantAnim = this.Resources["InstantShowAnim"] as Storyboard;
 

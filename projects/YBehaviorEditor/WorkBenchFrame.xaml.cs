@@ -57,8 +57,8 @@ namespace YBehavior.Editor
             DraggingConnection.Instance.SetCanvas(this.canvas);
 
             m_Operation = new Operation(this.CanvasBoard);
-            m_Operation.RegisterDrag(_OnDrag, null);
-            m_Operation.RegisterClick(_OnClick);
+            m_Operation.RegisterMiddleDrag(_OnDrag, null, null);
+            m_Operation.RegisterLeftClick(_OnClick);
         }
 
         private void _OnWorkBenchLoaded(EventArg arg)
