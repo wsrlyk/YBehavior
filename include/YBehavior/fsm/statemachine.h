@@ -6,7 +6,7 @@
 #include <map>
 #include <list>
 #include "YBehavior/utility.h"
-#include <unordered_set>
+#include <unordered_map>
 
 namespace YBehavior
 {
@@ -51,6 +51,7 @@ namespace YBehavior
 	{
 		MachineState* pFromState;
 		MachineState* pToState;
+		MachineState* pLCA;
 		Transition trans;
 		StateMachine* pMachine;
 
@@ -90,13 +91,14 @@ namespace YBehavior
 		inline void Lock() { m_bLock = true; }
 	};
 
-	typedef std::list<MachineState*> CurrentStatesType;
+	//typedef std::list<MachineState*> CurrentStatesType;
 	class MachineTreeMapping;
 	class BehaviorTree;
 	class MachineContext
 	{
 	protected:
-		CurrentStatesType m_CurStates;
+		//CurrentStatesType m_CurStates;
+		MachineState* m_pCurState;
 		TransitionContext m_Trans;
 		MachineTreeMapping* m_pMapping;
 		MachineState* m_pCurRunningState;
@@ -105,7 +107,7 @@ namespace YBehavior
 		MachineContext();
 		inline TransitionContext& GetTransition() { return m_Trans; }
 		inline const TransitionContext& GetTransition() const { return m_Trans; }
-		inline CurrentStatesType& GetCurStatesStack() { return m_CurStates; }
+		//inline CurrentStatesType& GetCurStatesStack() { return m_CurStates; }
 		inline void SetMapping(MachineTreeMapping* mapping) { m_pMapping = mapping; }
 		inline MachineTreeMapping* GetMapping() { return m_pMapping; }
 		inline void ResetCurRunning() { m_pCurRunningState = nullptr; m_pCurRunningTree = nullptr; }
@@ -113,42 +115,64 @@ namespace YBehavior
 		inline MachineState* GetCurRunningState() { return m_pCurRunningState; }
 		inline BehaviorTree* GetCurRunningTree() { return m_pCurRunningTree; }
 		inline bool CanRun(MachineState* pState) { return m_pCurRunningState == nullptr || m_pCurRunningState == pState; }
+		inline void SetCurState(MachineState* pState) { m_pCurState = pState; }
+		inline MachineState* GetCurState() const { return m_pCurState; }
 		void Reset();
+		void PopCurState();
 	};
 
+	class RootMachine;
+	class MetaState;
 	class StateMachine
 	{
 	protected:
-		std::map<TransitionMapKey, TransitionMapValue> m_TransitionMap;
-		std::unordered_set<MachineState*> m_States;
-		std::vector<MachineState*> m_AllStates;
 		MachineState* m_pDefaultState;
 		MachineState* m_EntryState;
 		MachineState* m_ExitState;
 		FSMUID m_UID;
+		RootMachine* m_pRootMachine;
+		MetaState* m_pMetaState;
 	public:
 		StateMachine(FSMUIDType layer, FSMUIDType level, FSMUIDType index);
 		~StateMachine();
-		void InsertTrans(const TransitionMapKey&, const TransitionMapValue&);
-		bool GetTransition(MachineState* pCurState, const MachineContext& context, TransitionResult& result);
 		inline MachineState* GetEntry() { return m_EntryState; }
 		inline MachineState* GetExit() { return m_ExitState; }
 		inline FSMUID GetUID() const { return m_UID; }
-		inline std::vector<MachineState*>& GetAllStates() { return m_AllStates; }
+		void SetMetaState(MetaState* pState);
+		inline MetaState* GetMetaState() const { return m_pMetaState; }
+		inline RootMachine* GetRootMachine() const { return m_pRootMachine; }
+		StateMachine* GetParentMachine() const;
 		inline void SetDefault(MachineState* pState) { m_pDefaultState = pState; }
 		void SetSpecialState(MachineState* pState);
 
-		void CheckDefault(MachineContext& context);
-		void Update(float fDeltaT, AgentPtr pAgent);
-
-		void OnLoadFinish();
+		virtual void OnLoadFinish();
 
 		MachineRunRes OnEnter(AgentPtr pAgent);
 		MachineRunRes OnExit(AgentPtr pAgent);
+		bool TryEnterDefault(AgentPtr pAgent);
 	protected:
-		bool _Trans(CurrentStatesType::const_iterator it, AgentPtr pAgent, TransitionResult& res);
+	};
+
+	class RootMachine : public StateMachine
+	{
+	protected:
+		std::map<TransitionMapKey, TransitionMapValue> m_TransitionMap;
+		std::unordered_map<STRING, MachineState*> m_States;
+		std::vector<MachineState*> m_AllStates;
+	public:
+		RootMachine(FSMUIDType layer);
+		~RootMachine();
+		bool InsertState(MachineState* pState);
+		void PushState(MachineState* pState);
+		bool InsertTrans(const TransitionMapKey&, const TransitionMapValue&);
+		inline std::vector<MachineState*>& GetAllStates() { return m_AllStates; }
+		bool GetTransition(MachineState* pCurState, const MachineContext& context, TransitionResult& result);
+		MachineState* FindState(const STRING& name);
+		void Update(float fDeltaT, AgentPtr pAgent);
+
+		void OnLoadFinish() override;
+	protected:
 		bool _Trans(AgentPtr pAgent);
-		bool _TryEnterDefault(AgentPtr pAgent);
 	};
 
 	struct MachineVersion;
@@ -159,17 +183,17 @@ namespace YBehavior
 		MachineVersion* m_Version;
 		MachineID* m_ID;
 		///> TODO: multilayers
-		StateMachine* m_pMachine;
+		RootMachine* m_pMachine;
 	public:
 		inline void SetVersion(MachineVersion* v) { m_Version = v; }
 		inline MachineVersion* GetVersion() const { return m_Version; }
 		inline void SetID(MachineID* id) { m_ID = id; }
 		inline MachineID* GetID() const { return m_ID; }
-		inline StateMachine* GetMachine() { return m_pMachine; }
+		inline RootMachine* GetMachine() { return m_pMachine; }
 
 		FSM(const STRING& name);
 		~FSM();
-		StateMachine* CreateMachine();
+		RootMachine* CreateMachine();
 
 		void Update(float fDeltaT, AgentPtr pAgent);
 	};

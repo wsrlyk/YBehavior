@@ -7,15 +7,15 @@ namespace YBehavior
 {
 	MetaState::MetaState(const STRING& name)
 		: MachineState(name, MST_Meta)
-		, m_pMachine(nullptr)
+		, m_pSubMachine(nullptr)
 	{
 
 	}
 
 	MetaState::~MetaState()
 	{
-		if (m_pMachine)
-			delete m_pMachine;
+		if (m_pSubMachine)
+			delete m_pSubMachine;
 	}
 
 	MachineRunRes MetaState::OnEnter(AgentPtr pAgent)
@@ -27,7 +27,7 @@ namespace YBehavior
 		}
 
 		MachineRunRes res;
-		res = m_pMachine->OnEnter(pAgent);
+		res = m_pSubMachine->OnEnter(pAgent);
 
 		switch (res)
 		{
@@ -50,7 +50,7 @@ namespace YBehavior
 
 	MachineRunRes MetaState::OnExit(AgentPtr pAgent)
 	{
-		MachineRunRes res = m_pMachine->OnExit(pAgent);
+		MachineRunRes res = m_pSubMachine->OnExit(pAgent);
 		if (res != MRR_Normal)
 			return res;
 

@@ -9,13 +9,13 @@ namespace YBehavior
 	class MetaState : public MachineState
 	{
 	protected:
-		StateMachine* m_pMachine;
+		StateMachine* m_pSubMachine;
 
 	public:
 		MetaState(const STRING& name);
 		~MetaState();
-		inline StateMachine* GetMachine() { return m_pMachine; }
-		inline void SetMachine(StateMachine* sm) { m_pMachine = sm; }
+		inline StateMachine* GetSubMachine() { return m_pSubMachine; }
+		inline void SetSubMachine(StateMachine* sm) { m_pSubMachine = sm; }
 		MachineRunRes OnEnter(AgentPtr pAgent) override;
 		MachineRunRes OnExit(AgentPtr pAgent) override;
 	};

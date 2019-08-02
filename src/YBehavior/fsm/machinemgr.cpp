@@ -251,8 +251,11 @@ namespace YBehavior
 		
 		FSM* pFSM = new FSM(id->GetName());
 		pFSM->SetID(id);
-		StateMachine* pMachine = pFSM->CreateMachine();
-		if (!_LoadMachine(pMachine, rootData.first_child()))
+		RootMachine* pMachine = pFSM->CreateMachine();
+		///> at most 8 levels, start from 1
+		int levelMachineCount[9];
+		memset(levelMachineCount, 0, sizeof(int) * 9);
+		if (!_LoadMachine(pMachine, rootData.first_child(), levelMachineCount))
 		{
 			ERROR_BEGIN << "Load FSM Failed: " << id->GetName() << ERROR_END;
 			delete pFSM;
@@ -263,9 +266,7 @@ namespace YBehavior
 
 	MachineState* _LoadState(
 		StateMachine* pMachine, 
-		const pugi::xml_node& node,
-		std::unordered_map<STRING, MachineState*>& states,
-		std::unordered_set<STRING>& unusedStates
+		const pugi::xml_node& node
 	)
 	{
 		auto attr = node.attribute("Type");
@@ -304,19 +305,16 @@ namespace YBehavior
 			pState = new MachineState(name, type);
 		}
 
+		pState->SetParentMachine(pMachine);
 		if (type == MST_Entry || type == MST_Exit)
 		{
 			pMachine->SetSpecialState(pState);
 		}
 		else
 		{
-			if (unusedStates.insert(name).second)
+			if (!pMachine->GetRootMachine()->InsertState(pState))
 			{
-				states[name] = pState;
-			}
-			else
-			{
-				ERROR_BEGIN << "Duplicate State Name " << name << ERROR_END;
+				ERROR_BEGIN << "Insert State Failed. Maybe Duplicate State Name " << name << ERROR_END;
 				delete pState;
 				pState = nullptr;
 			}
@@ -333,9 +331,7 @@ namespace YBehavior
 
 	bool _LoadTrans(
 		StateMachine* pMachine,
-		const pugi::xml_node& node,
-		std::unordered_map<STRING, MachineState*>& states,
-		std::unordered_set<STRING>& unusedStates
+		const pugi::xml_node& node
 	)
 	{
 		auto it = node.attribute("Name");
@@ -353,26 +349,24 @@ namespace YBehavior
 			return false;
 		}
 		STRING to(it.value());
-		auto it2 = states.find(to);
-		if (it2 == states.end())
+		MachineState* pTo = pMachine->GetRootMachine()->FindState(to);
+		if (pTo == nullptr)
 		{
 			ERROR_BEGIN << "Cant find ToState " << to << " when processing Trans " << name << ERROR_END;
 			return false;
 		}
-		MachineState* pTo = it2->second;
 
 		MachineState* pFrom = nullptr;
 		it = node.attribute("From");
 		if (!it.empty())
 		{
 			STRING from(it.value());
-			it2 = states.find(from);
-			if (it2 == states.end())
+			pFrom = pMachine->GetRootMachine()->FindState(from);
+			if (pFrom == nullptr)
 			{
 				ERROR_BEGIN << "Cant find FromState " << from << " when processing Trans " << name << ERROR_END;
 				return false;
 			}
-			pFrom = it2->second;
 		}
 
 		TransitionMapKey key;
@@ -381,16 +375,12 @@ namespace YBehavior
 		TransitionMapValue value;
 		value.toState = pTo;
 
-		pMachine->InsertTrans(key, value);
-
-		unusedStates.erase(pTo->GetName());
-		if (pFrom)
-			unusedStates.erase(pFrom->GetName());
+		pMachine->GetRootMachine()->InsertTrans(key, value);
 
 		return true;
 	}
 
-	bool MachineMgr::_LoadMachine(StateMachine* pMachine, const pugi::xml_node& data)
+	bool MachineMgr::_LoadMachine(StateMachine* pMachine, const pugi::xml_node& data, int levelMachineCount[])
 	{
 		if (pMachine == nullptr)
 		{
@@ -398,16 +388,13 @@ namespace YBehavior
 			return false;
 		}
 
-		std::unordered_map<STRING, MachineState*> states;
-		std::unordered_set<STRING> unusedStates;
-		FSMUIDType subMachineCount = 0;
 		bool bErr = false;
 		int stateNum = 0;
 		for (auto it = data.begin(); it != data.end(); ++it)
 		{
 			if (strcmp(it->name(), "State") == 0)
 			{
-				MachineState* pState = _LoadState(pMachine, *it, states, unusedStates);
+				MachineState* pState = _LoadState(pMachine, *it);
 				if (!pState)
 				{
 					ERROR_BEGIN << "Load State failed" << ERROR_END;
@@ -415,17 +402,19 @@ namespace YBehavior
 					break;
 				}
 
-				pState->SetSortValue(stateNum++);
-
+				pState->GetUID().Value = pMachine->GetUID().Value;
+				pState->GetUID().State = ++stateNum;
+				//LOG_BEGIN << "Create " << pState->ToString() << LOG_END;
 				if (pState->GetType() == MST_Meta)
 				{
 					StateMachine* pSubMachine = new StateMachine(
 						pMachine->GetUID().Layer,
 						pMachine->GetUID().Level + 1,
-						++subMachineCount);
-					((MetaState*)pState)->SetMachine(pSubMachine);
+						++levelMachineCount[pMachine->GetUID().Level]);
+					pSubMachine->SetMetaState((MetaState*)pState);
+					((MetaState*)pState)->SetSubMachine(pSubMachine);
 
-					if (!_LoadMachine(pSubMachine, it->first_child()))
+					if (!_LoadMachine(pSubMachine, it->first_child(), levelMachineCount))
 					{
 						ERROR_BEGIN << "Load SubMachine Failed." << ERROR_END;
 						bErr = true;
@@ -435,7 +424,7 @@ namespace YBehavior
 			}
 			else if (strcmp(it->name(), "Trans") == 0)
 			{
-				if (!_LoadTrans(pMachine, *it, states, unusedStates))
+				if (!_LoadTrans(pMachine, *it))
 				{
 					ERROR_BEGIN << "Load Trans Failed." << ERROR_END;
 					bErr = true;
@@ -449,40 +438,14 @@ namespace YBehavior
 			auto it = data.attribute("Default");
 			if (!it.empty())
 			{
-				STRING def(it.value());
-				auto it2 = states.find(def);
-				if (it2 == states.end())
+				MachineState* defaultState = pMachine->GetRootMachine()->FindState(it.value());
+				if (!defaultState)
 				{
-					ERROR_BEGIN << "Cant find DefaultState " << def << " when processing Machine" << ERROR_END;
+					ERROR_BEGIN << "Cant find DefaultState " << it.value() << " when processing Machine" << ERROR_END;
 					return false;
 				}
-				pMachine->SetDefault(it2->second);
-				unusedStates.erase(def);
+				pMachine->SetDefault(defaultState);
 			}
-		}
-
-		if (bErr)
-		{
-			for (auto it = states.begin(); it != states.end(); ++it)
-			{
-				delete it->second;
-			}
-			return false;
-		}
-
-		if (unusedStates.size() > 0)
-		{
-			LOG_BEGIN << "There are some states that are never used.";
-			for (auto it = unusedStates.begin(); it != unusedStates.end(); ++it)
-			{
-				auto it2 = states.find(*it);
-				if (it2 != states.end())
-				{
-					delete it2->second;
-					LOG_BEGIN << " " << *it;
-				}
-			}
-			LOG_BEGIN << LOG_END;
 		}
 
 		pMachine->OnLoadFinish();
@@ -491,36 +454,23 @@ namespace YBehavior
 
 	void _BuildID(FSM* pFSM, MachineID* id)
 	{
-		StateMachine* pMachine = pFSM->GetMachine();
+		RootMachine* pMachine = pFSM->GetMachine();
 		std::list<StateMachine*> l;
 		l.push_back(pMachine);
 		
 		id->GetStateTreeMap().clear();
 
-		while (!l.empty())
+		std::vector<MachineState *>& allStates = pMachine->GetAllStates();
+		for (auto it = allStates.begin(); it != allStates.end(); ++it)
 		{
-			StateMachine* pCur = l.front();
-			l.pop_front();
-
-			if (pCur == nullptr)
-				continue;
-
-			std::vector<MachineState *>& allStates = pCur->GetAllStates();
-			for (auto it = allStates.begin(); it != allStates.end(); ++it)
+			MachineState* pState = *it;
+			STRING outName;
+			if (pState->GetTree() != ""  && pState->GetIdentification() != "")
 			{
-				MachineState* pState = *it;
-				STRING outName;
-				if (pState->GetTree() != ""  && pState->GetIdentification() != "")
-				{
-					id->TryGet(pState->GetIdentification(), pState->GetTree(), outName);
-					id->GetStateTreeMap()[pState->GetUID().Value] = outName;
-				}
-
-				if (pState->GetType() == MST_Meta)
-				{
-					l.push_back(((MetaState*)pState)->GetMachine());
-				}
+				id->TryGet(pState->GetIdentification(), pState->GetTree(), outName);
+				id->GetStateTreeMap()[pState->GetUID().Value] = outName;
 			}
+
 		}
 
 		id->BuildID();

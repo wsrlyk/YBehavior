@@ -80,7 +80,7 @@ namespace YBehavior
 		void ReturnFSM(FSM* pFSM);
 	protected:
 		FSM * _LoadFSM(MachineID* id);
-		bool _LoadMachine(StateMachine* pMachine, const pugi::xml_node& data);
+		bool _LoadMachine(StateMachine* pMachine, const pugi::xml_node& data, int levelMachineCount[]);
 	};
 }
 

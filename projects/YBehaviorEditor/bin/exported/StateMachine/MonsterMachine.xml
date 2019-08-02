@@ -10,6 +10,11 @@
         <State Type="Exit" Tree="E" />
         <State Name="Walk" Tree="A" Identification="Walk"/>
         <State Name="Run" Tree="B"/>
+        <State Type="Meta" Name="Test0">
+	  <Machine Default="Test00">
+	    <State Name="Test00"/>
+	  </Machine>
+        </State>
         <Trans Name="ToWalk" To="Walk" />
         <Trans Name="ToRun" To="Run" />
       </Machine>
@@ -19,6 +24,11 @@
         <State Name="Detect" Tree="A"/>
         <State Name="Skill" Tree="B"/>
         <State Name="CD" Tree="C"/>
+        <State Type="Meta" Name="Test1">
+	  <Machine Default="Test11">
+	    <State Name="Test11"/>
+	  </Machine>
+        </State>
         <Trans Name="ToDetect" To="Detect" />
         <Trans Name="ToSkill" To="Skill" />
         <Trans Name="ToCD" From="Skill" To="CD" />

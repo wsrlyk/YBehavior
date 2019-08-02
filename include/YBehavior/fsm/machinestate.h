@@ -16,6 +16,7 @@ namespace YBehavior
 
 	enum MachineRunRes
 	{
+		MRR_Invalid = -1,
 		MRR_Normal,
 		MRR_Exit,
 		MRR_Running,
@@ -31,6 +32,7 @@ namespace YBehavior
 		virtual void OnUpdate(float fDeltaT, AgentPtr pAgent) {}
 	};
 
+	class StateMachine;
 	class MachineState
 	{
 	protected:
@@ -40,7 +42,8 @@ namespace YBehavior
 
 		MachineStateType m_Type;
 		FSMUID m_UID;
-		int m_SortValue;
+		//int m_SortValue;
+		StateMachine* m_pParentMachine;
 	public:
 		MachineState();
 		MachineState(const STRING& name, MachineStateType type);
@@ -49,6 +52,8 @@ namespace YBehavior
 		inline const STRING& GetIdentification() const { return m_Identification; }
 		inline void SetIdentification(const STRING& id) { m_Identification = id; }
 		inline FSMUID& GetUID() { return m_UID; }
+		inline void SetParentMachine(StateMachine* pMac) { m_pParentMachine = pMac; }
+		inline StateMachine* GetParentMachine() const { return m_pParentMachine; }
 		inline MachineStateType GetType() const { return m_Type; }
 		virtual STRING ToString() const;
 		virtual MachineRunRes OnEnter(AgentPtr pAgent);
@@ -56,8 +61,8 @@ namespace YBehavior
 		virtual MachineRunRes OnUpdate(float fDeltaT, AgentPtr pAgent);
 		inline void SetTree(const STRING& tree) { m_Tree = tree; }
 		inline const STRING& GetTree() { return m_Tree; }
-		inline int GetSortValue() const { return m_SortValue; }
-		inline void SetSortValue(int v) { m_SortValue = v; }
+		//inline int GetSortValue() const { return m_SortValue; }
+		//inline void SetSortValue(int v) { m_SortValue = v; }
 
 	protected:
 		MachineRunRes _RunTree(AgentPtr pAgent);
