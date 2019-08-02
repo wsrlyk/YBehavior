@@ -126,7 +126,7 @@ namespace YBehavior
 		if (!m_bSameArray)
 		{
 			m_Output->Clear(pAgent->GetMemory());
-			for (int i = 0; i < length - 1; ++i)
+			for (int i = 0; i < length; ++i)
 			{
 				m_Output->PushBackElement(pAgent->GetMemory(), m_Input->GetElement(pAgent->GetMemory(), i));
 			}
@@ -139,8 +139,8 @@ namespace YBehavior
 
 		void* pTemp = nullptr;
 		IVariableOperationHelper* pHelper = m_Input->GetElementOperation();
-		if (m_bSameArray)
-			pTemp = pHelper->AllocData();
+		//if (m_bSameArray)
+		pTemp = pHelper->AllocData();
 
 		for (int i = length - 1; i > 0; --i)
 		{
@@ -156,8 +156,8 @@ namespace YBehavior
 			pHelper->Set(const_cast<void*>(pTargetVariable->GetElement(pAgent->GetMemory(), i)), pTemp);
 		}
 
-		if (!pTemp)
-			pHelper->RecycleData(pTemp);
+		//if (!pTemp)
+		pHelper->RecycleData(pTemp);
 
 		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Output, false);
 
