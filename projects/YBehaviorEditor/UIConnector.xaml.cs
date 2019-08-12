@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -111,7 +112,7 @@ namespace YBehavior.Editor
                 {
                     Point pos = (OwnerNode.DataContext as Renderer).Geo.Pos + m_RelativePos;
                     //Hotspot = pos;
-                    (this.DataContext as ConnectorGeometry).Pos = pos;
+                    (this.DataContext as Core.New.ConnectorGeometry).Pos = pos;
                 }
             }
 
@@ -130,7 +131,7 @@ namespace YBehavior.Editor
             set { title.Text = value; }
         }
 
-        public ConnectionHolder ConnHolder { get; set; }
+        public Connector Ctr { get; set; }
 
         public Point GetPos(Visual visual)
         {
@@ -228,7 +229,7 @@ namespace YBehavior.Editor
             if (other == null)
                 return;
 
-            WorkBenchMgr.Instance.ConnectNodes(this.ConnHolder, other.ConnHolder);
+            Core.New.WorkBenchMgr.Instance.ConnectNodes(this.Ctr, other.Ctr);
         }
     }
 }

@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -52,7 +52,7 @@ namespace YBehavior.Editor
 
                     source = data;
                     Name = data.Name;
-                    Icon = !data.bIsFolder ? "📃"
+                    Icon = data.FileType != FileType.FOLDER ? "📃"
                                             : "📁";
 
                     if (Name == null)
@@ -116,7 +116,7 @@ namespace YBehavior.Editor
         private void _InitWorkingSpace()
         {
             m_ExpandedItems.Clear();
-            string expandedFolders = Config.Instance.ExpandedFolders;
+            string expandedFolders = Core.Config.Instance.ExpandedFolders;
             string[] folders = expandedFolders.Split(new char[] { '|' });
             foreach (string s in folders)
             {
@@ -172,8 +172,8 @@ namespace YBehavior.Editor
             this.Dispatcher.BeginInvoke(new Action
                 (() =>
                 {
-                    this.Files.IsEnabled = !DebugMgr.Instance.IsDebugging();
-                    this.FileOperatePanel.IsEnabled = !DebugMgr.Instance.IsDebugging();
+                    this.Files.IsEnabled = !Core.DebugMgr.Instance.IsDebugging();
+                    this.FileOperatePanel.IsEnabled = !Core.DebugMgr.Instance.IsDebugging();
                 })
             );
         }
@@ -190,7 +190,7 @@ namespace YBehavior.Editor
         private void btnNew_Click(object sender, RoutedEventArgs e)
         {
             WorkBench bench = null;
-            if ((bench = WorkBenchMgr.Instance.CreateNewBench()) != null)
+            if ((bench = WorkBenchMgr.Instance.CreateNewBench(FileType.TREE)) != null)
             {
                 WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
                 arg.Bench = bench;
@@ -214,7 +214,7 @@ namespace YBehavior.Editor
                     sb.Append('|');
                 sb.Append(s);
             }
-            Config.Instance.ExpandedFolders = sb.ToString();
+            Core.Config.Instance.ExpandedFolders = sb.ToString();
         }
     }
 }

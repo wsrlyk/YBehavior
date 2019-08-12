@@ -9,6 +9,7 @@ namespace YBehavior.Editor.Core
     class ExternalActionMgr : Singleton<ExternalActionMgr>
     {
         Dictionary<string, ActionNode> m_ActionDic = new Dictionary<string, ActionNode>();
+        Dictionary<string, New.ActionTreeNode> m_ActionTreeDic = new Dictionary<string, New.ActionTreeNode>();
         public ExternalActionMgr()
         {
         }
@@ -18,6 +19,15 @@ namespace YBehavior.Editor.Core
             if (m_ActionDic.TryGetValue(name, out ActionNode node))
             {
                 return node.Clone() as ActionNode;
+            }
+            return null;
+        }
+
+        public New.ActionTreeNode GetTreeNode(string name)
+        {
+            if (m_ActionTreeDic.TryGetValue(name, out New.ActionTreeNode node))
+            {
+                return node.Clone() as New.ActionTreeNode;
             }
             return null;
         }

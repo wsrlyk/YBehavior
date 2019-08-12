@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -25,7 +26,7 @@ namespace YBehavior.Editor
 
         public SelectionStateChangeHandler SelectHandler { get; set; }
 
-        public Node Node { get; set; }
+        public TreeNode Node { get; set; }
 
         Operation m_Operation;
 
@@ -59,7 +60,7 @@ namespace YBehavior.Editor
 
         void _DataContextChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e)
         {
-            Node = (DataContext as Renderer).Owner;
+            Node = (DataContext as NodeBaseRenderer).Owner as TreeNode;
 
             //SetCanvas(Node.Renderer.RenderCanvas);
 
@@ -74,23 +75,23 @@ namespace YBehavior.Editor
 
         private void _BuildConnectionBinding()
         {
-            foreach (ConnectionHolder conn in Node.Conns.ConnectionsList)
+            foreach (Core.New.Connector ctr in Node.Conns.ConnectorsList)
             {
-                _BuildConnectionBinding(conn);
+                _BuildConnectionBinding(ctr);
             }
 
-            if (Node.Conns.ParentHolder != null)
-                _BuildConnectionBinding(Node.Conns.ParentHolder, Connection.IdentifierParent);
+            if (Node.Conns.ParentConnector != null)
+                _BuildConnectionBinding(Node.Conns.ParentConnector);
         }
 
-        private void _BuildConnectionBinding(ConnectionHolder conn, string identifier = null)
+        private void _BuildConnectionBinding(Core.New.Connector ctr, string identifier = null)
         {
             if (identifier == null)
-                identifier = conn.Conn.Identifier;
+                identifier = ctr.Identifier;
 
             if (m_uiConnectors.TryGetValue(identifier, out UIConnector uiConnector))
             {
-                ConnectorGeometry geo = Node.Conns.GetConnHolder(identifier).Geo;
+                Core.New.ConnectorGeometry geo = Node.Conns.GetConnector(identifier).Geo;
                 uiConnector.DataContext = geo;
                 //uiConnector.SetBinding(UIConnector.HotspotProperty, new Binding()
                 //{
@@ -106,39 +107,39 @@ namespace YBehavior.Editor
             bottomConnectors.Children.Clear();
             leftConnectors.Child = null;
 
-            foreach (ConnectionHolder conn in Node.Conns.ConnectionsList)
+            foreach (Connector ctr in Node.Conns.ConnectorsList)
             {
-                if (conn.Conn is ConnectionNone)
-                    continue;
+                //if (ctr is ConnectorNone)
+                //    continue;
 
                 UIConnector uiConnector = new UIConnector
                 {
-                    Title = conn.Conn.Identifier,
-                    ConnHolder = conn
+                    Title = ctr.Identifier,
+                    Ctr = ctr
                 };
                 //uiConnector.SetCanvas(m_Canvas);
-                if (conn.Conn.Identifier == Connection.IdentifierCondition)
+                if (ctr.Identifier == Connector.IdentifierCondition)
                 {
                     leftConnectors.Child = uiConnector;
                 }
                 else
                     bottomConnectors.Children.Add(uiConnector);
 
-                m_uiConnectors.Add(conn.Conn.Identifier, uiConnector);
+                m_uiConnectors.Add(ctr.Identifier, uiConnector);
             }
 
-            if (Node.Conns.ParentHolder != null)
+            if (Node.Conns.ParentConnector != null)
             {
                 UIConnector uiConnector = new UIConnector
                 {
                     Title = Node.Icon,
-                    ConnHolder = Node.Conns.ParentHolder
+                    Ctr = Node.Conns.ParentConnector
                 };
                 //uiConnector.SetCanvas(m_Canvas);
                 uiConnector.title.FontSize = 14;
                 topConnectors.Children.Add(uiConnector);
 
-                m_uiConnectors.Add(Connection.IdentifierParent, uiConnector);
+                m_uiConnectors.Add(Connector.IdentifierParent, uiConnector);
             }
         }
 
@@ -270,7 +271,7 @@ namespace YBehavior.Editor
         void _OnClick()
         {
             m_Operation.MakeCanvasFocused();
-            if (Node is Tree)
+            if (Node is RootTreeNode)
                 return;
             SelectHandler(this, true);
         }
@@ -299,10 +300,10 @@ namespace YBehavior.Editor
             {
                 this.selectCover.Visibility = Visibility.Visible;
                 this.Node.NodeMemory.RefreshVariables();
-                if (this.Node is SubTreeNode)
-                {
-                    (this.Node as SubTreeNode).InOutMemory.RefreshVariables();
-                }
+                ////if (this.Node is SubTreeNode)
+                ////{
+                ////    (this.Node as SubTreeNode).InOutMemory.RefreshVariables();
+                ////}
             }
             else
                 this.selectCover.Visibility = Visibility.Collapsed;
@@ -310,41 +311,41 @@ namespace YBehavior.Editor
 
         public void OnDelete(int param)
         {
-            Node.Delete(param);
+            ////Node.Delete(param);
         }
 
         public void OnDuplicated(int param)
         {
             ///> Check if is root
-            if (Node.Type == NodeType.NT_Root)
+            if (Node.Type == TreeNodeType.TNT_Root)
                 return;
 
-            WorkBenchMgr.Instance.CloneNodeToBench(Node, param != 0);
+            ////Core.New.WorkBenchMgr.Instance.CloneNodeToBench(Node, param != 0);
         }
 
         public void OnCopied(int param)
         {
             ///> Check if is root
-            if (Node.Type == NodeType.NT_Root)
+            if (Node.Type == TreeNodeType.TNT_Root)
                 return;
 
-            WorkBenchMgr.Instance.CopyNode(Node, param != 0);
+            Core.New.WorkBenchMgr.Instance.CopyNode(Node, param != 0);
         }
 
         public void ToggleBreakPoint()
         {
-            if (Node.DebugPointInfo.HitCount > 0)
-                Node.SetDebugPoint(0);
-            else
-                Node.SetDebugPoint(1);
+            ////if (Node.DebugPointInfo.HitCount > 0)
+            ////    Node.SetDebugPoint(0);
+            ////else
+            ////    Node.SetDebugPoint(1);
         }
 
         public void ToggleLogPoint()
         {
-            if (Node.DebugPointInfo.HitCount < 0)
-                Node.SetDebugPoint(0);
-            else
-                Node.SetDebugPoint(-1);
+            ////if (Node.DebugPointInfo.HitCount < 0)
+            ////    Node.SetDebugPoint(0);
+            ////else
+            ////    Node.SetDebugPoint(-1);
         }
 
         public void ToggleDisable()
@@ -354,13 +355,13 @@ namespace YBehavior.Editor
 
         public void ToggleCondition()
         {
-            Node.EnableCondition = !Node.EnableCondition;
+            ////Node.EnableCondition = !Node.EnableCondition;
         }
 
         public void ToggleFold()
         {
-            if(Node.Conns.NodeCount > 0)
-                Node.Folded = !Node.Folded;
+            ////if(Node.Conns.NodeCount > 0)
+            ////    Node.Folded = !Node.Folded;
         }
     }
 }

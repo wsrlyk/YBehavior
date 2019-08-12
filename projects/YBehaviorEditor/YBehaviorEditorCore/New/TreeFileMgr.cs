@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace YBehavior.Editor.Core
+namespace YBehavior.Editor.Core.New
 {
     public enum FileType
     {
@@ -47,13 +47,13 @@ namespace YBehavior.Editor.Core
                 if (thisFolder.Children == null)
                     thisFolder.Children = new List<TreeFileInfo>();
 
-                if (NextFile.Extension != ".tree" && NextFile.Extension != ".fsm")
+                if (NextFile.Extension != ".tree" && NextFile.Extension != ".fsm" && NextFile.Extension != ".xml")
                     continue;
                 TreeFileInfo thisFile = new TreeFileInfo
                 {
                     Name = NextFile.Name.Remove(NextFile.Name.LastIndexOf(NextFile.Extension)),
                     Path = NextFile.FullName,
-                    FileType = NextFile.Extension == ".tree" ? FileType.TREE : FileType.FSM,
+                    FileType = NextFile.Extension == ".fsm" ? FileType.FSM : FileType.TREE,
                 };
                 thisFolder.Children.Add(thisFile);
 
