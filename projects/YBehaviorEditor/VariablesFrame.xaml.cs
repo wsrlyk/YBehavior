@@ -58,12 +58,12 @@ namespace YBehavior.Editor
 
                 this.VariableTab.IsSelected = true;
 
-                if (node.Node is Core.SubTreeNode)
-                {
-                    this.InOutTab.Visibility = Visibility.Visible;
-                    this.InOutTab.DataContext = node.Node;
-                }
-                else
+                ////if (node.Node is Core.New.SubTreeNode)
+                ////{
+                ////    this.InOutTab.Visibility = Visibility.Visible;
+                ////    this.InOutTab.DataContext = node.Node;
+                ////}
+                ////else
                 {
                     this.InOutTab.Visibility = Visibility.Collapsed;
                     this.InOutTab.DataContext = null;

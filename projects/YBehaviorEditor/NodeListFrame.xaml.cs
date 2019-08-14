@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -26,8 +27,8 @@ namespace YBehavior.Editor
             public DelayableNotificationCollection<NodeInfo> Children { get { return m_children; } }
             public string Name { get; set; }
             public string Icon { get; set; }
-            public Node Source { get { return m_Source; } }
-            Node m_Source;
+            public TreeNode Source { get { return m_Source; } }
+            TreeNode m_Source;
             NodeHierachy m_Hierachy;
             int m_Level;
             public string Description { get; set; }
@@ -71,7 +72,7 @@ namespace YBehavior.Editor
             }
 
             ///> Node
-            public NodeInfo(Node data)
+            public NodeInfo(TreeNode data)
             {
                 m_Source = data;
                 m_Hierachy = NodeHierachy.NH_None;
@@ -80,9 +81,9 @@ namespace YBehavior.Editor
                 Description = data.Description;
             }
 
-            public void Build(Node data, HashSet<string> expandedItems)
+            public void Build(TreeNode data, HashSet<string> expandedItems)
             {
-                if (data == null || data.Type == NodeType.NT_Root)
+                if (data == null || data.Type == TreeNodeType.TNT_Root)
                     return;
 
                 NodeInfo child;
@@ -143,7 +144,7 @@ namespace YBehavior.Editor
                 m_NodeInfos.Children.Clear();
                 if (!string.IsNullOrEmpty(keyword))
                     keyword = keyword.ToLower();
-                foreach (var node in Core.NodeMgr.Instance.NodeList)
+                foreach (var node in TreeNodeMgr.Instance.NodeList)
                 {
                     if (!string.IsNullOrEmpty(keyword) && !node.Name.ToLower().Contains(keyword))
                         continue;
@@ -190,7 +191,7 @@ namespace YBehavior.Editor
                     {
                         string nodeText = item.Name;
 
-                        WorkBenchMgr.Instance.CreateNodeToBench(item.Source);
+                        Core.New.WorkBenchMgr.Instance.CreateNodeToBench(item.Source);
                     }
                     break;
                 }
@@ -204,7 +205,7 @@ namespace YBehavior.Editor
         {
             if (DebugMgr.Instance.IsDebugging())
                 return;
-            WorkBenchMgr.Instance.CreateComment();
+            Core.New.WorkBenchMgr.Instance.CreateComment();
         }
 
         private void ClearSearch_Click(object sender, RoutedEventArgs e)

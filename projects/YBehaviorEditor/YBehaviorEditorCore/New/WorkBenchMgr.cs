@@ -48,8 +48,8 @@ namespace YBehavior.Editor.Core.New
 
         public void RemoveRenderers(NodeBase node, bool excludeRoot)
         {
-            ////if (m_ActiveWorkBench != null)
-            ////    m_ActiveWorkBench.RemoveRenderers(node, excludeRoot);
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.RemoveRenderers(node, excludeRoot);
         }
 
         public void AddNode(NodeBase node)
@@ -60,8 +60,8 @@ namespace YBehavior.Editor.Core.New
 
         public void AddRenderers(NodeBase node, bool batchAdd, bool excludeRoot)
         {
-            ////if (m_ActiveWorkBench != null)
-            ////    m_ActiveWorkBench.AddRenderers(node, batchAdd, excludeRoot);
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.AddRenderers(node, batchAdd, excludeRoot);
         }
 
         public void RemoveComment(Comment comment)

@@ -27,6 +27,7 @@ namespace YBehavior.Editor
         public SelectionStateChangeHandler SelectHandler { get; set; }
 
         public TreeNode Node { get; set; }
+        public TreeNodeRenderer Renderer { get; set; }
 
         Operation m_Operation;
 
@@ -60,7 +61,9 @@ namespace YBehavior.Editor
 
         void _DataContextChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e)
         {
-            Node = (DataContext as NodeBaseRenderer).Owner as TreeNode;
+            Renderer = DataContext as TreeNodeRenderer;
+
+            Node = Renderer.TreeOwner;
 
             //SetCanvas(Node.Renderer.RenderCanvas);
 
@@ -221,10 +224,7 @@ namespace YBehavior.Editor
                 }
                 this.debugCover.Background = bgBrush;
 
-                //                this.debugCover.Visibility = Visibility.Visible;
                 m_InstantAnim.Begin(this.debugCover, true);
-                //LogMgr.Instance.Log("InstantAnim");
-                //this.debugCover.BeginStoryboard(m_InstantAnim, HandoffBehavior.SnapshotAndReplace, true);
             }
         }
 
@@ -259,12 +259,6 @@ namespace YBehavior.Editor
                 this.debugCover.Background = bgBrush;
 
                 this.debugCover.Visibility = Visibility.Visible;
-
-                //LogMgr.Instance.Log("ConstantAnim");
-
-                //Storyboard board = this.Resources["ConstantShowAnim"] as Storyboard;
-                //Storyboard.SetTargetName(board, "debugCover");
-                //this.BeginStoryboard(board);
             }
         }
 
@@ -311,7 +305,7 @@ namespace YBehavior.Editor
 
         public void OnDelete(int param)
         {
-            ////Node.Delete(param);
+            Renderer.Delete(param);
         }
 
         public void OnDuplicated(int param)
@@ -320,7 +314,7 @@ namespace YBehavior.Editor
             if (Node.Type == TreeNodeType.TNT_Root)
                 return;
 
-            ////Core.New.WorkBenchMgr.Instance.CloneNodeToBench(Node, param != 0);
+            Core.New.WorkBenchMgr.Instance.CloneTreeNodeToBench(Node, param != 0);
         }
 
         public void OnCopied(int param)
@@ -334,34 +328,34 @@ namespace YBehavior.Editor
 
         public void ToggleBreakPoint()
         {
-            ////if (Node.DebugPointInfo.HitCount > 0)
-            ////    Node.SetDebugPoint(0);
-            ////else
-            ////    Node.SetDebugPoint(1);
+            if (Node.DebugPointInfo.HitCount > 0)
+                Node.SetDebugPoint(0);
+            else
+                Node.SetDebugPoint(1);
         }
 
         public void ToggleLogPoint()
         {
-            ////if (Node.DebugPointInfo.HitCount < 0)
-            ////    Node.SetDebugPoint(0);
-            ////else
-            ////    Node.SetDebugPoint(-1);
+            if (Node.DebugPointInfo.HitCount < 0)
+                Node.SetDebugPoint(0);
+            else
+                Node.SetDebugPoint(-1);
         }
 
         public void ToggleDisable()
         {
-            Node.Disabled = !Node.SelfDisabled;
+            Renderer.ToggleDisabled();
         }
 
         public void ToggleCondition()
         {
-            ////Node.EnableCondition = !Node.EnableCondition;
+            Renderer.EnableCondition = !Renderer.EnableCondition;
         }
 
         public void ToggleFold()
         {
-            ////if(Node.Conns.NodeCount > 0)
-            ////    Node.Folded = !Node.Folded;
+            if (Node.Conns.NodeCount > 0)
+                Renderer.Folded = !Renderer.Folded;
         }
     }
 }

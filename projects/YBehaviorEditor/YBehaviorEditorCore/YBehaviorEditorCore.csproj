@@ -58,6 +58,7 @@
     <Compile Include="New\Node.cs" />
     <Compile Include="New\Renderers.cs" />
     <Compile Include="New\TreeFileMgr.cs" />
+    <Compile Include="New\TypeMap.cs" />
     <Compile Include="New\Utility.cs" />
     <Compile Include="New\Variable.cs" />
     <Compile Include="New\VariableCollection.cs" />

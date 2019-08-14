@@ -416,4 +416,20 @@ namespace YBehavior.Editor.Core.New
             Variable.vType = OldType;
         }
     }
+
+    public class ChangeTreeNodeReturnTypeCommand : ICommand
+    {
+        public TreeNodeRenderer NodeRenderer { get; set; }
+        public string OriginReturnType { get; set; }
+        public string FinalReturnType { get; set; }
+
+        public void Redo()
+        {
+            NodeRenderer.ReturnType = FinalReturnType;
+        }
+        public void Undo()
+        {
+            NodeRenderer.ReturnType = OriginReturnType;
+        }
+    }
 }

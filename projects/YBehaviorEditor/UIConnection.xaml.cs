@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -28,8 +29,6 @@ namespace YBehavior.Editor
 
         SelectionStateChangeHandler SelectHandler { get; set; }
         Operation m_Operation;
-
-        public ConnectionHolder ChildHolder { get; set; }
 
         public UIConnection()
         {
@@ -65,8 +64,7 @@ namespace YBehavior.Editor
 
         void _DataContextChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e)
         {
-            ConnectionRenderer renderer = this.DataContext as ConnectionRenderer;
-            ChildHolder = renderer.ChildConn;
+            //ConnectionRenderer renderer = this.DataContext as ConnectionRenderer;
 
             //SetCanvas((renderer.ChildConn.Owner as Node).Renderer.RenderCanvas);
         }
@@ -112,7 +110,7 @@ namespace YBehavior.Editor
             if (DebugMgr.Instance.IsDebugging())
                 return;
 
-            WorkBenchMgr.Instance.DisconnectNodes(this.ChildHolder);
+            Core.New.WorkBenchMgr.Instance.DisconnectNodes((this.DataContext as Core.New.ConnectionRenderer).Owner);
         }
     }
 }

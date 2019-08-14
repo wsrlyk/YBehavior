@@ -13,7 +13,7 @@ namespace YBehavior.Editor.Core.New
     {
         bool m_bIsValid = true;
         public bool IsValid { get { return m_bIsValid; } }
-
+        public Connection Owner { get; set; }
         public Point ParentPos { get { return ParentConnectorGeo.Pos; } }
         public Point ChildPos { get { return ChildConnectorGeo.Pos; } }
         public Point FirstCorner { get { return new Point(ParentConnectorGeo.Pos.X, m_ParentConnectorGeo.MidY); } }
@@ -52,8 +52,6 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        public ConnectionHolder ChildConn { get; set; }
-
         void _OnChildPosChanged()
         {
             OnPropertyChanged("SecondCorner");
@@ -76,7 +74,6 @@ namespace YBehavior.Editor.Core.New
         {
             ParentConnectorGeo = null;
             ChildConnectorGeo = null;
-            ChildConn = null;
             m_bIsValid = false;
         }
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
@@ -94,17 +91,18 @@ namespace YBehavior.Editor.Core.New
         Comment,
         UID,
         Disable,
+        Note,
+        DebugPoint,
+
         Folded,
         ReturnType,
-        Note,
+        Condition,
     }
 
     public class NodeBaseRenderer : System.ComponentModel.INotifyPropertyChanged
     {
         NodeBase m_Owner;
         public NodeBase Owner { get { return m_Owner; } }
-
-        public Geometry Geo { get; } = new Geometry();
 
         public NodeBaseRenderer(NodeBase node)
         {
@@ -121,6 +119,24 @@ namespace YBehavior.Editor.Core.New
                     break;
                 case RenderProperty.Disable:
                     OnPropertyChanged("Disable");
+                    break;
+                case RenderProperty.DebugPoint:
+                    OnPropertyChanged("DebugPointInfo");
+                    break;
+                case RenderProperty.Note:
+                    OnPropertyChanged("Note");
+                    break;
+                case RenderProperty.Comment:
+                    OnPropertyChanged("Comment");
+                    break;
+                case RenderProperty.Folded:
+                    OnPropertyChanged("Folded");
+                    break;
+                case RenderProperty.ReturnType:
+                    OnPropertyChanged("ReturnType");
+                    break;
+                case RenderProperty.Condition:
+                    OnPropertyChanged("EnableCondition");
                     break;
                 default:
                     break;
@@ -148,6 +164,11 @@ namespace YBehavior.Editor.Core.New
                 WorkBenchMgr.Instance.PushCommand(command);
             }
         }
+
+        public void ToggleDisabled()
+        {
+            Disabled = !Owner.SelfDisabled;
+        }
         public bool Disabled
         {
             get { return Owner.Disabled; }
@@ -168,6 +189,8 @@ namespace YBehavior.Editor.Core.New
         }
 
         public string UITitle { get { return Owner.UID.ToString() + "." + FullName; } }
+        public DebugPointInfo DebugPointInfo { get { return Owner.DebugPointInfo; } }
+        public string Note { get { return Owner.Note; } }
 
         public string Comment
         {
@@ -245,19 +268,50 @@ namespace YBehavior.Editor.Core.New
         }
         public void SetPos(Point pos)
         {
-            _Move(pos - Geo.Pos);
+            _Move(pos - Owner.Geo.Pos);
         }
 
         void _Move(Vector delta)
         {
-            Geo.Pos = Geo.Pos + delta;
+            Owner.Geo.Pos = Owner.Geo.Pos + delta;
 
-            OnPropertyChanged("Geo");
+            OnPropertyChanged("Owner");
 
             foreach (NodeBase child in m_Owner.Conns)
             {
                 child.Renderer._Move(delta);
             }
+        }
+
+        public void Delete(int param)
+        {
+            ///> Check if is root
+            if ((Owner as TreeNode).Type == TreeNodeType.TNT_Root)
+                return;
+
+            ///> If folded but remove only this, unfold first
+            ////if (Owner.Folded && param == 0)
+            ////    Owner.Folded = !Owner.Folded;
+
+            ///> Disconnect all the connection
+            if (Owner.Conns.ParentConnector != null)
+            {
+                foreach (var conn in Owner.Conns.ParentConnector.Conns)
+                    WorkBenchMgr.Instance.DisconnectNodes(conn);
+            }
+
+            foreach (Connector ctr in Owner.Conns.ConnectorsList)
+            {
+                foreach (var conn in ctr.Conns)
+                {
+
+                    WorkBenchMgr.Instance.DisconnectNodes(conn);
+
+                    if (param != 0)
+                        conn.To.Owner.Renderer.Delete(param);
+                }
+            }
+            WorkBenchMgr.Instance.RemoveNode(Owner);
         }
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
@@ -266,6 +320,79 @@ namespace YBehavior.Editor.Core.New
             if (this.PropertyChanged != null)
             {
                 this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+
+    public class TreeNodeRenderer : NodeBaseRenderer
+    {
+        TreeNode m_TreeOwner;
+        public TreeNode TreeOwner { get { return m_TreeOwner; } }
+
+        public TreeNodeRenderer(TreeNode treeNode) : base(treeNode)
+        {
+            m_TreeOwner = treeNode;
+        }
+
+        public string ReturnType
+        {
+            get { return TreeOwner.ReturnType; }
+            set
+            {
+                ChangeTreeNodeReturnTypeCommand command = new ChangeTreeNodeReturnTypeCommand()
+                {
+                    NodeRenderer = this,
+                    OriginReturnType = TreeOwner.ReturnType,
+                    FinalReturnType = value,
+                };
+
+                TreeOwner.ReturnType = value;
+
+                WorkBenchMgr.Instance.PushCommand(command);
+            }
+        }
+
+        public bool Folded
+        {
+            get { return TreeOwner.Folded; }
+            set
+            {
+                if (TreeOwner.Folded != value)
+                {
+                    TreeOwner.Folded = value;
+
+                    if (value)
+                        WorkBenchMgr.Instance.RemoveRenderers(TreeOwner, true);
+                    else
+                        WorkBenchMgr.Instance.AddRenderers(TreeOwner, false, true);
+
+                    OnPropertyChanged("Folded");
+                }
+
+            }
+        }
+
+        public bool EnableCondition
+        {
+            get { return TreeOwner.EnableCondition; }
+            set
+            {
+                if (value == false)
+                {
+                    ///> Check if has connection
+                    if (TreeOwner.HasConditionConnection)
+                    {
+                        ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
+                        {
+                            Content = "Should remove connection first.",
+                            TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                        };
+                        EventMgr.Instance.Send(showSystemTipsArg);
+                        return;
+                    }
+                }
+                TreeOwner.EnableCondition = value;
+                OnPropertyChanged("EnableCondition");
             }
         }
     }

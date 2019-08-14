@@ -14,12 +14,17 @@ namespace YBehavior.Editor.Core.New
         public Connector From { get; set; }
         public Connector To { get; set; }
         public Graph Graph { get; set; }
+        public ConnectionRenderer Renderer { get; set; }
 
         public Connection(Connector from, Connector to)
         {
             From = from;
             To = to;
             //Graph = graph;
+            Renderer = new ConnectionRenderer();
+            Renderer.Owner = this;
+            Renderer.ParentConnectorGeo = From.Geo;
+            Renderer.ChildConnectorGeo = To.Geo;
         }
     }
 
@@ -82,7 +87,7 @@ namespace YBehavior.Editor.Core.New
         protected string m_Identifier;
         public string Identifier { get { return m_Identifier; } }
 
-        protected Dir m_Dir;
+        protected Dir m_Dir = Dir.OUT;
         public Dir GetDir => m_Dir;
 
         protected List<Connection> m_Conns = new List<Connection>();
@@ -105,8 +110,18 @@ namespace YBehavior.Editor.Core.New
             m_Geo = new ConnectorGeometry()
             {
                 Owner = this,
-                onPosChanged = _OnPosChanged,
             };
+
+            if (identifier == IdentifierParent)
+            {
+                m_Geo.onPosChanged = _OnParentConnectorChanged;
+                m_Dir = Dir.IN;
+            }
+            else
+            {
+                m_Geo.onPosChanged = _OnChildConnectorChanged;
+                m_Dir = Dir.OUT;
+            }
 
             if (identifier == IdentifierCondition || identifier == IdentifierParent)
             {
@@ -133,9 +148,16 @@ namespace YBehavior.Editor.Core.New
             m_Geo.MidY = midPos;
         }
 
-        void _OnPosChanged()
+        private void _OnParentConnectorChanged()
         {
+            foreach(var conn in m_Conns)
+                conn.From._OnChildConnectorChanged();
+        }
 
+
+        private void _OnChildConnectorChanged()
+        {
+            RecalcMidY();
         }
 
         public double CalcHorizontalPos()
@@ -151,22 +173,22 @@ namespace YBehavior.Editor.Core.New
         }
 
         protected virtual bool _CanAdd() { return true; }
-        public bool Connect(Connector target)
+        public Connection Connect(Connector target)
         {
             if (target == null)
-                return false;
+                return null;
 
             if (!_CanAdd())
-                return false;
+                return null;
             if (!target._CanAdd())
-                return false;
+                return null;
 
             foreach (var conn in target.Conns)
             {
                 if (conn.From == this)
                 {
                     ///> Already connected.
-                    return false;
+                    return null;
                 }
             }
 
@@ -183,40 +205,20 @@ namespace YBehavior.Editor.Core.New
             Owner.OnConnectToChanged();
 
             ///_CreateConnRenderer(target);
-            return true;
+            return connection;
         }
 
-        //public static bool HasConnected(Connector left, Connector right)
-        //{
-        //    Connector smaller;
-        //    Connector larger;;
-        //    if (left.Conns.Count < right.Conns.Count)
-        //    {
-        //        smaller = left;
-        //        larger = right;
-        //    }
-        //    else
-        //    {
-        //        smaller = right;
-        //        larger = left;
-        //    }
-
-        //    foreach (var conn in smaller.Conns)
-        //    {
-        //        if ()
-        //    }
-        //}
-        public static bool TryConnect(Connector left, Connector right, out Connector parent, out Connector child)
+        public static Connection TryConnect(Connector left, Connector right, out Connector parent, out Connector child)
         {
             parent = null;
             child = null;
 
             if (left == null || right == null)
-                return false;
+                return null;
 
             ///>From same owner. For now we dont support this.
             if (left.m_Owner == right.m_Owner)
-                return false;
+                return null;
 
             if (left.GetDir == Dir.OUT)
                 parent = left;
@@ -229,7 +231,7 @@ namespace YBehavior.Editor.Core.New
                 parent = right;
 
             if (parent.GetDir == Dir.IN || child.GetDir == Dir.OUT)
-                return false;
+                return null;
 
             return parent.Connect(child);
         }
@@ -289,25 +291,36 @@ namespace YBehavior.Editor.Core.New
                 m_ParentConnector = new Connector(m_Owner, Connector.IdentifierParent);
         }
 
-        public bool Add(string identifier)
+        public Connector Add(string identifier, bool isMultiple)
         {
+            Connector res;
             if (identifier == Connector.IdentifierParent)
             {
                 if (m_ParentConnector == null)
-                    m_ParentConnector = new Connector(m_Owner, Connector.IdentifierParent);
+                {
+                    if (isMultiple)
+                        res = new ConnectorMultiple(m_Owner, identifier);
+                    else
+                        res = new ConnectorSingle(m_Owner, identifier);
+                    m_ParentConnector = res;
+                }
                 else
-                    return false;
+                    return null;
             }
             else
             {
                 foreach (var c in m_Connectors)
                 {
                     if (c.Identifier == identifier)
-                        return false;
+                        return null;
                 }
-                m_Connectors.Add(new Connector(m_Owner, identifier));
+                if (isMultiple)
+                    res = new ConnectorMultiple(m_Owner, identifier);
+                else
+                    res = new ConnectorSingle(m_Owner, identifier);
+                m_Connectors.Add(res);
             }
-            return true;
+            return res;
         }
 
         void _ProcessDirty()
@@ -350,23 +363,23 @@ namespace YBehavior.Editor.Core.New
             return null;
         }
 
-        public bool Connect(NodeBase target, string identifier)
+        public Connection Connect(NodeBase target, string identifier)
         {
             if (identifier == null)
                 identifier = Connector.IdentifierChildren;
             Connector conn = GetConnector(identifier);
             if (conn == null)
-                return false;
+                return null;
             return conn.Connect(target.Conns.ParentConnector);
         }
 
-        public bool Connect(Connector target, string identifier)
+        public Connection Connect(Connector target, string identifier)
         {
             if (identifier == null)
                 identifier = Connector.IdentifierChildren;
             Connector conn = GetConnector(identifier);
             if (conn == null)
-                return false;
+                return null;
             return conn.Connect(target);
         }
 
@@ -376,6 +389,11 @@ namespace YBehavior.Editor.Core.New
             {
                 c.Conns.Sort(comparer);
             }
+        }
+
+        public static int SortByPosX(Connection aa, Connection bb)
+        {
+            return aa.To.Geo.Pos.X.CompareTo(bb.To.Geo.Pos.X);
         }
     }
 

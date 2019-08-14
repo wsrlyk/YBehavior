@@ -49,6 +49,8 @@ namespace YBehavior.Editor.Core.New
         public virtual void DisconnectNodes(Connection connection) { }
         public virtual void RemoveNode(NodeBase node) { }
         public virtual void AddNode(NodeBase node) { }
+        public virtual void AddRenderers(NodeBase node, bool batchAdd, bool excludeRoot = false) { }
+        public virtual void RemoveRenderers(NodeBase node, bool excludeRoot = false) { }
 
         public void PushDoneCommand(ICommand command)
         {
@@ -103,9 +105,7 @@ namespace YBehavior.Editor.Core.New
                 if (chi.Name == "Comment")
                 {
                     Comment comment = new Comment();
-                    //var attr = chi.Attributes.GetNamedItem("Title");
-                    //if (attr != null)
-                    //    comment.Name = attr.Value;
+
                     var attr = chi.Attributes["Content"];
                     if (attr != null)
                         comment.Content = attr.Value;

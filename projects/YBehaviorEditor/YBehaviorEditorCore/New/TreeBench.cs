@@ -24,25 +24,26 @@ namespace YBehavior.Editor.Core.New
         {
             Connector parent;
             Connector child;
+            Connection conn;
+            conn = Connector.TryConnect(ctr0, ctr1, out parent, out child);
 
-            if (Connector.TryConnect(ctr0, ctr0, out parent, out child))
+            if (conn != null)
             {
                 ///> refresh parent connections
-                ////ConnectionRenderer connRenderer = child.Conn.GetConnectionRenderer(child.Owner);
-                ////if (connRenderer != null)
-                ////    ConnectionList.Add(connRenderer);
+                ConnectionRenderer connRenderer = conn.Renderer;
+                if (connRenderer != null)
+                    ConnectionList.Add(connRenderer);
 
                 TreeNode childNode = child.Owner as TreeNode;
                 RemoveForestTree(childNode, false);
 
                 m_Tree.RefreshNodeUID();
 
-                ////ConnectNodeCommand connectNodeCommand = new ConnectNodeCommand
-                ////{
-                ////    Parent = parent,
-                ////    Child = child
-                ////};
-                ////PushDoneCommand(connectNodeCommand);
+                ConnectNodeCommand connectNodeCommand = new ConnectNodeCommand
+                {
+                    Conn = conn,
+                };
+                PushDoneCommand(connectNodeCommand);
             }
             else
             {
@@ -55,26 +56,25 @@ namespace YBehavior.Editor.Core.New
         {
             if (connection == null)
                 return;
-            ////ConnectionRenderer connRenderer = conn.GetConnectionRenderer(childHolder.Owner);
+
             Connector parent;
             Connector child;
 
             if (Connector.TryDisconnect(connection, out parent, out child))
             {
-                ////if (connRenderer != null)
-                ////    ConnectionList.Remove(connRenderer);
+                if (connection.Renderer != null)
+                    ConnectionList.Remove(connection.Renderer);
 
                 TreeNode childNode = child.Owner as TreeNode;
                 AddForestTree(childNode, false);
 
                 m_Tree.RefreshNodeUID();
 
-                ////DisconnectNodeCommand disconnectNodeCommand = new DisconnectNodeCommand
-                ////{
-                ////    Parent = conn.Holder,
-                ////    Child = childHolder
-                ////};
-                ////PushDoneCommand(disconnectNodeCommand);
+                DisconnectNodeCommand disconnectNodeCommand = new DisconnectNodeCommand
+                {
+                    Conn = connection,
+                };
+                PushDoneCommand(disconnectNodeCommand);
             }
             else
             {
@@ -86,37 +86,36 @@ namespace YBehavior.Editor.Core.New
         {
             RemoveForestTree(node as TreeNode);
 
-            ////RemoveNodeCommand removeNodeCommand = new RemoveNodeCommand()
-            ////{
-            ////    Node = node
-            ////};
-            ////PushDoneCommand(removeNodeCommand);
+            RemoveNodeCommand removeNodeCommand = new RemoveNodeCommand()
+            {
+                Node = node
+            };
+            PushDoneCommand(removeNodeCommand);
         }
 
         public override void AddNode(NodeBase node)
         {
             AddForestTree(node as TreeNode, true);
 
-            ////AddNodeCommand addNodeCommand = new AddNodeCommand()
-            ////{
-            ////    Node = node
-            ////};
-            ////PushDoneCommand(addNodeCommand);
+            AddNodeCommand addNodeCommand = new AddNodeCommand()
+            {
+                Node = node
+            };
+            PushDoneCommand(addNodeCommand);
         }
 
         public override void OnNodeMoved(EventArg arg)
         {
             NodeMovedArg oArg = arg as NodeMovedArg;
-
-            foreach (var connection in oArg.Node.Conns.ParentConnector.Conns)
-            {
-                m_Tree.RefreshNodeUIDFromMiddle(connection.From.Owner as TreeNode);
-            }
+            TreeNode parent = (oArg.Node as TreeNode).Parent;
+            if (parent != null)
+                m_Tree.RefreshNodeUIDFromMiddle(parent);
         }
 
         public override bool Load(XmlElement data)
         {
             CommandMgr.Blocked = true;
+            m_Tree.SetFlag(Graph.FLAG_LOADING);
 
             foreach (XmlNode chi in data.ChildNodes)
             {
@@ -139,7 +138,7 @@ namespace YBehavior.Editor.Core.New
                             return false;
                         }
                         _LoadTree(node, chi);
-                        ////AddForestTree(node, true);
+                        AddForestTree(node, true);
                     }
                 }
                 else if (chi.Name == "Comments")
@@ -148,6 +147,7 @@ namespace YBehavior.Editor.Core.New
                 }
             }
 
+            m_Tree.RemoveFlag(Graph.FLAG_LOADING);
             CommandMgr.Blocked = false;
             return true;
         }
@@ -195,9 +195,9 @@ namespace YBehavior.Editor.Core.New
                     node.LoadChild(chi);
                 }
             }
-            ////node.Conns.Sort(Node.SortByPosX);
-            ////if (node.HasConditionConnection)
-            ////    node.EnableCondition = true;
+            node.Conns.Sort(Connections.SortByPosX);
+            if (node.HasConditionConnection)
+                node.EnableCondition = true;
             return true;
         }
 
@@ -225,7 +225,7 @@ namespace YBehavior.Editor.Core.New
             data.AppendChild(nodeEl);
 
             nodeEl.SetAttribute("Class", node.Name);
-            ////node.Save(nodeEl, xmlDoc);
+            node.Save(nodeEl, xmlDoc);
 
             foreach (TreeNode chi in node.Conns)
             {
@@ -250,7 +250,7 @@ namespace YBehavior.Editor.Core.New
             data.AppendChild(nodeEl);
 
             nodeEl.SetAttribute("Class", node.Name);
-            ////node.Export(nodeEl, xmlDoc);
+            node.Export(nodeEl, xmlDoc);
 
             foreach (TreeNode chi in node.Conns)
             {
@@ -263,8 +263,8 @@ namespace YBehavior.Editor.Core.New
             if (root == null)
                 return;
 
-            ////if (bRemoveRenderer)
-            ////    RemoveRenderers(root);
+            if (bRemoveRenderer)
+                RemoveRenderers(root);
 
             m_Forest.Remove(root);
         }
@@ -275,15 +275,15 @@ namespace YBehavior.Editor.Core.New
                 return;
             m_Forest.Add(root);
 
-            ////if (bAddRenderer)
-            ////    AddRenderers(root, true);
+            if (bAddRenderer)
+                AddRenderers(root, true);
 
             m_Tree.RefreshNodeUIDFromRoot(root);
         }
 
-        public void AddRenderers(TreeNode node, bool batchAdd, bool excludeRoot = false)
+        public override void AddRenderers(NodeBase node, bool batchAdd, bool excludeRoot = false)
         {
-            _AddRenderers(node, excludeRoot);
+            _AddRenderers(node as TreeNode, excludeRoot);
 
             if (batchAdd)
             {
@@ -296,6 +296,8 @@ namespace YBehavior.Editor.Core.New
                             object r = ToAddRenderers.Dequeue();
                             if (r is NodeBaseRenderer)
                                 NodeList.Add(r as NodeBaseRenderer);
+                            else if (r is ConnectionRenderer)
+                                ConnectionList.Add(r as ConnectionRenderer);
                         }
                     }
                 }
@@ -319,48 +321,48 @@ namespace YBehavior.Editor.Core.New
                 _AddRenderers(chi as TreeNode, false);
             }
 
-            ////foreach (Connection conn in node.Conns.ConnectorsList)
-            ////{
-            ////    foreach (ConnectionRenderer renderer in conn.)
-            ////    {
-            ////        ToAddRenderers.Add(renderer);
-            ////    }
-            ////}
+            foreach (Connector ctr in node.Conns.ConnectorsList)
+            {
+                foreach(Connection conn in ctr.Conns)
+                {
+                    ToAddRenderers.Enqueue(conn.Renderer);
+                }
+            }
         }
 
-        ////public void RemoveRenderers(Node node, bool excludeRoot = false)
-        ////{
-        ////    //using (var v1 = ConnectionList.Delay())
-        ////    {
-        ////        //using (var v2 = NodeList.Delay())
-        ////        {
-        ////            _RemoveRenderers(node, excludeRoot);
-        ////        }
-        ////    }
-        ////}
+        public override void RemoveRenderers(NodeBase node, bool excludeRoot = false)
+        {
+            //using (var v1 = ConnectionList.Delay())
+            {
+                //using (var v2 = NodeList.Delay())
+                {
+                    _RemoveRenderers(node, excludeRoot);
+                }
+            }
+        }
 
-        ////void _RemoveRenderers(Node node, bool excludeRoot)
-        ////{
-        ////    foreach (ConnectionHolder conn in node.Conns.ConnectionsList)
-        ////    {
-        ////        foreach (ConnectionRenderer renderer in conn.Conn.Renderers)
-        ////        {
-        ////            ConnectionList.Remove(renderer);
-        ////        }
-        ////    }
+        void _RemoveRenderers(NodeBase node, bool excludeRoot)
+        {
+            foreach (Connector ctr in node.Conns.ConnectorsList)
+            {
+                foreach (Connection conn in ctr.Conns)
+                {
+                    ConnectionList.Remove(conn.Renderer);
+                }
+            }
 
-        ////    bool bNeedRemoveChildren = true;
-        ////    if (!excludeRoot)
-        ////        bNeedRemoveChildren = NodeList.Remove(node.Renderer);
+            bool bNeedRemoveChildren = true;
+            if (!excludeRoot)
+                bNeedRemoveChildren = NodeList.Remove(node.Renderer);
 
-        ////    if (bNeedRemoveChildren)
-        ////    {
-        ////        foreach (Node chi in node.Conns)
-        ////        {
-        ////            _RemoveRenderers(chi, false);
-        ////        }
-        ////    }
-        ////}
+            if (bNeedRemoveChildren)
+            {
+                foreach (NodeBase chi in node.Conns)
+                {
+                    _RemoveRenderers(chi, false);
+                }
+            }
+        }
 
         public override bool CheckError()
         {
@@ -370,13 +372,13 @@ namespace YBehavior.Editor.Core.New
         private bool _CheckError(TreeNode node)
         {
             bool bRes = true;
-            ////if (!node.CheckValid())
-            ////    bRes = false;
+            if (!node.CheckValid())
+                bRes = false;
             foreach (VariableHolder v in node.Variables.Datas)
             {
                 if (!v.Variable.CheckValid())
                 {
-                    ////LogMgr.Instance.Error("CheckError in Node: " + node.UITitle + ", Variable: " + v.Variable.Name);
+                    LogMgr.Instance.Error("CheckError in Node: " + node.Renderer.UITitle + ", Variable: " + v.Variable.Name);
                     bRes = false;
                 }
             }

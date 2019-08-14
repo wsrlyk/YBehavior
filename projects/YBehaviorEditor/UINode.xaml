@@ -44,37 +44,37 @@
         </Storyboard>
     </UserControl.Resources>
     <DockPanel>
-        <Border Name="leftConnectors" DockPanel.Dock="Left" Height="10" HorizontalAlignment="Left" Visibility="{Binding Owner.EnableCondition, Converter={StaticResource visibilityConvertor}}"/>
+        <Border Name="leftConnectors" DockPanel.Dock="Left" Height="10" HorizontalAlignment="Left" Visibility="{Binding EnableCondition, Converter={StaticResource visibilityConvertor}}"/>
         <Border Name="commentBorder" DockPanel.Dock="Right" Margin="0,20,0,10" BorderThickness="1" BorderBrush="#FFE8D3AF" Background="#FFF1E0C6"
-                Visibility="{Binding Path=Owner.Comment, Converter={StaticResource invertStringEmptyAndVisibilityConvertor}}">
-            <TextBlock Text="{Binding Owner.Comment, Mode=OneWay}" FontSize="10"/>
+                Visibility="{Binding Path=Comment, Converter={StaticResource invertStringEmptyAndVisibilityConvertor}}">
+            <TextBlock Text="{Binding Comment, Mode=OneWay}" FontSize="10"/>
         </Border>
         <StackPanel DockPanel.Dock="Top" Height="20"  Name="topConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
         <StackPanel DockPanel.Dock="Bottom" Height="10" Name="bottomConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
         <Border Name="border" BorderThickness="2" BorderBrush="#FFC1C7CD" Background="#FFB4B7B9">
             <Grid>
                 <Border Margin="0, -18, 0, 0" Background="#FFC1C7CD" Width="10" HorizontalAlignment="Left" VerticalAlignment="Top" Height="15">
-                    <TextBlock Name="Return" HorizontalAlignment="Center" Text="{Binding Path=Owner.ReturnType, Converter={StaticResource returnTypeConvertor}}"/>
+                    <TextBlock Name="Return" HorizontalAlignment="Center" Text="{Binding Path=ReturnType, Converter={StaticResource returnTypeConvertor}}"/>
                 </Border>
-                <Border Name="disableCover" BorderThickness="0" Background="#FF4B4B4B" Visibility="{Binding Owner.Disabled, Converter={StaticResource visibilityConvertor}}"/>
+                <Border Name="disableCover" BorderThickness="0" Background="#FF4B4B4B" Visibility="{Binding Disabled, Converter={StaticResource visibilityConvertor}}"/>
                 <Border Name="debugCover" BorderThickness="0" Background="#FFDA3F1C"/>
                 <Border Name="selectCover" BorderThickness="4" BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"/>
                 <StackPanel Name="mainPanel" Margin="3">
-                    <TextBlock Name="name" Text="{Binding Owner.UITitle}"></TextBlock>
-                    <TextBlock Name="note" Text="{Binding Owner.Note}"></TextBlock>
+                    <TextBlock Name="name" Text="{Binding UITitle}"></TextBlock>
+                    <TextBlock Name="note" Text="{Binding Note}"></TextBlock>
                 </StackPanel>
-                <Ellipse Name="breakPoint" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Visibility="{Binding Path=Owner.DebugPointInfo.HasBreakPoint, Converter={StaticResource visibilityConvertor}}" >
+                <Ellipse Name="breakPoint" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Visibility="{Binding Path=DebugPointInfo.HasBreakPoint, Converter={StaticResource visibilityConvertor}}" >
                     <Ellipse.Fill>
                         <SolidColorBrush Color="Red" Opacity="0.6" />
                     </Ellipse.Fill>
                 </Ellipse>
-                <Ellipse Name="logPoint" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Visibility="{Binding Path=Owner.DebugPointInfo.HasLogPoint, Converter={StaticResource visibilityConvertor}}" >
+                <Ellipse Name="logPoint" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Visibility="{Binding Path=DebugPointInfo.HasLogPoint, Converter={StaticResource visibilityConvertor}}" >
                     <Ellipse.Fill>
                         <SolidColorBrush Color="Purple" Opacity="0.6" />
                     </Ellipse.Fill>
                 </Ellipse>
                 <TextBlock Name="folded" HorizontalAlignment="Right"  VerticalAlignment="Bottom" Text="+" FontSize="20" FontWeight="Bold" Foreground="#FF615A5A"
-                            Visibility="{Binding Path=Owner.Folded, Converter={StaticResource visibilityConvertor}}">
+                            Visibility="{Binding Path=Folded, Converter={StaticResource visibilityConvertor}}">
                 </TextBlock>
             </Grid>
         </Border>

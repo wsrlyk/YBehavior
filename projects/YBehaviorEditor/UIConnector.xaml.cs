@@ -108,9 +108,9 @@ namespace YBehavior.Editor
                     m_RelativePos = TransformToAncestor(OwnerNode).Transform(new Point(ActualWidth / 2, ActualHeight / 2)) - new Point();
                 }
 
-                if (OwnerNode.DataContext is Renderer)
+                if (OwnerNode.DataContext is NodeBaseRenderer)
                 {
-                    Point pos = (OwnerNode.DataContext as Renderer).Geo.Pos + m_RelativePos;
+                    Point pos = (OwnerNode.DataContext as NodeBaseRenderer).Owner.Geo.Pos + m_RelativePos;
                     //Hotspot = pos;
                     (this.DataContext as Core.New.ConnectorGeometry).Pos = pos;
                 }

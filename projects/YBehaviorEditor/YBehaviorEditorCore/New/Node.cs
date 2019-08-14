@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 
 namespace YBehavior.Editor.Core.New
 {
@@ -13,6 +14,8 @@ namespace YBehavior.Editor.Core.New
         protected string m_Comment = string.Empty;// "This is a node comment test.";
         protected int m_DisableCount = 0;
         protected NodeDescription m_NodeDescripion;
+
+        public DebugPointInfo DebugPointInfo { get; } = new DebugPointInfo();
 
         public virtual string Name { get { return m_Name; } }
         public string NickName
@@ -64,6 +67,7 @@ namespace YBehavior.Editor.Core.New
         public virtual string Icon => Connector.IdentifierParent;
         public string Description => m_NodeDescripion == null ? string.Empty : m_NodeDescripion.node;
         public Graph Graph { get; set; }
+        public Geometry Geo { get; } = new Geometry();
 
         protected NodeBaseRenderer m_Renderer;
         public NodeBaseRenderer Renderer { get { return m_Renderer; } }
@@ -88,6 +92,14 @@ namespace YBehavior.Editor.Core.New
             m_Connections = new Connections(this);
         }
 
+        public void SetDebugPoint(int count)
+        {
+            DebugPointInfo.HitCount = count;
+            PropertyChange(RenderProperty.DebugPoint);
+            DebugMgr.Instance.SetDebugPoint(UID, count);
+        }
+
+        public virtual void CreateBase() { }
         /// <summary>
         /// Parent changed
         /// </summary>
@@ -154,9 +166,9 @@ namespace YBehavior.Editor.Core.New
             TreeNode node = null;
             if (m_TypeDic.TryGetValue(name, out Type type))
             {
-                node = Activator.CreateInstance(type, NodeConstructType.NCT_New) as TreeNode;
-                ///node.CreateBase();
-                ///node.CreateVariables();
+                node = Activator.CreateInstance(type) as TreeNode;
+                node.CreateBase();
+                node.CreateVariables();
                 node.LoadDescription();
                 return node;
             }
@@ -183,11 +195,6 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    public enum NodeConstructType
-    {
-        NCT_New,
-        NCT_Clone,
-    }
     public class TreeNode : NodeBase
     {
         private string m_ReturnType = "Default";
@@ -195,12 +202,18 @@ namespace YBehavior.Editor.Core.New
         protected int m_SelfDisabled = 0;
         public override bool SelfDisabled { get { return m_SelfDisabled > 0; } }
         public TreeNodeType Type { get; set; }
+        public NodeHierachy Hierachy { get; set; }
         public bool IsChildrenRendering { get { return !m_Folded; } }
+        public bool Folded { get { return m_Folded; } set { m_Folded = value; } }
+        public string ReturnType { get { return m_ReturnType; } set { m_ReturnType = value; } }
 
         protected NodeMemory m_NodeMemory;
         public NodeMemory NodeMemory { get { return m_NodeMemory; } }
         protected IVariableCollection m_Variables;
         public IVariableCollection Variables { get { return m_Variables; } }
+
+        TypeMap m_TypeMap = new TypeMap();
+        public TypeMap TypeMap { get { return m_TypeMap; } }
 
         public Tree Tree { get { return Graph as Tree; } }
 
@@ -211,10 +224,11 @@ namespace YBehavior.Editor.Core.New
         {
         }
 
-        public TreeNode(NodeConstructType constructType)
+        public override void CreateBase()
         {
+            base.CreateBase();
             if (Type != TreeNodeType.TNT_Root)
-                Conns.Add(Connector.IdentifierParent);
+                Conns.Add(Connector.IdentifierParent, false);
 
             if (Type == TreeNodeType.TNT_Root)
             {
@@ -225,9 +239,12 @@ namespace YBehavior.Editor.Core.New
                 m_Variables = new NodeMemory(this);
                 m_NodeMemory = m_Variables as NodeMemory;
             }
+            m_ConditonConnector = Conns.Add(Connector.IdentifierCondition, false);
+        }
 
-            if (constructType == NodeConstructType.NCT_New)
-                CreateVariables();
+        protected override void _CreateRenderer()
+        {
+            m_Renderer = new TreeNodeRenderer(this);
         }
 
         public TreeNode Parent
@@ -302,27 +319,27 @@ namespace YBehavior.Editor.Core.New
         {
             switch (attr.Name)
             {
-                ////case "Pos":
-                ////    Renderer.Geo.Pos = Point.Parse(attr.Value);
-                ////    break;
+                case "Pos":
+                    Geo.Pos = Point.Parse(attr.Value);
+                    break;
                 case "NickName":
                     m_NickName = attr.Value;
                     break;
-                ////case "DebugPoint":
-                ////    DebugPointInfo.HitCount = int.Parse(attr.Value);
-                ////    break;
-                ////case "Comment":
-                ////    Comment = attr.Value;
-                ////    break;
-                ////case "Disabled":
-                ////    Disabled = bool.Parse(attr.Value);
-                ////    break;
-                ////case "Folded":
-                ////    m_Folded = bool.Parse(attr.Value);
-                ////    break;
-                ////case "Return":
-                ////    ReturnType = attr.Value;
-                ////    break;
+                case "DebugPoint":
+                    DebugPointInfo.HitCount = int.Parse(attr.Value);
+                    break;
+                case "Comment":
+                    Comment = attr.Value;
+                    break;
+                case "Disabled":
+                    Disabled = bool.Parse(attr.Value);
+                    break;
+                case "Folded":
+                    m_Folded = bool.Parse(attr.Value);
+                    break;
+                case "Return":
+                    m_ReturnType = attr.Value;
+                    break;
                 default:
                     return LoadOtherAttr(attr);
             }
@@ -349,6 +366,138 @@ namespace YBehavior.Editor.Core.New
             return false;
         }
 
+        public void Save(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
+        {
+            if (Conns.ParentConnector != null && Conns.ParentConnector.Conns.Count > 0)
+            {
+                if (m_Connections.ParentConnector.Conns[0].From.Identifier != Connector.IdentifierChildren)
+                    data.SetAttribute("Connection", m_Connections.ParentConnector.Conns[0].From.Identifier);
+            }
+
+            if (ReturnType != "Default")
+                data.SetAttribute("Return", ReturnType);
+
+            Point intPos = new Point((int)Geo.Pos.X, (int)Geo.Pos.Y);
+            data.SetAttribute("Pos", intPos.ToString());
+            if (!string.IsNullOrEmpty(m_NickName))
+                data.SetAttribute("NickName", m_NickName);
+
+            if (!DebugPointInfo.NoDebugPoint)
+                data.SetAttribute("DebugPoint", DebugPointInfo.HitCount.ToString());
+
+            if (!string.IsNullOrEmpty(Comment))
+            {
+                data.SetAttribute("Comment", Comment);
+            }
+
+            if (SelfDisabled)
+            {
+                data.SetAttribute("Disabled", "true");
+            }
+
+            if (Folded)
+            {
+                data.SetAttribute("Folded", "true");
+            }
+
+            _OnSaveVariables(data, xmlDoc);
+        }
+
+        protected void _WriteVariables(IVariableCollection collection, System.Xml.XmlElement data)
+        {
+            foreach (VariableHolder v in collection.Datas)
+            {
+                data.SetAttribute(v.Variable.Name, v.Variable.ValueInXml);
+            }
+        }
+        protected virtual void _OnSaveVariables(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
+        {
+            _WriteVariables(Variables, data);
+        }
+        public void Export(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
+        {
+            if (Conns.ParentConnector != null && Conns.ParentConnector.Conns.Count > 0)
+            {
+                if (m_Connections.ParentConnector.Conns[0].From.Identifier != Connector.IdentifierChildren)
+                    data.SetAttribute("Connection", m_Connections.ParentConnector.Conns[0].From.Identifier);
+            }
+
+            if (ReturnType != "Default")
+                data.SetAttribute("Return", ReturnType);
+
+            _OnExportVariables(data, xmlDoc);
+        }
+        protected virtual void _OnExportVariables(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
+        {
+            _WriteVariables(Variables, data);
+        }
+
+        public bool CheckValid()
+        {
+            bool bRes = true;
+            if (m_Variables is NodeMemory)
+            {
+                NodeMemory memory = m_Variables as NodeMemory;
+                SameTypeGroup sameTypeGroup = memory.SameTypeGroup;
+                if (sameTypeGroup != null)
+                {
+                    foreach (HashSet<string> group in sameTypeGroup)
+                    {
+                        Variable.ValueType valueType = Variable.ValueType.VT_NONE;
+                        foreach (string vName in group)
+                        {
+                            Variable v = memory.GetVariable(vName);
+                            if (v == null)
+                                continue;
+
+                            if (valueType == Variable.ValueType.VT_NONE)
+                                valueType = v.vType;
+                            else if (valueType != v.vType)
+                            {
+                                LogMgr.Instance.Log("ValueType not match in Node: " + Renderer.UITitle + "." + vName);
+                                bRes = false;
+                            }
+                        }
+                    }
+                }
+
+                if (TypeMap.Items.Count > 0)
+                {
+                    Variable vCache = null;
+                    foreach (var mapItem in TypeMap.Items)
+                    {
+                        if (vCache == null || vCache.Name != mapItem.SrcVariable)
+                            vCache = memory.GetVariable(mapItem.SrcVariable);
+                        if (vCache == null)
+                            continue;
+                        if (vCache.Value != mapItem.SrcValue)
+                            continue;
+                        Variable des = memory.GetVariable(mapItem.DesVariable);
+                        if (des == null)
+                            continue;
+
+                        if (mapItem.DesVType != Variable.ValueType.VT_NONE && mapItem.DesVType != des.vType)
+                        {
+                            LogMgr.Instance.Log("Value Type not match in Node: " + Renderer.UITitle + "." + mapItem.DesVariable);
+                            bRes = false;
+                        }
+
+                        if (mapItem.DesCType != Variable.CountType.CT_NONE && mapItem.DesCType != des.cType)
+                        {
+                            LogMgr.Instance.Log("Count Type not match in Node: " + Renderer.UITitle + "." + mapItem.DesVariable);
+                            bRes = false;
+                        }
+                    }
+                }
+            }
+
+            return _OnCheckValid() && bRes;
+        }
+
+        protected virtual bool _OnCheckValid()
+        {
+            return true;
+        }
 
         public override bool Disabled
         {
@@ -407,15 +556,24 @@ namespace YBehavior.Editor.Core.New
                 treeNode.m_DisableCount = treeNode.m_SelfDisabled + parent.m_DisableCount;
         }
 
+        #region CONDITION
+        Connector m_ConditonConnector;
+        bool m_bEnableConditionConnection = false;
+        public bool HasConditionConnection { get { return m_ConditonConnector.Conns.Count > 0; } }
+        public bool EnableCondition
+        {
+            get { return m_bEnableConditionConnection; }
+            set
+            {
+                m_bEnableConditionConnection = value;
+            }
+        }
+        #endregion
+
     }
 
-    public class RootTreeNode : TreeNode
+    public class RootTreeNode : SingleChildNode
     {
-        public RootTreeNode(NodeConstructType constructType) : base(constructType)
-        {
-            m_Name = "Root";
-            Type = TreeNodeType.TNT_Root;
-        }
         public RootTreeNode() : base()
         {
             m_Name = "Root";
@@ -423,12 +581,37 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    public class ActionTreeNode : TreeNode
+    public class BranchNode : TreeNode
     {
-        public ActionTreeNode(NodeConstructType constructType) : base(constructType)
+        protected Connector m_Ctr;
+        public Connector Ctr { get { return m_Ctr; } }
+    }
+
+    public class LeafNode : TreeNode
+    {
+        public LeafNode()
         {
-            Type = TreeNodeType.TNT_External;
         }
+    }
+
+    public class SingleChildNode : BranchNode
+    {
+        public SingleChildNode()
+        {
+            m_Ctr = m_Connections.Add(Connector.IdentifierChildren, false);
+        }
+    }
+
+    public class CompositeNode : BranchNode
+    {
+        public CompositeNode()
+        {
+            m_Ctr = m_Connections.Add(Connector.IdentifierChildren, true);
+        }
+    }
+
+    public class ActionTreeNode : LeafNode
+    {
         public ActionTreeNode() : base()
         {
             Type = TreeNodeType.TNT_External;
@@ -441,13 +624,8 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    public class SequenceTreeNode : TreeNode
+    public class SequenceTreeNode : CompositeNode
     {
-        public SequenceTreeNode(NodeConstructType constructType) : base(constructType)
-        {
-            m_Name = "Sequence";
-            Type = TreeNodeType.TNT_Default;
-        }
         public SequenceTreeNode() : base()
         {
             m_Name = "Sequence";
@@ -455,13 +633,8 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    public class SubTreeNode : TreeNode
+    public class SubTreeNode : LeafNode
     {
-        public SubTreeNode(NodeConstructType constructType) : base(constructType)
-        {
-            m_Name = "SubTree";
-            Type = TreeNodeType.TNT_Default;
-        }
         public SubTreeNode() : base()
         {
             m_Name = "SubTree";

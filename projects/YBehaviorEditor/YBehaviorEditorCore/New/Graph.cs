@@ -7,10 +7,24 @@ namespace YBehavior.Editor.Core.New
 {
     public class Graph
     {
+        public static readonly int FLAG_LOADING = 1 << 0;
+
         protected List<NodeBase> m_NodeList = new List<NodeBase>();
 
         public virtual void RefreshNodeUID() { }
-
+        int m_State = 0;
+        public void SetFlag(int flag)
+        {
+            m_State |= flag;
+        }
+        public void RemoveFlag(int flag)
+        {
+            m_State &= (~flag);
+        }
+        public bool IsInState(int flag)
+        {
+            return (m_State & flag) != 0;
+        }
     }
 
     public class Tree : Graph, IVariableDataSource
@@ -39,17 +53,23 @@ namespace YBehavior.Editor.Core.New
 
         public override void RefreshNodeUID()
         {
+            if (IsInState(FLAG_LOADING))
+                return;
             RefreshNodeUIDFromRoot(Root);
         }
 
         public void RefreshNodeUIDFromRoot(TreeNode node)
         {
+            if (IsInState(FLAG_LOADING))
+                return;
             uint uid = 0;
             _RefreshNodeUID(node, ref uid);
         }
 
         public void RefreshNodeUIDFromMiddle(TreeNode node)
         {
+            if (IsInState(FLAG_LOADING))
+                return;
             uint uid = node.UID - 1;
             _RefreshNodeUID(node, ref uid);
         }
