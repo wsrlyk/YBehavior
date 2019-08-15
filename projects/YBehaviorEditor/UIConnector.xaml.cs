@@ -11,7 +11,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
 using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
@@ -112,7 +111,7 @@ namespace YBehavior.Editor
                 {
                     Point pos = (OwnerNode.DataContext as NodeBaseRenderer).Owner.Geo.Pos + m_RelativePos;
                     //Hotspot = pos;
-                    (this.DataContext as Core.New.ConnectorGeometry).Pos = pos;
+                    (this.DataContext as ConnectorGeometry).Pos = pos;
                 }
             }
 
@@ -143,7 +142,7 @@ namespace YBehavior.Editor
             }
             catch (Exception e)
             {
-                LogMgr.Instance.Log(e.ToString());
+                Core.LogMgr.Instance.Log(e.ToString());
                 return new Point();
             }
         }
@@ -229,7 +228,7 @@ namespace YBehavior.Editor
             if (other == null)
                 return;
 
-            Core.New.WorkBenchMgr.Instance.ConnectNodes(this.Ctr, other.Ctr);
+            WorkBenchMgr.Instance.ConnectNodes(this.Ctr, other.Ctr);
         }
     }
 }

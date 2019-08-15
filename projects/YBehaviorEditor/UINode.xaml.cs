@@ -12,7 +12,6 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
 using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
@@ -78,7 +77,7 @@ namespace YBehavior.Editor
 
         private void _BuildConnectionBinding()
         {
-            foreach (Core.New.Connector ctr in Node.Conns.ConnectorsList)
+            foreach (Connector ctr in Node.Conns.ConnectorsList)
             {
                 _BuildConnectionBinding(ctr);
             }
@@ -87,14 +86,14 @@ namespace YBehavior.Editor
                 _BuildConnectionBinding(Node.Conns.ParentConnector);
         }
 
-        private void _BuildConnectionBinding(Core.New.Connector ctr, string identifier = null)
+        private void _BuildConnectionBinding(Connector ctr, string identifier = null)
         {
             if (identifier == null)
                 identifier = ctr.Identifier;
 
             if (m_uiConnectors.TryGetValue(identifier, out UIConnector uiConnector))
             {
-                Core.New.ConnectorGeometry geo = Node.Conns.GetConnector(identifier).Geo;
+                ConnectorGeometry geo = Node.Conns.GetConnector(identifier).Geo;
                 uiConnector.DataContext = geo;
                 //uiConnector.SetBinding(UIConnector.HotspotProperty, new Binding()
                 //{
@@ -314,7 +313,7 @@ namespace YBehavior.Editor
             if (Node.Type == TreeNodeType.TNT_Root)
                 return;
 
-            Core.New.WorkBenchMgr.Instance.CloneTreeNodeToBench(Node, param != 0);
+            WorkBenchMgr.Instance.CloneTreeNodeToBench(Node, param != 0);
         }
 
         public void OnCopied(int param)
@@ -323,7 +322,7 @@ namespace YBehavior.Editor
             if (Node.Type == TreeNodeType.TNT_Root)
                 return;
 
-            Core.New.WorkBenchMgr.Instance.CopyNode(Node, param != 0);
+            WorkBenchMgr.Instance.CopyNode(Node, param != 0);
         }
 
         public void ToggleBreakPoint()

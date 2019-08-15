@@ -11,7 +11,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
 using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
@@ -29,11 +28,11 @@ namespace YBehavior.Editor
             public string Icon { get; set; }
             public TreeNode Source { get { return m_Source; } }
             TreeNode m_Source;
-            NodeHierachy m_Hierachy;
+            int m_Hierachy;
             int m_Level;
             public string Description { get; set; }
 
-            public bool bIsFolder { get { return m_Hierachy != NodeHierachy.NH_None; } }
+            public bool bIsFolder { get { return m_Hierachy != 0; } }
             private bool exp = false;
             public bool Expanded
             {
@@ -61,7 +60,7 @@ namespace YBehavior.Editor
             }
 
             ///> Folder
-            public NodeInfo(NodeHierachy hierachy, int level)
+            public NodeInfo(int hierachy, int level)
             {
                 m_Hierachy = hierachy;
                 m_Source = null;
@@ -75,7 +74,7 @@ namespace YBehavior.Editor
             public NodeInfo(TreeNode data)
             {
                 m_Source = data;
-                m_Hierachy = NodeHierachy.NH_None;
+                m_Hierachy = 0;
                 Name = data.Name;
                 Icon = "▶";
                 Description = data.Description;
@@ -95,7 +94,7 @@ namespace YBehavior.Editor
                 else
                 {
                     int nextLevel = m_Level + 1;
-                    NodeHierachy subHierachy = (NodeHierachy)((int)data.Hierachy % (int)Math.Pow(10, nextLevel));
+                    int subHierachy = ((int)data.Hierachy % (int)Math.Pow(10, nextLevel));
                     child = null;
                     foreach (var chi in m_children)
                     {
@@ -130,7 +129,7 @@ namespace YBehavior.Editor
         public NodeListFrame()
         {
             InitializeComponent();
-            m_NodeInfos = new NodeInfo(NodeHierachy.NH_None, 0);
+            m_NodeInfos = new NodeInfo(0, 0);
             this.Nodes.ItemsSource = m_NodeInfos.Children;
             _FilterNodes(null);
         }
@@ -191,7 +190,7 @@ namespace YBehavior.Editor
                     {
                         string nodeText = item.Name;
 
-                        Core.New.WorkBenchMgr.Instance.CreateNodeToBench(item.Source);
+                        WorkBenchMgr.Instance.CreateNodeToBench(item.Source);
                     }
                     break;
                 }
@@ -205,7 +204,7 @@ namespace YBehavior.Editor
         {
             if (DebugMgr.Instance.IsDebugging())
                 return;
-            Core.New.WorkBenchMgr.Instance.CreateComment();
+            WorkBenchMgr.Instance.CreateComment();
         }
 
         private void ClearSearch_Click(object sender, RoutedEventArgs e)

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Data;
 using System.Windows.Media;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -111,7 +111,7 @@ namespace YBehavior.Editor
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (!(value is Variable.VariableType))
-                return string.Empty;
+                return false;
             Variable.VariableType type = (Variable.VariableType)value;
             return type == Variable.VariableType.VBT_Pointer;
         }

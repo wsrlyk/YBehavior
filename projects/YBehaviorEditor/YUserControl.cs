@@ -8,7 +8,7 @@ using System.Windows.Data;
 
 namespace YBehavior.Editor
 {
-    public class YUserControl : UserControl, Core.IHasAncestor
+    public class YUserControl : UserControl, Core.New.IHasAncestor
     {
         public static readonly DependencyProperty AncestorProperty =
             DependencyProperty.Register("Ancestor",

@@ -91,7 +91,10 @@
                 </Button>
             </StackPanel>
             <Grid>
-                <ComboBox IsEnabled="{Binding IsEditable}" ItemsSource="{Binding Candidates}" SelectedItem="{Binding DisplayValue}" x:Name="VPointer" MinWidth="110" MaxDropDownHeight ="150"
+                <ComboBox IsEnabled="{Binding IsEditable}" ItemsSource="{Binding Candidates.variables}" 
+                          DisplayMemberPath="variable.DisplayName"
+                          SelectedValue="{Binding DisplayValue}" SelectedValuePath="variable.DisplayName"
+                          x:Name="VPointer" MinWidth="110" MaxDropDownHeight ="150"
                       Visibility="{Binding Path=IsChecked, ElementName=VBSwitcher, Converter={StaticResource visibilityConvertor}}" 
                       Background="{Binding Path = IsValid, Converter={StaticResource validConvertor}}">
                     <ComboBox.ItemsPanel>
@@ -113,7 +116,11 @@
             <TextBlock Text="VectorIndex" FontSize="13" Width="90" DockPanel.Dock="Left" Background="LightCyan"/>
             <CheckBox IsEnabled="{Binding IsEditable}" Width="20" Height="20" Name="VectorIndexSwitcher" Background="Orange" Foreground="GreenYellow" DockPanel.Dock="Right" IsChecked="{Binding Path=VectorIndex.vbType, Converter={StaticResource variableTypeConvertor}}"/>
             <Grid>
-                <ComboBox IsEnabled="{Binding IsEditable}" SelectedItem="{Binding Path=VectorIndex.DisplayValue}" ItemsSource="{Binding Path=VectorIndex.Candidates}" x:Name="VectorIndexPointer" MinWidth="110" MaxDropDownHeight ="150"
+                <ComboBox IsEnabled="{Binding IsEditable}"
+                          ItemsSource="{Binding Path=VectorIndex.Candidates.variables}"
+                          DisplayMemberPath="variable.DisplayName"
+                          SelectedValue="{Binding VectorIndex.DisplayValue}" SelectedValuePath="variable.DisplayName"
+                          x:Name="VectorIndexPointer" MinWidth="110" MaxDropDownHeight ="150"
                       Visibility="{Binding Path=IsChecked, ElementName=VectorIndexSwitcher, Converter={StaticResource visibilityConvertor}}" 
                       Background="{Binding Path = VectorIndex.IsValid, Converter={StaticResource validConvertor}}">
                     <ComboBox.ItemsPanel>

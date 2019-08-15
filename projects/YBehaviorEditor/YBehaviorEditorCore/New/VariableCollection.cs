@@ -64,8 +64,8 @@ namespace YBehavior.Editor.Core.New
         protected DelayableNotificationCollection<VariableHolder> m_VariableList = new DelayableNotificationCollection<VariableHolder>();
         public DelayableNotificationCollection<VariableHolder> Datas { get { return m_VariableList; } }
 
-        protected TreeNode m_Owner;
-        public VariableCollection(TreeNode owner)
+        protected IVariableDataSourceGetter m_Owner;
+        public VariableCollection(IVariableDataSourceGetter owner)
         {
             m_Owner = owner;
         }
@@ -106,9 +106,9 @@ namespace YBehavior.Editor.Core.New
 
             m_Variables[v.Name] = holder;
             m_VariableList.Add(holder);
-            if (v.SharedDataSource != m_Owner.Tree)
+            if (v.SharedDataSource != m_Owner)
             {
-                v.SharedDataSource = m_Owner.Tree;
+                v.SharedDataSource = m_Owner;
                 v.RefreshCandidates(true);
             }
             v.Container = this;
@@ -262,9 +262,9 @@ namespace YBehavior.Editor.Core.New
                         m_VariableList.Add(v);
                         m_Variables[v.Variable.Name] = v;
                         v.Index = index++;
-                        if (v.Variable.SharedDataSource != m_Owner.Tree)
+                        if (v.Variable.SharedDataSource != m_Owner)
                         {
-                            v.Variable.SharedDataSource = m_Owner.Tree;
+                            v.Variable.SharedDataSource = m_Owner;
                             v.Variable.RefreshCandidates(true);
                         }
                         v.Variable.Container = this;

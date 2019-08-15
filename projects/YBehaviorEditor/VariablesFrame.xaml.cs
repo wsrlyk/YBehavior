@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -87,15 +87,15 @@ namespace YBehavior.Editor
 
         private void _OnSharedVariableChanged(EventArg arg)
         {
-            Node node = this.VariableTab.DataContext as Node;
+            TreeNode node = this.VariableTab.DataContext as TreeNode;
             if (node == null)
                 return;
 
             node.NodeMemory.RefreshVariables();
-            if (node is SubTreeNode)
-            {
-                (node as SubTreeNode).InOutMemory.RefreshVariables();
-            }
+            ////if (node is SubTreeNode)
+            ////{
+            ////    (node as SubTreeNode).InOutMemory.RefreshVariables();
+            ////}
         }
 
         private void _OnDebugTargetChanged(EventArg arg)
@@ -103,7 +103,7 @@ namespace YBehavior.Editor
             this.Dispatcher.BeginInvoke(new Action
                 (() =>
                 {
-                    Node node = this.VariableTab.DataContext as Node;
+                    TreeNode node = this.VariableTab.DataContext as TreeNode;
                     if (node == null)
                         return;
 
@@ -128,15 +128,15 @@ namespace YBehavior.Editor
             if (node == null)
                 return;
 
-            if (node.ReloadInOut())
-            {
-                ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
-                {
-                    Content = "SubTree input/output reloaded.",
-                    TipType = ShowSystemTipsArg.TipsType.TT_Success,
-                };
-                EventMgr.Instance.Send(showSystemTipsArg);
-            }
+            ////if (node.ReloadInOut())
+            ////{
+            ////    ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
+            ////    {
+            ////        Content = "SubTree input/output reloaded.",
+            ////        TipType = ShowSystemTipsArg.TipsType.TT_Success,
+            ////    };
+            ////    EventMgr.Instance.Send(showSystemTipsArg);
+            ////}
         }
 
         private void TabController_SelectionChanged(object sender, SelectionChangedEventArgs e)

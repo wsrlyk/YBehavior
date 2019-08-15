@@ -95,6 +95,7 @@ namespace YBehavior.Editor.Core.New
 
         public override void AddNode(NodeBase node)
         {
+            Utility.OperateNode(node, m_Graph, true, NodeBase.OnAddToGraph);
             AddForestTree(node as TreeNode, true);
 
             AddNodeCommand addNodeCommand = new AddNodeCommand()
@@ -165,8 +166,8 @@ namespace YBehavior.Editor.Core.New
             if (node == null)
                 return false;
 
-            node.Graph = m_Graph;
             node.Load(data);
+            Utility.OperateNode(node, m_Graph, false, NodeBase.OnAddToGraph);
 
             foreach (XmlNode chi in data.ChildNodes)
             {

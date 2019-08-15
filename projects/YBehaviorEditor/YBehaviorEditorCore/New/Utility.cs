@@ -64,5 +64,18 @@ namespace YBehavior.Editor.Core.New
                 }
             }
         }
+
+        public static void OperateNode(NodeBase node, object param, bool bIncludeChildren, Action<NodeBase, object> action)
+        {
+            action(node, param);
+
+            if (bIncludeChildren)
+            {
+                foreach (NodeBase child in node.Conns)
+                {
+                    OperateNode(child, param, bIncludeChildren, action);
+                }
+            }
+        }
     }
 }

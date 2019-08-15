@@ -11,7 +11,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
 using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
@@ -110,7 +109,7 @@ namespace YBehavior.Editor
             if (DebugMgr.Instance.IsDebugging())
                 return;
 
-            Core.New.WorkBenchMgr.Instance.DisconnectNodes((this.DataContext as Core.New.ConnectionRenderer).Owner);
+            WorkBenchMgr.Instance.DisconnectNodes((this.DataContext as ConnectionRenderer).Owner);
         }
     }
 }

@@ -6,6 +6,21 @@ using System.Windows;
 
 namespace YBehavior.Editor.Core.New
 {
+    interface IGraphGetter
+    {
+        Graph Graph { get; }
+    }
+    public class GraphGetter : IGraphGetter
+    {
+        public Graph Graph { get; set; }
+    }
+
+    public class TreeGetter: GraphGetter, IVariableDataSourceGetter
+    {
+        public Tree Tree { get { return Graph as Tree; } }
+        public IVariableDataSource VariableDataSource {  get { return Tree; } }
+    }
+
     public class NodeBase
     {
         private uint m_UID = 0;
@@ -66,7 +81,12 @@ namespace YBehavior.Editor.Core.New
         public virtual string Note => string.Empty;
         public virtual string Icon => Connector.IdentifierParent;
         public string Description => m_NodeDescripion == null ? string.Empty : m_NodeDescripion.node;
-        public Graph Graph { get; set; }
+        protected GraphGetter m_GraphGetter;
+        public Graph Graph
+        {
+            get { return m_GraphGetter.Graph; }
+            set { m_GraphGetter.Graph = value; }
+        }
         public Geometry Geo { get; } = new Geometry();
 
         protected NodeBaseRenderer m_Renderer;
@@ -99,7 +119,15 @@ namespace YBehavior.Editor.Core.New
             DebugMgr.Instance.SetDebugPoint(UID, count);
         }
 
-        public virtual void CreateBase() { }
+        protected virtual void _CreateGetter()
+        {
+            m_GraphGetter = new GraphGetter();
+        }
+
+        public virtual void CreateBase()
+        {
+            _CreateGetter();
+        }
         /// <summary>
         /// Parent changed
         /// </summary>
@@ -116,6 +144,11 @@ namespace YBehavior.Editor.Core.New
 
         }
 
+        public virtual void OnAddToGraph()
+        {
+
+        }
+
         protected void PropertyChange(RenderProperty property)
         {
             if (m_Renderer != null)
@@ -126,6 +159,12 @@ namespace YBehavior.Editor.Core.New
         {
             NodeBase other = Activator.CreateInstance(this.GetType()) as NodeBase;
             return other;
+        }
+
+        public static void OnAddToGraph(NodeBase node, object graph)
+        {
+            node.Graph = graph as Graph;
+            node.OnAddToGraph();
         }
     }
 
@@ -202,7 +241,7 @@ namespace YBehavior.Editor.Core.New
         protected int m_SelfDisabled = 0;
         public override bool SelfDisabled { get { return m_SelfDisabled > 0; } }
         public TreeNodeType Type { get; set; }
-        public NodeHierachy Hierachy { get; set; }
+        public int Hierachy { get; set; }
         public bool IsChildrenRendering { get { return !m_Folded; } }
         public bool Folded { get { return m_Folded; } set { m_Folded = value; } }
         public string ReturnType { get { return m_ReturnType; } set { m_ReturnType = value; } }
@@ -224,6 +263,11 @@ namespace YBehavior.Editor.Core.New
         {
         }
 
+        protected override void _CreateGetter()
+        {
+            m_GraphGetter = new TreeGetter();
+        }
+
         public override void CreateBase()
         {
             base.CreateBase();
@@ -232,11 +276,11 @@ namespace YBehavior.Editor.Core.New
 
             if (Type == TreeNodeType.TNT_Root)
             {
-                m_Variables = new TreeMemory(this);
+                m_Variables = new TreeMemory(m_GraphGetter as TreeGetter);
             }
             else
             {
-                m_Variables = new NodeMemory(this);
+                m_Variables = new NodeMemory(m_GraphGetter as TreeGetter);
                 m_NodeMemory = m_Variables as NodeMemory;
             }
             m_ConditonConnector = Conns.Add(Connector.IdentifierCondition, false);
@@ -499,6 +543,15 @@ namespace YBehavior.Editor.Core.New
             return true;
         }
 
+        public override void OnAddToGraph()
+        {
+            base.OnAddToGraph();
+            foreach (VariableHolder v in Variables.Datas)
+            {
+                v.Variable.RefreshCandidates();
+            }
+        }
+
         public override bool Disabled
         {
             get => base.Disabled;
@@ -641,4 +694,70 @@ namespace YBehavior.Editor.Core.New
             Type = TreeNodeType.TNT_Default;
         }
     }
+
+    class CalculatorTreeNode : LeafNode
+    {
+        public override string Icon => "+-×÷";
+        public CalculatorTreeNode()
+        {
+            m_Name = "Calculator";
+            Type = TreeNodeType.TNT_Default;
+
+        }
+
+        public override void CreateVariables()
+        {
+            Variable optr = NodeMemory.CreateVariable(
+                "Operator",
+                "+",
+                Variable.CreateParams_Enum,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                0,
+                "+|-|*|/"
+            );
+
+            Variable opl = NodeMemory.CreateVariable(
+                "Opl",
+                "0",
+                Variable.CreateParams_CalculatorTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                1
+            );
+
+            Variable opr1 = NodeMemory.CreateVariable(
+                "Opr1",
+                "0",
+                Variable.CreateParams_CalculatorTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+
+            Variable opr2 = NodeMemory.CreateVariable(
+                "Opr2",
+                "0",
+                Variable.CreateParams_CalculatorTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} << {1} {2} {3}",
+                    Variables.GetVariable("Opl").NoteValue,
+                    Variables.GetVariable("Opr1").NoteValue,
+                    Variables.GetVariable("Operator").NoteValue,
+                    Variables.GetVariable("Opr2").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
+
 }

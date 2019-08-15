@@ -7,7 +7,7 @@ namespace YBehavior.Editor.Core.New
 {
     public class TreeVariable : Variable
     {
-        public TreeVariable(IVariableDataSource source) : base(source)
+        public TreeVariable(IVariableDataSourceGetter source) : base(source)
         {
 
         }
@@ -15,7 +15,7 @@ namespace YBehavior.Editor.Core.New
 
     public class TreeMemory : IVariableCollection
     {
-        protected TreeNode m_Owner;
+        protected IVariableDataSourceGetter m_Owner;
 
         VariableCollection m_SharedVariables;
         VariableCollection m_LocalVariables;
@@ -25,7 +25,14 @@ namespace YBehavior.Editor.Core.New
         public IVariableCollection SharedMemory { get { return m_SharedVariables; } }
         public IVariableCollection LocalMemory { get { return m_LocalVariables; } }
 
-        public TreeMemory(TreeNode owner)
+        public VariableCandidates Candidatas { get; } = new VariableCandidates();
+        public void RefreshCandidatas()
+        {
+            Candidatas.Refresh(this);
+            SharedVariableChangedArg arg = new SharedVariableChangedArg();
+            EventMgr.Instance.Send(arg);
+        }
+        public TreeMemory(IVariableDataSourceGetter owner)
         {
             m_Owner = owner;
             m_SharedVariables = new VariableCollection(owner);
@@ -36,7 +43,7 @@ namespace YBehavior.Editor.Core.New
         {
             if (!VariableCollection.IsValidVariableName(name))
                 return false;
-            TreeVariable v = new TreeVariable(m_Owner.Tree);
+            TreeVariable v = new TreeVariable(m_Owner);
             v.vTypeSet.AddRange(Variable.CreateParams_AllTypes);
             if (!v.SetVariableInNode(value, name))
                 return false;
@@ -58,7 +65,7 @@ namespace YBehavior.Editor.Core.New
             Variable v;
             using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
             {
-                v = new TreeVariable(m_Owner.Tree);
+                v = new TreeVariable(m_Owner);
                 v.vTypeSet.AddRange(Variable.CreateParams_AllTypes);
                 if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, isLocal, value, null, name))
                     return false;
@@ -108,8 +115,8 @@ namespace YBehavior.Editor.Core.New
 
             m_DataList.Add(holder);
 
-            SharedVariableChangedArg arg = new SharedVariableChangedArg();
-            EventMgr.Instance.Send(arg);
+            ///> TODO: make it better
+            RefreshCandidatas();
 
             return true;
         }
@@ -129,8 +136,8 @@ namespace YBehavior.Editor.Core.New
 
             m_DataList.Add(holder);
 
-            SharedVariableChangedArg arg = new SharedVariableChangedArg();
-            EventMgr.Instance.Send(arg);
+            ///> TODO: make it better
+            RefreshCandidatas();
 
             return true;
         }
@@ -154,10 +161,8 @@ namespace YBehavior.Editor.Core.New
 
             m_DataList.Remove(holder);
 
-            {
-                SharedVariableChangedArg arg = new SharedVariableChangedArg();
-                EventMgr.Instance.Send(arg);
-            }
+            ///> TODO: make it better
+            RefreshCandidatas();
 
             RemoveSharedVariableCommand removeSharedVariableCommand = new RemoveSharedVariableCommand()
             {
@@ -187,7 +192,7 @@ namespace YBehavior.Editor.Core.New
             return GetVariableHolder(name, bIsLocal)?.Variable;
         }
 
-        public TreeMemory Clone(TreeNode owner = null)
+        public TreeMemory Clone(IVariableDataSourceGetter owner = null)
         {
             TreeMemory memory = new TreeMemory(owner ?? m_Owner);
 
@@ -202,7 +207,7 @@ namespace YBehavior.Editor.Core.New
 
     public class InOutVariable : Variable
     {
-        public InOutVariable(IVariableDataSource source): base(source)
+        public InOutVariable(IVariableDataSourceGetter source): base(source)
         {
 
         }
@@ -211,7 +216,7 @@ namespace YBehavior.Editor.Core.New
     }
     public class InOutMemory
     {
-        protected TreeNode m_Owner;
+        protected IVariableDataSourceGetter m_Owner;
         bool m_bIsCore = true;
         VariableCollection m_InputVariables;
         VariableCollection m_OutputVariables;
@@ -219,7 +224,7 @@ namespace YBehavior.Editor.Core.New
         public IVariableCollection InputMemory { get { return m_InputVariables; } }
         public IVariableCollection OutputMemory { get { return m_OutputVariables; } }
 
-        public InOutMemory(TreeNode owner, bool bIsCore)
+        public InOutMemory(IVariableDataSourceGetter owner, bool bIsCore)
         {
             m_Owner = owner;
             m_bIsCore = bIsCore;
@@ -231,7 +236,7 @@ namespace YBehavior.Editor.Core.New
         {
             if (!VariableCollection.IsValidVariableName(name))
                 return false;
-            InOutVariable v = new InOutVariable(m_Owner.Tree);
+            InOutVariable v = new InOutVariable(m_Owner);
             if (m_bIsCore)
                 v.vTypeSet.AddRange(Variable.CreateParams_AllTypes);
             if (!v.SetVariableInNode(value, name))
@@ -276,7 +281,7 @@ namespace YBehavior.Editor.Core.New
             InOutVariable v;
             using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())
             {
-                v = new InOutVariable(m_Owner.Tree);
+                v = new InOutVariable(m_Owner);
                 if (m_bIsCore)
                     v.vTypeSet.AddRange(Variable.CreateParams_AllTypes);
                 if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Pointer, false, "", null, name))
@@ -414,7 +419,7 @@ namespace YBehavior.Editor.Core.New
                     v.Variable.VectorIndex.RefreshCandidates(true);
             }
         }
-        public InOutMemory Clone(TreeNode owner = null)
+        public InOutMemory Clone(IVariableDataSourceGetter owner = null)
         {
             InOutMemory memory = new InOutMemory(owner ?? m_Owner, m_bIsCore);
 
@@ -447,7 +452,7 @@ namespace YBehavior.Editor.Core.New
     {
         public SameTypeGroup SameTypeGroup { get; set; } = null;
 
-        public NodeMemory(TreeNode owner) : base(owner)
+        public NodeMemory(IVariableDataSourceGetter owner) : base(owner)
         {
 
         }
@@ -461,7 +466,7 @@ namespace YBehavior.Editor.Core.New
             int typeGroup = 0,
             string param = null)
         {
-            Variable v = new Variable(m_Owner.Tree);
+            Variable v = new Variable(m_Owner);
             v.vTypeSet.AddRange(valueType);
 
             v.SetVariable(valueType[0], countType, vbType, false, defaultValue, param, name);

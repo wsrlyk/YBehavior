@@ -37,7 +37,7 @@ namespace YBehavior.Editor
         Dictionary<TabItem, PageData> m_PageDataDic = new Dictionary<TabItem, PageData>();
 
         PageData m_CurPageData;
-        Core.Operation m_Operation;
+        Operation m_Operation;
 
         public WorkBenchFrame()
         {
@@ -56,7 +56,7 @@ namespace YBehavior.Editor
 
             DraggingConnection.Instance.SetCanvas(this.canvas);
 
-            m_Operation = new Core.Operation(this.CanvasBoard);
+            m_Operation = new Operation(this.CanvasBoard);
             m_Operation.RegisterDrag(_OnDrag, null);
             m_Operation.RegisterClick(_OnClick);
         }
@@ -174,7 +174,7 @@ namespace YBehavior.Editor
 
         private void _OnTickResult(EventArg arg)
         {
-            if (Core.DebugMgr.Instance.IsDebugging())
+            if (DebugMgr.Instance.IsDebugging())
             {
                 TickResultArg oArg = arg as TickResultArg;
 
@@ -211,7 +211,7 @@ namespace YBehavior.Editor
             WorkBench bench = tab.Content as WorkBench;
             if (bench != null)
             {
-                if (Core.DebugMgr.Instance.IsDebugging(bench.FileInfo.Name))
+                if (DebugMgr.Instance.IsDebugging(bench.FileInfo.Name))
                     return false;
 
                 if (bench.CommandMgr.Dirty)
@@ -390,7 +390,7 @@ namespace YBehavior.Editor
         void _OnClick()
         {
             Focus();
-            Core.SelectionMgr.Instance.Clear();
+            SelectionMgr.Instance.Clear();
         }
         public void ResetTransform()
         {

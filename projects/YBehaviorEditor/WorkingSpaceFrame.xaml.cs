@@ -172,8 +172,8 @@ namespace YBehavior.Editor
             this.Dispatcher.BeginInvoke(new Action
                 (() =>
                 {
-                    this.Files.IsEnabled = !Core.DebugMgr.Instance.IsDebugging();
-                    this.FileOperatePanel.IsEnabled = !Core.DebugMgr.Instance.IsDebugging();
+                    this.Files.IsEnabled = !DebugMgr.Instance.IsDebugging();
+                    this.FileOperatePanel.IsEnabled = !DebugMgr.Instance.IsDebugging();
                 })
             );
         }
