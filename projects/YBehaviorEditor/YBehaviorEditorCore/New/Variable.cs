@@ -7,11 +7,6 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
-    public interface IVariableDataSourceGetter
-    {
-        IVariableDataSource VariableDataSource { get; }
-    }
-
     public interface IVariableDataSource
     {
         TreeMemory SharedData { get; }
@@ -267,30 +262,30 @@ namespace YBehavior.Editor.Core.New
         string m_Name;
         string m_Params = null;
         bool m_bCanbeRemoved = false;
-        public IVariableDataSourceGetter SharedDataSource { get; set; } = null;
+        public IVariableDataSource SharedDataSource { get; set; } = null;
         public VariableCollection Container { get; set; } = null;
 
         public string Description { get; set; }
 
-        public Variable(IVariableDataSourceGetter sharedData) => SharedDataSource = sharedData;
+        public Variable(IVariableDataSource sharedData) => SharedDataSource = sharedData;
 
         public void RefreshCandidates(bool bForce = false)
         {
             if (!m_bInited && !bForce)
                 return;
             m_bInited = true;
-            if (SharedDataSource != null && SharedDataSource.VariableDataSource != null && SharedDataSource.VariableDataSource.SharedData != null)
+            if (SharedDataSource != null && SharedDataSource.SharedData != null)
             {
                 if (this is TreeVariable)
                 {
-                    SharedDataSource.VariableDataSource.SharedData.RefreshCandidatas();
+                    SharedDataSource.SharedData.RefreshCandidatas();
                 }
                 else
                 {
                     if (IsIndex)
-                        Candidates = SharedDataSource.VariableDataSource.SharedData.Candidatas.GetIndex();
+                        Candidates = SharedDataSource.SharedData.Candidatas.GetIndex();
                     else
-                        Candidates = SharedDataSource.VariableDataSource.SharedData.Candidatas.Get(this);
+                        Candidates = SharedDataSource.SharedData.Candidatas.Get(this);
                 }
             }
         }
@@ -327,8 +322,8 @@ namespace YBehavior.Editor.Core.New
             {
                 return 
                     m_bIsLocal && 
-                    SharedDataSource != null && SharedDataSource.VariableDataSource != null
-                    && SharedDataSource.VariableDataSource is Tree &&
+                    //SharedDataSource != null
+                    //&& SharedDataSource is Tree &&
                     !(this is InOutVariable)
                     ? m_Name + "'" : m_Name;
             }
@@ -534,7 +529,7 @@ namespace YBehavior.Editor.Core.New
 
         public bool CheckValid()
         {
-            if (SharedDataSource == null || SharedDataSource.VariableDataSource == null || SharedDataSource.VariableDataSource.SharedData == null)
+            if (SharedDataSource == null || SharedDataSource.SharedData == null)
                 return false;
             if (vbType == VariableType.VBT_Pointer)
             {
@@ -545,7 +540,7 @@ namespace YBehavior.Editor.Core.New
                 //}
                 if (string.IsNullOrEmpty(Value))
                     return false;
-                Variable other = SharedDataSource.VariableDataSource.SharedData.GetVariable(Value, IsLocal);
+                Variable other = SharedDataSource.SharedData.GetVariable(Value, IsLocal);
                 if (other == null)
                 {
                     LogMgr.Instance.Log(string.Format("Pointer doesnt exist for variable {0}, while the pointer is {1} ", DisplayName, DisplayValue));
@@ -792,9 +787,10 @@ namespace YBehavior.Editor.Core.New
             return true;
         }
 
-        public Variable Clone(IVariableDataSourceGetter newDataSource = null)
+        public Variable Clone(IVariableDataSource newDataSource = null)
         {
-            Variable v = new Variable(newDataSource == null ? SharedDataSource : newDataSource);
+            Variable v = Activator.CreateInstance(GetType(), newDataSource == null ? SharedDataSource : newDataSource) as Variable;
+            //Variable v = new Variable(newDataSource == null ? SharedDataSource : newDataSource);
             v.vTypeSet.AddRange(vTypeSet.ToArray());
             v.vType = vType;
             v.cType = cType;

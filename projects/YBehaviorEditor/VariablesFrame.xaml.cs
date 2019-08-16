@@ -58,12 +58,12 @@ namespace YBehavior.Editor
 
                 this.VariableTab.IsSelected = true;
 
-                ////if (node.Node is Core.New.SubTreeNode)
-                ////{
-                ////    this.InOutTab.Visibility = Visibility.Visible;
-                ////    this.InOutTab.DataContext = node.Node;
-                ////}
-                ////else
+                if (node.Node is SubTreeNode)
+                {
+                    this.InOutTab.Visibility = Visibility.Visible;
+                    this.InOutTab.DataContext = node.Node;
+                }
+                else
                 {
                     this.InOutTab.Visibility = Visibility.Collapsed;
                     this.InOutTab.DataContext = null;
@@ -92,10 +92,10 @@ namespace YBehavior.Editor
                 return;
 
             node.NodeMemory.RefreshVariables();
-            ////if (node is SubTreeNode)
-            ////{
-            ////    (node as SubTreeNode).InOutMemory.RefreshVariables();
-            ////}
+            if (node is SubTreeNode)
+            {
+                (node as SubTreeNode).InOutMemory.RefreshVariables();
+            }
         }
 
         private void _OnDebugTargetChanged(EventArg arg)
@@ -128,15 +128,15 @@ namespace YBehavior.Editor
             if (node == null)
                 return;
 
-            ////if (node.ReloadInOut())
-            ////{
-            ////    ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
-            ////    {
-            ////        Content = "SubTree input/output reloaded.",
-            ////        TipType = ShowSystemTipsArg.TipsType.TT_Success,
-            ////    };
-            ////    EventMgr.Instance.Send(showSystemTipsArg);
-            ////}
+            if (node.ReloadInOut())
+            {
+                ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
+                {
+                    Content = "SubTree input/output reloaded.",
+                    TipType = ShowSystemTipsArg.TipsType.TT_Success,
+                };
+                EventMgr.Instance.Send(showSystemTipsArg);
+            }
         }
 
         private void TabController_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -145,7 +145,7 @@ namespace YBehavior.Editor
             {
                 if (this.InOutTab.IsSelected)
                 {
-                    if((this.InOutTab.DataContext as Core.SubTreeNode).LoadInOut())
+                    if((this.InOutTab.DataContext as SubTreeNode).LoadInOut())
                     {
                         ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
                         {

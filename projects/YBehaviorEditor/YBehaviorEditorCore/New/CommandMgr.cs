@@ -184,17 +184,20 @@ namespace YBehavior.Editor.Core.New
 
         public void Redo()
         {
-            if (VariableHolder.Variable.SharedDataSource != null && VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData != null)
-            {
-                VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData.AddBackVariable(VariableHolder);
-            }
+            VariableHolder.Variable.Container.DoInsertVariable(VariableHolder);
+            //if (VariableHolder.Variable.SharedDataSource != null && VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData != null)
+            //{
+            //    VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData.AddBackVariable(VariableHolder);
+            //}
         }
         public void Undo()
         {
-            if (VariableHolder.Variable.SharedDataSource != null && VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData != null)
-            {
-                VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData.RemoveVariable(VariableHolder.Variable);
-            }
+            VariableHolder.Variable.Container.DoRemove(VariableHolder);
+
+            //if (VariableHolder.Variable.SharedDataSource != null && VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData != null)
+            //{
+            //    VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData.RemoveVariable(VariableHolder.Variable);
+            //}
         }
     }
 
@@ -204,17 +207,19 @@ namespace YBehavior.Editor.Core.New
 
         public void Redo()
         {
-            if (VariableHolder.Variable.SharedDataSource != null && VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData != null)
-            {
-                VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData.RemoveVariable(VariableHolder.Variable);
-            }
+            VariableHolder.Variable.Container.DoRemove(VariableHolder);
+            //if (VariableHolder.Variable.SharedDataSource != null && VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData != null)
+            //{
+            //    VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData.RemoveVariable(VariableHolder.Variable);
+            //}
         }
         public void Undo()
         {
-            if (VariableHolder.Variable.SharedDataSource != null && VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData != null)
-            {
-                VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData.AddBackVariable(VariableHolder);
-            }
+            VariableHolder.Variable.Container.DoInsertVariable(VariableHolder);
+            //if (VariableHolder.Variable.SharedDataSource != null && VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData != null)
+            //{
+            //    VariableHolder.Variable.SharedDataSource.VariableDataSource.InOutData.AddBackVariable(VariableHolder);
+            //}
         }
     }
 

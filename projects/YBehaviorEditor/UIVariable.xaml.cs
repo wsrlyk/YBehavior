@@ -40,13 +40,13 @@ namespace YBehavior.Editor
 
                 if (v is InOutVariable)
                 {
-                    if (v.SharedDataSource.VariableDataSource.InOutData != null)
-                        v.SharedDataSource.VariableDataSource.InOutData.RemoveVariable(v);
+                    if (v.SharedDataSource.InOutData != null)
+                        v.SharedDataSource.InOutData.RemoveVariable(v);
                 }
                 else
                 {
-                    if (v.SharedDataSource.VariableDataSource.SharedData != null)
-                        v.SharedDataSource.VariableDataSource.SharedData.RemoveVariable(v);
+                    if (v.SharedDataSource.SharedData != null)
+                        v.SharedDataSource.SharedData.RemoveVariable(v);
                 }
             }
         }

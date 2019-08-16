@@ -73,57 +73,6 @@
                     </DockPanel>
                 </Grid>
             </TabItem>
-            <!--<TabItem Header="Add" Width="60">
-                <StackPanel>
-                    <Grid>
-                        <TextBlock Text="Name" HorizontalAlignment="Left"/>
-                        <TextBox Name="VName" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0" Width="150"/>
-                    </Grid>
-                    <Grid Visibility="{Binding ElementName=IsDatasSelected, Path=IsChecked, Converter={StaticResource visibilityConvertor}}">
-                        <TextBlock Text="Value" HorizontalAlignment="Left"/>
-                        <TextBox Name="VValue" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0" Width="150"/>
-                    </Grid>
-                    <Grid>
-                        <TextBlock Text="Type" HorizontalAlignment="Left"/>
-                        --><!--ComboBox Name="VType" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0" Width="150" SelectedIndex="0">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" FontSize="10"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </--><!--
-                        <ComboBox Name="VType" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0" Width="150" SelectedIndex="0">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" FontSize="10"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-
-                    </Grid>
-                    <Grid>
-                        <TextBlock Text="IsArray" HorizontalAlignment="Left"/>
-                        <CheckBox Name="VIsArray" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0"/>
-                    </Grid>
-                    <Grid Visibility="{Binding ElementName=IsDatasSelected, Path=IsChecked, Converter={StaticResource visibilityConvertor}}">
-                        <TextBlock Text="IsLocal" HorizontalAlignment="Left"/>
-                        <CheckBox Name="VIsLocal" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0"/>
-                    </Grid>
-                    <Grid Visibility="{Binding ElementName=IsInOutSelected, Path=IsChecked, Converter={StaticResource visibilityConvertor}}">
-                        <TextBlock Text="IsInput" HorizontalAlignment="Left"/>
-                        <CheckBox Name="VIsInput" Grid.Column="1" HorizontalAlignment="Left" Margin="50,0,0,0"/>
-                    </Grid>
-                    <Grid>
-                        <Button Name="Add" Width="100" Margin="20,20" Click="Add_Click">
-                            <TextBlock Text="Add"/>
-                        </Button>
-                    </Grid>
-                    <StackPanel Orientation="Horizontal">
-                        <RadioButton Name="IsDatasSelected" Margin="10, 0, 10, 0" IsChecked="True">Datas</RadioButton>
-                        <RadioButton Name="IsInOutSelected" Margin="10, 0, 10, 0">InOut</RadioButton>
-                    </StackPanel>
-                </StackPanel>
-            </TabItem>-->
             <TabItem Header="InOut" Width="60">
                 <Grid Name="InOutPanel">
                     <Grid.RowDefinitions>

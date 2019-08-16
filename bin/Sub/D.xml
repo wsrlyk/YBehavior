@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <D>
-  <Node Class="Root" Pos="194,41" d="_IC 4">
-    <Node Class="SubTree" Pos="156,264" Tree="_SC E" />
+  <Node Class="Root" Pos="194,41">
+    <Local b="_Ic 0" />
+    <Node Class="SubTree" Pos="156,264" Tree="_SC E" Identification="_SC ">
+      <Input aa="_IC 3" />
+      <Output bb="_Ip b" />
+    </Node>
   </Node>
 </D>

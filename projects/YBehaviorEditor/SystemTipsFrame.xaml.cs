@@ -12,7 +12,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -42,9 +42,9 @@ namespace YBehavior.Editor
             m_InstantAnim.Begin(this.Bg, true);
 
             if (oArg.TipType == ShowSystemTipsArg.TipsType.TT_Success)
-                LogMgr.Instance.Log(oArg.Content);
+                Core.LogMgr.Instance.Log(oArg.Content);
             else
-                LogMgr.Instance.Error(oArg.Content);
+                Core.LogMgr.Instance.Error(oArg.Content);
         }
     }
 }

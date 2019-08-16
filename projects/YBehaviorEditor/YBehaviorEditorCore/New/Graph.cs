@@ -27,7 +27,7 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    public class Tree : Graph, IVariableDataSource, IVariableDataSourceGetter
+    public class Tree : Graph, IVariableDataSource
     {
         RootTreeNode m_Root;
         public RootTreeNode Root { get { return m_Root; } }
@@ -39,7 +39,6 @@ namespace YBehavior.Editor.Core.New
 
         public TreeMemory SharedData { get { return m_TreeMemory; } }
         public InOutMemory InOutData { get { return m_InOutMemory; } }
-        public IVariableDataSource VariableDataSource { get { return this; } }
 
         public Tree()
         {
