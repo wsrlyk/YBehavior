@@ -448,6 +448,8 @@ namespace YBehavior.Editor.Core.New
 
             m_OpenedWorkBenchs.Add(workBench);
             m_ActiveWorkBench = workBench;
+
+            workBench.InitEmpty();
             return workBench;
         }
 

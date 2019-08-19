@@ -20,6 +20,13 @@ namespace YBehavior.Editor.Core.New
             m_Graph = m_Tree;
         }
 
+        public override void InitEmpty()
+        {
+            Utility.OperateNode(m_Tree.Root, m_Graph, false, NodeBase.OnAddToGraph);
+            m_Tree.RefreshNodeUID();
+            AddRenderers(m_Tree.Root, true);
+        }
+
         public override void ConnectNodes(Connector ctr0, Connector ctr1)
         {
             Connector parent;
@@ -116,7 +123,6 @@ namespace YBehavior.Editor.Core.New
         public override bool Load(XmlElement data)
         {
             CommandMgr.Blocked = true;
-            m_Tree.SetFlag(Graph.FLAG_LOADING);
 
             foreach (XmlNode chi in data.ChildNodes)
             {
@@ -128,7 +134,7 @@ namespace YBehavior.Editor.Core.New
                     if (attr.Value == "Root")
                     {
                         _LoadTree(m_Tree.Root, chi);
-                        AddRenderers(m_Tree.Root, true);
+                        AddRenderers(m_Tree.Root, false);
                     }
                     else
                     {
@@ -148,14 +154,15 @@ namespace YBehavior.Editor.Core.New
                 }
             }
 
-            m_Tree.RemoveFlag(Graph.FLAG_LOADING);
             CommandMgr.Blocked = false;
             return true;
         }
 
         private bool _LoadTree(TreeNode tree, XmlNode data)
         {
+            m_Tree.SetFlag(Graph.FLAG_LOADING);
             bool bRes = _LoadOneNode(tree, data);
+            m_Tree.RemoveFlag(Graph.FLAG_LOADING);
             ////Utility.InitNode(tree, true);
             m_Tree.RefreshNodeUID();
             return bRes;
@@ -286,33 +293,16 @@ namespace YBehavior.Editor.Core.New
         {
             _AddRenderers(node as TreeNode, excludeRoot);
 
-            if (batchAdd)
-            {
-                using (var v1 = ConnectionList.Delay())
-                {
-                    using (var v2 = NodeList.Delay())
-                    {
-                        while(ToAddRenderers.Count > 0)
-                        {
-                            object r = ToAddRenderers.Dequeue();
-                            if (r is NodeBaseRenderer)
-                                NodeList.Add(r as NodeBaseRenderer);
-                            else if (r is ConnectionRenderer)
-                                ConnectionList.Add(r as ConnectionRenderer);
-                        }
-                    }
-                }
-                SelectionMgr.Instance.Clear();
-            }
-            else
-            {
-            }
+            SelectionMgr.Instance.Clear();
+
+            NodeList.Dispose();
+            ConnectionList.Dispose();
         }
 
         void _AddRenderers(TreeNode node, bool excludeRoot)
         {
             if (!excludeRoot)
-                ToAddRenderers.Enqueue(node.ForceGetRenderer);
+                NodeList.DelayAdd(node.ForceGetRenderer);
 
             if (!node.IsChildrenRendering)
                 return;
@@ -326,7 +316,7 @@ namespace YBehavior.Editor.Core.New
             {
                 foreach(Connection conn in ctr.Conns)
                 {
-                    ToAddRenderers.Enqueue(conn.Renderer);
+                    ConnectionList.DelayAdd(conn.Renderer);
                 }
             }
         }

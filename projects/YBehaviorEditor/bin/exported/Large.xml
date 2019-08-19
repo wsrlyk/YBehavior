@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Large>
+  <Node Class="Root">
+    <Node Class="Sequence">
+      <Node Class="Sequence" />
+    </Node>
+  </Node>
+</Large>

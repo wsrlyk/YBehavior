@@ -24,6 +24,8 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
+
+            UnityCoroutines.CoroutineManager.Instance.Run();
         }
 
         public static void ProcessKeyDown(Key key, ModifierKeys modifier)

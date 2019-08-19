@@ -70,7 +70,7 @@ namespace YBehavior.Editor.Core
             ExportingDir = configFile.ReadString("Config", "ExportingDir", "");
             DescriptionMgr.Instance.Load(Environment.CurrentDirectory + "\\description.xml");
 
-            ExternalActionMgr.Instance.Load(configFile.ReadString("Config", "ExternalAction", "actions.xml"));
+            New.ExternalActionMgr.Instance.Load(configFile.ReadString("Config", "ExternalAction", "actions.xml"));
 
 
             DirectoryInfo workingDir = new DirectoryInfo(WorkingDir);

@@ -17,7 +17,7 @@ namespace YBehavior.Editor.Core.New
         public bool HasDoneCommands { get { return m_DoneCommands.Count > 0; } }
         public bool HasUndoCommands { get { return m_UndoCommands.Count > 0; } }
 
-        public bool Blocked { get; set; } = true;
+        public bool Blocked { get; set; } = false;
 
         public bool Dirty { get; set; }
         bool m_bDoing = false;

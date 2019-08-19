@@ -161,6 +161,7 @@ namespace YBehavior.Editor.Core.New
         public virtual NodeBase Clone()
         {
             NodeBase other = Activator.CreateInstance(this.GetType()) as NodeBase;
+            ///> TODO
             return other;
         }
 
@@ -759,9 +760,18 @@ namespace YBehavior.Editor.Core.New
 
     public class ActionTreeNode : LeafNode
     {
+        public string NoteFormat { get; set; }
+        public string ClassName { get; set; }
+        public override string Name => ClassName;
+
+        protected static string s_Icon = "▶";
+        public override string Icon => m_Icon;
+        protected string m_Icon = s_Icon;
+        public void SetIcon(string icon) { m_Icon = icon; }
+
         public ActionTreeNode() : base()
         {
-            Type = TreeNodeType.TNT_External;
+            Type = TreeNodeType.TNT_Invalid;
         }
 
         public override NodeBase Clone()

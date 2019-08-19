@@ -14,10 +14,8 @@ namespace YBehavior.Editor.Core.New
         public CommandMgr CommandMgr { get; } = new CommandMgr();
 
         public DelayableNotificationCollection<Comment> Comments { get; } = new DelayableNotificationCollection<Comment>();
-        public DelayableNotificationCollection<NodeBaseRenderer> NodeList { get; } = new DelayableNotificationCollection<NodeBaseRenderer>();
-        public DelayableNotificationCollection<ConnectionRenderer> ConnectionList { get; } = new DelayableNotificationCollection<ConnectionRenderer>();
-
-        protected Queue<object> ToAddRenderers = new Queue<object>();
+        public CoroutineCollection<DelayableNotificationCollection<NodeBaseRenderer>, NodeBaseRenderer> NodeList { get; } = new CoroutineCollection<DelayableNotificationCollection<NodeBaseRenderer>, NodeBaseRenderer>();
+        public CoroutineCollection<DelayableNotificationCollection<ConnectionRenderer>, ConnectionRenderer> ConnectionList { get; } = new CoroutineCollection<DelayableNotificationCollection<ConnectionRenderer>, ConnectionRenderer>();
 
         public string FilePath { get; set; }
 
@@ -38,6 +36,8 @@ namespace YBehavior.Editor.Core.New
 
         public WorkBench()
         {
+            //NodeList.Step = 1;
+            //ConnectionList.Step = 20;
         }
 
         public virtual bool Load(XmlElement data) { return true; }
@@ -51,7 +51,7 @@ namespace YBehavior.Editor.Core.New
         public virtual void AddNode(NodeBase node) { }
         public virtual void AddRenderers(NodeBase node, bool batchAdd, bool excludeRoot = false) { }
         public virtual void RemoveRenderers(NodeBase node, bool excludeRoot = false) { }
-
+        public virtual void InitEmpty() { }
         public void PushDoneCommand(ICommand command)
         {
             bool bOldDirty = CommandMgr.Dirty;

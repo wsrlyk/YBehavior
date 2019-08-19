@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -30,14 +30,14 @@ namespace YBehavior.Editor
             {
                 Path = new PropertyPath("DebugIP"),
                 Mode = BindingMode.TwoWay,
-                Source = Config.Instance
+                Source = Core.Config.Instance
             });
 
             this.Port.SetBinding(TextBox.TextProperty, new Binding()
             {
                 Path = new PropertyPath("DebugPort"),
                 Mode = BindingMode.TwoWay,
-                Source = Config.Instance
+                Source = Core.Config.Instance
             });
         }
 
@@ -109,7 +109,7 @@ namespace YBehavior.Editor
 
         private void btnStopDebug_Click(object sender, RoutedEventArgs e)
         {
-            NetworkMgr.Instance.Disconnect();
+            Core.NetworkMgr.Instance.Disconnect();
         }
 
         private void btnDebugThisTree_Click(object sender, RoutedEventArgs e)

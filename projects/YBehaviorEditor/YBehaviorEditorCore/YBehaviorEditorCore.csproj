@@ -45,16 +45,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Comment.cs" />
+    <Compile Include="Coroutine\Coroutine.cs" />
+    <Compile Include="Coroutine\CoroutineManager.cs" />
+    <Compile Include="Coroutine\MathExtensions.cs" />
+    <Compile Include="Coroutine\Time.cs" />
+    <Compile Include="Coroutine\YieldInstruction.cs" />
     <Compile Include="DebugMgr.cs" />
     <Compile Include="DescriptionMgr.cs" />
     <Compile Include="ExternalActionMgr.cs" />
     <Compile Include="InOutMemoryMgr.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="New\CommandMgr.cs" />
+    <Compile Include="New\Comment.cs" />
     <Compile Include="New\Connections.cs" />
+    <Compile Include="New\CoroutineCollection.cs" />
     <Compile Include="New\DebugMgr.cs" />
     <Compile Include="New\DragDropMgr.cs" />
     <Compile Include="New\EventMgr.cs" />
+    <Compile Include="New\ExternalActionMgr.cs" />
     <Compile Include="New\Graph.cs" />
     <Compile Include="New\InOutMemoryMgr.cs" />
     <Compile Include="New\Memory.cs" />

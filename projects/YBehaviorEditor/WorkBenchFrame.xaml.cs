@@ -146,9 +146,11 @@ namespace YBehavior.Editor
                 //    _RefreshMainTreeDebug(false, NetworkMgr.Instance.MessageProcessor.TickResultToken);
                 //}
 
-                this.nodeLayer.ItemsSource = oArg.Bench.NodeList;
+                oArg.Bench.NodeList.ReAdd();
+                oArg.Bench.ConnectionList.ReAdd();
+                this.nodeLayer.ItemsSource = oArg.Bench.NodeList.Collection;
                 this.commentLayer.ItemsSource = oArg.Bench.Comments;
-                this.connectionLayer.ItemsSource = oArg.Bench.ConnectionList;
+                this.connectionLayer.ItemsSource = oArg.Bench.ConnectionList.Collection;
             }
             else
             {
