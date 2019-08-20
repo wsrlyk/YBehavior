@@ -46,7 +46,7 @@ namespace YBehavior.Editor.Core.New
         public virtual void Export(XmlElement data, XmlDocument xmlDoc) { }
         public virtual void OnNodeMoved(EventArg arg) { }
         public virtual void ConnectNodes(Connector ctr0, Connector ctr1) { }
-        public virtual void DisconnectNodes(Connection connection) { }
+        public virtual void DisconnectNodes(Connection.FromTo connection) { }
         public virtual void RemoveNode(NodeBase node) { }
         public virtual void AddNode(NodeBase node) { }
         public virtual void AddRenderers(NodeBase node, bool batchAdd, bool excludeRoot = false) { }

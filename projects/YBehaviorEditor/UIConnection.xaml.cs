@@ -109,7 +109,7 @@ namespace YBehavior.Editor
             if (DebugMgr.Instance.IsDebugging())
                 return;
 
-            WorkBenchMgr.Instance.DisconnectNodes((this.DataContext as ConnectionRenderer).Owner);
+            WorkBenchMgr.Instance.DisconnectNodes((this.DataContext as ConnectionRenderer).Owner.Ctr);
         }
     }
 }

@@ -53,7 +53,7 @@ namespace YBehavior.Editor
             }
             else
             {
-                this.VariableTab.DataContext = node.Node;
+                this.VariableTab.DataContext = node.Node.Renderer;
                 this.VariableContainer.ItemsSource = node.Node.Variables.Datas;
 
                 this.VariableTab.IsSelected = true;

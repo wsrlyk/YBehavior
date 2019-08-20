@@ -58,14 +58,19 @@ namespace YBehavior.Editor.Core.New
         Variable GetVariable(string name);
     }
 
+    public interface IVariableCollectionOwner : IVariableDataSource
+    {
+        void OnVariableValueChanged(Variable v);
+    }
+
     public class VariableCollection: IVariableCollection
     {
         protected Dictionary<string, VariableHolder> m_Variables = new Dictionary<string, VariableHolder>();
         protected DelayableNotificationCollection<VariableHolder> m_VariableList = new DelayableNotificationCollection<VariableHolder>();
         public DelayableNotificationCollection<VariableHolder> Datas { get { return m_VariableList; } }
 
-        protected IVariableDataSource m_Owner;
-        public VariableCollection(IVariableDataSource owner)
+        protected IVariableCollectionOwner m_Owner;
+        public VariableCollection(IVariableCollectionOwner owner)
         {
             m_Owner = owner;
         }
@@ -168,8 +173,8 @@ namespace YBehavior.Editor.Core.New
 
         public void OnVariableValueChanged(Variable v)
         {
-            ////if (m_Owner != null)
-            ////    m_Owner.OnVariableValueChanged(v);
+            if (m_Owner != null)
+                m_Owner.OnVariableValueChanged(v);
         }
 
         public void CloneFrom(VariableCollection other)

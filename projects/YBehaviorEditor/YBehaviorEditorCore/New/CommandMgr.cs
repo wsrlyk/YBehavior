@@ -51,6 +51,8 @@ namespace YBehavior.Editor.Core.New
                 m_UndoCommands.AddLast(last);
                 m_bDoing = false;
 
+                LogMgr.Instance.Log("Undo command: " + last.ToString());
+
                 OnPropertyChanged("HasDoneCommands");
                 OnPropertyChanged("HasUndoCommands");
             }
@@ -66,6 +68,8 @@ namespace YBehavior.Editor.Core.New
                 last.Redo();
                 m_DoneCommands.AddLast(last);
                 m_bDoing = false;
+
+                LogMgr.Instance.Log("Redo command: " + last.ToString());
 
                 OnPropertyChanged("HasDoneCommands");
                 OnPropertyChanged("HasUndoCommands");
@@ -84,7 +88,7 @@ namespace YBehavior.Editor.Core.New
 
     public class ConnectNodeCommand : ICommand
     {
-        public Connection Conn { get; set; }
+        public Connection.FromTo Conn { get; set; }
 
         public void Redo()
         {
@@ -98,7 +102,7 @@ namespace YBehavior.Editor.Core.New
 
     public class DisconnectNodeCommand : ICommand
     {
-        public Connection Conn { get; set; }
+        public Connection.FromTo Conn { get; set; }
 
         public void Redo()
         {

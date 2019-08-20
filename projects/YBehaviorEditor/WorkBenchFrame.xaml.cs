@@ -193,7 +193,8 @@ namespace YBehavior.Editor
             }
 
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            ////bench.MainTree.Renderer.RefreshDebug();
+            if (bench is TreeBench)
+                (bench as TreeBench).Tree.Root.Renderer.RefreshDebug();
         }
 
         private void _OnDebugTargetChanged(EventArg arg)
@@ -201,7 +202,8 @@ namespace YBehavior.Editor
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
             if (bench != null)
             {
-                ////bench.MainTree.Renderer.RefreshDebug();
+                if (bench is TreeBench)
+                    (bench as TreeBench).Tree.Root.Renderer.RefreshDebug();
             }
         }
 
@@ -448,45 +450,46 @@ namespace YBehavior.Editor
 
         bool _MakeCenter(ref Point newDes)
         {
-            ////Vector halfcanvas = new Vector(this.CanvasBoard.ActualWidth / 2, this.CanvasBoard.ActualHeight / 2);
-            ////Point curPos = new Point(0, 0) + halfcanvas;
-            ////Point nodesPos = new Point(m_CurPageData.TranslateTransform.X, m_CurPageData.TranslateTransform.Y);
-            ////double nodesScale = m_CurPageData.ScaleTransform.ScaleX;
-            ////double sqrradius = Math.Max(halfcanvas.X, halfcanvas.Y);
-            ////sqrradius *= sqrradius;
+            Vector halfcanvas = new Vector(this.CanvasBoard.ActualWidth / 2, this.CanvasBoard.ActualHeight / 2);
+            Point curPos = new Point(0, 0) + halfcanvas;
+            Point nodesPos = new Point(m_CurPageData.TranslateTransform.X, m_CurPageData.TranslateTransform.Y);
+            double nodesScale = m_CurPageData.ScaleTransform.ScaleX;
+            double sqrradius = Math.Max(halfcanvas.X, halfcanvas.Y);
+            sqrradius *= sqrradius;
 
-            ////Point nextPos = new Point(0, 0);
-            ////int count = 0;
-            ////foreach (Renderer renderer in WorkBenchMgr.Instance.ActiveWorkBench.NodeList)
-            ////{
-            ////    Point pos = new Vector(renderer.Geo.Pos.X * nodesScale, renderer.Geo.Pos.Y * nodesScale) + nodesPos;
-            ////    if ((pos - curPos).LengthSquared < sqrradius)
-            ////    {
-            ////        ///> Much Larger Weight
-            ////        count += 50;
-            ////        nextPos.X += (pos.X * 50);
-            ////        nextPos.Y += (pos.Y * 50);
-            ////    }
-            ////    else
-            ////    {
-            ////        ///> Normal Weight
-            ////        ++count;
-            ////        nextPos.X += (pos.X);
-            ////        nextPos.Y += (pos.Y);
-            ////    }
-            ////}
+            Point nextPos = new Point(0, 0);
+            int count = 0;
 
-            ////if (count > 0)
-            ////{
-            ////    nextPos.X /= count;
-            ////    nextPos.Y /= count;
+            foreach (NodeBaseRenderer renderer in WorkBenchMgr.Instance.ActiveWorkBench.NodeList.Collection)
+            {
+                Point pos = new Vector(renderer.Owner.Geo.Pos.X * nodesScale, renderer.Owner.Geo.Pos.Y * nodesScale) + nodesPos;
+                if ((pos - curPos).LengthSquared < sqrradius)
+                {
+                    ///> Much Larger Weight
+                    count += 50;
+                    nextPos.X += (pos.X * 50);
+                    nextPos.Y += (pos.Y * 50);
+                }
+                else
+                {
+                    ///> Normal Weight
+                    ++count;
+                    nextPos.X += (pos.X);
+                    nextPos.Y += (pos.Y);
+                }
+            }
 
-            ////    Vector delta = nextPos - curPos;
+            if (count > 0)
+            {
+                nextPos.X /= count;
+                nextPos.Y /= count;
 
-            ////    newDes.X = m_CurPageData.TranslateTransform.X - delta.X;
-            ////    newDes.Y = m_CurPageData.TranslateTransform.Y - delta.Y;
-            ////    return true;
-            ////}
+                Vector delta = nextPos - curPos;
+
+                newDes.X = m_CurPageData.TranslateTransform.X - delta.X;
+                newDes.Y = m_CurPageData.TranslateTransform.Y - delta.Y;
+                return true;
+            }
             return false;
         }
     }

@@ -248,7 +248,7 @@ namespace YBehavior.Editor.Core.New
                 ///> let the parent node sort the chilren
                 foreach (var conn in m_Owner.Conns.ParentConnector.Conns)
                 {
-                    conn.From.Owner.OnConnectToChanged();
+                    conn.Ctr.From.Owner.OnConnectToChanged();
                 }
             }
 
@@ -283,34 +283,33 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        protected virtual bool _BeforeDelete(int param) { return true; }
         public void Delete(int param)
         {
-            ///> Check if is root
-            if ((Owner as TreeNode).Type == TreeNodeType.TNT_Root)
+            if (!_BeforeDelete(param))
                 return;
-
-            ///> If folded but remove only this, unfold first
-            ////if (Owner.Folded && param == 0)
-            ////    Owner.Folded = !Owner.Folded;
 
             ///> Disconnect all the connection
             if (Owner.Conns.ParentConnector != null)
             {
-                foreach (var conn in Owner.Conns.ParentConnector.Conns)
-                    WorkBenchMgr.Instance.DisconnectNodes(conn);
+                while(Owner.Conns.ParentConnector.Conns.Count > 0)
+                {
+                    WorkBenchMgr.Instance.DisconnectNodes(Owner.Conns.ParentConnector.Conns[0].Ctr);
+                }
             }
 
             foreach (Connector ctr in Owner.Conns.ConnectorsList)
             {
-                foreach (var conn in ctr.Conns)
+                while (ctr.Conns.Count > 0)
                 {
-
-                    WorkBenchMgr.Instance.DisconnectNodes(conn);
+                    Connection conn = ctr.Conns[ctr.Conns.Count - 1];
+                    WorkBenchMgr.Instance.DisconnectNodes(conn.Ctr);
 
                     if (param != 0)
-                        conn.To.Owner.Renderer.Delete(param);
+                        conn.Ctr.To.Owner.Renderer.Delete(param);
                 }
             }
+
             WorkBenchMgr.Instance.RemoveNode(Owner);
         }
 
@@ -334,6 +333,19 @@ namespace YBehavior.Editor.Core.New
             m_TreeOwner = treeNode;
         }
 
+        protected override bool _BeforeDelete(int param)
+        {
+            ///> Check if is root
+            if ((Owner as TreeNode).Type == TreeNodeType.TNT_Root)
+                return false;
+
+            ///> If folded but remove only this, unfold first
+            if (Folded && param == 0)
+                Folded = !Folded;
+
+            return true;
+        }
+
         public string ReturnType
         {
             get { return TreeOwner.ReturnType; }
@@ -347,6 +359,8 @@ namespace YBehavior.Editor.Core.New
                 };
 
                 TreeOwner.ReturnType = value;
+
+                OnPropertyChanged("ReturnType");
 
                 WorkBenchMgr.Instance.PushCommand(command);
             }

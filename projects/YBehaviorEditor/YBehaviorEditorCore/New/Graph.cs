@@ -27,7 +27,7 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    public class Tree : Graph, IVariableDataSource
+    public class Tree : Graph, IVariableCollectionOwner
     {
         RootTreeNode m_Root;
         public RootTreeNode Root { get { return m_Root; } }
@@ -88,5 +88,9 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        public void OnVariableValueChanged(Variable v)
+        {
+            ///> Nothing to do
+        }
     }
 }

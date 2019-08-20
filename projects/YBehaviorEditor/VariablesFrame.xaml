@@ -18,7 +18,7 @@
             <TabItem Header="Variable" Name="VariableTab" Width="80" Visibility="{Binding IsSelected, ElementName=CommentTab, Converter={StaticResource invertBoolAndVisibilityConvertor}}">
                 <DockPanel Background="DarkGray">
                     <StackPanel DockPanel.Dock="Top">
-                        <TextBlock Name="Type" Text ="{Binding Name}" FontSize="14" Height="25" ToolTip="{Binding Description}"/>
+                        <TextBlock Name="Type" Text ="{Binding Owner.Name}" FontSize="14" Height="25" ToolTip="{Binding Owner.Description}"/>
                         <DockPanel Background="LightBlue" Margin="2,2,2,2">
                             <TextBlock Text="Return" FontSize="13" Width="90" DockPanel.Dock="Left" Background="LightCyan"/>
                             <ComboBox Name="ReturnType" SelectedValue="{Binding ReturnType}" SelectedValuePath="Tag">

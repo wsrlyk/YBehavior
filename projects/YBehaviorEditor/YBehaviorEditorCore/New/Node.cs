@@ -7,21 +7,23 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
-    interface IGraphGetter
+    public class NodeWrapper
     {
-        Graph Graph { get; }
-    }
-    public class GraphGetter : IGraphGetter
-    {
+        public NodeBase Node { get; set; }
         public Graph Graph { get; set; }
     }
 
-    public class TreeGetter: GraphGetter, IVariableDataSource
+    public class TreeNodeWrapper: NodeWrapper, IVariableCollectionOwner
     {
         public Tree Tree { get { return Graph as Tree; } }
         public IVariableDataSource VariableDataSource {  get { return Tree; } }
         public TreeMemory SharedData { get { return Tree == null ? null : Tree.SharedData; } }
         public InOutMemory InOutData { get { return Tree == null ? null : Tree.InOutData; } }
+
+        public void OnVariableValueChanged(Variable v)
+        {
+            (Node as TreeNode).OnVariableValueChanged(v);
+        }
     }
 
     public class NodeBase
@@ -84,11 +86,11 @@ namespace YBehavior.Editor.Core.New
         public virtual string Note => string.Empty;
         public virtual string Icon => Connector.IdentifierParent;
         public string Description => m_NodeDescripion == null ? string.Empty : m_NodeDescripion.node;
-        protected GraphGetter m_GraphGetter;
+        protected NodeWrapper m_Wrapper;
         public Graph Graph
         {
-            get { return m_GraphGetter.Graph; }
-            set { m_GraphGetter.Graph = value; }
+            get { return m_Wrapper.Graph; }
+            set { m_Wrapper.Graph = value; }
         }
         public Geometry Geo { get; } = new Geometry();
 
@@ -122,14 +124,15 @@ namespace YBehavior.Editor.Core.New
             DebugMgr.Instance.SetDebugPoint(UID, count);
         }
 
-        protected virtual void _CreateGetter()
+        protected virtual void _CreateWrapper()
         {
-            m_GraphGetter = new GraphGetter();
+            m_Wrapper = new NodeWrapper();
         }
 
         public virtual void CreateBase()
         {
-            _CreateGetter();
+            _CreateWrapper();
+            m_Wrapper.Node = this;
         }
         /// <summary>
         /// Parent changed
@@ -161,7 +164,13 @@ namespace YBehavior.Editor.Core.New
         public virtual NodeBase Clone()
         {
             NodeBase other = Activator.CreateInstance(this.GetType()) as NodeBase;
-            ///> TODO
+            other.CreateBase();
+            other.m_Name = this.m_Name;
+            other.m_NickName = this.m_NickName;
+            other.Geo.Copy(this.Geo);
+            other.Geo.Pos = other.Geo.Pos + new Vector(5, 5);
+            other.m_NodeDescripion = this.m_NodeDescripion;
+
             return other;
         }
 
@@ -267,9 +276,23 @@ namespace YBehavior.Editor.Core.New
         {
         }
 
-        protected override void _CreateGetter()
+        public override NodeBase Clone()
         {
-            m_GraphGetter = new TreeGetter();
+            TreeNode other = base.Clone() as TreeNode;
+            other.Type = Type;
+            other.Hierachy = Hierachy;
+            if (Variables is NodeMemory)
+            {
+                (other.Variables as NodeMemory).CloneFrom(Variables as NodeMemory);
+            }
+            other.TypeMap.CloneFrom(TypeMap);
+
+            return other;
+        }
+
+        protected override void _CreateWrapper()
+        {
+            m_Wrapper = new TreeNodeWrapper();
         }
 
         public override void CreateBase()
@@ -280,11 +303,11 @@ namespace YBehavior.Editor.Core.New
 
             if (Type == TreeNodeType.TNT_Root)
             {
-                m_Variables = new TreeMemory(m_GraphGetter as TreeGetter);
+                m_Variables = new TreeMemory(m_Wrapper as TreeNodeWrapper);
             }
             else
             {
-                m_Variables = new NodeMemory(m_GraphGetter as TreeGetter);
+                m_Variables = new NodeMemory(m_Wrapper as TreeNodeWrapper);
                 m_NodeMemory = m_Variables as NodeMemory;
             }
             m_ConditonConnector = Conns.Add(Connector.IdentifierCondition, false);
@@ -307,7 +330,7 @@ namespace YBehavior.Editor.Core.New
             {
                 if (m_Connections.ParentConnector == null || m_Connections.ParentConnector.Conns.Count == 0)
                     return null;
-                return m_Connections.ParentConnector.Conns[0].From.Owner as TreeNode;
+                return m_Connections.ParentConnector.Conns[0].Ctr.From.Owner as TreeNode;
             }
         }
 
@@ -424,8 +447,8 @@ namespace YBehavior.Editor.Core.New
         {
             if (Conns.ParentConnector != null && Conns.ParentConnector.Conns.Count > 0)
             {
-                if (m_Connections.ParentConnector.Conns[0].From.Identifier != Connector.IdentifierChildren)
-                    data.SetAttribute("Connection", m_Connections.ParentConnector.Conns[0].From.Identifier);
+                if (m_Connections.ParentConnector.Conns[0].Ctr.From.Identifier != Connector.IdentifierChildren)
+                    data.SetAttribute("Connection", m_Connections.ParentConnector.Conns[0].Ctr.From.Identifier);
             }
 
             if (ReturnType != "Default")
@@ -472,8 +495,8 @@ namespace YBehavior.Editor.Core.New
         {
             if (Conns.ParentConnector != null && Conns.ParentConnector.Conns.Count > 0)
             {
-                if (m_Connections.ParentConnector.Conns[0].From.Identifier != Connector.IdentifierChildren)
-                    data.SetAttribute("Connection", m_Connections.ParentConnector.Conns[0].From.Identifier);
+                if (m_Connections.ParentConnector.Conns[0].Ctr.From.Identifier != Connector.IdentifierChildren)
+                    data.SetAttribute("Connection", m_Connections.ParentConnector.Conns[0].Ctr.From.Identifier);
             }
 
             if (ReturnType != "Default")
@@ -618,6 +641,29 @@ namespace YBehavior.Editor.Core.New
             else
                 treeNode.m_DisableCount = treeNode.m_SelfDisabled + parent.m_DisableCount;
         }
+
+        public override void OnConnectToChanged()
+        {
+            base.OnConnectToChanged();
+            Conns.Sort(Connections.SortByPosX);
+        }
+
+        public void OnVariableValueChanged(Variable v)
+        {
+            if (TypeMap.TryGet(v, out TypeMap.Item item))
+            {
+                Variable des = this.Variables.GetVariable(item.DesVariable);
+                if (des != null)
+                {
+                    if (item.DesCType != Variable.CountType.CT_NONE)
+                        des.cType = item.DesCType;
+                    if (item.DesVType != Variable.ValueType.VT_NONE)
+                        des.vType = item.DesVType;
+                }
+            }
+            PropertyChange(RenderProperty.Note);
+        }
+
 
         #region CONDITION
         Connector m_ConditonConnector;
@@ -776,8 +822,12 @@ namespace YBehavior.Editor.Core.New
 
         public override NodeBase Clone()
         {
-            ActionTreeNode other = base.Clone() as ActionTreeNode;
-            return other;
+            ActionTreeNode node = base.Clone() as ActionTreeNode;
+            node.NoteFormat = this.NoteFormat;
+            node.ClassName = this.ClassName;
+            node.m_Icon = this.m_Icon;
+
+            return node;
         }
     }
 
@@ -792,20 +842,11 @@ namespace YBehavior.Editor.Core.New
 
     public class SubTreeNode : LeafNode
     {
-        public class DataSourceGetter : IVariableDataSource
+        public class SubTreeNodeWrapper : TreeNodeWrapper
         {
-            public DataSourceGetter(SubTreeNode node)
-            {
-                m_Node = node;
-                m_TreeGetter = node.m_GraphGetter as TreeGetter;
-            }
-            SubTreeNode m_Node;
-            TreeGetter m_TreeGetter;
-            public TreeMemory SharedData { get { return m_TreeGetter.SharedData; } }
-            public InOutMemory InOutData { get { return m_Node.InOutMemory; } }
+            public new InOutMemory InOutData { get { return (Node as SubTreeNode).InOutMemory; } }
         };
 
-        DataSourceGetter m_SourceGetter;
         InOutMemory m_InOutMemory;
         public InOutMemory InOutMemory { get { return m_InOutMemory; } }
 
@@ -818,10 +859,13 @@ namespace YBehavior.Editor.Core.New
             Type = TreeNodeType.TNT_Default;
         }
 
+        protected override void _CreateWrapper()
+        {
+            m_Wrapper = new SubTreeNodeWrapper();
+        }
         protected override void _OnCreateBase()
         {
-            m_SourceGetter = new DataSourceGetter(this);
-            m_InOutMemory = new InOutMemory(m_SourceGetter, false);
+            m_InOutMemory = new InOutMemory(m_Wrapper as SubTreeNodeWrapper, false);
         }
 
         public override void CreateVariables()

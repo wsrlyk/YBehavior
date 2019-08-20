@@ -11,20 +11,31 @@ namespace YBehavior.Editor.Core.New
     /// </summary>
     public class Connection
     {
-        public Connector From { get; set; }
-        public Connector To { get; set; }
-        public Graph Graph { get; set; }
+        public struct FromTo : IEquatable<FromTo>
+        {
+            public Connector From { get; set; }
+            public Connector To { get; set; }
+
+            public bool Equals(FromTo other)
+            {
+                return From == other.From && To == other.To;
+            }
+        }
+        public FromTo Ctr { get; set; }
         public ConnectionRenderer Renderer { get; set; }
 
         public Connection(Connector from, Connector to)
         {
-            From = from;
-            To = to;
+            FromTo ctr = new FromTo();
+            ctr.From = from;
+            ctr.To = to;
+            Ctr = ctr;
+
             //Graph = graph;
             Renderer = new ConnectionRenderer();
             Renderer.Owner = this;
-            Renderer.ParentConnectorGeo = From.Geo;
-            Renderer.ChildConnectorGeo = To.Geo;
+            Renderer.ParentConnectorGeo = from.Geo;
+            Renderer.ChildConnectorGeo = to.Geo;
         }
     }
 
@@ -90,6 +101,7 @@ namespace YBehavior.Editor.Core.New
         protected Dir m_Dir = Dir.OUT;
         public Dir GetDir => m_Dir;
 
+
         protected List<Connection> m_Conns = new List<Connection>();
         public List<Connection> Conns { get { return m_Conns; } }
 
@@ -151,7 +163,7 @@ namespace YBehavior.Editor.Core.New
         private void _OnParentConnectorChanged()
         {
             foreach(var conn in m_Conns)
-                conn.From._OnChildConnectorChanged();
+                conn.Ctr.From._OnChildConnectorChanged();
         }
 
 
@@ -165,7 +177,7 @@ namespace YBehavior.Editor.Core.New
             double miny = double.MaxValue;
             foreach (Connection conn in m_Conns)
             {
-                double top = conn.To.Geo.Pos.Y;
+                double top = conn.Ctr.To.Geo.Pos.Y;
                 miny = Math.Min(miny, top);
             }
 
@@ -185,7 +197,7 @@ namespace YBehavior.Editor.Core.New
 
             foreach (var conn in target.Conns)
             {
-                if (conn.From == this)
+                if (conn.Ctr.From == this)
                 {
                     ///> Already connected.
                     return null;
@@ -236,19 +248,13 @@ namespace YBehavior.Editor.Core.New
             return parent.Connect(child);
         }
 
-        public static bool TryDisconnect(Connection connection, out Connector parent, out Connector child)
+        public static bool TryDisconnect(Connection.FromTo fromto)
         {
-            parent = null;
-            child = null;
+            Connector parent = fromto.From;
+            Connector child = fromto.To;
 
-            if (connection == null)
-                return false;
-
-            parent = connection.From;
-            child = connection.To;
-
-            parent.Conns.Remove(connection);
-            child.Conns.Remove(connection);
+            parent.SimpleRemove(fromto);
+            child.SimpleRemove(fromto);
 
 
             parent.Owner.Conns.MarkDirty();
@@ -258,6 +264,30 @@ namespace YBehavior.Editor.Core.New
             parent.Owner.OnConnectToChanged();
 
             return true;
+        }
+
+        public void SimpleRemove(Connection.FromTo fromto)
+        {
+            for(int i = 0; i < m_Conns.Count; ++i)
+            {
+                if (m_Conns[i].Ctr.Equals(fromto))
+                {
+                    m_Conns.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        public ConnectionRenderer GetRenderer(Connection.FromTo fromto)
+        {
+            for (int i = 0; i < m_Conns.Count; ++i)
+            {
+                if (m_Conns[i].Ctr.Equals(fromto))
+                {
+                    return m_Conns[i].Renderer;
+                }
+            }
+            return null;
         }
     }
 
@@ -333,7 +363,7 @@ namespace YBehavior.Editor.Core.New
                 {
                     foreach (var conn in ctrs.Conns)
                     {
-                        m_Nodes.Add(conn.To.Owner);
+                        m_Nodes.Add(conn.Ctr.To.Owner);
                     }
                 }
             }
@@ -389,11 +419,12 @@ namespace YBehavior.Editor.Core.New
             {
                 c.Conns.Sort(comparer);
             }
+            MarkDirty();
         }
 
         public static int SortByPosX(Connection aa, Connection bb)
         {
-            return aa.To.Geo.Pos.X.CompareTo(bb.To.Geo.Pos.X);
+            return aa.Ctr.To.Geo.Pos.X.CompareTo(bb.Ctr.To.Geo.Pos.X);
         }
     }
 

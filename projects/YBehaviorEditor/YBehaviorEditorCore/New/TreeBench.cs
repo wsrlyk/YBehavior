@@ -31,7 +31,7 @@ namespace YBehavior.Editor.Core.New
         {
             Connector parent;
             Connector child;
-            Connection conn;
+            Connection conn = null;
             conn = Connector.TryConnect(ctr0, ctr1, out parent, out child);
 
             if (conn != null)
@@ -48,7 +48,7 @@ namespace YBehavior.Editor.Core.New
 
                 ConnectNodeCommand connectNodeCommand = new ConnectNodeCommand
                 {
-                    Conn = conn,
+                    Conn = conn.Ctr,
                 };
                 PushDoneCommand(connectNodeCommand);
             }
@@ -56,23 +56,18 @@ namespace YBehavior.Editor.Core.New
             {
                 ///> errorcode
             }
-
         }
 
-        public override void DisconnectNodes(Connection connection)
+
+        public override void DisconnectNodes(Connection.FromTo connection)
         {
-            if (connection == null)
-                return;
-
-            Connector parent;
-            Connector child;
-
-            if (Connector.TryDisconnect(connection, out parent, out child))
+            ConnectionRenderer connectionRenderer = connection.From.GetRenderer(connection);
+            if (Connector.TryDisconnect(connection))
             {
-                if (connection.Renderer != null)
-                    ConnectionList.Remove(connection.Renderer);
+                if (connectionRenderer != null)
+                    ConnectionList.Remove(connectionRenderer);
 
-                TreeNode childNode = child.Owner as TreeNode;
+                TreeNode childNode = connection.To.Owner as TreeNode;
                 AddForestTree(childNode, false);
 
                 m_Tree.RefreshNodeUID();
@@ -88,6 +83,7 @@ namespace YBehavior.Editor.Core.New
                 ///> errorcode
             }
         }
+
 
         public override void RemoveNode(NodeBase node)
         {

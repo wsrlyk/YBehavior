@@ -35,11 +35,13 @@ namespace YBehavior.Editor.Core.New
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.ConnectNodes(ctr0, ctr1);
         }
-        public void DisconnectNodes(Connection conn)
+
+        public void DisconnectNodes(Connection.FromTo conn)
         {
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.DisconnectNodes(conn);
         }
+
         public void RemoveNode(NodeBase node)
         {
             if (m_ActiveWorkBench != null)

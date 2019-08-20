@@ -30,8 +30,8 @@ namespace YBehavior.Editor.Core.New
                 {
                     foreach (Connection conn in ctr.Conns)
                     {
-                        NodeBase child = CloneNode(conn.To.Owner, true);
-                        node.Conns.Connect(child, conn.From.Identifier);
+                        NodeBase child = CloneNode(conn.Ctr.To.Owner, true);
+                        node.Conns.Connect(child, conn.Ctr.From.Identifier);
                     }
                 }
             }

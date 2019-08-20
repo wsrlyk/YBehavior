@@ -15,7 +15,7 @@ namespace YBehavior.Editor.Core.New
 
     public class TreeMemory : IVariableCollection
     {
-        protected IVariableDataSource m_Owner;
+        protected IVariableCollectionOwner m_Owner;
 
         VariableCollection m_SharedVariables;
         VariableCollection m_LocalVariables;
@@ -32,7 +32,7 @@ namespace YBehavior.Editor.Core.New
             SharedVariableChangedArg arg = new SharedVariableChangedArg();
             EventMgr.Instance.Send(arg);
         }
-        public TreeMemory(IVariableDataSource owner)
+        public TreeMemory(IVariableCollectionOwner owner)
         {
             m_Owner = owner;
             m_SharedVariables = new VariableCollection(owner);
@@ -192,7 +192,7 @@ namespace YBehavior.Editor.Core.New
             return GetVariableHolder(name, bIsLocal)?.Variable;
         }
 
-        public TreeMemory Clone(IVariableDataSource owner = null)
+        public TreeMemory Clone(IVariableCollectionOwner owner = null)
         {
             TreeMemory memory = new TreeMemory(owner ?? m_Owner);
 
@@ -216,7 +216,7 @@ namespace YBehavior.Editor.Core.New
     }
     public class InOutMemory
     {
-        protected IVariableDataSource m_Owner;
+        protected IVariableCollectionOwner m_Owner;
         bool m_bIsCore = true;
         VariableCollection m_InputVariables;
         VariableCollection m_OutputVariables;
@@ -224,7 +224,7 @@ namespace YBehavior.Editor.Core.New
         public IVariableCollection InputMemory { get { return m_InputVariables; } }
         public IVariableCollection OutputMemory { get { return m_OutputVariables; } }
 
-        public InOutMemory(IVariableDataSource owner, bool bIsCore)
+        public InOutMemory(IVariableCollectionOwner owner, bool bIsCore)
         {
             m_Owner = owner;
             m_bIsCore = bIsCore;
@@ -419,7 +419,7 @@ namespace YBehavior.Editor.Core.New
                     v.Variable.VectorIndex.RefreshCandidates(true);
             }
         }
-        public InOutMemory Clone(IVariableDataSource owner = null)
+        public InOutMemory Clone(IVariableCollectionOwner owner = null)
         {
             InOutMemory memory = new InOutMemory(owner ?? m_Owner, m_bIsCore);
 
@@ -452,7 +452,7 @@ namespace YBehavior.Editor.Core.New
     {
         public SameTypeGroup SameTypeGroup { get; set; } = null;
 
-        public NodeMemory(IVariableDataSource owner) : base(owner)
+        public NodeMemory(IVariableCollectionOwner owner) : base(owner)
         {
 
         }
