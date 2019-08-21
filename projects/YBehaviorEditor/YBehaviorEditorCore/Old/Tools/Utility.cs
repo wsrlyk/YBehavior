@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace YBehavior.Editor.Core.New
+namespace YBehavior.Editor.Core
 {
     public class Lock : IDisposable
     {
@@ -20,19 +20,16 @@ namespace YBehavior.Editor.Core.New
     }
     class Utility
     {
-        public static NodeBase CloneNode(NodeBase template, bool bIncludeChildren)
+        public static Node CloneNode(Node template, bool bIncludeChildren)
         {
-            NodeBase node = template.Clone();
+            Node node = template.Clone();
 
             if (bIncludeChildren)
             {
-                foreach (Connector ctr in template.Conns.ConnectorsList)
+                foreach (Node templatechild in template.Conns)
                 {
-                    foreach (Connection conn in ctr.Conns)
-                    {
-                        NodeBase child = CloneNode(conn.Ctr.To.Owner, true);
-                        node.Conns.Connect(child, conn.Ctr.From.Identifier);
-                    }
+                    Node child = CloneNode(templatechild, true);
+                    node.Conns.Connect(child, templatechild.ParentConn.Identifier);
                 }
             }
 
@@ -52,28 +49,15 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        public static void OperateNode(NodeBase node, bool bIncludeChildren, Action<NodeBase> action)
+        public static void OperateNode(Node node, bool bIncludeChildren, Action<Node> action)
         {
             action(node);
 
             if (bIncludeChildren)
             {
-                foreach (NodeBase child in node.Conns)
+                foreach (Node child in node.Conns)
                 {
                     OperateNode(child, bIncludeChildren, action);
-                }
-            }
-        }
-
-        public static void OperateNode(NodeBase node, object param, bool bIncludeChildren, Action<NodeBase, object> action)
-        {
-            action(node, param);
-
-            if (bIncludeChildren)
-            {
-                foreach (NodeBase child in node.Conns)
-                {
-                    OperateNode(child, param, bIncludeChildren, action);
                 }
             }
         }

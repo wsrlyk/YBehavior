@@ -64,7 +64,7 @@ namespace YBehavior.Editor
             {
                 m_Hierachy = hierachy;
                 m_Source = null;
-                Name = Core.DescriptionMgr.Instance.GetHierachyDescription((int)hierachy);
+                Name = DescriptionMgr.Instance.GetHierachyDescription((int)hierachy);
                 m_Level = level;
                 Icon = "📁";
                 Description = null;

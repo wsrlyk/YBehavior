@@ -42,9 +42,9 @@ namespace YBehavior.Editor
             m_InstantAnim.Begin(this.Bg, true);
 
             if (oArg.TipType == ShowSystemTipsArg.TipsType.TT_Success)
-                Core.LogMgr.Instance.Log(oArg.Content);
+                LogMgr.Instance.Log(oArg.Content);
             else
-                Core.LogMgr.Instance.Error(oArg.Content);
+                LogMgr.Instance.Error(oArg.Content);
         }
     }
 }

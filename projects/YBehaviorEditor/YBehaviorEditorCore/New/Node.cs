@@ -7,6 +7,117 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
+    #region Geometry
+    public class Geometry
+    {
+        Rect m_Rect;
+        public Rect Rec { get { return m_Rect; } set { m_Rect = value; } }
+        public Thickness Thick { get { return new Thickness(m_Rect.Left, m_Rect.Top, m_Rect.Right, m_Rect.Bottom); } }
+
+        public Geometry()
+        {
+            m_Rect = new Rect(0, 0, 80, 60);
+        }
+
+        public Point CenterPoint
+        {
+            get
+            {
+                return new Point((m_Rect.Left + m_Rect.Right) / 2, (m_Rect.Top + m_Rect.Bottom) / 2);
+            }
+        }
+        public Point TopPoint
+        {
+            get
+            {
+                return new Point((m_Rect.Left + m_Rect.Right) / 2, m_Rect.Top);
+            }
+        }
+        public Point BottomPoint
+        {
+            get
+            {
+                return new Point((m_Rect.Left + m_Rect.Right) / 2, m_Rect.Bottom);
+            }
+        }
+
+        public Point Pos
+        {
+            get { return m_Rect.Location; }
+            set { m_Rect.Location = value; }
+        }
+
+        public Point BottomRightPos
+        {
+            get { return m_Rect.BottomRight; }
+            set
+            {
+                Point p = value;
+                if (p.X < m_Rect.X)
+                    p.X = m_Rect.X;
+                if (p.Y < m_Rect.Y)
+                    p.Y = m_Rect.Y;
+                m_Rect.Width = p.X - m_Rect.X;
+                m_Rect.Height = p.Y - m_Rect.Y;
+            }
+        }
+
+
+        public Point TopLeftPos
+        {
+            get { return m_Rect.TopLeft; }
+            set
+            {
+                Point p = value;
+                if (p.Y > m_Rect.Y + m_Rect.Height)
+                    p.Y = m_Rect.Y + m_Rect.Height;
+                if (p.X > m_Rect.X + m_Rect.Width)
+                    p.X = m_Rect.X + m_Rect.Width;
+                m_Rect.Height = m_Rect.Y + m_Rect.Height - p.Y;
+                m_Rect.Y = p.Y;
+                m_Rect.Width = m_Rect.X + m_Rect.Width - p.X;
+                m_Rect.X = p.X;
+            }
+        }
+
+        public Point TopRightPos
+        {
+            get { return m_Rect.TopRight; }
+            set
+            {
+                Point p = value;
+                if (p.X < m_Rect.X)
+                    p.X = m_Rect.X;
+                if (p.Y > m_Rect.Y + m_Rect.Height)
+                    p.Y = m_Rect.Y + m_Rect.Height;
+                m_Rect.Height = m_Rect.Y + m_Rect.Height - p.Y;
+                m_Rect.Y = p.Y;
+                m_Rect.Width = p.X - m_Rect.X;
+            }
+        }
+
+        public Point BottomLeftPos
+        {
+            get { return m_Rect.BottomLeft; }
+            set
+            {
+                Point p = value;
+                if (p.Y < m_Rect.Y)
+                    p.Y = m_Rect.Y;
+                if (p.X > m_Rect.X + m_Rect.Width)
+                    p.X = m_Rect.X + m_Rect.Width;
+                m_Rect.Width = m_Rect.X + m_Rect.Width - p.X;
+                m_Rect.X = p.X;
+                m_Rect.Height = p.Y - m_Rect.Y;
+            }
+        }
+        public void Copy(Geometry other)
+        {
+            m_Rect = other.m_Rect;
+        }
+    }
+    #endregion
+
     public class NodeWrapper
     {
         public NodeBase Node { get; set; }

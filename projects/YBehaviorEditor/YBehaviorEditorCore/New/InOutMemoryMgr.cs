@@ -56,7 +56,7 @@ namespace YBehavior.Editor.Core.New
                         {
                             foreach (System.Xml.XmlAttribute attr2 in chi2.Attributes)
                             {
-                                if (Node.ReservedAttributes.Contains(attr2.Name))
+                                if (Utility.ReservedAttributes.Contains(attr2.Name))
                                     continue;
 
                                 if (!inOutMemory.TryAddData(attr2.Name, attr2.Value, chi2.Name == "Input"))

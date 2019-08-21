@@ -94,7 +94,7 @@ namespace YBehavior.Editor.Core.New
             if (v == null)
                 return false;
 
-            if (Node.ReservedAttributesAll.Contains(v.Name))
+            if (Utility.ReservedAttributesAll.Contains(v.Name))
             {
                 LogMgr.Instance.Error("Reserved name: " + v.Name);
                 return false;
@@ -319,7 +319,7 @@ namespace YBehavior.Editor.Core.New
             if (v == null)
                 return false;
 
-            if (Node.ReservedAttributesAll.Contains(v.Name))
+            if (Utility.ReservedAttributesAll.Contains(v.Name))
             {
                 LogMgr.Instance.Error("Reserved name: " + v.Name);
                 return false;
@@ -481,7 +481,7 @@ namespace YBehavior.Editor.Core.New
             if (v == null)
                 return false;
 
-            if (Node.ReservedAttributesAll.Contains(v.Name))
+            if (Utility.ReservedAttributesAll.Contains(v.Name))
             {
                 LogMgr.Instance.Error("Reserved name: " + v.Name);
                 return false;

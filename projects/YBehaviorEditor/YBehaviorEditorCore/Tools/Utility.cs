@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace YBehavior.Editor.Core
+namespace YBehavior.Editor.Core.New
 {
     public class Lock : IDisposable
     {
@@ -20,44 +20,63 @@ namespace YBehavior.Editor.Core
     }
     class Utility
     {
-        public static Node CloneNode(Node template, bool bIncludeChildren)
+        public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class", "Connection" });
+        public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName", "Connection", "DebugPoint", "Comment" });
+
+        public static NodeBase CloneNode(NodeBase template, bool bIncludeChildren)
         {
-            Node node = template.Clone();
+            NodeBase node = template.Clone();
 
             if (bIncludeChildren)
             {
-                foreach (Node templatechild in template.Conns)
+                foreach (Connector ctr in template.Conns.ConnectorsList)
                 {
-                    Node child = CloneNode(templatechild, true);
-                    node.Conns.Connect(child, templatechild.ParentConn.Identifier);
+                    foreach (Connection conn in ctr.Conns)
+                    {
+                        NodeBase child = CloneNode(conn.Ctr.To.Owner, true);
+                        node.Conns.Connect(child, conn.Ctr.From.Identifier);
+                    }
                 }
             }
 
             return node;
         }
 
-        public static void InitNode(Node node, bool bIncludeChildren)
-        {
-            node.Init();
+        //public static void InitNode(Node node, bool bIncludeChildren)
+        //{
+        //    node.Init();
 
-            if (bIncludeChildren)
-            {
-                foreach (Node child in node.Conns)
-                {
-                    InitNode(child, bIncludeChildren);
-                }
-            }
-        }
+        //    if (bIncludeChildren)
+        //    {
+        //        foreach (Node child in node.Conns)
+        //        {
+        //            InitNode(child, bIncludeChildren);
+        //        }
+        //    }
+        //}
 
-        public static void OperateNode(Node node, bool bIncludeChildren, Action<Node> action)
+        public static void OperateNode(NodeBase node, bool bIncludeChildren, Action<NodeBase> action)
         {
             action(node);
 
             if (bIncludeChildren)
             {
-                foreach (Node child in node.Conns)
+                foreach (NodeBase child in node.Conns)
                 {
                     OperateNode(child, bIncludeChildren, action);
+                }
+            }
+        }
+
+        public static void OperateNode(NodeBase node, object param, bool bIncludeChildren, Action<NodeBase, object> action)
+        {
+            action(node, param);
+
+            if (bIncludeChildren)
+            {
+                foreach (NodeBase child in node.Conns)
+                {
+                    OperateNode(child, param, bIncludeChildren, action);
                 }
             }
         }

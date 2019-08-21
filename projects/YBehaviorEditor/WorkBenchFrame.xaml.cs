@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
@@ -187,7 +180,7 @@ namespace YBehavior.Editor
 
         void _RefreshMainTreeDebug(uint token)
         {
-            if (token != Core.NetworkMgr.Instance.MessageProcessor.TickResultToken)
+            if (token != NetworkMgr.Instance.MessageProcessor.TickResultToken)
             {
                 return;
             }
@@ -347,7 +340,7 @@ namespace YBehavior.Editor
                         }
                     }
 
-                    Core.LogMgr.Instance.Error("Tab switch failed.");
+                    LogMgr.Instance.Error("Tab switch failed.");
                 }
 
                 m_CurPageData = null;

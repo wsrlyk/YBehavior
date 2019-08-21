@@ -110,7 +110,7 @@ namespace YBehavior.Editor.Core.New
 
     public class NodeDuplicatedArg : EventArg
     {
-        public Node Node { get; set; }
+        public NodeBase Node { get; set; }
         public bool bIncludeChildren { get; set; } = false;
         public override EventType Type => EventType.NodeDuplicated;
     }

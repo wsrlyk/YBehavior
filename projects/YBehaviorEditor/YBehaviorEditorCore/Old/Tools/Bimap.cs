@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace YBehavior.Editor.Core.New
+namespace YBehavior.Editor.Core
 {
     public class Bimap<T0, T1> : System.Collections.IEnumerable
     {

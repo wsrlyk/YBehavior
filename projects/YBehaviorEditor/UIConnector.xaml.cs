@@ -142,7 +142,7 @@ namespace YBehavior.Editor
             }
             catch (Exception e)
             {
-                Core.LogMgr.Instance.Log(e.ToString());
+                LogMgr.Instance.Log(e.ToString());
                 return new Point();
             }
         }

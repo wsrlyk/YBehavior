@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
@@ -116,7 +109,7 @@ namespace YBehavior.Editor
         private void _InitWorkingSpace()
         {
             m_ExpandedItems.Clear();
-            string expandedFolders = Core.Config.Instance.ExpandedFolders;
+            string expandedFolders = Config.Instance.ExpandedFolders;
             string[] folders = expandedFolders.Split(new char[] { '|' });
             foreach (string s in folders)
             {
@@ -214,7 +207,7 @@ namespace YBehavior.Editor
                     sb.Append('|');
                 sb.Append(s);
             }
-            Core.Config.Instance.ExpandedFolders = sb.ToString();
+            Config.Instance.ExpandedFolders = sb.ToString();
         }
     }
 }
