@@ -55,6 +55,8 @@
     <None Include="Old\ExternalActionMgr.cs" />
     <None Include="Old\InOutMemoryMgr.cs" />
     <None Include="Old\Memory.cs" />
+    <Compile Include="New\TreeNodes.cs" />
+    <Compile Include="New\TreeNode.cs" />
     <Compile Include="Tools\Bimap.cs" />
     <Compile Include="New\CommandMgr.cs" />
     <Compile Include="New\Comment.cs" />

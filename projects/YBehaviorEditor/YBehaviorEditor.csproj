@@ -79,6 +79,9 @@
     <Compile Include="SystemTipsFrame.xaml.cs">
       <DependentUpon>SystemTipsFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TabBarFrame.xaml.cs">
+      <DependentUpon>TabBarFrame.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ToolBarFrame.xaml.cs">
       <DependentUpon>ToolBarFrame.xaml</DependentUpon>
     </Compile>
@@ -109,9 +112,10 @@
     <Compile Include="UIVariable.xaml.cs">
       <DependentUpon>UIVariable.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WorkBenchFrame.xaml.cs">
-      <DependentUpon>WorkBenchFrame.xaml</DependentUpon>
+    <Compile Include="TreeBenchFrame.xaml.cs">
+      <DependentUpon>TreeBenchFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WorkBenchFrame.cs" />
     <Compile Include="WorkingSpaceFrame.xaml.cs">
       <DependentUpon>WorkingSpaceFrame.xaml</DependentUpon>
     </Compile>
@@ -137,6 +141,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SystemTipsFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TabBarFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -180,9 +188,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="WorkBenchFrame.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="TreeBenchFrame.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="WorkingSpaceFrame.xaml">
       <SubType>Designer</SubType>
