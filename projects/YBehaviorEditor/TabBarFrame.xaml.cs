@@ -140,9 +140,9 @@ namespace YBehavior.Editor
                 {
                     nextBench = this.TreeBench;
                 }
-                else if (oArg.Bench is TreeBench)
+                else if (oArg.Bench is FSMBench)
                 {
-                    nextBench = this.TreeBench;
+                    nextBench = this.FSMBench;
                 }
             }
 
@@ -154,6 +154,7 @@ namespace YBehavior.Editor
                     m_CurBench.Visibility = Visibility.Collapsed;
                 }
                 m_CurBench = nextBench;
+                if (m_CurBench != null)
                 {
                     m_CurBench.Enable();
                     m_CurBench.Visibility = Visibility.Visible;

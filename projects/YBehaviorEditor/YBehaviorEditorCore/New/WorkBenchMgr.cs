@@ -162,7 +162,7 @@ namespace YBehavior.Editor.Core.New
             }
             else
             {
-                workBench = new TreeBench
+                workBench = new FSMBench
                 {
                     FilePath = file.Path
                 };
@@ -433,7 +433,7 @@ namespace YBehavior.Editor.Core.New
             }
             else if (type == FileType.FSM)
             {
-                workBench = new TreeBench
+                workBench = new FSMBench
                 {
                     FilePath = string.Empty,
                     FileInfo = new TreeFileMgr.TreeFileInfo()
