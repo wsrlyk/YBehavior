@@ -85,6 +85,9 @@
     <Compile Include="ToolBarFrame.xaml.cs">
       <DependentUpon>ToolBarFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FSMBenchFrame.xaml.cs">
+      <DependentUpon>FSMBenchFrame.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UIComment.xaml.cs">
       <DependentUpon>UIComment.xaml</DependentUpon>
     </Compile>
@@ -93,6 +96,9 @@
     </Compile>
     <Compile Include="UIConnector.xaml.cs">
       <DependentUpon>UIConnector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIFSMState.xaml.cs">
+      <DependentUpon>UIFSMState.xaml</DependentUpon>
     </Compile>
     <Compile Include="UINode.xaml.cs">
       <DependentUpon>UINode.xaml</DependentUpon>
@@ -152,6 +158,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="FSMBenchFrame.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UIComment.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -161,6 +171,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UIConnector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UIFSMState.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

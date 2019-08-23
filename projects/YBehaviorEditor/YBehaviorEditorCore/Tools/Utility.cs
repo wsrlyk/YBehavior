@@ -80,5 +80,57 @@ namespace YBehavior.Editor.Core.New
                 }
             }
         }
+
+        ///> TODO: make it universal
+        public static FSMMachineNode FindAncestor(FSMMachineNode a, FSMMachineNode b, ref FSMMachineNode toppestLevelChild)
+        {
+            if (a == null || b == null)
+                return null;
+
+            FSMMachineNode deeper;
+            FSMMachineNode shallower;
+
+            if (FSM.UID.GetLevel(a.UID) > FSM.UID.GetLevel(b.UID))
+            {
+                deeper = a;
+                shallower = b;
+            }
+            else
+            {
+                deeper = b;
+                shallower = a;
+            }
+
+            FSMMachineNode c = deeper;
+            FSMMachineNode d = shallower;
+
+            for (uint i = FSM.UID.GetLevel(deeper.UID)- FSM.UID.GetLevel(shallower.UID); i > 0; --i)
+            {
+                toppestLevelChild = c;
+                c = c.OwnerMachine;
+            }
+
+            while (c != d && c != null)
+            {
+                c = c.OwnerMachine;
+                d = d.OwnerMachine;
+            }
+
+            return c;
+        }
+
+        public static bool IsSubClassOf(Type type, Type baseType)
+        {
+            var b = type.BaseType;
+            while (b != null)
+            {
+                if (b.Equals(baseType))
+                {
+                    return true;
+                }
+                b = b.BaseType;
+            }
+            return false;
+        }
     }
 }

@@ -58,6 +58,8 @@
     <Compile Include="New\FSM.cs" />
     <Compile Include="New\FSMBench.cs" />
     <Compile Include="New\FSMNode.cs" />
+    <Compile Include="New\FSMRenderers.cs" />
+    <Compile Include="New\Transition.cs" />
     <Compile Include="New\TreeNodes.cs" />
     <Compile Include="New\TreeNode.cs" />
     <Compile Include="Tools\Bimap.cs" />

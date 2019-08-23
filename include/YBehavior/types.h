@@ -235,13 +235,13 @@ namespace YBehavior
 	union FSMUID
 	{
 		FSMUIDType Value;
-		///> All Valid values start from 1; If a State == 0, but Machine == 2, it only means the No.2 Machine
+		///> Machine & State start from 1; If a State == 0, but Machine == 2, it only means the No.2 Machine
 		struct
 		{
-			FSMUIDType Layer : 2;		///> Up to 4 Layers
-			FSMUIDType Level : 3;		///> Up to 8 Levels of SubMachines per Layer
-			FSMUIDType Machine : 5;		///> Up to 32 SubMachines in the same Level
-			FSMUIDType State : 6;		///> Up to 64 State in the same machine
+			FSMUIDType Layer : 2;		///> Up to 4 Layers, start from 0
+			FSMUIDType Level : 3;		///> Up to 8 Levels of SubMachines per Layer, start from 0
+			FSMUIDType Machine : 5;		///> Up to 16 SubMachines in the same Level, start from 1
+			FSMUIDType State : 6;		///> Up to 32 State in the same machine, start from 1
 		};
 	};
 

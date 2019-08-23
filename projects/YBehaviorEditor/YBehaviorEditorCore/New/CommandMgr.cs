@@ -232,15 +232,15 @@ namespace YBehavior.Editor.Core.New
         public NodeBaseRenderer NodeRenderer { get; set; }
         public System.Windows.Point OriginPos { get; set; }
         public System.Windows.Point FinalPos { get; set; }
-
+        public int DragParam { get; set; }
         public void Redo()
         {
-            NodeRenderer.DragMain(FinalPos - OriginPos);
+            NodeRenderer.DragMain(FinalPos - OriginPos, DragParam);
             NodeRenderer.FinishDrag(FinalPos - OriginPos, FinalPos);
         }
         public void Undo()
         {
-            NodeRenderer.DragMain(OriginPos - FinalPos);
+            NodeRenderer.DragMain(OriginPos - FinalPos, DragParam);
             NodeRenderer.FinishDrag(OriginPos - FinalPos, OriginPos);
         }
     }

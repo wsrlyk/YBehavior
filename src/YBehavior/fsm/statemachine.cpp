@@ -74,6 +74,7 @@ namespace YBehavior
 
 	void StateMachine::OnLoadFinish()
 	{
+
 	}
 
 	bool StateMachine::TryEnterDefault(AgentPtr pAgent)
@@ -160,7 +161,7 @@ namespace YBehavior
 	{
 		if (m_pMachine)
 			delete m_pMachine;
-		m_pMachine = new RootMachine(1);
+		m_pMachine = new RootMachine(0);
 		return m_pMachine;
 	}
 
@@ -218,7 +219,7 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 
 	RootMachine::RootMachine(FSMUIDType layer)
-		: StateMachine(layer, 1, 1)
+		: StateMachine(layer, 0, 1)
 	{
 		m_pRootMachine = this;
 	}

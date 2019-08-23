@@ -252,9 +252,9 @@ namespace YBehavior
 		FSM* pFSM = new FSM(id->GetName());
 		pFSM->SetID(id);
 		RootMachine* pMachine = pFSM->CreateMachine();
-		///> at most 8 levels, start from 1
-		int levelMachineCount[9];
-		memset(levelMachineCount, 0, sizeof(int) * 9);
+		///> at most 8 levels, start from 0
+		int levelMachineCount[8];
+		memset(levelMachineCount, 0, sizeof(int) * 8);
 		if (!_LoadMachine(pMachine, rootData.first_child(), levelMachineCount))
 		{
 			ERROR_BEGIN << "Load FSM Failed: " << id->GetName() << ERROR_END;
@@ -404,6 +404,7 @@ namespace YBehavior
 
 				pState->GetUID().Value = pMachine->GetUID().Value;
 				pState->GetUID().State = ++stateNum;
+				LOG_BEGIN << "Load State " << pState->ToString() << LOG_END;
 				//LOG_BEGIN << "Create " << pState->ToString() << LOG_END;
 				if (pState->GetType() == MST_Meta)
 				{
@@ -449,6 +450,7 @@ namespace YBehavior
 		}
 
 		pMachine->OnLoadFinish();
+		LOG_BEGIN << "Load Machine " << Utility::ToString(pMachine->GetUID()) << LOG_END;
 		return true;
 	}
 

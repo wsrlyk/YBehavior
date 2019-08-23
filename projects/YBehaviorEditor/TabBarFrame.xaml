@@ -15,7 +15,7 @@
         <TabControl Name="TabController" Grid.Row="0" Tag="200" SelectionChanged="TabController_SelectionChanged" Background="DarkGray"/>
         <Grid Grid.Row="1">
             <local:TreeBenchFrame x:Name="TreeBench"/>
-            <local:TreeBenchFrame x:Name="FSMBench"/>
+            <local:FSMBenchFrame x:Name="FSMBench"/>
         </Grid>
     </Grid>
 </UserControl>

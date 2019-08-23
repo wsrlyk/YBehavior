@@ -236,9 +236,12 @@ namespace YBehavior.Editor.Core.New
 
         public NodeState RunState { get { return DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(m_Owner.UID) : NodeState.NS_INVALID; } }
 
-        public void DragMain(Vector delta)
+        int m_DragParam = -1;
+        public void DragMain(Vector delta, int param)
         {
-            _Move(delta);
+            if (m_DragParam == -1)
+                m_DragParam = param;
+            _Move(delta, m_DragParam);
         }
 
         public void FinishDrag(Vector delta, Point pos)
@@ -265,21 +268,25 @@ namespace YBehavior.Editor.Core.New
                 FinalPos = pos
             };
             WorkBenchMgr.Instance.PushCommand(moveNodeCommand);
+            m_DragParam = -1;
         }
         public void SetPos(Point pos)
         {
-            _Move(pos - Owner.Geo.Pos);
+            _Move(pos - Owner.Geo.Pos, m_DragParam);
         }
 
-        void _Move(Vector delta)
+        void _Move(Vector delta, int param)
         {
             Owner.Geo.Pos = Owner.Geo.Pos + delta;
 
             OnPropertyChanged("Owner");
 
-            foreach (NodeBase child in m_Owner.Conns)
+            if (param == 0)
             {
-                child.Renderer._Move(delta);
+                foreach (NodeBase child in m_Owner.Conns)
+                {
+                    child.Renderer._Move(delta, param);
+                }
             }
         }
 

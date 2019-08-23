@@ -36,7 +36,7 @@ namespace YBehavior.Editor.Core.New
         public TreeNodeMgr()
         {
             var subTypeQuery = from t in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
-                               where IsSubClassOf(t, typeof(TreeNode))
+                               where Utility.IsSubClassOf(t, typeof(TreeNode))
                                select t;
 
             foreach (var type in subTypeQuery)
@@ -68,20 +68,6 @@ namespace YBehavior.Editor.Core.New
             {
             }
             return node;
-        }
-
-        static bool IsSubClassOf(Type type, Type baseType)
-        {
-            var b = type.BaseType;
-            while (b != null)
-            {
-                if (b.Equals(baseType))
-                {
-                    return true;
-                }
-                b = b.BaseType;
-            }
-            return false;
         }
     }
 

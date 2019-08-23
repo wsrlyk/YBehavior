@@ -22,7 +22,7 @@
                         <DockPanel Background="LightBlue" Margin="2,2,2,2">
                             <TextBlock Text="Return" FontSize="13" Width="90" DockPanel.Dock="Left" Background="LightCyan"/>
                             <ComboBox Name="ReturnType" SelectedValue="{Binding ReturnType}" SelectedValuePath="Tag">
-                                <ComboBoxItem Content="Default" Tag="Default"/>
+                                <ComboBoxItem Content="Normal" Tag="Normal"/>
                                 <ComboBoxItem Content="Invert" Tag="Invert"/>
                                 <ComboBoxItem Content="Success" Tag="Success"/>
                                 <ComboBoxItem Content="Failure" Tag="Failure"/>
