@@ -78,7 +78,7 @@ namespace YBehavior.Editor
             HoverHandler = new DropHandler(defaultHoverHandler);
 
             m_Operation = new Operation(this);
-            m_Operation.RegisterDragDrop(_OnDragged, _OnStartDragged, _OnFinishDragged);
+            m_Operation.RegisterLeftDrag(_OnDragged, _OnStartDragged, _OnFinishDragged);
 
             this.LayoutUpdated += _OnLayoutUpdated;
 
