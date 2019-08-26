@@ -53,11 +53,11 @@ namespace YBehavior.Editor
             }
         }
 
-        public UINode OwnerNode
+        public YUserControl OwnerNode
         {
             get
             {
-                return (UINode)GetValue(OwnerNodeProperty);
+                return (YUserControl)GetValue(OwnerNodeProperty);
             }
             set
             {
