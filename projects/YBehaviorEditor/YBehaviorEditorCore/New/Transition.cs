@@ -67,14 +67,14 @@ namespace YBehavior.Editor.Core.New
 
     public class Transition : System.Collections.IEnumerable
     {
-        Dictionary<TransitionMapKey, TransitionResult> m_Trans = new Dictionary<TransitionMapKey, TransitionResult>();
-        public System.Collections.IEnumerator GetEnumerator() { return m_Trans.Values.GetEnumerator(); }
+        List<TransitionResult> m_Trans = new List<TransitionResult>();
+        public System.Collections.IEnumerator GetEnumerator() { return m_Trans.GetEnumerator(); }
 
         public bool Insert(TransitionMapKey key, TransitionMapValue value)
         {
             try
             {
-                m_Trans.Add(key, new TransitionResult(key, value));
+                m_Trans.Add(new TransitionResult(key, value));
             }
             catch (Exception e)
             {
@@ -96,16 +96,16 @@ namespace YBehavior.Editor.Core.New
             return Insert(key, value);
         }
 
-        public void Remove(TransitionMapKey key)
+        public void Remove(TransitionResult trans)
         {
-            m_Trans.Remove(key);
+            m_Trans.Remove(trans);
         }
 
-        public TransitionResult GetTransition(TransitionMapKey key)
-        {
-            TransitionResult res;
-            m_Trans.TryGetValue(key, out res);
-            return res;
-        }
+        //public TransitionResult GetTransition(TransitionMapKey key)
+        //{
+        //    TransitionResult res;
+        //    m_Trans.TryGetValue(key, out res);
+        //    return res;
+        //}
     }
 }

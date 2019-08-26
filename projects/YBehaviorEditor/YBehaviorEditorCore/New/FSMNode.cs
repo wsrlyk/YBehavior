@@ -495,6 +495,8 @@ namespace YBehavior.Editor.Core.New
         {
             m_Name = TypeExit;
             Type = FSMStateType.Special;
+
+            Conns.Add(Connector.IdentifierParent, true);
         }
     }
 

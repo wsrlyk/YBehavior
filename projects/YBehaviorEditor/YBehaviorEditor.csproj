@@ -74,6 +74,10 @@
     <Compile Include="NodeListFrame.xaml.cs">
       <DependentUpon>NodeListFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PopMenu.cs" />
+    <Compile Include="PopMenuFrame.xaml.cs">
+      <DependentUpon>PopMenuFrame.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -96,6 +100,9 @@
     </Compile>
     <Compile Include="UIComment.xaml.cs">
       <DependentUpon>UIComment.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMUIConnection.xaml.cs">
+      <DependentUpon>FSMUIConnection.xaml</DependentUpon>
     </Compile>
     <Compile Include="UIConnection.xaml.cs">
       <DependentUpon>UIConnection.xaml</DependentUpon>
@@ -157,6 +164,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="PopMenuFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SystemTipsFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -180,6 +191,10 @@
     <Page Include="UIComment.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FSMUIConnection.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UIConnection.xaml">
       <Generator>MSBuild:Compile</Generator>

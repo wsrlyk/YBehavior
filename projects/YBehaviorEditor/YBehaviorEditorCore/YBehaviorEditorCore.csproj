@@ -59,6 +59,7 @@
     <Compile Include="New\FSMBench.cs" />
     <Compile Include="New\FSMNode.cs" />
     <Compile Include="New\FSMRenderers.cs" />
+    <Compile Include="New\PopMenu.cs" />
     <Compile Include="New\Transition.cs" />
     <Compile Include="New\TreeNodes.cs" />
     <Compile Include="New\TreeNode.cs" />

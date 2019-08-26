@@ -23,6 +23,7 @@ namespace YBehavior.Editor.Core.New
         CommentCreated,
         ShowSystemTips,
         MakeCenter,
+        PopMenu,
     }
 
     public class EventMgr : Singleton<EventMgr>
@@ -161,5 +162,13 @@ namespace YBehavior.Editor.Core.New
     public class MakeCenterArg : EventArg
     {
         public override EventType Type => EventType.MakeCenter;
+    }
+
+    public class PopMenuArg : EventArg
+    {
+        public override EventType Type => EventType.PopMenu;
+
+        public PopMenu Menu { get; set; }
+        public System.Windows.Point Pos { get; set; }
     }
 }
