@@ -114,7 +114,7 @@ namespace YBehavior.Editor
                 //if (ctr is ConnectorNone)
                 //    continue;
 
-                UIConnector uiConnector = new UIConnector
+                TreeUIConnector uiConnector = new TreeUIConnector
                 {
                     Title = ctr.Identifier,
                     Ctr = ctr
@@ -132,7 +132,7 @@ namespace YBehavior.Editor
 
             if (Node.Conns.ParentConnector != null)
             {
-                UIConnector uiConnector = new UIConnector
+                TreeUIConnector uiConnector = new TreeUIConnector
                 {
                     Title = Node.Icon,
                     Ctr = Node.Conns.ParentConnector

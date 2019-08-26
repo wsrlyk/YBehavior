@@ -18,56 +18,15 @@ namespace YBehavior.Editor
     /// <summary>
     /// UIConnector.xaml 的交互逻辑
     /// </summary>
-    public partial class UIConnector : YUserControl, IDragable, IDropable
+    public partial class TreeUIConnector : UIConnector, IDragable, IDropable
     {
-        static DragHandler defaultDragHandler = new DragHandler(DragDropMgr.Instance.OnDragged);
-        static DropHandler defaultDropHandler = new DropHandler(DragDropMgr.Instance.OnDropped);
-        static DropHandler defaultHoverHandler = new DropHandler(DragDropMgr.Instance.OnHover);
-
-        DragHandler DragHandler { get; set; }
-        DropHandler DropHandler { get; set; }
-        DropHandler HoverHandler { get; set; }
-
         Brush normalBorderBrush;
 
-        Operation m_Operation;
-
-        #region Dependency Property/Event Definitions
-
-        public static readonly DependencyProperty HotspotProperty =
-            DependencyProperty.Register("Hotspot", typeof(Point), typeof(UIConnector));
-        public static readonly DependencyProperty OwnerNodeProperty =
-            DependencyProperty.Register("OwnerNode", typeof(UINode), typeof(UIConnector));
-
-        #endregion Dependency Property/Event Definitions
-
-        public Point Hotspot
-        {
-            get
-            {
-                return (Point)GetValue(HotspotProperty);
-            }
-            set
-            {
-                SetValue(HotspotProperty, value);
-            }
-        }
-
-        public YUserControl OwnerNode
-        {
-            get
-            {
-                return (YUserControl)GetValue(OwnerNodeProperty);
-            }
-            set
-            {
-                SetValue(OwnerNodeProperty, value);
-            }
-        }
+        public override Border Main { get { return this.main; } }
 
         Vector m_RelativePos = new Vector(double.MaxValue, double.MaxValue);
 
-        public UIConnector()
+        public TreeUIConnector()
         {
             InitializeComponent();
 
@@ -77,20 +36,7 @@ namespace YBehavior.Editor
             DropHandler = new DropHandler(defaultDropHandler);
             HoverHandler = new DropHandler(defaultHoverHandler);
 
-            m_Operation = new Operation(this);
-            m_Operation.RegisterLeftDrag(_OnDragged, _OnStartDragged, _OnFinishDragged);
-
-            this.LayoutUpdated += _OnLayoutUpdated;
-
-            this.SetBinding(OwnerNodeProperty, new Binding()
-            {
-                RelativeSource = new RelativeSource()
-                {
-                    Mode = RelativeSourceMode.FindAncestor,
-                    AncestorLevel = 1,
-                    AncestorType = typeof(UINode)
-                }
-            });
+            m_Operation.RegisterRightDrag(_OnDragged, _OnStartDragged, _OnFinishDragged);
         }
 
         void _OnLayoutUpdated(object sender, EventArgs e)
@@ -118,33 +64,10 @@ namespace YBehavior.Editor
             //Hotspot = GetPos(Ancestor);
         }
 
-        public void ResetPos()
-        {
-            m_RelativePos.X = double.MaxValue;
-            m_RelativePos.Y = double.MaxValue;
-        }
-
         public string Title
         {
             get { return title.Text; }
             set { title.Text = value; }
-        }
-
-        public Connector Ctr { get; set; }
-
-        public Point GetPos(Visual visual)
-        {
-            if (visual == null)
-                return new Point();
-            try
-            {
-                return TransformToAncestor(visual).Transform(new Point(ActualWidth / 2, ActualHeight / 2));
-            }
-            catch (Exception e)
-            {
-                LogMgr.Instance.Log(e.ToString());
-                return new Point();
-            }
         }
 
         void _OnStartDragged(Vector delta, Point absPos)
@@ -178,27 +101,6 @@ namespace YBehavior.Editor
             DropHandler(droppable);
         }
 
-        IDropable _HitTesting(Point pos)
-        {
-            List<DependencyObject> objs = m_Operation.HitTesting(pos);
-            foreach (var o in objs)
-            {
-                var obj = o;
-                //                LogMgr.Instance.Log("Drag HitTest: " + obj.ToString());
-                while (obj != null && obj.GetType() != typeof(Canvas))
-                {
-                    if (obj is IDropable && obj != this)
-                    {
-                        //                        LogMgr.Instance.Log("Drag FinalHit: " + obj.ToString());
-                        return obj as IDropable;
-                    }
-
-                    obj = VisualTreeHelper.GetParent(obj);
-                }
-            }
-            //            LogMgr.Instance.Log("Drag FinalHit: NULL");
-            return null;
-        }
 
         public void SetDragged(bool bDragged)
         {

@@ -20,7 +20,6 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             _Init();
-            ////DraggingConnection.Instance.SetCanvas(this.canvas);
         }
 
         public override void OnWorkBenchSelected(EventArg arg)
@@ -41,6 +40,8 @@ namespace YBehavior.Editor
                 this.nodeLayer.ItemsSource = oArg.Bench.NodeList.Collection;
                 this.commentLayer.ItemsSource = oArg.Bench.Comments;
                 this.connectionLayer.ItemsSource = oArg.Bench.ConnectionList.Collection;
+
+                DraggingConnection.Instance.SetCanvas(this.canvas);
             }
             else
             {

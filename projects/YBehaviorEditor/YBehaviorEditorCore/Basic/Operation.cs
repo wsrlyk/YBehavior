@@ -27,6 +27,10 @@ namespace YBehavior.Editor.Core.New
         DragHandler m_LeftStartDragHandler;
         DragHandler m_LeftFinishDragHandler;
 
+        DragHandler m_RightDragHandler;
+        DragHandler m_RightStartDragHandler;
+        DragHandler m_RightFinishDragHandler;
+
         DragHandler m_MiddleDragHandler;
         DragHandler m_MiddleStartDragHandler;
         DragHandler m_MiddleFinishDragHandler;
@@ -88,6 +92,13 @@ namespace YBehavior.Editor.Core.New
             m_MiddleFinishDragHandler = finishhandler;
             m_ValidButtonMask |= (1 << (int)MouseButton.Middle);
         }
+        public void RegisterRightDrag(DragHandler handler, DragHandler starthandler, DragHandler finishhandler)
+        {
+            m_RightDragHandler = handler;
+            m_RightStartDragHandler = starthandler;
+            m_RightFinishDragHandler = finishhandler;
+            m_ValidButtonMask |= (1 << (int)MouseButton.Right);
+        }
 
         MouseButton m_PressedButton;
         bool m_bStartClick = false;
@@ -130,6 +141,7 @@ namespace YBehavior.Editor.Core.New
             }
             else if (e.RightButton == MouseButtonState.Pressed && m_PressedButton == MouseButton.Right)
             {
+                dragHandler = m_RightStartDragHandler;
                 bValid = true;
             }
 
@@ -161,6 +173,11 @@ namespace YBehavior.Editor.Core.New
             else if (e.MiddleButton == MouseButtonState.Pressed && m_PressedButton == MouseButton.Middle)
             {
                 dragHandler = m_MiddleDragHandler;
+                bValid = true;
+            }
+            else if (e.RightButton == MouseButtonState.Pressed && m_PressedButton == MouseButton.Right)
+            {
+                dragHandler = m_RightDragHandler;
                 bValid = true;
             }
 
@@ -200,6 +217,7 @@ namespace YBehavior.Editor.Core.New
                         break;
                     case MouseButton.Right:
                         clickHandler = m_RightClickHandler;
+                        dragHandler = m_RightFinishDragHandler;
                         break;
                     default:
                         break;

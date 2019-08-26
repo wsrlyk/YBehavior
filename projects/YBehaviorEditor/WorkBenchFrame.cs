@@ -24,8 +24,6 @@ namespace YBehavior.Editor
             m_Operation = new Operation(this.GetCanvasBoard);
             m_Operation.RegisterMiddleDrag(_OnDrag, null, null);
             m_Operation.RegisterLeftClick(_OnClick);
-
-            ////DraggingConnection.Instance.SetCanvas(this.canvas);
         }
 
         public void Enable()

@@ -104,9 +104,8 @@ namespace YBehavior.Editor
                 //if (ctr is ConnectorNone)
                 //    continue;
 
-                UIConnector uiConnector = new UIConnector
+                FSMUIOutConnector uiConnector = new FSMUIOutConnector
                 {
-                    Title = ctr.Identifier,
                     Ctr = ctr
                 };
 
@@ -117,9 +116,8 @@ namespace YBehavior.Editor
 
             if (Node.Conns.ParentConnector != null)
             {
-                UIConnector uiConnector = new UIConnector
+                FSMUIInConnector uiConnector = new FSMUIInConnector
                 {
-                    Title = Node.Icon,
                     Ctr = Node.Conns.ParentConnector
                 };
 
@@ -145,7 +143,7 @@ namespace YBehavior.Editor
 
         public static readonly DependencyProperty DebugTriggerProperty =
             DependencyProperty.Register("DebugTrigger",
-            typeof(bool), typeof(UINode), new FrameworkPropertyMetadata(DebugTrigger_PropertyChanged));
+            typeof(bool), typeof(UIFSMState), new FrameworkPropertyMetadata(DebugTrigger_PropertyChanged));
         private static void DebugTrigger_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UINode c = (UINode)d;

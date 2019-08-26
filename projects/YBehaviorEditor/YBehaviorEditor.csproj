@@ -67,6 +67,9 @@
       <DependentUpon>DebugFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="DraggingConnection.cs" />
+    <Compile Include="FSMUIOutConnector.xaml.cs">
+      <DependentUpon>FSMUIOutConnector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\VariableHelper.cs" />
     <Compile Include="NodeListFrame.xaml.cs">
       <DependentUpon>NodeListFrame.xaml</DependentUpon>
@@ -88,15 +91,19 @@
     <Compile Include="FSMBenchFrame.xaml.cs">
       <DependentUpon>FSMBenchFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FSMUIInConnector.xaml.cs">
+      <DependentUpon>FSMUIInConnector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UIComment.xaml.cs">
       <DependentUpon>UIComment.xaml</DependentUpon>
     </Compile>
     <Compile Include="UIConnection.xaml.cs">
       <DependentUpon>UIConnection.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UIConnector.xaml.cs">
-      <DependentUpon>UIConnector.xaml</DependentUpon>
+    <Compile Include="TreeUIConnector.xaml.cs">
+      <DependentUpon>TreeUIConnector.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UIConnector.cs" />
     <Compile Include="UIFSMState.xaml.cs">
       <DependentUpon>UIFSMState.xaml</DependentUpon>
     </Compile>
@@ -130,6 +137,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="FSMUIOutConnector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -162,6 +173,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="FSMUIInConnector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UIComment.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -170,7 +185,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UIConnector.xaml">
+    <Page Include="TreeUIConnector.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
