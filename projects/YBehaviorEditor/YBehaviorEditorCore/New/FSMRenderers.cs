@@ -14,5 +14,31 @@ namespace YBehavior.Editor.Core.New
         {
             m_FSMStateOwner = stateNode;
         }
+
+        public string Tree
+        {
+            get { return FSMStateOwner.Tree; }
+            set
+            {
+                ////ChangeNodeCommentCommand command = new ChangeNodeCommentCommand()
+                ////{
+                ////    NodeRenderer = this,
+                ////    OriginComment = Owner.Comment,
+                ////    FinalComment = value,
+                ////};
+
+                FSMStateOwner.Tree = value;
+
+                ////WorkBenchMgr.Instance.PushCommand(command);
+            }
+        }
+
+        public string Type
+        {
+            get
+            {
+                return FSMStateOwner.Name;
+            }
+        }
     }
 }

@@ -67,6 +67,15 @@
       <DependentUpon>DebugFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="DraggingConnection.cs" />
+    <Compile Include="FSMConnectionDataFrame.xaml.cs">
+      <DependentUpon>FSMConnectionDataFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMSelectionFrame.xaml.cs">
+      <DependentUpon>FSMSelectionFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMStateFrame.xaml.cs">
+      <DependentUpon>FSMStateFrame.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FSMUIOutConnector.xaml.cs">
       <DependentUpon>FSMUIOutConnector.xaml</DependentUpon>
     </Compile>
@@ -141,6 +150,18 @@
     </Compile>
     <Compile Include="YUserControl.cs" />
     <Page Include="DebugFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FSMConnectionDataFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FSMSelectionFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FSMStateFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

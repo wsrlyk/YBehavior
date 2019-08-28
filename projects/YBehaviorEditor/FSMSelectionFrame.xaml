@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="YBehavior.Editor.FSMSelectionFrame"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:YBehavior.Editor"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
+        <local:ValueConverterGroup x:Key="invertBoolAndVisibilityConvertor">
+            <local:InvertBoolConverter/>
+            <BooleanToVisibilityConverter/>
+        </local:ValueConverterGroup>
+    </UserControl.Resources>
+    <Grid>
+        <TabControl Name="TabController" Tag="300" SelectionChanged="TabController_SelectionChanged">
+            <TabItem Header="State" Name="StateTab" Width="80" Visibility="{Binding IsSelected, RelativeSource={RelativeSource Self}, Converter={StaticResource visibilityConvertor}}">
+                <local:FSMStateFrame/>
+            </TabItem>
+            <TabItem Header="Connection" Name="ConnectionTab" Width="80" Visibility="{Binding IsSelected, RelativeSource={RelativeSource Self}, Converter={StaticResource visibilityConvertor}}">
+                <local:FSMConnectionDataFrame/>
+            </TabItem>
+            <TabItem Header="Comment" Name="CommentTab" Width="80" Visibility="{Binding IsSelected, RelativeSource={RelativeSource Self}, Converter={StaticResource visibilityConvertor}}">
+                <Grid>
+                    <TextBox TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Text="{Binding Content}"/>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</UserControl>

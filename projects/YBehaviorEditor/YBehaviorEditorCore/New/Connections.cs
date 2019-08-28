@@ -32,10 +32,15 @@ namespace YBehavior.Editor.Core.New
             Ctr = ctr;
 
             //Graph = graph;
-            Renderer = new ConnectionRenderer();
+            Renderer = _CreateRenderer();
             Renderer.Owner = this;
             Renderer.ParentConnectorGeo = from.Geo;
             Renderer.ChildConnectorGeo = to.Geo;
+        }
+        
+        protected virtual ConnectionRenderer _CreateRenderer()
+        {
+            return new ConnectionRenderer();
         }
     }
 

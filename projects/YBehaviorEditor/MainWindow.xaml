@@ -37,9 +37,12 @@
             <local:TabBarFrame Grid.Column="1" Margin="0,0,0,0"/>
             <local:PopMenuFrame Grid.Column="1"/>
             <local:SystemTipsFrame Grid.Column="1"/>
-            <DockPanel Grid.Column="2">
+            <DockPanel Grid.Column="2" Name="TreeRightPanel" Visibility="Collapsed">
                 <local:SharedDataFrame DockPanel.Dock="Top" Height="450" Margin="5, 0"/>
                 <local:VariablesFrame Margin="5, 5"/>
+            </DockPanel>
+            <DockPanel Grid.Column="2" Name="FSMRightPanel" Visibility="Collapsed">
+                <local:FSMSelectionFrame/>
             </DockPanel>
         </Grid>
         <!--<local:StateBarFrame Grid.Row="2"  Height="34" VerticalAlignment="Bottom" Margin="10,0,0,0"/>-->

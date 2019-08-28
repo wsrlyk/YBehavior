@@ -27,20 +27,33 @@ namespace YBehavior.Editor
             InitializeComponent();
 
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
+        }
+
+        public void Enable()
+        {
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.SharedVariableChanged, _OnSharedVariableChanged);
         }
 
+        public void Disable()
+        {
+            EventMgr.Instance.Unregister(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);
+            EventMgr.Instance.Unregister(EventType.DebugTargetChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Unregister(EventType.SharedVariableChanged, _OnSharedVariableChanged);
+        }
+
         private void _OnWorkBenchSelected(EventArg arg)
         {
             WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
-            if (oArg.Bench == null)
+            if (oArg.Bench == null || !(oArg.Bench is TreeBench))
             {
                 this.InOutPanel.DataContext = null;
                 this.DataContext = null;
+                Disable();
                 return;
             }
+            Enable();
             m_CurTree = oArg.Bench.MainGraph as Tree;
             if (m_CurTree == null)
                 return;

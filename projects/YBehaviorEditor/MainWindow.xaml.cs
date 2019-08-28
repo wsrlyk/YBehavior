@@ -194,11 +194,15 @@ namespace YBehavior.Editor
                 //    _RefreshMainTreeDebug(false, NetworkMgr.Instance.MessageProcessor.TickResultToken);
                 //}
                 this.Title = oArg.Bench.DisplayName + " - YBehaviorEditor";
+
+                this.TreeRightPanel.Visibility = oArg.Bench is TreeBench ? Visibility.Visible : Visibility.Collapsed;
+                this.FSMRightPanel.Visibility = oArg.Bench is FSMBench ? Visibility.Visible : Visibility.Collapsed;
             }
             else
             {
                 this.Title = "YBehaviorEditor";
             }
+
         }
     }
 }

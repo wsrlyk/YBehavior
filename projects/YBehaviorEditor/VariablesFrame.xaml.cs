@@ -25,16 +25,38 @@ namespace YBehavior.Editor
             InitializeComponent();
 
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
+        }
+
+        public void Enable()
+        {
             EventMgr.Instance.Register(EventType.SelectionChanged, _OnSelectionChanged);
             EventMgr.Instance.Register(EventType.SharedVariableChanged, _OnSharedVariableChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
         }
 
+        public void Disable()
+        {
+            EventMgr.Instance.Unregister(EventType.SelectionChanged, _OnSelectionChanged);
+            EventMgr.Instance.Unregister(EventType.SharedVariableChanged, _OnSharedVariableChanged);
+            EventMgr.Instance.Unregister(EventType.DebugTargetChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Unregister(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
+        }
+
         private void _OnWorkBenchSelected(EventArg arg)
         {
             this.DataContext = null;
             this.VariableContainer.ItemsSource = null;
+
+            WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
+            if (oArg.Bench == null || !(oArg.Bench is TreeBench))
+            {
+                Disable();
+            }
+            else
+            {
+                Enable();
+            }
         }
         private void _OnSelectionChanged(EventArg arg)
         {

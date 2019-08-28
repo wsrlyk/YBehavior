@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="YBehavior.Editor.FSMStateFrame"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:YBehavior.Editor"
+             mc:Ignorable="d" 
+             d:DesignHeight="250" d:DesignWidth="400">
+    <StackPanel DataContextChanged="OnDataContextChanged">
+        <TextBlock Text="{Binding Type}" Background="DarkGray"/>
+        <DockPanel Name="NamePanel">
+            <TextBlock Text="Name" Background="LightBlue" Width="90"/>
+            <TextBox Name="Name" Text="{Binding NickName}"/>
+        </DockPanel>
+        <DockPanel>
+            <TextBlock Text="Tree" Background="LightBlue" Width="90"/>
+            <TextBox Name="Tree" Text="{Binding Tree}"/>
+        </DockPanel>
+    </StackPanel>
+</UserControl>
