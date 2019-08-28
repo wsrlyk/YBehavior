@@ -11,24 +11,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// FSMConnectionDataFrame.xaml 的交互逻辑
+    /// FSMTransitionDataFrame.xaml 的交互逻辑
     /// </summary>
-    public partial class FSMConnectionDataFrame : UserControl
+    public partial class FSMTransitionDataFrame : UserControl
     {
-        public FSMConnectionDataFrame()
+        public FSMTransitionDataFrame()
         {
             InitializeComponent();
-        }
-
-        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            FSMConnectionRenderer Renderer = DataContext as FSMConnectionRenderer;
-            this.TransListFrame.DataContext = Renderer.FSMOwner;
         }
     }
 }

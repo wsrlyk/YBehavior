@@ -64,9 +64,14 @@ namespace YBehavior.Editor.Core.New
         {
             Key = key;
             Value = value;
+
+            Renderer = new TransitionRenderer();
+            Renderer.Owner = this;
         }
         public TransitionMapKey Key { get; set; }
         public TransitionMapValue Value { get; set; }
+
+        public TransitionRenderer Renderer { get; set; }
     }
 
     public class Transition : System.Collections.IEnumerable
@@ -112,5 +117,47 @@ namespace YBehavior.Editor.Core.New
         //    m_Trans.TryGetValue(key, out res);
         //    return res;
         //}
+    }
+
+    public class TransitionRenderer : System.ComponentModel.INotifyPropertyChanged
+    {
+        public TransitionResult Owner { get; set; }
+
+        public string Event
+        {
+            get { return Owner.Key.Trans.Event; }
+            set
+            {
+                if (Owner.Key.Trans.Event != value)
+                {
+                    TransitionEvent e = Owner.Key.Trans;
+                    e.Event = value;
+                    TransitionMapKey key = Owner.Key;
+                    key.Trans = e;
+                    Owner.Key = key;
+
+                    OnPropertyChanged("Event");
+                }
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return string.Format("{0} => {1}"
+                    , Owner.Key.FromState == null ? "AnyState" : Owner.Key.FromState.ForceGetRenderer.FullName
+                    , Owner.Value.ToState.ForceGetRenderer.FullName);
+            }
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        internal protected void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
     }
 }

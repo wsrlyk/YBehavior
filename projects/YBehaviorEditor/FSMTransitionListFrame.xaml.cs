@@ -16,19 +16,21 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// FSMConnectionDataFrame.xaml 的交互逻辑
+    /// FSMTransitionListFrame.xaml 的交互逻辑
     /// </summary>
-    public partial class FSMConnectionDataFrame : UserControl
+    public partial class FSMTransitionListFrame : UserControl
     {
-        public FSMConnectionDataFrame()
+        public FSMTransitionListFrame()
         {
             InitializeComponent();
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            FSMConnectionRenderer Renderer = DataContext as FSMConnectionRenderer;
-            this.TransListFrame.DataContext = Renderer.FSMOwner;
+            FSMConnection conn = DataContext as FSMConnection;
+
+            this.TransContainer.ItemsSource = conn.Trans;
+            this.DataFrame.DataContext = null;
         }
     }
 }

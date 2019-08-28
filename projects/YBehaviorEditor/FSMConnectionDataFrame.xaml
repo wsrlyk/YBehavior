@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel>
+    <StackPanel DataContextChanged="OnDataContextChanged">
         <TextBlock Text="{Binding Name}" Background="DarkGray" HorizontalAlignment="Left" />
+        <local:FSMTransitionListFrame x:Name="TransListFrame" MaxHeight="200"/>
     </StackPanel>
 </UserControl>
