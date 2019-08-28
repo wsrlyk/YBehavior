@@ -18,7 +18,7 @@ namespace YBehavior.Editor
     /// <summary>
     /// UIConnection.xaml 的交互逻辑
     /// </summary>
-    public partial class UIConnection : YUserControl, ISelectable, IDeletable
+    public partial class UIConnection : YUserControl, ISelectable, IDeletable, IDraggingConnection
     {
         static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
         //static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
@@ -76,7 +76,7 @@ namespace YBehavior.Editor
         //    figure.StartPoint = new Point();
         //}
 
-        public void SetWithMidY(Point start, Point end, double midY)
+        public void Set(Point start, Point end, double midY)
         {
             //Clear();
             figure.StartPoint = start;

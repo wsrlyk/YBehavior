@@ -57,6 +57,7 @@
     <None Include="Old\Memory.cs" />
     <Compile Include="New\FSM.cs" />
     <Compile Include="New\FSMBench.cs" />
+    <Compile Include="New\FSMConnections.cs" />
     <Compile Include="New\FSMNode.cs" />
     <Compile Include="New\FSMRenderers.cs" />
     <Compile Include="New\PopMenu.cs" />

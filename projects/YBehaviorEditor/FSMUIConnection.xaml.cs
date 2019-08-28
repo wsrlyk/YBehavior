@@ -18,12 +18,13 @@ namespace YBehavior.Editor
     /// <summary>
     /// UIConnection.xaml 的交互逻辑
     /// </summary>
-    public partial class FSMUIConnection : YUserControl, ISelectable, IDeletable
+    public partial class FSMUIConnection : YUserControl, ISelectable, IDeletable, IDraggingConnection
     {
         static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
         //static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
 
         PathFigure figure;
+        PathFigure arrowFigure;
         Brush normalStrokeBrush;
 
         SelectionStateChangeHandler SelectHandler { get; set; }
@@ -33,6 +34,7 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             figure = PathGeometry.Figures[0];
+            arrowFigure = PathGeometry.Figures[1];
             //Clear();
             normalStrokeBrush = this.path.Stroke;
 
@@ -48,6 +50,7 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             figure = PathGeometry.Figures[0];
+            arrowFigure = PathGeometry.Figures[1];
             //Clear();
             normalStrokeBrush = this.path.Stroke;
 
@@ -76,7 +79,7 @@ namespace YBehavior.Editor
         //    figure.StartPoint = new Point();
         //}
 
-        public void SetWithMidY(Point start, Point end, double midY)
+        public void Set(Point start, Point end, double midY)
         {
             //Clear();
             figure.StartPoint = start;
@@ -84,6 +87,7 @@ namespace YBehavior.Editor
             LineSegment trdLine = figure.Segments[0] as LineSegment;
             trdLine.Point = end;
 
+            _UpdateArrow();
         }
 
         void _OnClick()
@@ -106,6 +110,32 @@ namespace YBehavior.Editor
                 return;
 
             WorkBenchMgr.Instance.DisconnectNodes((this.DataContext as ConnectionRenderer).Owner.Ctr);
+        }
+
+        private void Path_TargetUpdated(object sender, DataTransferEventArgs e)
+        {
+            _UpdateArrow();
+        }
+
+        void _UpdateArrow()
+        {
+            Point start = figure.StartPoint;
+
+            LineSegment trdLine = figure.Segments[0] as LineSegment;
+            Point end = trdLine.Point;
+
+            Point midPoint = new Point((start.X + end.X) * 0.5, (start.Y + end.Y) * 0.5);
+            Vector arrow = end - start;
+            arrow.Normalize();
+
+            arrowFigure.StartPoint = midPoint + arrow * 2;
+
+            midPoint = midPoint - arrow * 2;
+
+            arrow = new Vector(arrow.Y, -arrow.X);
+            (arrowFigure.Segments[0] as LineSegment).Point = midPoint + arrow * 2;
+            arrow = -arrow;
+            (arrowFigure.Segments[1] as LineSegment).Point = midPoint + arrow * 2;
         }
     }
 }

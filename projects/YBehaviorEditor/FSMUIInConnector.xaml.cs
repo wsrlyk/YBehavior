@@ -83,7 +83,7 @@ namespace YBehavior.Editor
             if (other == null)
                 return;
 
-            WorkBenchMgr.Instance.ConnectNodes(this.Ctr, other.Ctr);
+            WorkBenchMgr.Instance.ConnectNodes(other.Ctr, this.Ctr);
         }
     }
 }

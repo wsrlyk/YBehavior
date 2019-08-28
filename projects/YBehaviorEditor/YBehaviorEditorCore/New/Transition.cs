@@ -44,7 +44,11 @@ namespace YBehavior.Editor.Core.New
 
         public bool Equals(TransitionMapKey other)
         {
-            return FromState == other.FromState && Trans.Equals(other.Trans);
+            return Trans.Equals(other.Trans)
+                && (
+                FromState == other.FromState
+                || ((FromState == null || FromState is FSMAnyStateNode)
+                && (other.FromState == null || other.FromState is FSMAnyStateNode)));
         }
 
 	};
@@ -70,21 +74,22 @@ namespace YBehavior.Editor.Core.New
         List<TransitionResult> m_Trans = new List<TransitionResult>();
         public System.Collections.IEnumerator GetEnumerator() { return m_Trans.GetEnumerator(); }
 
-        public bool Insert(TransitionMapKey key, TransitionMapValue value)
+        public TransitionResult Insert(TransitionMapKey key, TransitionMapValue value)
         {
+            TransitionResult res = new TransitionResult(key, value);
             try
             {
-                m_Trans.Add(new TransitionResult(key, value));
+                m_Trans.Add(res);
             }
             catch (Exception e)
             {
                 LogMgr.Instance.Error("Insert trans failed: " + e.ToString());
-                return false;
+                return null;
             }
-            return true;
+            return res;
         }
 
-        public bool Insert(FSMStateNode from, string eventName, FSMStateNode to)
+        public TransitionResult Insert(FSMStateNode from, string eventName, FSMStateNode to)
         {
             TransitionMapKey key = new TransitionMapKey(from, eventName);
 

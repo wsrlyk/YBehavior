@@ -41,7 +41,7 @@ namespace YBehavior.Editor
                 this.commentLayer.ItemsSource = oArg.Bench.Comments;
                 this.connectionLayer.ItemsSource = oArg.Bench.ConnectionList.Collection;
 
-                DraggingConnection.Instance.SetCanvas(this.canvas);
+                DraggingConnection<FSMUIConnection>.Instance.SetCanvas(this.canvas);
             }
             else
             {

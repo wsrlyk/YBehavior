@@ -2,9 +2,10 @@
 <MonsterMachine>
   <Machine Default="Idle">
     <State Type="Entry" Tree="D" Identification="MainEntry"/>
-    <State Type="Exit" Tree="E" />
-    <State Name="Idle" Tree="A" />
-    <State Type="Meta" Name="Move" Tree="B">
+    <State Type="Exit" Tree="E" Pos="400,400"/>
+    <State Type="Any" Pos="200,100"/>
+    <State Name="Idle" Tree="A" Pos="100,100"/>
+    <State Type="Meta" Name="Move" Tree="B" Pos="100,200">
       <Machine Default="Walk">
         <State Type="Entry" Tree="D" />
         <State Type="Exit" Tree="E" />
@@ -14,7 +15,7 @@
         <Trans Name="ToRun" To="Run" />
       </Machine>
     </State>
-    <State Type="Meta" Name="Fight" Tree="B">
+    <State Type="Meta" Name="Fight" Tree="B" Pos="300,200">
       <Machine Default="Detect">
         <State Name="Detect" Tree="A"/>
         <State Name="Skill" Tree="B"/>

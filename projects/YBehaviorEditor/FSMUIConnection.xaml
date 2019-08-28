@@ -7,11 +7,15 @@
              mc:Ignorable="d" 
              >
     <Grid>
-        <Path Name="path" Stroke="#FFDADCE4" StrokeThickness="5" Fill="#FFE1E3E8">
+        <Path Name="path" Stroke="#FFDADCE4" StrokeThickness="5" Fill="#FFE1E3E8" TargetUpdated="Path_TargetUpdated">
             <Path.Data>
                 <PathGeometry>
-                    <PathFigure IsFilled="False" StartPoint="{Binding ParentPos, Mode=OneWay}"  IsClosed="False">
-                        <LineSegment Point="{Binding ChildPos, Mode=OneWay}" />
+                    <PathFigure IsFilled="False" StartPoint="{Binding ParentPos, Mode=OneWay, NotifyOnTargetUpdated=True}" IsClosed="False">
+                        <LineSegment Point="{Binding ChildPos, Mode=OneWay, NotifyOnTargetUpdated=True}" />
+                    </PathFigure>
+                    <PathFigure IsFilled="true" StartPoint="0,0"  IsClosed="true">
+                        <LineSegment Point="-0.5,0.2" />
+                        <LineSegment Point="-0.5,-0.2" />
                     </PathFigure>
                 </PathGeometry>
             </Path.Data>

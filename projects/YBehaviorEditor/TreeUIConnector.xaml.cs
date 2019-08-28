@@ -84,9 +84,9 @@ namespace YBehavior.Editor
             IDropable droppable = _HitTesting(absPos);
 
             {
-                Point from = GetPos(DraggingConnection.Instance.Canvas);
+                Point from = GetPos(DraggingConnection<UIConnection>.Instance.Canvas);
                 Point to = absPos;
-                DraggingConnection.Instance.Drag(from, to);
+                DraggingConnection<UIConnection>.Instance.Drag(from, to);
 
                 HoverHandler(droppable);
             }
@@ -96,7 +96,7 @@ namespace YBehavior.Editor
             if (DebugMgr.Instance.IsDebugging())
                 return;
             IDropable droppable = _HitTesting(absPos);
-            DraggingConnection.Instance.FinishDrag();
+            DraggingConnection<UIConnection>.Instance.FinishDrag();
 
             DropHandler(droppable);
         }

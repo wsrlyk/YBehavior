@@ -183,5 +183,64 @@ namespace YBehavior.Editor.Core.New
         {
             NodeList.DelayAdd(node.ForceGetRenderer);
         }
+
+        public override void DisconnectNodes(Connection.FromTo connection)
+        {
+            FSMConnection conn = connection.From.FindConnection(connection) as FSMConnection;
+            if (conn == null)
+                return;
+
+            while(conn.Trans.Count > 0)
+            {
+                Disconnect(conn, conn.Trans[0]);
+            }
+        }
+
+        public void Disconnect(Connection.FromTo fromto, TransitionResult trans)
+        {
+            FSMConnection conn = fromto.From.FindConnection(fromto) as FSMConnection;
+            if (conn == null)
+                return;
+            Disconnect(conn, trans);
+        }
+
+        void Disconnect(FSMConnection conn, TransitionResult trans)
+        {
+            ConnectionRenderer connectionRenderer = conn.Renderer;
+            m_FSM.RootMachine.RemoveTrans(trans);
+            if (conn.Trans.Count == 0)
+            {
+                if (connectionRenderer != null)
+                    ConnectionList.Remove(connectionRenderer);
+
+            }
+        }
+
+        public override void ConnectNodes(Connector from, Connector to)
+        {
+            if (from == null || to == null || from.GetDir != Connector.Dir.OUT || to.GetDir != Connector.Dir.IN)
+                return;
+            if (m_FSM.RootMachine.MakeTrans(from.Owner as FSMStateNode, to.Owner as FSMStateNode))
+            {
+                Connection.FromTo fromto = new Connection.FromTo
+                {
+                    From = from,
+                    To = to
+                };
+                FSMConnection conn = to.FindConnection(fromto) as FSMConnection;
+                if (conn != null)
+                {
+                    ConnectionRenderer connRenderer = conn.Renderer;
+                    if (connRenderer != null)
+                        ConnectionList.Add(connRenderer);
+                }
+            }
+
+        }
+
+        public void ConnectNodes(FSMStateNode fromState, FSMStateNode toState)
+        {
+            ConnectNodes(fromState.Conns.GetConnector(Connector.IdentifierChildren), toState.Conns.ParentConnector);
+        }
     }
 }

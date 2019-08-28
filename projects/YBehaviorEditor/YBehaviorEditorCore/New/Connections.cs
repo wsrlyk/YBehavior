@@ -75,6 +75,8 @@ namespace YBehavior.Editor.Core.New
         public Action onMidYChanged;
     }
 
+    public delegate Connection ConnectionCreateDelegate(Connector from, Connector to);
+
     /// <summary>
     /// Hold the connections coming in or going out
     /// </summary>
@@ -110,6 +112,8 @@ namespace YBehavior.Editor.Core.New
 
         public ConnectorGeometry Geo { get { return m_Geo; } }
         ConnectorGeometry m_Geo;
+
+        public ConnectionCreateDelegate ConnectionCreator { get; set; }
 
         int m_AtBottom = 1;  //> Connections on the top of the nodes = -1;
         public Connector(NodeBase node, string identifier)
@@ -200,11 +204,11 @@ namespace YBehavior.Editor.Core.New
                 if (conn.Ctr.From == this)
                 {
                     ///> Already connected.
-                    return null;
+                    return conn;
                 }
             }
 
-            Connection connection = new Connection(this, target);
+            Connection connection = ConnectionCreator == null ? new Connection(this, target) : ConnectionCreator(this, target);
             m_Conns.Add(connection);
             target.Conns.Add(connection);
 
@@ -278,13 +282,23 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        public Connection FindConnection(Connection.FromTo fromto)
+        {
+            foreach (var c in m_Conns)
+            {
+                if (c.Ctr.Equals(fromto))
+                    return c;
+            }
+            return null;
+        }
+
         public ConnectionRenderer GetRenderer(Connection.FromTo fromto)
         {
-            for (int i = 0; i < m_Conns.Count; ++i)
+            foreach (var c in m_Conns)
             {
-                if (m_Conns[i].Ctr.Equals(fromto))
+                if (c.Ctr.Equals(fromto))
                 {
-                    return m_Conns[i].Renderer;
+                    return c.Renderer;
                 }
             }
             return null;
@@ -313,12 +327,6 @@ namespace YBehavior.Editor.Core.New
         public Connections(NodeBase owner)
         {
             m_Owner = owner;
-        }
-
-        public void CreateParentHolder()
-        {
-            if (m_ParentConnector == null)
-                m_ParentConnector = new Connector(m_Owner, Connector.IdentifierParent);
         }
 
         public Connector Add(string identifier, bool isMultiple)
