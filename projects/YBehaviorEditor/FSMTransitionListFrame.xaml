@@ -7,26 +7,24 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel DataContextChanged="OnDataContextChanged">
-        <ScrollViewer VerticalScrollBarVisibility ="Auto" MaxHeight="200" Margin="0,0,0,20">
-            <ItemsControl Name="TransContainer">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <DockPanel>
-                            <TextBlock Text="{Binding Renderer.Name}"/>
-                            <Button DockPanel.Dock="Right" Width="20" Height="20" HorizontalAlignment="Right">
-                                <TextBlock Text="-"/>
-                            </Button>
-                        </DockPanel>
-                        <!--TextBlock Text = "{Binding Name}"/-->
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+        <ListBox Name="TransContainer" MaxHeight="200" SelectionChanged="TransContainer_SelectionChanged">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel>
+                        <TextBlock Text="{Binding Renderer.Name}"/>
+                    </DockPanel>
+                    <!--TextBlock Text = "{Binding Name}"/-->
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Button Width="20" Height="20" Click="DeleteTrans_Click" HorizontalAlignment="Right">
+            -
+        </Button>
         <local:FSMTransitionDataFrame x:Name="DataFrame"/>
     </StackPanel>
 </UserControl>

@@ -85,6 +85,7 @@
     <Compile Include="FSMUIOutConnector.xaml.cs">
       <DependentUpon>FSMUIOutConnector.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\InputBinding.cs" />
     <Compile Include="Helpers\VariableHelper.cs" />
     <Compile Include="NodeListFrame.xaml.cs">
       <DependentUpon>NodeListFrame.xaml</DependentUpon>

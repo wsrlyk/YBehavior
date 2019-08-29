@@ -7,10 +7,11 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel>
-        <TextBlock Text="{Binding Type}" Background="DarkGray"/>
+        <TextBlock Text="{Binding Renderer.Name}" Background="DarkGray"/>
         <DockPanel Name="ConditionPanel">
             <TextBlock Text="Condition" Background="LightBlue" Width="90"/>
-            <TextBox Name="Condition" Text="{Binding NickName}"/>
+            <TextBox Name="Condition" Text="{Binding Renderer.Event, UpdateSourceTrigger=PropertyChanged}"
+                     local:InputBindingsManager.UpdatePropertySourceWhenEnterPressed="TextBox.Text"/>
         </DockPanel>
     </StackPanel>
 </UserControl>
