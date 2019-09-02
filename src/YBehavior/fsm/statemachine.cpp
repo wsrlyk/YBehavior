@@ -40,31 +40,41 @@ namespace YBehavior
 		return m_pMetaState->GetParentMachine();
 	}
 
-	void StateMachine::SetSpecialState(MachineState* pState)
+	bool StateMachine::SetSpecialState(MachineState* pState)
 	{
 		if (pState == nullptr)
-			return;
+			return false;
 
 		if (pState->GetType() == MST_Entry)
 		{
 			if (m_EntryState != nullptr)
 			{
 				ERROR_BEGIN << "Duplicated Entry." << ERROR_END;
-				return;
+				return false;
 			}
 			m_EntryState = pState;
-			GetRootMachine()->PushState(pState);
+			pState->GetUID().Value = GetUID().Value;
+			pState->GetUID().State = 1;
+			//GetRootMachine()->PushState(pState);
 		}
 		else if (pState->GetType() == MST_Exit)
 		{
 			if (m_ExitState != nullptr)
 			{
 				ERROR_BEGIN << "Duplicated Exit." << ERROR_END;
-				return;
+				return false;
 			}
 			m_ExitState = pState;
-			GetRootMachine()->PushState(pState);
+			pState->GetUID().Value = GetUID().Value;
+			pState->GetUID().State = 2;
+			//GetRootMachine()->PushState(pState);
 		}
+		else
+		{
+			ERROR_BEGIN << "Invalid Type." << ERROR_END;
+			return false;
+		}
+		return true;
 	}
 
 	//bool _CompareState(const MachineState* left, const MachineState* right)
@@ -77,71 +87,19 @@ namespace YBehavior
 
 	}
 
-	bool StateMachine::TryEnterDefault(AgentPtr pAgent)
+	void StateMachine::EnterDefaultOrExit(AgentPtr pAgent)
 	{
 		MachineContext& context = *pAgent->GetMachineContext();
 		if (m_pDefaultState)
 		{
-			context.SetCurState(m_pDefaultState);
-			context.GetTransition().transferRunRes = m_pDefaultState->OnEnter(pAgent);
-
-			return true;
-		}
-		return false;
-	}
-
-	MachineRunRes StateMachine::OnEnter(AgentPtr pAgent)
-	{
-		MachineContext& context = *pAgent->GetMachineContext();
-		if (m_EntryState)
-		{
-			if (context.CanRun(m_EntryState))
-			{
-				if (context.GetCurRunningState() == nullptr)
-					LOG_BEGIN << "EnterMachine" << LOG_END;
-
-				MachineRunRes res = m_EntryState->OnUpdate(0, pAgent);
-				if (res == MRR_Running || res == MRR_Break)
-					return res;
-			}
-		}
-
-		///> Enter default state
-		if (m_pDefaultState)
-		{
-			///> Only go to default when there's no trans target or trans target is this
-			if (context.GetTransition().transferResult.pToState != nullptr)// &&
-//					context.GetTransition().transferResult.pToState != this->GetMetaState())
-				return MRR_Normal;
-			if (context.CanRun(m_pDefaultState))
-			{
-				context.SetCurState(m_pDefaultState);
-				return m_pDefaultState->OnEnter(pAgent);
-			}
+			context.GetTransQueue().push_back(m_pDefaultState);
 		}
 		else
 		{
-			return MRR_Exit;
+			context.GetTransQueue().push_back(m_ExitState);
 		}
-
-		return MRR_Normal;
 	}
 
-	MachineRunRes StateMachine::OnExit(AgentPtr pAgent)
-	{
-		MachineContext& context = *pAgent->GetMachineContext();
-
-		if (m_ExitState)
-		{
-			if (context.CanRun(m_EntryState))
-			{
-				if (context.GetCurRunningState() == nullptr)
-					LOG_BEGIN << "ExitMachine" << LOG_END;
-				return m_ExitState->OnUpdate(0, pAgent);
-			}
-		}
-		return MRR_Normal;
-	}
 
 	FSM::FSM(const STRING& name)
 		: m_Name(name)
@@ -176,8 +134,6 @@ namespace YBehavior
 	TransitionContext::TransitionContext(const STRING& e)
 		: m_Trans(e)
 		, m_bLock(false)
-		, transferStage(MTS_None)
-		, transferRunRes(MRR_Normal)
 	{
 
 	}
@@ -185,8 +141,6 @@ namespace YBehavior
 	TransitionContext::TransitionContext()
 		: m_Trans()
 		, m_bLock(false)
-		, transferStage(MTS_None)
-		, transferRunRes(MRR_Normal)
 	{
 
 	}
@@ -194,7 +148,7 @@ namespace YBehavior
 	MachineContext::MachineContext()
 		: m_pCurState (nullptr)
 		, m_pMapping(nullptr)
-		, m_pCurRunningState(nullptr)
+		, LastRunRes(MRR_Invalid)
 	{
 
 	}
@@ -202,7 +156,6 @@ namespace YBehavior
 	void MachineContext::Reset()
 	{
 		m_pMapping = nullptr;
-		m_pCurRunningState = nullptr;
 		m_pCurState = nullptr;
 		m_Trans.Reset();
 	}
@@ -237,7 +190,10 @@ namespace YBehavior
 		if (pState == nullptr)
 			return false;
 
-		if (m_States.insert(std::pair<STRING, MachineState*>(pState->GetName(), pState)).second)
+		///> Only named states will be inserted into the name map
+		if ((pState->GetName() == Utility::StringEmpty || m_NamedStatesMap.insert(std::pair<STRING, MachineState*>(pState->GetName(), pState)).second)
+			&&
+			m_UIDStatesMap.insert(std::pair<FSMUIDType, MachineState*>(pState->GetUID().Value, pState)).second)
 		{
 			m_AllStates.push_back(pState);
 			return true;
@@ -259,38 +215,79 @@ namespace YBehavior
 		return res.second;
 	}
 
-	MachineState* _FindLCA(MachineState* pA, MachineState* pB)
+	std::list<StateMachine*> _FromRoute;
+	std::list<StateMachine*> _ToRoute;
+	StateMachine* _FindLCA(MachineState* pFrom, MachineState* pTo)
 	{
-		if (pA == nullptr || pB == nullptr)
+		if (pFrom == nullptr || pTo == nullptr)
 			return nullptr;
 
-		MachineState* pDeeper;
-		MachineState* pShallower;
-		if (pA->GetUID().Level > pB->GetUID().Level)
+		_FromRoute.clear();
+		_ToRoute.clear();
+
+		StateMachine* pDeeper;
+		StateMachine* pShallower;
+
+		std::list<StateMachine*>* pDeeperRoute;
+		std::list<StateMachine*>* pShallowerRoute;
+
+		bool bFromIsDeeper = false;
+		if (pFrom->GetUID().Level > pTo->GetUID().Level)
 		{
-			pDeeper = pA;
-			pShallower = pB;
+			bFromIsDeeper = true;
+			pDeeper = pFrom->GetParentMachine();
+			pShallower = pTo->GetParentMachine();
+
+			pDeeperRoute = &_FromRoute;
+			pShallowerRoute = &_ToRoute;
 		}
 		else
 		{
-			pDeeper = pB;
-			pShallower = pA;
+			pDeeper = pTo->GetParentMachine();
+			pShallower = pFrom->GetParentMachine();
+
+			pDeeperRoute = &_ToRoute;
+			pShallowerRoute = &_FromRoute;
 		}
 
-		MachineState* pC = pDeeper;
-		MachineState* pD = pShallower;
 		for (int i = pDeeper->GetUID().Level - pShallower->GetUID().Level; i > 0; --i)
 		{
-			pC = pC->GetParentMachine()->GetMetaState();
+			pDeeperRoute->push_back(pDeeper);
+			pDeeper = pDeeper->GetParentMachine();
 		}
 
-		while (pC != pD && pC != nullptr)
+		///> the Ancestor will be in neither of these two lists
+		while (pDeeper != pShallower && pDeeper != nullptr)
 		{
-			pC = pC->GetParentMachine()->GetMetaState();
-			pD = pD->GetParentMachine()->GetMetaState();
+			pDeeperRoute->push_back(pDeeper);
+			pShallowerRoute->push_back(pShallower);
+
+			pDeeper = pDeeper->GetParentMachine();
+			pShallower = pShallower->GetParentMachine();
 		}
 
-		return pC;
+		return pDeeper;
+	}
+
+	void _MakeLCARoute(std::list<MachineState*>& route)
+	{
+		route.clear();
+
+		while (!_FromRoute.empty())
+		{
+			StateMachine* d = _FromRoute.front();
+			_FromRoute.pop_front();
+			if (d != nullptr)
+				route.push_back(d->GetExit());
+		}
+
+		while (!_ToRoute.empty())
+		{
+			StateMachine* d = _ToRoute.back();
+			_ToRoute.pop_back();
+			if (d != nullptr)
+				route.push_back(d->GetEntry());
+		}
 	}
 
 	bool RootMachine::GetTransition(MachineState* pCurState, const MachineContext& context, TransitionResult& result)
@@ -309,13 +306,15 @@ namespace YBehavior
 				it = m_TransitionMap.find(key);
 			}
 
-			if (it != m_TransitionMap.end())
+			if (it != m_TransitionMap.end() && it->second.toState != pCurState /*Cant Self -> Self through Any*/)
 			{
 				result.pFromState = key.fromState;
 				result.trans = key.trans;
 				result.pToState = it->second.toState;
 				result.pMachine = this;
-				result.pLCA = _FindLCA(pCurState, result.pToState);
+				
+				_FindLCA(pCurState, result.pToState);
+				_MakeLCARoute(result.lcaRoute);
 				return true;
 			}
 		}
@@ -324,8 +323,16 @@ namespace YBehavior
 
 	YBehavior::MachineState* RootMachine::FindState(const STRING& name)
 	{
-		auto it = m_States.find(name);
-		if (it == m_States.end())
+		auto it = m_NamedStatesMap.find(name);
+		if (it == m_NamedStatesMap.end())
+			return nullptr;
+		return it->second;
+	}
+
+	YBehavior::MachineState* RootMachine::FindState(FSMUIDType uid)
+	{
+		auto it = m_UIDStatesMap.find(uid);
+		if (it == m_UIDStatesMap.end())
 			return nullptr;
 		return it->second;
 	}
@@ -338,48 +345,66 @@ namespace YBehavior
 	{
 		MachineContext& context = *pAgent->GetMachineContext();
 		LOG_BEGIN << "Update Machine" << LOG_END;
-		///> There's a transition
-		if (context.GetTransition().HasTransition() && context.GetCurState() != nullptr)
+
+		if (context.GetCurState() == nullptr)
+			context.GetTransQueue().push_back(m_EntryState);
+		else if (context.LastRunRes == MRR_Running || context.LastRunRes == MRR_Break)
 		{
-			if (context.GetTransition().transferStage == MTS_None)
-			{
-				LOG_BEGIN << "Start Trans: " << context.GetTransition().Get().GetEvent() << LOG_END;
-				context.GetTransition().Lock();
-			}
-			///> Trans is not finished in this tick
-			if (!_Trans(pAgent))
+			context.LastRunRes = context.GetCurState()->OnUpdate(fDeltaT, pAgent);
+			if (context.LastRunRes == MRR_Running || context.LastRunRes == MRR_Break)
 				return;
+		}
 
-			context.GetTransition().Reset();
-		}
-		if (context.GetCurState() != nullptr)
+		if (context.GetTransQueue().size() == 0)
 		{
-			LOG_BEGIN << "Update State In Machine" << LOG_END;
-			context.GetCurState()->OnUpdate(fDeltaT, pAgent);
-		}
-		else
-		{
-			context.GetTransition().transferRunRes = OnEnter(pAgent);
-		}
-	}
+			///> No Trans, Just Update Current
+			if (!_Trans(pAgent))
+			{
+				context.LastRunRes = context.GetCurState()->OnUpdate(fDeltaT, pAgent);
+			}
 
-	MachineState* FindNextState(MachineState* pCur, MachineState* pFinal)
-	{
-		if (pCur == pFinal || pFinal == nullptr)
-			return nullptr;
-
-		MachineState* pRes;
-		MachineState* pPrev = pFinal;
-		do 
-		{
-			pRes = pPrev;
-			if (pRes == nullptr)
-				break;
-			pPrev = (MachineState*)pRes->GetParentMachine()->GetMetaState();
 		}
-		while (pPrev != pCur);
-		
-		return pRes;
+		while (context.GetTransQueue().size() > 0)
+		{
+			while (context.GetTransQueue().size() > 0)
+			{
+				if (!(context.LastRunRes == MRR_Running || context.LastRunRes == MRR_Break))
+				{
+					MachineState* pNextState = context.GetTransQueue().front().pState;
+					context.GetTransQueue().pop_front();
+					context.SetCurState(pNextState);
+				}
+
+				context.LastRunRes = context.GetCurState()->OnUpdate(fDeltaT, pAgent);
+				if (context.LastRunRes == MRR_Running || context.LastRunRes == MRR_Break)
+					return;
+			}
+
+			///> Find a trans, push all states in the trans into the queue
+			if (_Trans(pAgent))
+			{
+				continue;
+			}
+
+			///> Trans to an Entry, and this Entry has no trans to other states, then just trans to Default
+			if (context.GetCurState()->GetType() == MST_Entry)
+			{
+				context.GetCurState()->GetParentMachine()->EnterDefaultOrExit(pAgent);
+			}
+			else if (context.GetCurState()->GetType() == MST_Exit)
+			{
+				///> Is RootMachine, Just exit
+				if (context.GetCurState()->GetParentMachine()->GetMetaState() == nullptr)
+				{
+					context.SetCurState(nullptr);
+				}
+				///> Go to ParentMachine's Default
+				else
+				{
+					context.GetCurState()->GetParentMachine()->GetMetaState()->GetParentMachine()->EnterDefaultOrExit(pAgent);
+				}
+			}
+		}
 	}
 
 	bool RootMachine::_Trans(AgentPtr pAgent)
@@ -389,170 +414,25 @@ namespace YBehavior
 		TransitionContext& transContext = context.GetTransition();
 
 		///> Find the From State
-		if (transContext.transferStage <= MTS_None)
+		if (GetTransition(context.GetCurState(), context, transContext.transferResult))
 		{
-			transContext.transferStage = MTS_None;
-
-			if (GetTransition(context.GetCurState(), context, transContext.transferResult))
-			{
-				///> Found;
-			}
-			else
-			{
-				LOG_BEGIN << "Trans Event that cant trans to any states: " << context.GetTransition().Get().GetEvent() << LOG_END;
-				return true;
-			}
+			///> Found;
+		}
+		else
+		{
+			return false;
 		}
 
-		///> Exit the low level states
-		if (transContext.transferStage <= MTS_Exit)
+		///> Exit->Exit->...(AncesterMachine)...->Entry->Entry->Target
+		while (!transContext.transferResult.lcaRoute.empty())
 		{
-			transContext.transferStage = MTS_Exit;
-			while (context.GetCurState() != nullptr && context.GetCurState() != transContext.transferResult.pLCA)
-			{
-				MachineState* pCurState = context.GetCurState();
-				///> The tree not finally return yet
-				transContext.transferRunRes = pCurState->OnExit(pAgent);
-				if (transContext.transferRunRes != MRR_Normal)
-				{
-					return false;
-				}
-				context.PopCurState();
-			}
-
-			///>Pop to the target, no need to enter
-			if (context.GetCurState() == transContext.transferResult.pToState)
-				transContext.transferStage = MTS_Default;
+			MachineState* pState = transContext.transferResult.lcaRoute.front();
+			transContext.transferResult.lcaRoute.pop_front();
+			context.GetTransQueue().push_back(pState);
 		}
+		context.GetTransQueue().push_back(transContext.transferResult.pToState);
 
-		///> Enter the new state
-		if (transContext.transferStage <= MTS_Enter)
-		{
-			bool failed = false;
-			if (transContext.transferStage < MTS_Enter)
-			{
-				transContext.transferRunRes = MRR_Normal;
-					transContext.transferStage = MTS_Enter;
-			}
-			while (true)
-			{
-				if (transContext.transferRunRes == MRR_Normal)
-				{
-					MachineState* pNext = FindNextState(context.GetCurState(), transContext.transferResult.pToState);
-					if (!pNext)
-					{
-						ERROR_BEGIN << "Cant find a route from " << context.GetCurState()->ToString() << " to " << transContext.transferResult.pToState->ToString() << ERROR_END;
-						break;
-					}
-					else
-					{
-						context.SetCurState(pNext);
-					}
-				}
-				transContext.transferRunRes = context.GetCurState()->OnEnter(pAgent);
-
-				switch (transContext.transferRunRes)
-				{
-				case YBehavior::MRR_Normal:
-					///> Go Next Level
-					break;
-				case YBehavior::MRR_Exit:
-				{
-					context.PopCurState();
-					failed = true;
-				}
-				break;
-				case YBehavior::MRR_Running:
-				case YBehavior::MRR_Break:
-					return false;
-				default:
-					break;
-				}
-				if (failed)
-					break;
-				if (context.GetCurState() == transContext.transferResult.pToState)
-				{
-					///> Meta need to enter the default state
-					if (context.GetCurState()->GetType() != MST_Meta)
-						return true;
-					break;
-				}
-			}
-		}
-
-		///> Enter default state
-		if (transContext.transferStage <= MTS_Default)
-		{
-			transContext.transferStage = MTS_Default;
-
-			while (context.GetCurState() != nullptr)
-			{
-				MachineState* pCurState = context.GetCurState();
-				StateMachine* pCurMachine = nullptr;
-				if (transContext.transferRunRes == MRR_Running || transContext.transferRunRes == MRR_Break)
-				{
-					transContext.transferRunRes = pCurState->OnEnter(pAgent);
-				}
-				else if (pCurState->GetType() == MST_Meta)
-				{
-					pCurMachine = static_cast<MetaState*>(pCurState)->GetSubMachine();
-					if (!pCurMachine->TryEnterDefault(pAgent))
-					{
-						///> No Default State, only pop current state, 
-						///> instead of both default&submachine in case MRR_Exit below
-						transContext.transferRunRes = MRR_Invalid;
-						context.PopCurState();
-					}
-				}
-				else
-				{
-					ERROR_BEGIN << "State in the stack is not a SubMachine: " << pCurState->ToString() << ERROR_END;
-					return false;
-				}
-
-				switch (transContext.transferRunRes)
-				{
-				case MRR_Running:
-				case MRR_Break:
-					return false;
-				case MRR_Normal:
-					return true;
-				case MRR_Exit:
-					///> Pop cur default state
-					context.PopCurState();
-
-					///> Pop SubMachine
-					context.PopCurState();
-				default:
-					break;
-				}
-			}
-
-			///> Root machine
-			if (m_pDefaultState)
-			{
-				context.SetCurState(m_pDefaultState);
-				///> Enter failed
-				transContext.transferRunRes = m_pDefaultState->OnEnter(pAgent);
-				switch (transContext.transferRunRes)
-				{
-				case MRR_Running:
-				case MRR_Break:
-					return false;
-				case MRR_Normal:
-					return true;
-				case MRR_Exit:
-					///> Pop cur default state
-					context.PopCurState();
-				default:
-					break;
-				}
-			}
-		}
-
-		///> Should not run to here
-		transContext.transferRunRes = MRR_Normal;
-		return false;
+		return true;
 	}
 
 }

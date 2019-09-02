@@ -56,7 +56,7 @@ namespace YBehavior
 		BehaviorTree* pTree = pAgent->GetMachineContext()->GetMapping()->GetTree(this->m_UID.Value);
 		if (pTree)
 		{
-			pAgent->GetMachineContext()->SetCurRunning(this, pTree);
+			pAgent->GetMachineContext()->SetCurRunning(pTree);
 			NodeState ns = pTree->RootExecute(pAgent, pAgent->IsRCEmpty() ? NS_INVALID : NS_RUNNING);
 			switch (ns)
 			{

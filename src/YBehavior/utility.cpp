@@ -124,6 +124,27 @@ namespace YBehavior
 	}
 
 	template<>
+	FSMUID Utility::ToType(const STRING& str)
+	{
+		///> [layer level machine state]
+		FSMUID uid;
+		uid.Value = 0;
+		FSMUIDType layer;
+		FSMUIDType level;
+		FSMUIDType machine;
+		FSMUIDType state;
+
+		sscanf_s(str.c_str(), "[%hu %hu %hu %hu]", &layer, &level, &machine, &state);
+
+		uid.Layer = layer;
+		uid.Level = level;
+		uid.Machine = machine;
+		uid.State = state;
+
+		return uid;
+	}
+
+	template<>
 	STRING Utility::ToString(const BOOL& t)
 	{
 		return t > 0 ? "T" : "F";

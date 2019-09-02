@@ -117,6 +117,9 @@ namespace YBehavior
 	BOOL Utility::ToType(const STRING& str);
 
 	template<>
+	FSMUID Utility::ToType(const STRING& str);
+
+	template<>
 	STRING Utility::ToString(const BOOL& t);
 
 	template<>

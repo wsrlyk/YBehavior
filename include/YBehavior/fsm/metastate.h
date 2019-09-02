@@ -16,8 +16,6 @@ namespace YBehavior
 		~MetaState();
 		inline StateMachine* GetSubMachine() { return m_pSubMachine; }
 		inline void SetSubMachine(StateMachine* sm) { m_pSubMachine = sm; }
-		MachineRunRes OnEnter(AgentPtr pAgent) override;
-		MachineRunRes OnExit(AgentPtr pAgent) override;
 	};
 }
 

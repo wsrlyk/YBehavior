@@ -237,7 +237,7 @@ namespace YBehavior
 	{
 		pugi::xml_document doc;
 
-		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + id->GetName() + ".xml").c_str());
+		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + id->GetName() + ".fsm").c_str());
 		LOG_BEGIN << "Loading: " << id->GetName() << ".xml" << LOG_END;
 		if (result.status)
 		{
@@ -296,29 +296,26 @@ namespace YBehavior
 		}
 
 		MachineState* pState;
-		if (type == MST_Meta)
+		switch (type)
 		{
+		case YBehavior::MST_Entry:
+			pState = pMachine->GetEntry();
+			break;
+		case YBehavior::MST_Exit:
+			pState = pMachine->GetExit();
+			break;
+		case YBehavior::MST_Meta:
 			pState = new MetaState(name);
-		}
-		else
-		{
+			break;
+		case YBehavior::MST_Normal:
 			pState = new MachineState(name, type);
+			break;
+		default:
+			break;
 		}
 
-		pState->SetParentMachine(pMachine);
-		if (type == MST_Entry || type == MST_Exit)
-		{
-			pMachine->SetSpecialState(pState);
-		}
-		else
-		{
-			if (!pMachine->GetRootMachine()->InsertState(pState))
-			{
-				ERROR_BEGIN << "Insert State Failed. Maybe Duplicate State Name " << name << ERROR_END;
-				delete pState;
-				pState = nullptr;
-			}
-		}
+		if (pState == nullptr)
+			return nullptr;
 
 		attr = node.attribute("Tree");
 		if (!attr.empty())
@@ -335,11 +332,11 @@ namespace YBehavior
 	)
 	{
 		auto it = node.attribute("Name");
-		if (it.empty())
-		{
-			ERROR_BEGIN << "Trans has no name: " << node.value() << ERROR_END;
-			return false;
-		}
+		//if (it.empty())
+		//{
+		//	ERROR_BEGIN << "Trans has no name: " << node.value() << ERROR_END;
+		//	return false;
+		//}
 
 		STRING name(it.value());
 		it = node.attribute("To");
@@ -348,11 +345,11 @@ namespace YBehavior
 			ERROR_BEGIN << "Trans has no destination: " << name << ERROR_END;
 			return false;
 		}
-		STRING to(it.value());
-		MachineState* pTo = pMachine->GetRootMachine()->FindState(to);
+		FSMUID to = Utility::ToType<FSMUID>(it.value());
+		MachineState* pTo = pMachine->GetRootMachine()->FindState(to.Value);
 		if (pTo == nullptr)
 		{
-			ERROR_BEGIN << "Cant find ToState " << to << " when processing Trans " << name << ERROR_END;
+			ERROR_BEGIN << "Cant find ToState " << Utility::ToString(to) << " when processing Trans " << name << ERROR_END;
 			return false;
 		}
 
@@ -360,11 +357,11 @@ namespace YBehavior
 		it = node.attribute("From");
 		if (!it.empty())
 		{
-			STRING from(it.value());
-			pFrom = pMachine->GetRootMachine()->FindState(from);
+			FSMUID from = Utility::ToType<FSMUID>(it.value());
+			pFrom = pMachine->GetRootMachine()->FindState(from.Value);
 			if (pFrom == nullptr)
 			{
-				ERROR_BEGIN << "Cant find FromState " << from << " when processing Trans " << name << ERROR_END;
+				ERROR_BEGIN << "Cant find FromState " << Utility::ToString(from) << " when processing Trans " << name << ERROR_END;
 				return false;
 			}
 		}
@@ -380,6 +377,29 @@ namespace YBehavior
 		return true;
 	}
 
+	bool MachineMgr::_CreateSpecialStates(StateMachine* pMachine)
+	{
+		MachineState* pState;
+
+		pState = new MachineState(Utility::StringEmpty, MST_Entry);
+		if (!pMachine->SetSpecialState(pState) || !pMachine->GetRootMachine()->InsertState(pState))
+		{
+			delete pState;
+			return false;
+		}
+		pState->SetParentMachine(pMachine);
+
+		pState = new MachineState(Utility::StringEmpty, MST_Exit);
+		if (!pMachine->SetSpecialState(pState) || !pMachine->GetRootMachine()->InsertState(pState))
+		{
+			delete pState;
+			return false;
+		}
+		pState->SetParentMachine(pMachine);
+
+		return true;
+	}
+
 	bool MachineMgr::_LoadMachine(StateMachine* pMachine, const pugi::xml_node& data, int levelMachineCount[])
 	{
 		if (pMachine == nullptr)
@@ -388,8 +408,15 @@ namespace YBehavior
 			return false;
 		}
 
+		if (!_CreateSpecialStates(pMachine))
+		{
+			ERROR_BEGIN << "Create special states failed. " << data.name() << ERROR_END;
+			return false;
+		}
+
 		bool bErr = false;
-		int stateNum = 0;
+		///> Start from 3. 1 for EntryState, and 2 for ExitState
+		int stateNum = 2;
 		for (auto it = data.begin(); it != data.end(); ++it)
 		{
 			if (strcmp(it->name(), "State") == 0)
@@ -401,11 +428,26 @@ namespace YBehavior
 					bErr = true;
 					break;
 				}
+				
+				if (pState->GetType() != MST_Entry && pState->GetType() != MST_Exit)
+				{
+					pState->SetParentMachine(pMachine);
 
-				pState->GetUID().Value = pMachine->GetUID().Value;
-				pState->GetUID().State = ++stateNum;
+					pState->GetUID().Value = pMachine->GetUID().Value;
+					pState->GetUID().State = ++stateNum;
+
+					if (!pMachine->GetRootMachine()->InsertState(pState))
+					{
+						ERROR_BEGIN << "Insert State Failed. Maybe Duplicate State Name " << pState->GetName() << ERROR_END;
+						delete pState;
+						pState = nullptr;
+						bErr = true;
+						break;
+					}
+				}
+
 				LOG_BEGIN << "Load State " << pState->ToString() << LOG_END;
-				//LOG_BEGIN << "Create " << pState->ToString() << LOG_END;
+
 				if (pState->GetType() == MST_Meta)
 				{
 					StateMachine* pSubMachine = new StateMachine(

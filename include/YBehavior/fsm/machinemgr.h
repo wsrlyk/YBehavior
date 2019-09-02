@@ -74,12 +74,13 @@ namespace YBehavior
 
 	public:
 		~MachineMgr();
-		MachineID* GetFSMID(const ProcessKey& key);
+
 		bool GetFSM(const ProcessKey& key, FSM* &pFSM, MachineID* &id);
 		void SetWorkingDir(const STRING& dir);
 		void ReturnFSM(FSM* pFSM);
 	protected:
 		FSM * _LoadFSM(MachineID* id);
+		bool _CreateSpecialStates(StateMachine* pMachine);
 		bool _LoadMachine(StateMachine* pMachine, const pugi::xml_node& data, int levelMachineCount[]);
 	};
 }

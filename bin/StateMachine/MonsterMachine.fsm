@@ -1,32 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <MonsterMachine>
   <Machine Default="Idle">
-    <State Type="Entry" Tree="D" Identification="MainEntry"/>
-    <State Type="Exit" Tree="E" Pos="400,400"/>
-    <State Type="Any" Pos="200,100"/>
-    <State Name="Idle" Tree="A" Pos="100,100"/>
-    <State Type="Meta" Name="Move" Tree="B" Pos="100,200">
+    <State Type="Entry" Tree="Single" Pos="0,0" />
+    <State Type="Exit" Tree="Single" Pos="400,400" />
+    <State Type="Any" Pos="200,100" />
+    <State Name="Idle" Tree="Single" Pos="100,100" />
+    <State Type="Meta" Name="Move" Pos="100,200">
       <Machine Default="Walk">
-        <State Type="Entry" Tree="D" />
-        <State Type="Exit" Tree="E" />
-        <State Name="Walk" Tree="A" Identification="Walk"/>
-        <State Name="Run" Tree="B"/>
-        <Trans Name="ToWalk" To="Walk" />
-        <Trans Name="ToRun" To="Run" />
+        <State Type="Entry" Pos="0,0" />
+        <State Type="Exit" Tree="Single" Pos="0,0" />
+        <State Name="Walk" Pos="0,0" />
+        <State Name="Run" Pos="0,0" />
+        <State Type="Any" Pos="0,0" />
+        <State Type="Upper" Pos="0,0" />
       </Machine>
     </State>
-    <State Type="Meta" Name="Fight" Tree="B" Pos="300,200">
+    <State Type="Meta" Name="Fight" Pos="300,200">
       <Machine Default="Detect">
-        <State Name="Detect" Tree="A"/>
-        <State Name="Skill" Tree="B"/>
-        <State Name="CD" Tree="C"/>
-        <Trans Name="ToDetect" To="Detect" />
-        <Trans Name="ToSkill" To="Skill" />
-        <Trans Name="ToCD" From="Skill" To="CD" />
+        <State Name="Detect" Pos="0,0" />
+        <State Name="Skill" Tree="Single" Pos="0,0" />
+        <State Name="CD" Tree="Single" Pos="0,0" />
+        <State Type="Entry" Pos="0,0" />
+        <State Type="Exit" Pos="0,0" />
+        <State Type="Any" Pos="0,0" />
+        <State Type="Upper" Pos="0,0" />
       </Machine>
     </State>
-    <Trans Name="ToIdle" To="Idle" />
-    <Trans Name="ToMove" To="Move" />
-    <Trans Name="ToFight" To="Fight" />
+    <Trans Name="ToMoveEntryWalk" From="[0 0 1 1]" To="[0 0 1 4]" />
+    <Trans Name="AnyToCD" To="[0 1 2 5]" />
+    <Trans Name="AnyToWalk" To="[0 1 1 3]" />
+    <Trans Name="WalkToRun" From="[0 1 1 3]" To="[0 1 1 4]" />
   </Machine>
 </MonsterMachine>
