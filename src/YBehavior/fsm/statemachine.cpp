@@ -3,6 +3,8 @@
 #include "YBehavior/fsm/metastate.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/agent.h"
+#include <list>
+#include "YBehavior/fsm/context.h"
 
 namespace YBehavior
 {
@@ -120,6 +122,7 @@ namespace YBehavior
 		if (m_pMachine)
 			delete m_pMachine;
 		m_pMachine = new RootMachine(0);
+		m_pMachine->SetFSM(this);
 		return m_pMachine;
 	}
 
@@ -127,46 +130,11 @@ namespace YBehavior
 	{
 		if (m_pMachine)
 			m_pMachine->Update(fDeltaT, pAgent);
+
+		MachineContext& context = *pAgent->GetMachineContext();
+		context.GetTransition().Reset();
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-
-	TransitionContext::TransitionContext(const STRING& e)
-		: m_Trans(e)
-		, m_bLock(false)
-	{
-
-	}
-
-	TransitionContext::TransitionContext()
-		: m_Trans()
-		, m_bLock(false)
-	{
-
-	}
-
-	MachineContext::MachineContext()
-		: m_pCurState (nullptr)
-		, m_pMapping(nullptr)
-		, LastRunRes(MRR_Invalid)
-	{
-
-	}
-
-	void MachineContext::Reset()
-	{
-		m_pMapping = nullptr;
-		m_pCurState = nullptr;
-		m_Trans.Reset();
-	}
-
-	void MachineContext::PopCurState()
-	{
-		if (m_pCurState == nullptr)
-			return;
-
-		m_pCurState = m_pCurState->GetParentMachine()->GetMetaState();
-	}
 
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
@@ -211,8 +179,16 @@ namespace YBehavior
 	{
 		if (v.toState == nullptr)
 			return false;
-		auto res = m_TransitionMap.insert(std::pair< TransitionMapKey, TransitionMapValue>(k, v));
-		return res.second;
+		if (k.fromState != nullptr)
+		{
+			auto res = m_FromTransitionMap.insert(TransitionData(k, v));
+			return res.second;
+		}
+		else
+		{
+			auto res = m_AnyTransitionMap.insert(TransitionData(k, v));
+			return res.second;
+		}
 	}
 
 	std::list<StateMachine*> _FromRoute;
@@ -298,19 +274,21 @@ namespace YBehavior
 			///> First find CurState->XXX
 			key.fromState = pCurState;
 			key.trans = context.GetTransition().Get();
-			auto it = m_TransitionMap.find(key);
-			if (it == m_TransitionMap.end())
+			auto it = std::find_if(m_FromTransitionMap.begin(), m_FromTransitionMap.end(), CanTransTeller(key));
+			if (it == m_FromTransitionMap.end())
 			{
 				///> Then find AnyState->XXX
 				key.fromState = nullptr;
-				it = m_TransitionMap.find(key);
+				it = std::find_if(m_AnyTransitionMap.begin(), m_AnyTransitionMap.end(), CanTransTeller(key));
+				if (it == m_AnyTransitionMap.end())
+					return false;
 			}
 
-			if (it != m_TransitionMap.end() && it->second.toState != pCurState /*Cant Self -> Self through Any*/)
+			if (it->Value.toState != pCurState /*Cant Self -> Self through Any*/)
 			{
 				result.pFromState = key.fromState;
 				result.trans = key.trans;
-				result.pToState = it->second.toState;
+				result.pToState = it->Value.toState;
 				result.pMachine = this;
 				
 				_FindLCA(pCurState, result.pToState);
@@ -417,6 +395,10 @@ namespace YBehavior
 		if (GetTransition(context.GetCurState(), context, transContext.transferResult))
 		{
 			///> Found;
+			
+			///> too many
+			if (!transContext.IncTransCount())
+				return false;
 		}
 		else
 		{

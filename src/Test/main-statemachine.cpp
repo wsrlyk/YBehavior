@@ -13,6 +13,8 @@
 #include "YBehavior/fsm/statemachine.h"
 #include "YBehavior/fsm/metastate.h"
 #include <iostream>
+#include "YBehavior/fsm/transition.h"
+#include "YBehavior/fsm/context.h"
 
 using namespace YBehavior;
 int main(int argc, char** argv)

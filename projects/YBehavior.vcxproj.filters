@@ -222,6 +222,12 @@
     <ClInclude Include="..\include\YBehavior\mgrs.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\transition.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\context.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -370,6 +376,12 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\mgrs.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\transition.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\context.cpp">
+      <Filter>源文件\fsm</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

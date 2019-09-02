@@ -6,6 +6,7 @@
 #include <iostream>
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/fsm/metastate.h"
+#include "YBehavior/fsm/statemachine.h"
 
 namespace YBehavior
 {
@@ -368,9 +369,14 @@ namespace YBehavior
 
 		TransitionMapKey key;
 		key.fromState = pFrom;
-		key.trans = name;
+		key.trans.SetConditionMgr(pMachine->GetRootMachine()->GetFSM()->GetConditionMgr());
 		TransitionMapValue value;
 		value.toState = pTo;
+
+		for (auto chi = node.begin(); chi != node.end(); ++chi)
+		{
+			key.trans.Set(chi->name());
+		}
 
 		pMachine->GetRootMachine()->InsertTrans(key, value);
 

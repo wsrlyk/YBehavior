@@ -4,6 +4,7 @@
 #include "YBehavior/types.h"
 #include "fsm/statemachine.h"
 #include "memory.h"
+#include "fsm/context.h"
 
 namespace YBehavior
 {

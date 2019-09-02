@@ -3,146 +3,14 @@
 
 #include "YBehavior/types.h"
 #include "machinestate.h"
-#include <map>
+#include <set>
 #include <list>
 #include "YBehavior/utility.h"
 #include <unordered_map>
+#include "transition.h"
 
 namespace YBehavior
 {
-	class Transition
-	{
-	protected:
-		STRING m_Event;
-		bool m_bValid;
-	public:
-		Transition() : m_bValid(false) {}
-		Transition(const STRING& e) : m_Event(e), m_bValid(true) {}
-		inline bool operator==(const Transition& _rhs) const { return m_Event == _rhs.m_Event; }
-		inline bool operator<(const Transition& _rhs) const { return m_Event < _rhs.m_Event; }
-		inline const std::string GetEvent() const { return m_Event; }
-		inline bool IsValid() const { return m_bValid; }
-		inline void Reset() { m_Event = Utility::StringEmpty; m_bValid = false; }
-		inline void Set(const STRING& e) { m_Event = e; m_bValid = true; }
-	};
-
-	struct TransitionMapKey
-	{
-		MachineState* fromState;
-		Transition trans;
-		TransitionMapKey() : fromState(nullptr) {}
-		inline bool operator==(const TransitionMapKey& _rhs) const
-		{
-			return fromState == _rhs.fromState && trans == _rhs.trans;
-		}
-		inline bool operator<(const TransitionMapKey& _rhs) const
-		{
-			return fromState < _rhs.fromState || (fromState == _rhs.fromState && trans < _rhs.trans);
-		}
-	};
-
-	struct TransitionMapValue
-	{
-		MachineState* toState;
-		TransitionMapValue() : toState(nullptr) {}
-	};
-
-	class StateMachine;
-	struct TransitionResult
-	{
-		MachineState* pFromState;
-		MachineState* pToState;
-		Transition trans;
-		StateMachine* pMachine;
-
-		std::list<MachineState*> lcaRoute;
-
-		TransitionResult()
-			: pFromState(nullptr)
-			, pToState(nullptr)
-			, pMachine(nullptr)
-		{
-		}
-	};
-
-	enum TransQueueOp
-	{
-		TQO_None,
-		TQO_Enter,
-		TQO_Exit,
-	};
-
-	struct TransQueueData
-	{
-		MachineState* pState;
-		TransQueueOp op;
-
-		TransQueueData(MachineState* state)
-		{
-			pState = state;
-			op = TQO_None;
-		}
-
-		TransQueueData(MachineState* state, TransQueueOp o)
-		{
-			pState = state;
-			op = o;
-		}
-	};
-
-	class TransitionContext
-	{
-		Transition m_Trans;
-		bool m_bLock;
-
-	public:
-		TransitionResult transferResult;
-	public:
-		TransitionContext();
-		TransitionContext(const STRING& e);
-		const Transition& Get() const { return m_Trans; }
-		bool HasTransition() { return m_Trans.IsValid(); }
-		void Set(const STRING& e) { if (!m_bLock) m_Trans.Set(e); }
-		inline void Reset() { m_Trans.Reset(); m_bLock = false; }
-
-		inline void Lock() { m_bLock = true; }
-	};
-
-	//typedef std::list<MachineState*> CurrentStatesType;
-	class MachineTreeMapping;
-	class BehaviorTree;
-	class MachineContext
-	{
-	protected:
-		//CurrentStatesType m_CurStates;
-		MachineState* m_pCurState;
-		TransitionContext m_Trans;
-		MachineTreeMapping* m_pMapping;
-		BehaviorTree* m_pCurRunningTree;
-
-		std::list<TransQueueData> m_pTransQueue;
-	public:
-		MachineRunRes LastRunRes;
-
-	public:
-		MachineContext();
-		inline TransitionContext& GetTransition() { return m_Trans; }
-		inline const TransitionContext& GetTransition() const { return m_Trans; }
-		//inline CurrentStatesType& GetCurStatesStack() { return m_CurStates; }
-		inline void SetMapping(MachineTreeMapping* mapping) { m_pMapping = mapping; }
-		inline MachineTreeMapping* GetMapping() { return m_pMapping; }
-		inline void ResetCurRunning() { m_pCurRunningTree = nullptr; }
-		inline void SetCurRunning(BehaviorTree* pCurRunningTree) { m_pCurRunningTree = pCurRunningTree; }
-		inline BehaviorTree* GetCurRunningTree() { return m_pCurRunningTree; }
-		inline void SetCurState(MachineState* pState) { m_pCurState = pState; }
-		inline MachineState* GetCurState() const { return m_pCurState; }
-
-		inline std::list<TransQueueData>& GetTransQueue() { return m_pTransQueue; }
-
-		void Reset();
-		void PopCurState();
-	};
-
 	class RootMachine;
 	class MetaState;
 	class StateMachine
@@ -173,16 +41,22 @@ namespace YBehavior
 	protected:
 	};
 
+	class FSM;
 	class RootMachine : public StateMachine
 	{
 	protected:
-		std::map<TransitionMapKey, TransitionMapValue> m_TransitionMap;
+		std::set<TransitionData> m_FromTransitionMap;
+		std::set<TransitionData> m_AnyTransitionMap;
+
 		std::unordered_map<STRING, MachineState*> m_NamedStatesMap;
 		std::unordered_map<FSMUIDType, MachineState*> m_UIDStatesMap;
 		std::vector<MachineState*> m_AllStates;
+		FSM* m_pFSM;
 	public:
 		RootMachine(FSMUIDType layer);
 		~RootMachine();
+		inline FSM* GetFSM() { return m_pFSM; }
+		inline void SetFSM(FSM* pFSM) { m_pFSM = pFSM; }
 		bool InsertState(MachineState* pState);
 		void PushState(MachineState* pState);
 		bool InsertTrans(const TransitionMapKey&, const TransitionMapValue&);
@@ -206,13 +80,14 @@ namespace YBehavior
 		MachineID* m_ID;
 		///> TODO: multilayers
 		RootMachine* m_pMachine;
+		ConditionMgr m_ConditionMgr;
 	public:
 		inline void SetVersion(MachineVersion* v) { m_Version = v; }
 		inline MachineVersion* GetVersion() const { return m_Version; }
 		inline void SetID(MachineID* id) { m_ID = id; }
 		inline MachineID* GetID() const { return m_ID; }
 		inline RootMachine* GetMachine() { return m_pMachine; }
-
+		inline ConditionMgr* GetConditionMgr() { return &m_ConditionMgr; }
 		FSM(const STRING& name);
 		~FSM();
 		RootMachine* CreateMachine();
