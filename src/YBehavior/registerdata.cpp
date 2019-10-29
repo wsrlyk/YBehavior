@@ -4,7 +4,9 @@
 YBehavior::RegisterData::RegisterData()
 {
 	m_bDirty = false;
-#define VARIABLE_INIT(TYPE) m_ReceiveData.pVec##TYPE = &m_Vec##TYPE;
+#define VARIABLE_INIT(TYPE)\
+	m_ReceiveData.pVec##TYPE = &m_Vec##TYPE;\
+	m_Vec##TYPE.resize(3);
 	///> m_ReceiveData.pVecInt = &m_VecInt;
 	FOR_EACH_REGISTER_TYPE(VARIABLE_INIT);
 	m_ReceiveData.pEvent = &m_Event;

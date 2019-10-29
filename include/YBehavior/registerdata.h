@@ -11,6 +11,7 @@ namespace YBehavior
 		func(String);    \
 		func(Bool);    \
 		func(Ulong);   \
+		func(EntityWrapper);   \
 		func(Vector3);
 
 	class YBEHAVIOR_API RegisterData
