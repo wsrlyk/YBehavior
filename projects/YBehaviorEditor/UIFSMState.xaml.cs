@@ -99,6 +99,18 @@ namespace YBehavior.Editor
             m_uiConnectors.Clear();
             connectors.Children.Clear();
 
+            if (Node.Conns.ParentConnector != null)
+            {
+                FSMUIInConnector uiConnector = new FSMUIInConnector
+                {
+                    Ctr = Node.Conns.ParentConnector
+                };
+
+                connectors.Children.Add(uiConnector);
+
+                m_uiConnectors.Add(Connector.IdentifierParent, uiConnector);
+            }
+
             foreach (Connector ctr in Node.Conns.ConnectorsList)
             {
                 //if (ctr is ConnectorNone)
@@ -112,18 +124,6 @@ namespace YBehavior.Editor
                 connectors.Children.Add(uiConnector);
 
                 m_uiConnectors.Add(ctr.Identifier, uiConnector);
-            }
-
-            if (Node.Conns.ParentConnector != null)
-            {
-                FSMUIInConnector uiConnector = new FSMUIInConnector
-                {
-                    Ctr = Node.Conns.ParentConnector
-                };
-
-                connectors.Children.Add(uiConnector);
-
-                m_uiConnectors.Add(Connector.IdentifierParent, uiConnector);
             }
         }
 

@@ -59,7 +59,7 @@ namespace YBehavior.Editor.Core.New
         {
             if (m_EventDic.TryGetValue(arg.Type, out EventHandler exist))
             {
-                exist(arg);
+                exist?.Invoke(arg);
             }
         }
     }

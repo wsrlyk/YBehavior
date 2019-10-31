@@ -30,6 +30,8 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
 
+            m_Operation = new Operation(this);
+
             normalBorderBrush = this.Main.BorderBrush;
 
             DragHandler = new DragHandler(defaultDragHandler);

@@ -69,8 +69,6 @@ namespace YBehavior.Editor
 
         public UIConnector()
         {
-            m_Operation = new Operation(this);
-
             this.LayoutUpdated += _OnLayoutUpdated;
 
             this.SetBinding(OwnerNodeProperty, new Binding()
