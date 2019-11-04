@@ -17,6 +17,8 @@ namespace YBehavior
 
 	bool TransitionContext::IncTransCount()
 	{
+		///> TODO: Check infinite loops, especially when trans has no conditions
+
 		if (++m_TransCount > 10)
 		{
 			ERROR_BEGIN << "Too many trans in a frame, check your machine." << ERROR_END;

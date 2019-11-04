@@ -395,7 +395,9 @@ namespace YBehavior
 		if (GetTransition(context.GetCurState(), context, transContext.transferResult))
 		{
 			///> Found;
-			
+			///> To avoid trans to destination again and again, clear its condition once we get a trans
+			context.GetTransition().Get().UnSet(transContext.transferResult.trans);
+
 			///> too many
 			if (!transContext.IncTransCount())
 				return false;

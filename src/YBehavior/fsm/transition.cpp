@@ -48,6 +48,24 @@ namespace YBehavior
 		return false;
 	}
 
+	bool Transition::UnSet(const STRING& e)
+	{
+		int v;
+		if (m_pConditionMgr->TryGetConditionValue(e, v))
+		{
+			m_Conditions &= (~((ULONG)1 << v));
+			return true;
+		}
+		return false;
+	}
+
+	bool Transition::UnSet(const Transition& other)
+	{
+		bool res = (m_Conditions & other.m_Conditions) != 0;
+		m_Conditions &= (~other.m_Conditions);
+		return res;
+	}
+
 	bool Transition::ContainedBy(const Transition& other) const
 	{
 		return (m_Conditions & other.m_Conditions) == m_Conditions;

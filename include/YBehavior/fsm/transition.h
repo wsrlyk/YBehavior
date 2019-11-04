@@ -34,6 +34,8 @@ namespace YBehavior
 		void Set(const STRING& e);
 		bool TrySet(const STRING& e);
 
+		bool UnSet(const STRING& e);
+		bool UnSet(const Transition& other);
 		bool ContainedBy(const Transition& other) const;
 	};
 

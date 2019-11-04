@@ -117,11 +117,22 @@ namespace YBehavior.Editor.Core.New
         public FSMStateNode AnyState { get { return m_Any; } }
         public FSMStateNode UpperState { get { return m_Upper; } }
 
-        Transition m_LocalTransition = new Transition();
-        public Transition LocalTransition { get { return m_LocalTransition; } }
+        Transitions m_LocalTransition = new Transitions();
+        public Transitions LocalTransition { get { return m_LocalTransition; } }
 
         public FSMMachineNode()
         {
+        }
+
+        public bool PreLoad()
+        {
+            _ForceAddSpecialState(ref m_Entry, FSMStateNode.TypeEntry);
+            _ForceAddSpecialState(ref m_Exit, FSMStateNode.TypeExit);
+            _ForceAddSpecialState(ref m_Any, FSMStateNode.TypeAny);
+
+            if (OwnerMachine != null)
+                _ForceAddSpecialState(ref m_Upper, FSMStateNode.TypeUpper);
+            return true;
         }
 
         public bool PostLoad(XmlNode data)
@@ -140,13 +151,6 @@ namespace YBehavior.Editor.Core.New
                     return false;
                 }
             }
-
-            _ForceAddSpecialState(ref m_Entry, FSMStateNode.TypeEntry);
-            _ForceAddSpecialState(ref m_Exit, FSMStateNode.TypeExit);
-            _ForceAddSpecialState(ref m_Any, FSMStateNode.TypeAny);
-
-            if (OwnerMachine != null)
-                _ForceAddSpecialState(ref m_Upper, FSMStateNode.TypeUpper);
 
             return true;
         }
@@ -210,8 +214,19 @@ namespace YBehavior.Editor.Core.New
             AddState(state);
         }
 
-        public bool TryAddTrans(string eventName, string from, string to)
+        public bool TryAddTrans(string from, string to, List<string> events)
         {
+            FSMStateNode fromState = null;
+            if (!string.IsNullOrEmpty(from))
+            {
+                fromState = RootMachine.FindGloablState(from);
+                if (fromState == null)
+                {
+                    LogMgr.Instance.Error("Cant find state: " + from);
+                    return false;
+                }
+            }
+
             FSMStateNode toState = null;
             if (!string.IsNullOrEmpty(to))
             {
@@ -224,22 +239,16 @@ namespace YBehavior.Editor.Core.New
             }
             else
             {
-                LogMgr.Instance.Error("To state is necessary.");
-                return false;
-            }
-
-            FSMStateNode fromState = null;
-            if (!string.IsNullOrEmpty(from))
-            {
-                fromState = RootMachine.FindGloablState(from);
                 if (fromState == null)
                 {
-                    LogMgr.Instance.Error("Cant find state: " + from);
+                    LogMgr.Instance.Error("Cant trans from AnyState to ExitState");
                     return false;
                 }
+                ///> 'to' is null means trans from 'from' to 'exit'
+                toState = this.ExitState;
             }
 
-            if (RootMachine.Transition.Insert(fromState, eventName, toState) == null)
+            if (RootMachine.Transition.Insert(fromState, toState, events) == null)
                 return false;
 
             ///> TODO: build connection
@@ -251,8 +260,8 @@ namespace YBehavior.Editor.Core.New
     public class FSMRootMachineNode : FSMMachineNode
     {
         List<FSMStateNode> m_AllStates = new List<FSMStateNode>();
-        Transition m_Transition = new Transition();
-        public Transition Transition { get { return m_Transition; } }
+        Transitions m_Transition = new Transitions();
+        public Transitions Transition { get { return m_Transition; } }
 
         public override void CreateBase()
         {
@@ -381,7 +390,7 @@ namespace YBehavior.Editor.Core.New
             foreach (TransitionResult t in m_Transition)
             {
                 FSMStateNode fromState = t.Key.FromState;
-                FSMStateNode toState = t.Value.ToState;
+                FSMStateNode toState = t.Key.ToState;
 
                 var res = FindTransRoute(fromState, toState);
                 foreach(var p in res)
@@ -403,7 +412,7 @@ namespace YBehavior.Editor.Core.New
         public void RemoveTrans(TransitionResult t)
         {
             FSMStateNode fromState = t.Key.FromState;
-            FSMStateNode toState = t.Value.ToState;
+            FSMStateNode toState = t.Key.ToState;
 
             var res = FindTransRoute(fromState, toState);
             foreach (var p in res)

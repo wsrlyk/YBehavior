@@ -47,6 +47,9 @@ namespace YBehavior.Editor.Core.New
         {
             Utility.OperateNode(machine, m_Graph, false, NodeBase.OnAddToGraph);
 
+            if (!machine.PreLoad())
+                return false;
+
             foreach (XmlNode chi in data.ChildNodes)
             {
                 if (chi.Name == "State")
@@ -117,12 +120,7 @@ namespace YBehavior.Editor.Core.New
 
         protected bool _LoadTrans(FSMMachineNode machine, XmlNode data)
         {
-            var attr = data.Attributes["Name"];
-            string eventName = string.Empty;
-            if (attr != null)
-                eventName = attr.Value;
-
-            attr = data.Attributes["From"];
+            var attr = data.Attributes["From"];
             string from = string.Empty;
             if (attr != null)
                 from = attr.Value;
@@ -132,7 +130,13 @@ namespace YBehavior.Editor.Core.New
             if (attr != null)
                 to = attr.Value;
 
-            if (!machine.TryAddTrans(eventName, from, to))
+            List<string> events = new List<string>();
+            foreach (XmlNode chi in data.ChildNodes)
+            {
+                events.Add(chi.Name);
+            }
+
+            if (!machine.TryAddTrans(from, to, events))
             {
                 LogMgr.Instance.Error("Invalid trans: " + attr.ToString());
                 return false;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Collections.ObjectModel;
 
 namespace YBehavior.Editor.Core.New
 {
@@ -34,28 +33,36 @@ namespace YBehavior.Editor.Core.New
     public struct TransitionMapKey : IEquatable<TransitionMapKey>
     {
         public FSMStateNode FromState { get; set; }
-        public TransitionEvent Trans { get; set; }
+        public FSMStateNode ToState { get; set; }
 
-        public TransitionMapKey(FSMStateNode from, string eventName)
+        public TransitionMapKey(FSMStateNode from, FSMStateNode to)
         {
             FromState = from;
-            Trans = new TransitionEvent(eventName);
+            ToState = to;
         }
 
         public bool Equals(TransitionMapKey other)
         {
-            return Trans.Equals(other.Trans)
-                && (
-                FromState == other.FromState
-                || ((FromState == null || FromState is FSMAnyStateNode)
-                && (other.FromState == null || other.FromState is FSMAnyStateNode)));
+            return EqualState(FromState, other.FromState)
+                && EqualState(ToState, other.ToState);
         }
 
+        private bool EqualState(FSMStateNode s0, FSMStateNode s1)
+        {
+            return
+                s0 == s1
+                || ((s0 == null || s0 is FSMAnyStateNode)
+                && (s1 == null || s1 is FSMAnyStateNode));
+        }
 	};
 
     public struct TransitionMapValue
     {
-        public FSMStateNode ToState { get; set; }
+        public TransitionMapValue(string e)
+        {
+            Event = new TransitionEvent(e);
+        }
+        public TransitionEvent Event { get; set; }
     };
 
     public class TransitionResult
@@ -63,52 +70,88 @@ namespace YBehavior.Editor.Core.New
         public TransitionResult(TransitionMapKey key, TransitionMapValue value)
         {
             Key = key;
-            Value = value;
+            Value.Add(value);
 
-            Renderer = new TransitionRenderer();
+            Renderer.Owner = this;
+        }
+        public TransitionResult(TransitionMapKey key)
+        {
+            Key = key;
+
             Renderer.Owner = this;
         }
         public TransitionMapKey Key { get; set; }
-        public TransitionMapValue Value { get; set; }
+        public ObservableCollection<TransitionMapValue> Value { get; set; } = new ObservableCollection<TransitionMapValue>();
 
-        public TransitionRenderer Renderer { get; set; }
+        public TransitionRenderer Renderer { get; set; } = new TransitionRenderer();
     }
 
-    public class Transition : System.Collections.IEnumerable
+    public class Transitions : System.Collections.IEnumerable
     {
-        List<TransitionResult> m_Trans = new List<TransitionResult>();
-        public System.Collections.IEnumerator GetEnumerator() { return m_Trans.GetEnumerator(); }
+        Dictionary<TransitionMapKey, TransitionResult> m_Trans = new Dictionary<TransitionMapKey, TransitionResult>();
+        public System.Collections.IEnumerator GetEnumerator() { return m_Trans.Values.GetEnumerator(); }
+
+        public TransitionResult CreateEmpty(TransitionMapKey key)
+        {
+            if (!m_Trans.TryGetValue(key, out var res))
+            {
+                res = new TransitionResult(key);
+                m_Trans.Add(key, res);
+                return res;
+            }
+            return null;
+        }
 
         public TransitionResult Insert(TransitionMapKey key, TransitionMapValue value)
         {
-            TransitionResult res = new TransitionResult(key, value);
-            try
+            if (!m_Trans.TryGetValue(key, out var res))
             {
-                m_Trans.Add(res);
+                res = new TransitionResult(key, value);
+                m_Trans.Add(key, res);
             }
-            catch (Exception e)
+            else
             {
-                LogMgr.Instance.Error("Insert trans failed: " + e.ToString());
-                return null;
+                if(res.Value.Contains(value))
+                {
+                    LogMgr.Instance.Error("Insert trans failed: " + value.Event);
+                    return null;
+                }
+                else
+                {
+                    res.Value.Add(value);
+                }
             }
             return res;
         }
 
         public TransitionResult Insert(FSMStateNode from, string eventName, FSMStateNode to)
         {
-            TransitionMapKey key = new TransitionMapKey(from, eventName);
+            TransitionMapKey key = new TransitionMapKey(from, to);
 
-            TransitionMapValue value = new TransitionMapValue
-            {
-                ToState = to
-            };
+            TransitionMapValue value = new TransitionMapValue(eventName);
 
             return Insert(key, value);
         }
 
+        public TransitionResult Insert(FSMStateNode from, FSMStateNode to, List<string> events)
+        {
+            TransitionMapKey key = new TransitionMapKey(from, to);
+
+            if (events.Count == 0)
+                return CreateEmpty(key);
+
+            TransitionResult res = null;
+            foreach (string s in events)
+            {
+                TransitionMapValue value = new TransitionMapValue(s);
+                res = Insert(key, value);
+            }
+            return res;
+        }
+
         public void Remove(TransitionResult trans)
         {
-            m_Trans.Remove(trans);
+            m_Trans.Remove(trans.Key);
         }
 
         //public TransitionResult GetTransition(TransitionMapKey key)
@@ -123,22 +166,9 @@ namespace YBehavior.Editor.Core.New
     {
         public TransitionResult Owner { get; set; }
 
-        public string Event
+        public ObservableCollection<TransitionMapValue> Events
         {
-            get { return Owner.Key.Trans.Event; }
-            set
-            {
-                if (Owner.Key.Trans.Event != value)
-                {
-                    TransitionEvent e = Owner.Key.Trans;
-                    e.Event = value;
-                    TransitionMapKey key = Owner.Key;
-                    key.Trans = e;
-                    Owner.Key = key;
-
-                    OnPropertyChanged("Event");
-                }
-            }
+            get { return Owner.Value; }
         }
 
         public string Name
@@ -146,8 +176,8 @@ namespace YBehavior.Editor.Core.New
             get
             {
                 return string.Format("{0} => {1}"
-                    , Owner.Key.FromState == null ? "AnyState" : Owner.Key.FromState.ForceGetRenderer.FullName
-                    , Owner.Value.ToState.ForceGetRenderer.FullName);
+                    , Owner.Key.FromState == null ? "Any" : Owner.Key.FromState.ForceGetRenderer.FullName
+                    , Owner.Key.ToState == null ? "Any" : Owner.Key.ToState.ForceGetRenderer.FullName);
             }
         }
 

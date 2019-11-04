@@ -333,11 +333,6 @@ namespace YBehavior
 	)
 	{
 		auto it = node.attribute("Name");
-		//if (it.empty())
-		//{
-		//	ERROR_BEGIN << "Trans has no name: " << node.value() << ERROR_END;
-		//	return false;
-		//}
 
 		STRING name(it.value());
 		it = node.attribute("To");
@@ -346,11 +341,21 @@ namespace YBehavior
 			ERROR_BEGIN << "Trans has no destination: " << name << ERROR_END;
 			return false;
 		}
-		FSMUID to = Utility::ToType<FSMUID>(it.value());
-		MachineState* pTo = pMachine->GetRootMachine()->FindState(to.Value);
+
+		MachineState* pTo;
+		if (it.empty())
+		{
+			///> This Trans to ExitState
+			pTo = pMachine->GetExit();
+		}
+		else
+		{
+			pTo = pMachine->GetRootMachine()->FindState(it.value());
+		}
+
 		if (pTo == nullptr)
 		{
-			ERROR_BEGIN << "Cant find ToState " << Utility::ToString(to) << " when processing Trans " << name << ERROR_END;
+			ERROR_BEGIN << "Cant find ToState " << it.value() << " when processing Trans " << name << ERROR_END;
 			return false;
 		}
 
@@ -358,11 +363,10 @@ namespace YBehavior
 		it = node.attribute("From");
 		if (!it.empty())
 		{
-			FSMUID from = Utility::ToType<FSMUID>(it.value());
-			pFrom = pMachine->GetRootMachine()->FindState(from.Value);
+			pFrom = pMachine->GetRootMachine()->FindState(it.value());
 			if (pFrom == nullptr)
 			{
-				ERROR_BEGIN << "Cant find FromState " << Utility::ToString(from) << " when processing Trans " << name << ERROR_END;
+				ERROR_BEGIN << "Cant find FromState " << it.value() << " when processing Trans " << name << ERROR_END;
 				return false;
 			}
 		}

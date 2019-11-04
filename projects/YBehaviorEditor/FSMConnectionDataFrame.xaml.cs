@@ -20,6 +20,9 @@ namespace YBehavior.Editor
     /// </summary>
     public partial class FSMConnectionDataFrame : UserControl
     {
+        FSMConnection m_CurrentConnection;
+        TransitionResult m_SelectedTrans;
+
         public FSMConnectionDataFrame()
         {
             InitializeComponent();
@@ -28,7 +31,81 @@ namespace YBehavior.Editor
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             FSMConnectionRenderer Renderer = DataContext as FSMConnectionRenderer;
-            this.TransListFrame.DataContext = Renderer.FSMOwner;
+            m_CurrentConnection = Renderer.FSMOwner;
+            this.TransitionList.DataContext = m_CurrentConnection;
+
+            this.TransContainer.ItemsSource = m_CurrentConnection.Trans;
+            _SetSelectedTransition(null);
+
+            AutoSelectTransition();
+
+        }
+
+        void _SetSelectedTransition(TransitionResult res)
+        {
+            m_SelectedTrans = res;
+            this.SelectedTrans.DataContext = res;
+            if (res != null)
+                this.CondsContainer.ItemsSource = res.Value;
+            else
+                this.CondsContainer.ItemsSource = null;
+        }
+
+        private void DeleteTrans_Click(object sender, RoutedEventArgs e)
+        {
+            FSMConnection conn = DataContext as FSMConnection;
+            if (this.TransContainer.SelectedItem != null)
+            {
+                TransitionResult trans = this.TransContainer.SelectedItem as TransitionResult;
+
+                if (WorkBenchMgr.Instance.ActiveWorkBench is FSMBench)
+                {
+                    (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).Disconnect(conn.Ctr, trans);
+                }
+            }
+        }
+
+        private void TransContainer_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0)
+            {
+                _SetSelectedTransition((TransitionResult)e.AddedItems[0]);
+            }
+            else if (e.RemovedItems.Count > 0)
+            {
+                foreach (var item in e.RemovedItems)
+                {
+                    if (item == this.CondsContainer.DataContext)
+                    {
+                        _SetSelectedTransition(null);
+
+                        AutoSelectTransition();
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void AutoSelectTransition()
+        {
+            if (m_CurrentConnection != null && m_CurrentConnection.Trans.Count > 0)
+            {
+                int selectIdx = Math.Min(this.TransContainer.SelectedIndex, m_CurrentConnection.Trans.Count);
+                selectIdx = Math.Max(0, selectIdx);
+                Dispatcher.BeginInvoke((Action)(() => this.TransContainer.SelectedIndex = selectIdx));
+            }
+        }
+
+        private void AddCond_Click(object sender, RoutedEventArgs e)
+        {
+            if (m_SelectedTrans != null)
+                m_SelectedTrans.Value.Add(new TransitionMapValue());
+        }
+
+        private void DeleteCond_Click(object sender, RoutedEventArgs e)
+        {
+            if (m_SelectedTrans != null && this.CondsContainer.SelectedItem != null)
+                m_SelectedTrans.Value.RemoveAt(this.CondsContainer.SelectedIndex);
         }
     }
 }
