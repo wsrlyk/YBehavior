@@ -48,7 +48,7 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <DockPanel>
-                            <TextBox Name="Condition" Text="{Binding Event.Event, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox Text="{Binding Event.Event, UpdateSourceTrigger=PropertyChanged}"
                                 local:InputBindingsManager.UpdatePropertySourceWhenEnterPressed="TextBox.Text"/>
                         </DockPanel>
                         <!--TextBlock Text = "{Binding Name}"/-->

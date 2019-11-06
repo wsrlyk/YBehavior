@@ -40,6 +40,7 @@ namespace YBehavior.Editor
                 this.nodeLayer.ItemsSource = oArg.Bench.NodeList.Collection;
                 this.commentLayer.ItemsSource = oArg.Bench.Comments;
                 this.connectionLayer.ItemsSource = oArg.Bench.ConnectionList.Collection;
+                this.MachineStack.ItemsSource = (oArg.Bench as FSMBench).StackMachines;
 
                 DraggingConnection<FSMUIConnection>.Instance.SetCanvas(this.canvas);
             }
@@ -48,6 +49,7 @@ namespace YBehavior.Editor
                 this.nodeLayer.ItemsSource = null;
                 this.commentLayer.ItemsSource = null;
                 this.connectionLayer.ItemsSource = null;
+                this.MachineStack.ItemsSource = null;
             }
         }
 
@@ -82,6 +84,12 @@ namespace YBehavior.Editor
                 if (bench is TreeBench)
                     (bench as TreeBench).Tree.Root.Renderer.RefreshDebug();
             }
+        }
+
+        private void OnMachineStackItemClicked(object sender, RoutedEventArgs e)
+        {
+            FSMMachineNode node = (sender as Button).DataContext as FSMMachineNode;
+            WorkBenchMgr.Instance.AddRenderers(node, true, false);
         }
     }
 }

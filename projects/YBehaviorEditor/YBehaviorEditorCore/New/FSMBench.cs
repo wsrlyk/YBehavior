@@ -9,6 +9,7 @@ namespace YBehavior.Editor.Core.New
     public class FSMBench : WorkBench
     {
         FSM m_FSM;
+        public DelayableNotificationCollection<FSMMachineNode> StackMachines { get; } = new DelayableNotificationCollection<FSMMachineNode>();
 
         public FSMBench()
         {
@@ -145,14 +146,39 @@ namespace YBehavior.Editor.Core.New
             return true;
         }
 
+        void _RefreshStackMachines(FSMNode node)
+        {
+            using (var v = StackMachines.Delay())
+            {
+                StackMachines.Clear();
+                if (node != null)
+                {
+                    if (node is FSMMachineNode)
+                    {
+                        FSMMachineNode cur = node as FSMMachineNode;
+                        while (cur != null)
+                        {
+                            StackMachines.Add(cur);
+                            cur = cur.MetaState?.OwnerMachine;
+                        }
+                    }
+                }
+            }
+        }
+
         public override void AddRenderers(NodeBase node, bool batchAdd, bool excludeRoot = false)
         {
+            NodeList.Clear();
+            ConnectionList.Clear();
+
             _AddRenderers(node as FSMNode);
 
             SelectionMgr.Instance.Clear();
 
             NodeList.Dispose();
             ConnectionList.Dispose();
+
+            _RefreshStackMachines(node as FSMNode);
         }
 
         void _AddRenderers(FSMNode node)

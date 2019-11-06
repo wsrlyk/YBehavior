@@ -23,6 +23,8 @@ namespace YBehavior.Editor.Core.New
         ClickHandler m_RightClickHandler;
         ClickHandler m_MiddleClickHandler;
 
+        ClickHandler m_LeftDoubleClickHandler;
+
         DragHandler m_LeftDragHandler;
         DragHandler m_LeftStartDragHandler;
         DragHandler m_LeftFinishDragHandler;
@@ -78,6 +80,24 @@ namespace YBehavior.Editor.Core.New
             m_ValidButtonMask |= (1 << (int)MouseButton.Middle);
         }
 
+        public void RegisterLeftDoubleClick(ClickHandler handler)
+        {
+            m_LeftDoubleClickHandler = handler;
+            m_ValidButtonMask |= (1 << (int)MouseButton.Left);
+
+            _CreateDoubleClickTimer();
+        }
+
+        void _CreateDoubleClickTimer()
+        {
+            if (m_Timer == null)
+            {
+                m_Timer = new System.Windows.Threading.DispatcherTimer();
+                m_Timer.Interval = new TimeSpan(0, 0, 0, 0, 80);
+                m_Timer.Tick += (s, e1) => { m_Timer.Stop(); if (m_ClickHandler != null) m_ClickHandler(); };
+            }
+        }
+
         public void RegisterLeftDrag(DragHandler handler, DragHandler starthandler, DragHandler finishhandler)
         {
             m_LeftDragHandler = handler;
@@ -100,11 +120,16 @@ namespace YBehavior.Editor.Core.New
             m_ValidButtonMask |= (1 << (int)MouseButton.Right);
         }
 
+        DragHandler m_DragHandler = null;
+        ClickHandler m_ClickHandler = null;
         MouseButton m_PressedButton;
         bool m_bStartClick = false;
         bool m_bStartDrag = false;
         Point m_StartPos = new Point();
         Point m_Pos = new Point();
+
+        System.Windows.Threading.DispatcherTimer m_Timer;
+        bool m_bDoubleClick;
 
         void _MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -119,6 +144,29 @@ namespace YBehavior.Editor.Core.New
             m_StartPos = m_Pos;
             m_PressedButton = e.ChangedButton;
             e.Handled = true;
+
+            m_bDoubleClick = m_Timer != null && m_Timer.IsEnabled;
+
+            switch (m_PressedButton)
+            {
+                case MouseButton.Left:
+                    m_ClickHandler = m_bDoubleClick ? m_LeftDoubleClickHandler : m_LeftClickHandler;
+                    m_DragHandler = m_LeftFinishDragHandler;
+                    break;
+                case MouseButton.Middle:
+                    m_ClickHandler = m_MiddleClickHandler;
+                    m_DragHandler = m_MiddleFinishDragHandler;
+                    break;
+                case MouseButton.Right:
+                    m_ClickHandler = m_RightClickHandler;
+                    m_DragHandler = m_RightFinishDragHandler;
+                    break;
+                default:
+                    break;
+            }
+
+            if (m_bDoubleClick)
+                m_Timer.Stop();
         }
         void _PreviewMouseMove(object sender, MouseEventArgs e)
         {
@@ -199,29 +247,10 @@ namespace YBehavior.Editor.Core.New
             FrameworkElement tmp = (FrameworkElement)sender;
             tmp.ReleaseMouseCapture();
 
-            DragHandler dragHandler = null;
-            ClickHandler clickHandler = null;
             bool bValid = false;
             if (e.ChangedButton == m_PressedButton)
             {
                 bValid = true;
-                switch (m_PressedButton)
-                {
-                    case MouseButton.Left:
-                        clickHandler = m_LeftClickHandler;
-                        dragHandler = m_LeftFinishDragHandler;
-                        break;
-                    case MouseButton.Middle:
-                        clickHandler = m_MiddleClickHandler;
-                        dragHandler = m_MiddleFinishDragHandler;
-                        break;
-                    case MouseButton.Right:
-                        clickHandler = m_RightClickHandler;
-                        dragHandler = m_RightFinishDragHandler;
-                        break;
-                    default:
-                        break;
-                }
             }
 
             if (bValid)
@@ -230,16 +259,25 @@ namespace YBehavior.Editor.Core.New
                 {
                     m_bStartClick = false;
                     m_bStartDrag = false;
-                    if (clickHandler != null)
-                        clickHandler();
+
+                    ///> It's first click
+                    if (!m_bDoubleClick && m_Timer != null)
+                    {
+                        m_Timer.Start();
+                    }
+                    else
+                    {
+                        if (m_ClickHandler != null)
+                            m_ClickHandler();
+                    }
                 }
 
                 if (m_bStartDrag)
                 {
                     m_bStartDrag = false;
 
-                    if (dragHandler != null)
-                        dragHandler(m_Pos - m_StartPos, m_Pos);
+                    if (m_DragHandler != null)
+                        m_DragHandler(m_Pos - m_StartPos, m_Pos);
                 }
                 e.Handled = true;
             }

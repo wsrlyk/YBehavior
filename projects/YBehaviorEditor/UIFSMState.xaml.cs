@@ -65,6 +65,9 @@ namespace YBehavior.Editor
                 SetDebug(Node.Renderer.RunState);
             else
                 SetDebug(NodeState.NS_INVALID);
+
+            if (Node is FSMMetaStateNode)
+                m_Operation.RegisterLeftDoubleClick(_OnDoubleClick);
         }
 
         private void _BuildConnectionBinding()
@@ -227,6 +230,12 @@ namespace YBehavior.Editor
 
                 this.debugCover.Visibility = Visibility.Visible;
             }
+        }
+        void _OnDoubleClick()
+        {
+            m_Operation.MakeCanvasFocused();
+
+            WorkBenchMgr.Instance.AddRenderers((Node as FSMMetaStateNode).SubMachine, true, false);
         }
 
         void _OnClick()

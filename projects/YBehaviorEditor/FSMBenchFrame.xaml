@@ -69,6 +69,24 @@
                 </ItemsControl>
                 <Canvas Focusable="True" Name="nodeLayer_old"/>
             </Canvas>
+            <ItemsControl Name="MachineStack" MaxHeight="20" VerticalAlignment="Top" HorizontalAlignment="Left"
+                          Margin="5,5" FlowDirection="RightToLeft">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Button Click="OnMachineStackItemClicked">
+                                <TextBlock Text="{Binding Path=ForceGetRenderer.UITitle, Mode=OneWay}"/>
+                            </Button>
+                        </Grid>
+                        <!--TextBlock Text = "{Binding Name}"/-->
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </Grid>
     </Grid>
 </local:WorkBenchFrame>

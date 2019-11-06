@@ -126,12 +126,6 @@ namespace YBehavior.Editor.Core.New
 
         public bool PreLoad()
         {
-            _ForceAddSpecialState(ref m_Entry, FSMStateNode.TypeEntry);
-            _ForceAddSpecialState(ref m_Exit, FSMStateNode.TypeExit);
-            _ForceAddSpecialState(ref m_Any, FSMStateNode.TypeAny);
-
-            if (OwnerMachine != null)
-                _ForceAddSpecialState(ref m_Upper, FSMStateNode.TypeUpper);
             return true;
         }
 
@@ -151,6 +145,13 @@ namespace YBehavior.Editor.Core.New
                     return false;
                 }
             }
+
+            _ForceAddSpecialState(ref m_Entry, FSMStateNode.TypeEntry);
+            _ForceAddSpecialState(ref m_Exit, FSMStateNode.TypeExit);
+            _ForceAddSpecialState(ref m_Any, FSMStateNode.TypeAny);
+
+            if (OwnerMachine != null)
+                _ForceAddSpecialState(ref m_Upper, FSMStateNode.TypeUpper);
 
             return true;
         }
@@ -246,6 +247,11 @@ namespace YBehavior.Editor.Core.New
                 }
                 ///> 'to' is null means trans from 'from' to 'exit'
                 toState = this.ExitState;
+                if (toState == null)
+                {
+                    LogMgr.Instance.Error("ExitState not exists.");
+                    return false;
+                }
             }
 
             if (RootMachine.Transition.Insert(fromState, toState, events) == null)
