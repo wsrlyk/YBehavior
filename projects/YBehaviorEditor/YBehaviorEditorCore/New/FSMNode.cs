@@ -120,8 +120,15 @@ namespace YBehavior.Editor.Core.New
         Transitions m_LocalTransition = new Transitions();
         public Transitions LocalTransition { get { return m_LocalTransition; } }
 
+        public uint Level { get; set; } = 0;
+
         public FSMMachineNode()
         {
+        }
+
+        protected override void _CreateRenderer()
+        {
+            m_Renderer = new FSMMachineRenderer(this);
         }
 
         public bool PreLoad()
@@ -166,9 +173,12 @@ namespace YBehavior.Editor.Core.New
             return null;
         }
 
+        static int s_StateSortIndex = 0;
         public bool AddState(FSMStateNode state)
         {
             state.OwnerMachine = this;
+            state.SortIndex = ++s_StateSortIndex;
+
             m_States.Add(state);
             state.OnAddToMachine();
 
@@ -493,6 +503,17 @@ namespace YBehavior.Editor.Core.New
         public string Tree { get; set; } = string.Empty;
         public string Identification { get; set; } = string.Empty;
 
+        private int m_SortIndex = 0;
+        public int SortIndex
+        {
+            get { return m_SortIndex; }
+            set
+            {
+                if (m_SortIndex >= 0)
+                    m_SortIndex = value;
+            }
+        }
+
         public FSMStateNode() : base()
         {
         }
@@ -592,6 +613,7 @@ namespace YBehavior.Editor.Core.New
         {
             m_Name = TypeEntry;
             Type = FSMStateType.Special;
+            SortIndex = -4;
 
             Conns.Add(Connector.IdentifierChildren, false).ConnectionCreator = _CreateConnection;
         }
@@ -603,6 +625,7 @@ namespace YBehavior.Editor.Core.New
         {
             m_Name = TypeExit;
             Type = FSMStateType.Special;
+            SortIndex = -3;
 
             Conns.Add(Connector.IdentifierParent, true).ConnectionCreator = _CreateConnection;
         }
@@ -614,6 +637,7 @@ namespace YBehavior.Editor.Core.New
         {
             m_Name = TypeAny;
             Type = FSMStateType.Special;
+            SortIndex = -2;
 
             Conns.Add(Connector.IdentifierChildren, true).ConnectionCreator = _CreateConnection;
         }
@@ -625,6 +649,7 @@ namespace YBehavior.Editor.Core.New
         {
             m_Name = TypeUpper;
             Type = FSMStateType.Special;
+            SortIndex = -1;
 
             Conns.Add(Connector.IdentifierParent, true).ConnectionCreator = _CreateConnection;
         }

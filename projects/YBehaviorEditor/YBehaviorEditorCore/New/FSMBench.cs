@@ -67,6 +67,9 @@ namespace YBehavior.Editor.Core.New
 
             if (!machine.PostLoad(data))
                 return false;
+
+            machine.Conns.Sort(Utility.SortByFSMNodeSortIndex);
+
             return true;
         }
 

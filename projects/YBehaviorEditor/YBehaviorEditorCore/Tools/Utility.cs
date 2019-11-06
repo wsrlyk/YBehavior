@@ -90,7 +90,7 @@ namespace YBehavior.Editor.Core.New
             FSMMachineNode deeper;
             FSMMachineNode shallower;
 
-            if (FSM.UID.GetLevel(a.UID) > FSM.UID.GetLevel(b.UID))
+            if (a.Level > b.Level)
             {
                 deeper = a;
                 shallower = b;
@@ -104,7 +104,7 @@ namespace YBehavior.Editor.Core.New
             FSMMachineNode c = deeper;
             FSMMachineNode d = shallower;
 
-            for (uint i = FSM.UID.GetLevel(deeper.UID)- FSM.UID.GetLevel(shallower.UID); i > 0; --i)
+            for (uint i = deeper.Level- shallower.Level; i > 0; --i)
             {
                 toppestLevelChild = c;
                 c = c.OwnerMachine;
@@ -132,5 +132,11 @@ namespace YBehavior.Editor.Core.New
             }
             return false;
         }
+
+        public static int SortByFSMNodeSortIndex(Connection aa, Connection bb)
+        {
+            return (aa.Ctr.To.Owner as FSMStateNode).SortIndex.CompareTo((bb.Ctr.To.Owner as FSMStateNode).SortIndex);
+        }
+
     }
 }

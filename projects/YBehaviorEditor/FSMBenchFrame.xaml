@@ -69,8 +69,8 @@
                 </ItemsControl>
                 <Canvas Focusable="True" Name="nodeLayer_old"/>
             </Canvas>
-            <ItemsControl Name="MachineStack" MaxHeight="20" VerticalAlignment="Top" HorizontalAlignment="Left"
-                          Margin="5,5" FlowDirection="RightToLeft">
+            <ItemsControl Name="MachineStack" Height="30" VerticalAlignment="Top" HorizontalAlignment="Right"
+                          Margin="5,5">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal"/>
@@ -78,8 +78,8 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid>
-                            <Button Click="OnMachineStackItemClicked">
+                        <Grid Margin="2,0">
+                            <Button Click="OnMachineStackItemClicked" Height="25">
                                 <TextBlock Text="{Binding Path=ForceGetRenderer.UITitle, Mode=OneWay}"/>
                             </Button>
                         </Grid>

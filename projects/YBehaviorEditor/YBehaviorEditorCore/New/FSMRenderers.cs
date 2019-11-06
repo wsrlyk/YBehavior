@@ -41,4 +41,22 @@ namespace YBehavior.Editor.Core.New
             }
         }
     }
+    public class FSMMachineRenderer : NodeBaseRenderer
+    {
+        FSMMachineNode m_FSMMachineOwner;
+        public FSMMachineNode FSMMachineOwner { get { return m_FSMMachineOwner; } }
+
+        public FSMMachineRenderer(FSMMachineNode machineNode) : base(machineNode)
+        {
+            m_FSMMachineOwner = machineNode;
+        }
+
+        public override string FullName
+        {
+            get
+            {
+                return m_FSMMachineOwner.MetaState == null ? "Root" : m_FSMMachineOwner.MetaState.Renderer.FullName;
+            }
+        }
+    }
 }

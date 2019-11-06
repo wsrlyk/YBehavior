@@ -143,7 +143,7 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        public string FullName
+        public virtual string FullName
         {
             get { return string.IsNullOrEmpty(Owner.NickName) ? Owner.Name : Owner.NickName; }
         }
