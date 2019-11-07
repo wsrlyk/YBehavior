@@ -168,8 +168,7 @@ namespace YBehavior.Editor.Core.New
     public class PopMenuArg : EventArg
     {
         public override EventType Type => EventType.PopMenu;
-
-        public PopMenu Menu { get; set; }
+        public object MenuModel { get; set; }
         public System.Windows.Point Pos { get; set; }
     }
 }

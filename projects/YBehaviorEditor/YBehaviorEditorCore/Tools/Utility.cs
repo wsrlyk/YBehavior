@@ -18,6 +18,19 @@ namespace YBehavior.Editor.Core.New
             --m_LockCount;
         }
     }
+
+    public struct TransRoute
+    {
+        public TransRoute(FSMStateNode fromState, FSMStateNode toState)
+        {
+            FromState = fromState;
+            ToState = toState;
+            Route = new List<KeyValuePair<FSMStateNode, FSMStateNode>>();
+        }
+        public List<KeyValuePair<FSMStateNode, FSMStateNode>> Route;
+        public FSMStateNode FromState;
+        public FSMStateNode ToState;
+    }
     class Utility
     {
         public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class", "Connection" });
@@ -136,6 +149,92 @@ namespace YBehavior.Editor.Core.New
         public static int SortByFSMNodeSortIndex(Connection aa, Connection bb)
         {
             return (aa.Ctr.To.Owner as FSMStateNode).SortIndex.CompareTo((bb.Ctr.To.Owner as FSMStateNode).SortIndex);
+        }
+
+        public static TransRoute FindTransRoute(FSMStateNode fromState, FSMStateNode toState)
+        {
+            TransRoute route = new TransRoute(fromState, toState);
+            List<KeyValuePair<FSMStateNode, FSMStateNode>> res = route.Route;
+
+            if (toState == null)
+            {
+                LogMgr.Instance.Error("ToState is null");
+            }
+
+            ///> fromState == null ->  AnyState=>ToState
+            else if (fromState == null)
+            {
+                fromState = toState.OwnerMachine.AnyState;
+                res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(fromState, toState));
+            }
+            ///> In the same machine, simplest situation, nothing to do
+            else if (fromState.OwnerMachine == toState.OwnerMachine)
+            {
+                res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(fromState, toState));
+            }
+            ///> Find their ancester
+            else
+            {
+                FSMMachineNode toppestLevelChild = null;
+                FSMMachineNode ancestorMachine = Utility.FindAncestor(fromState.OwnerMachine, toState.OwnerMachine, ref toppestLevelChild);
+
+                ///> fromState is the parent of toState 
+                ///>    ---> fromState=>toppestLevelChild
+                ///>    ---> UpperState=>toState
+                if (ancestorMachine == fromState.OwnerMachine)
+                {
+                    if (toppestLevelChild == null
+                        || toppestLevelChild.MetaState == null
+                        || toppestLevelChild.MetaState.OwnerMachine != fromState.OwnerMachine)
+                    {
+                        LogMgr.Instance.Error("Something error when find ancestor");
+                    }
+                    else
+                    {
+                        res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(fromState, toppestLevelChild.MetaState));
+                        res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(toState.OwnerMachine.UpperState, toState));
+                    }
+                }
+                ///> toState is the parent of fromState 
+                ///>    ---> fromState=>UpperState
+                ///>    ---> toppestLevelChild=>ToState
+                else if (ancestorMachine == toState.OwnerMachine)
+                {
+                    if (toppestLevelChild == null
+                        || toppestLevelChild.MetaState == null
+                        || toppestLevelChild.MetaState.OwnerMachine != toState.OwnerMachine)
+                    {
+                        LogMgr.Instance.Error("Something error when find ancestor");
+                    }
+                    else
+                    {
+                        res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(fromState, fromState.OwnerMachine.UpperState));
+                        res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(toppestLevelChild.MetaState, toState));
+                    }
+                }
+                ///> XXState is the common ancestor of fromState and toState
+                ///>    ---> fromState=>UpperState
+                ///>    ---> UpperState=>UpperUpperState
+                ///>    ---> (In AncestorMachine) Upper..UpperFromState=>Upper..UpperToState
+                ///>    ---> UpperUpperState=>UpperState...
+                ///>    ---> UpperState=>toState
+                else
+                {
+                    while (fromState.OwnerMachine != ancestorMachine)
+                    {
+                        res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(fromState, fromState.OwnerMachine.UpperState));
+                        fromState = fromState.OwnerMachine.MetaState;
+                    }
+                    while (toState.OwnerMachine != ancestorMachine)
+                    {
+                        res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(toState.OwnerMachine.UpperState, toState));
+                        toState = toState.OwnerMachine.MetaState;
+                    }
+                    res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(fromState, toState));
+                }
+            }
+
+            return route;
         }
 
     }

@@ -316,91 +316,6 @@ namespace YBehavior.Editor.Core.New
             //return state;
         }
 
-        public List<KeyValuePair<FSMStateNode, FSMStateNode>> FindTransRoute(FSMStateNode fromState, FSMStateNode toState)
-        {
-            List<KeyValuePair<FSMStateNode, FSMStateNode>> res = new List<KeyValuePair<FSMStateNode, FSMStateNode>>();
-
-            if (toState == null)
-            {
-                LogMgr.Instance.Error("ToState is null");
-            }
-
-            ///> fromState == null ->  AnyState=>ToState
-            else if (fromState == null)
-            {
-                fromState = toState.OwnerMachine.AnyState;
-                res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(fromState, toState));
-            }
-            ///> In the same machine, simplest situation, nothing to do
-            else if (fromState.OwnerMachine == toState.OwnerMachine)
-            {
-                res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(fromState, toState));
-            }
-            ///> Find their ancester
-            else
-            {
-                FSMMachineNode toppestLevelChild = null;
-                FSMMachineNode ancestorMachine = Utility.FindAncestor(fromState.OwnerMachine, toState.OwnerMachine, ref toppestLevelChild);
-
-                ///> fromState is the parent of toState 
-                ///>    ---> fromState=>toppestLevelChild
-                ///>    ---> UpperState=>toState
-                if (ancestorMachine == fromState.OwnerMachine)
-                {
-                    if (toppestLevelChild == null
-                        || toppestLevelChild.MetaState == null
-                        || toppestLevelChild.MetaState.OwnerMachine != fromState.OwnerMachine)
-                    {
-                        LogMgr.Instance.Error("Something error when find ancestor");
-                    }
-                    else
-                    {
-                        res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(fromState, toppestLevelChild.MetaState));
-                        res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(toState.OwnerMachine.UpperState, toState));
-                    }
-                }
-                ///> toState is the parent of fromState 
-                ///>    ---> fromState=>UpperState
-                ///>    ---> toppestLevelChild=>ToState
-                else if (ancestorMachine == toState.OwnerMachine)
-                {
-                    if (toppestLevelChild == null
-                        || toppestLevelChild.MetaState == null
-                        || toppestLevelChild.MetaState.OwnerMachine != toState.OwnerMachine)
-                    {
-                        LogMgr.Instance.Error("Something error when find ancestor");
-                    }
-                    else
-                    {
-                        res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(fromState, fromState.OwnerMachine.UpperState));
-                        res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(toppestLevelChild.MetaState, toState));
-                    }
-                }
-                ///> XXState is the common ancestor of fromState and toState
-                ///>    ---> fromState=>UpperState
-                ///>    ---> UpperState=>UpperUpperState
-                ///>    ---> (In AncestorMachine) Upper..UpperFromState=>Upper..UpperToState
-                ///>    ---> UpperUpperState=>UpperState...
-                ///>    ---> UpperState=>toState
-                else
-                {
-                    while (fromState.OwnerMachine != ancestorMachine)
-                    {
-                        res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(fromState, fromState.OwnerMachine.UpperState));
-                        fromState = fromState.OwnerMachine.MetaState;
-                    }
-                    while (toState.OwnerMachine != ancestorMachine)
-                    {
-                        res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(toState.OwnerMachine.UpperState, toState));
-                        toState = toState.OwnerMachine.MetaState;
-                    }
-                    res.Add(new KeyValuePair<FSMStateNode, FSMStateNode>(fromState, toState));
-                }
-            }
-
-            return res;
-        }
-
         public void BuildConnections()
         {
             foreach (TransitionResult t in m_Transition)
@@ -408,8 +323,8 @@ namespace YBehavior.Editor.Core.New
                 FSMStateNode fromState = t.Key.FromState;
                 FSMStateNode toState = t.Key.ToState;
 
-                var res = FindTransRoute(fromState, toState);
-                foreach(var p in res)
+                var res = Utility.FindTransRoute(fromState, toState);
+                foreach(var p in res.Route)
                 {
                     _BuildConnection(p.Key, p.Value, t);
                 }
@@ -430,8 +345,8 @@ namespace YBehavior.Editor.Core.New
             FSMStateNode fromState = t.Key.FromState;
             FSMStateNode toState = t.Key.ToState;
 
-            var res = FindTransRoute(fromState, toState);
-            foreach (var p in res)
+            var res = Utility.FindTransRoute(fromState, toState);
+            foreach (var p in res.Route)
             {
                 _RemoveConnection(p.Key, p.Value, t);
             }
@@ -456,18 +371,18 @@ namespace YBehavior.Editor.Core.New
                 Connector.TryDisconnect(fromto);
         }
 
-        public bool MakeTrans(FSMStateNode fromState, FSMStateNode toState)
+        public TransRoute MakeTrans(FSMStateNode fromState, FSMStateNode toState)
         {
             TransitionResult trans = Transition.Insert(fromState, "", toState);
             if (trans == null)
-                return false;
+                return new TransRoute();
 
-            var res = FindTransRoute(fromState, toState);
-            foreach (var p in res)
+            var res = Utility.FindTransRoute(fromState, toState);
+            foreach (var p in res.Route)
             {
                 _MakeTrans(p.Key, p.Value, trans);
             }
-            return res.Count > 0;
+            return res;
         }
 
         void _MakeTrans(FSMStateNode fromState, FSMStateNode toState, TransitionResult t)
@@ -652,6 +567,7 @@ namespace YBehavior.Editor.Core.New
             SortIndex = -1;
 
             Conns.Add(Connector.IdentifierParent, true).ConnectionCreator = _CreateConnection;
+            Conns.Add(Connector.IdentifierChildren, true).ConnectionCreator = _CreateConnection;
         }
     }
 }

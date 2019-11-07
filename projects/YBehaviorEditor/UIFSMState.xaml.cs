@@ -104,7 +104,7 @@ namespace YBehavior.Editor
 
             if (Node.Conns.ParentConnector != null)
             {
-                FSMUIInConnector uiConnector = new FSMUIInConnector
+                FSMUIInConnector uiConnector = new FSMUIInConnector()
                 {
                     Ctr = Node.Conns.ParentConnector
                 };
@@ -119,7 +119,7 @@ namespace YBehavior.Editor
                 //if (ctr is ConnectorNone)
                 //    continue;
 
-                FSMUIOutConnector uiConnector = new FSMUIOutConnector
+                FSMUIOutConnector uiConnector = new FSMUIOutConnector(!(Node is FSMUpperStateNode)) ///> TODO: make this more elegant...
                 {
                     Ctr = ctr
                 };

@@ -195,7 +195,9 @@ namespace YBehavior.Editor
                 //}
                 this.Title = oArg.Bench.DisplayName + " - YBehaviorEditor";
 
-                this.TreeRightPanel.Visibility = oArg.Bench is TreeBench ? Visibility.Visible : Visibility.Collapsed;
+                Visibility treeVisibility = oArg.Bench is TreeBench ? Visibility.Visible : Visibility.Collapsed;
+                this.TreeRightPanel.Visibility = treeVisibility;
+                this.NodeListPanel.Visibility = treeVisibility;
                 this.FSMRightPanel.Visibility = oArg.Bench is FSMBench ? Visibility.Visible : Visibility.Collapsed;
             }
             else

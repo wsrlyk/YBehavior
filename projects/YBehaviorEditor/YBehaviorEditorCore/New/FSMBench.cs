@@ -253,19 +253,30 @@ namespace YBehavior.Editor.Core.New
         {
             if (from == null || to == null || from.GetDir != Connector.Dir.OUT || to.GetDir != Connector.Dir.IN)
                 return;
-            if (m_FSM.RootMachine.MakeTrans(from.Owner as FSMStateNode, to.Owner as FSMStateNode))
+            var res = m_FSM.RootMachine.MakeTrans(from.Owner as FSMStateNode, to.Owner as FSMStateNode);
+            if (res.Route != null)
             {
-                Connection.FromTo fromto = new Connection.FromTo
+                foreach (var p in res.Route)
                 {
-                    From = from,
-                    To = to
-                };
-                FSMConnection conn = to.FindConnection(fromto) as FSMConnection;
-                if (conn != null)
-                {
-                    ConnectionRenderer connRenderer = conn.Renderer;
-                    if (connRenderer != null)
-                        ConnectionList.Add(connRenderer);
+                    if (p.Key != from.Owner)
+                        continue;
+
+                    Connection.FromTo fromto = new Connection.FromTo
+                    {
+                        From = from,
+                        To = p.Value.Conns.ParentConnector
+                    };
+                    FSMConnection conn = from.FindConnection(fromto) as FSMConnection;
+                    ///> There may be multiple trans in one connection. We only add the renderer when the
+                    ///  first trans is built
+                    if (conn != null && conn.Trans.Count == 1)
+                    {
+                        ConnectionRenderer connRenderer = conn.Renderer;
+                        if (connRenderer != null)
+                            ConnectionList.Add(connRenderer);
+                    }
+
+                    break;
                 }
             }
 

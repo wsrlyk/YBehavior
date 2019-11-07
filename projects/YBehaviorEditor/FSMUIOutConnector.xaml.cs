@@ -26,19 +26,22 @@ namespace YBehavior.Editor
 
         Vector m_RelativePos = new Vector(double.MaxValue, double.MaxValue);
 
-        public FSMUIOutConnector()
+        public FSMUIOutConnector(bool bHasOperation)
         {
             InitializeComponent();
 
-            m_Operation = new Operation(this);
+            if (bHasOperation)
+            {
+                m_Operation = new Operation(this);
 
-            normalBorderBrush = this.Main.BorderBrush;
+                normalBorderBrush = this.Main.BorderBrush;
 
-            DragHandler = new DragHandler(defaultDragHandler);
-            DropHandler = new DropHandler(defaultDropHandler);
-            HoverHandler = new DropHandler(defaultHoverHandler);
+                DragHandler = new DragHandler(defaultDragHandler);
+                DropHandler = new DropHandler(defaultDropHandler);
+                HoverHandler = new DropHandler(defaultHoverHandler);
 
-            m_Operation.RegisterRightDrag(_OnDragged, _OnStartDragged, _OnFinishDragged);
+                m_Operation.RegisterRightDrag(_OnDragged, _OnStartDragged, _OnFinishDragged);
+            }
         }
 
         void _OnLayoutUpdated(object sender, EventArgs e)

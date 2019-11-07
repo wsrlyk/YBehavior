@@ -83,7 +83,17 @@ namespace YBehavior.Editor
             if (other == null)
                 return;
 
-            WorkBenchMgr.Instance.ConnectNodes(other.Ctr, this.Ctr);
+            if (this.Ctr.Owner is FSMMetaStateNode || this.Ctr.Owner is FSMUpperStateNode)
+            {
+                MenuItemViewModel menuModel = PopMenuUtility.CreateFSMConnectionDropMenu(other.Ctr.Owner as FSMStateNode, this.Ctr.Owner as FSMStateNode);
+                PopMenuArg arg = new PopMenuArg
+                {
+                    MenuModel = menuModel
+                };
+                EventMgr.Instance.Send(arg);
+            }
+            else
+                WorkBenchMgr.Instance.ConnectNodes(other.Ctr, this.Ctr);
         }
     }
 }

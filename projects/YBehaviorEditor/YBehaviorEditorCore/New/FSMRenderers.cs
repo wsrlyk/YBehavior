@@ -55,7 +55,7 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return m_FSMMachineOwner.MetaState == null ? "Root" : m_FSMMachineOwner.MetaState.Renderer.FullName;
+                return m_FSMMachineOwner.MetaState == null ? "Root" : m_FSMMachineOwner.MetaState.ForceGetRenderer.FullName;
             }
         }
     }

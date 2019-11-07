@@ -20,11 +20,18 @@ namespace YBehavior.Editor
     /// </summary>
     public partial class PopMenuFrame : UserControl
     {
-        public PopMenu Menu { get; } = new PopMenu();
-
         public PopMenuFrame()
         {
             InitializeComponent();
+            EventMgr.Instance.Register(EventType.PopMenu, _OnShowPopMenu);
+        }
+
+        private void _OnShowPopMenu(EventArg arg)
+        {
+            PopMenuArg oArg = arg as PopMenuArg;
+            MenuItemViewModel model = oArg.MenuModel as MenuItemViewModel;
+            this.Menu.ItemsSource = model.MenuItems;
+            this.Menu.IsOpen = true;
         }
     }
 }
