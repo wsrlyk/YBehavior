@@ -173,6 +173,33 @@ namespace YBehavior.Editor
         }
     }
 
+
+    [ValueConversion(typeof(System.Windows.Vector), typeof(System.Windows.Vector))]
+    public class FSMUIConnectionOffsetConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            System.Windows.Point startPos = (System.Windows.Point)values[0];
+            System.Windows.Point endPos = (System.Windows.Point)values[1];
+            var dir = (endPos - startPos);
+            dir.Normalize();
+            var offset = new System.Windows.Vector(dir.Y, -dir.X) * 4;
+
+            if ((string)parameter == "0")
+                return startPos + offset;
+            else
+                return startPos - offset;
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+
+       
+        public System.Windows.Vector Start;
+        public System.Windows.Vector End;
+    }
+
     public class ValueConverterGroup : List<IValueConverter>, IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

@@ -124,8 +124,10 @@ namespace YBehavior.Editor
             LineSegment trdLine = figure.Segments[0] as LineSegment;
             Point end = trdLine.Point;
 
-            Point midPoint = new Point((start.X + end.X) * 0.5, (start.Y + end.Y) * 0.5);
             Vector arrow = end - start;
+
+            Point midPoint = start + arrow * 0.47f;
+
             arrow.Normalize();
 
             arrowFigure.StartPoint = midPoint + arrow * 2;

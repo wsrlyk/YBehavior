@@ -6,12 +6,28 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              >
+    <UserControl.Resources>
+        <local:FSMUIConnectionOffsetConverter x:Key="offsetConvertor"/>
+    </UserControl.Resources>
     <Grid>
         <Path Name="path" Stroke="#FFDADCE4" StrokeThickness="5" Fill="#FFE1E3E8" TargetUpdated="Path_TargetUpdated">
             <Path.Data>
                 <PathGeometry>
-                    <PathFigure IsFilled="False" StartPoint="{Binding ParentPos, Mode=OneWay, NotifyOnTargetUpdated=True}" IsClosed="False">
-                        <LineSegment Point="{Binding ChildPos, Mode=OneWay, NotifyOnTargetUpdated=True}" />
+                    <PathFigure IsFilled="False" IsClosed="False">
+                        <PathFigure.StartPoint>
+                            <MultiBinding Converter="{StaticResource offsetConvertor}" ConverterParameter="0" NotifyOnTargetUpdated="True" Mode="OneWay">
+                                <Binding Path="ParentPos"/>
+                                <Binding Path="ChildPos"/>
+                            </MultiBinding>
+                        </PathFigure.StartPoint>
+                        <LineSegment>
+                            <LineSegment.Point>
+                                <MultiBinding Converter="{StaticResource offsetConvertor}" ConverterParameter="1" NotifyOnTargetUpdated="True" Mode="OneWay">
+                                    <Binding Path="ChildPos"/>
+                                    <Binding Path="ParentPos"/>
+                                </MultiBinding>
+                            </LineSegment.Point>
+                        </LineSegment>
                     </PathFigure>
                     <PathFigure IsFilled="true" StartPoint="0,0"  IsClosed="true">
                         <LineSegment Point="-0.5,0.2" />

@@ -377,7 +377,8 @@ namespace YBehavior.Editor.Core.New
             if (trans == null)
                 return new TransRoute();
 
-            var res = Utility.FindTransRoute(fromState, toState);
+            ///> FromState may change if it's an AnyState
+            var res = Utility.FindTransRoute(trans.Key.FromState, trans.Key.ToState);
             foreach (var p in res.Route)
             {
                 _MakeTrans(p.Key, p.Value, trans);

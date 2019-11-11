@@ -39,6 +39,12 @@ namespace YBehavior.Editor.Core.New
         {
             FromState = from;
             ToState = to;
+
+            ///> AnyState must convert to the one in the same submachine with ToState
+            if (from is FSMAnyStateNode)
+            {
+                FromState = to.OwnerMachine.AnyState;
+            }
         }
 
         public bool Equals(TransitionMapKey other)
