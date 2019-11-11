@@ -57,7 +57,7 @@ namespace YBehavior.Editor
             Node = Renderer.FSMStateOwner;
 
             //SetCanvas(Node.Renderer.RenderCanvas);
-
+            _SetOutlook();
             _CreateConnectors();
             _BuildConnectionBinding();
             _SetCommentPos();
@@ -70,6 +70,27 @@ namespace YBehavior.Editor
                 m_Operation.RegisterLeftDoubleClick(_OnDoubleClick);
         }
 
+        private void _SetOutlook()
+        {
+            if (Node.Type == FSMStateType.Normal)
+            {
+                if (Node is FSMNormalStateNode)
+                    this.border.BorderBrush = (SolidColorBrush)this.FindResource("normalColor");
+                else if (Node is FSMMetaStateNode)
+                    this.border.BorderBrush = (SolidColorBrush)this.FindResource("metaColor");
+            }
+            else if (Node.Type == FSMStateType.Special)
+            {
+                if (Node is FSMEntryStateNode)
+                    this.border.BorderBrush = (SolidColorBrush)this.FindResource("entryColor");
+                else if (Node is FSMExitStateNode)
+                    this.border.BorderBrush = (SolidColorBrush)this.FindResource("exitColor");
+                else if (Node is FSMAnyStateNode)
+                    this.border.BorderBrush = (SolidColorBrush)this.FindResource("anyColor");
+                else if (Node is FSMUpperStateNode)
+                    this.border.BorderBrush = (SolidColorBrush)this.FindResource("upperColor");
+            }
+        }
         private void _BuildConnectionBinding()
         {
             foreach (Connector ctr in Node.Conns.ConnectorsList)

@@ -194,10 +194,6 @@ namespace YBehavior.Editor
         {
             return null;
         }
-
-       
-        public System.Windows.Vector Start;
-        public System.Windows.Vector End;
     }
 
     public class ValueConverterGroup : List<IValueConverter>, IValueConverter
