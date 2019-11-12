@@ -333,7 +333,7 @@ namespace YBehavior.Editor.Core.New
             _WriteVariables(Variables, data);
         }
 
-        public bool CheckValid()
+        public override bool CheckValid()
         {
             bool bRes = true;
             if (m_Variables is NodeMemory)

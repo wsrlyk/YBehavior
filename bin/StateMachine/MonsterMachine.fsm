@@ -9,43 +9,42 @@
       <Machine Default="Walk">
         <State Type="Entry" Pos="0,0" />
         <State Type="Exit" Tree="Single" Pos="400,400" />
-        <State Name="Walk" Pos="100,100" />
-        <State Name="Run" Pos="100,200" />
         <State Type="Any" Pos="200,100" />
         <State Type="Upper" Pos="200,400" />
+        <State Name="Walk" Pos="100,100" />
+        <State Name="Run" Pos="100,200" />
         <State Type="Meta" Name="Test" Pos="200,200">
-	  <Machine Default="Test1">
-	    <State Type="Entry" Pos="0,0" />
-	    <State Type="Exit" Tree="Single" Pos="400,400" />
-	    <State Type="Any" Pos="200,100" />
-	    <State Type="Upper" Pos="200,400" />
-	    <State Name="Test1" Pos="100,100" />
-	    <State Name="Test2" Pos="100,200" />
-	  </Machine>
-	</State>
+          <Machine Default="Test1">
+            <State Type="Entry" Pos="0,0" />
+            <State Type="Exit" Tree="Single" Pos="400,400" />
+            <State Type="Any" Pos="200,100" />
+            <State Type="Upper" Pos="200,400" />
+            <State Name="Test1" Pos="100,100" />
+            <State Name="Test2" Pos="100,200" />
+          </Machine>
+        </State>
       </Machine>
     </State>
     <State Type="Meta" Name="Fight" Pos="300,200">
       <Machine Default="Detect">
-        <State Name="Detect" Pos="0,0" />
-        <State Name="Skill" Tree="Single" Pos="0,0" />
-        <State Name="CD" Tree="Single" Pos="0,0" />
         <State Type="Entry" Pos="0,0" />
         <State Type="Exit" Pos="0,0" />
         <State Type="Any" Pos="0,0" />
         <State Type="Upper" Pos="0,0" />
+        <State Name="Detect" Pos="0,0" />
+        <State Name="Skill" Tree="Single" Pos="0,0" />
+        <State Name="CD" Tree="Single" Pos="0,0" />
       </Machine>
     </State>
     <Trans To="CD">
-	<AnyToCD/>
+      <AnyToCD />
     </Trans>
     <Trans To="Walk">
-	<AnyToWalk/>
+      <AnyToWalk />
     </Trans>
     <Trans To="Idle">
-	<AnyToIdle/>
+      <AnyToIdle />
     </Trans>
-    <Trans From="Walk" To="Run">
-    </Trans>
+    <Trans From="Walk" To="Run" />
   </Machine>
 </MonsterMachine>

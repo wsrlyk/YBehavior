@@ -180,10 +180,21 @@ namespace YBehavior.Editor
             //    _RefreshWorkingSpace(false);
         }
 
-        private void btnNew_Click(object sender, RoutedEventArgs e)
+        private void btnNewTree_Click(object sender, RoutedEventArgs e)
         {
             WorkBench bench = null;
             if ((bench = WorkBenchMgr.Instance.CreateNewBench(FileType.TREE)) != null)
+            {
+                WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
+                arg.Bench = bench;
+                EventMgr.Instance.Send(arg);
+            }
+        }
+
+        private void btnNewFSM_Click(object sender, RoutedEventArgs e)
+        {
+            WorkBench bench = null;
+            if ((bench = WorkBenchMgr.Instance.CreateNewBench(FileType.FSM)) != null)
             {
                 WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
                 arg.Bench = bench;

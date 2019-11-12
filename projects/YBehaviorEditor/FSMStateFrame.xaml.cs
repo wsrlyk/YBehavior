@@ -33,7 +33,7 @@ namespace YBehavior.Editor
 
             if (Renderer != null)
             {
-                this.NamePanel.Visibility = (Renderer.FSMStateOwner.Type == FSMStateType.Normal) ? Visibility.Visible : Visibility.Collapsed;
+                this.NamePanel.Visibility = (Renderer.FSMStateOwner.Type == FSMStateType.User) ? Visibility.Visible : Visibility.Collapsed;
             }
         }
     }

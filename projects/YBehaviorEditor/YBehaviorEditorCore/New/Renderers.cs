@@ -265,7 +265,8 @@ namespace YBehavior.Editor.Core.New
             {
                 NodeRenderer = this,
                 OriginPos = pos - delta,
-                FinalPos = pos
+                FinalPos = pos,
+                DragParam = m_DragParam,
             };
             WorkBenchMgr.Instance.PushCommand(moveNodeCommand);
             m_DragParam = -1;

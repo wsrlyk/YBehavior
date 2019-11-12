@@ -264,7 +264,7 @@ namespace YBehavior.Editor.Core.New
 
             if (!bench.CheckError())
             {
-                LogMgr.Instance.Error("Something wrong in tree.");
+                LogMgr.Instance.Error("Something wrong in file.");
                 ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
                 {
                     Content = "Saved With Errors.",
@@ -344,7 +344,10 @@ namespace YBehavior.Editor.Core.New
                 {
                     node = TreeNodeMgr.Instance.CreateNodeByName(template.Name);
                 }
-
+                else if (template is FSMNode)
+                {
+                    node = FSMNodeMgr.Instance.CreateStateByName(template.Name);
+                }
                 ///> Init Variables
                 ////Utility.InitNode(node, true);
             }

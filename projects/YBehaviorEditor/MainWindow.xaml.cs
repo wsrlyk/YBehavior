@@ -197,7 +197,7 @@ namespace YBehavior.Editor
 
                 Visibility treeVisibility = oArg.Bench is TreeBench ? Visibility.Visible : Visibility.Collapsed;
                 this.TreeRightPanel.Visibility = treeVisibility;
-                this.NodeListPanel.Visibility = treeVisibility;
+                //this.NodeListPanel.Visibility = treeVisibility;
                 this.FSMRightPanel.Visibility = oArg.Bench is FSMBench ? Visibility.Visible : Visibility.Collapsed;
             }
             else

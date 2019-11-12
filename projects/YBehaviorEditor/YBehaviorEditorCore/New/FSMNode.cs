@@ -10,7 +10,7 @@ namespace YBehavior.Editor.Core.New
     public class FSMNodeMgr : Singleton<FSMNodeMgr>
     {
         List<FSMStateNode> m_StateList = new List<FSMStateNode>();
-        public List<FSMStateNode> StateList { get { return m_StateList; } }
+        public List<FSMStateNode> NodeList { get { return m_StateList; } }
         private Dictionary<string, Type> m_TypeDic = new Dictionary<string, Type>();
 
         public FSMNodeMgr()
@@ -126,6 +126,25 @@ namespace YBehavior.Editor.Core.New
         {
         }
 
+        public override void CreateBase()
+        {
+            base.CreateBase();
+            CreateEmpty();
+        }
+
+        public void CreateEmpty()
+        {
+            _ForceAddSpecialState(ref m_Entry, FSMStateNode.TypeEntry);
+            _ForceAddSpecialState(ref m_Exit, FSMStateNode.TypeExit);
+            _ForceAddSpecialState(ref m_Any, FSMStateNode.TypeAny);
+        }
+
+        public void CreateUpper()
+        {
+            if (OwnerMachine != null)
+                _ForceAddSpecialState(ref m_Upper, FSMStateNode.TypeUpper);
+        }
+
         protected override void _CreateRenderer()
         {
             m_Renderer = new FSMMachineRenderer(this);
@@ -153,27 +172,32 @@ namespace YBehavior.Editor.Core.New
                 }
             }
 
-            _ForceAddSpecialState(ref m_Entry, FSMStateNode.TypeEntry);
-            _ForceAddSpecialState(ref m_Exit, FSMStateNode.TypeExit);
-            _ForceAddSpecialState(ref m_Any, FSMStateNode.TypeAny);
-
-            if (OwnerMachine != null)
-                _ForceAddSpecialState(ref m_Upper, FSMStateNode.TypeUpper);
-
             return true;
         }
 
-        FSMStateNode FindState(string name)
+        public FSMStateNode FindState(string name)
         {
             foreach (var state in m_States)
             {
-                if (state.NickName == name)
+                if ((state.Type == FSMStateType.User && state.NickName == name)
+                    || (state.Type == FSMStateType.Special && state.Name == name))
                     return state;
             }
             return null;
         }
 
         static int s_StateSortIndex = 0;
+        public bool RemoveState(FSMStateNode state)
+        {
+            if (state.Type == FSMStateType.Special)
+                return false;
+
+            m_States.Remove(state);
+            if (state.IsUserState)
+                return RootMachine.RemoveGlobalState(state);
+
+            return true;
+        }
         public bool AddState(FSMStateNode state)
         {
             state.OwnerMachine = this;
@@ -271,6 +295,17 @@ namespace YBehavior.Editor.Core.New
             
             return true;
         }
+
+        public override bool CheckValid()
+        {
+            bool res = true;
+            foreach (FSMStateNode state in m_States)
+            {
+                res &= state.CheckValid();
+            }
+
+            return res;
+        }
     }
 
     public class FSMRootMachineNode : FSMMachineNode
@@ -285,9 +320,26 @@ namespace YBehavior.Editor.Core.New
             OwnerMachine = null;
         }
 
+        public bool RemoveGlobalState(FSMStateNode state)
+        {
+            if (state == null/* || string.IsNullOrEmpty(state.NickName)*/)
+                return false;
+            try
+            {
+                ///> TODO: check duplicate
+                m_AllStates.Remove(state);
+            }
+            catch (Exception e)
+            {
+                LogMgr.Instance.Error("Remove global state failed: " + e.ToString());
+                return false;
+            }
+
+            return true;
+        }
         public bool AddGlobalState(FSMStateNode state)
         {
-            if (state == null || string.IsNullOrEmpty(state.NickName))
+            if (state == null/* || string.IsNullOrEmpty(state.NickName)*/)
                 return false;
             try
             {
@@ -350,6 +402,8 @@ namespace YBehavior.Editor.Core.New
             {
                 _RemoveConnection(p.Key, p.Value, t);
             }
+
+            Transition.Remove(t);
         }
 
         void _RemoveConnection(FSMStateNode fromState, FSMStateNode toState, TransitionResult trans)
@@ -400,7 +454,7 @@ namespace YBehavior.Editor.Core.New
     public enum FSMStateType
     {
         Invalid,
-        Normal,
+        User,
         Special,
     }
 
@@ -412,9 +466,10 @@ namespace YBehavior.Editor.Core.New
         public static readonly string TypeExit = "Exit";
         public static readonly string TypeAny = "Any";
         public static readonly string TypeUpper = "Upper";
+        public static readonly HashSet<string> TypeSpecialStates = new HashSet<string> { TypeEntry, TypeExit, TypeAny, TypeUpper };
 
         public FSMStateType Type { get; set; } = FSMStateType.Invalid;
-        public bool IsUserState { get { return Type == FSMStateType.Normal; } }
+        public bool IsUserState { get { return Type == FSMStateType.User; } }
 
         public string Tree { get; set; } = string.Empty;
         public string Identification { get; set; } = string.Empty;
@@ -446,9 +501,6 @@ namespace YBehavior.Editor.Core.New
                     case "Tree":
                         Tree = attr.Value;
                         break;
-                    case "Identification":
-                        Identification = attr.Value;
-                        break;
                     case "Name":
                         m_NickName = attr.Value;
                         break;
@@ -465,6 +517,40 @@ namespace YBehavior.Editor.Core.New
             }
             _OnLoaded();
             return true;
+        }
+
+        public void Save(XmlElement data)
+        {
+            if (!string.IsNullOrEmpty(m_NickName))
+                data.SetAttribute("Name", m_NickName);
+
+            if (!string.IsNullOrEmpty(Tree))
+                data.SetAttribute("Tree", Tree);
+
+            Point intPos = new Point((int)Geo.Pos.X, (int)Geo.Pos.Y);
+            data.SetAttribute("Pos", intPos.ToString());
+
+            if (!DebugPointInfo.NoDebugPoint)
+                data.SetAttribute("DebugPoint", DebugPointInfo.HitCount.ToString());
+
+            if (!string.IsNullOrEmpty(Comment))
+            {
+                data.SetAttribute("Comment", Comment);
+            }
+
+            if (SelfDisabled)
+            {
+                data.SetAttribute("Disabled", "true");
+            }
+        }
+
+        public void Export(XmlElement data)
+        {
+            if (!string.IsNullOrEmpty(m_NickName))
+                data.SetAttribute("Name", m_NickName);
+
+            if (!string.IsNullOrEmpty(Tree))
+                data.SetAttribute("Tree", Tree);
         }
 
         protected virtual void _OnLoaded()
@@ -488,30 +574,40 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    public class FSMNormalStateNode : FSMStateNode
+    public class FSMUserStateNode : FSMStateNode
     {
-        public FSMNormalStateNode()
+        public FSMUserStateNode()
         {
-            m_Name = "Normal";
-            Type = FSMStateType.Normal;
-
+            Type = FSMStateType.User;
             Conns.Add(Connector.IdentifierParent, true).ConnectionCreator = _CreateConnection;
             Conns.Add(Connector.IdentifierChildren, true).ConnectionCreator = _CreateConnection;
         }
+        public override bool CheckValid()
+        {
+            bool res = !string.IsNullOrEmpty(m_NickName);
+            if (!res)
+            {
+                LogMgr.Instance.Log("Must have a NAME: " + Renderer.UITitle);
+            }
+            return res;
+        }
+    }
+    public class FSMNormalStateNode : FSMUserStateNode
+    {
+        public FSMNormalStateNode() : base()
+        {
+            m_Name = "Normal";
+        }
     }
 
-    public class FSMMetaStateNode : FSMStateNode
+    public class FSMMetaStateNode : FSMUserStateNode
     {
         FSMMachineNode m_SubMachine;
         public FSMMachineNode SubMachine { get { return m_SubMachine; } }
 
-        public FSMMetaStateNode()
+        public FSMMetaStateNode() : base()
         {
             m_Name = "Meta";
-            Type = FSMStateType.Normal;
-
-            Conns.Add(Connector.IdentifierParent, true).ConnectionCreator = _CreateConnection;
-            Conns.Add(Connector.IdentifierChildren, true).ConnectionCreator = _CreateConnection;
         }
 
         public override void OnAddToMachine()
@@ -520,6 +616,15 @@ namespace YBehavior.Editor.Core.New
             m_SubMachine = FSMNodeMgr.Instance.CreateNode<FSMMachineNode>();
             m_SubMachine.MetaState = this;
             SubMachine.OwnerMachine = OwnerMachine;
+            SubMachine.CreateUpper();
+        }
+
+        public override bool CheckValid()
+        {
+            bool res = base.CheckValid();
+
+            res &= SubMachine.CheckValid();
+            return res;
         }
     }
 
@@ -532,6 +637,7 @@ namespace YBehavior.Editor.Core.New
             SortIndex = -4;
 
             Conns.Add(Connector.IdentifierChildren, false).ConnectionCreator = _CreateConnection;
+            Geo.Pos = new Point(100, 100);
         }
     }
 
@@ -544,6 +650,7 @@ namespace YBehavior.Editor.Core.New
             SortIndex = -3;
 
             Conns.Add(Connector.IdentifierParent, true).ConnectionCreator = _CreateConnection;
+            Geo.Pos = new Point(400, 400);
         }
     }
 
@@ -556,6 +663,7 @@ namespace YBehavior.Editor.Core.New
             SortIndex = -2;
 
             Conns.Add(Connector.IdentifierChildren, true).ConnectionCreator = _CreateConnection;
+            Geo.Pos = new Point(250, 250);
         }
     }
 
@@ -569,6 +677,7 @@ namespace YBehavior.Editor.Core.New
 
             Conns.Add(Connector.IdentifierParent, true).ConnectionCreator = _CreateConnection;
             Conns.Add(Connector.IdentifierChildren, true).ConnectionCreator = _CreateConnection;
+            Geo.Pos = new Point(400, 100);
         }
     }
 }

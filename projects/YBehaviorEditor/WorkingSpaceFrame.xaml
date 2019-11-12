@@ -8,7 +8,8 @@
              d:DesignHeight="300" d:DesignWidth="200">
     <DockPanel>
         <StackPanel Name="FileOperatePanel" Orientation="Horizontal" Height="30" HorizontalAlignment="Left" Width="200"  DockPanel.Dock="Top">
-            <Button Name="btnNew" Click="btnNew_Click">New</Button>
+            <Button Name="btnNewTree" Click="btnNewTree_Click">NewTree</Button>
+            <Button Name="btnNewFSM" Click="btnNewFSM_Click">NewFSM</Button>
             <Button Name="btnSave" Click="btnSave_Click">Save</Button>
             <Button Name="btnRefresh" Click="btnRefresh_Click">Refresh</Button>
         </StackPanel>

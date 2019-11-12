@@ -14,6 +14,10 @@ namespace YBehavior.Editor.Core.New
         /// </summary>
         public FSMRootMachineNode RootMachine { get { return m_RootMachines.Count == 0 ? null : m_RootMachines[0]; } }
 
+        public FSM()
+        {
+            CreateRoot();
+        }
         public void CreateRoot()
         {
             FSMRootMachineNode root = FSMNodeMgr.Instance.CreateNode<FSMRootMachineNode>();

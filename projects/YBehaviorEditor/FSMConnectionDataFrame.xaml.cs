@@ -53,14 +53,14 @@ namespace YBehavior.Editor
 
         private void DeleteTrans_Click(object sender, RoutedEventArgs e)
         {
-            FSMConnection conn = DataContext as FSMConnection;
+            FSMConnectionRenderer conn = DataContext as FSMConnectionRenderer;
             if (this.TransContainer.SelectedItem != null)
             {
                 TransitionResult trans = this.TransContainer.SelectedItem as TransitionResult;
 
                 if (WorkBenchMgr.Instance.ActiveWorkBench is FSMBench)
                 {
-                    (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).Disconnect(conn.Ctr, trans);
+                    (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).Disconnect(conn.Owner.Ctr, trans);
                 }
             }
         }

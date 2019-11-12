@@ -72,7 +72,7 @@ namespace YBehavior.Editor
 
         private void _SetOutlook()
         {
-            if (Node.Type == FSMStateType.Normal)
+            if (Node.Type == FSMStateType.User)
             {
                 if (Node is FSMNormalStateNode)
                     this.border.BorderBrush = (SolidColorBrush)this.FindResource("normalColor");
@@ -296,12 +296,14 @@ namespace YBehavior.Editor
 
         public void OnDelete(int param)
         {
+            if (Node.Type != FSMStateType.User)
+                return;
             Renderer.Delete(param);
         }
 
         public void OnDuplicated(int param)
         {
-            if (Node.Type != FSMStateType.Normal)
+            if (Node.Type != FSMStateType.User)
                 return;
 
             WorkBenchMgr.Instance.CloneTreeNodeToBench(Node, param != 0);
@@ -309,7 +311,7 @@ namespace YBehavior.Editor
 
         public void OnCopied(int param)
         {
-            if (Node.Type != FSMStateType.Normal)
+            if (Node.Type != FSMStateType.User)
                 return;
 
             WorkBenchMgr.Instance.CopyNode(Node, param != 0);

@@ -17,6 +17,13 @@ namespace YBehavior.Editor.Core.New
             m_Graph = m_FSM;
         }
 
+        public override void InitEmpty()
+        {
+            Utility.OperateNode(m_FSM.RootMachine, m_Graph, false, NodeBase.OnAddToGraph);
+            m_FSM.RefreshNodeUID();
+            AddRenderers(m_FSM.RootMachine, true);
+        }
+
         public override bool Load(XmlElement data)
         {
             CommandMgr.Blocked = true;
@@ -25,7 +32,6 @@ namespace YBehavior.Editor.Core.New
             {
                 if (chi.Name == "Machine")
                 {
-                    m_FSM.CreateRoot();
                     _LoadMachine(m_FSM.RootMachine, chi);
                     m_FSM.RootMachine.BuildConnections();
                     AddRenderers(m_FSM.RootMachine, false);
@@ -76,10 +82,17 @@ namespace YBehavior.Editor.Core.New
         protected bool _LoadState(FSMMachineNode machine, XmlNode data)
         {
             FSMStateNode stateNode = null;
+            bool bNewState = true;
             var type = data.Attributes["Type"];
             if (type != null)
             {
-                stateNode = FSMNodeMgr.Instance.CreateStateByName(type.Value);
+                if (FSMStateNode.TypeSpecialStates.Contains(type.Value))
+                {
+                    stateNode = machine.FindState(type.Value);
+                    bNewState = false;
+                }
+                else
+                    stateNode = FSMNodeMgr.Instance.CreateStateByName(type.Value);
             }
             else
             {
@@ -92,12 +105,15 @@ namespace YBehavior.Editor.Core.New
             if (!stateNode.Load(data))
                 return false;
 
-            Utility.OperateNode(stateNode, m_Graph, false, NodeBase.OnAddToGraph);
-
-            if (!machine.AddState(stateNode))
+            if (bNewState)
             {
-                LogMgr.Instance.Error("Add state failed: " + stateNode.Name);
-                return false;
+                Utility.OperateNode(stateNode, m_Graph, false, NodeBase.OnAddToGraph);
+
+                if (!machine.AddState(stateNode))
+                {
+                    LogMgr.Instance.Error("Add state failed: " + stateNode.Name);
+                    return false;
+                }
             }
 
             if (stateNode is FSMMetaStateNode)
@@ -169,6 +185,83 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        public override void Save(XmlElement data, XmlDocument xmlDoc)
+        {
+            CommandMgr.Blocked = true;
+            _SaveMachine(m_FSM.RootMachine, data, xmlDoc, false);
+            CommandMgr.Blocked = false;
+
+            m_ExportFileHash = 0;
+
+            OnPropertyChanged("DisplayName");
+        }
+
+        void _SaveMachine(FSMMachineNode machine, XmlElement data, XmlDocument xmlDoc, bool bExport)
+        {
+            XmlElement nodeEl = xmlDoc.CreateElement("Machine");
+            data.AppendChild(nodeEl);
+
+            if (machine.DefaultState != null)
+                nodeEl.SetAttribute("Default", machine.DefaultState.NickName);
+
+            foreach (FSMStateNode state in machine.States)
+            {
+                _SaveState(state, nodeEl, xmlDoc, bExport);
+            }
+
+            if (machine is FSMRootMachineNode)
+            {
+                foreach (TransitionResult trans in (machine as FSMRootMachineNode).Transition)
+                {
+                    _SaveTrans(trans, nodeEl, xmlDoc);
+                }
+            }
+        }
+
+        void _SaveState(FSMStateNode state, XmlElement data, XmlDocument xmlDoc, bool bExport)
+        {
+            XmlElement nodeEl = xmlDoc.CreateElement("State");
+            data.AppendChild(nodeEl);
+
+            if (!(state is FSMNormalStateNode))
+                nodeEl.SetAttribute("Type", state.Name);
+
+            if (bExport)
+                state.Export(nodeEl);
+            else
+                state.Save(nodeEl);
+
+            if (state is FSMMetaStateNode)
+            {
+                _SaveMachine((state as FSMMetaStateNode).SubMachine, nodeEl, xmlDoc, bExport);
+            }
+        }
+
+        void _SaveTrans(TransitionResult trans, XmlElement data, XmlDocument xmlDoc)
+        {
+            XmlElement nodeEl = xmlDoc.CreateElement("Trans");
+            data.AppendChild(nodeEl);
+
+            if (trans.Key.FromState != null)
+                nodeEl.SetAttribute("From", trans.Key.FromState.NickName);
+
+            if (trans.Key.ToState != null)
+                nodeEl.SetAttribute("To", trans.Key.ToState.NickName);
+
+            foreach (var e in trans.Value)
+            {
+                XmlElement el = xmlDoc.CreateElement(e.Event.Event);
+                nodeEl.AppendChild(el);
+            }
+        }
+
+        public override void Export(XmlElement data, XmlDocument xmlDoc)
+        {
+            CommandMgr.Blocked = true;
+            _SaveMachine(m_FSM.RootMachine, data, xmlDoc, true);
+            CommandMgr.Blocked = false;
+        }
+
         public override void AddRenderers(NodeBase node, bool batchAdd, bool excludeRoot = false)
         {
             NodeList.Clear();
@@ -217,6 +310,19 @@ namespace YBehavior.Editor.Core.New
             NodeList.DelayAdd(node.ForceGetRenderer);
         }
 
+        public override void RemoveRenderers(NodeBase node, bool excludeRoot = false)
+        {
+            foreach (Connector ctr in node.Conns.ConnectorsList)
+            {
+                foreach (Connection conn in ctr.Conns)
+                {
+                    ConnectionList.Remove(conn.Renderer);
+                }
+            }
+
+            NodeList.Remove(node.Renderer);
+        }
+
         public override void DisconnectNodes(Connection.FromTo connection)
         {
             FSMConnection conn = connection.From.FindConnection(connection) as FSMConnection;
@@ -227,6 +333,12 @@ namespace YBehavior.Editor.Core.New
             {
                 Disconnect(conn, conn.Trans[0]);
             }
+
+            DisconnectNodeCommand disconnectNodeCommand = new DisconnectNodeCommand
+            {
+                Conn = connection,
+            };
+            PushDoneCommand(disconnectNodeCommand);
         }
 
         public void Disconnect(Connection.FromTo fromto, TransitionResult trans)
@@ -280,11 +392,63 @@ namespace YBehavior.Editor.Core.New
                 }
             }
 
+            ConnectNodeCommand connectNodeCommand = new ConnectNodeCommand
+            {
+                Conn = new Connection.FromTo{ From = from, To = to },
+            };
+            PushDoneCommand(connectNodeCommand);
         }
 
         public void ConnectNodes(FSMStateNode fromState, FSMStateNode toState)
         {
             ConnectNodes(fromState.Conns.GetConnector(Connector.IdentifierChildren), toState.Conns.ParentConnector);
+        }
+
+        public override void AddNode(NodeBase node)
+        {
+            FSMStateNode state = node as FSMStateNode;
+            FSMMachineNode curMachine = this.StackMachines[0];
+            Utility.OperateNode(node, m_Graph, true, NodeBase.OnAddToGraph);
+
+            if (!curMachine.AddState(state))
+                return;
+
+            _AddStateRenderer(state);
+            SelectionMgr.Instance.Clear();
+
+            NodeList.Dispose();
+
+            m_FSM.RefreshNodeUID();
+
+
+            AddNodeCommand addNodeCommand = new AddNodeCommand()
+            {
+                Node = node
+            };
+            PushDoneCommand(addNodeCommand);
+        }
+
+        public override void RemoveNode(NodeBase node)
+        {
+            RemoveRenderers(node);
+            FSMStateNode state = node as FSMStateNode;
+            state.OwnerMachine.RemoveState(state);
+
+            RemoveNodeCommand removeNodeCommand = new RemoveNodeCommand()
+            {
+                Node = node
+            };
+            PushDoneCommand(removeNodeCommand);
+        }
+
+        public override bool CheckError()
+        {
+            return _CheckError(m_FSM.RootMachine);
+        }
+
+        private bool _CheckError(FSMMachineNode machine)
+        {
+            return machine.CheckValid();
         }
     }
 }

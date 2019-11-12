@@ -251,7 +251,7 @@ namespace YBehavior.Editor.Core
 
             if (!bench.CheckError())
             {
-                LogMgr.Instance.Error("Something wrong in tree.");
+                LogMgr.Instance.Error("Something wrong in file.");
                 ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
                 {
                     Content = "Saved With Errors.",

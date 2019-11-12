@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<MonsterMachine>
+  <Machine Default="Idle">
+    <State Type="Entry" Tree="Single" />
+    <State Type="Exit" Tree="Single" />
+    <State Type="Any" />
+    <State Name="Idle" Tree="Single" />
+    <State Type="Meta" Name="Move">
+      <Machine Default="Walk">
+        <State Type="Entry" />
+        <State Type="Exit" Tree="Single" />
+        <State Type="Any" />
+        <State Type="Upper" />
+        <State Name="Walk" />
+        <State Name="Run" />
+        <State Type="Meta" Name="Test">
+          <Machine Default="Test1">
+            <State Type="Entry" />
+            <State Type="Exit" Tree="Single" />
+            <State Type="Any" />
+            <State Type="Upper" />
+            <State Name="Test1" />
+            <State Name="Test2" />
+          </Machine>
+        </State>
+      </Machine>
+    </State>
+    <State Type="Meta" Name="Fight">
+      <Machine Default="Detect">
+        <State Type="Entry" />
+        <State Type="Exit" />
+        <State Type="Any" />
+        <State Type="Upper" />
+        <State Name="Detect" />
+        <State Name="Skill" Tree="Single" />
+        <State Name="CD" Tree="Single" />
+      </Machine>
+    </State>
+    <Trans To="CD">
+      <AnyToCD />
+    </Trans>
+    <Trans To="Walk">
+      <AnyToWalk />
+    </Trans>
+    <Trans To="Idle">
+      <AnyToIdle />
+    </Trans>
+    <Trans From="Walk" To="Run" />
+  </Machine>
+</MonsterMachine>
