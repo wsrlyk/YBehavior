@@ -11,7 +11,7 @@ namespace YBehavior.Editor
     /// <summary>
     /// BehaviorNode.xaml 的交互逻辑
     /// </summary>
-    public partial class UIFSMState : YUserControl, ISelectable, IDeletable, IDuplicatable, IDebugPointable, ICanDisable
+    public partial class UIFSMState : YUserControl, ISelectable, IDeletable, IDuplicatable, IDebugPointable, ICanDisable, ICanMakeDefault
     {
         static SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
@@ -336,6 +336,14 @@ namespace YBehavior.Editor
         public void ToggleDisable()
         {
             Renderer.ToggleDisabled();
+        }
+
+        public void MakeDefault()
+        {
+            if (WorkBenchMgr.Instance.ActiveWorkBench is FSMBench)
+            {
+                (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).SetDefault(Node);
+            }
         }
     }
 }

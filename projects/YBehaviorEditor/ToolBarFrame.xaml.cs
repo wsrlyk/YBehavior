@@ -33,6 +33,13 @@ namespace YBehavior.Editor
             {
                 this.btnUndo.DataContext = oArg.Bench.CommandMgr;
                 this.btnRedo.DataContext = oArg.Bench.CommandMgr;
+
+                Visibility treeVisibility = oArg.Bench is TreeBench ? Visibility.Visible : Visibility.Collapsed;
+                Visibility fsmVisibility = oArg.Bench is FSMBench ? Visibility.Visible : Visibility.Collapsed;
+
+                btnFold.Visibility = treeVisibility;
+                btnCondition.Visibility = treeVisibility;
+                btnMakeDefault.Visibility = fsmVisibility;
             }
         }
 
@@ -99,6 +106,11 @@ namespace YBehavior.Editor
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
             MainWindow.ProcessKeyDown(Key.F2, ModifierKeys.None);
+        }
+
+        private void btnMakeDefault_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.ProcessKeyDown(Key.F7, ModifierKeys.None);
         }
     }
 }

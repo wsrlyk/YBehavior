@@ -399,9 +399,21 @@ namespace YBehavior.Editor.Core.New
             PushDoneCommand(connectNodeCommand);
         }
 
-        public void ConnectNodes(FSMStateNode fromState, FSMStateNode toState)
+        public void SetDefault(FSMStateNode state)
         {
-            ConnectNodes(fromState.Conns.GetConnector(Connector.IdentifierChildren), toState.Conns.ParentConnector);
+            if (state == null)
+                return;
+            FSMConnection oldConn = null;
+            FSMConnection newConn = null;
+
+            FSMMachineNode machine = state.OwnerMachine;
+            if (machine.SetDefault(state, ref oldConn, ref newConn))
+            {
+                if (oldConn.Trans.Count == 0)
+                    ConnectionList.Remove(oldConn.Renderer);
+                if (newConn.Trans.Count == 1)
+                    ConnectionList.Add(newConn.Renderer);
+            }
         }
 
         public override void AddNode(NodeBase node)

@@ -41,6 +41,7 @@ namespace YBehavior.Editor.Core.New
             }
         }
     }
+
     public class FSMMachineRenderer : NodeBaseRenderer
     {
         FSMMachineNode m_FSMMachineOwner;

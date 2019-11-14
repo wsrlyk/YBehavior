@@ -130,6 +130,7 @@ namespace YBehavior.Editor
                     if (DebugMgr.Instance.IsDebugging())
                         break;
                     SelectionMgr.Instance.TryToggleFold();
+                    SelectionMgr.Instance.TryMakeDefault();
                     break;
                 case Key.F1:
                     {

@@ -44,23 +44,16 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Old\Comment.cs" />
     <Compile Include="Coroutine\Coroutine.cs" />
     <Compile Include="Coroutine\CoroutineManager.cs" />
     <Compile Include="Coroutine\MathExtensions.cs" />
     <Compile Include="Coroutine\Time.cs" />
     <Compile Include="Coroutine\YieldInstruction.cs" />
-    <None Include="Old\DebugMgr.cs" />
-    <None Include="Old\DescriptionMgr.cs" />
-    <None Include="Old\ExternalActionMgr.cs" />
-    <None Include="Old\InOutMemoryMgr.cs" />
-    <None Include="Old\Memory.cs" />
     <Compile Include="New\FSM.cs" />
     <Compile Include="New\FSMBench.cs" />
     <Compile Include="New\FSMConnections.cs" />
     <Compile Include="New\FSMNode.cs" />
     <Compile Include="New\FSMRenderers.cs" />
-    <Compile Include="New\PopMenu.cs" />
     <Compile Include="New\Transition.cs" />
     <Compile Include="New\TreeNodes.cs" />
     <Compile Include="New\TreeNode.cs" />
@@ -99,35 +92,7 @@
     <Compile Include="New\WorkBench.cs" />
     <Compile Include="New\TreeBench.cs" />
     <Compile Include="New\WorkBenchMgr.cs" />
-    <None Include="Old\TypeMap.cs" />
-    <None Include="Old\VariableCollection.cs" />
-    <None Include="Old\Tools\DiffMatchPatch.cs" />
-    <None Include="Old\Tools\IniFile.cs" />
-    <None Include="Old\MessageProcessor.cs" />
-    <None Include="Old\NetworkMgr.cs" />
-    <None Include="Old\SharedData.cs" />
-    <None Include="Old\Tools\Bimap.cs" />
-    <None Include="Old\Tools\ObjectPool.cs" />
-    <None Include="Old\Tools\ObservableCollectionEx.cs" />
-    <None Include="Old\Tools\ObservableDictionary.cs" />
-    <None Include="Old\Tools\Utility.cs" />
-    <None Include="Old\Variable.cs" />
-    <None Include="Old\Config.cs" />
-    <None Include="Old\Connection.cs" />
-    <None Include="Old\EventMgr.cs" />
-    <None Include="Old\LogMgr.cs" />
-    <None Include="Old\Operation.cs" />
-    <None Include="Old\CommandMgr.cs" />
-    <None Include="Old\NodeMgr.cs" />
-    <None Include="Old\Render\Renderers.cs" />
-    <None Include="Old\Nodes\Nodes.cs" />
-    <None Include="Old\DragDropMgr.cs" />
-    <None Include="Old\SelectionMgr.cs" />
-    <None Include="Old\Singleton.cs" />
-    <None Include="Old\TreeFileMgr.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="Old\WorkBenchMgr.cs" />
-    <None Include="Old\WorkBench.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

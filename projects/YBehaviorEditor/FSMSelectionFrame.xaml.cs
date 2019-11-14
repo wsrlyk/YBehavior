@@ -63,19 +63,33 @@ namespace YBehavior.Editor
 
                 Dispatcher.BeginInvoke((Action)(() => this.TabController.SelectedItem = this.StateTab));
             }
-            else if (oArg.Target is UIComment)
+            else
+            {
+                this.StateTab.DataContext = null;
+            }
+
+            if (oArg.Target is UIComment)
             {
                 UIComment com = oArg.Target as UIComment;
                 this.CommentTab.DataContext = com.DataContext;
 
                 Dispatcher.BeginInvoke((Action)(() => this.TabController.SelectedItem = this.CommentTab));
             }
-            else if (oArg.Target is FSMUIConnection)
+            else
+            {
+                this.CommentTab.DataContext = null;
+            }
+
+            if (oArg.Target is FSMUIConnection)
             {
                 FSMUIConnection conn = oArg.Target as FSMUIConnection;
                 this.ConnectionTab.DataContext = conn.DataContext;
 
                 Dispatcher.BeginInvoke((Action)(() => this.TabController.SelectedItem = this.ConnectionTab));
+            }
+            else
+            {
+                this.ConnectionTab.DataContext = null;
             }
         }
 

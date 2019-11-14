@@ -50,7 +50,6 @@
         </Border>
         <Border Name="border" BorderThickness="4" Background="#FFB4B7B9" MinWidth="80" BorderBrush="#FF9E599B">
             <Grid>
-                <Grid Name="connectors"/>
                 <Border Name="disableCover" BorderThickness="0" Background="#FF4B4B4B" Visibility="{Binding Disabled, Converter={StaticResource visibilityConvertor}}"/>
                 <Border Name="debugCover" BorderThickness="0" Background="#FFDA3F1C"/>
                 <Border Name="selectCover" BorderThickness="3" BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"/>
@@ -68,6 +67,7 @@
                         <SolidColorBrush Color="Purple" Opacity="0.6" />
                     </Ellipse.Fill>
                 </Ellipse>
+                <Grid Name="connectors"/>
             </Grid>
         </Border>
     </DockPanel>

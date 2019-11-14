@@ -37,6 +37,9 @@
         <Button Name="btnFold" Width="50" Click="btnFold_Click">
             <TextBlock Text ="Fold&#x0a;  F7 "/>
         </Button>
+        <Button Name="btnMakeDefault" Width="50" Click="btnMakeDefault_Click">
+            <TextBlock Text ="  Make&#x0a; Default&#x0a;     F7" />
+        </Button>
         <Button Name="btnLog" Width="60" Click="btnLog_Click">
             <TextBlock Text ="LogPoint&#x0a;    F8"/>
         </Button>

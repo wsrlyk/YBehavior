@@ -41,6 +41,11 @@ namespace YBehavior.Editor.Core.New
         void ToggleFold();
     }
 
+    public interface ICanMakeDefault
+    {
+        void MakeDefault();
+    }
+
     public delegate void SelectionStateChangeHandler(ISelectable obj, bool bState);
     public delegate void DeleteHandler(IDeletable obj);
 
@@ -226,6 +231,17 @@ namespace YBehavior.Editor.Core.New
             if (fold != null)
             {
                 fold.ToggleFold();
+            }
+        }
+        public void TryMakeDefault()
+        {
+            if (m_SingleSelection == null)
+                return;
+
+            ICanMakeDefault makedefault = m_SingleSelection as ICanMakeDefault;
+            if (makedefault != null)
+            {
+                makedefault.MakeDefault();
             }
         }
     }

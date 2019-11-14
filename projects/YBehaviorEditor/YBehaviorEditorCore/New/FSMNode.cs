@@ -163,7 +163,9 @@ namespace YBehavior.Editor.Core.New
                 FSMStateNode state = FindState(attr.Value);
                 if (state!= null)
                 {
-                    SetDefault(state);
+                    FSMConnection oldConn = null;
+                    FSMConnection newConn = null;
+                    SetDefault(state, ref oldConn, ref newConn);
                 }
                 else
                 {
@@ -223,11 +225,73 @@ namespace YBehavior.Editor.Core.New
             return true;
         }
 
-        public void SetDefault(FSMStateNode state)
+        public bool SetDefault(FSMStateNode state, ref FSMConnection oldConn, ref FSMConnection newConn)
         {
-            ///> TODO
+            if (state == null)
+                return false;
+            if (state.OwnerMachine != this)
+                return false;
+            if (state.Type == FSMStateType.Special)
+                return false;
+
+            if (m_Default != null)
+            {
+                Connection.FromTo fromto = new Connection.FromTo
+                {
+                    From = EntryState.Conns.GetConnector(Connector.IdentifierChildren),
+                    To = m_Default.Conns.ParentConnector
+                };
+
+                FSMConnection conn = fromto.From.FindConnection(fromto) as FSMConnection;
+                if (conn == null)
+                {
+                    LogMgr.Instance.Error("There's a default state but cant find the connection");
+                    return false;
+                }
+                TransitionResult defaultTrans = null;
+                foreach (var trans in conn.Trans)
+                {
+                    if (trans.Type == TransitionResultType.Default)
+                    {
+                        defaultTrans = trans;
+                        break;
+                    }
+                }
+                if (defaultTrans == null)
+                {
+                    LogMgr.Instance.Error("There's a default state but cant find the transition");
+                    return false;
+                }
+                conn.Trans.Remove(defaultTrans);
+                if (conn.Trans.Count == 0)
+                {
+                    Connector.TryDisconnect(fromto);
+                }
+
+                oldConn = conn;
+            }
+            /// new default
+            {
+                Connector parent;
+                Connector child;
+
+                FSMConnection conn = Connector.TryConnect(EntryState.Conns.GetConnector(Connector.IdentifierChildren), state.Conns.ParentConnector, out parent, out child) as FSMConnection;
+                if (conn != null)
+                {
+                    TransitionResult res = new TransitionResult(new TransitionMapKey(EntryState, state));
+                    res.Type = TransitionResultType.Default;
+                    conn.Trans.Add(res);
+
+                }
+                else
+                {
+                    return false;
+                }
+                newConn = conn;
+            }
 
             m_Default = state;
+            return true;
         }
 
         void _ProcessSpecialState(ref FSMStateNode target, FSMStateNode state)
@@ -427,7 +491,7 @@ namespace YBehavior.Editor.Core.New
 
         public TransRoute MakeTrans(FSMStateNode fromState, FSMStateNode toState)
         {
-            TransitionResult trans = Transition.Insert(fromState, "", toState);
+            TransitionResult trans = Transition.Insert(fromState, toState);
             if (trans == null)
                 return new TransRoute();
 
@@ -578,7 +642,7 @@ namespace YBehavior.Editor.Core.New
     {
         public FSMUserStateNode()
         {
-            Type = FSMStateType.User;
+            Type = FSMStateType.Invalid;
             Conns.Add(Connector.IdentifierParent, true).ConnectionCreator = _CreateConnection;
             Conns.Add(Connector.IdentifierChildren, true).ConnectionCreator = _CreateConnection;
         }
@@ -597,6 +661,7 @@ namespace YBehavior.Editor.Core.New
         public FSMNormalStateNode() : base()
         {
             m_Name = "Normal";
+            Type = FSMStateType.User;
         }
     }
 
@@ -608,6 +673,7 @@ namespace YBehavior.Editor.Core.New
         public FSMMetaStateNode() : base()
         {
             m_Name = "Meta";
+            Type = FSMStateType.User;
         }
 
         public override void OnAddToMachine()

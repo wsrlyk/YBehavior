@@ -31,14 +31,23 @@ namespace YBehavior.Editor
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             FSMConnectionRenderer Renderer = DataContext as FSMConnectionRenderer;
-            m_CurrentConnection = Renderer.FSMOwner;
-            this.TransitionList.DataContext = m_CurrentConnection;
+            if (Renderer != null)
+            {
+                m_CurrentConnection = Renderer.FSMOwner;
+                this.TransitionList.DataContext = m_CurrentConnection;
 
-            this.TransContainer.ItemsSource = m_CurrentConnection.Trans;
-            _SetSelectedTransition(null);
+                this.TransContainer.ItemsSource = m_CurrentConnection.Trans;
+                _SetSelectedTransition(null);
 
-            AutoSelectTransition();
-
+                AutoSelectTransition();
+            }
+            else
+            {
+                m_CurrentConnection = null;
+                this.TransitionList.DataContext = null;
+                this.TransContainer.ItemsSource = null;
+                this.CondsContainer.ItemsSource = null;
+            }
         }
 
         void _SetSelectedTransition(TransitionResult res)
@@ -99,7 +108,7 @@ namespace YBehavior.Editor
         private void AddCond_Click(object sender, RoutedEventArgs e)
         {
             if (m_SelectedTrans != null)
-                m_SelectedTrans.Value.Add(new TransitionMapValue());
+                m_SelectedTrans.Value.Add(new TransitionMapValue(string.Empty));
         }
 
         private void DeleteCond_Click(object sender, RoutedEventArgs e)
