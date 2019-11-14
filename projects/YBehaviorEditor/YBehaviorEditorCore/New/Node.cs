@@ -254,7 +254,7 @@ namespace YBehavior.Editor.Core.New
 
         }
 
-        protected void PropertyChange(RenderProperty property)
+        public void PropertyChange(RenderProperty property)
         {
             if (m_Renderer != null)
                 m_Renderer.PropertyChange(property);

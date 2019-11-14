@@ -20,27 +20,26 @@ namespace YBehavior.Editor.Core.New
                 m_TreeFileInfos.Children.Clear();
             m_FileDic.Clear();
 
-            _LoadDir(Config.Instance.WorkingDir, m_TreeFileInfos);
-        }
-        private void _LoadDir(string dir, TreeFileInfo parent)
-        {
-            DirectoryInfo TheFolder = new DirectoryInfo(dir);
+            DirectoryInfo TheFolder = new DirectoryInfo(Config.Instance.WorkingDir);
             if (!TheFolder.Exists)
                 return;
-
-            TreeFileInfo thisFolder = new TreeFileInfo
-            {
-                Name = TheFolder.Name,
-                FileType = FileType.FOLDER,
-            };
-
-            if (parent.Children == null)
-                parent.Children = new List<TreeFileInfo>();
-            parent.Children.Add(thisFolder);
+            _LoadDir(TheFolder, m_TreeFileInfos);
+        }
+        private void _LoadDir(DirectoryInfo TheFolder, TreeFileInfo thisFolder)
+        {
+            if (thisFolder.Children == null)
+                thisFolder.Children = new List<TreeFileInfo>();
 
             foreach (DirectoryInfo nextDir in TheFolder.GetDirectories())
             {
-                _LoadDir(nextDir.FullName, thisFolder);
+                TreeFileInfo childFolder = new TreeFileInfo
+                {
+                    Name = nextDir.Name,
+                    FileType = FileType.FOLDER,
+                };
+                thisFolder.Children.Add(childFolder);
+
+                _LoadDir(nextDir, childFolder);
             }
             foreach (FileInfo NextFile in TheFolder.GetFiles())
             {

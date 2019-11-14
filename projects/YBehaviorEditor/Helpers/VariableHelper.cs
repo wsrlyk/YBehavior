@@ -196,6 +196,23 @@ namespace YBehavior.Editor
         }
     }
 
+    [ValueConversion(typeof(System.Windows.Vector), typeof(System.Windows.Vector))]
+    public class FSMStateBackGroundConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool isdefault = (bool)values[0];
+            System.Windows.FrameworkElement o = values[1] as System.Windows.FrameworkElement;
+            if ((bool)isdefault)
+                return o.FindResource("defaultBackground");
+            return o.FindResource("normalBackground");
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
     public class ValueConverterGroup : List<IValueConverter>, IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

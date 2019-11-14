@@ -66,8 +66,16 @@ namespace YBehavior.Editor
             if (this.TransContainer.SelectedItem != null)
             {
                 TransitionResult trans = this.TransContainer.SelectedItem as TransitionResult;
-
-                if (WorkBenchMgr.Instance.ActiveWorkBench is FSMBench)
+                if (trans.Type == TransitionResultType.Default)
+                {
+                    ShowSystemTipsArg arg = new ShowSystemTipsArg()
+                    {
+                        Content = "Default State Transition Cant Delete.",
+                        TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                    };
+                    EventMgr.Instance.Send(arg);
+                }
+                else if (WorkBenchMgr.Instance.ActiveWorkBench is FSMBench)
                 {
                     (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).Disconnect(conn.Owner.Ctr, trans);
                 }
@@ -108,7 +116,21 @@ namespace YBehavior.Editor
         private void AddCond_Click(object sender, RoutedEventArgs e)
         {
             if (m_SelectedTrans != null)
-                m_SelectedTrans.Value.Add(new TransitionMapValue(string.Empty));
+            {
+                if (m_SelectedTrans.Type == TransitionResultType.Default)
+                {
+                    ShowSystemTipsArg arg = new ShowSystemTipsArg()
+                    {
+                        Content = "Default State Transition Cant Add Condition.",
+                        TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                    };
+                    EventMgr.Instance.Send(arg);
+                }
+                else
+                {
+                    m_SelectedTrans.Value.Add(new TransitionMapValue(string.Empty));
+                }
+            }
         }
 
         private void DeleteCond_Click(object sender, RoutedEventArgs e)

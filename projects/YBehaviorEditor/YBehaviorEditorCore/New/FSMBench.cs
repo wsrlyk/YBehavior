@@ -191,6 +191,7 @@ namespace YBehavior.Editor.Core.New
             _SaveMachine(m_FSM.RootMachine, data, xmlDoc, false);
             CommandMgr.Blocked = false;
 
+            CommandMgr.Dirty = false;
             m_ExportFileHash = 0;
 
             OnPropertyChanged("DisplayName");

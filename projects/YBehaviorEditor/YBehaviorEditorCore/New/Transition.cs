@@ -176,9 +176,10 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return string.Format("{0} => {1}"
+                return string.Format("{0} => {1} {2}"
                     , Owner.Key.FromState == null ? "Any" : Owner.Key.FromState.ForceGetRenderer.FullName
-                    , Owner.Key.ToState == null ? "Any" : Owner.Key.ToState.ForceGetRenderer.FullName);
+                    , Owner.Key.ToState == null ? "Any" : Owner.Key.ToState.ForceGetRenderer.FullName
+                    , Owner.Type == TransitionResultType.Default ? "(Default)" : string.Empty);
             }
         }
 

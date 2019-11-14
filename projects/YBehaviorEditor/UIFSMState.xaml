@@ -14,7 +14,8 @@
             <local:InvertBoolConverter/>
             <BooleanToVisibilityConverter/>
         </local:ValueConverterGroup>
-
+        <local:FSMStateBackGroundConverter x:Key="backgroundConvertor"/>
+        
         <Style TargetType="FrameworkElement" x:Key="VisibleAnimation">
             <Setter Property="Visibility" Value="Collapsed"/>
             <Setter Property="Opacity" Value="0"/>
@@ -36,6 +37,8 @@
                 <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
             </ObjectAnimationUsingKeyFrames>
         </Storyboard>
+        <SolidColorBrush x:Key="defaultBackground"  Color="#FF7E8081"/>
+        <SolidColorBrush x:Key="normalBackground"  Color="#FFB4B7B9"/>
         <SolidColorBrush x:Key="normalColor"  Color="#FFC2C3C5"/>
         <SolidColorBrush x:Key="metaColor"  Color="#FFCFCA60"/>
         <SolidColorBrush x:Key="entryColor"  Color="#FF74C555"/>
@@ -48,7 +51,14 @@
                 Visibility="{Binding Path=Comment, Converter={StaticResource invertStringEmptyAndVisibilityConvertor}}">
             <TextBlock Text="{Binding Comment, Mode=OneWay}" FontSize="10"/>
         </Border>
-        <Border Name="border" BorderThickness="4" Background="#FFB4B7B9" MinWidth="80" BorderBrush="#FF9E599B">
+        <Border Name="border" BorderThickness="4"
+                MinWidth="80" BorderBrush="#FF9E599B">
+            <Border.Background>
+                <MultiBinding Converter="{StaticResource backgroundConvertor}" Mode="OneWay">
+                    <Binding Path="IsDefaultState"/>
+                    <Binding RelativeSource="{RelativeSource Self}"/>
+                </MultiBinding>
+            </Border.Background>
             <Grid>
                 <Border Name="disableCover" BorderThickness="0" Background="#FF4B4B4B" Visibility="{Binding Disabled, Converter={StaticResource visibilityConvertor}}"/>
                 <Border Name="debugCover" BorderThickness="0" Background="#FFDA3F1C"/>

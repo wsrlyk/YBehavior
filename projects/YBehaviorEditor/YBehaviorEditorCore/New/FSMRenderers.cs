@@ -40,6 +40,14 @@ namespace YBehavior.Editor.Core.New
                 return FSMStateOwner.Name;
             }
         }
+
+        public bool IsDefaultState
+        {
+            get
+            {
+                return m_FSMStateOwner.OwnerMachine.DefaultState == m_FSMStateOwner;
+            }
+        }
     }
 
     public class FSMMachineRenderer : NodeBaseRenderer

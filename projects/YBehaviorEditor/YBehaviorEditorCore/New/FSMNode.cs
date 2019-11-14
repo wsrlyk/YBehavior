@@ -196,8 +196,11 @@ namespace YBehavior.Editor.Core.New
 
             m_States.Remove(state);
             if (state.IsUserState)
+            {
+                if (m_Default == state)
+                    m_Default = null;
                 return RootMachine.RemoveGlobalState(state);
-
+            }
             return true;
         }
         public bool AddState(FSMStateNode state)
@@ -269,6 +272,9 @@ namespace YBehavior.Editor.Core.New
                 }
 
                 oldConn = conn;
+                var oldState = m_Default;
+                m_Default = null;
+                oldState.PropertyChange(RenderProperty.DefaultState);
             }
             /// new default
             {
@@ -291,6 +297,7 @@ namespace YBehavior.Editor.Core.New
             }
 
             m_Default = state;
+            m_Default.PropertyChange(RenderProperty.DefaultState);
             return true;
         }
 
@@ -363,11 +370,17 @@ namespace YBehavior.Editor.Core.New
         public override bool CheckValid()
         {
             bool res = true;
+            bool hasUserState = false;
             foreach (FSMStateNode state in m_States)
             {
+                hasUserState |= state.IsUserState;
                 res &= state.CheckValid();
             }
-
+            if (m_Default == null && hasUserState)
+            {
+                LogMgr.Instance.Error(string.Format("{0} must have a DefaultState", ForceGetRenderer.UITitle));
+                res = false;
+            }
             return res;
         }
     }

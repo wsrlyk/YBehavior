@@ -97,6 +97,8 @@ namespace YBehavior.Editor.Core.New
         Folded,
         ReturnType,
         Condition,
+
+        DefaultState,
     }
 
     public class NodeBaseRenderer : System.ComponentModel.INotifyPropertyChanged
@@ -137,6 +139,9 @@ namespace YBehavior.Editor.Core.New
                     break;
                 case RenderProperty.Condition:
                     OnPropertyChanged("EnableCondition");
+                    break;
+                case RenderProperty.DefaultState:
+                    OnPropertyChanged("IsDefaultState");
                     break;
                 default:
                     break;
