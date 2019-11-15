@@ -6,19 +6,29 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <local:MenuStyleSelector x:Key="menuStyleSelector" />
+    </UserControl.Resources>
     <Grid>
         <Grid.ContextMenu>
-            <ContextMenu Name="Menu" ItemsSource="{Binding MenuItems}">
-                <ContextMenu.ItemContainerStyle>
+            <ContextMenu Name="Menu" ItemsSource="{Binding MenuItems}" ItemContainerStyleSelector="{StaticResource menuStyleSelector}">
+                <ContextMenu.Resources>
                     <Style TargetType="{x:Type MenuItem}">
-                        <Setter Property="Command" Value="{Binding Command}" />
+                        <Setter Property="Command" Value="{Binding Path=Command}"/>
+                        <Setter Property="Header" Value="{Binding Path=Text}"/>
+                        <Setter Property="ItemsSource" Value="{Binding MenuItems}"/>
+                        <Setter Property="ItemContainerStyleSelector" Value="{StaticResource menuStyleSelector}"/>
                     </Style>
-                </ContextMenu.ItemContainerStyle>
-                <ContextMenu.ItemTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type local:MenuItemViewModel}" ItemsSource="{Binding Path=MenuItems}">
-                        <TextBlock Text="{Binding Header}"/>
-                    </HierarchicalDataTemplate>
-                </ContextMenu.ItemTemplate>
+                    <Style TargetType="{x:Type MenuItem}" x:Key="stMenuHeader">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type MenuItem}">
+                                    <TextBlock Text="{Binding Text}" Margin="0,5"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ContextMenu.Resources>
             </ContextMenu>
         </Grid.ContextMenu>
     </Grid>

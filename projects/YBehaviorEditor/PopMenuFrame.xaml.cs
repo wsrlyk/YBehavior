@@ -15,6 +15,17 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
+    public class MenuStyleSelector : StyleSelector
+    {
+        public override Style SelectStyle(object item, DependencyObject container)
+        {
+            if (item is MenuItemHeadViewModel)
+            {
+                return ((FrameworkElement)container).FindResource("stMenuHeader") as Style;
+            }
+            return base.SelectStyle(item, container);
+        }
+    }
     /// <summary>
     /// PopMenu.xaml 的交互逻辑
     /// </summary>

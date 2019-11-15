@@ -6,7 +6,16 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
-    public class MenuItemViewModel
+    public interface IMenuItemViewModel
+    {
+        string Text { get; set; }
+    }
+    public class MenuItemHeadViewModel : IMenuItemViewModel
+    {
+        public string Text { get; set; }
+    }
+
+    public class MenuItemViewModel : IMenuItemViewModel
     {
         private readonly System.Windows.Input.ICommand _command;
 
@@ -15,9 +24,9 @@ namespace YBehavior.Editor
             _command = new CommandViewModel(action);
         }
 
-        public string Header { get; set; }
+        public string Text { get; set; }
 
-        public List<MenuItemViewModel> MenuItems { get; set; }
+        public List<IMenuItemViewModel> MenuItems { get; set; }
 
         public System.Windows.Input.ICommand Command
         {
@@ -25,12 +34,6 @@ namespace YBehavior.Editor
             {
                 return _command;
             }
-        }
-
-        private void Execute()
-        {
-            // (NOTE: In a view model, you normally should not use MessageBox.Show()).
-            //MessageBox.Show("Clicked at " + Header);
         }
     }
 
@@ -64,23 +67,32 @@ namespace YBehavior.Editor
     {
         public static MenuItemViewModel CreateFSMConnectionDropMenu(FSMStateNode from, FSMStateNode to)
         {
-
-            FSMMachineNode machine = null;
+            MenuItemViewModel menu = null;
             if (to is FSMMetaStateNode)
-                machine = (to as FSMMetaStateNode).SubMachine;
+                menu = _CreateMachineMenuItem(from, to as FSMMetaStateNode, to.OwnerMachine);
             else if (to is FSMUpperStateNode)
-                machine = to.RootMachine;
+                menu = _CreateMachineMenuItem(from, to.RootMachine, to.OwnerMachine);
 
-            if (machine == null)
+            if (menu == null)
                 return null;
 
-            return _CreateMachineMenuItem(from, machine, to.OwnerMachine);
+            menu.MenuItems.Insert(0, new MenuItemHeadViewModel() { Text = string.Format("{0} => ", from.ForceGetRenderer.UITitle) });
+            return menu;
+        }
+
+        static MenuItemViewModel _CreateMachineMenuItem(FSMStateNode from, FSMMetaStateNode to, FSMMachineNode except)
+        {
+            MenuItemViewModel popMenu = new MenuItemViewModel(null) { Text = to.ForceGetRenderer.UITitle };
+            popMenu.MenuItems = new List<IMenuItemViewModel>();
+            popMenu.MenuItems.Add(_CreateMenu(from, to));
+            popMenu.MenuItems.Add(_CreateMachineMenuItem(from, to.SubMachine, except));
+            return popMenu;
         }
 
         static MenuItemViewModel _CreateMachineMenuItem(FSMStateNode from, FSMMachineNode to, FSMMachineNode except)
         {
-            MenuItemViewModel popMenu = new MenuItemViewModel(null) { Header = to.ForceGetRenderer.UITitle };
-            popMenu.MenuItems = new List<MenuItemViewModel>();
+            MenuItemViewModel popMenu = new MenuItemViewModel(null) { Text = to.ForceGetRenderer.UITitle };
+            popMenu.MenuItems = new List<IMenuItemViewModel>();
             foreach (var state in to.States)
             {
                 if (state.Type == FSMStateType.Special)
@@ -88,11 +100,7 @@ namespace YBehavior.Editor
 
                 MenuItemViewModel model;
                 ///> The states
-                model = new MenuItemViewModel(() =>
-                    {
-                        WorkBenchMgr.Instance.ConnectNodes(from.Conns.GetConnector(Connector.IdentifierChildren), state.Conns.ParentConnector);
-                    })
-                { Header = state.ForceGetRenderer.UITitle };
+                model = _CreateMenu(from, state);
 
                 popMenu.MenuItems.Add(model);
 
@@ -110,6 +118,15 @@ namespace YBehavior.Editor
 
             return popMenu;
 
+        }
+
+        static MenuItemViewModel _CreateMenu(FSMStateNode from, FSMStateNode to)
+        {
+            return new MenuItemViewModel(() =>
+            {
+                WorkBenchMgr.Instance.ConnectNodes(from.Conns.GetConnector(Connector.IdentifierChildren), to.Conns.ParentConnector);
+            })
+            { Text = to.ForceGetRenderer.UITitle };
         }
     }
 }
