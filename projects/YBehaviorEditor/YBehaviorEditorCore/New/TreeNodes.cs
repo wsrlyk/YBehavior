@@ -164,6 +164,38 @@ namespace YBehavior.Editor.Core.New
             m_Name = "Sequence";
             Type = TreeNodeType.TNT_Default;
         }
+        public override string Icon => "➜➜➜";
+    }
+    class SelectorTreeNode : CompositeNode
+    {
+        public SelectorTreeNode()
+        {
+            m_Name = "Selector";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override string Icon => "？？？";
+    }
+
+    class RandomSequenceTreeNode : CompositeNode
+    {
+        public RandomSequenceTreeNode()
+        {
+            m_Name = "RandomSequence";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override string Icon => "～➜➜➜";
+    }
+    class RandomSelectorTreeNode : CompositeNode
+    {
+        public RandomSelectorTreeNode()
+        {
+            m_Name = "RandomSelector";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override string Icon => "～？？？";
     }
 
     public class SubTreeNode : LeafNode
@@ -388,4 +420,930 @@ namespace YBehavior.Editor.Core.New
             }
         }
     }
+
+    class ComparerTreeNode : LeafNode
+    {
+        //static Dictionary<string, string> s_OperatorDic = new Dictionary<string, string>() { { "ADD", "+" }, { "SUB", "-" }, { "MUL", "*" }, { "DIV", "/" } };
+        public override string Icon => "x ？y";
+
+        public ComparerTreeNode()
+        {
+            m_Name = "Comparer";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable optr = NodeMemory.CreateVariable(
+                "Operator",
+                "==",
+                Variable.CreateParams_Enum,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                0,
+                "==|!=|>|<|>=|<="
+            );
+
+            Variable opl = NodeMemory.CreateVariable(
+                "Opl",
+                "0",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                1
+            );
+
+            Variable opr = NodeMemory.CreateVariable(
+                "Opr",
+                "0",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} {1} {2} ?",
+                    Variables.GetVariable("Opl").NoteValue,
+                    Variables.GetVariable("Operator").Value,
+                    Variables.GetVariable("Opr").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
+    class SetDataTreeNode : LeafNode
+    {
+        public override string Icon => "x<<y";
+
+        public SetDataTreeNode()
+        {
+            m_Name = "SetData";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable opl = NodeMemory.CreateVariable(
+                "Target",
+                "0",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_NONE,
+                Variable.VariableType.VBT_Pointer,
+                1
+            );
+
+            Variable opr = NodeMemory.CreateVariable(
+                "Source",
+                "0",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_NONE,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} << {1}",
+                    Variables.GetVariable("Target").NoteValue,
+                    Variables.GetVariable("Source").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
+    class IfThenElseTreeNode : TreeNode
+    {
+        public override string Icon => "↙ ？↘";
+
+        public IfThenElseTreeNode()
+        {
+            m_Name = "IfThenElse";
+            Type = TreeNodeType.TNT_Default;
+
+            m_Connections.Add("if", false);
+            m_Connections.Add("then", false);
+            m_Connections.Add("else", false);
+        }
+    }
+
+    class RandomTreeNode : LeafNode
+    {
+        public override string Icon => "～";
+
+        public RandomTreeNode()
+        {
+            m_Name = "Random";
+            Type = TreeNodeType.TNT_Default;
+
+        }
+
+        public override void CreateVariables()
+        {
+            Variable opl = NodeMemory.CreateVariable(
+                "Target",
+                "0",
+                Variable.CreateParams_RandomTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                1
+            );
+
+            Variable opr1 = NodeMemory.CreateVariable(
+                "Bound1",
+                "0",
+                Variable.CreateParams_RandomTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+
+            Variable opr2 = NodeMemory.CreateVariable(
+                "Bound2",
+                "0",
+                Variable.CreateParams_RandomTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} << [ {1} ~ {2} )",
+                    Variables.GetVariable("Target").NoteValue,
+                    Variables.GetVariable("Bound1").NoteValue,
+                    Variables.GetVariable("Bound2").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
+
+    class RandomSelectTreeNode : LeafNode
+    {
+        public override string Icon => "～";
+
+        public RandomSelectTreeNode()
+        {
+            m_Name = "RandomSelect";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable opl = NodeMemory.CreateVariable(
+                "Input",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+
+            Variable opr1 = NodeMemory.CreateVariable(
+                "Output",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{1} <~= {0}",
+                    Variables.GetVariable("Input").NoteValue,
+                    Variables.GetVariable("Output").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
+
+    class ReadRegisterTreeNode : LeafNode
+    {
+        public override string Icon => "[_↓_]";
+
+        public ReadRegisterTreeNode()
+        {
+            m_Name = "ReadRegister";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable name = NodeMemory.CreateVariable(
+                "Event",
+                "",
+                Variable.CreateParams_String,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                0
+            );
+
+            Variable ints = NodeMemory.CreateVariable(
+                "Int",
+                "",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                0
+            );
+
+            Variable floats = NodeMemory.CreateVariable(
+                "Float",
+                "",
+                Variable.CreateParams_Float,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                0
+            );
+
+            Variable strings = NodeMemory.CreateVariable(
+                "String",
+                "",
+                Variable.CreateParams_String,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                0
+            );
+
+            Variable ulongs = NodeMemory.CreateVariable(
+                "Ulong",
+                "",
+                Variable.CreateParams_Ulong,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                0
+            );
+
+            Variable bools = NodeMemory.CreateVariable(
+                "Bool",
+                "",
+                Variable.CreateParams_Bool,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                0
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0}\nInt: {1}\nFloat: {2}\nString: {3}\nUlong: {4}\nBool: {5}",
+                    Variables.GetVariable("Event").NoteValue,
+                    Variables.GetVariable("Int").NoteValue,
+                    Variables.GetVariable("Float").NoteValue,
+                    Variables.GetVariable("String").NoteValue,
+                    Variables.GetVariable("Ulong").NoteValue,
+                    Variables.GetVariable("Bool").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
+    class WriteRegisterTreeNode : LeafNode
+    {
+        public override string Icon => "[_↑_]";
+
+        public WriteRegisterTreeNode()
+        {
+            m_Name = "WriteRegister";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable name = NodeMemory.CreateVariable(
+                "Event",
+                "",
+                Variable.CreateParams_String,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                0
+            );
+
+            Variable ints = NodeMemory.CreateVariable(
+                "Int",
+                "",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                0
+            );
+
+            Variable floats = NodeMemory.CreateVariable(
+                "Float",
+                "",
+                Variable.CreateParams_Float,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                0
+            );
+
+            Variable strings = NodeMemory.CreateVariable(
+                "String",
+                "",
+                Variable.CreateParams_String,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                0
+            );
+
+            Variable ulongs = NodeMemory.CreateVariable(
+                "Ulong",
+                "",
+                Variable.CreateParams_Ulong,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                0
+            );
+
+            Variable bools = NodeMemory.CreateVariable(
+                "Bool",
+                "",
+                Variable.CreateParams_Bool,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                0
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0}\nInt: {1}\nFloat: {2}\nString: {3}\nUlong: {4}\nBool: {5}",
+                    Variables.GetVariable("Event").NoteValue,
+                    Variables.GetVariable("Int").NoteValue,
+                    Variables.GetVariable("Float").NoteValue,
+                    Variables.GetVariable("String").NoteValue,
+                    Variables.GetVariable("Ulong").NoteValue,
+                    Variables.GetVariable("Bool").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
+
+    class SwitchCaseTreeNode : CompositeNode
+    {
+        public override string Icon => "↙↓↘";
+
+        public SwitchCaseTreeNode()
+        {
+            m_Name = "SwitchCase";
+            Type = TreeNodeType.TNT_Default;
+
+            m_Connections.Add(Connector.IdentifierDefault, false);
+        }
+
+        public override void CreateVariables()
+        {
+            NodeMemory.CreateVariable(
+                "Switch",
+                "0",
+                Variable.CreateParams_SwitchTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                1
+            );
+
+            NodeMemory.CreateVariable(
+                "Cases",
+                "",
+                Variable.CreateParams_SwitchTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} from {{ {1} }}",
+                    Variables.GetVariable("Switch").NoteValue,
+                    Variables.GetVariable("Cases").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
+
+    class ForTreeNode : BranchNode
+    {
+        public override string Icon => "↺";
+
+        public ForTreeNode()
+        {
+            m_Name = "For";
+            Type = TreeNodeType.TNT_Default;
+
+            m_Connections.Add(Connector.IdentifierInit, false);
+            m_Connections.Add(Connector.IdentifierCond, false);
+            m_Connections.Add(Connector.IdentifierIncrement, false);
+
+            ///> to make the "chilren" conn the last conn
+            m_Ctr = m_Connections.Add(Connector.IdentifierChildren, false);
+        }
+
+        public override void CreateVariables()
+        {
+            NodeMemory.CreateVariable(
+                "ExitWhenFailure",
+                "F",
+                Variable.CreateParams_Bool,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE
+            );
+        }
+    }
+
+    class ForEachTreeNode : SingleChildNode
+    {
+        public override string Icon => "↺";
+
+        public ForEachTreeNode()
+        {
+            m_Name = "ForEach";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            NodeMemory.CreateVariable(
+                "Collection",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+            NodeMemory.CreateVariable(
+                "Current",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                1
+            );
+            NodeMemory.CreateVariable(
+                "ExitWhenFailure",
+                "F",
+                Variable.CreateParams_Bool,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} from {{ {1} }}",
+                    Variables.GetVariable("Current").NoteValue,
+                    Variables.GetVariable("Collection").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
+
+    class LoopTreeNode : SingleChildNode
+    {
+        public override string Icon => "↺";
+
+        public LoopTreeNode()
+        {
+            m_Name = "Loop";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            NodeMemory.CreateVariable(
+                "Count",
+                "",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+            NodeMemory.CreateVariable(
+                "Current",
+                "",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                1
+            );
+            NodeMemory.CreateVariable(
+                "ExitWhenFailure",
+                "F",
+                Variable.CreateParams_Bool,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} at [0, {1})",
+                    Variables.GetVariable("Current").NoteValue,
+                    Variables.GetVariable("Count").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
+
+    class PiecewiseFunctionTreeNode : LeafNode
+    {
+        public override string Icon => "_|￣";
+
+        public PiecewiseFunctionTreeNode()
+        {
+            m_Name = "PiecewiseFunction";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            NodeMemory.CreateVariable(
+                "KeyPointX",
+                "",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+
+            NodeMemory.CreateVariable(
+                "KeyPointY",
+                "",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+
+            NodeMemory.CreateVariable(
+                "InputX",
+                "",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+
+            NodeMemory.CreateVariable(
+                "OutputY",
+                "",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                1
+            );
+
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} << func({1})",
+                    Variables.GetVariable("OutputY").NoteValue,
+                    Variables.GetVariable("InputX").NoteValue);
+                return sb.ToString();
+            }
+        }
+    }
+
+    class DiceTreeNode : LeafNode
+    {
+        public override string Icon => "🎲";
+
+        public DiceTreeNode()
+        {
+            m_Name = "Dice";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            NodeMemory.CreateVariable(
+                "Distribution",
+                "",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+
+            NodeMemory.CreateVariable(
+                "Values",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                2
+            );
+
+            NodeMemory.CreateVariable(
+                "Input",
+                "0",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+
+            NodeMemory.CreateVariable(
+                "Output",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                2
+            );
+
+            NodeMemory.CreateVariable(
+                "IgnoreInput",
+                "T",
+                Variable.CreateParams_Bool,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                0
+            );
+
+        }
+
+        public override string Note
+        {
+            get
+            {
+                return string.Empty;
+                //StringBuilder sb = new StringBuilder();
+                //sb.AppendFormat("{0} << func({1})",
+                //    Variables.GetVariable("OutputY").NoteValue,
+                //    Variables.GetVariable("InputX").NoteValue);
+                //return sb.ToString();
+            }
+        }
+    }
+
+    class WaitTreeNode : LeafNode
+    {
+        public override string Icon => "⏰";
+
+        public WaitTreeNode()
+        {
+            m_Name = "Wait";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            NodeMemory.CreateVariable(
+                "TickCount",
+                "1",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                return Variables.GetVariable("TickCount").NoteValue;
+            }
+        }
+    }
+
+    class ClearArrayTreeNode : LeafNode
+    {
+        public override string Icon => "[ ]";
+
+        public ClearArrayTreeNode()
+        {
+            m_Name = "ClearArray";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable opl = NodeMemory.CreateVariable(
+                "Array",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0}",
+                    Variables.GetVariable("Array").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
+    class IsArrayEmptyTreeNode : LeafNode
+    {
+        public override string Icon => "[ ]";
+
+        public IsArrayEmptyTreeNode()
+        {
+            m_Name = "IsArrayEmpty";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable opl = NodeMemory.CreateVariable(
+                "Array",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0}",
+                    Variables.GetVariable("Array").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
+    class GetArrayLengthTreeNode : LeafNode
+    {
+        public override string Icon => "[].Length";
+
+        public GetArrayLengthTreeNode()
+        {
+            m_Name = "GetArrayLength";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable array = NodeMemory.CreateVariable(
+                "Array",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE
+            );
+
+            Variable length = NodeMemory.CreateVariable(
+                "Length",
+                "0",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("{0} << [{1}].Length",
+                    Variables.GetVariable("Length").NoteValue,
+                    Variables.GetVariable("Array").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
+    class ArrayPushElementTreeNode : LeafNode
+    {
+        public override string Icon => "[x] <-- y";
+
+        public ArrayPushElementTreeNode()
+        {
+            m_Name = "ArrayPushElement";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable array = NodeMemory.CreateVariable(
+                "Array",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                1
+            );
+
+            Variable element = NodeMemory.CreateVariable(
+                "Element",
+                "0",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("[{0}] add {1}",
+                    Variables.GetVariable("Array").NoteValue,
+                    Variables.GetVariable("Element").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
+    class ShuffleTreeNode : LeafNode
+    {
+        public override string Icon => "[x]<??<[y]";
+
+        public ShuffleTreeNode()
+        {
+            m_Name = "Shuffle";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable input = NodeMemory.CreateVariable(
+                "Input",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+
+            Variable output = NodeMemory.CreateVariable(
+                "Output",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("[{0}] <??< [{1}]",
+                    Variables.GetVariable("Output").NoteValue,
+                    Variables.GetVariable("Input").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
 }
