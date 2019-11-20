@@ -5,20 +5,21 @@
 #include "YBehavior/agent.h"
 #include <list>
 #include "YBehavior/fsm/context.h"
+#ifdef DEBUGGER
+#include "YBehavior/debugger.h"
+#endif
 
 namespace YBehavior
 {
-	StateMachine::StateMachine(FSMUIDType layer, FSMUIDType level, FSMUIDType index)
+	StateMachine::StateMachine(UINT uid, UINT level)
 		: m_pDefaultState(nullptr)
 		, m_EntryState(nullptr)
 		, m_ExitState(nullptr)
 		, m_pRootMachine(nullptr)
 		, m_pMetaState(nullptr)
 	{
-		m_UID.Layer = layer;
-		m_UID.Level = level;
-		m_UID.Machine = index;
-		m_UID.State = 0;
+		m_UID = uid;
+		m_Level = level;
 	}
 
 	StateMachine::~StateMachine()
@@ -55,8 +56,7 @@ namespace YBehavior
 				return false;
 			}
 			m_EntryState = pState;
-			pState->GetUID().Value = GetUID().Value;
-			pState->GetUID().State = 1;
+			m_EntryState->SetUID(m_UID + 1);
 			//GetRootMachine()->PushState(pState);
 		}
 		else if (pState->GetType() == MST_Exit)
@@ -67,8 +67,7 @@ namespace YBehavior
 				return false;
 			}
 			m_ExitState = pState;
-			pState->GetUID().Value = GetUID().Value;
-			pState->GetUID().State = 2;
+			m_ExitState->SetUID(m_UID + 2);
 			//GetRootMachine()->PushState(pState);
 		}
 		else
@@ -104,11 +103,11 @@ namespace YBehavior
 
 
 	FSM::FSM(const STRING& name)
-		: m_Name(name)
-		, m_Version(nullptr)
+		: m_Version(nullptr)
 		, m_pMachine(nullptr)
 	{
-
+		m_NameWithPath = name;
+		m_Name = Utility::GetNameFromPath(name);
 	}
 
 	FSM::~FSM()
@@ -133,14 +132,21 @@ namespace YBehavior
 
 		MachineContext& context = *pAgent->GetMachineContext();
 		context.GetTransition().Reset();
+
+#ifdef DEBUGGER
+		if (DebugMgr::Instance()->GetTargetAgent() == pAgent->GetDebugUID())
+		{
+			DebugMgr::Instance()->SendInfos(pAgent, true);
+		}
+#endif
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 
-	RootMachine::RootMachine(FSMUIDType layer)
-		: StateMachine(layer, 0, 1)
+	RootMachine::RootMachine(UINT uid)
+		: StateMachine(uid, 0)
 	{
 		m_pRootMachine = this;
 	}
@@ -161,7 +167,7 @@ namespace YBehavior
 		///> Only named states will be inserted into the name map
 		if ((pState->GetName() == Utility::StringEmpty || m_NamedStatesMap.insert(std::pair<STRING, MachineState*>(pState->GetName(), pState)).second)
 			&&
-			m_UIDStatesMap.insert(std::pair<FSMUIDType, MachineState*>(pState->GetUID().Value, pState)).second)
+			m_UIDStatesMap.insert(std::pair<UINT, MachineState*>(pState->GetUID(), pState)).second)
 		{
 			m_AllStates.push_back(pState);
 			return true;
@@ -208,7 +214,7 @@ namespace YBehavior
 		std::list<StateMachine*>* pShallowerRoute;
 
 		bool bFromIsDeeper = false;
-		if (pFrom->GetUID().Level > pTo->GetUID().Level)
+		if (pFrom->GetParentMachine()->GetLevel() > pTo->GetParentMachine()->GetLevel())
 		{
 			bFromIsDeeper = true;
 			pDeeper = pFrom->GetParentMachine();
@@ -226,7 +232,7 @@ namespace YBehavior
 			pShallowerRoute = &_FromRoute;
 		}
 
-		for (int i = pDeeper->GetUID().Level - pShallower->GetUID().Level; i > 0; --i)
+		for (UINT i = pDeeper->GetLevel() - pShallower->GetLevel(); i > 0; --i)
 		{
 			pDeeperRoute->push_back(pDeeper);
 			pDeeper = pDeeper->GetParentMachine();
@@ -307,7 +313,7 @@ namespace YBehavior
 		return it->second;
 	}
 
-	YBehavior::MachineState* RootMachine::FindState(FSMUIDType uid)
+	YBehavior::MachineState* RootMachine::FindState(UINT uid)
 	{
 		auto it = m_UIDStatesMap.find(uid);
 		if (it == m_UIDStatesMap.end())
@@ -328,7 +334,7 @@ namespace YBehavior
 			context.GetTransQueue().push_back(m_EntryState);
 		else if (context.LastRunRes == MRR_Running || context.LastRunRes == MRR_Break)
 		{
-			context.LastRunRes = context.GetCurState()->OnUpdate(fDeltaT, pAgent);
+			context.LastRunRes = context.GetCurState()->Execute(pAgent, context.LastRunRes);
 			if (context.LastRunRes == MRR_Running || context.LastRunRes == MRR_Break)
 				return;
 		}
@@ -338,7 +344,7 @@ namespace YBehavior
 			///> No Trans, Just Update Current
 			if (!_Trans(pAgent))
 			{
-				context.LastRunRes = context.GetCurState()->OnUpdate(fDeltaT, pAgent);
+				context.LastRunRes = context.GetCurState()->Execute(pAgent, context.LastRunRes);
 			}
 
 		}
@@ -353,7 +359,7 @@ namespace YBehavior
 					context.SetCurState(pNextState);
 				}
 
-				context.LastRunRes = context.GetCurState()->OnUpdate(fDeltaT, pAgent);
+				context.LastRunRes = context.GetCurState()->Execute(pAgent, context.LastRunRes);
 				if (context.LastRunRes == MRR_Running || context.LastRunRes == MRR_Break)
 					return;
 			}

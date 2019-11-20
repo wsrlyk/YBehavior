@@ -17,10 +17,10 @@ namespace YBehavior
 	enum MachineRunRes
 	{
 		MRR_Invalid = -1,
-		MRR_Normal,
-		MRR_Exit,
-		MRR_Running,
-		MRR_Break,
+		MRR_Normal = 0,
+		MRR_Exit =1,
+		MRR_Break = 2,
+		MRR_Running = 3,
 	};
 	class MachineContext;
 
@@ -33,6 +33,7 @@ namespace YBehavior
 	};
 
 	class StateMachine;
+	class DebugFSMHelper;
 	class MachineState
 	{
 	protected:
@@ -41,9 +42,27 @@ namespace YBehavior
 		STRING m_Identification;
 
 		MachineStateType m_Type;
-		FSMUID m_UID;
+		UINT m_UID;
+
 		//int m_SortValue;
 		StateMachine* m_pParentMachine;
+#ifdef DEBUGGER
+	protected:
+		std::stringstream m_DebugLogInfo;
+		DebugFSMHelper* m_pDebugHelper;
+		bool _HasLogPoint();
+#define IF_HAS_LOG_POINT if (_HasLogPoint())
+#define DEBUG_LOG_INFO(info)\
+	{\
+		IF_HAS_LOG_POINT\
+			m_DebugLogInfo << info;\
+	}
+	public:
+		std::stringstream& GetDebugLogInfo() { return m_DebugLogInfo; }
+#else
+#define DEBUG_LOG_INFO(info);
+#define IF_HAS_LOG_POINT
+#endif 
 	public:
 		MachineState();
 		MachineState(const STRING& name, MachineStateType type);
@@ -51,20 +70,22 @@ namespace YBehavior
 		inline const STRING& GetName() const { return m_Name; }
 		inline const STRING& GetIdentification() const { return m_Identification; }
 		inline void SetIdentification(const STRING& id) { m_Identification = id; }
-		inline FSMUID& GetUID() { return m_UID; }
+		inline UINT GetUID() const { return m_UID; }
+		inline void SetUID(UINT uid) { m_UID = uid; }
 		inline void SetParentMachine(StateMachine* pMac) { m_pParentMachine = pMac; }
 		inline StateMachine* GetParentMachine() const { return m_pParentMachine; }
 		inline MachineStateType GetType() const { return m_Type; }
 		virtual STRING ToString() const;
 		virtual MachineRunRes OnEnter(AgentPtr pAgent);
 		virtual MachineRunRes OnExit(AgentPtr pAgent);
-		virtual MachineRunRes OnUpdate(float fDeltaT, AgentPtr pAgent);
+		MachineRunRes Execute(AgentPtr pAgent, MachineRunRes previousState);
 		inline void SetTree(const STRING& tree) { m_Tree = tree; }
 		inline const STRING& GetTree() { return m_Tree; }
 		//inline int GetSortValue() const { return m_SortValue; }
 		//inline void SetSortValue(int v) { m_SortValue = v; }
 
 	protected:
+		MachineRunRes _OnUpdate(AgentPtr pAgent);
 		MachineRunRes _RunTree(AgentPtr pAgent);
 	};
 }

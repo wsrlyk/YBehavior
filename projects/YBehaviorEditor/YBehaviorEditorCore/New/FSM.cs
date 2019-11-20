@@ -46,7 +46,7 @@ namespace YBehavior.Editor.Core.New
 
             foreach (var state in machine.States)
             {
-                state.UID = uid++;
+                state.UID = ++uid;
             }
             foreach (var state in machine.States)
             {

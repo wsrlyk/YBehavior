@@ -6,6 +6,12 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d"
              MinWidth="60" MinHeight="80" HorizontalAlignment="Center">
+    <UserControl.Style>
+        <Style>
+            <Setter Property="local:UIFSMState.DebugTrigger" Value="{Binding Path=DebugTrigger}" />
+            <!--<Setter Property="local:UINode.DebugConstant" Value="{Binding Path=DebugConstant}" />-->
+        </Style>
+    </UserControl.Style>
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
         <local:ReturnTypeConvertor x:Key="returnTypeConvertor"/>

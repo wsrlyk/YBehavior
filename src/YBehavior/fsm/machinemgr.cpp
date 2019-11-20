@@ -7,6 +7,7 @@
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/fsm/metastate.h"
 #include "YBehavior/fsm/statemachine.h"
+#include "YBehavior/tools/common.h"
 
 namespace YBehavior
 {
@@ -254,14 +255,21 @@ namespace YBehavior
 		pFSM->SetID(id);
 		RootMachine* pMachine = pFSM->CreateMachine();
 		///> at most 8 levels, start from 0
-		int levelMachineCount[8];
-		memset(levelMachineCount, 0, sizeof(int) * 8);
-		if (!_LoadMachine(pMachine, rootData.first_child(), levelMachineCount))
+		UINT uid = 0;
+
+		if (!_LoadMachine(pMachine, rootData.first_child(), uid))
 		{
 			ERROR_BEGIN << "Load FSM Failed: " << id->GetName() << ERROR_END;
 			delete pFSM;
 			return nullptr;
 		}
+#ifdef DEBUGGER
+		xml_string_writer writer;
+		rootData.print(writer, PUGIXML_TEXT("\t"), pugi::format_indent | pugi::format_raw);
+		writer.result.erase(std::remove_if(writer.result.begin(), writer.result.end(), ::isspace), writer.result.end());
+		pFSM->SetHash(Utility::Hash(writer.result));
+		LOG_BEGIN << writer.result << LOG_END;
+#endif
 		return pFSM;
 	}
 
@@ -410,7 +418,7 @@ namespace YBehavior
 		return true;
 	}
 
-	bool MachineMgr::_LoadMachine(StateMachine* pMachine, const pugi::xml_node& data, int levelMachineCount[])
+	bool MachineMgr::_LoadMachine(StateMachine* pMachine, const pugi::xml_node& data, UINT& uid)
 	{
 		if (pMachine == nullptr)
 		{
@@ -423,6 +431,8 @@ namespace YBehavior
 			ERROR_BEGIN << "Create special states failed. " << data.name() << ERROR_END;
 			return false;
 		}
+
+		uid += pMachine->GetUIDOffset();
 
 		bool bErr = false;
 		///> Start from 3. 1 for EntryState, and 2 for ExitState
@@ -443,8 +453,7 @@ namespace YBehavior
 				{
 					pState->SetParentMachine(pMachine);
 
-					pState->GetUID().Value = pMachine->GetUID().Value;
-					pState->GetUID().State = ++stateNum;
+					pState->SetUID(++uid);
 
 					if (!pMachine->GetRootMachine()->InsertState(pState))
 					{
@@ -461,13 +470,12 @@ namespace YBehavior
 				if (pState->GetType() == MST_Meta)
 				{
 					StateMachine* pSubMachine = new StateMachine(
-						pMachine->GetUID().Layer,
-						pMachine->GetUID().Level + 1,
-						++levelMachineCount[pMachine->GetUID().Level]);
+						uid,
+						pMachine->GetLevel() + 1);
 					pSubMachine->SetMetaState((MetaState*)pState);
 					((MetaState*)pState)->SetSubMachine(pSubMachine);
 
-					if (!_LoadMachine(pSubMachine, it->first_child(), levelMachineCount))
+					if (!_LoadMachine(pSubMachine, it->first_child(), uid))
 					{
 						ERROR_BEGIN << "Load SubMachine Failed." << ERROR_END;
 						bErr = true;
@@ -502,7 +510,7 @@ namespace YBehavior
 		}
 
 		pMachine->OnLoadFinish();
-		LOG_BEGIN << "Load Machine " << Utility::ToString(pMachine->GetUID()) << LOG_END;
+
 		return true;
 	}
 
@@ -522,7 +530,7 @@ namespace YBehavior
 			if (pState->GetTree() != ""  && pState->GetIdentification() != "")
 			{
 				id->TryGet(pState->GetIdentification(), pState->GetTree(), outName);
-				id->GetStateTreeMap()[pState->GetUID().Value] = outName;
+				id->GetStateTreeMap()[pState->GetUID()] = outName;
 			}
 
 		}

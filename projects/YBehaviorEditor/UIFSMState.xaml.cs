@@ -170,7 +170,7 @@ namespace YBehavior.Editor
             typeof(bool), typeof(UIFSMState), new FrameworkPropertyMetadata(DebugTrigger_PropertyChanged));
         private static void DebugTrigger_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            UINode c = (UINode)d;
+            UIFSMState c = (UIFSMState)d;
             if (DebugMgr.Instance.bBreaked)
                 c.SetDebug(c.Node.Renderer.RunState);
             else

@@ -21,7 +21,7 @@ namespace pugi
 
 namespace YBehavior
 {
-	typedef std::unordered_map<FSMUIDType, STRING> StateTreeMapType;
+	typedef std::unordered_map<UINT, STRING> StateTreeMapType;
 	class MachineID : public BehaviorID
 	{
 		StateTreeMapType m_StateTreeMap;
@@ -81,7 +81,7 @@ namespace YBehavior
 	protected:
 		FSM * _LoadFSM(MachineID* id);
 		bool _CreateSpecialStates(StateMachine* pMachine);
-		bool _LoadMachine(StateMachine* pMachine, const pugi::xml_node& data, int levelMachineCount[]);
+		bool _LoadMachine(StateMachine* pMachine, const pugi::xml_node& data, UINT& uid);
 	};
 }
 

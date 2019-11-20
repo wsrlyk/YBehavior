@@ -37,7 +37,7 @@ namespace YBehavior
 		void Reset();
 	};
 
-	typedef std::unordered_map<FSMUIDType, BehaviorTree*> MachineTreeMappingType;
+	typedef std::unordered_map<UINT, BehaviorTree*> MachineTreeMappingType;
 	class MachineTreeMapping
 	{
 		MachineTreeMappingVersion* m_Version;
@@ -60,7 +60,7 @@ namespace YBehavior
 		inline FSM* GetFSM() { return m_pFSM; }
 		inline Memory* GetMemory() { return m_pMemory; }
 		void Build();
-		BehaviorTree* GetTree(FSMUIDType fsmuid);
+		BehaviorTree* GetTree(UINT fsmuid);
 	};
 
 }

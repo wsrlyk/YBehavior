@@ -146,7 +146,8 @@ namespace YBehavior.Editor.Core.New
 
             foreach (var t in m_OpenedWorkBenchs)
             {
-                if (t.FileInfo == file)
+                var info = t.FileInfo;
+                if (info == file)
                 {
                     return t;
                 }
@@ -531,13 +532,17 @@ namespace YBehavior.Editor.Core.New
 
             return res;
         }
-        public List<WorkBench> OpenAList(IEnumerable<string> list)
+        public List<WorkBench> OpenAList(IEnumerable<BenchInfo> list)
         {
             List<WorkBench> res = new List<WorkBench>();
 
-            foreach (string treename in list)
+            foreach (BenchInfo info in list)
             {
-                System.IO.FileInfo file = new System.IO.FileInfo(Config.Instance.WorkingDir + treename + ".xml");
+                System.IO.FileInfo file = null;
+                if (info.Type == GraphType.TREE)
+                    file = new System.IO.FileInfo(Config.Instance.WorkingDir + info.Name + ".xml");
+                else
+                    file = new System.IO.FileInfo(Config.Instance.WorkingDir + info.Name + ".fsm");
                 if (!file.Exists)
                     continue;
 
@@ -554,5 +559,11 @@ namespace YBehavior.Editor.Core.New
             return res;
         }
 
+    }
+
+    public struct BenchInfo
+    {
+        public string Name;
+        public GraphType Type;
     }
 }

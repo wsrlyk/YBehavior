@@ -94,6 +94,24 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        public static void ForEachFSMState(FSM fsm, Action<FSMStateNode> action)
+        {
+            ForEachFSMState(fsm.RootMachine, action);
+        }
+
+        public static void ForEachFSMState(FSMMachineNode machine, Action<FSMStateNode> action)
+        {
+            foreach (NodeBase child in machine.States)
+            {
+                action(child as FSMStateNode);
+            }
+            foreach (NodeBase child in machine.States)
+            {
+                if (child is FSMMetaStateNode)
+                    ForEachFSMState((child as FSMMetaStateNode).SubMachine, action);
+            }
+        }
+
         ///> TODO: make it universal
         public static FSMMachineNode FindAncestor(FSMMachineNode a, FSMMachineNode b, ref FSMMachineNode toppestLevelChild)
         {
@@ -146,9 +164,9 @@ namespace YBehavior.Editor.Core.New
             return false;
         }
 
-        public static int SortByFSMNodeSortIndex(Connection aa, Connection bb)
+        public static int SortByFSMNodeSortIndex(FSMStateNode aa, FSMStateNode bb)
         {
-            return (aa.Ctr.To.Owner as FSMStateNode).SortIndex.CompareTo((bb.Ctr.To.Owner as FSMStateNode).SortIndex);
+            return aa.SortIndex.CompareTo(bb.SortIndex);
         }
 
         public static TransRoute FindTransRoute(FSMStateNode fromState, FSMStateNode toState)

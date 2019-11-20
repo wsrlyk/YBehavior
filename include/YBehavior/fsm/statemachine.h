@@ -19,15 +19,19 @@ namespace YBehavior
 		MachineState* m_pDefaultState;
 		MachineState* m_EntryState;
 		MachineState* m_ExitState;
-		FSMUID m_UID;
+		UINT m_Level;
+		UINT m_UID;	///> Same with the meta state.
+
 		RootMachine* m_pRootMachine;
 		MetaState* m_pMetaState;
 	public:
-		StateMachine(FSMUIDType layer, FSMUIDType level, FSMUIDType index);
+		StateMachine(UINT uid, UINT level);
 		~StateMachine();
 		inline MachineState* GetEntry() { return m_EntryState; }
 		inline MachineState* GetExit() { return m_ExitState; }
-		inline FSMUID GetUID() const { return m_UID; }
+		inline UINT GetLevel() const { return m_Level; }
+		inline UINT SetLevel(UINT level) { m_Level = level; }
+		virtual UINT GetUIDOffset() const { return 4; }///> Entry, Exit, Any, Upper;    to keep step with Editor
 		void SetMetaState(MetaState* pState);
 		inline MetaState* GetMetaState() const { return m_pMetaState; }
 		inline RootMachine* GetRootMachine() const { return m_pRootMachine; }
@@ -49,11 +53,11 @@ namespace YBehavior
 		std::set<TransitionData> m_AnyTransitionMap;
 
 		std::unordered_map<STRING, MachineState*> m_NamedStatesMap;
-		std::unordered_map<FSMUIDType, MachineState*> m_UIDStatesMap;
+		std::unordered_map<UINT, MachineState*> m_UIDStatesMap;
 		std::vector<MachineState*> m_AllStates;
 		FSM* m_pFSM;
 	public:
-		RootMachine(FSMUIDType layer);
+		RootMachine(UINT uid);
 		~RootMachine();
 		inline FSM* GetFSM() { return m_pFSM; }
 		inline void SetFSM(FSM* pFSM) { m_pFSM = pFSM; }
@@ -62,11 +66,13 @@ namespace YBehavior
 		bool InsertTrans(const TransitionMapKey&, const TransitionMapValue&);
 		inline std::vector<MachineState*>& GetAllStates() { return m_AllStates; }
 		bool GetTransition(MachineState* pCurState, const MachineContext& context, TransitionResult& result);
-		MachineState* FindState(FSMUIDType uid);
+		MachineState* FindState(UINT uid);
 		MachineState* FindState(const STRING& name);
 		void Update(float fDeltaT, AgentPtr pAgent);
 
 		void OnLoadFinish() override;
+		UINT GetUIDOffset() const override { return 3; }///> Entry, Exit, Any;   No Upper
+
 	protected:
 		bool _Trans(AgentPtr pAgent);
 	};
@@ -76,11 +82,15 @@ namespace YBehavior
 	class FSM
 	{
 		STRING m_Name;
+		STRING m_NameWithPath;
 		MachineVersion* m_Version;
 		MachineID* m_ID;
 		///> TODO: multilayers
 		RootMachine* m_pMachine;
 		ConditionMgr m_ConditionMgr;
+#ifdef DEBUGGER
+		UINT m_Hash;
+#endif
 	public:
 		inline void SetVersion(MachineVersion* v) { m_Version = v; }
 		inline MachineVersion* GetVersion() const { return m_Version; }
@@ -88,11 +98,17 @@ namespace YBehavior
 		inline MachineID* GetID() const { return m_ID; }
 		inline RootMachine* GetMachine() { return m_pMachine; }
 		inline ConditionMgr* GetConditionMgr() { return &m_ConditionMgr; }
+		inline const STRING& GetName() { return m_Name; }
+		inline const STRING& GetNameWithPath() { return m_NameWithPath; }
 		FSM(const STRING& name);
 		~FSM();
 		RootMachine* CreateMachine();
 
 		void Update(float fDeltaT, AgentPtr pAgent);
+#ifdef DEBUGGER
+		inline UINT GetHash() { return m_Hash; }
+		inline void SetHash(UINT hash) { m_Hash = hash; }
+#endif
 	};
 }
 

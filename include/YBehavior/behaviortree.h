@@ -19,10 +19,10 @@ namespace YBehavior
 	enum NodeState
 	{
 		NS_INVALID = -1,
-		NS_SUCCESS,
-		NS_FAILURE,
-		NS_BREAK,
-		NS_RUNNING,
+		NS_SUCCESS = 0,
+		NS_FAILURE = 1,
+		NS_BREAK = 2,
+		NS_RUNNING = 3,
 	};
 
 	enum ReturnType
@@ -44,7 +44,7 @@ namespace YBehavior
 	class SharedDataEx;
 	struct NameKeyMgr;
 #ifdef DEBUGGER
-	class DebugHelper;
+	class DebugTreeHelper;
 #endif
 	class BehaviorTree;
 	class RunningContext;
@@ -67,7 +67,7 @@ namespace YBehavior
 #ifdef DEBUGGER
 	protected:
 		std::stringstream m_DebugLogInfo;
-		DebugHelper* m_pDebugHelper;
+		DebugTreeHelper* m_pDebugHelper;
 		bool _HasLogPoint();
 		void _LogSharedData(ISharedVariableEx* pVariable, bool bIsBefore);
 #define IF_HAS_LOG_POINT if (_HasLogPoint())

@@ -23,7 +23,7 @@ namespace YBehavior.Editor.Core.New
         NS_RUNNING,
     };
 
-    public class RunInfo
+    public class TreeRunInfo
     {
         public Dictionary<uint, int> info = new Dictionary<uint, int>();
         public string treeName;
@@ -34,6 +34,18 @@ namespace YBehavior.Editor.Core.New
             info.Clear();
             sharedData = null;
             treeName = string.Empty;
+        }
+    }
+
+    public class FSMRunInfo
+    {
+        public Dictionary<uint, int> info = new Dictionary<uint, int>();
+        public string fsmName;
+        // TODO: trans?
+
+        public void Clear()
+        {
+            info.Clear();
         }
     }
 
@@ -48,7 +60,7 @@ namespace YBehavior.Editor.Core.New
             get
             {
                 string treeName = WorkBenchMgr.Instance.ActiveTreeName;
-                if (m_RunInfo.TryGetValue(treeName, out RunInfo runInfo))
+                if (m_RunInfo.TryGetValue(treeName, out TreeRunInfo runInfo))
                 {
                     if (runInfo.sharedData != null)
                         return runInfo.sharedData;
@@ -56,28 +68,46 @@ namespace YBehavior.Editor.Core.New
                 return m_EmptySharedData;
             }
         }
-        public Dictionary<string, RunInfo> GetRunInfos { get { return m_RunInfo; } }
-        Dictionary<string, RunInfo> m_RunInfo = new Dictionary<string, RunInfo>();
+        public Dictionary<string, TreeRunInfo> GetRunInfos { get { return m_RunInfo; } }
+        Dictionary<string, TreeRunInfo> m_RunInfo = new Dictionary<string, TreeRunInfo>();
+
+        public FSMRunInfo FSMRunInfo { get; } = new FSMRunInfo();
+
         public NodeState GetRunState(uint uid)
         {
-            string treeName = WorkBenchMgr.Instance.ActiveTreeName;
-            if (m_RunInfo.TryGetValue(treeName, out RunInfo runInfo))
+            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
+            if (bench == null)
+                return NodeState.NS_INVALID;
+
+            if (bench is TreeBench)
             {
-                if (runInfo.info.TryGetValue(uid, out int state))
+                if (m_RunInfo.TryGetValue(bench.FileInfo.Name, out TreeRunInfo runInfo))
+                {
+                    if (runInfo.info.TryGetValue(uid, out int state))
+                    {
+                        return (NodeState)state;
+                    }
+                }
+            }
+            else
+            {
+                if (FSMRunInfo.info.TryGetValue(uid, out int state))
                 {
                     return (NodeState)state;
                 }
             }
             return NodeState.NS_INVALID;
         }
+
         public void ClearRunInfo()
         {
             foreach (var info in m_RunInfo)
             {
                 info.Value.Clear();
-                ObjectPool<RunInfo>.Recycle(info.Value);
+                ObjectPool<TreeRunInfo>.Recycle(info.Value);
             }
             m_RunInfo.Clear();
+            FSMRunInfo.Clear();
         }
         public void ClearRunState()
         {
@@ -85,22 +115,17 @@ namespace YBehavior.Editor.Core.New
             {
                 info.Value.info.Clear();
             }
+            FSMRunInfo.info.Clear();
         }
-        public RunInfo GetRunInfo(string treeName)
+        public TreeRunInfo GetRunInfo(string treeName)
         {
-            RunInfo runInfo;
+            TreeRunInfo runInfo;
             if (!m_RunInfo.TryGetValue(treeName, out runInfo))
             {
-                runInfo = ObjectPool<RunInfo>.Get();
+                runInfo = ObjectPool<TreeRunInfo>.Get();
                 runInfo.treeName = treeName;
                 m_RunInfo[treeName] = runInfo;
             }
-            return runInfo;
-        }
-        public RunInfo GetRunInfoIfExists(string treeName)
-        {
-            RunInfo runInfo = null;
-            m_RunInfo.TryGetValue(treeName, out runInfo);
             return runInfo;
         }
 
@@ -109,16 +134,21 @@ namespace YBehavior.Editor.Core.New
             ClearRunInfo();
         }
 
-        public bool IsDebugging(string treeName = null)
+        public bool IsDebugging(WorkBench bench = null)
         {
-            if (treeName == null)
+            if (!NetworkMgr.Instance.IsConnected)
+                return false;
+            if (bench == null)
             {
-                treeName = WorkBenchMgr.Instance.ActiveTreeName;
+                bench = WorkBenchMgr.Instance.ActiveWorkBench;
             }
 
-            if (NetworkMgr.Instance.IsConnected)
-                return m_RunInfo.ContainsKey(treeName);
-            return false;
+            if (bench == null)
+                return false;
+
+            if (bench is TreeBench)
+                return m_RunInfo.ContainsKey(bench.FileInfo.Name);
+            return FSMRunInfo.fsmName == bench.FileInfo.Name;
         }
 
         public DebugMgr()
@@ -137,15 +167,17 @@ namespace YBehavior.Editor.Core.New
 
         public void StartDebugTreeWithAgent(ulong uid)
         {
-            string targetTreeName;
-            if (WorkBenchMgr.Instance.ActiveWorkBench != null && WorkBenchMgr.Instance.ActiveWorkBench.FileInfo != null)
-                targetTreeName = WorkBenchMgr.Instance.ActiveWorkBench.FileInfo.Name;
+            TreeFileMgr.TreeFileInfo fileInfo = null;
+            if (WorkBenchMgr.Instance.ActiveWorkBench != null)
+            {
+                fileInfo = WorkBenchMgr.Instance.ActiveWorkBench.FileInfo;
+            }
             else
-                targetTreeName = string.Empty;
+                fileInfo = null;
 
             //List<WorkBench> benches = WorkBenchMgr.Instance.OpenAllRelated();
             //BuildRunInfo(benches);
-            NetworkMgr.Instance.MessageProcessor.DebugTreeWithAgent(targetTreeName, uid);
+            NetworkMgr.Instance.MessageProcessor.DebugTreeWithAgent(fileInfo, uid);
         }
 
         public void Continue()
@@ -177,8 +209,15 @@ namespace YBehavior.Editor.Core.New
             ClearRunInfo();
             foreach (WorkBench bench in benches)
             {
-                RunInfo runInfo = GetRunInfo(bench.FileInfo.Name);
-                runInfo.sharedData = (bench as TreeBench).Tree.TreeMemory.Clone() as TreeMemory;
+                if (bench is TreeBench)
+                {
+                    TreeRunInfo runInfo = GetRunInfo(bench.FileInfo.Name);
+                    runInfo.sharedData = (bench as TreeBench).Tree.TreeMemory.Clone() as TreeMemory;
+                }
+                else
+                {
+                    FSMRunInfo.fsmName = bench.FileInfo.Name;
+                }
             }
         }
     }

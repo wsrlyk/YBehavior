@@ -124,27 +124,6 @@ namespace YBehavior
 	}
 
 	template<>
-	FSMUID Utility::ToType(const STRING& str)
-	{
-		///> [layer level machine state]
-		FSMUID uid;
-		uid.Value = 0;
-		FSMUIDType layer;
-		FSMUIDType level;
-		FSMUIDType machine;
-		FSMUIDType state;
-
-		sscanf_s(str.c_str(), "[%hu %hu %hu %hu]", &layer, &level, &machine, &state);
-
-		uid.Layer = layer;
-		uid.Level = level;
-		uid.Machine = machine;
-		uid.State = state;
-
-		return uid;
-	}
-
-	template<>
 	STRING Utility::ToString(const BOOL& t)
 	{
 		return t > 0 ? "T" : "F";
@@ -170,16 +149,6 @@ namespace YBehavior
 		return str;
 	}
 
-	template<>
-	STRING Utility::ToString(const FSMUID& t)
-	{
-		STRING str;
-		std::stringstream ss;
-		ss << "FSMUID[" << t.Layer << " " << t.Level << " " << t.Machine << " " << t.State << ": " << t.Value << "]";
-		str = ss.str();
-		return str;
-	}
-
 	UINT Utility::Hash(const STRING& str)
 	{
 		UINT len = str.length();
@@ -189,6 +158,20 @@ namespace YBehavior
 			hash = (hash << 5) + hash + (UINT)str[i];
 		}
 		return hash;
+	}
+
+	YBehavior::STRING Utility::GetNameFromPath(const STRING& path)
+	{
+		STRING res;
+		auto it = path.find_last_of('/');
+		if (it != STRING::npos)
+			res = path.substr(it + 1);
+		else
+			res = path;
+		it = res.find_last_of('\\');
+		if (it != STRING::npos)
+			res = res.substr(it + 1);
+		return res;
 	}
 
 	template<>

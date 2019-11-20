@@ -50,11 +50,25 @@ namespace YBehavior.Editor.Core.New
             m_LastTickResultToken = 0;
             m_TickResultToken = 0;
         }
-        public void DebugTreeWithAgent(string treename, ulong agentUID)
+        public void DebugTreeWithAgent(TreeFileMgr.TreeFileInfo fileInfo, ulong agentUID)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("[DebugTreeWithAgent]").Append(msgContentSplitter).Append(treename);
-            sb.Append(msgContentSplitter).Append(agentUID);
+            string head;
+            string content;
+            if (agentUID != 0 || fileInfo == null || fileInfo.FileType == FileType.FOLDER)
+            {
+                head = "[DebugAgent]";
+                content = agentUID.ToString();
+            }
+            else
+            {
+                if (fileInfo.FileType == FileType.TREE)
+                    head = "[DebugTree]";
+                else
+                    head = "[DebugFSM]";
+                content = fileInfo.Name;
+            }
+            sb.Append(head).Append(msgContentSplitter).Append(content);
             NetworkMgr.Instance.SendText(sb.ToString());
             Clear();
         }
@@ -269,8 +283,9 @@ namespace YBehavior.Editor.Core.New
             if (ss == null)
                 return;
             string[] data = ss.Split(msgContentSplitter);
-            if (data.Length >= 1)
+            if (data.Length >= 2)
             {
+                DebugMgr.Instance.ClearRunState();
                 ///> MainData
                 ///> Copied to each subtrees
                 foreach (var v in DebugMgr.Instance.GetRunInfos.Values)
@@ -279,16 +294,32 @@ namespace YBehavior.Editor.Core.New
                         _HandleMemory(v.sharedData.SharedMemory, data[0]);
                 }
 
+                ///> FSM RunInfo
+                {
+                    FSMRunInfo runInfo = DebugMgr.Instance.FSMRunInfo;
+                    string[] runInfos = data[1].Split(msgListSplitter);
+                    foreach (string s in runInfos)
+                    {
+                        string[] strR = s.Split(msgSequenceSplitter);
+                        if (strR.Length != 2)
+                            continue;
+
+                        runInfo.info[uint.Parse(strR[0])] = int.Parse(strR[1]);
+                    }
+
+                }
+
                 ++m_TickResultToken;
 
-                if ((data.Length - 1) % 3 == 0)
+                int offset = 2;
+                if ((data.Length - offset) % 3 == 0)
                 {
-                    DebugMgr.Instance.ClearRunState();
-                    RunInfo runInfo = null;
-                    for (int i = 1; i < data.Length; ++i)
+                    TreeRunInfo runInfo = null;
+                    for (int i = offset; i < data.Length; ++i)
                     {
+                        int innerIndex = i - offset;
                         ///> TreeName
-                        if (i % 3 == 1)
+                        if (innerIndex % 3 == 0)
                         {
                             runInfo = DebugMgr.Instance.GetRunInfo(data[i]);
                             runInfo.info.Clear();
@@ -296,7 +327,7 @@ namespace YBehavior.Editor.Core.New
                         }
                         ///> LocalData
                         ///> Only copied to the specified subtree
-                        if (i % 3 == 2)
+                        if (innerIndex % 3 == 1)
                         {
                             if (runInfo.sharedData != null)
                                 _HandleMemory(runInfo.sharedData.LocalMemory, data[i]);
@@ -466,25 +497,37 @@ namespace YBehavior.Editor.Core.New
             string[] data = ss.Split(msgListSplitter, StringSplitOptions.RemoveEmptyEntries);
             if (data.Length > 0)
             {
-                List<string> treeName = new List<string>();
+                List<BenchInfo> names = new List<BenchInfo>();
                 List<uint> hashes = new List<uint>();
 
                 foreach (string s in data)
                 {
                     string[] sub = s.Split(msgSequenceSplitter, StringSplitOptions.RemoveEmptyEntries);
                     if (sub.Length != 2)
-                        continue;
+                    {
+                        EventMgr.Instance.Send(new ShowSystemTipsArg
+                        {
+                            Content = "Format error: " + s,
+                            TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                        });
+
+                        return;
+                    }
 
                     if (uint.TryParse(sub[1], out uint hash))
                     {
-                        treeName.Add(sub[0]);
+                        ///> The first one is the FSM
+                        if (names.Count == 0)
+                            names.Add(new BenchInfo() { Name = sub[0], Type = GraphType.FSM });
+                        else
+                            names.Add(new BenchInfo() { Name = sub[0], Type = GraphType.TREE });
                         hashes.Add(hash);
                     }
                 }
 
                 if (hashes.Count > 0)
                 {
-                    List<WorkBench> res = WorkBenchMgr.Instance.OpenAList(treeName);
+                    List<WorkBench> res = WorkBenchMgr.Instance.OpenAList(names);
                     if (res.Count != hashes.Count)
                     {
                         LogMgr.Instance.Error("Open some files failed.");
@@ -548,30 +591,42 @@ namespace YBehavior.Editor.Core.New
 
         void _DoDebugBegin(List<WorkBench> benches)
         {
-            Action<NodeBase, StringBuilder> appendOneNode = null;
-            appendOneNode = delegate (NodeBase node, StringBuilder stringBuilder)
-            {
-                if (!node.DebugPointInfo.NoDebugPoint)
-                {
-                    stringBuilder.Append(cSequenceSplitter).Append(node.UID).Append(cSequenceSplitter).Append(node.DebugPointInfo.HitCount);
-                }
+            //Action<NodeBase, StringBuilder> appendOneNode = null;
+            //appendOneNode = delegate (NodeBase node, StringBuilder stringBuilder)
+            //{
+            //    if (!node.DebugPointInfo.NoDebugPoint)
+            //    {
+            //        stringBuilder.Append(cSequenceSplitter).Append(node.UID).Append(cSequenceSplitter).Append(node.DebugPointInfo.HitCount);
+            //    }
 
-                foreach (NodeBase chi in node.Conns)
-                {
-                    appendOneNode(chi, stringBuilder);
-                }
-            };
+            //    foreach (NodeBase chi in node.Conns)
+            //    {
+            //        appendOneNode(chi, stringBuilder);
+            //    }
+            //};
 
 
             StringBuilder sb = new StringBuilder();
             sb.Append("[DebugBegin]");
+
+            void action(NodeBase node)
+            {
+                sb.Append(cSequenceSplitter).Append(node.UID).Append(cSequenceSplitter).Append(node.DebugPointInfo.HitCount);
+            }
 
             foreach (WorkBench workBench in benches)
             {
                 sb.Append(cContentSplitter);
                 sb.Append(workBench.FileInfo.Name);
 
-                appendOneNode((workBench as TreeBench).Tree.Root, sb);
+                if (workBench is FSMBench)
+                {
+                    Utility.ForEachFSMState((workBench as FSMBench).FSM, action);
+                }
+                else
+                {
+                    Utility.OperateNode((workBench as TreeBench).Tree.Root, true, action);
+                }
             }
 
 

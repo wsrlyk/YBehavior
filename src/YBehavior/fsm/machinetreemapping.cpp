@@ -83,7 +83,7 @@ namespace YBehavior
 		}
 	}
 
-	YBehavior::BehaviorTree* MachineTreeMapping::GetTree(FSMUIDType fsmuid)
+	YBehavior::BehaviorTree* MachineTreeMapping::GetTree(UINT fsmuid)
 	{
 		auto it = m_Mapping.find(fsmuid);
 		if (it == m_Mapping.end())

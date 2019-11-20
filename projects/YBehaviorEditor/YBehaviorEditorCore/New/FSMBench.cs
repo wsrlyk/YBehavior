@@ -9,7 +9,9 @@ namespace YBehavior.Editor.Core.New
     public class FSMBench : WorkBench
     {
         FSM m_FSM;
+        public FSM FSM { get { return m_FSM; } }
         public DelayableNotificationCollection<FSMMachineNode> StackMachines { get; } = new DelayableNotificationCollection<FSMMachineNode>();
+        public FSMMachineNode CurMachine { get { return StackMachines[0]; } }
 
         public FSMBench()
         {
@@ -74,7 +76,7 @@ namespace YBehavior.Editor.Core.New
             if (!machine.PostLoad(data))
                 return false;
 
-            machine.Conns.Sort(Utility.SortByFSMNodeSortIndex);
+            machine.States.Sort(Utility.SortByFSMNodeSortIndex);
 
             return true;
         }
@@ -221,6 +223,8 @@ namespace YBehavior.Editor.Core.New
 
         void _SaveState(FSMStateNode state, XmlElement data, XmlDocument xmlDoc, bool bExport)
         {
+            if (bExport && (state is FSMAnyStateNode || state is FSMUpperStateNode))
+                return;
             XmlElement nodeEl = xmlDoc.CreateElement("State");
             data.AppendChild(nodeEl);
 
@@ -420,10 +424,10 @@ namespace YBehavior.Editor.Core.New
         public override void AddNode(NodeBase node)
         {
             FSMStateNode state = node as FSMStateNode;
-            FSMMachineNode curMachine = this.StackMachines[0];
+
             Utility.OperateNode(node, m_Graph, true, NodeBase.OnAddToGraph);
 
-            if (!curMachine.AddState(state))
+            if (!CurMachine.AddState(state))
                 return;
 
             _AddStateRenderer(state);

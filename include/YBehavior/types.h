@@ -231,21 +231,6 @@ namespace YBehavior
 	typedef StdVector<EntityWrapper>	VecEntityWrapper;
 	typedef StdVector<Vector3>	VecVector3;
 
-	typedef USHORT FSMUIDType;
-	union FSMUID
-	{
-		FSMUIDType Value;
-		///> Machine & State start from 1; If a State == 0, but Machine == 2, it only means the No.2 Machine
-		struct
-		{
-			FSMUIDType Layer : 2;		///> Up to 4 Layers, start from 0
-			FSMUIDType Level : 3;		///> Up to 8 Levels of SubMachines per Layer, start from 0
-			FSMUIDType Machine : 5;		///> Up to 16 SubMachines in the same Level, start from 1
-			FSMUIDType State : 6;		///> Up to 32 State in the same machine, start from 1
-		};
-	};
-
-
 #define YBEHAVIOR_BASICTYPE_NUMBER_ID(type, id)			\
 	template<> inline TYPEID GetTypeID<type>() \
 	{\

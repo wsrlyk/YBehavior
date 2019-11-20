@@ -79,7 +79,7 @@ namespace YBehavior
 	YBehavior::NodeState BehaviorNode::Execute(AgentPtr pAgent, NodeState parentState)
 	{
 #ifdef DEBUGGER
-		DebugHelper dbgHelper(pAgent, this);
+		DebugTreeHelper dbgHelper(pAgent, this);
 		m_pDebugHelper = &dbgHelper;
 #endif
 		NodeState state = NS_INVALID;
@@ -121,7 +121,7 @@ namespace YBehavior
 
 			///> check breakpoint
 #ifdef DEBUGGER
-			dbgHelper.TestBreaking();
+			dbgHelper.TryBreaking();
 #endif
 
 			//////////////////////////////////////////////////////////////////////////
@@ -145,7 +145,7 @@ namespace YBehavior
 #ifdef DEBUGGER
 			//DEBUG_LOG_INFO(" Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 
-			dbgHelper.TestPause();
+			dbgHelper.TryPause();
 			m_pDebugHelper = nullptr;
 #endif
 		} while (false);
@@ -411,16 +411,8 @@ namespace YBehavior
 	{
 		m_ID = id;
 		m_TreeNameWithPath = id->GetName();
-		{
-			auto it = id->GetName().find_last_of('/');
-			if (it != STRING::npos)
-				m_TreeName = id->GetName().substr(it + 1);
-			else
-				m_TreeName = id->GetName();
-			it = m_TreeName.find_last_of('\\');
-			if (it != STRING::npos)
-				m_TreeName = m_TreeName.substr(it + 1);
-		}
+		m_TreeName = Utility::GetNameFromPath(m_TreeNameWithPath);
+		
 		m_SharedData = new SharedDataEx();
 		m_LocalData = nullptr;
 		//m_NameKeyMgr = new NameKeyMgr();

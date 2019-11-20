@@ -153,8 +153,8 @@ namespace YBehavior.Editor
             WorkBench bench = oArg.Bench;
             if (bench == null)
                 return;
-            ///> Rename the tab title
-            if (oArg.bCreate)
+            ///> Rename the tab title, refresh the references to the TreeMgr
+            //if (oArg.bCreate)
             {
                 _RefreshWorkingSpace(false);
             }

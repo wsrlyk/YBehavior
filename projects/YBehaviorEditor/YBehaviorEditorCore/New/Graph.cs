@@ -5,6 +5,12 @@ using System.Text;
 
 namespace YBehavior.Editor.Core.New
 {
+    public enum GraphType
+    {
+        TREE,
+        FSM,
+    }
+
     public class Graph
     {
         public static readonly int FLAG_LOADING = 1 << 0;

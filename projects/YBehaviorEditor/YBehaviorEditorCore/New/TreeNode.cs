@@ -425,7 +425,8 @@ namespace YBehavior.Editor.Core.New
                 else
                     Utility.OperateNode(this, true, _DecreaseDisable);
 
-                Graph.RefreshNodeUID();
+                if (Graph != null)
+                    Graph.RefreshNodeUID();
             }
         }
 
