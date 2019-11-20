@@ -280,11 +280,11 @@ namespace YBehavior.Editor.Core.New
                 ///> Pop the save dialog
                 Microsoft.Win32.SaveFileDialog sfd = new Microsoft.Win32.SaveFileDialog();
                 sfd.InitialDirectory = Config.Instance.WorkingDir;
-                sfd.Filter = "XML|*.xml";
+                sfd.Filter = bench is TreeBench ? "XML|*.xml" : "FSM|*.fsm";
                 if (sfd.ShowDialog() == true)
                 {
                     bench.FileInfo.Path = sfd.FileName;
-                    bench.FileInfo.Name = sfd.SafeFileName.Remove(sfd.SafeFileName.LastIndexOf(".xml"));
+                    bench.FileInfo.Name = sfd.SafeFileName.Remove(sfd.SafeFileName.LastIndexOf(bench is TreeBench ? ".xml" : ".fsm"));
 
                     res |= SaveResultFlag_NewFile;
                 }

@@ -1346,4 +1346,63 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
+    class FSMSetConditionTreeNode : LeafNode
+    {
+        public FSMSetConditionTreeNode()
+        {
+            m_Name = "FSMSetCondition";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable conditions = NodeMemory.CreateVariable(
+                "Conditions",
+                "",
+                Variable.CreateParams_String,
+                Variable.CountType.CT_NONE,
+                Variable.VariableType.VBT_NONE,
+                1
+            );
+            Variable optr = NodeMemory.CreateVariable(
+                "Operator",
+                "On",
+                Variable.CreateParams_Enum,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                0,
+                "On|Off"
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("Set Conditions {0}: {1}",
+                    Variables.GetVariable("Operator").NoteValue,
+                    Variables.GetVariable("Conditions").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
+    class FSMClearConditionsTreeNode : LeafNode
+    {
+        public FSMClearConditionsTreeNode()
+        {
+            m_Name = "FSMClearConditions";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override string Note
+        {
+            get
+            {
+                return "Clear Conditions.";
+            }
+        }
+    }
 }

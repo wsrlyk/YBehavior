@@ -12,8 +12,7 @@ namespace YBehavior
 	class TransitionContext
 	{
 		Transition m_Trans;
-		bool m_bLock;
-		int m_TransCount;
+		int m_TransCount{ 0 };
 	public:
 		TransitionResult transferResult;
 	public:
@@ -21,13 +20,12 @@ namespace YBehavior
 		Transition& Get() { return m_Trans; }
 		const Transition& Get() const { return m_Trans; }
 		bool IncTransCount();
-		void Set(const STRING& e) { if (!m_bLock) m_Trans.TrySet(e); }
-		inline void Reset() 
+		void Set(const STRING& e) { m_Trans.TrySet(e); }
+		void UnSet(const STRING& e) { m_Trans.UnSet(e); }
+		inline void Reset()
 		{
-			m_Trans.Reset(); m_bLock = false; m_TransCount = 0;
+			m_Trans.Reset(); m_TransCount = 0;
 		}
-
-		inline void Lock() { m_bLock = true; }
 	};
 
 	//typedef std::list<MachineState*> CurrentStatesType;

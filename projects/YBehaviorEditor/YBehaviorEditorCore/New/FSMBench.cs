@@ -414,7 +414,7 @@ namespace YBehavior.Editor.Core.New
             FSMMachineNode machine = state.OwnerMachine;
             if (machine.SetDefault(state, ref oldConn, ref newConn))
             {
-                if (oldConn.Trans.Count == 0)
+                if (oldConn != null && oldConn.Trans.Count == 0)
                     ConnectionList.Remove(oldConn.Renderer);
                 if (newConn.Trans.Count == 1)
                     ConnectionList.Add(newConn.Renderer);

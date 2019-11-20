@@ -130,8 +130,8 @@ namespace YBehavior
 		if (m_pMachine)
 			m_pMachine->Update(fDeltaT, pAgent);
 
-		MachineContext& context = *pAgent->GetMachineContext();
-		context.GetTransition().Reset();
+		//MachineContext& context = *pAgent->GetMachineContext();
+		//context.GetTransition().Reset();
 
 #ifdef DEBUGGER
 		if (DebugMgr::Instance()->GetTargetAgent() == pAgent->GetDebugUID())

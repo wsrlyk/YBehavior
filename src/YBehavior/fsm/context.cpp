@@ -10,7 +10,6 @@ namespace YBehavior
 {
 	TransitionContext::TransitionContext()
 		: m_Trans()
-		, m_bLock(false)
 	{
 
 	}
@@ -22,6 +21,7 @@ namespace YBehavior
 		if (++m_TransCount > 10)
 		{
 			ERROR_BEGIN << "Too many trans in a frame, check your machine." << ERROR_END;
+			m_TransCount = 0;
 			return false;
 		}
 		return true;

@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BB>
+  <Node Class="Root" Pos="0,0">
+    <Node Class="FSMSetCondition" Pos="222,256" Conditions="_SC ToC" Operator="_EC On" />
+  </Node>
+</BB>

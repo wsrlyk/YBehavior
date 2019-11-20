@@ -25,15 +25,20 @@ int main(int argc, char** argv)
 	XAgent::InitData();
 
 	STRING s;
-	XEntity* pEntity = new XEntity("Hehe", "StateMachine/MonsterMachine", nullptr, nullptr);
+	XEntity* pEntity = new XEntity("Hehe", "StateMachine/SimpleFSM", nullptr, nullptr);
 
 	//pMain->OnEnter(pEntity->GetAgent());
 	while (true)
 	{
 		//pMain->Update(0, pEntity->GetAgent());
 		pEntity->GetAgent()->Tick();
-		std::cin >> s;
-		pEntity->GetAgent()->GetMachineContext()->GetTransition().Set(s);
+		//std::cin >> s;
+		//pEntity->GetAgent()->GetMachineContext()->GetTransition().Set(s);
+#if _MSC_VER
+		Sleep(2000);
+#else
+		usleep(1000000);
+#endif
 	}
 
 	return 0;

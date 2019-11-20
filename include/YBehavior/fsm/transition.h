@@ -28,8 +28,15 @@ namespace YBehavior
 		inline bool operator==(const Transition& _rhs) const { return m_Conditions == _rhs.m_Conditions; }
 		inline bool operator<(const Transition& _rhs) const { return m_Conditions < _rhs.m_Conditions; }
 
-		inline void Reset() { m_Conditions = 0; }
-		inline void SetConditionMgr(ConditionMgr* conditionMgr) { m_pConditionMgr = conditionMgr; m_Conditions = 0; }
+		inline void Reset() 
+		{
+			m_Conditions = 0; 
+		}
+		inline void SetConditionMgr(ConditionMgr* conditionMgr) 
+		{
+			m_pConditionMgr = conditionMgr; 
+			m_Conditions = 0;
+		}
 		
 		void Set(const STRING& e);
 		bool TrySet(const STRING& e);
