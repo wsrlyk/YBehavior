@@ -200,8 +200,7 @@ namespace YBehavior.Editor.Core.New
 
         public void SetDebugPoint(uint uid, int count)
         {
-            string treename = WorkBenchMgr.Instance.ActiveWorkBench.FileInfo.Name;
-            NetworkMgr.Instance.MessageProcessor.SetDebugPoint(treename, uid, count);
+            NetworkMgr.Instance.MessageProcessor.SetDebugPoint(WorkBenchMgr.Instance.ActiveWorkBench.FileInfo, uid, count);
         }
 
         public void BuildRunInfo(List<WorkBench> benches)

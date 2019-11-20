@@ -1,4 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <G>
-  <Node Class="Root" />
+  <Node Class="Root">
+    <Node Class="Sequence" />
+  </Node>
 </G>

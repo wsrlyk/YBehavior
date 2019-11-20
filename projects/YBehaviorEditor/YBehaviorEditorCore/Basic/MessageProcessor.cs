@@ -116,22 +116,28 @@ namespace YBehavior.Editor.Core.New
         public void DoContinue()
         {
             NetworkMgr.Instance.SendText("[Continue]");
+            DebugMgr.Instance.ClearRunState();
         }
 
         public void DoStepInto()
         {
             NetworkMgr.Instance.SendText("[StepInto]");
+            DebugMgr.Instance.ClearRunState();
         }
 
         public void DoStepOver()
         {
             NetworkMgr.Instance.SendText("[StepOver]");
+            DebugMgr.Instance.ClearRunState();
         }
 
-        public void SetDebugPoint(string treename, uint uid, int count)
+        public void SetDebugPoint(TreeFileMgr.TreeFileInfo fileInfo, uint uid, int count)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("[DebugPoint]").Append(msgContentSplitter).Append(treename).Append(msgContentSplitter).Append(uid).Append(msgContentSplitter).Append(count);
+            sb.Append(fileInfo.FileType == FileType.TREE ? "[DebugTreePoint]" : "[DebugFSMPoint]")
+                .Append(msgContentSplitter).Append(fileInfo.Name)
+                .Append(msgContentSplitter).Append(uid)
+                .Append(msgContentSplitter).Append(count);
             NetworkMgr.Instance.SendText(sb.ToString());
             //NetworkMgr.Instance.SendText("[DebugPoint]" + msgContentSplitter + treename + msgContentSplitter + uid.ToString() + msgContentSplitter + count.ToString());
         }
@@ -283,7 +289,8 @@ namespace YBehavior.Editor.Core.New
             if (ss == null)
                 return;
             string[] data = ss.Split(msgContentSplitter);
-            if (data.Length >= 2)
+            int subtreesoffset = 2;
+            if (data.Length >= subtreesoffset)
             {
                 DebugMgr.Instance.ClearRunState();
                 ///> MainData
@@ -311,13 +318,12 @@ namespace YBehavior.Editor.Core.New
 
                 ++m_TickResultToken;
 
-                int offset = 2;
-                if ((data.Length - offset) % 3 == 0)
+                if ((data.Length - subtreesoffset) % 3 == 0)
                 {
                     TreeRunInfo runInfo = null;
-                    for (int i = offset; i < data.Length; ++i)
+                    for (int i = subtreesoffset; i < data.Length; ++i)
                     {
-                        int innerIndex = i - offset;
+                        int innerIndex = i - subtreesoffset;
                         ///> TreeName
                         if (innerIndex % 3 == 0)
                         {

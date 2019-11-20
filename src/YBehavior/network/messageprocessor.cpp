@@ -64,18 +64,18 @@ namespace YBehavior
 		DebugMgr::Instance()->SetCommand(DC_StepInto);
 	}
 
-	void ProcessDebugPoint(const StdVector<STRING>& datas)
+	void ProcessDebugPoint(DebugTargetType type, const StdVector<STRING>& datas)
 	{
 		const STRING& treeName = datas[1];
 		UINT uid = Utility::ToType<UINT>(datas[2]);
 		INT count = Utility::ToType<INT>(datas[3]);
 
 		if (count > 0)
-			DebugMgr::Instance()->AddBreakPoint({ DebugTargetType::TREE, treeName }, uid);
+			DebugMgr::Instance()->AddBreakPoint({ type, treeName }, uid);
 		else if (count < 0)
-			DebugMgr::Instance()->AddLogPoint({ DebugTargetType::TREE, treeName }, uid);
+			DebugMgr::Instance()->AddLogPoint({ type, treeName }, uid);
 		else
-			DebugMgr::Instance()->RemoveDebugPoint({ DebugTargetType::TREE, treeName }, uid);
+			DebugMgr::Instance()->RemoveDebugPoint({ type, treeName }, uid);
 	}
 
 	void MessageProcessor::ProcessOne(const STRING& s)
@@ -107,9 +107,13 @@ namespace YBehavior
 		{
 			StepOver();
 		}
-		else if (datas[0] == "[DebugPoint]")
+		else if (datas[0] == "[DebugTreePoint]")
 		{
-			ProcessDebugPoint(datas);
+			ProcessDebugPoint(DebugTargetType::TREE, datas);
+		}
+		else if (datas[0] == "[DebugFSMPoint]")
+		{
+			ProcessDebugPoint(DebugTargetType::FSM, datas);
 		}
 		else if (datas[0] == "[DebugBegin]")
 		{
