@@ -77,7 +77,7 @@ namespace YBehavior.Editor.Core.New
 
         public static bool IsValidVariableName(string name)
         {
-            string pattern = @"^[a-zA-Z0-9_]*$";
+            string pattern = @"^[a-zA-Z_][a-zA-Z0-9_]*$";
             bool res = false;
             if (name.Length > 0 && name.Length <= 20)
             {
@@ -89,7 +89,7 @@ namespace YBehavior.Editor.Core.New
                 return false;
             }
             if (!res)
-                LogMgr.Instance.Error("Contains invalid characters (Only: a~z, A~Z, 0~9, _ ): " + name);
+                LogMgr.Instance.Error("(Only: a~z, A~Z, 0~9, _ ) and (Start with a~z, A~Z, _ ): " + name);
             return res;
         }
 

@@ -28,7 +28,7 @@ namespace YBehavior.Editor.Core.New
                 ////};
 
                 FSMStateOwner.Tree = value;
-
+                PropertyChange(RenderProperty.Note);
                 ////WorkBenchMgr.Instance.PushCommand(command);
             }
         }

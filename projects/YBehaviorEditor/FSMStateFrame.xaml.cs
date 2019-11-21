@@ -34,6 +34,7 @@ namespace YBehavior.Editor
             if (Renderer != null)
             {
                 this.NamePanel.Visibility = (Renderer.FSMStateOwner.Type == FSMStateType.User) ? Visibility.Visible : Visibility.Collapsed;
+                this.TreePanel.Visibility = (Renderer.FSMStateOwner is FSMAnyStateNode || Renderer.FSMStateOwner is FSMUpperStateNode) ? Visibility.Collapsed : Visibility.Visible;
             }
         }
     }

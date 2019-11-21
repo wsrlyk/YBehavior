@@ -265,13 +265,13 @@ namespace YBehavior.Editor.Core.New
 
             if (!bench.CheckError())
             {
-                LogMgr.Instance.Error("Something wrong in file.");
-                ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
-                {
-                    Content = "Saved With Errors.",
-                    TipType = ShowSystemTipsArg.TipsType.TT_Error,
-                };
-                EventMgr.Instance.Send(showSystemTipsArg);
+                //LogMgr.Instance.Error("Something wrong in file.");
+                //ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
+                //{
+                //    Content = "Saved With Errors.",
+                //    TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                //};
+                //EventMgr.Instance.Send(showSystemTipsArg);
                 res |= SaveResultFlag_WithError;
             }
 

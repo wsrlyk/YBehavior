@@ -12,7 +12,7 @@
             <TextBlock Text="Name" Background="LightBlue" Width="90"/>
             <TextBox Name="NickName" Text="{Binding NickName}"/>
         </DockPanel>
-        <DockPanel>
+        <DockPanel Name="TreePanel">
             <TextBlock Text="Tree" Background="LightBlue" Width="90"/>
             <TextBox Name="Tree" Text="{Binding Tree}"/>
         </DockPanel>

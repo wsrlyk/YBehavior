@@ -525,6 +525,25 @@ namespace YBehavior.Editor.Core.New
             if (conn != null)
                 conn.Trans.Add(t);
         }
+
+        public override bool CheckValid()
+        {
+            if (!base.CheckValid())
+                return false;
+
+            HashSet<string> names = new HashSet<string>();
+            bool res = true;
+            foreach (FSMStateNode state in m_AllStates)
+            {
+                if (!names.Add(state.NickName))
+                {
+                    LogMgr.Instance.Error("Duplicate State Name: " + state.NickName);
+                    res = false;
+                }
+            }
+
+            return res;
+        }
     }
 
 
@@ -564,6 +583,14 @@ namespace YBehavior.Editor.Core.New
 
         public FSMStateNode() : base()
         {
+        }
+
+        public override string Note
+        {
+            get
+            {
+                return Tree;
+            }
         }
 
         public bool Load(System.Xml.XmlNode data)
@@ -664,7 +691,12 @@ namespace YBehavior.Editor.Core.New
             bool res = !string.IsNullOrEmpty(m_NickName);
             if (!res)
             {
-                LogMgr.Instance.Log("Must have a NAME: " + Renderer.UITitle);
+                LogMgr.Instance.Error("Must have a NAME: " + Renderer.UITitle);
+            }
+            if (!VariableCollection.IsValidVariableName(m_NickName))
+            {
+                LogMgr.Instance.Error("NAME format error: " + Renderer.UITitle);
+                return false;
             }
             return res;
         }

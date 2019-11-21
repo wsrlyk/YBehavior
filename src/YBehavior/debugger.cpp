@@ -272,11 +272,15 @@ namespace YBehavior
 		return &(it->second);
 	}
 
-	NodeRunInfo* DebugMgr::CreateAndAppendRunInfo()
+	NodeRunInfo* DebugMgr::CreateAndAppendRunInfo(const void* pNode)
 	{
+		auto it = m_RunInfos.find(pNode);
+		if (it != m_RunInfos.end())
+			return it->second;
+			
 		ScopedLock lock(m_Mutex);
 		NodeRunInfo* pInfo = ObjectPool<NodeRunInfo>::Get();
-		m_RunInfos.push_back(pInfo);
+		m_RunInfos[pNode] = pInfo;
 		return pInfo;
 	}
 
@@ -285,7 +289,7 @@ namespace YBehavior
 		ScopedLock lock(m_Mutex);
 		for (auto it = m_RunInfos.begin(); it != m_RunInfos.end(); ++it)
 		{
-			ObjectPool<NodeRunInfo>::Recycle(*it);
+			ObjectPool<NodeRunInfo>::Recycle(it->second);
 		}
 		m_RunInfos.clear();
 	}
@@ -370,17 +374,17 @@ namespace YBehavior
 		///> Run Info:
 		{
 			ScopedLock lock(GetMutex());
-			const std::list<NodeRunInfo*>& runInfos = GetTreeRunInfos();
-			for (auto it : runInfos)
+			for (auto it = m_RunInfos.begin(); it != m_RunInfos.end(); ++it)
 			{
+				auto pInfo = it->second;
 				STRING* buf = nullptr;
-				if (it->type == DebugTargetType::FSM)
+				if (pInfo->type == DebugTargetType::FSM)
 					buf = &fsmBuffer;
 				else
-					buf = &(treeBuffer[(BehaviorTree*)it->pNode].second);
+					buf = &(treeBuffer[(BehaviorTree*)pInfo->pNode].second);
 				if (buf->length() > 0)
 					*buf += IDebugHelper::s_ListSpliter;
-				*buf += it->ToString();
+				*buf += pInfo->ToString();
 			}
 		}
 	
@@ -408,9 +412,9 @@ namespace YBehavior
 
 	unsigned IDebugHelper::s_Token = 0;
 
-	void IDebugHelper::CreateRunInfo()
+	void IDebugHelper::CreateRunInfo(const void* pNode)
 	{
-		m_pRunInfo = DebugMgr::Instance()->CreateAndAppendRunInfo();
+		m_pRunInfo = DebugMgr::Instance()->CreateAndAppendRunInfo(pNode);
 	}
 
 	void IDebugHelper::SetResult(int rawState, int finalState)
@@ -525,7 +529,7 @@ namespace YBehavior
 		m_pNode = pNode;
 		m_Type = DebugTargetType::TREE;
 
-		CreateRunInfo();
+		CreateRunInfo(pNode);
 		m_pRunInfo->nodeUID = pNode->GetUID();
 		m_pRunInfo->rawRunState = NS_RUNNING;
 		m_pRunInfo->finalRunState = NS_RUNNING;
@@ -676,7 +680,7 @@ namespace YBehavior
 		m_pNode = pNode;
 		m_Type = DebugTargetType::FSM;
 
-		CreateRunInfo();
+		CreateRunInfo(pNode);
 		m_pRunInfo->nodeUID = pNode->GetUID();
 		m_pRunInfo->rawRunState = NS_RUNNING;
 		m_pRunInfo->finalRunState = NS_RUNNING;

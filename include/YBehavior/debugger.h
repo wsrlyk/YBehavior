@@ -15,13 +15,13 @@
 namespace YBehavior
 {
 	enum struct DebugTargetType;
-
+	
 	struct NodeRunInfo
 	{
 		UINT nodeUID;
 		int rawRunState;
 		int finalRunState;
-		void* pNode;
+		const void* pNode;
 		DebugTargetType type;
 		const STRING ToString() const;
 	};
@@ -121,7 +121,8 @@ namespace YBehavior
 		bool m_bTargetDirty = false;
 
 		Mutex m_Mutex;
-		std::list<NodeRunInfo*> m_RunInfos;
+		///> Node(Tree or FSM) => RunInfo, one node has only one info
+		std::unordered_map<const void*, NodeRunInfo*> m_RunInfos;
 		//std::unordered_map<UINT, DebugPointInfo> m_DebugPointInfos;
 
 		std::unordered_map<STRING, GraphDebugInfo> m_TreeDebugInfo;
@@ -144,7 +145,7 @@ namespace YBehavior
 		bool IsValidTarget(Agent* pAgent, FSM* pFSM);
 		inline const DebugTargetID& GetTarget() { return m_Target; }
 		inline UINT64 GetTargetAgent() { return m_TargetAgent; }
-		inline const std::list<NodeRunInfo*>& GetTreeRunInfos() { return m_RunInfos; }
+
 		inline Mutex& GetMutex() { return m_Mutex; }
 		bool HasBreakPoint(const DebugTargetID& target, UINT nodeUID);
 		bool HasLogPoint(const DebugTargetID& target, UINT nodeUID);
@@ -155,7 +156,7 @@ namespace YBehavior
 		void AddTreeDebugInfo(const DebugTargetID& target, GraphDebugInfo&& info);
 		void RemoveDebugPoint(const DebugTargetID& target, UINT nodeUID);
 		GraphDebugInfo* FindGraphDebugInfo(const DebugTargetID& target);
-		NodeRunInfo* CreateAndAppendRunInfo();
+		NodeRunInfo* CreateAndAppendRunInfo(const void* pNode);
 		void Clear();
 
 		inline void TogglePause(bool bPaused) { m_bPaused = bPaused; }
@@ -187,7 +188,7 @@ namespace YBehavior
 		IDebugHelper(Agent* pAgent) : m_Target(pAgent){}
 		virtual ~IDebugHelper() {}
 		inline bool IsValid() { return m_Target != nullptr; }
-		void CreateRunInfo();
+		void CreateRunInfo(const void* pNode);
 		void SetResult(int rawState, int finalState);
 		void TryBreaking();
 		void TryPause();
