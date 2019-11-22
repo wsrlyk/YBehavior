@@ -25,7 +25,7 @@ namespace YBehavior.Editor.Core.New
 
     public class FSMConnectionRenderer : ConnectionRenderer
     {
-        public FSMConnection FSMOwner;
+        public FSMConnection FSMOwner { get; set; }
         public string Name
         {
             get
@@ -35,6 +35,5 @@ namespace YBehavior.Editor.Core.New
                     , FSMOwner.Ctr.To.Owner.ForceGetRenderer.FullName);
             }
         }
-
     }
 }

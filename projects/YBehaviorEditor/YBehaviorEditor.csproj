@@ -80,7 +80,6 @@
     <Compile Include="UINodes\UIFSMStateNode.xaml.cs">
       <DependentUpon>UIFSMStateNode.xaml</DependentUpon>
     </Compile>
-    <None Include="UINodes\UIFSMStateBase.cs" />
     <Compile Include="FSMUIOutConnector.xaml.cs">
       <DependentUpon>FSMUIOutConnector.xaml</DependentUpon>
     </Compile>

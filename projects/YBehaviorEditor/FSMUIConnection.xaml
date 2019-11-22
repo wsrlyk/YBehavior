@@ -8,6 +8,11 @@
              >
     <UserControl.Resources>
         <local:FSMUIConnectionOffsetConverter x:Key="offsetConvertor"/>
+        <local:ValueConverterGroup x:Key="ExtraArrowsVisibilityConvertor">
+            <local:IsTwoOrMoreConverter/>
+            <BooleanToVisibilityConverter/>
+        </local:ValueConverterGroup>
+
     </UserControl.Resources>
     <Grid>
         <Path Name="path" Stroke="#FFDADCE4" StrokeThickness="5" Fill="#FFE1E3E8" TargetUpdated="Path_TargetUpdated">
@@ -28,6 +33,20 @@
                                 </MultiBinding>
                             </LineSegment.Point>
                         </LineSegment>
+                    </PathFigure>
+                    <PathFigure IsFilled="true" StartPoint="0,0"  IsClosed="true">
+                        <LineSegment Point="-0.5,0.2" />
+                        <LineSegment Point="-0.5,-0.2" />
+                    </PathFigure>
+                </PathGeometry>
+            </Path.Data>
+        </Path>
+        <Path Name="extraArrows" Stroke="#FFDADCE4" StrokeThickness="5" Fill="#FFE1E3E8" Visibility="{Binding Path=FSMOwner.Trans.Count, Converter={StaticResource ExtraArrowsVisibilityConvertor}}">
+            <Path.Data>
+                <PathGeometry>
+                    <PathFigure IsFilled="true" StartPoint="0,0"  IsClosed="true">
+                        <LineSegment Point="-0.5,0.2" />
+                        <LineSegment Point="-0.5,-0.2" />
                     </PathFigure>
                     <PathFigure IsFilled="true" StartPoint="0,0"  IsClosed="true">
                         <LineSegment Point="-0.5,0.2" />

@@ -24,17 +24,20 @@ namespace YBehavior.Editor
         //static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
 
         PathFigure figure;
-        PathFigure arrowFigure;
         Brush normalStrokeBrush;
+
+        PathFigure[] arrowFigure = new PathFigure[3];
 
         SelectionStateChangeHandler SelectHandler { get; set; }
         Operation m_Operation;
-
+        FSMConnection Conn;
         public FSMUIConnection()
         {
             InitializeComponent();
             figure = PathGeometry.Figures[0];
-            arrowFigure = PathGeometry.Figures[1];
+            arrowFigure[0] = PathGeometry.Figures[1];
+            arrowFigure[1] = (extraArrows.Data as PathGeometry).Figures[0];
+            arrowFigure[2] = (extraArrows.Data as PathGeometry).Figures[1];
             //Clear();
             normalStrokeBrush = this.path.Stroke;
 
@@ -50,7 +53,10 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             figure = PathGeometry.Figures[0];
-            arrowFigure = PathGeometry.Figures[1];
+            arrowFigure[0] = PathGeometry.Figures[1];
+            arrowFigure[1] = (extraArrows.Data as PathGeometry).Figures[0];
+            arrowFigure[2] = (extraArrows.Data as PathGeometry).Figures[1];
+            extraArrows.Visibility = Visibility.Collapsed;
             //Clear();
             normalStrokeBrush = this.path.Stroke;
 
@@ -66,7 +72,7 @@ namespace YBehavior.Editor
 
         void _DataContextChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e)
         {
-            //ConnectionRenderer renderer = this.DataContext as ConnectionRenderer;
+            Conn = (this.DataContext as FSMConnectionRenderer).FSMOwner;
 
             //SetCanvas((renderer.ChildConn.Owner as Node).Renderer.RenderCanvas);
         }
@@ -99,9 +105,15 @@ namespace YBehavior.Editor
         public void SetSelect(bool bSelect)
         {
             if (bSelect)
+            {
                 this.path.SetResourceReference(Shape.StrokeProperty, SystemColors.HotTrackBrushKey);
+                this.extraArrows.SetResourceReference(Shape.StrokeProperty, SystemColors.HotTrackBrushKey);
+            }
             else
+            {
                 this.path.Stroke = normalStrokeBrush;
+                this.extraArrows.Stroke = normalStrokeBrush;
+            }
         }
 
         public void OnDelete(int param)
@@ -124,20 +136,27 @@ namespace YBehavior.Editor
             LineSegment trdLine = figure.Segments[0] as LineSegment;
             Point end = trdLine.Point;
 
+            _DrawArrow(arrowFigure[0], start, end, 0);
+            _DrawArrow(arrowFigure[1], start, end, 0.06f);
+            _DrawArrow(arrowFigure[2], start, end, -0.06f);
+        }
+
+        void _DrawArrow(PathFigure figure, Point start, Point end, float offset)
+        {
             Vector arrow = end - start;
 
-            Point midPoint = start + arrow * 0.47f;
+            Point midPoint = start + arrow * (0.47f + offset);
 
             arrow.Normalize();
 
-            arrowFigure.StartPoint = midPoint + arrow * 2;
+            figure.StartPoint = midPoint + arrow * 2;
 
             midPoint = midPoint - arrow * 2;
 
             arrow = new Vector(arrow.Y, -arrow.X);
-            (arrowFigure.Segments[0] as LineSegment).Point = midPoint + arrow * 2;
+            (figure.Segments[0] as LineSegment).Point = midPoint + arrow * 2;
             arrow = -arrow;
-            (arrowFigure.Segments[1] as LineSegment).Point = midPoint + arrow * 2;
+            (figure.Segments[1] as LineSegment).Point = midPoint + arrow * 2;
         }
     }
 }
