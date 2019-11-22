@@ -17,10 +17,13 @@
             </local:UIFSMUserStateNode>
         </DataTemplate>
         <DataTemplate x:Key="Meta">
-            <local:UIFSMUserStateNode/>
+            <local:UIFSMMetaStateNode/>
         </DataTemplate>
         <DataTemplate x:Key="Special">
             <local:UIFSMSpecialStateNode/>
+        </DataTemplate>
+        <DataTemplate x:Key="SpecialVirtual">
+            <local:UIFSMSpecialVirtualStateNode/>
         </DataTemplate>
 
         <SolidColorBrush x:Key="defaultBackground"  Color="#FF7E8081"/>
@@ -89,7 +92,8 @@
                         <local:FSMStateTypeTemplateSelector
                             NormalTemplate="{StaticResource Normal}"
                             MetaTemplate="{StaticResource Meta}"
-                            SpecialTemplate="{StaticResource Special}"/>
+                            SpecialTemplate="{StaticResource Special}"
+                            SpecialVirtualTemplate="{StaticResource SpecialVirtual}"/>
                     </ItemsControl.ItemTemplateSelector>
                 </ItemsControl>
                 <Canvas Focusable="True" Name="nodeLayer_old"/>

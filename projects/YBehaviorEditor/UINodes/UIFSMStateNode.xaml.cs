@@ -46,7 +46,6 @@ namespace YBehavior.Editor
         protected override void _OnDataContextChanged()
         {
             _CreateConnectors();
-            _SetCommentPos();
         }
 
         private void _CreateConnectors()
@@ -81,20 +80,6 @@ namespace YBehavior.Editor
                 m_uiConnectors.Add(ctr.Identifier, uiConnector);
             }
         }
-
-        private void _SetCommentPos()
-        {
-            //if (bottomConnectors.Children.Count > 0)
-            //{
-            //    DockPanel.SetDock(commentBorder, Dock.Right);
-            //    commentBorder.Margin = new Thickness(0, this.topConnectors.Height, 0, bottomConnectors.Height);
-            //}
-            //else
-            {
-                DockPanel.SetDock(CommentUI, Dock.Bottom);
-                CommentUI.Margin = new Thickness(0);
-            }
-        }
     }
 
     public class UIFSMUserStateNode : UIFSMStateNode, ISelectable, IDeletable, IDuplicatable, IDebugPointable, ICanDisable, ICanMakeDefault
@@ -108,7 +93,26 @@ namespace YBehavior.Editor
         }
     }
 
+    public class UIFSMMetaStateNode : UIFSMUserStateNode
+    {
+        public UIFSMMetaStateNode()
+        {
+            m_Operation.RegisterLeftDoubleClick(_OnDoubleClick);
+        }
+
+        void _OnDoubleClick()
+        {
+            m_Operation.MakeCanvasFocused();
+
+            WorkBenchMgr.Instance.AddRenderers((Node as FSMMetaStateNode).SubMachine, true, false);
+        }
+    }
     public class UIFSMSpecialStateNode : UIFSMStateNode, ISelectable, IDebugPointable
+    {
+
+    }
+
+    public class UIFSMSpecialVirtualStateNode : UIFSMStateNode, ISelectable
     {
 
     }

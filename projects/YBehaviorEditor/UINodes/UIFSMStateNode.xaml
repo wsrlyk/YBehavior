@@ -24,8 +24,9 @@
         <local:FSMStateBorderCornerRadiusConverter x:Key="cornerRadiusConverter"/>
     </UserControl.Resources>
     <DockPanel>
-        <Border Name="commentBorder" DockPanel.Dock="Right" Margin="0,20,0,10" BorderThickness="1" BorderBrush="#FFE8D3AF" Background="#FFF1E0C6"
-                Visibility="{Binding Path=Comment, Converter={StaticResource invertStringEmptyAndVisibilityConvertor}}">
+        <Border Name="commentBorder" DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="#FFE8D3AF" Background="#DDF1E0C6"
+                Visibility="{Binding Path=Comment, Converter={StaticResource invertStringEmptyAndVisibilityConvertor}}"
+                CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}">
             <TextBlock Text="{Binding Comment, Mode=OneWay}" FontSize="10"/>
         </Border>
         <Border Name="border" BorderThickness="4"

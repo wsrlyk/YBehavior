@@ -126,9 +126,6 @@
       <DependentUpon>TreeUIConnector.xaml</DependentUpon>
     </Compile>
     <Compile Include="UIConnector.cs" />
-    <None Include="UIFSMState.xaml.cs">
-      <DependentUpon>UIFSMState.xaml</DependentUpon>
-    </None>
     <Compile Include="UINodes\UITreeNode.xaml.cs">
       <DependentUpon>UITreeNode.xaml</DependentUpon>
     </Compile>
@@ -235,10 +232,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <None Include="UIFSMState.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
     <Page Include="UINodes\UITreeNode.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

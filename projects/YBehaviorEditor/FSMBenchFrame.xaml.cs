@@ -13,6 +13,7 @@ namespace YBehavior.Editor
 
         public DataTemplate MetaTemplate { get; set; }
         public DataTemplate SpecialTemplate { get; set; }
+        public DataTemplate SpecialVirtualTemplate { get; set; }
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             FSMStateNode node = (item as FSMStateRenderer).FSMStateOwner;
@@ -20,6 +21,8 @@ namespace YBehavior.Editor
                 return MetaTemplate;
             if (node is FSMNormalStateNode)
                 return NormalTemplate;
+            if (node is FSMUpperStateNode || node is FSMAnyStateNode)
+                return SpecialVirtualTemplate;
             return SpecialTemplate;
         }
     }

@@ -16,5 +16,9 @@
             <TextBlock Text="Tree" Background="LightBlue" Width="90"/>
             <TextBox Name="Tree" Text="{Binding Tree}"/>
         </DockPanel>
+        <DockPanel Name="CommentPanel">
+            <TextBlock Text="Comment" Background="LightBlue" Width="90"/>
+            <TextBox TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Text="{Binding Comment}"/>
+        </DockPanel>
     </StackPanel>
 </UserControl>
