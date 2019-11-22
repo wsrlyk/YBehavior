@@ -7,6 +7,20 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
+    public class TreeNodeTypeTemplateSelector : DataTemplateSelector
+    {
+        public DataTemplate NormalTemplate { get; set; }
+        public DataTemplate RootTemplate { get; set; }
+
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            TreeNode node = (item as TreeNodeRenderer).TreeOwner;
+            if (node is RootTreeNode)
+                return RootTemplate;
+            return NormalTemplate;
+        }
+    }
+
     /// <summary>
     /// WorkBenchFrame.xaml 的交互逻辑
     /// </summary>

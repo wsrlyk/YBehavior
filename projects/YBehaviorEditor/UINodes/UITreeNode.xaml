@@ -1,4 +1,4 @@
-﻿<local:YUserControl x:Class="YBehavior.Editor.UINode"
+﻿<local:UITreeNodeBase x:Class="YBehavior.Editor.UITreeNode"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,40 +8,12 @@
              MinWidth="60" MinHeight="80" HorizontalAlignment="Center">
     <UserControl.Style>
         <Style>
-            <Setter Property="local:UINode.DebugTrigger" Value="{Binding Path=DebugTrigger}" />
+            <Setter Property="local:UITreeNode.DebugTrigger" Value="{Binding Path=DebugTrigger}" />
             <!--<Setter Property="local:UINode.DebugConstant" Value="{Binding Path=DebugConstant}" />-->
         </Style>
     </UserControl.Style>
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
         <local:ReturnTypeConvertor x:Key="returnTypeConvertor"/>
-        <local:ValueConverterGroup x:Key="invertStringEmptyAndVisibilityConvertor">
-            <local:StringNullOrEmptyConvertor/>
-            <local:InvertBoolConverter/>
-            <BooleanToVisibilityConverter/>
-        </local:ValueConverterGroup>
-
-        <Style TargetType="FrameworkElement" x:Key="VisibleAnimation">
-            <Setter Property="Visibility" Value="Collapsed"/>
-            <Setter Property="Opacity" Value="0"/>
-        </Style>
-        <Storyboard x:Key="InstantShowAnim" FillBehavior="Stop">
-<!--            <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             From="0.0" To="1.0" Duration="0:0:0.1"/>   -->
-            <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             From="1.0" To="0.0" Duration="0:0:0.1" BeginTime="0:0:0.8"/>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
-                <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
-                <!--<DiscreteObjectKeyFrame KeyTime="0:0:0.8" Value="{x:Static Visibility.Collapsed}"/> -->
-            </ObjectAnimationUsingKeyFrames>
-        </Storyboard>
-        <Storyboard x:Key="ConstantShowAnim">
-            <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             From="0.0" To="1.0" Duration="0:0:0.1"/>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
-                <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
-            </ObjectAnimationUsingKeyFrames>
-        </Storyboard>
     </UserControl.Resources>
     <DockPanel>
         <Border Name="leftConnectors" DockPanel.Dock="Left" Height="10" HorizontalAlignment="Left" Visibility="{Binding EnableCondition, Converter={StaticResource visibilityConvertor}}"/>
@@ -79,4 +51,4 @@
             </Grid>
         </Border>
     </DockPanel>
-</local:YUserControl>
+</local:UITreeNodeBase>

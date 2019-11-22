@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
@@ -19,23 +11,33 @@ namespace YBehavior.Editor
     /// <summary>
     /// BehaviorNode.xaml 的交互逻辑
     /// </summary>
-    public partial class UINode : YUserControl, ISelectable, IDeletable, IDuplicatable, IDebugPointable, ICanDisable, IHasCondition, ICanFold
+    
+    public abstract class UINodeBase<NodeType, NodeRendererType>: YUserControl where NodeRendererType: NodeBaseRenderer where NodeType : NodeBase
     {
-        static SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
+        static protected SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
         public SelectionStateChangeHandler SelectHandler { get; set; }
 
-        public TreeNode Node { get; set; }
-        public TreeNodeRenderer Renderer { get; set; }
+        public NodeType Node { get; set; }
+        public NodeRendererType Renderer { get; set; }
 
-        Operation m_Operation;
+        public abstract FrameworkElement SelectCoverUI { get; }
+        public abstract Brush OutlookBrush { get; set; }
+        public abstract FrameworkElement CommentUI { get; }
+        public abstract FrameworkElement DebugUI { get; }
+        public abstract Brush DebugBrush { get; set; }
 
-        Dictionary<string, UIConnector> m_uiConnectors = new Dictionary<string, UIConnector>();
+        protected Operation m_Operation;
 
-        public UINode()
+        protected Dictionary<string, UIConnector> m_uiConnectors = new Dictionary<string, UIConnector>();
+
+        public UINodeBase()
         {
-            InitializeComponent();
-            this.selectCover.Visibility = Visibility.Collapsed;
+        }
+
+        protected void _Init()
+        {
+            this.SelectCoverUI.Visibility = Visibility.Collapsed;
 
             SelectHandler = defaultSelectHandler;
 
@@ -43,7 +45,7 @@ namespace YBehavior.Editor
             m_Operation.RegisterLeftClick(_OnClick);
             m_Operation.RegisterLeftDrag(_OnDrag, null, _OnFinishDrag);
 
-            m_InstantAnim = this.Resources["InstantShowAnim"] as Storyboard;
+            m_InstantAnim = Application.Current.Resources["InstantShowAnim"] as Storyboard;
 
             this.DataContextChanged += _DataContextChangedEventHandler;
         }
@@ -60,19 +62,23 @@ namespace YBehavior.Editor
 
         void _DataContextChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e)
         {
-            Renderer = DataContext as TreeNodeRenderer;
+            Renderer = DataContext as NodeRendererType;
+            Node = Renderer.Owner as NodeType;
 
-            Node = Renderer.TreeOwner;
+            _OnDataContextChanged();
 
             //SetCanvas(Node.Renderer.RenderCanvas);
-
-            _CreateConnectors();
             _BuildConnectionBinding();
-            _SetCommentPos();
             if (DebugMgr.Instance.bBreaked)
                 SetDebug(Node.Renderer.RunState);
             else
                 SetDebug(NodeState.NS_INVALID);
+
+        }
+
+        protected virtual void _OnDataContextChanged()
+        {
+
         }
 
         private void _BuildConnectionBinding()
@@ -95,90 +101,15 @@ namespace YBehavior.Editor
             {
                 ConnectorGeometry geo = Node.Conns.GetConnector(identifier).Geo;
                 uiConnector.DataContext = geo;
-                //uiConnector.SetBinding(UIConnector.HotspotProperty, new Binding()
-                //{
-                //    Path = new PropertyPath("Pos"),
-                //    Mode = BindingMode.OneWayToSource
-                //});
             }
         }
-        private void _CreateConnectors()
-        {
-            m_uiConnectors.Clear();
-            topConnectors.Children.Clear();
-            bottomConnectors.Children.Clear();
-            leftConnectors.Child = null;
-
-            foreach (Connector ctr in Node.Conns.ConnectorsList)
-            {
-                //if (ctr is ConnectorNone)
-                //    continue;
-
-                TreeUIConnector uiConnector = new TreeUIConnector
-                {
-                    Title = ctr.Identifier,
-                    Ctr = ctr
-                };
-                //uiConnector.SetCanvas(m_Canvas);
-                if (ctr.Identifier == Connector.IdentifierCondition)
-                {
-                    leftConnectors.Child = uiConnector;
-                }
-                else
-                    bottomConnectors.Children.Add(uiConnector);
-
-                m_uiConnectors.Add(ctr.Identifier, uiConnector);
-            }
-
-            if (Node.Conns.ParentConnector != null)
-            {
-                TreeUIConnector uiConnector = new TreeUIConnector
-                {
-                    Title = Node.Icon,
-                    Ctr = Node.Conns.ParentConnector
-                };
-                //uiConnector.SetCanvas(m_Canvas);
-                uiConnector.title.FontSize = 14;
-                topConnectors.Children.Add(uiConnector);
-
-                m_uiConnectors.Add(Connector.IdentifierParent, uiConnector);
-            }
-        }
-
-        private void _SetCommentPos()
-        {
-            if (bottomConnectors.Children.Count > 0)
-            {
-                DockPanel.SetDock(commentBorder, Dock.Right);
-                commentBorder.Margin = new Thickness(0, this.topConnectors.Height, 0, bottomConnectors.Height);
-            }
-            else
-            {
-                DockPanel.SetDock(commentBorder, Dock.Bottom);
-                commentBorder.Margin = new Thickness(0);
-            }
-        }
-
-        //public static readonly DependencyProperty DebugInstantProperty =
-        //    DependencyProperty.Register("DebugInstant",
-        //    typeof(bool), typeof(UINode), new FrameworkPropertyMetadata(DebugInstant_PropertyChanged));
-        //private static void DebugInstant_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    UINode c = (UINode)d;
-        //    c.SetDebugInstant(c.Node.Renderer.RunState);
-        //}
-        //public bool DebugInstant
-        //{
-        //    get { return (bool)GetValue(DebugInstantProperty); }
-        //    set { SetValue(DebugInstantProperty, value); }
-        //}
 
         public static readonly DependencyProperty DebugTriggerProperty =
             DependencyProperty.Register("DebugTrigger",
-            typeof(bool), typeof(UINode), new FrameworkPropertyMetadata(DebugTrigger_PropertyChanged));
+            typeof(bool), typeof(UINodeBase<NodeType, NodeRendererType>), new FrameworkPropertyMetadata(DebugTrigger_PropertyChanged));
         private static void DebugTrigger_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            UINode c = (UINode)d;
+            UINodeBase<NodeType, NodeRendererType> c = (UINodeBase<NodeType, NodeRendererType>)d;
             if (DebugMgr.Instance.bBreaked)
                 c.SetDebug(c.Node.Renderer.RunState);
             else
@@ -195,10 +126,10 @@ namespace YBehavior.Editor
 
         public void SetDebugInstant(NodeState state = NodeState.NS_INVALID)
         {
-            this.debugCover.Visibility = Visibility.Collapsed;
+            this.DebugUI.Visibility = Visibility.Collapsed;
             if (state == NodeState.NS_INVALID)
             {
-                m_InstantAnim.Remove(debugCover);
+                m_InstantAnim.Remove(DebugUI);
             }
             else
             {
@@ -221,18 +152,18 @@ namespace YBehavior.Editor
                         bgBrush = new SolidColorBrush(Colors.Red);
                         break;
                 }
-                this.debugCover.Background = bgBrush;
+                this.DebugBrush = bgBrush;
 
-                m_InstantAnim.Begin(this.debugCover, true);
+                m_InstantAnim.Begin(this.DebugUI, true);
             }
         }
 
         public void SetDebug(NodeState state = NodeState.NS_INVALID)
         {
-            m_InstantAnim.Remove(debugCover);
+            m_InstantAnim.Remove(DebugUI);
             if (state == NodeState.NS_INVALID)
             {
-                this.debugCover.Visibility = Visibility.Collapsed;
+                this.DebugUI.Visibility = Visibility.Collapsed;
             }
             else
             {
@@ -255,17 +186,16 @@ namespace YBehavior.Editor
                         bgBrush = new SolidColorBrush(Colors.Red);
                         break;
                 }
-                this.debugCover.Background = bgBrush;
+                this.DebugBrush = bgBrush;
 
-                this.debugCover.Visibility = Visibility.Visible;
+                this.DebugUI.Visibility = Visibility.Visible;
             }
         }
 
         void _OnClick()
         {
             m_Operation.MakeCanvasFocused();
-            if (Node is RootTreeNode)
-                return;
+
             SelectHandler(this, true);
         }
 
@@ -275,7 +205,7 @@ namespace YBehavior.Editor
                 return;
             if (Node != null)
             {
-                Node.Renderer.DragMain(delta, 0);
+                Node.Renderer.DragMain(delta, 1);
             }
         }
 
@@ -291,16 +221,15 @@ namespace YBehavior.Editor
         {
             if (bSelect)
             {
-                this.selectCover.Visibility = Visibility.Visible;
-                this.Node.NodeMemory.RefreshVariables();
-                if (this.Node is SubTreeNode)
-                {
-                    (this.Node as SubTreeNode).InOutMemory.RefreshVariables();
-                }
+                this.SelectCoverUI.Visibility = Visibility.Visible;
             }
             else
-                this.selectCover.Visibility = Visibility.Collapsed;
+                this.SelectCoverUI.Visibility = Visibility.Collapsed;
+
+            _OnSelect(bSelect);
         }
+
+        protected virtual void _OnSelect(bool bSelect) { }
 
         public void OnDelete(int param)
         {
@@ -309,19 +238,11 @@ namespace YBehavior.Editor
 
         public void OnDuplicated(int param)
         {
-            ///> Check if is root
-            if (Node.Type == TreeNodeType.TNT_Root)
-                return;
-
             WorkBenchMgr.Instance.CloneTreeNodeToBench(Node, param != 0);
         }
 
         public void OnCopied(int param)
         {
-            ///> Check if is root
-            if (Node.Type == TreeNodeType.TNT_Root)
-                return;
-
             WorkBenchMgr.Instance.CopyNode(Node, param != 0);
         }
 
@@ -344,17 +265,6 @@ namespace YBehavior.Editor
         public void ToggleDisable()
         {
             Renderer.ToggleDisabled();
-        }
-
-        public void ToggleCondition()
-        {
-            Renderer.EnableCondition = !Renderer.EnableCondition;
-        }
-
-        public void ToggleFold()
-        {
-            if (Node.Conns.NodeCount > 0)
-                Renderer.Folded = !Renderer.Folded;
         }
     }
 }

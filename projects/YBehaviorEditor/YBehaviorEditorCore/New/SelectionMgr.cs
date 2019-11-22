@@ -46,7 +46,7 @@ namespace YBehavior.Editor.Core.New
         void MakeDefault();
     }
 
-    public delegate void SelectionStateChangeHandler(ISelectable obj, bool bState);
+    public delegate void SelectionStateChangeHandler(object obj, bool bState);
     public delegate void DeleteHandler(IDeletable obj);
 
     public class SelectionMgr : Singleton<SelectionMgr>
@@ -86,8 +86,9 @@ namespace YBehavior.Editor.Core.New
             _FireSelectionEvent();
         }
 
-        public void OnSingleSelectedChange(ISelectable selection, bool bState)
+        public void OnSingleSelectedChange(object o, bool bState)
         {
+            ISelectable selection = o as ISelectable;
             if (selection == null)
                 return;
 
@@ -113,8 +114,9 @@ namespace YBehavior.Editor.Core.New
             _FireSelectionEvent();
         }
 
-        public void OnMultiSelectedChange(ISelectable selection, bool bState)
+        public void OnMultiSelectedChange(object o, bool bState)
         {
+            ISelectable selection = o as ISelectable;
             if (selection == null)
                 return;
             if (bState)

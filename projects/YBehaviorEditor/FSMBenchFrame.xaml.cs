@@ -7,6 +7,22 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
+    public class FSMStateTypeTemplateSelector : DataTemplateSelector
+    {
+        public DataTemplate NormalTemplate { get; set; }
+
+        public DataTemplate MetaTemplate { get; set; }
+        public DataTemplate SpecialTemplate { get; set; }
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            FSMStateNode node = (item as FSMStateRenderer).FSMStateOwner;
+            if (node is FSMMetaStateNode)
+                return MetaTemplate;
+            if (node is FSMNormalStateNode)
+                return NormalTemplate;
+            return SpecialTemplate;
+        }
+    }
     /// <summary>
     /// WorkBenchFrame.xaml 的交互逻辑
     /// </summary>

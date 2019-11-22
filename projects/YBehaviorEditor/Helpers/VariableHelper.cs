@@ -196,7 +196,7 @@ namespace YBehavior.Editor
         }
     }
 
-    [ValueConversion(typeof(System.Windows.Vector), typeof(System.Windows.Vector))]
+    [ValueConversion(typeof(bool), typeof(System.Windows.FrameworkElement))]
     public class FSMStateBackGroundConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -210,6 +210,53 @@ namespace YBehavior.Editor
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             return null;
+        }
+    }
+
+    [ValueConversion(typeof(object), typeof(System.Windows.FrameworkElement))]
+    public class FSMStateBorderColorConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            FSMStateNode node = (values[0] as FSMStateRenderer).FSMStateOwner;
+            System.Windows.FrameworkElement o = values[1] as System.Windows.FrameworkElement;
+            if (node is FSMNormalStateNode)
+                return o.FindResource("normalColor");
+            if (node is FSMMetaStateNode)
+                return o.FindResource("metaColor");
+            if (node is FSMEntryStateNode)
+                return o.FindResource("entryColor");
+            if (node is FSMExitStateNode)
+                return o.FindResource("exitColor");
+            if (node is FSMAnyStateNode)
+                return o.FindResource("anyColor");
+            if (node is FSMUpperStateNode)
+                return o.FindResource("upperColor");
+
+            return o.FindResource("normalColor");
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
+    [ValueConversion(typeof(string), typeof(string))]
+    public class FSMStateBorderCornerRadiusConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            FSMStateNode node = (value as FSMStateRenderer).FSMStateOwner;
+            if (node is FSMNormalStateNode)
+                return 5;
+            if (node is FSMMetaStateNode)
+                return 20;
+            return 0;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
         }
     }
 

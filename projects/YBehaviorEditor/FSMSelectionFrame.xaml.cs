@@ -56,9 +56,9 @@ namespace YBehavior.Editor
             //if (oArg.Target == null)
             //    return;
 
-            if (oArg.Target is UIFSMState)
+            if (oArg.Target is UIFSMStateNode)
             {
-                UIFSMState node = oArg.Target as UIFSMState;
+                UIFSMStateNode node = oArg.Target as UIFSMStateNode;
                 this.StateTab.DataContext = node.DataContext;
 
                 Dispatcher.BeginInvoke((Action)(() => this.TabController.SelectedItem = this.StateTab));

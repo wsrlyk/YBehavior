@@ -85,7 +85,9 @@ namespace YBehavior.Editor
             MenuItemViewModel popMenu = new MenuItemViewModel(null) { Text = to.ForceGetRenderer.UITitle };
             popMenu.MenuItems = new List<IMenuItemViewModel>();
             popMenu.MenuItems.Add(_CreateMenu(from, to));
-            popMenu.MenuItems.Add(_CreateMachineMenuItem(from, to.SubMachine, except));
+            var menu = _CreateMachineMenuItem(from, to.SubMachine, except);
+            if (menu != null)
+                popMenu.MenuItems.Add(menu);
             return popMenu;
         }
 
@@ -111,11 +113,14 @@ namespace YBehavior.Editor
                     if (subMachine != except)
                     {
                         model = _CreateMachineMenuItem(from, subMachine, except);
-                        popMenu.MenuItems.Add(model);
+                        if (model != null)
+                            popMenu.MenuItems.Add(model);
                     }
                 }
             }
 
+            if (popMenu.MenuItems.Count == 0)
+                return null;
             return popMenu;
 
         }

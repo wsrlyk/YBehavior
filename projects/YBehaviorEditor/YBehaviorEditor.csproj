@@ -76,6 +76,11 @@
     <Compile Include="FSMStateFrame.xaml.cs">
       <DependentUpon>FSMStateFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UINodes\UINodeBase.cs" />
+    <Compile Include="UINodes\UIFSMStateNode.xaml.cs">
+      <DependentUpon>UIFSMStateNode.xaml</DependentUpon>
+    </Compile>
+    <None Include="UINodes\UIFSMStateBase.cs" />
     <Compile Include="FSMUIOutConnector.xaml.cs">
       <DependentUpon>FSMUIOutConnector.xaml</DependentUpon>
     </Compile>
@@ -121,11 +126,11 @@
       <DependentUpon>TreeUIConnector.xaml</DependentUpon>
     </Compile>
     <Compile Include="UIConnector.cs" />
-    <Compile Include="UIFSMState.xaml.cs">
+    <None Include="UIFSMState.xaml.cs">
       <DependentUpon>UIFSMState.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UINode.xaml.cs">
-      <DependentUpon>UINode.xaml</DependentUpon>
+    </None>
+    <Compile Include="UINodes\UITreeNode.xaml.cs">
+      <DependentUpon>UITreeNode.xaml</DependentUpon>
     </Compile>
     <Compile Include="VariablesFrame.xaml.cs">
       <DependentUpon>VariablesFrame.xaml</DependentUpon>
@@ -165,6 +170,10 @@
     <Page Include="FSMStateFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UINodes\UIFSMStateNode.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="FSMUIOutConnector.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -226,11 +235,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UIFSMState.xaml">
+    <None Include="UIFSMState.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UINode.xaml">
+    </None>
+    <Page Include="UINodes\UITreeNode.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

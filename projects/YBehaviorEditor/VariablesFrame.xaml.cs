@@ -64,7 +64,7 @@ namespace YBehavior.Editor
             //if (oArg.Target == null)
             //    return;
 
-            UINode node = oArg.Target as UINode;
+            UITreeNode node = oArg.Target as UITreeNode;
             if (node == null)
             {
                 // Clear
