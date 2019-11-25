@@ -421,6 +421,39 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
+    class AlwaysSuccessTreeNode : LeafNode
+    {
+        public override string Icon => "T";
+
+        public AlwaysSuccessTreeNode()
+        {
+            m_Name = "AlwaysSuccess";
+            Type = TreeNodeType.TNT_Default;
+        }
+    }
+
+    class AlwaysFailureTreeNode : LeafNode
+    {
+        public override string Icon => "F";
+
+        public AlwaysFailureTreeNode()
+        {
+            m_Name = "AlwaysFailure";
+            Type = TreeNodeType.TNT_Default;
+        }
+    }
+
+    class InvertorTreeNode : LeafNode
+    {
+        public override string Icon => "!";
+
+        public InvertorTreeNode()
+        {
+            m_Name = "Invertor";
+            Type = TreeNodeType.TNT_Default;
+        }
+    }
+
     class ComparerTreeNode : LeafNode
     {
         //static Dictionary<string, string> s_OperatorDic = new Dictionary<string, string>() { { "ADD", "+" }, { "SUB", "-" }, { "MUL", "*" }, { "DIV", "/" } };
