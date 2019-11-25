@@ -20,11 +20,12 @@ namespace YBehavior
 		Transition& Get() { return m_Trans; }
 		const Transition& Get() const { return m_Trans; }
 		bool IncTransCount();
+		inline void ResetTransCount() { m_TransCount = 0; }
 		void Set(const STRING& e) { m_Trans.TrySet(e); }
 		void UnSet(const STRING& e) { m_Trans.UnSet(e); }
 		inline void Reset()
 		{
-			m_Trans.Reset(); m_TransCount = 0;
+			m_Trans.Reset(); ResetTransCount();
 		}
 	};
 

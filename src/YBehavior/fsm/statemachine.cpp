@@ -338,7 +338,7 @@ namespace YBehavior
 			if (context.LastRunRes == MRR_Running || context.LastRunRes == MRR_Break)
 				return;
 		}
-
+		context.GetTransition().ResetTransCount();
 		if (context.GetTransQueue().size() == 0)
 		{
 			///> No Trans, Just Update Current
