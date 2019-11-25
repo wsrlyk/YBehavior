@@ -160,7 +160,7 @@ namespace YBehavior.Editor.Core.New
 
             if (!machine.TryAddTrans(from, to, events))
             {
-                LogMgr.Instance.Error("Invalid trans: " + attr.ToString());
+                LogMgr.Instance.Error("Invalid trans: " + data.OuterXml.ToString());
                 return false;
             }
 
@@ -370,7 +370,11 @@ namespace YBehavior.Editor.Core.New
         {
             if (from == null || to == null || from.GetDir != Connector.Dir.OUT || to.GetDir != Connector.Dir.IN)
                 return;
-            var res = m_FSM.RootMachine.MakeTrans(from.Owner as FSMStateNode, to.Owner as FSMStateNode);
+            var fromNode = from.Owner as FSMStateNode;
+            var toNode = to.Owner as FSMStateNode;
+            if (fromNode is FSMAnyStateNode && toNode is FSMExitStateNode)
+                return;
+            var res = m_FSM.RootMachine.MakeTrans(fromNode, toNode);
             if (res.Route != null)
             {
                 foreach (var p in res.Route)

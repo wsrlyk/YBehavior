@@ -40,10 +40,11 @@ namespace YBehavior.Editor.Core.New
             FromState = from;
             ToState = to;
 
-            ///> AnyState must convert to the one in the same submachine with ToState
+            ///> AnyState must convert to NULL
             if (from is FSMAnyStateNode)
             {
-                FromState = to.OwnerMachine.AnyState;
+                //FromState = to.OwnerMachine.AnyState;
+                FromState = null;
             }
         }
 
