@@ -38,10 +38,10 @@ namespace YBehavior.Editor
         public override FrameworkElement DebugUI { get { return debugCover; } }
         public override Brush DebugBrush
         {
-            get { return this.debugCover.BorderBrush; }
+            get { return this.debugCover.Background; }
             set
             {
-                this.debugCover.BorderBrush = value;
+                this.debugCover.Background = value;
             }
         }
 
