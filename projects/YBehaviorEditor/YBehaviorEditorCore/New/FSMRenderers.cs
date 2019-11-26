@@ -48,6 +48,15 @@ namespace YBehavior.Editor.Core.New
                 return m_FSMStateOwner.OwnerMachine.DefaultState == m_FSMStateOwner;
             }
         }
+
+        protected override bool _BeforeDelete(int param)
+        {
+            if (m_FSMStateOwner.OwnerMachine.DefaultState == m_FSMStateOwner)
+            {
+                (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).ResetDefault(m_FSMStateOwner.OwnerMachine);
+            }
+            return true;
+        }
     }
 
     public class FSMMachineRenderer : NodeBaseRenderer

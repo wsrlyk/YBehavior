@@ -7,7 +7,7 @@ namespace YBehavior.Editor.Core.New
 {
     public class FSMConnection : Connection
     {
-        public DelayableNotificationCollection<TransitionResult> Trans { get; } = new DelayableNotificationCollection<TransitionResult>();
+        public DelayableNotificationCollection<Transition> Trans { get; } = new DelayableNotificationCollection<Transition>();
 
         public FSMConnectionRenderer FSMRenderer;
 

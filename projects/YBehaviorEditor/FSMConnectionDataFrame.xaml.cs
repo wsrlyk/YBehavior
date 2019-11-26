@@ -21,7 +21,7 @@ namespace YBehavior.Editor
     public partial class FSMConnectionDataFrame : UserControl
     {
         FSMConnection m_CurrentConnection;
-        TransitionResult m_SelectedTrans;
+        Transition m_SelectedTrans;
 
         public FSMConnectionDataFrame()
         {
@@ -50,7 +50,7 @@ namespace YBehavior.Editor
             }
         }
 
-        void _SetSelectedTransition(TransitionResult res)
+        void _SetSelectedTransition(Transition res)
         {
             m_SelectedTrans = res;
             this.SelectedTrans.DataContext = res;
@@ -65,8 +65,8 @@ namespace YBehavior.Editor
             FSMConnectionRenderer conn = DataContext as FSMConnectionRenderer;
             if (this.TransContainer.SelectedItem != null)
             {
-                TransitionResult trans = this.TransContainer.SelectedItem as TransitionResult;
-                if (trans.Type == TransitionResultType.Default)
+                Transition trans = this.TransContainer.SelectedItem as Transition;
+                if (trans.Type == TransitionType.Default)
                 {
                     ShowSystemTipsArg arg = new ShowSystemTipsArg()
                     {
@@ -86,7 +86,7 @@ namespace YBehavior.Editor
         {
             if (e.AddedItems.Count > 0)
             {
-                _SetSelectedTransition((TransitionResult)e.AddedItems[0]);
+                _SetSelectedTransition((Transition)e.AddedItems[0]);
             }
             else if (e.RemovedItems.Count > 0)
             {
@@ -117,7 +117,7 @@ namespace YBehavior.Editor
         {
             if (m_SelectedTrans != null)
             {
-                if (m_SelectedTrans.Type == TransitionResultType.Default)
+                if (m_SelectedTrans.Type == TransitionType.Default)
                 {
                     ShowSystemTipsArg arg = new ShowSystemTipsArg()
                     {
@@ -128,7 +128,13 @@ namespace YBehavior.Editor
                 }
                 else
                 {
-                    m_SelectedTrans.Value.Add(new TransitionMapValue(string.Empty));
+                    var cond = new TransitionMapValue(string.Empty);
+                    m_SelectedTrans.Value.Add(cond);
+                    WorkBenchMgr.Instance.PushCommand(new AddCondCommand()
+                    {
+                        Cond = cond,
+                        Trans = m_SelectedTrans,
+                    });
                 }
             }
         }
@@ -136,7 +142,15 @@ namespace YBehavior.Editor
         private void DeleteCond_Click(object sender, RoutedEventArgs e)
         {
             if (m_SelectedTrans != null && this.CondsContainer.SelectedItem != null)
+            {
+                var cond = m_SelectedTrans.Value[this.CondsContainer.SelectedIndex];
                 m_SelectedTrans.Value.RemoveAt(this.CondsContainer.SelectedIndex);
+                WorkBenchMgr.Instance.PushCommand(new RemoveCondCommand()
+                {
+                    Cond = cond,
+                    Trans = m_SelectedTrans,
+                });
+            }
         }
     }
 }

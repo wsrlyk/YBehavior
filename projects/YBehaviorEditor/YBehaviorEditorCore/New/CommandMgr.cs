@@ -441,4 +441,90 @@ namespace YBehavior.Editor.Core.New
             NodeRenderer.ReturnType = OriginReturnType;
         }
     }
+
+    public class RemoveTransCommand : ICommand
+    {
+        public Connection.FromTo Conn { get; set; }
+        public Transition Trans { get; set; }
+        public void Redo()
+        {
+            (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).Disconnect(Conn, Trans);
+        }
+        public void Undo()
+        {
+            Trans = (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).MakeTrans(Conn.From, Conn.To, Trans);
+        }
+    }
+
+    public class MakeTransCommand : ICommand
+    {
+        public Connection.FromTo Conn { get; set; }
+        public Transition Trans { get; set; }
+        public void Redo()
+        {
+            (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).MakeTrans(Conn.From, Conn.To, Trans);
+        }
+        public void Undo()
+        {
+            (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).Disconnect(Conn, Trans);
+        }
+    }
+
+    public class AddCondCommand : ICommand
+    {
+        public TransitionMapValue Cond { get; set; }
+        public Transition Trans { get; set; }
+        public void Redo()
+        {
+            Trans.Value.Add(Cond);
+        }
+        public void Undo()
+        {
+            Trans.Value.Remove(Cond);
+        }
+    }
+
+    public class RemoveCondCommand : ICommand
+    {
+        public TransitionMapValue Cond { get; set; }
+        public Transition Trans { get; set; }
+        public void Redo()
+        {
+            Trans.Value.Remove(Cond);
+        }
+        public void Undo()
+        {
+            Trans.Value.Add(Cond);
+        }
+    }
+
+
+    public class SetDefaultStateCommand : ICommand
+    {
+        public FSMStateNode Origin { get; set; }
+        public FSMStateNode Final { get; set; }
+        public void Redo()
+        {
+            (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).SetDefault(Final);
+        }
+        public void Undo()
+        {
+            (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).SetDefault(Origin);
+        }
+    }
+
+    public class SetCurMachineCommand : ICommand
+    {
+        public FSMMachineNode Origin { get; set; }
+        public FSMMachineNode Final { get; set; }
+        public void Redo()
+        {
+            (WorkBenchMgr.Instance.ActiveWorkBench).AddRenderers(Final, true);
+        }
+        public void Undo()
+        {
+            (WorkBenchMgr.Instance.ActiveWorkBench).AddRenderers(Origin, true);
+        }
+    }
+
 }

@@ -11,7 +11,7 @@ namespace YBehavior.Editor.Core.New
         FSM m_FSM;
         public FSM FSM { get { return m_FSM; } }
         public DelayableNotificationCollection<FSMMachineNode> StackMachines { get; } = new DelayableNotificationCollection<FSMMachineNode>();
-        public FSMMachineNode CurMachine { get { return StackMachines[0]; } }
+        public FSMMachineNode CurMachine { get { return StackMachines.Count > 0 ? StackMachines[0] : null; } }
 
         public FSMBench()
         {
@@ -61,21 +61,40 @@ namespace YBehavior.Editor.Core.New
 
             foreach (XmlNode chi in data.ChildNodes)
             {
-                if (chi.Name == "State")
+                switch (chi.Name)
                 {
-                    if (!_LoadState(machine, chi))
-                        return false;
-                }
-                else if (chi.Name == "Trans")
-                {
-                    if (!_LoadTrans(machine, chi))
-                        return false;
+                    case "State":
+                        {
+                            if (!_LoadState(machine, chi))
+                                return false;
+                            break;
+                        }
+                    case "Trans":
+                        {
+                            if (!_LoadTrans(machine, chi))
+                                return false;
+                            break;
+                        }
+                    case "EntryTrans":
+                        {
+                            if (!_LoadEntryTrans(machine, chi))
+                                return false;
+                            break;
+                        }
+                    case "ExitTrans":
+                        {
+                            if (!_LoadEntryTrans(machine, chi))
+                                return false;
+                            break;
+                        }
+                    default:
+                        break;
                 }
             }
 
             if (!machine.PostLoad(data))
                 return false;
-
+            machine.BuildLocalConnections();
             machine.States.Sort(Utility.SortByFSMNodeSortIndex);
 
             return true;
@@ -166,24 +185,69 @@ namespace YBehavior.Editor.Core.New
 
             return true;
         }
+        protected bool _LoadEntryTrans(FSMMachineNode machine, XmlNode data)
+        {
+            var attr = data.Attributes["To"];
+            string to = string.Empty;
+            if (attr != null)
+                to = attr.Value;
+
+            List<string> events = new List<string>();
+            foreach (XmlNode chi in data.ChildNodes)
+            {
+                events.Add(chi.Name);
+            }
+
+            if (!machine.TryAddEntryTrans(to, events))
+            {
+                LogMgr.Instance.Error("Invalid trans: " + data.OuterXml.ToString());
+                return false;
+            }
+
+            return true;
+        }
+        protected bool _LoadExitTrans(FSMMachineNode machine, XmlNode data)
+        {
+            var attr = data.Attributes["From"];
+            string from = string.Empty;
+            if (attr != null)
+                from = attr.Value;
+
+            List<string> events = new List<string>();
+            foreach (XmlNode chi in data.ChildNodes)
+            {
+                events.Add(chi.Name);
+            }
+
+            if (!machine.TryAddEntryTrans(from, events))
+            {
+                LogMgr.Instance.Error("Invalid trans: " + data.OuterXml.ToString());
+                return false;
+            }
+
+            return true;
+        }
 
         void _RefreshStackMachines(FSMNode node)
         {
-            using (var v = StackMachines.Delay())
+            if (node != null && node is FSMMachineNode)
             {
-                StackMachines.Clear();
-                if (node != null)
+                FSMMachineNode old = CurMachine;
+                using (var v = StackMachines.Delay())
                 {
-                    if (node is FSMMachineNode)
+                    StackMachines.Clear();
+                    FSMMachineNode cur = node as FSMMachineNode;
+                    while (cur != null)
                     {
-                        FSMMachineNode cur = node as FSMMachineNode;
-                        while (cur != null)
-                        {
-                            StackMachines.Add(cur);
-                            cur = cur.MetaState?.OwnerMachine;
-                        }
+                        StackMachines.Add(cur);
+                        cur = cur.MetaState?.OwnerMachine;
                     }
                 }
+                PushDoneCommand(new SetCurMachineCommand()
+                {
+                    Origin = old,
+                    Final = node as FSMMachineNode,
+                });
             }
         }
 
@@ -212,9 +276,27 @@ namespace YBehavior.Editor.Core.New
                 _SaveState(state, nodeEl, xmlDoc, bExport);
             }
 
+            {
+                foreach (Transition trans in machine.LocalTransition)
+                {
+                    switch(trans.Type)
+                    {
+                        case TransitionType.Entry:
+                            _SaveEntryTrans(trans, nodeEl, xmlDoc);
+                            break;
+                        case TransitionType.Exit:
+                            _SaveExitTrans(trans, nodeEl, xmlDoc);
+                            break;
+                        default:
+                            _SaveTrans(trans, nodeEl, xmlDoc);
+                            break;
+                    }
+                }
+            }
+
             if (machine is FSMRootMachineNode)
             {
-                foreach (TransitionResult trans in (machine as FSMRootMachineNode).Transition)
+                foreach (Transition trans in (machine as FSMRootMachineNode).Transition)
                 {
                     _SaveTrans(trans, nodeEl, xmlDoc);
                 }
@@ -242,7 +324,7 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        void _SaveTrans(TransitionResult trans, XmlElement data, XmlDocument xmlDoc)
+        void _SaveTrans(Transition trans, XmlElement data, XmlDocument xmlDoc)
         {
             XmlElement nodeEl = xmlDoc.CreateElement("Trans");
             data.AppendChild(nodeEl);
@@ -252,6 +334,36 @@ namespace YBehavior.Editor.Core.New
 
             if (trans.Key.ToState != null)
                 nodeEl.SetAttribute("To", trans.Key.ToState.NickName);
+
+            foreach (var e in trans.Value)
+            {
+                XmlElement el = xmlDoc.CreateElement(e.Event.Event);
+                nodeEl.AppendChild(el);
+            }
+        }
+
+        void _SaveEntryTrans(Transition trans, XmlElement data, XmlDocument xmlDoc)
+        {
+            XmlElement nodeEl = xmlDoc.CreateElement("EntryTrans");
+            data.AppendChild(nodeEl);
+
+            if (trans.Key.ToState != null)
+                nodeEl.SetAttribute("To", trans.Key.ToState.NickName);
+
+            foreach (var e in trans.Value)
+            {
+                XmlElement el = xmlDoc.CreateElement(e.Event.Event);
+                nodeEl.AppendChild(el);
+            }
+        }
+
+        void _SaveExitTrans(Transition trans, XmlElement data, XmlDocument xmlDoc)
+        {
+            XmlElement nodeEl = xmlDoc.CreateElement("ExitTrans");
+            data.AppendChild(nodeEl);
+
+            if (trans.Key.FromState != null)
+                nodeEl.SetAttribute("From", trans.Key.FromState.NickName);
 
             foreach (var e in trans.Value)
             {
@@ -334,50 +446,83 @@ namespace YBehavior.Editor.Core.New
             if (conn == null)
                 return;
 
-            while(conn.Trans.Count > 0)
+            int idx = 0;
+            while(idx < conn.Trans.Count)
             {
-                Disconnect(conn, conn.Trans[0]);
+                ///> Some trans cant be deleted from here. Keep it and inc the idx to delete next one.
+                if (!_Disconnect(conn, conn.Trans[idx]))
+                    ++idx;
             }
-
-            DisconnectNodeCommand disconnectNodeCommand = new DisconnectNodeCommand
-            {
-                Conn = connection,
-            };
-            PushDoneCommand(disconnectNodeCommand);
         }
 
-        public void Disconnect(Connection.FromTo fromto, TransitionResult trans)
+        public void Disconnect(Connection.FromTo fromto, Transition trans)
         {
             FSMConnection conn = fromto.From.FindConnection(fromto) as FSMConnection;
             if (conn == null)
                 return;
-            Disconnect(conn, trans);
+            _Disconnect(conn, trans);
         }
 
-        void Disconnect(FSMConnection conn, TransitionResult trans)
+        bool _Disconnect(FSMConnection conn, Transition trans)
         {
             ConnectionRenderer connectionRenderer = conn.Renderer;
-            m_FSM.RootMachine.RemoveTrans(trans);
-            if (conn.Trans.Count == 0)
+            if (CurMachine.RemoveTrans(trans))
             {
-                if (connectionRenderer != null)
-                    ConnectionList.Remove(connectionRenderer);
+                if (conn.Trans.Count == 0)
+                {
+                    if (connectionRenderer != null)
+                        ConnectionList.Remove(connectionRenderer);
 
+                }
+
+                PushDoneCommand(new RemoveTransCommand()
+                {
+                    Conn = conn.Ctr,
+                    Trans = trans,
+                });
+
+                return true;
             }
+            return false;
         }
 
         public override void ConnectNodes(Connector from, Connector to)
         {
+            MakeTrans(from, to);
+        }
+
+        public Transition MakeTrans(Connector from, Connector to)
+        {
             if (from == null || to == null || from.GetDir != Connector.Dir.OUT || to.GetDir != Connector.Dir.IN)
-                return;
+                return null;
             var fromNode = from.Owner as FSMStateNode;
             var toNode = to.Owner as FSMStateNode;
-            if (fromNode is FSMAnyStateNode && toNode is FSMExitStateNode)
-                return;
-            var res = m_FSM.RootMachine.MakeTrans(fromNode, toNode);
-            if (res.Route != null)
+            if (fromNode.Type == FSMStateType.Special && toNode is FSMExitStateNode)
+                return null;
+            var res = CurMachine.MakeTrans(fromNode, toNode);
+            _OnTransMade(from, to, ref res);
+            return res.Trans;
+        }
+
+        public Transition MakeTrans(Connector from, Connector to, Transition existTrans)
+        {
+            if (from == null || to == null || from.GetDir != Connector.Dir.OUT || to.GetDir != Connector.Dir.IN)
+                return null;
+            var fromNode = from.Owner as FSMStateNode;
+            var toNode = to.Owner as FSMStateNode;
+            if (fromNode.Type == FSMStateType.Special && toNode is FSMExitStateNode)
+                return null;
+            var res = CurMachine.MakeTrans(existTrans);
+            _OnTransMade(from, to, ref res);
+            return res.Trans;
+        }
+
+
+        void _OnTransMade(Connector from, Connector to, ref TransitionResult res)
+        {
+            if (res.Route.Route != null)
             {
-                foreach (var p in res.Route)
+                foreach (var p in res.Route.Route)
                 {
                     if (p.Key != from.Owner)
                         continue;
@@ -401,27 +546,41 @@ namespace YBehavior.Editor.Core.New
                 }
             }
 
-            ConnectNodeCommand connectNodeCommand = new ConnectNodeCommand
+            PushDoneCommand(new MakeTransCommand()
             {
-                Conn = new Connection.FromTo{ From = from, To = to },
-            };
-            PushDoneCommand(connectNodeCommand);
+                Conn = new Connection.FromTo { From = from, To = to },
+                Trans = res.Trans,
+            });
+        }
+
+        public void ResetDefault(FSMMachineNode machine)
+        {
+            _SetDefault(machine, null);
         }
 
         public void SetDefault(FSMStateNode state)
         {
-            if (state == null)
-                return;
+            FSMMachineNode machine = state == null ? CurMachine : state.OwnerMachine;
+            _SetDefault(machine, state);
+        }
+
+        void _SetDefault(FSMMachineNode machine, FSMStateNode state)
+        {
             FSMConnection oldConn = null;
             FSMConnection newConn = null;
 
-            FSMMachineNode machine = state.OwnerMachine;
             if (machine.SetDefault(state, ref oldConn, ref newConn))
             {
                 if (oldConn != null && oldConn.Trans.Count == 0)
                     ConnectionList.Remove(oldConn.Renderer);
-                if (newConn.Trans.Count == 1)
+                if (newConn != null && newConn.Trans.Count == 1)
                     ConnectionList.Add(newConn.Renderer);
+
+                PushDoneCommand(new SetDefaultStateCommand()
+                {
+                    Origin = oldConn?.Ctr.To.Owner as FSMStateNode,
+                    Final = state,
+                });
             }
         }
 

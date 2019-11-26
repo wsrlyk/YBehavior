@@ -145,10 +145,9 @@ namespace YBehavior.Editor.Core.New
             IDeletable deletable = m_SingleSelection as IDeletable;
             if (deletable != null)
             {
-                deletable.OnDelete(param);
-                m_SingleSelection = null;
+                Clear();
 
-                _FireSelectionEvent();
+                deletable.OnDelete(param);
             }
         }
 

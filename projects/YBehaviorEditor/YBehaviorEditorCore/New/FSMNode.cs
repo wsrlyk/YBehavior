@@ -230,12 +230,13 @@ namespace YBehavior.Editor.Core.New
 
         public bool SetDefault(FSMStateNode state, ref FSMConnection oldConn, ref FSMConnection newConn)
         {
-            if (state == null)
-                return false;
-            if (state.OwnerMachine != this)
-                return false;
-            if (state.Type == FSMStateType.Special)
-                return false;
+            if (state != null)
+            {
+                if (state.OwnerMachine != this)
+                    return false;
+                if (state.Type == FSMStateType.Special)
+                    return false;
+            }
 
             if (m_Default != null)
             {
@@ -251,10 +252,10 @@ namespace YBehavior.Editor.Core.New
                     LogMgr.Instance.Error("There's a default state but cant find the connection");
                     return false;
                 }
-                TransitionResult defaultTrans = null;
+                Transition defaultTrans = null;
                 foreach (var trans in conn.Trans)
                 {
-                    if (trans.Type == TransitionResultType.Default)
+                    if (trans.Type == TransitionType.Default)
                     {
                         defaultTrans = trans;
                         break;
@@ -277,6 +278,7 @@ namespace YBehavior.Editor.Core.New
                 oldState.PropertyChange(RenderProperty.DefaultState);
             }
             /// new default
+            if (state != null)
             {
                 Connector parent;
                 Connector child;
@@ -284,8 +286,8 @@ namespace YBehavior.Editor.Core.New
                 FSMConnection conn = Connector.TryConnect(EntryState.Conns.GetConnector(Connector.IdentifierChildren), state.Conns.ParentConnector, out parent, out child) as FSMConnection;
                 if (conn != null)
                 {
-                    TransitionResult res = new TransitionResult(new TransitionMapKey(EntryState, state));
-                    res.Type = TransitionResultType.Default;
+                    Transition res = new Transition(new TransitionMapKey(EntryState, state));
+                    res.Type = TransitionType.Default;
                     conn.Trans.Add(res);
 
                 }
@@ -297,7 +299,8 @@ namespace YBehavior.Editor.Core.New
             }
 
             m_Default = state;
-            m_Default.PropertyChange(RenderProperty.DefaultState);
+            if (m_Default != null)
+                m_Default.PropertyChange(RenderProperty.DefaultState);
             return true;
         }
 
@@ -343,21 +346,7 @@ namespace YBehavior.Editor.Core.New
                     return false;
                 }
             }
-            else
-            {
-                if (fromState == null)
-                {
-                    LogMgr.Instance.Error("Cant trans from AnyState to ExitState");
-                    return false;
-                }
-                ///> 'to' is null means trans from 'from' to 'exit'
-                toState = this.ExitState;
-                if (toState == null)
-                {
-                    LogMgr.Instance.Error("ExitState not exists.");
-                    return false;
-                }
-            }
+            else return false;
 
             if (RootMachine.Transition.Insert(fromState, toState, events) == null)
                 return false;
@@ -365,6 +354,197 @@ namespace YBehavior.Editor.Core.New
             ///> TODO: build connection
             
             return true;
+        }
+
+        public bool TryAddEntryTrans(string to, List<string> events)
+        {
+            FSMStateNode fromState = this.EntryState;
+            if (fromState == null)
+                return false;
+
+            FSMStateNode toState = null;
+            if (!string.IsNullOrEmpty(to))
+            {
+                toState = RootMachine.FindGloablState(to);
+                if (toState == null)
+                {
+                    LogMgr.Instance.Error("Cant find state: " + to);
+                    return false;
+                }
+            }
+            else return false;
+            if (LocalTransition.Insert(fromState, toState, events) == null)
+                return false;
+
+            return true;
+        }
+
+        public bool TryAddExitTrans(string from, List<string> events)
+        {
+            FSMStateNode toState = this.ExitState;
+            if (toState == null)
+                return false;
+
+            FSMStateNode fromState = null;
+            if (!string.IsNullOrEmpty(from))
+            {
+                fromState = RootMachine.FindGloablState(from);
+                if (fromState == null)
+                {
+                    LogMgr.Instance.Error("Cant find state: " + from);
+                    return false;
+                }
+            }
+            else return false;
+            if (LocalTransition.Insert(fromState, toState, events) == null)
+                return false;
+
+            return true;
+        }
+
+        public void BuildLocalConnections()
+        {
+            _BuildConnections(m_LocalTransition);
+        }
+
+        protected void _BuildConnections(Transitions transitions)
+        {
+            foreach (Transition t in transitions)
+            {
+                FSMStateNode fromState = t.Key.FromState;
+                FSMStateNode toState = t.Key.ToState;
+
+                var res = Utility.FindTransRoute(fromState, toState);
+                foreach (var p in res.Route)
+                {
+                    _BuildConnection(p.Key, p.Value, t);
+                }
+            }
+        }
+
+        void _BuildConnection(FSMStateNode fromState, FSMStateNode toState, Transition trans)
+        {
+            if (fromState == null || toState == null || fromState.OwnerMachine != toState.OwnerMachine)
+                return;
+
+            FSMConnection conn = fromState.Conns.Connect(toState, Connector.IdentifierChildren) as FSMConnection;
+            conn.Trans.Add(trans);
+        }
+
+        public bool RemoveLocalTrans(Transition t)
+        {
+            return _RemoveTrans(t, m_LocalTransition);
+        }
+
+        protected bool _RemoveTrans(Transition t, Transitions transitions)
+        {
+            if (!transitions.Remove(t))
+                return false;
+            FSMStateNode fromState = t.Key.FromState;
+            FSMStateNode toState = t.Key.ToState;
+
+            var res = Utility.FindTransRoute(fromState, toState);
+            foreach (var p in res.Route)
+            {
+                _RemoveConnection(p.Key, p.Value, t);
+            }
+
+            return true;
+        }
+
+        void _RemoveConnection(FSMStateNode fromState, FSMStateNode toState, Transition trans)
+        {
+            if (fromState == null || toState == null || fromState.OwnerMachine != toState.OwnerMachine)
+                return;
+            Connection.FromTo fromto = new Connection.FromTo
+            {
+                From = fromState.Conns.GetConnector(Connector.IdentifierChildren),
+                To = toState.Conns.ParentConnector
+            };
+
+            FSMConnection conn = fromto.From.FindConnection(fromto) as FSMConnection;
+            if (conn == null)
+                return;
+
+            conn.Trans.Remove(trans);
+            if (conn.Trans.Count == 0)
+                Connector.TryDisconnect(fromto);
+        }
+
+        public TransitionResult MakeLocalTrans(FSMStateNode fromState, FSMStateNode toState)
+        {
+            return _MakeTrans(fromState, toState, m_LocalTransition);
+        }
+
+        public TransitionResult MakeLocalTrans(Transition existTrans)
+        {
+            return _MakeTrans(existTrans, m_LocalTransition);
+        }
+
+        protected TransitionResult _MakeTrans(FSMStateNode fromState, FSMStateNode toState, Transitions transitions)
+        {
+            Transition trans = transitions.Insert(fromState, toState);
+
+            return _OnTransMade(trans);
+        }
+
+        protected TransitionResult _MakeTrans(Transition existTrans, Transitions transitions)
+        {
+            Transition trans = transitions.Insert(existTrans);
+
+            return _OnTransMade(trans);
+        }
+
+        protected TransitionResult _OnTransMade(Transition trans)
+        {
+            if (trans == null)
+                return new TransitionResult();
+
+            ///> FromState may change if it's an AnyState
+            TransitionResult res;
+            var route = Utility.FindTransRoute(trans.Key.FromState, trans.Key.ToState);
+            foreach (var p in route.Route)
+            {
+                _MakeTransInRoute(p.Key, p.Value, trans);
+            }
+            res.Trans = trans;
+            res.Route = route;
+            return res;
+        }
+
+        void _MakeTransInRoute(FSMStateNode fromState, FSMStateNode toState, Transition t)
+        {
+            Connector parent;
+            Connector child;
+            FSMConnection conn = Connector.TryConnect(fromState.Conns.GetConnector(Connector.IdentifierChildren), toState.Conns.ParentConnector, out parent, out child) as FSMConnection;
+            if (conn != null)
+                conn.Trans.Add(t);
+        }
+
+        public bool RemoveTrans(Transition t)
+        {
+            if ((t.Key.FromState != null && t.Key.FromState.Type == FSMStateType.Special)
+               || (t.Key.ToState != null && t.Key.ToState.Type == FSMStateType.Special))
+                return RemoveLocalTrans(t);
+            return RootMachine.RemoveGlobalTrans(t);
+        }
+
+        public TransitionResult MakeTrans(FSMStateNode fromState, FSMStateNode toState)
+        {
+            if ((fromState != null && fromState.Type == FSMStateType.Special)
+                || (toState != null && toState.Type == FSMStateType.Special))
+                return MakeLocalTrans(fromState, toState);
+            return RootMachine.MakeGlobalTrans(fromState, toState);
+        }
+
+        public TransitionResult MakeTrans(Transition existTrans)
+        {
+            if (existTrans == null)
+                return new TransitionResult();
+            if ((existTrans.Key.FromState != null && existTrans.Key.FromState.Type == FSMStateType.Special)
+                || (existTrans.Key.ToState != null && existTrans.Key.ToState.Type == FSMStateType.Special))
+                return MakeLocalTrans(existTrans);
+            return RootMachine.MakeGlobalTrans(existTrans);
         }
 
         public override bool CheckValid()
@@ -383,6 +563,12 @@ namespace YBehavior.Editor.Core.New
             }
             return res;
         }
+    }
+
+    public struct TransitionResult
+    {
+        public Transition Trans;
+        public TransRoute Route;
     }
 
     public class FSMRootMachineNode : FSMMachineNode
@@ -440,6 +626,7 @@ namespace YBehavior.Editor.Core.New
                 if (node.NickName == name)
                     return node;
             }
+            LogMgr.Instance.Error("Cant find state: " + name);
             //m_AllStates.TryGetValue(name, out state);
             return null;
             //return state;
@@ -447,83 +634,22 @@ namespace YBehavior.Editor.Core.New
 
         public void BuildConnections()
         {
-            foreach (TransitionResult t in m_Transition)
-            {
-                FSMStateNode fromState = t.Key.FromState;
-                FSMStateNode toState = t.Key.ToState;
-
-                var res = Utility.FindTransRoute(fromState, toState);
-                foreach(var p in res.Route)
-                {
-                    _BuildConnection(p.Key, p.Value, t);
-                }
-            }
+            _BuildConnections(m_Transition);
         }
 
-        void _BuildConnection(FSMStateNode fromState, FSMStateNode toState, TransitionResult trans)
+        public bool RemoveGlobalTrans(Transition t)
         {
-            if (fromState == null || toState == null || fromState.OwnerMachine != toState.OwnerMachine)
-                return;
-
-            FSMConnection conn = fromState.Conns.Connect(toState, Connector.IdentifierChildren) as FSMConnection;
-            conn.Trans.Add(trans);
+            return _RemoveTrans(t, m_Transition);
         }
 
-        public void RemoveTrans(TransitionResult t)
+        public TransitionResult MakeGlobalTrans(FSMStateNode fromState, FSMStateNode toState)
         {
-            FSMStateNode fromState = t.Key.FromState;
-            FSMStateNode toState = t.Key.ToState;
-
-            var res = Utility.FindTransRoute(fromState, toState);
-            foreach (var p in res.Route)
-            {
-                _RemoveConnection(p.Key, p.Value, t);
-            }
-
-            Transition.Remove(t);
+            return _MakeTrans(fromState, toState, m_Transition);
         }
 
-        void _RemoveConnection(FSMStateNode fromState, FSMStateNode toState, TransitionResult trans)
+        public TransitionResult MakeGlobalTrans(Transition existTrans)
         {
-            if (fromState == null || toState == null || fromState.OwnerMachine != toState.OwnerMachine)
-                return;
-            Connection.FromTo fromto = new Connection.FromTo
-            {
-                From = fromState.Conns.GetConnector(Connector.IdentifierChildren),
-                To = toState.Conns.ParentConnector
-            };
-
-            FSMConnection conn = fromto.From.FindConnection(fromto) as FSMConnection;
-            if (conn == null)
-                return;
-
-            conn.Trans.Remove(trans);
-            if (conn.Trans.Count == 0)
-                Connector.TryDisconnect(fromto);
-        }
-
-        public TransRoute MakeTrans(FSMStateNode fromState, FSMStateNode toState)
-        {
-            TransitionResult trans = Transition.Insert(fromState, toState);
-            if (trans == null)
-                return new TransRoute();
-
-            ///> FromState may change if it's an AnyState
-            var res = Utility.FindTransRoute(trans.Key.FromState, trans.Key.ToState);
-            foreach (var p in res.Route)
-            {
-                _MakeTrans(p.Key, p.Value, trans);
-            }
-            return res;
-        }
-
-        void _MakeTrans(FSMStateNode fromState, FSMStateNode toState, TransitionResult t)
-        {
-            Connector parent;
-            Connector child;
-            FSMConnection conn = Connector.TryConnect(fromState.Conns.GetConnector(Connector.IdentifierChildren), toState.Conns.ParentConnector, out parent, out child) as FSMConnection;
-            if (conn != null)
-                conn.Trans.Add(t);
+            return _MakeTrans(existTrans, m_Transition);
         }
 
         public override bool CheckValid()
@@ -747,7 +873,7 @@ namespace YBehavior.Editor.Core.New
             Type = FSMStateType.Special;
             SortIndex = -4;
 
-            Conns.Add(Connector.IdentifierChildren, false).ConnectionCreator = _CreateConnection;
+            Conns.Add(Connector.IdentifierChildren, true).ConnectionCreator = _CreateConnection;
             Geo.Pos = new Point(100, 100);
         }
     }
