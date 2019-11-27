@@ -131,7 +131,7 @@ namespace YBehavior.Editor.Core.New
             return false;
         }
 
-        public WorkBench OpenWorkBench(TreeFileMgr.TreeFileInfo file)
+        public WorkBench OpenWorkBench(FileMgr.FileInfo file)
         {
             WorkBench bench = OpenWorkBenchInBackGround(file);
             if (bench != null)
@@ -139,7 +139,7 @@ namespace YBehavior.Editor.Core.New
 
             return bench;
         }
-        public WorkBench OpenWorkBenchInBackGround(TreeFileMgr.TreeFileInfo file)
+        public WorkBench OpenWorkBenchInBackGround(FileMgr.FileInfo file)
         {
             if (file == null)
                 return null;
@@ -220,7 +220,7 @@ namespace YBehavior.Editor.Core.New
                     bench = ActiveWorkBench;
                 bench.FilePath = bench.FileInfo.Path;
 
-                TreeFileMgr.Instance.Load();
+                FileMgr.Instance.Load();
 
                 WorkBenchSavedArg arg = new WorkBenchSavedArg()
                 {
@@ -280,11 +280,11 @@ namespace YBehavior.Editor.Core.New
                 ///> Pop the save dialog
                 Microsoft.Win32.SaveFileDialog sfd = new Microsoft.Win32.SaveFileDialog();
                 sfd.InitialDirectory = Config.Instance.WorkingDir;
-                sfd.Filter = bench is TreeBench ? "XML|*.xml" : "FSM|*.fsm";
+                sfd.Filter = bench is TreeBench ? "TREE|*.tree" : "FSM|*.fsm";
                 if (sfd.ShowDialog() == true)
                 {
                     bench.FileInfo.Path = sfd.FileName;
-                    bench.FileInfo.Name = sfd.SafeFileName.Remove(sfd.SafeFileName.LastIndexOf(bench is TreeBench ? ".xml" : ".fsm"));
+                    bench.FileInfo.Name = sfd.SafeFileName.Remove(sfd.SafeFileName.LastIndexOf(bench is TreeBench ? ".tree" : ".fsm"));
 
                     res |= SaveResultFlag_NewFile;
                 }
@@ -427,9 +427,9 @@ namespace YBehavior.Editor.Core.New
                 workBench = new TreeBench
                 {
                     FilePath = string.Empty,
-                    FileInfo = new TreeFileMgr.TreeFileInfo()
+                    FileInfo = new FileMgr.FileInfo()
                     {
-                        Name = TreeFileMgr.TreeFileInfo.UntitledName,
+                        Name = FileMgr.FileInfo.UntitledName,
                         Path = string.Empty,
                         FileType = type,
                     }
@@ -440,9 +440,9 @@ namespace YBehavior.Editor.Core.New
                 workBench = new FSMBench
                 {
                     FilePath = string.Empty,
-                    FileInfo = new TreeFileMgr.TreeFileInfo()
+                    FileInfo = new FileMgr.FileInfo()
                     {
-                        Name = TreeFileMgr.TreeFileInfo.UntitledName,
+                        Name = FileMgr.FileInfo.UntitledName,
                         Path = string.Empty,
                         FileType = type,
                     }
@@ -515,7 +515,7 @@ namespace YBehavior.Editor.Core.New
                     if (!file.Exists || loaded.Contains(file.FullName))
                         continue;
 
-                    TreeFileMgr.TreeFileInfo fileInfo = TreeFileMgr.Instance.GetFileInfo(file.FullName);
+                    FileMgr.FileInfo fileInfo = FileMgr.Instance.GetFileInfo(file.FullName);
                     WorkBench newBench = OpenWorkBenchInBackGround(fileInfo);
 
                     WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
@@ -546,7 +546,7 @@ namespace YBehavior.Editor.Core.New
                 if (!file.Exists)
                     continue;
 
-                TreeFileMgr.TreeFileInfo fileInfo = TreeFileMgr.Instance.GetFileInfo(file.FullName);
+                FileMgr.FileInfo fileInfo = FileMgr.Instance.GetFileInfo(file.FullName);
                 WorkBench newBench = OpenWorkBenchInBackGround(fileInfo);
 
                 WorkBenchLoadedArg arg = new WorkBenchLoadedArg();

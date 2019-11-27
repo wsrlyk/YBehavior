@@ -167,7 +167,7 @@ namespace YBehavior.Editor.Core.New
 
         public void StartDebugTreeWithAgent(ulong uid)
         {
-            TreeFileMgr.TreeFileInfo fileInfo = null;
+            FileMgr.FileInfo fileInfo = null;
             if (WorkBenchMgr.Instance.ActiveWorkBench != null)
             {
                 fileInfo = WorkBenchMgr.Instance.ActiveWorkBench.FileInfo;

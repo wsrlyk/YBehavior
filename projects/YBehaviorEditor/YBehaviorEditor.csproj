@@ -128,6 +128,9 @@
     <Compile Include="UINodes\UITreeNode.xaml.cs">
       <DependentUpon>UITreeNode.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UISelectTreeVariable.xaml.cs">
+      <DependentUpon>UISelectTreeVariable.xaml</DependentUpon>
+    </Compile>
     <Compile Include="VariablesFrame.xaml.cs">
       <DependentUpon>VariablesFrame.xaml</DependentUpon>
     </Compile>
@@ -232,6 +235,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UINodes\UITreeNode.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UISelectTreeVariable.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

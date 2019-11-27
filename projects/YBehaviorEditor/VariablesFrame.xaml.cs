@@ -15,9 +15,20 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
-    /// <summary>
-    /// SharedDataFrame.xaml 的交互逻辑
-    /// </summary>
+    public class VariableTypeSelector : DataTemplateSelector
+    {
+        public DataTemplate NormalTemplate { get; set; }
+
+        public DataTemplate TreeTemplate { get; set; }
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            VariableHolder holder = item as VariableHolder;
+            if (holder.Variable is SubTreeNode.TreeVariable)
+                return TreeTemplate;
+            return NormalTemplate;
+        }
+    }
+
     public partial class VariablesFrame : UserControl
     {
         public VariablesFrame()

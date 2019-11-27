@@ -50,7 +50,7 @@ namespace YBehavior.Editor.Core.New
             m_LastTickResultToken = 0;
             m_TickResultToken = 0;
         }
-        public void DebugTreeWithAgent(TreeFileMgr.TreeFileInfo fileInfo, ulong agentUID)
+        public void DebugTreeWithAgent(FileMgr.FileInfo fileInfo, ulong agentUID)
         {
             StringBuilder sb = new StringBuilder();
             string head;
@@ -131,7 +131,7 @@ namespace YBehavior.Editor.Core.New
             DebugMgr.Instance.ClearRunState();
         }
 
-        public void SetDebugPoint(TreeFileMgr.TreeFileInfo fileInfo, uint uid, int count)
+        public void SetDebugPoint(FileMgr.FileInfo fileInfo, uint uid, int count)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(fileInfo.FileType == FileType.TREE ? "[DebugTreePoint]" : "[DebugFSMPoint]")

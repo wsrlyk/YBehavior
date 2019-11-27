@@ -82,6 +82,9 @@ namespace YBehavior.Editor.Core.New
             if (!ExportingDir.EndsWith("\\"))
                 ExportingDir = ExportingDir + "\\";
 
+            WorkingDir = WorkingDir.Replace("\\", "/");
+            ExportingDir = ExportingDir.Replace("\\", "/");
+
             ////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
 

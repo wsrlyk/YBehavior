@@ -22,8 +22,8 @@ namespace YBehavior.Editor
             public DelayableNotificationCollection<FileInfo> Children { get { return m_children; } }
             public string Name { get; set; }
             public string Icon { get; set; }
-            TreeFileMgr.TreeFileInfo source;
-            public TreeFileMgr.TreeFileInfo Source { get { return source; } }
+            FileMgr.FileInfo source;
+            public FileMgr.FileInfo Source { get { return source; } }
             private bool exp = false;
             public bool Expanded
             {
@@ -34,7 +34,7 @@ namespace YBehavior.Editor
                 }
             }
 
-            public void Build(TreeFileMgr.TreeFileInfo data, HashSet<string> expandedItems = null)
+            public void Build(FileMgr.FileInfo data, HashSet<string> expandedItems = null)
             {
                 using (var handler = Children.Delay())
                 {
@@ -45,8 +45,20 @@ namespace YBehavior.Editor
 
                     source = data;
                     Name = data.Name;
-                    Icon = data.FileType != FileType.FOLDER ? "📃"
-                                            : "📁";
+                    switch(data.FileType)
+                    {
+                        case FileType.FOLDER:
+                            Icon = "📁";
+                            break;
+                        case FileType.TREE:
+                            Icon = "🌿";
+                            break;
+                        case FileType.FSM:
+                            Icon = "♻";
+                            break;
+                        default:
+                            break;
+                    }
 
                     if (Name == null)
                         Expanded = true;
@@ -56,7 +68,7 @@ namespace YBehavior.Editor
                     if (data.Children == null)
                         return;
 
-                    foreach (TreeFileMgr.TreeFileInfo child in data.Children)
+                    foreach (FileMgr.FileInfo child in data.Children)
                     {
                         FileInfo info = new FileInfo();
                         this.Children.Add(info);
@@ -102,7 +114,7 @@ namespace YBehavior.Editor
             m_ExpandedItems.Clear();
             _GetExpandedItems(this.Files, m_ExpandedItems);
 
-            m_FileInfos.Build(bReload ? TreeFileMgr.Instance.ReloadAndGetAllTrees() : TreeFileMgr.Instance.AllTrees, m_ExpandedItems);
+            m_FileInfos.Build(bReload ? FileMgr.Instance.ReloadAndGetAllFiles() : FileMgr.Instance.AllFiles, m_ExpandedItems);
 //            this.Files.ItemsSource = m_FileInfos.Children;
         }
 
@@ -116,7 +128,7 @@ namespace YBehavior.Editor
                 m_ExpandedItems.Add(s);
             }
 
-            m_FileInfos.Build(TreeFileMgr.Instance.ReloadAndGetAllTrees(), m_ExpandedItems);
+            m_FileInfos.Build(FileMgr.Instance.ReloadAndGetAllFiles(), m_ExpandedItems);
         }
 
         private void OnFilesItemDoubleClick(object sender, MouseButtonEventArgs e)

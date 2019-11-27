@@ -83,7 +83,7 @@
     <Compile Include="New\Renderers.cs" />
     <Compile Include="New\SelectionMgr.cs" />
     <Compile Include="Basic\Singleton.cs" />
-    <Compile Include="New\TreeFileMgr.cs" />
+    <Compile Include="New\FileMgr.cs" />
     <Compile Include="New\TypeMap.cs" />
     <Compile Include="Tools\Utility.cs" />
     <Compile Include="New\Variable.cs" />

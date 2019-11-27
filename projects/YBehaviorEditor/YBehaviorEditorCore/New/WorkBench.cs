@@ -21,12 +21,12 @@ namespace YBehavior.Editor.Core.New
 
         public string DisplayName { get { return FileInfo.DisplayName + (CommandMgr.Dirty ? " *" : ""); } }
 
-        private TreeFileMgr.TreeFileInfo m_UntitledFileInfo = null;
-        public TreeFileMgr.TreeFileInfo FileInfo
+        private FileMgr.FileInfo m_UntitledFileInfo = null;
+        public FileMgr.FileInfo FileInfo
         {
             get
             {
-                return string.IsNullOrEmpty(FilePath) ? m_UntitledFileInfo : TreeFileMgr.Instance.GetFileInfo(FilePath);
+                return string.IsNullOrEmpty(FilePath) ? m_UntitledFileInfo : FileMgr.Instance.GetFileInfo(FilePath);
             }
             set
             {

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<A>
+  <Node Class="Root">
+    <Shared a="_IC 11" />
+    <Local a="_Ic 1" />
+    <Node Class="SubTree" Tree="_SC B" Identification="_SC ">
+      <Input Name="_Ip a" MP="_IP a" />
+      <Output Direction="_Ip a" Location="_IP a" />
+    </Node>
+  </Node>
+</A>

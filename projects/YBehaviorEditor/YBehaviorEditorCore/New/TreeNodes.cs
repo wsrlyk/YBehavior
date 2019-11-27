@@ -204,7 +204,12 @@ namespace YBehavior.Editor.Core.New
         {
             public new InOutMemory InOutData { get { return (Node as SubTreeNode).InOutMemory; } }
         };
-
+        public class TreeVariable : Variable
+        {
+            public TreeVariable(IVariableDataSource source) : base(source)
+            { }
+            public DelayableNotificationCollection<string> TreeList { get { return FileMgr.Instance.TreeList; } }
+        }
         InOutMemory m_InOutMemory;
         public InOutMemory InOutMemory { get { return m_InOutMemory; } }
 
@@ -228,7 +233,8 @@ namespace YBehavior.Editor.Core.New
 
         public override void CreateVariables()
         {
-            m_Tree = NodeMemory.CreateVariable(
+            m_Tree = new TreeVariable(NodeMemory.Owner);
+            NodeMemory.CreateVariable(m_Tree,
                 "Tree",
                 "",
                 Variable.CreateParams_String,

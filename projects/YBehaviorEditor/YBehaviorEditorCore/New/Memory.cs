@@ -457,6 +457,25 @@ namespace YBehavior.Editor.Core.New
 
         }
 
+        public bool CreateVariable(
+            Variable v,
+            string name,
+            string defaultValue,
+            Variable.ValueType[] valueType,
+            Variable.CountType countType,
+            Variable.VariableType vbType,
+            int typeGroup = 0,
+            string param = null)
+        {
+            v.vTypeSet.AddRange(valueType);
+
+            v.SetVariable(valueType[0], countType, vbType, false, defaultValue, param, name);
+
+            if (AddVariable(v, typeGroup))
+                return true;
+            return false;
+        }
+
         public Variable CreateVariable(
             string name,
             string defaultValue,

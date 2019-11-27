@@ -6,8 +6,8 @@
     <Input Name="_IP b" MP="_Ip b" />
     <Output Direction="_Ip b" Location="_IP b" />
     <Node Class="Sequence">
-      <Node Class="Calculator" Operator="_EC ADD" Opl="_IP b" Opr1="_IP b" Opr2="_IC 2" />
-      <Node Class="Calculator" Operator="_EC ADD" Opl="_Ip b" Opr1="_Ip b" Opr2="_IC 2" />
+      <Node Class="Calculator" Operator="_EC +" Opl="_IP b" Opr1="_IP b" Opr2="_IC 2" />
+      <Node Class="Calculator" Operator="_EC +" Opl="_Ip b" Opr1="_Ip b" Opr2="_IC 2" />
     </Node>
   </Node>
 </B>

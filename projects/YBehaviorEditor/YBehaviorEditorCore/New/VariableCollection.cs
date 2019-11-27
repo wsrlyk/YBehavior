@@ -70,6 +70,7 @@ namespace YBehavior.Editor.Core.New
         public DelayableNotificationCollection<VariableHolder> Datas { get { return m_VariableList; } }
 
         protected IVariableCollectionOwner m_Owner;
+        public IVariableCollectionOwner Owner { get { return m_Owner; } }
         public VariableCollection(IVariableCollectionOwner owner)
         {
             m_Owner = owner;

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="YBehavior.Editor.FSMStateFrame"
+﻿<UserControl x:Class="YBehavior.Editor.UISelectTreeVariable"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,16 +6,16 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
-             d:DesignHeight="250" d:DesignWidth="400">
-    <StackPanel DataContextChanged="OnDataContextChanged">
-        <TextBlock Text="{Binding Type}" Background="DarkGray"/>
-        <DockPanel Name="NamePanel">
-            <TextBlock Text="Name" Background="LightBlue" Width="90"/>
-            <TextBox Name="NickName" Text="{Binding NickName}"/>
-        </DockPanel>
-        <DockPanel Name="TreePanel">
-            <TextBlock Text="Tree" Background="LightBlue" Width="90"/>
-            <ComboBox Name="Tree" ItemsSource="{Binding TreeList}" SelectedItem="{Binding Tree}">
+             d:DesignWidth="400">
+    <UserControl.Resources>
+        <local:VariableCountTypeColorConvertor x:Key="countTypeConvertor"/>
+    </UserControl.Resources>
+    <StackPanel>
+        <DockPanel Background="LightBlue" Margin="2,2,2,2">
+            <Grid DockPanel.Dock="Left">
+                <TextBlock Name="VKey" Text="{Binding DisplayName}" FontSize="13" Width="150" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}"/>
+            </Grid>
+            <ComboBox IsEnabled="{Binding IsEditable}" Name="Candidates" ItemsSource="{Binding TreeList}" SelectedItem="{Binding DisplayValue}">
                 <!--IsEditable="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}"
                       Focusable="False"
                       -->
@@ -28,11 +28,6 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-
-        </DockPanel>
-        <DockPanel Name="CommentPanel">
-            <TextBlock Text="Comment" Background="LightBlue" Width="90"/>
-            <TextBox TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Text="{Binding Comment}"/>
         </DockPanel>
     </StackPanel>
 </UserControl>

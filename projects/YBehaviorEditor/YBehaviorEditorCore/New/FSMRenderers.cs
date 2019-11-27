@@ -33,6 +33,10 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        public DelayableNotificationCollection<string> TreeList
+        {
+            get { return FileMgr.Instance.TreeList; }
+        }
         public string Type
         {
             get

@@ -12,6 +12,12 @@
             <local:InvertBoolConverter/>
             <BooleanToVisibilityConverter/>
         </local:ValueConverterGroup>
+        <DataTemplate x:Key="NormalVariable">
+            <local:UIVariable DataContext="{Binding Variable}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="TreeVariable">
+            <local:UISelectTreeVariable DataContext="{Binding Variable}"/>
+        </DataTemplate>
     </UserControl.Resources>
     <Grid>
         <TabControl Name="TabController" Grid.Row="0" Tag="200" SelectionChanged="TabController_SelectionChanged">
@@ -44,12 +50,11 @@
                                     <StackPanel/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <local:UIVariable DataContext="{Binding Variable}"/>
-                                    <!--TextBlock Text = "{Binding Name}"/-->
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemTemplateSelector>
+                                <local:VariableTypeSelector
+                                    NormalTemplate="{StaticResource NormalVariable}"
+                                    TreeTemplate="{StaticResource TreeVariable}"/>
+                            </ItemsControl.ItemTemplateSelector>
                         </ItemsControl>
                     </ScrollViewer>
                 </DockPanel>
