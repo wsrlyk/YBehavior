@@ -240,7 +240,7 @@ namespace YBehavior
 		pugi::xml_document doc;
 
 		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + id->GetName() + ".fsm").c_str());
-		LOG_BEGIN << "Loading: " << id->GetName() << ".xml" << LOG_END;
+		LOG_BEGIN << "Loading: " << id->GetName() << ".fsm" << LOG_END;
 		if (result.status)
 		{
 			ERROR_BEGIN << "Load result: " << result.description() << ERROR_END;
@@ -512,6 +512,41 @@ namespace YBehavior
 		pMachine->OnLoadFinish();
 
 		return true;
+	}
+
+	void MachineMgr::ReloadMachine(const STRING& name)
+	{
+		auto it = m_MachineIDs.find(name);
+		if (it != m_MachineIDs.end())
+		{
+			for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+			{
+				auto it3 = m_Machines.find(*it2);
+				if (it3 == m_Machines.end())
+					continue;
+				it3->second->IncreaseLatestVesion();
+			}
+		}
+
+	}
+
+	void MachineMgr::ReloadAll()
+	{
+		for (auto it = m_Machines.begin(); it != m_Machines.end(); ++it)
+		{
+			it->second->IncreaseLatestVesion();
+		}
+	}
+
+	void MachineMgr::Print()
+	{
+		std::cout << "Print all fsms" << std::endl;
+		for (auto it = m_Machines.begin(); it != m_Machines.end(); ++it)
+		{
+			std::cout << it->first->GetName() << std::endl;
+			it->second->Print();
+		}
+		std::cout << "Print all fsms end." << std::endl;
 	}
 
 	void _BuildID(FSM* pFSM, MachineID* id)

@@ -78,6 +78,9 @@ namespace YBehavior
 		bool GetFSM(const ProcessKey& key, FSM* &pFSM, MachineID* &id);
 		void SetWorkingDir(const STRING& dir);
 		void ReturnFSM(FSM* pFSM);
+		void ReloadMachine(const STRING& name);
+		void ReloadAll();
+		void Print();
 	protected:
 		FSM * _LoadFSM(MachineID* id);
 		bool _CreateSpecialStates(StateMachine* pMachine);

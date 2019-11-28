@@ -9,6 +9,8 @@
 #include <unistd.h>
 #endif
 #include <iostream>
+#include "YBehavior/mgrs.h"
+#include "YBehavior/fsm/machinemgr.h"
 
 using namespace YBehavior;
 
@@ -30,25 +32,16 @@ int main(int argc, char** argv)
 	}
 
 	std::string treeName[TOTAL]{ "A", "B", "C", "D", "E", "F", "G" };
+	std::unordered_set<std::string> entitycmd{ "1", "2" , "3" , "4" , "5" , "6" , "7" };
 	while (1)
 	{
-		char c;
-		std::cin >> c;
-		switch (c)
+		std::string s;
+		std::cin >> s;
+		if (entitycmd.count(s))
 		{
-		case ' ':
-			return 0;
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		{
-			int index = c - '1';
+			int index = s[0] - '1';
 			if (arrays[index] == nullptr)
-				arrays[index] = new XEntity("Hehe", treeName[index]);
+				arrays[index] = new XEntity("Hehe", "StateMachine/SimpleFSM");
 			else
 			{
 				delete arrays[index];
@@ -58,34 +51,28 @@ int main(int argc, char** argv)
 			for (int i = 0; i < TOTAL; ++i)
 				std::cout << (arrays[i] != nullptr) << ' ';
 			std::cout << std::endl;
-			TreeMgr::Instance()->Print();
-			break;
+			Mgrs::Instance()->GetMachineMgr()->Print();
+			Mgrs::Instance()->GetTreeMgr()->Print();
 		}
-		case 'r':
-			TreeMgr::Instance()->ReloadTree("A");
-			TreeMgr::Instance()->Print();
-			break;
-		case 'a':
-		case 'b':
-		case 'c':
-		case 'd':
-		case 'e':
-		case 'f':
+		else if (s == "rm")
 		{
-			std::string s(1, c + ('A' - 'a'));
-			TreeMgr::Instance()->ReloadTree(s);
-			TreeMgr::Instance()->Print();
-			break;
+			std::cin >> s;
+			Mgrs::Instance()->GetMachineMgr()->ReloadMachine(s);
+			Mgrs::Instance()->GetMachineMgr()->Print();
 		}
-		case '/':
+		else if (s == "rt")
 		{
-			TreeMgr::Instance()->GarbageCollection();
-			TreeMgr::Instance()->Print();
+			std::cin >> s;
+			Mgrs::Instance()->GetTreeMgr()->ReloadTree(s);
+			Mgrs::Instance()->GetTreeMgr()->Print();
 		}
-		break;
-		default:
-			break;
+		else if (s == "gc")
+		{
+			Mgrs::Instance()->GetTreeMgr()->GarbageCollection();
+			Mgrs::Instance()->GetTreeMgr()->Print();
 		}
+
+		std::cout << std::endl << std::endl;
 	}
 	return 0;
 }

@@ -26,8 +26,8 @@ namespace YBehavior
 	{
 		pugi::xml_document doc;
 
-		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + id->GetName() + ".xml").c_str());
-		LOG_BEGIN << "Loading: " << id->GetName() << ".xml" << LOG_END;
+		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + id->GetName() + ".tree").c_str());
+		LOG_BEGIN << "Loading: " << id->GetName() << ".tree" << LOG_END;
 		if (result.status)
 		{
 			ERROR_BEGIN << "Load result: " << result.description() << ERROR_END;
@@ -43,7 +43,7 @@ namespace YBehavior
 		UINT uid = 0;
 		if (!_LoadOneNode(tree, rootData.first_child(), uid, tree))
 		{
-			ERROR_BEGIN << "Load xml failed: " << id->GetName() << ERROR_END;
+			ERROR_BEGIN << "Load tree failed: " << id->GetName() << ERROR_END;
 			delete tree;
 			return nullptr;
 		}
@@ -335,7 +335,7 @@ namespace YBehavior
 		std::cout << "Print all trees" << std::endl;
 		for (auto it = m_Trees.begin(); it != m_Trees.end(); ++it)
 		{
-			std::cout << it->first << std::endl;
+			std::cout << it->first->GetName() << std::endl;
 			it->second->Print();
 		}
 		std::cout << "Print all trees end." << std::endl;
