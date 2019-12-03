@@ -234,15 +234,12 @@ namespace YBehavior
 		TempMemory m_TempMemory;
 	};
 
-	struct TreeVersion;
-	class BehaviorID;
 	class YBEHAVIOR_API BehaviorTree : public SingleChildNode
 	{
 	public:
 		STRING GetClassName() const override { return "Tree"; }
-		inline void SetVersion(TreeVersion* v) { m_Version = v; }
-		inline TreeVersion* GetVersion() const { return m_Version; }
-		inline BehaviorID* GetTreeID() const { return m_ID; }
+		inline void SetVersion(void* v) { m_Version = v; }
+		inline void* GetVersion() const { return m_Version; }
 #ifdef DEBUGGER
 		inline UINT GetHash() { return m_Hash; }
 		inline void SetHash(UINT hash) { m_Hash = hash; }
@@ -253,8 +250,8 @@ namespace YBehavior
 		//NameKeyMgr* m_NameKeyMgr;
 		STRING m_TreeNameWithPath;	///> Full Path
 		STRING m_TreeName;	///> Only File
-		TreeVersion* m_Version;
-		BehaviorID* m_ID;
+		void* m_Version;
+		TreeMap m_TreeMap;
 #ifdef DEBUGGER
 		UINT m_Hash;
 #endif
@@ -263,13 +260,15 @@ namespace YBehavior
 		std::unordered_map<STRING, ISharedVariableEx*> m_Inputs;
 		std::unordered_map<STRING, ISharedVariableEx*> m_Outputs;
 	public:
-		BehaviorTree(BehaviorID* id);
+		BehaviorTree(const STRING& name);
 		~BehaviorTree();
-		inline const STRING& GetTreeNameWithPath() { return m_TreeNameWithPath; }
+		inline const STRING& GetKey() { return m_TreeNameWithPath; }
+		inline const STRING& GetFullName() { return m_TreeNameWithPath; }
 		inline const STRING& GetTreeName() { return m_TreeName; }
 		inline SharedDataEx* GetSharedData() { return m_SharedData; }
 		SharedDataEx* GetLocalData();
 		inline SharedDataEx* GetLocalDataIfExists() { return m_LocalData; }
+		inline TreeMap& GetTreeMap() { return m_TreeMap; }
 		//inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }
 		void CloneDataTo(SharedDataEx& destination);
 

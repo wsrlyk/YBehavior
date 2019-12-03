@@ -53,10 +53,7 @@ public:
 	{
 		m_Name = name;
 		pAgent = new XAgent(this);
-		YBehavior::ProcessKey key;
-		key.machineName = machineName;
-		key.stateTrees = trees;
-		key.subTrees = subs;
+		YBehavior::BehaviorKey key(machineName, trees, subs);
 		pAgent->SetBehavior(key);
 		pAgent->SetData();
 	}

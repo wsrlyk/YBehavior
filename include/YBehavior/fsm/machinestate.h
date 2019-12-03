@@ -39,7 +39,6 @@ namespace YBehavior
 	protected:
 		STRING m_Name;
 		STRING m_Tree;
-		STRING m_Identification;
 
 		MachineStateType m_Type;
 		UINT m_UID;
@@ -68,8 +67,7 @@ namespace YBehavior
 		MachineState(const STRING& name, MachineStateType type);
 		~MachineState();
 		inline const STRING& GetName() const { return m_Name; }
-		inline const STRING& GetIdentification() const { return m_Identification; }
-		inline void SetIdentification(const STRING& id) { m_Identification = id; }
+		inline void SetName(const STRING& name) { m_Name = name; }
 		inline UINT GetUID() const { return m_UID; }
 		inline void SetUID(UINT uid) { m_UID = uid; }
 		inline void SetParentMachine(StateMachine* pMac) { m_pParentMachine = pMac; }

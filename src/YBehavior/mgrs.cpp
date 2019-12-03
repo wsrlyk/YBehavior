@@ -1,7 +1,7 @@
 #include "YBehavior/mgrs.h"
 #include "YBehavior/behaviortreemgr.h"
 #include "YBehavior/fsm/machinemgr.h"
-#include "YBehavior/fsm/machinetreemappingmgr.h"
+#include "YBehavior/fsm/behaviormgr.h"
 
 namespace YBehavior
 {
@@ -9,12 +9,12 @@ namespace YBehavior
 	{
 		m_pTreeMgr = new TreeMgr();
 		m_pMachineMgr = new MachineMgr();
-		m_pMappingMgr = new MachineTreeMappingMgr();
+		m_pBehaviorMgr = new BehaviorMgr();
 	}
 
 	Mgrs::~Mgrs()
 	{
-		delete m_pMappingMgr;
+		delete m_pBehaviorMgr;
 		delete m_pMachineMgr;
 		delete m_pTreeMgr;
 	}

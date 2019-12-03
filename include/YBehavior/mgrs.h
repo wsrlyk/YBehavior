@@ -7,7 +7,7 @@ namespace YBehavior
 {
 	class TreeMgr;
 	class MachineMgr;
-	class MachineTreeMappingMgr;
+	class BehaviorMgr;
 	class Mgrs : public Singleton<Mgrs>
 	{
 	public:
@@ -16,12 +16,12 @@ namespace YBehavior
 
 		inline TreeMgr* GetTreeMgr() { return m_pTreeMgr; }
 		inline MachineMgr* GetMachineMgr() { return m_pMachineMgr; }
-		inline MachineTreeMappingMgr* GetMappingMgr() { return m_pMappingMgr; }
+		inline BehaviorMgr* GetBehaviorMgr() { return m_pBehaviorMgr; }
 
 	protected:
 		TreeMgr* m_pTreeMgr;
 		MachineMgr* m_pMachineMgr;
-		MachineTreeMappingMgr* m_pMappingMgr;
+		BehaviorMgr* m_pBehaviorMgr;
 	};
 
 }

@@ -30,7 +30,7 @@ namespace YBehavior
 	};
 
 	//typedef std::list<MachineState*> CurrentStatesType;
-	class MachineTreeMapping;
+	class Behavior;
 	class BehaviorTree;
 	class MachineContext
 	{
@@ -38,7 +38,6 @@ namespace YBehavior
 		//CurrentStatesType m_CurStates;
 		MachineState* m_pCurState;
 		TransitionContext m_Trans;
-		MachineTreeMapping* m_pMapping;
 		BehaviorTree* m_pCurRunningTree;
 
 		std::list<TransQueueData> m_pTransQueue;
@@ -50,8 +49,7 @@ namespace YBehavior
 		inline TransitionContext& GetTransition() { return m_Trans; }
 		inline const TransitionContext& GetTransition() const { return m_Trans; }
 		//inline CurrentStatesType& GetCurStatesStack() { return m_CurStates; }
-		void SetMapping(MachineTreeMapping* mapping);
-		inline MachineTreeMapping* GetMapping() { return m_pMapping; }
+		void Init(Behavior* behavior);
 		inline void ResetCurRunning() { m_pCurRunningTree = nullptr; }
 		inline void SetCurRunning(BehaviorTree* pCurRunningTree) { m_pCurRunningTree = pCurRunningTree; }
 		inline BehaviorTree* GetCurRunningTree() { return m_pCurRunningTree; }

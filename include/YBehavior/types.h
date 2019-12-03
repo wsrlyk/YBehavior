@@ -6,6 +6,7 @@
 #include "define.h"
 #include <sstream>
 #include <memory>
+#include <unordered_map>
 
 namespace YBehavior
 {
@@ -261,6 +262,34 @@ namespace YBehavior
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecString, 105);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecEntityWrapper, 106);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecVector3, 107);
+
+	typedef const void* NodePtr;
+	struct TreeMap
+	{
+		typedef std::tuple<NodePtr, STRING> NodeDesc;
+
+		struct key_hash : public std::unary_function<NodeDesc, std::size_t>
+		{
+			std::size_t operator()(const NodeDesc& k) const
+			{
+				return std::hash<NodePtr>{}(std::get<0>(k)) ^ std::hash<STRING>{}(std::get<1>(k));
+			}
+		};
+
+		struct key_equal : public std::binary_function<NodeDesc, NodeDesc, bool>
+		{
+			bool operator()(const NodeDesc& v0, const NodeDesc& v1) const
+			{
+				return (
+					std::get<0>(v0) == std::get<0>(v1) &&
+					std::get<1>(v0) == std::get<1>(v1)
+					);
+			}
+		};
+
+		std::unordered_map<NodePtr, STRING> Node2Trees;
+		std::unordered_map<NodeDesc, STRING, key_hash, key_equal> Name2Trees;
+	};
 }
 
 namespace YB = YBehavior;

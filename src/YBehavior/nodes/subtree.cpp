@@ -7,8 +7,8 @@
 #include "YBehavior/sharedvariableex.h"
 #include "YBehavior/behaviortreemgr.h"
 #include <string.h>
-#include "YBehavior/behaviorid.h"
 #include "YBehavior/mgrs.h"
+#include "YBehavior/fsm/behavior.h"
 
 namespace YBehavior
 {
@@ -37,7 +37,7 @@ namespace YBehavior
 		STRING id;
 		m_Identification->GetCastedValue(nullptr, id);
 
-		m_Root->GetTreeID()->TryGet(id, defaultTreeName, m_FinalTreeName);
+		/*m_Root->GetTreeID()->TryGet(id, defaultTreeName, m_FinalTreeName);
 		
 		if (m_FinalTreeName == Utility::StringEmpty)
 		{
@@ -46,7 +46,18 @@ namespace YBehavior
 		}
 
 		if (m_Root->GetTreeNameWithPath() != m_FinalTreeName)
-			Mgrs::Instance()->GetTreeMgr()->PushToBeLoadedTree(m_FinalTreeName);
+			Mgrs::Instance()->GetTreeMgr()->PushToBeLoadedTree(m_FinalTreeName);*/
+		if (id.empty())
+		{
+			if (defaultTreeName.empty())
+			{
+				ERROR_BEGIN << "Null Value for Tree in " << this->GetClassName() << ERROR_END;
+				return false;
+			}
+			m_Root->GetTreeMap().Node2Trees[this] = defaultTreeName;
+		}
+		else
+			m_Root->GetTreeMap().Name2Trees[{this, id}] = defaultTreeName;
 
 		return true;
 	}
@@ -89,30 +100,17 @@ namespace YBehavior
 
 	YBehavior::NodeState SubTree::Update(AgentPtr pAgent)
 	{
-		if (m_Tree == nullptr && m_Root != nullptr)
-		{
-			for (auto it = m_Root->GetSubTrees().begin(); it != m_Root->GetSubTrees().end(); ++it)
-			{
-				if ((*it)->GetTreeNameWithPath() == m_FinalTreeName)
-				{
-					m_Tree = *it;
-					break;
-				}
-			}
-			if (m_Tree == nullptr && m_Root->GetTreeNameWithPath() == m_FinalTreeName)
-				m_Tree = m_Root;
-		}
-
-		if (m_Tree != nullptr)
+		auto tree = pAgent->GetBehavior()->GetMappedTree(this);
+		if (tree != nullptr)
 		{
 			if (m_Inputs.size() > 0 || m_Outputs.size() > 0)
 			{
 				LocalMemoryInOut inout(pAgent, m_Inputs.size() > 0 ? &m_Inputs : nullptr, m_Outputs.size() > 0 ? &m_Outputs : nullptr);
-				return m_Tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID, &inout);
+				return tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID, &inout);
 			}
 			else
 			{
-				return m_Tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID);
+				return tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID);
 			}
 		}
 		return NS_FAILURE;

@@ -18,8 +18,6 @@ namespace YBehavior
 		SharedVariableEx<STRING>* m_TreeName;
 		SharedVariableEx<STRING>* m_Identification;
 
-		BehaviorTree* m_Tree = nullptr;
-
 		std::vector<ISharedVariableEx* > m_Inputs;
 		std::vector<ISharedVariableEx* > m_Outputs;
 

@@ -13,7 +13,6 @@
 #include "YBehavior/agent.h"
 #include <string.h>
 #include "YBehavior/runningcontext.h"
-#include "YBehavior/behaviorid.h"
 
 namespace YBehavior
 {
@@ -407,10 +406,9 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 
 
-	BehaviorTree::BehaviorTree(BehaviorID* id)
+	BehaviorTree::BehaviorTree(const STRING& name)
 	{
-		m_ID = id;
-		m_TreeNameWithPath = id->GetName();
+		m_TreeNameWithPath = name;
 		m_TreeName = Utility::GetNameFromPath(m_TreeNameWithPath);
 		
 		m_SharedData = new SharedDataEx();

@@ -11,6 +11,7 @@
 #include <iostream>
 #include "YBehavior/mgrs.h"
 #include "YBehavior/fsm/machinemgr.h"
+#include "YBehavior/fsm/behaviormgr.h"
 
 using namespace YBehavior;
 
@@ -33,6 +34,8 @@ int main(int argc, char** argv)
 
 	std::string treeName[TOTAL]{ "A", "B", "C", "D", "E", "F", "G" };
 	std::unordered_set<std::string> entitycmd{ "1", "2" , "3" , "4" , "5" , "6" , "7" };
+	std::vector<std::string> stateTrees[TOTAL]{ {}, {}, {"A", "F"}, {"A", "A"}, {"A", "A"}, {}, {} };
+	std::vector<std::string> subTrees[TOTAL]{ {}, {}, {}, {}, {"A", "B"}, {}, {} };
 	while (1)
 	{
 		std::string s;
@@ -41,7 +44,7 @@ int main(int argc, char** argv)
 		{
 			int index = s[0] - '1';
 			if (arrays[index] == nullptr)
-				arrays[index] = new XEntity("Hehe", "StateMachine/SimpleFSM");
+				arrays[index] = new XEntity("Hehe", "StateMachine/SimpleFSM", &stateTrees[index], &subTrees[index]);
 			else
 			{
 				delete arrays[index];
@@ -53,23 +56,21 @@ int main(int argc, char** argv)
 			std::cout << std::endl;
 			Mgrs::Instance()->GetMachineMgr()->Print();
 			Mgrs::Instance()->GetTreeMgr()->Print();
+			Mgrs::Instance()->GetBehaviorMgr()->Print();
 		}
 		else if (s == "rm")
 		{
 			std::cin >> s;
-			Mgrs::Instance()->GetMachineMgr()->ReloadMachine(s);
+			BehaviorProcessHelper::ReloadMachine(s);
 			Mgrs::Instance()->GetMachineMgr()->Print();
+			Mgrs::Instance()->GetBehaviorMgr()->Print();
 		}
 		else if (s == "rt")
 		{
 			std::cin >> s;
-			Mgrs::Instance()->GetTreeMgr()->ReloadTree(s);
+			BehaviorProcessHelper::ReloadTree(s);
 			Mgrs::Instance()->GetTreeMgr()->Print();
-		}
-		else if (s == "gc")
-		{
-			Mgrs::Instance()->GetTreeMgr()->GarbageCollection();
-			Mgrs::Instance()->GetTreeMgr()->Print();
+			Mgrs::Instance()->GetBehaviorMgr()->Print();
 		}
 
 		std::cout << std::endl << std::endl;

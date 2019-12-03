@@ -77,29 +77,33 @@ namespace YBehavior
 		bool _Trans(AgentPtr pAgent);
 	};
 
-	struct MachineVersion;
 	class MachineID;
 	class FSM
 	{
 		STRING m_Name;
 		STRING m_NameWithPath;
-		MachineVersion* m_Version;
+		void* m_Version;
 		MachineID* m_ID;
 		///> TODO: multilayers
 		RootMachine* m_pMachine;
 		ConditionMgr m_ConditionMgr;
+		TreeMap m_TreeMap;
+
 #ifdef DEBUGGER
 		UINT m_Hash;
 #endif
 	public:
-		inline void SetVersion(MachineVersion* v) { m_Version = v; }
-		inline MachineVersion* GetVersion() const { return m_Version; }
+		inline void SetVersion(void* v) { m_Version = v; }
+		inline void* GetVersion() const { return m_Version; }
 		inline void SetID(MachineID* id) { m_ID = id; }
 		inline MachineID* GetID() const { return m_ID; }
 		inline RootMachine* GetMachine() { return m_pMachine; }
 		inline ConditionMgr* GetConditionMgr() { return &m_ConditionMgr; }
 		inline const STRING& GetName() { return m_Name; }
-		inline const STRING& GetNameWithPath() { return m_NameWithPath; }
+		inline const STRING& GetFullName() { return m_NameWithPath; }
+		inline const STRING& GetKey() { return m_NameWithPath; }
+		inline TreeMap& GetTreeMap() { return m_TreeMap; }
+
 		FSM(const STRING& name);
 		~FSM();
 		RootMachine* CreateMachine();

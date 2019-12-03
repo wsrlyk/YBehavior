@@ -5,7 +5,7 @@
 #include "YBehavior/singleton.h"
 #include <unordered_map>
 #include "statemachine.h"
-#include "YBehavior/behaviorid.h"
+#include "YBehavior/version.h"
 
 ///>///////////////////////////////////////////////////////////////////////
 ///> Machine->MacTreeMap->Tree
@@ -21,68 +21,27 @@ namespace pugi
 
 namespace YBehavior
 {
-	typedef std::unordered_map<UINT, STRING> StateTreeMapType;
-	class MachineID : public BehaviorID
-	{
-		StateTreeMapType m_StateTreeMap;
-	public:
-		MachineID(const STRING& name) : BehaviorID(name) {}
-		inline StateTreeMapType& GetStateTreeMap() { return m_StateTreeMap; }
-	};
-
-	struct MachineVersion
-	{
-		int version = -1;
-		FSM* pFSM = nullptr;
-		int agentReferenceCount = 0;
-		int GetReferenceCount() { return agentReferenceCount; }
-	};
-
-	class MachineInfo
-	{
-	public:
-		MachineInfo();
-		~MachineInfo();
-
-		void TryRemoveVersion(MachineVersion* version);
-		void RemoveVersion(MachineVersion* version);
-		MachineVersion* CreateVersion();
-		void RevertVersion();
-		FSM* GetLatestFSM() { return m_LatestVersion ? m_LatestVersion->pFSM : nullptr; }
-		inline MachineVersion* GetLatestVersion() { return m_LatestVersion; }
-		void IncreaseLatestVesion();
-
-		void SetLatestFSM(FSM* pFSM);
-		void ChangeReferenceCount(bool bInc, MachineVersion* version = nullptr);
-		void Print();
-
-		inline std::unordered_map<int, MachineVersion*>& GetVersions() { return m_MachineVersions; }
-	private:
-		MachineVersion * m_LatestVersion;
-		MachineVersion* m_PreviousVersion;
-		std::unordered_map<int, MachineVersion*> m_MachineVersions;
-	};
-
-	struct ProcessKey;
+	typedef typename VersionMgr<FSM, STRING> MachineVersionMgrType;
+	typedef typename MachineVersionMgrType::InfoType MachineInfoType;
+	typedef typename MachineVersionMgrType::InfoType::VersionType MachineVersionType;
 
 	class YBEHAVIOR_API MachineMgr
 	{
-		std::unordered_map<MachineID*, MachineInfo*> m_Machines;
-		std::unordered_map<STRING, StdVector<MachineID*>> m_MachineIDs;
+		MachineVersionMgrType m_VersionMgr;
 
 		STRING m_WorkingDir;
 
 	public:
 		~MachineMgr();
 
-		bool GetFSM(const ProcessKey& key, FSM* &pFSM, MachineID* &id);
+		FSM* GetFSM(const STRING& key);
 		void SetWorkingDir(const STRING& dir);
 		void ReturnFSM(FSM* pFSM);
 		void ReloadMachine(const STRING& name);
 		void ReloadAll();
 		void Print();
 	protected:
-		FSM * _LoadFSM(MachineID* id);
+		FSM * _LoadFSM(const STRING& name);
 		bool _CreateSpecialStates(StateMachine* pMachine);
 		bool _LoadMachine(StateMachine* pMachine, const pugi::xml_node& data, UINT& uid);
 	};

@@ -4,7 +4,7 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/fsm/statemachine.h"
 #include "YBehavior/fsm/transition.h"
-#include "YBehavior/fsm/machinetreemapping.h"
+#include "YBehavior/fsm/behavior.h"
 
 namespace YBehavior
 {
@@ -29,21 +29,18 @@ namespace YBehavior
 
 	MachineContext::MachineContext()
 		: m_pCurState (nullptr)
-		, m_pMapping(nullptr)
 		, LastRunRes(MRR_Invalid)
 	{
 
 	}
 
-	void MachineContext::SetMapping(MachineTreeMapping* mapping)
+	void MachineContext::Init(Behavior* behavior)
 	{
-		m_pMapping = mapping;
-		m_Trans.Get().SetConditionMgr(m_pMapping->GetFSM()->GetConditionMgr());
+		m_Trans.Get().SetConditionMgr(behavior->GetFSM()->GetConditionMgr());
 	}
 
 	void MachineContext::Reset()
 	{
-		m_pMapping = nullptr;
 		m_pCurState = nullptr;
 		m_Trans.Reset();
 	}

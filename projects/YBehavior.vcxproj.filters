@@ -207,16 +207,7 @@
     <ClInclude Include="..\include\YBehavior\fsm\machinemgr.h">
       <Filter>头文件\fsm</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\YBehavior\fsm\machinetreemappingmgr.h">
-      <Filter>头文件\fsm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\YBehavior\fsm\machinetreemapping.h">
-      <Filter>头文件\fsm</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\YBehavior\behaviorprocess.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\YBehavior\behaviorid.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\YBehavior\mgrs.h">
@@ -230,6 +221,15 @@
     </ClInclude>
     <ClInclude Include="..\include\YBehavior\nodes\fsmrelated.h">
       <Filter>头文件\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\version.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\behavior.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\behaviormgr.h">
+      <Filter>头文件\fsm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -247,9 +247,6 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodes\sequence.cpp">
       <Filter>源文件\nodes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\factory.cpp">
-      <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\utility.cpp">
       <Filter>源文件</Filter>
@@ -365,17 +362,8 @@
     <ClCompile Include="..\src\YBehavior\fsm\machinemgr.cpp">
       <Filter>源文件\fsm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\YBehavior\fsm\machinetreemappingmgr.cpp">
-      <Filter>源文件\fsm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\YBehavior\behaviorprocess.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\behaviorid.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\fsm\machinetreemapping.cpp">
-      <Filter>源文件\fsm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\mgrs.cpp">
       <Filter>源文件</Filter>
@@ -388,6 +376,12 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodes\fsmrelated.cpp">
       <Filter>源文件\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\behavior.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\behaviormgr.cpp">
+      <Filter>源文件\fsm</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

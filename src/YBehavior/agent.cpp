@@ -8,7 +8,7 @@
 #include "YBehavior/memory.h"
 #include "YBehavior/fsm/statemachine.h"
 #include "YBehavior/mgrs.h"
-#include "YBehavior/fsm/machinetreemappingmgr.h"
+#include "YBehavior/fsm/behaviormgr.h"
 
 YBehavior::UINT64 YBehavior::Agent::s_UID = 0;
 
@@ -30,7 +30,7 @@ YBehavior::RegisterData* YBehavior::Agent::GetRegister()
 //	return true;
 //}
 
-bool YBehavior::Agent::SetBehavior(const ProcessKey& key)
+bool YBehavior::Agent::SetBehavior(const BehaviorKey& key)
 {
 	UnloadBehavior();
 

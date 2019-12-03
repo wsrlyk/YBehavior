@@ -7,7 +7,7 @@
 #include <sstream>
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/memory.h"
-#include "YBehavior/fsm/machinetreemapping.h"
+#include "YBehavior/fsm/behavior.h"
 
 #ifdef DEBUGGER
 namespace YBehavior
@@ -135,38 +135,19 @@ namespace YBehavior
 		buffer += IDebugHelper::s_HeadSpliter;
 
 		///> Machine Name
-		auto mapping = pAgent->GetMachineContext()->GetMapping();
-		buffer += mapping->GetFSM()->GetNameWithPath();
+		auto behavior = pAgent->GetBehavior();
+		buffer += behavior->GetFSM()->GetFullName();
 		buffer += IDebugHelper::s_SequenceSpliter;
-		buffer += Utility::ToString(mapping->GetFSM()->GetHash());
+		buffer += Utility::ToString(behavior->GetFSM()->GetHash());
 		//buffer += IDebugHelper::s_ListSpliter;
 
 		///> Tree&SubTree Name
-		std::list<BehaviorTree*> toVisit;
-		std::unordered_set<BehaviorTree*> visited;
 
-		for (const auto& it : mapping->GetMapping())
-		{
-			toVisit.push_back(it.second);
-			visited.insert(it.second);
-		}
-		while (!toVisit.empty())
-		{
-			BehaviorTree* pCurTree = toVisit.front();
-			toVisit.pop_front();
-
-			for (auto it : pCurTree->GetSubTrees())
-			{
-				if (visited.count(it) == 0)
-				{
-					toVisit.push_back(it);
-					visited.insert(it);
-				}
-			}
-		}
 		//bool bFirst = true;
-		for (auto it : visited)
+		for (auto& it : behavior->GetTreeMapping())
 		{
+			BehaviorTree* pCurTree = it.second;
+
 			//if (bFirst)
 			//{
 			//	bFirst = false;
@@ -175,9 +156,9 @@ namespace YBehavior
 			{
 				buffer += IDebugHelper::s_ListSpliter;
 			}
-			buffer += it->GetTreeNameWithPath();
+			buffer += pCurTree->GetFullName();
 			buffer += IDebugHelper::s_SequenceSpliter;
-			buffer += Utility::ToString(it->GetHash());
+			buffer += Utility::ToString(pCurTree->GetHash());
 		}
 		Network::Instance()->SendText(buffer);
 

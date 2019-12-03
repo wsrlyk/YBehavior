@@ -1,28 +1,31 @@
 #include "YBehavior/behaviorprocess.h"
 #include "YBehavior/logger.h"
-#include "YBehavior/fsm/machinetreemappingmgr.h"
+#include "YBehavior/fsm/behaviormgr.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/mgrs.h"
+#include "YBehavior/behaviortreemgr.h"
+#include "YBehavior/fsm/machinemgr.h"
 
 namespace YBehavior
 {
-	bool BehaviorProcessHelper::GetBehaviorProcess(const ProcessKey& key, BehaviorProcess& behaviorProcess)
+	bool BehaviorProcessHelper::GetBehaviorProcess(const BehaviorKey& key, BehaviorProcess& behaviorProcess)
 	{
-		MachineTreeMapping* pMapping = Mgrs::Instance()->GetMappingMgr()->GetMapping(key);
-		if (!pMapping)
+		Behavior* pBehavior = Mgrs::Instance()->GetBehaviorMgr()->GetBehavior(key);
+		if (!pBehavior)
 			return false;
-		behaviorProcess.machineContext.SetMapping(pMapping);
+		behaviorProcess.pBehavior = pBehavior;
+		behaviorProcess.machineContext.Init(pBehavior);
 
-		behaviorProcess.memory.GetMainData()->CloneFrom(*pMapping->GetMemory()->GetMainData());
+		behaviorProcess.memory.GetMainData()->CloneFrom(*pBehavior->GetMemory()->GetMainData());
 
 		return true;
 	}
 
 	void BehaviorProcessHelper::Release(BehaviorProcess& behaviorProcess)
 	{
-		if (behaviorProcess.machineContext.GetMapping())
+		if (behaviorProcess.pBehavior)
 		{
-			Mgrs::Instance()->GetMappingMgr()->ReturnMapping(behaviorProcess.machineContext.GetMapping());
+			Mgrs::Instance()->GetBehaviorMgr()->ReturnBehavior(behaviorProcess.pBehavior);
 			behaviorProcess.machineContext.Reset();
 
 			behaviorProcess.memory.GetMainData()->Clear();
@@ -32,10 +35,29 @@ namespace YBehavior
 
 	void BehaviorProcessHelper::Execute(AgentPtr pAgent)
 	{
-		if (pAgent->GetMachineContext()->GetMapping() == nullptr)
+		if (pAgent->GetBehavior() == nullptr)
 			return;
 
-		pAgent->GetMachineContext()->GetMapping()->GetFSM()->Update(0.0f, pAgent);
+		pAgent->GetBehavior()->GetFSM()->Update(0.0f, pAgent);
+	}
+
+	void BehaviorProcessHelper::ReloadTree(const STRING& name)
+	{
+		Mgrs::Instance()->GetTreeMgr()->ReloadTree(name);
+		Mgrs::Instance()->GetBehaviorMgr()->ReloadTree(name);
+	}
+
+	void BehaviorProcessHelper::ReloadMachine(const STRING& name)
+	{
+		Mgrs::Instance()->GetMachineMgr()->ReloadMachine(name);
+		Mgrs::Instance()->GetBehaviorMgr()->ReloadMachine(name);
+	}
+
+	void BehaviorProcessHelper::ReloadAll()
+	{
+		Mgrs::Instance()->GetTreeMgr()->ReloadAll();
+		Mgrs::Instance()->GetMachineMgr()->ReloadAll();
+		Mgrs::Instance()->GetBehaviorMgr()->ReloadAll();
 	}
 
 }

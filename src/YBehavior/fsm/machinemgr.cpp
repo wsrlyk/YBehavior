@@ -2,7 +2,6 @@
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/behaviorprocess.h"
-#include "YBehavior/behaviorid.h"
 #include <iostream>
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/fsm/metastate.h"
@@ -11,143 +10,8 @@
 
 namespace YBehavior
 {
-	void MachineInfo::Print()
-	{
-		for (auto it = m_MachineVersions.begin(); it != m_MachineVersions.end(); ++it)
-		{
-			std::cout << "version " << it->first << ", agentcount " << it->second->agentReferenceCount << std::endl;
-		}
-	}
-
-	MachineInfo::MachineInfo()
-		: m_LatestVersion(nullptr)
-		, m_PreviousVersion(nullptr)
-	{
-		CreateVersion();
-	}
-
-	MachineInfo::~MachineInfo()
-	{
-		for (auto it = m_MachineVersions.begin(); it != m_MachineVersions.end(); ++it)
-		{
-			delete it->second->pFSM;
-			delete it->second;
-		}
-		m_MachineVersions.clear();
-	}
-
-	void MachineInfo::TryRemoveVersion(MachineVersion* version)
-	{
-		if (version == nullptr || version->pFSM == nullptr || version->GetReferenceCount() > 0)
-			return;
-		RemoveVersion(version);
-	}
-
-	void MachineInfo::RemoveVersion(MachineVersion* version)
-	{
-		if (version)
-		{
-			m_MachineVersions.erase(version->version);
-
-			if (version->pFSM)
-				delete version->pFSM;
-
-			if (m_PreviousVersion == version)
-				m_PreviousVersion = nullptr;
-			if (m_LatestVersion == version)
-				m_LatestVersion = nullptr;
-			delete version;
-		}
-	}
-
-	MachineVersion* MachineInfo::CreateVersion()
-	{
-		MachineVersion* pVersion = new MachineVersion();
-		if (m_LatestVersion == nullptr)
-		{
-			pVersion->version = 0;
-		}
-		else
-		{
-			pVersion->version = m_LatestVersion->version + 1;
-
-			///> Check if the current latest version has no reference. Remove it if true
-			{
-				TryRemoveVersion(m_LatestVersion);
-			}
-		}
-		m_PreviousVersion = m_LatestVersion;
-		m_LatestVersion = pVersion;
-		m_MachineVersions[pVersion->version] = pVersion;
-
-		return pVersion;
-	}
-
-	void MachineInfo::RevertVersion()
-	{
-		TryRemoveVersion(m_LatestVersion);
-		m_LatestVersion = m_PreviousVersion;
-		m_PreviousVersion = nullptr;
-	}
-
-	void MachineInfo::IncreaseLatestVesion()
-	{
-		if (m_LatestVersion == nullptr || m_LatestVersion->pFSM == nullptr)
-			return;
-
-		CreateVersion();
-	}
-
-	void MachineInfo::SetLatestFSM(FSM* pFSM)
-	{
-		if (m_LatestVersion == nullptr)
-			CreateVersion();
-		m_LatestVersion->pFSM = pFSM;
-		pFSM->SetVersion(m_LatestVersion);
-	}
-
-	void MachineInfo::ChangeReferenceCount(bool bInc, MachineVersion* version)
-	{
-		if (version == nullptr)
-			version = m_LatestVersion;
-		else
-		{
-			auto it = m_MachineVersions.find(version->version);
-			if (it != m_MachineVersions.end() && it->second != version)
-				version = nullptr;
-		}
-
-		if (version == nullptr)
-			return;
-
-		if (bInc)
-		{
-			++(version->agentReferenceCount);
-		}
-		else
-		{
-			--(version->agentReferenceCount);
-
-			if (m_LatestVersion != version)
-			{
-				///> Old version has no reference, remove it
-				TryRemoveVersion(version);
-			}
-		}
-	}
-
-	///>//////////////////////////////////////////////////////////////////////////////////////////
-	///>//////////////////////////////////////////////////////////////////////////////////////////
-	///>//////////////////////////////////////////////////////////////////////////////////////////
 	MachineMgr::~MachineMgr()
 	{
-		for (auto it = m_Machines.begin(); it != m_Machines.end(); ++it)
-		{
-			delete it->first;
-			delete it->second;
-		}
-		m_Machines.clear();
-		m_MachineIDs.clear();
 	}
 
 	void MachineMgr::SetWorkingDir(const STRING& dir)
@@ -167,80 +31,36 @@ namespace YBehavior
 
 	void MachineMgr::ReturnFSM(FSM* pFSM)
 	{
-		if (pFSM == nullptr)
-			return;
-
-		auto it = m_Machines.find(pFSM->GetID());
-		if (it != m_Machines.end())
-		{
-			it->second->ChangeReferenceCount(false, pFSM->GetVersion());
-		}
-
+		m_VersionMgr.Return(pFSM);
 	}
 
-	void _BuildID(FSM* pFSM, MachineID* id);
+	void _BuildStateTreeMapping(FSM* pFSM);
 
-	bool MachineMgr::GetFSM(const ProcessKey& key, FSM* &pFSM, MachineID* &id)
+	FSM* MachineMgr::GetFSM(const STRING& name)
 	{
-		MachineInfo* info = nullptr;
-		id = nullptr;
-		pFSM = nullptr;
-		auto it = m_MachineIDs.find(key.machineName);
-		if (it != m_MachineIDs.end())
+		FSM *pFSM;
+		MachineInfoType* info;
+		if (!m_VersionMgr.GetData(name, pFSM, info))
 		{
-			for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2)
-			{
-				id = *it2;
-				if (!id->IsSame(key.stateTrees))
-					continue;
-				auto it3 = m_Machines.find(id);
-				if (it3 != m_Machines.end())
-				{
-					pFSM = it3->second->GetLatestFSM();
-					if (pFSM)
-					{
-						it3->second->ChangeReferenceCount(true);
-						return true;
-					}
-					else
-						info = it3->second;
+			pFSM = _LoadFSM(name);
+			if (!pFSM)
+				return nullptr;
 
-					break;
-				}
-			}
+			info->SetLatest(pFSM);
+			info->ChangeReferenceCount(true);
+			_BuildStateTreeMapping(pFSM);
+
 		}
 
-		if (info == nullptr)
-		{
-			info = new MachineInfo();
-			id = new MachineID(key.machineName);
-			if (key.stateTrees != nullptr)
-				id->SetMappings(*key.stateTrees);
-			m_MachineIDs[key.machineName].push_back(id);
-			m_Machines[id] = info;
-		}
-
-		if (key.stateTrees != nullptr)
-			id->SetMappings(*key.stateTrees);
-	
-		pFSM = _LoadFSM(id);
-		if (!pFSM)
-			return true;
-
-		info->SetLatestFSM(pFSM);
-		info->ChangeReferenceCount(true);
-
-		_BuildID(pFSM, id);
-
-		return true;
+		return pFSM;
 	}
 
-	FSM * MachineMgr::_LoadFSM(MachineID* id)
+	FSM * MachineMgr::_LoadFSM(const STRING& name)
 	{
 		pugi::xml_document doc;
 
-		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + id->GetName() + ".fsm").c_str());
-		LOG_BEGIN << "Loading: " << id->GetName() << ".fsm" << LOG_END;
+		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + ".fsm").c_str());
+		LOG_BEGIN << "Loading: " << name << ".fsm" << LOG_END;
 		if (result.status)
 		{
 			ERROR_BEGIN << "Load result: " << result.description() << ERROR_END;
@@ -251,15 +71,14 @@ namespace YBehavior
 		if (rootData == nullptr)
 			return nullptr;
 		
-		FSM* pFSM = new FSM(id->GetName());
-		pFSM->SetID(id);
+		FSM* pFSM = new FSM(name);
 		RootMachine* pMachine = pFSM->CreateMachine();
 		///> at most 8 levels, start from 0
 		UINT uid = 0;
 
 		if (!_LoadMachine(pMachine, rootData.first_child(), uid))
 		{
-			ERROR_BEGIN << "Load FSM Failed: " << id->GetName() << ERROR_END;
+			ERROR_BEGIN << "Load FSM Failed: " << name << ERROR_END;
 			delete pFSM;
 			return nullptr;
 		}
@@ -309,9 +128,11 @@ namespace YBehavior
 		{
 		case YBehavior::MST_Entry:
 			pState = pMachine->GetEntry();
+			pState->SetName(name);
 			break;
 		case YBehavior::MST_Exit:
 			pState = pMachine->GetExit();
+			pState->SetName(name);
 			break;
 		case YBehavior::MST_Meta:
 			pState = new MetaState(name);
@@ -516,60 +337,43 @@ namespace YBehavior
 
 	void MachineMgr::ReloadMachine(const STRING& name)
 	{
-		auto it = m_MachineIDs.find(name);
-		if (it != m_MachineIDs.end())
-		{
-			for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2)
-			{
-				auto it3 = m_Machines.find(*it2);
-				if (it3 == m_Machines.end())
-					continue;
-				it3->second->IncreaseLatestVesion();
-			}
-		}
-
+		m_VersionMgr.Reload(name);
 	}
 
 	void MachineMgr::ReloadAll()
 	{
-		for (auto it = m_Machines.begin(); it != m_Machines.end(); ++it)
-		{
-			it->second->IncreaseLatestVesion();
-		}
+		m_VersionMgr.ReloadAll();
 	}
 
 	void MachineMgr::Print()
 	{
 		std::cout << "Print all fsms" << std::endl;
-		for (auto it = m_Machines.begin(); it != m_Machines.end(); ++it)
+		for (auto it = m_VersionMgr.GetInfos().begin(); it != m_VersionMgr.GetInfos().end(); ++it)
 		{
-			std::cout << it->first->GetName() << std::endl;
+			std::cout << it->first << std::endl;
 			it->second->Print();
 		}
 		std::cout << "Print all fsms end." << std::endl;
 	}
 
-	void _BuildID(FSM* pFSM, MachineID* id)
+	void _BuildStateTreeMapping(FSM* pFSM)
 	{
 		RootMachine* pMachine = pFSM->GetMachine();
-		std::list<StateMachine*> l;
-		l.push_back(pMachine);
 		
-		id->GetStateTreeMap().clear();
-
 		std::vector<MachineState *>& allStates = pMachine->GetAllStates();
 		for (auto it = allStates.begin(); it != allStates.end(); ++it)
 		{
 			MachineState* pState = *it;
 			STRING outName;
-			if (pState->GetTree() != ""  && pState->GetIdentification() != "")
+			if (pState->GetName().empty())
 			{
-				id->TryGet(pState->GetIdentification(), pState->GetTree(), outName);
-				id->GetStateTreeMap()[pState->GetUID()] = outName;
+				if (!pState->GetTree().empty())
+					pFSM->GetTreeMap().Node2Trees[pState] = pState->GetTree();
 			}
-
+			else
+			{
+				pFSM->GetTreeMap().Name2Trees[{pState, pState->GetName()}] = pState->GetTree();
+			}
 		}
-
-		id->BuildID();
 	}
 }

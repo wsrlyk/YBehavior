@@ -23,8 +23,8 @@
     <ClInclude Include="..\include\YBehavior\fsm\context.h" />
     <ClInclude Include="..\include\YBehavior\fsm\machinemgr.h" />
     <ClInclude Include="..\include\YBehavior\fsm\machinestate.h" />
-    <ClInclude Include="..\include\YBehavior\fsm\machinetreemapping.h" />
-    <ClInclude Include="..\include\YBehavior\fsm\machinetreemappingmgr.h" />
+    <ClInclude Include="..\include\YBehavior\fsm\behavior.h" />
+    <ClInclude Include="..\include\YBehavior\fsm\behaviormgr.h" />
     <ClInclude Include="..\include\YBehavior\fsm\metastate.h" />
     <ClInclude Include="..\include\YBehavior\fsm\statemachine.h" />
     <ClInclude Include="..\include\YBehavior\fsm\transition.h" />
@@ -66,11 +66,11 @@
     <ClInclude Include="..\include\YBehavior\tools\meta.h" />
     <ClInclude Include="..\include\YBehavior\tools\objectpool.h" />
     <ClInclude Include="..\include\YBehavior\tools\treemgrhelper.hpp" />
-    <ClInclude Include="..\include\YBehavior\behaviorid.h" />
     <ClInclude Include="..\include\YBehavior\treekeymgr.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />
     <ClInclude Include="..\include\YBehavior\variableoperation.h" />
+    <ClInclude Include="..\include\YBehavior\version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\3rd\pugixml\pugixml.cpp" />
@@ -79,12 +79,11 @@
     <ClCompile Include="..\src\YBehavior\behaviortree.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviortreemgr.cpp" />
     <ClCompile Include="..\src\YBehavior\debugger.cpp" />
-    <ClCompile Include="..\src\YBehavior\factory.cpp" />
     <ClCompile Include="..\src\YBehavior\fsm\context.cpp" />
     <ClCompile Include="..\src\YBehavior\fsm\machinemgr.cpp" />
     <ClCompile Include="..\src\YBehavior\fsm\machinestate.cpp" />
-    <ClCompile Include="..\src\YBehavior\fsm\machinetreemappingmgr.cpp" />
-    <ClCompile Include="..\src\YBehavior\fsm\machinetreemapping.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\behaviormgr.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\behavior.cpp" />
     <ClCompile Include="..\src\YBehavior\fsm\metastate.cpp" />
     <ClCompile Include="..\src\YBehavior\fsm\statemachine.cpp" />
     <ClCompile Include="..\src\YBehavior\fsm\transition.cpp" />
@@ -120,7 +119,6 @@
     <ClCompile Include="..\src\YBehavior\SharedVariableCreateHelper.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\common.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\objectpool.cpp" />
-    <ClCompile Include="..\src\YBehavior\behaviorid.cpp" />
     <ClCompile Include="..\src\YBehavior\treekeymgr.cpp" />
     <ClCompile Include="..\src\YBehavior\types.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />

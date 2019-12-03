@@ -1,7 +1,7 @@
 #include "YBehavior/fsm/machinestate.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
-#include "YBehavior/fsm/machinetreemapping.h"
+#include "YBehavior/fsm/behavior.h"
 #include "YBehavior/fsm/statemachine.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/behaviortree.h"
@@ -29,7 +29,6 @@ namespace YBehavior
 	MachineState::MachineState(const STRING& name, MachineStateType type)
 		: m_Name(name)
 		, m_Type(type)
-		, m_Identification(name)
 	{
 		m_UID = 0;
 	}
@@ -96,7 +95,7 @@ namespace YBehavior
 
 	MachineRunRes MachineState::_RunTree(AgentPtr pAgent)
 	{
-		BehaviorTree* pTree = pAgent->GetMachineContext()->GetMapping()->GetTree(m_UID);
+		BehaviorTree* pTree = pAgent->GetBehavior()->GetMappedTree(this);
 		if (pTree)
 		{
 			pAgent->GetMachineContext()->SetCurRunning(pTree);

@@ -43,6 +43,7 @@ namespace YBehavior
 	public:
 		Agent(Entity* entity);
 		~Agent();
+		inline Behavior* GetBehavior() { return m_Process.pBehavior; }
 		inline Memory* GetMemory() { return &m_Process.memory; }
 		inline MachineContext* GetMachineContext() { return &m_Process.machineContext; }
 		//inline SharedDataEx* GetSharedData() { return m_SharedData; }
@@ -52,7 +53,7 @@ namespace YBehavior
 		inline void SetEntity(Entity* entity) { m_Entity = entity; }
 		RegisterData* GetRegister();
 		//bool SetTree(const STRING& name, const std::vector<STRING>* subs = nullptr);
-		bool SetBehavior(const ProcessKey& key);
+		bool SetBehavior(const BehaviorKey& key);
 		//void UnloadTree();
 		void UnloadBehavior();
 		void Tick();
