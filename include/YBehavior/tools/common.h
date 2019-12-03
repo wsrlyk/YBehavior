@@ -11,7 +11,7 @@ namespace YBehavior
 	{
 	public:
 		void Rand();
-		void Append() { m_IndexList.push_back(m_IndexList.size()); }
+		void Append() { m_IndexList.push_back((int)m_IndexList.size()); }
 		void Set(int length);
 		void Clear();
 		int operator[] (int index);

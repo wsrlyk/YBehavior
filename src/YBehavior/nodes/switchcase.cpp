@@ -43,7 +43,7 @@ namespace YBehavior
 			current = m_RCContainer.GetRC()->Current;
 		}
 
-		INT size = m_CasesChilds.size();
+		INT size = (INT)m_CasesChilds.size();
 		BehaviorNodePtr targetNode = nullptr;
 		switch (current)
 		{

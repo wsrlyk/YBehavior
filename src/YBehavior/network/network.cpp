@@ -209,7 +209,7 @@ namespace YBehavior
 		{
 			ScopedLock lock(m_Mutex);
 
-			HalfWord halfword(text.size());
+			HalfWord halfword((INT)text.size());
 			ms_sendBuffer += halfword.ToString();
 			ms_sendBuffer += text;
 #ifdef PRINT_INTERMEDIATE_INFO

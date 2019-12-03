@@ -7,7 +7,7 @@ namespace YBehavior
 
 	void RandomIndex::Rand()
 	{
-		for (int i = m_IndexList.size() - 1; i > 0; --i)
+		for (int i = (int)m_IndexList.size() - 1; i > 0; --i)
 		{
 			int j = Utility::Rand(0, i + 1);
 			if (j == i)

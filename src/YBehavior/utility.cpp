@@ -151,7 +151,7 @@ namespace YBehavior
 
 	UINT Utility::Hash(const STRING& str)
 	{
-		UINT len = str.length();
+		UINT len = (UINT)str.length();
 		UINT hash = 0;
 		for (UINT i = 0; i < len; ++i)
 		{

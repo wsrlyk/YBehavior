@@ -10,7 +10,7 @@ namespace YBehavior
 		auto it = m_Map.find(cond);
 		if (it == m_Map.end())
 		{
-			int newValue = m_Map.size();
+			int newValue = (int)m_Map.size();
 			m_Map[cond] = newValue;
 			return newValue;
 		}
