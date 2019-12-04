@@ -12,6 +12,7 @@ namespace YBehavior
 	public:
 		virtual SharedDataEx* GetMainData() = 0;
 		virtual SharedDataEx* GetStackTop() = 0;
+		virtual ~IMemory() {}
 	};
 	class ISharedVariableEx
 	{

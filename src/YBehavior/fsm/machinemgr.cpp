@@ -7,6 +7,8 @@
 #include "YBehavior/fsm/metastate.h"
 #include "YBehavior/fsm/statemachine.h"
 #include "YBehavior/tools/common.h"
+#include <algorithm>
+#include <cstring>
 
 namespace YBehavior
 {
@@ -257,7 +259,6 @@ namespace YBehavior
 
 		bool bErr = false;
 		///> Start from 3. 1 for EntryState, and 2 for ExitState
-		int stateNum = 2;
 		for (auto it = data.begin(); it != data.end(); ++it)
 		{
 			if (strcmp(it->name(), "State") == 0)

@@ -65,7 +65,7 @@ namespace YBehavior
 	public:
 		MachineState();
 		MachineState(const STRING& name, MachineStateType type);
-		~MachineState();
+		virtual ~MachineState();
 		inline const STRING& GetName() const { return m_Name; }
 		inline void SetName(const STRING& name) { m_Name = name; }
 		inline UINT GetUID() const { return m_UID; }

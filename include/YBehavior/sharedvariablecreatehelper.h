@@ -12,6 +12,7 @@ namespace YBehavior
 	class ISharedVariableCreateHelper
 	{
 	public:
+		virtual ~ISharedVariableCreateHelper() {}
 		virtual ISharedVariableEx* CreateVariable() const = 0;
 		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) const = 0;
 		virtual bool TrySetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str, CHAR separator = '|') const = 0;
