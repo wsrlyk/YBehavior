@@ -221,12 +221,12 @@ namespace YBehavior
 		bool Get(KEY key, T& res);
 
 		template<typename T>
-		const T* Get(KEY key);
+		T* Get(KEY key);
 
-		const void* Get(KEY key, KEY typeKey)
+		void* Get(KEY key, KEY typeKey)
 		{
 			IDataArray* iarray = m_Datas[typeKey];
-			return (const void*)iarray->Get(key);
+			return (void*)iarray->Get(key);
 		}
 		STRING GetToString(KEY key, KEY typeKey)
 		{
@@ -289,11 +289,11 @@ namespace YBehavior
 		return parray->Get(key, res);
 	}
 	template<typename T>
-	const T* SharedDataEx::Get(KEY key)
+	T* SharedDataEx::Get(KEY key)
 	{
 		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
 		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return (const T*)parray->Get(key);
+		return (T*)parray->Get(key);
 	}
 
 	template<typename T>

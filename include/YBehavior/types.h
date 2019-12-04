@@ -268,7 +268,7 @@ namespace YBehavior
 	{
 		typedef std::tuple<NodePtr, STRING> NodeDesc;
 
-		struct key_hash : public std::unary_function<NodeDesc, std::size_t>
+		struct key_hash
 		{
 			std::size_t operator()(const NodeDesc& k) const
 			{
@@ -276,7 +276,7 @@ namespace YBehavior
 			}
 		};
 
-		struct key_equal : public std::binary_function<NodeDesc, NodeDesc, bool>
+		struct key_equal
 		{
 			bool operator()(const NodeDesc& v0, const NodeDesc& v1) const
 			{

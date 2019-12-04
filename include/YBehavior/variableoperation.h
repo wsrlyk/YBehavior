@@ -25,6 +25,27 @@ namespace YBehavior
 		OT_DIV
 	};
 
+	class IVariableOperationHelper;
+	struct TempObject
+	{
+		void* pData{ nullptr };
+		IVariableOperationHelper* pHelper{ nullptr };
+
+		TempObject(void* data, IVariableOperationHelper* helper)
+			: pData(data), pHelper(helper)
+		{}
+		TempObject(TempObject&& o)
+		{
+			pData = o.pData;
+			o.pData = nullptr;
+		}
+		~TempObject();
+
+	private:
+		TempObject(const TempObject& o) = delete;
+		TempObject& operator=(const TempObject& o) = delete;
+	};
+
 	class IVariableOperationHelper
 	{
 	public:
@@ -38,6 +59,7 @@ namespace YBehavior
 		virtual void Random(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1) = 0;
 		virtual void Set(void* pLeft, const void* pRight0) = 0;
 		virtual void* AllocData() = 0;
+		virtual TempObject AllocTempData() = 0;
 		virtual void RecycleData(void* pData) = 0;
 	};
 
@@ -340,10 +362,16 @@ namespace YBehavior
 			ValueHandler::Set<T>(pLeft, pRight0);
 		}
 
+		TempObject AllocTempData()
+		{
+			return TempObject(ObjectPool<T>::Get(), this);
+		}
+
 		void* AllocData()
 		{
 			return ObjectPool<T>::Get();
 		}
+
 		void RecycleData(void* pData)
 		{
 			if (pData != nullptr)
@@ -395,6 +423,11 @@ namespace YBehavior
 		void Set(void* pLeft, const void* pRight0)
 		{
 			ValueHandler::Set<StdVector<elementType>>(pLeft, pRight0);
+		}
+
+		TempObject AllocTempData()
+		{
+			return TempObject(ObjectPool<StdVector<elementType>>::Get(), this);
 		}
 
 		void* AllocData()

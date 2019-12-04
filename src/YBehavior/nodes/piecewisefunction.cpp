@@ -54,11 +54,11 @@ namespace YBehavior
 		///>								Instead, we calc pDeltaY * pOffsetX first
 		///>   y = y0 + pOffsetY
 
-		void* pDeltaX = pHelper->AllocData();
-		void* pDeltaY = pHelper->AllocData();
-		void* pOffsetX = pHelper->AllocData();
-		void* pDeltaYxpOffsetX = pHelper->AllocData();
-		void* pOffsetY = pHelper->AllocData();
+		auto deltaX = pHelper->AllocTempData();
+		auto deltaY = pHelper->AllocTempData();
+		auto offsetX = pHelper->AllocTempData();
+		auto deltaYxpOffsetX = pHelper->AllocTempData();
+		auto offsetY = pHelper->AllocTempData();
 
 		const void* x = m_InputX->GetValue(pAgent->GetMemory());
 		for (INT i = 0; i < sizeX - 1; ++i)
@@ -78,12 +78,12 @@ namespace YBehavior
 				continue;
 			}
 
-			pHelper->Calculate(pDeltaX, x1, x0, OT_SUB);
-			pHelper->Calculate(pOffsetX, x, x0, OT_SUB);
-			pHelper->Calculate(pDeltaY, y1, y0, OT_SUB);
-			pHelper->Calculate(pDeltaYxpOffsetX, pDeltaY, pOffsetX, OT_MUL);
-			pHelper->Calculate(pOffsetY, pDeltaYxpOffsetX, pDeltaX, OT_DIV);
-			const void* res = pHelper->Calculate(y0, pOffsetY, OT_ADD);
+			pHelper->Calculate(deltaX.pData, x1, x0, OT_SUB);
+			pHelper->Calculate(offsetX.pData, x, x0, OT_SUB);
+			pHelper->Calculate(deltaY.pData, y1, y0, OT_SUB);
+			pHelper->Calculate(deltaYxpOffsetX.pData, deltaY.pData, offsetX.pData, OT_MUL);
+			pHelper->Calculate(offsetY.pData, deltaYxpOffsetX.pData, deltaX.pData, OT_DIV);
+			const void* res = pHelper->Calculate(y0, offsetY.pData, OT_ADD);
 
 			m_OutputY->SetValue(pAgent->GetMemory(), res);
 			ns = NS_SUCCESS;
@@ -99,11 +99,7 @@ namespace YBehavior
 			//	return ns;
 			//}
 		}
-		pHelper->RecycleData(pDeltaX);
-		pHelper->RecycleData(pDeltaY);
-		pHelper->RecycleData(pOffsetX);
-		pHelper->RecycleData(pOffsetY);
-		pHelper->RecycleData(pDeltaYxpOffsetX);
+
 		//if (m_DefaultChild != nullptr)
 		//{
 		//	DEBUG_LOG_INFO("Switch to default; ");
