@@ -43,7 +43,6 @@ namespace YBehavior
 
 		IVariableOperationHelper* pHelper = m_Input->GetOperation();
 
-		const void* x0 = m_Distribution->GetElement(pAgent->GetMemory(), 0);
 		auto zero = pHelper->AllocTempData();
 
 		const void* input;
