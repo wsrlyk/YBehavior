@@ -1,10 +1,10 @@
 set(ProjectName Test)
-PROJECT(${ProjectName})
+#PROJECT(${ProjectName})
 
 INCLUDE_DIRECTORIES(../../include)
 
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
-list(REMOVE_ITEM DIR_SRCS ./main-reload.cpp ./main-benchmark.cpp)
+list(REMOVE_ITEM DIR_SRCS ./main.cpp ./main-benchmark.cpp ./main-statemachine.cpp)
 
 SET(CMAKE_CXX_COMPILER ${CompilerSetting})
 

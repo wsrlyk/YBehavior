@@ -298,12 +298,12 @@ namespace YBehavior
 
 	void Mutex::Lock()
 	{
-		int rval = pthread_mutex_lock(&_impl->_mutex);
+		pthread_mutex_lock(&_impl->_mutex);
 	}
 
 	void Mutex::Unlock()
 	{
-		int rval = pthread_mutex_unlock(&_impl->_mutex);
+		pthread_mutex_unlock(&_impl->_mutex);
 	}
 }
 

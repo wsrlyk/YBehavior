@@ -13,7 +13,7 @@ namespace YBehavior
 			return false;
 		}
 
-		TYPEID typeID = CreateVariable(m_Length, "Length", data, Utility::POINTER_CHAR);
+		CreateVariable(m_Length, "Length", data, Utility::POINTER_CHAR);
 		if (!m_Length)
 		{
 			return false;

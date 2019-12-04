@@ -35,7 +35,7 @@ public:
 		//this->GetSharedData()->Set<YBehavior::BOOL>(isfighting, YBehavior::Utility::FALSE_VALUE);
 		//this->GetSharedData()->Set<YBehavior::FLOAT>(heartrate, 2);
 
-		YBehavior::KEY f = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::FLOAT>("f");
+		/*YBehavior::KEY f = */YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::FLOAT>("f");
 		fftest = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::VecFloat>("fftest");
 	}
 

@@ -21,7 +21,7 @@ namespace YBehavior
 		EntityWrapper* m_Wrapper;
 	public:
 		Entity();
-		~Entity();
+		virtual ~Entity();
 		const EntityWrapper& GetWrapper();
 		virtual STRING ToString() const;
 	};
@@ -42,7 +42,7 @@ namespace YBehavior
 		std::stack<RunningContext*> m_RunningContexts;
 	public:
 		Agent(Entity* entity);
-		~Agent();
+		virtual ~Agent();
 		inline Behavior* GetBehavior() { return m_Process.pBehavior; }
 		inline Memory* GetMemory() { return &m_Process.memory; }
 		inline MachineContext* GetMachineContext() { return &m_Process.machineContext; }

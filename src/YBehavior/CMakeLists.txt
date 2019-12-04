@@ -1,5 +1,5 @@
 set(ProjectName YBehavior)  
-PROJECT(${ProjectName})  
+#PROJECT(${ProjectName})  
   
 INCLUDE_DIRECTORIES(../../include)  
   
@@ -8,6 +8,7 @@ AUX_SOURCE_DIRECTORY(./nodes DIR_SRCS)
 AUX_SOURCE_DIRECTORY(./3rd/pugixml DIR_SRCS)  
 AUX_SOURCE_DIRECTORY(./tools DIR_SRCS)  
 AUX_SOURCE_DIRECTORY(./network DIR_SRCS)  
+AUX_SOURCE_DIRECTORY(./fsm DIR_SRCS)  
 
 #SET(CMAKE_CXX_COMPILER ${CompilerSetting})  
   

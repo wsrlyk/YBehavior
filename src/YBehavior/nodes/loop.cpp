@@ -90,7 +90,7 @@ namespace YBehavior
 
 	bool For::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
+		CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
 		if (!m_ExitWhenFailure)
 		{
 			return false;
@@ -214,7 +214,7 @@ namespace YBehavior
 			return false;
 		}
 
-		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
+		CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
 		if (!m_ExitWhenFailure)
 		{
 			return false;
@@ -229,18 +229,18 @@ namespace YBehavior
 
 	bool Loop::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID type = CreateVariable(m_Current, "Current", data);
+		CreateVariable(m_Current, "Current", data);
 		if (!m_Current)
 		{
 			return false;
 		}
-		type = CreateVariable(m_Count, "Count", data);
+		CreateVariable(m_Count, "Count", data);
 		if (!m_Count)
 		{
 			return false;
 		}
 
-		type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
+		CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
 		if (!m_ExitWhenFailure)
 		{
 			return false;
