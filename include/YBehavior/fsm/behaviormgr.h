@@ -16,7 +16,7 @@
 
 namespace YBehavior
 {
-	typedef typename VersionMgr<Behavior, UINT> BehaviorVersionMgrType;
+	typedef VersionMgr<Behavior, UINT> BehaviorVersionMgrType;
 	typedef typename BehaviorVersionMgrType::InfoType BehaviorInfoType;
 	typedef typename BehaviorVersionMgrType::InfoType::VersionType BehaviorVersionType;
 

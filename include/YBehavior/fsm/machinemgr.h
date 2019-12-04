@@ -21,7 +21,7 @@ namespace pugi
 
 namespace YBehavior
 {
-	typedef typename VersionMgr<FSM, STRING> MachineVersionMgrType;
+	typedef VersionMgr<FSM, STRING> MachineVersionMgrType;
 	typedef typename MachineVersionMgrType::InfoType MachineInfoType;
 	typedef typename MachineVersionMgrType::InfoType::VersionType MachineVersionType;
 

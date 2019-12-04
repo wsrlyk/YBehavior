@@ -4,6 +4,7 @@
 #include "YBehavior/define.h"
 #include "YBehavior/types.h"
 #include <unordered_map>
+#include <iostream>
 
 namespace YBehavior
 {

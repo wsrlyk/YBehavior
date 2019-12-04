@@ -30,7 +30,7 @@ namespace YBehavior
 		inline MachineState* GetEntry() { return m_EntryState; }
 		inline MachineState* GetExit() { return m_ExitState; }
 		inline UINT GetLevel() const { return m_Level; }
-		inline UINT SetLevel(UINT level) { m_Level = level; }
+		inline void SetLevel(UINT level) { m_Level = level; }
 		virtual UINT GetUIDOffset() const { return 4; }///> Entry, Exit, Any, Upper;    to keep step with Editor
 		void SetMetaState(MetaState* pState);
 		inline MetaState* GetMetaState() const { return m_pMetaState; }
