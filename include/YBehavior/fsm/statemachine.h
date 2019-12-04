@@ -26,7 +26,7 @@ namespace YBehavior
 		MetaState* m_pMetaState;
 	public:
 		StateMachine(UINT uid, UINT level);
-		~StateMachine();
+		virtual ~StateMachine();
 		inline MachineState* GetEntry() { return m_EntryState; }
 		inline MachineState* GetExit() { return m_ExitState; }
 		inline UINT GetLevel() const { return m_Level; }

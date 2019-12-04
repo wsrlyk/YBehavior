@@ -8,6 +8,7 @@
 #ifdef DEBUGGER
 #include "YBehavior/debugger.h"
 #endif
+#include <algorithm>
 
 namespace YBehavior
 {
@@ -213,10 +214,8 @@ namespace YBehavior
 		std::list<StateMachine*>* pDeeperRoute;
 		std::list<StateMachine*>* pShallowerRoute;
 
-		bool bFromIsDeeper = false;
 		if (pFrom->GetParentMachine()->GetLevel() > pTo->GetParentMachine()->GetLevel())
 		{
-			bFromIsDeeper = true;
 			pDeeper = pFrom->GetParentMachine();
 			pShallower = pTo->GetParentMachine();
 
