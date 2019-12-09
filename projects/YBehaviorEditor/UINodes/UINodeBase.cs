@@ -122,6 +122,21 @@ namespace YBehavior.Editor
         }
 
 
+        public static readonly DependencyProperty SelectTriggerProperty =
+            DependencyProperty.Register("SelectTrigger",
+            typeof(bool), typeof(UINodeBase<NodeType, NodeRendererType>), new FrameworkPropertyMetadata(SelectTrigger_PropertyChanged));
+        private static void SelectTrigger_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            UINodeBase<NodeType, NodeRendererType> c = (UINodeBase<NodeType, NodeRendererType>)d;
+            c.SelectHandler(c, true);
+        }
+        public bool SelectTrigger
+        {
+            get { return (bool)GetValue(SelectTriggerProperty); }
+            set { SetValue(SelectTriggerProperty, value); }
+        }
+
+
         Storyboard m_InstantAnim;
 
         public void SetDebugInstant(NodeState state = NodeState.NS_INVALID)

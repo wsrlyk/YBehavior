@@ -238,6 +238,16 @@ namespace YBehavior.Editor.Core.New
                 OnPropertyChanged("DebugTrigger");
             }
         }
+        private bool m_bSelectTrigger;
+        public bool SelectTrigger
+        {
+            get { return m_bSelectTrigger; }
+            set
+            {
+                m_bSelectTrigger = value;
+                OnPropertyChanged("SelectTrigger");
+            }
+        }
 
         public NodeState RunState { get { return DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(m_Owner.UID) : NodeState.NS_INVALID; } }
 

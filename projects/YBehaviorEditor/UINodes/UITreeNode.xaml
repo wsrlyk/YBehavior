@@ -9,6 +9,7 @@
     <UserControl.Style>
         <Style>
             <Setter Property="local:UITreeNode.DebugTrigger" Value="{Binding Path=DebugTrigger}" />
+            <Setter Property="local:UITreeNode.SelectTrigger" Value="{Binding Path=SelectTrigger}" />
             <!--<Setter Property="local:UINode.DebugConstant" Value="{Binding Path=DebugConstant}" />-->
         </Style>
     </UserControl.Style>

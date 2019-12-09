@@ -112,5 +112,10 @@ namespace YBehavior.Editor
         {
             MainWindow.ProcessKeyDown(Key.F7, ModifierKeys.None);
         }
+
+        private void btnSearch_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.ProcessKeyDown(Key.F, ModifierKeys.Control);
+        }
     }
 }

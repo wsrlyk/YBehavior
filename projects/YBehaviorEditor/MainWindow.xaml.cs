@@ -110,6 +110,13 @@ namespace YBehavior.Editor
                         WorkBenchMgr.Instance.TrySaveAndExport();
                     }
                     break;
+                case Key.F:
+                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
+                    {
+                        SearchFrame searchFrame = (App.Current.MainWindow as MainWindow).SearchFrame;
+                        searchFrame.Visibility = searchFrame.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+                    }
+                    break;
                 case Key.F9:
                     SelectionMgr.Instance.TryToggleBreakPoint();
                     break;

@@ -163,6 +163,7 @@ namespace YBehavior.Editor.Core.New
     public class MakeCenterArg : EventArg
     {
         public override EventType Type => EventType.MakeCenter;
+        public NodeBaseRenderer Target { get; set; }
     }
 
     public class PopMenuArg : EventArg

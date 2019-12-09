@@ -151,30 +151,63 @@ namespace YBehavior.Editor
             if (m_CurPageData == null)
                 return;
 
-            m_MakingCenterDes.X = 0;
-            m_MakingCenterDes.Y = 0;
+            MakeCenterArg oArg = arg as MakeCenterArg;
+            if (oArg.Target == null)
+            {
+                m_MakingCenterDes.X = 0;
+                m_MakingCenterDes.Y = 0;
 
-            CompositionTarget.Rendering -= MakingCenter;
-            CompositionTarget.Rendering += MakingCenter;
+                CompositionTarget.Rendering -= AutoMakingCenter;
+                CompositionTarget.Rendering += AutoMakingCenter;
+            }
+            else
+            {
+                Vector halfcanvas = new Vector(this.GetCanvasBoard.ActualWidth / 2, this.GetCanvasBoard.ActualHeight / 2);
+                Point curPos = new Point(0, 0) + halfcanvas;
+                double nodesScale = m_CurPageData.ScaleTransform.ScaleX;
+                Point pos = new Vector(-oArg.Target.Owner.Geo.Pos.X * nodesScale, -oArg.Target.Owner.Geo.Pos.Y * nodesScale) + curPos;
+                m_MakingCenterDes = pos;
+
+                CompositionTarget.Rendering -= ManualMakingCenter;
+                CompositionTarget.Rendering += ManualMakingCenter;
+            }
         }
 
         Point m_MakingCenterDes;
-        private void MakingCenter(object sender, EventArgs e)
+        private void ManualMakingCenter(object sender, EventArgs e)
+        {
+            if (m_CurPageData == null)
+                return;
+
+            if (_MakingCenter())
+            {
+                CompositionTarget.Rendering -= ManualMakingCenter;
+            }
+        }
+
+        private void AutoMakingCenter(object sender, EventArgs e)
         {
             if (m_CurPageData == null)
                 return;
 
             Point newDes = new Point();
-            if (_MakeCenter(ref newDes))
+            if (_FindCenterPos(ref newDes))
             {
                 m_MakingCenterDes = newDes;
             }
 
+            if (_MakingCenter())
+            {
+                CompositionTarget.Rendering -= AutoMakingCenter;
+            }
+        }
+
+        bool _MakingCenter()
+        {
             Point curPos = new Point(m_CurPageData.TranslateTransform.X, m_CurPageData.TranslateTransform.Y);
             if ((curPos - m_MakingCenterDes).LengthSquared < 1)
             {
-                CompositionTarget.Rendering -= MakingCenter;
-                return;
+                return true;
             }
 
             Vector delta = m_MakingCenterDes - curPos;
@@ -182,13 +215,15 @@ namespace YBehavior.Editor
             double speed = 30.0;
             if (sqrLength > speed * speed)
             {
-                delta = delta / Math.Sqrt(sqrLength) * speed;
+                delta = delta / 4;
             }
             m_CurPageData.TranslateTransform.X += delta.X;
             m_CurPageData.TranslateTransform.Y += delta.Y;
+
+            return false;
         }
 
-        bool _MakeCenter(ref Point newDes)
+        bool _FindCenterPos(ref Point newDes)
         {
             Vector halfcanvas = new Vector(this.GetCanvasBoard.ActualWidth / 2, this.GetCanvasBoard.ActualHeight / 2);
             Point curPos = new Point(0, 0) + halfcanvas;

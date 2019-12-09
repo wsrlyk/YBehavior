@@ -25,6 +25,9 @@
         <Button Name="btnDelete" Width="50" Click="btnDelete_Click">
             <TextBlock Text ="Delete&#x0a;Delete&#x0a;(shift)" HorizontalAlignment="Center"/>
         </Button>
+        <Button Name="btnSearch" Width="50" Click="btnSearch_Click">
+            <TextBlock Text ="Search&#x0a; Ctrl-F"/>
+        </Button>
         <Button Name="btnCenter" Width="50" Click="btnCenter_Click">
             <TextBlock Text ="Center&#x0a;    F1"/>
         </Button>
