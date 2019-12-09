@@ -15,7 +15,8 @@ namespace YBehavior
 		GetTypeID<Bool>(),
 		GetTypeID<String>(),
 		GetTypeID<Vector3>(),
-		GetTypeID<Uint64>()
+		GetTypeID<Uint64>(),
+		GetTypeID<EntityWrapper>()
 	};
 
 	bool Comparer::OnLoaded(const pugi::xml_node& data)
