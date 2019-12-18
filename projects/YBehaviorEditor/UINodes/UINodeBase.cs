@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using YBehavior.Editor.Core.New;
@@ -12,7 +13,7 @@ namespace YBehavior.Editor
     /// BehaviorNode.xaml 的交互逻辑
     /// </summary>
     
-    public abstract class UINodeBase<NodeType, NodeRendererType>: YUserControl where NodeRendererType: NodeBaseRenderer where NodeType : NodeBase
+    public abstract class UINodeBase<NodeType, NodeRendererType>: DebugControl<UINodeBase<NodeType, NodeRendererType>> where NodeRendererType: NodeBaseRenderer where NodeType : NodeBase
     {
         static protected SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
@@ -24,9 +25,8 @@ namespace YBehavior.Editor
         public abstract FrameworkElement SelectCoverUI { get; }
         public abstract Brush OutlookBrush { get; set; }
         public abstract FrameworkElement CommentUI { get; }
-        public abstract FrameworkElement DebugUI { get; }
-        public abstract Brush DebugBrush { get; set; }
 
+        public override NodeState RunState => Node.Renderer.RunState;
         protected Operation m_Operation;
 
         protected Dictionary<string, UIConnector> m_uiConnectors = new Dictionary<string, UIConnector>();
@@ -48,6 +48,12 @@ namespace YBehavior.Editor
             m_InstantAnim = Application.Current.Resources["InstantShowAnim"] as Storyboard;
 
             this.DataContextChanged += _DataContextChangedEventHandler;
+
+            this.SetBinding(DebugTriggerProperty, new Binding()
+            {
+                Path = new PropertyPath("DebugTrigger"),
+                Mode = BindingMode.OneWay,
+            });
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
@@ -104,23 +110,6 @@ namespace YBehavior.Editor
             }
         }
 
-        public static readonly DependencyProperty DebugTriggerProperty =
-            DependencyProperty.Register("DebugTrigger",
-            typeof(bool), typeof(UINodeBase<NodeType, NodeRendererType>), new FrameworkPropertyMetadata(DebugTrigger_PropertyChanged));
-        private static void DebugTrigger_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            UINodeBase<NodeType, NodeRendererType> c = (UINodeBase<NodeType, NodeRendererType>)d;
-            if (DebugMgr.Instance.bBreaked)
-                c.SetDebug(c.Node.Renderer.RunState);
-            else
-                c.SetDebugInstant(c.Node.Renderer.RunState);
-        }
-        public bool DebugTrigger
-        {
-            get { return (bool)GetValue(DebugTriggerProperty); }
-            set { SetValue(DebugTriggerProperty, value); }
-        }
-
 
         public static readonly DependencyProperty SelectTriggerProperty =
             DependencyProperty.Register("SelectTrigger",
@@ -138,74 +127,7 @@ namespace YBehavior.Editor
 
 
         Storyboard m_InstantAnim;
-
-        public void SetDebugInstant(NodeState state = NodeState.NS_INVALID)
-        {
-            this.DebugUI.Visibility = Visibility.Collapsed;
-            if (state == NodeState.NS_INVALID)
-            {
-                m_InstantAnim.Remove(DebugUI);
-            }
-            else
-            {
-                Brush bgBrush;
-                switch (state)
-                {
-                    case NodeState.NS_SUCCESS:
-                        bgBrush = new SolidColorBrush(Colors.LightGreen);
-                        break;
-                    case NodeState.NS_FAILURE:
-                        bgBrush = new SolidColorBrush(Colors.LightBlue);
-                        break;
-                    case NodeState.NS_RUNNING:
-                        bgBrush = new SolidColorBrush(Colors.LightPink);
-                        break;
-                    case NodeState.NS_BREAK:
-                        bgBrush = new SolidColorBrush(Colors.DarkRed);
-                        break;
-                    default:
-                        bgBrush = new SolidColorBrush(Colors.Red);
-                        break;
-                }
-                this.DebugBrush = bgBrush;
-
-                m_InstantAnim.Begin(this.DebugUI, true);
-            }
-        }
-
-        public void SetDebug(NodeState state = NodeState.NS_INVALID)
-        {
-            m_InstantAnim.Remove(DebugUI);
-            if (state == NodeState.NS_INVALID)
-            {
-                this.DebugUI.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                Brush bgBrush;
-                switch (state)
-                {
-                    case NodeState.NS_SUCCESS:
-                        bgBrush = new SolidColorBrush(Colors.LightGreen);
-                        break;
-                    case NodeState.NS_FAILURE:
-                        bgBrush = new SolidColorBrush(Colors.LightBlue);
-                        break;
-                    case NodeState.NS_RUNNING:
-                        bgBrush = new SolidColorBrush(Colors.LightPink);
-                        break;
-                    case NodeState.NS_BREAK:
-                        bgBrush = new SolidColorBrush(Colors.DarkRed);
-                        break;
-                    default:
-                        bgBrush = new SolidColorBrush(Colors.Red);
-                        break;
-                }
-                this.DebugBrush = bgBrush;
-
-                this.DebugUI.Visibility = Visibility.Visible;
-            }
-        }
+        public override Storyboard InstantAnim { get { return m_InstantAnim; } }
 
         void _OnClick()
         {

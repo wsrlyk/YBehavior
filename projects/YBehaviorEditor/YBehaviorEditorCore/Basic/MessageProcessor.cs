@@ -308,7 +308,7 @@ namespace YBehavior.Editor.Core.New
                     foreach (string s in runInfos)
                     {
                         string[] strR = s.Split(msgSequenceSplitter);
-                        if (strR.Length != 2)
+                        if (strR.Length != 3)
                             continue;
 
                         runInfo.info[uint.Parse(strR[0])] = int.Parse(strR[1]);
@@ -345,10 +345,14 @@ namespace YBehavior.Editor.Core.New
                         foreach (string s in runInfos)
                         {
                             string[] strR = s.Split(msgSequenceSplitter);
-                            if (strR.Length != 2)
+                            if (strR.Length != 3)
                                 continue;
 
-                            runInfo.info[uint.Parse(strR[0])] = int.Parse(strR[1]);
+                            runInfo.info[uint.Parse(strR[0])] = new TreeRunInfo.ResultState()
+                            {
+                                Self = int.Parse(strR[1]),
+                                Final = int.Parse(strR[2]),
+                            };
                         }
                     }
                 }

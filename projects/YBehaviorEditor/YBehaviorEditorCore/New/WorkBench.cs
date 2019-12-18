@@ -165,6 +165,18 @@ namespace YBehavior.Editor.Core.New
             return m_ExportFileHash;
         }
 
+        public void RefreshDebug()
+        {
+            foreach (var node in NodeList.Collection)
+            {
+                node.RefreshDebug();
+            }
+            foreach (var conn in ConnectionList.Collection)
+            {
+                conn.RefreshDebug();
+            }
+        }
+
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         internal protected void OnPropertyChanged(string propertyName)
         {

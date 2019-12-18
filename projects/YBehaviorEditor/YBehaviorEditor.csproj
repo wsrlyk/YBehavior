@@ -63,6 +63,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DebugControl.cs" />
     <Compile Include="DebugFrame.xaml.cs">
       <DependentUpon>DebugFrame.xaml</DependentUpon>
     </Compile>

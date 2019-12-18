@@ -28,6 +28,9 @@ namespace YBehavior.Editor.Core.New
         public WorkBenchMgr()
         {
             EventMgr.Instance.Register(EventType.NodeMoved, _NodeMoved);
+            EventMgr.Instance.Register(EventType.TickResult, _OnTickResult);
+            EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
         }
 
         public void ConnectNodes(Connector ctr0, Connector ctr1)
@@ -100,6 +103,22 @@ namespace YBehavior.Editor.Core.New
         {
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.OnNodeMoved(arg);
+        }
+        private void _OnTickResult(EventArg arg)
+        {
+            if (DebugMgr.Instance.IsDebugging() && m_ActiveWorkBench != null)
+            {
+                TickResultArg oArg = arg as TickResultArg;
+                if (oArg.Token == NetworkMgr.Instance.MessageProcessor.TickResultToken)
+                {
+                    m_ActiveWorkBench.RefreshDebug();
+                }
+            }
+        }
+        private void _OnDebugTargetChanged(EventArg arg)
+        {
+            if (DebugMgr.Instance.IsDebugging() && m_ActiveWorkBench != null)
+                m_ActiveWorkBench.RefreshDebug();
         }
 
         public bool Switch(WorkBench target)
@@ -540,11 +559,14 @@ namespace YBehavior.Editor.Core.New
             {
                 System.IO.FileInfo file = null;
                 if (info.Type == GraphType.TREE)
-                    file = new System.IO.FileInfo(Config.Instance.WorkingDir + info.Name + ".xml");
+                    file = new System.IO.FileInfo(Config.Instance.WorkingDir + info.Name + ".tree");
                 else
                     file = new System.IO.FileInfo(Config.Instance.WorkingDir + info.Name + ".fsm");
                 if (!file.Exists)
+                {
+                    LogMgr.Instance.Error("File not exists: " + file.FullName);
                     continue;
+                }
 
                 FileMgr.FileInfo fileInfo = FileMgr.Instance.GetFileInfo(file.FullName);
                 WorkBench newBench = OpenWorkBenchInBackGround(fileInfo);

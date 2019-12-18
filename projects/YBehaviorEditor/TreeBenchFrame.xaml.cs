@@ -64,38 +64,5 @@ namespace YBehavior.Editor
                 this.connectionLayer.ItemsSource = null;
             }
         }
-
-        protected override void _OnTickResult(EventArg arg)
-        {
-            if (DebugMgr.Instance.IsDebugging())
-            {
-                TickResultArg oArg = arg as TickResultArg;
-
-                _RefreshMainTreeDebug(oArg.Token);
-                //this.nodeLayer.Dispatcher.BeginInvoke(new Action<bool, uint>(_RefreshMainTreeDebug), oArg.bInstant, oArg.Token);
-            }
-        }
-
-        void _RefreshMainTreeDebug(uint token)
-        {
-            if (token != NetworkMgr.Instance.MessageProcessor.TickResultToken)
-            {
-                return;
-            }
-
-            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            if (bench is TreeBench)
-                (bench as TreeBench).Tree.Root.Renderer.RefreshDebug();
-        }
-
-        protected override void _OnDebugTargetChanged(EventArg arg)
-        {
-            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            if (bench != null)
-            {
-                if (bench is TreeBench)
-                    (bench as TreeBench).Tree.Root.Renderer.RefreshDebug();
-            }
-        }
     }
 }

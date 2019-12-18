@@ -16,7 +16,9 @@ namespace YBehavior
 	{
 		STRING str;
 		std::stringstream ss;
-		ss << nodeUID << IDebugHelper::s_SequenceSpliter << finalRunState;
+		ss << nodeUID << IDebugHelper::s_SequenceSpliter
+			<< rawRunState << IDebugHelper::s_SequenceSpliter
+			<< finalRunState;
 		ss >> str;
 		return str;
 	}

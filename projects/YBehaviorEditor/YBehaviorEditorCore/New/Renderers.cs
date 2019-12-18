@@ -76,6 +76,28 @@ namespace YBehavior.Editor.Core.New
             ChildConnectorGeo = null;
             m_bIsValid = false;
         }
+
+        public NodeState RunState { get { return DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(Owner.Ctr.To.Owner.UID, false) : NodeState.NS_INVALID; } }
+
+        public void RefreshDebug()
+        {
+            DebugTrigger = !DebugTrigger;
+        }
+
+        /// <summary>
+        /// Only a trigger to UI, meaningless
+        /// </summary>
+        private bool m_bDebugTrigger;
+        public bool DebugTrigger
+        {
+            get { return m_bDebugTrigger; }
+            set
+            {
+                m_bDebugTrigger = value;
+                OnPropertyChanged("DebugTrigger");
+            }
+        }
+
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         internal protected void OnPropertyChanged(string propertyName)
         {
@@ -219,10 +241,10 @@ namespace YBehavior.Editor.Core.New
         {
             DebugTrigger = !DebugTrigger;
 
-            foreach (NodeBase child in m_Owner.Conns)
-            {
-                child.Renderer.RefreshDebug();
-            }
+            //foreach (NodeBase child in m_Owner.Conns)
+            //{
+            //    child.Renderer.RefreshDebug();
+            //}
         }
 
         /// <summary>
@@ -249,7 +271,7 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        public NodeState RunState { get { return DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(m_Owner.UID) : NodeState.NS_INVALID; } }
+        public NodeState RunState { get { return DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(m_Owner.UID, true) : NodeState.NS_INVALID; } }
 
         int m_DragParam = -1;
         public void DragMain(Vector delta, int param)

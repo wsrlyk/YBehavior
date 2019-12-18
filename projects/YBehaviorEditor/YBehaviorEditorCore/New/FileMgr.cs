@@ -116,7 +116,7 @@ namespace YBehavior.Editor.Core.New
         }
         public FileInfo GetFileInfo(string path)
         {
-            if (m_FileDic.TryGetValue(path.ToLower(), out FileInfo info))
+            if (m_FileDic.TryGetValue(path.Replace("\\", "/").ToLower(), out FileInfo info))
                 return info;
             return null;
         }

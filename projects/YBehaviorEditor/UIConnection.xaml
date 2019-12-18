@@ -1,4 +1,4 @@
-﻿<local:YUserControl x:Class="YBehavior.Editor.UIConnection"
+﻿<local:UIConnectionBase x:Class="YBehavior.Editor.UIConnection"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,15 +6,28 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              >
-    <Path Name="path" Stroke="#FFDADCE4" StrokeThickness="5" Fill="#FFE1E3E8">
-        <Path.Data>
-            <PathGeometry>
-                <PathFigure IsFilled="False" StartPoint="{Binding ParentPos, Mode=OneWay}"  IsClosed="False">
-                    <LineSegment Point="{Binding FirstCorner, Mode=OneWay}" />
-                    <LineSegment Point="{Binding SecondCorner, Mode=OneWay}" />
-                    <LineSegment Point="{Binding ChildPos, Mode=OneWay}" />
-                </PathFigure>
-            </PathGeometry>
-        </Path.Data>
-    </Path>
-</local:YUserControl>
+    <Grid>
+        <Path Name="path" Stroke="#FFDADCE4" StrokeThickness="5" Fill="#FFE1E3E8">
+            <Path.Data>
+                <PathGeometry>
+                    <PathFigure IsFilled="False" StartPoint="{Binding ParentPos, Mode=OneWay}"  IsClosed="False">
+                        <LineSegment Point="{Binding FirstCorner, Mode=OneWay}" />
+                        <LineSegment Point="{Binding SecondCorner, Mode=OneWay}" />
+                        <LineSegment Point="{Binding ChildPos, Mode=OneWay}" />
+                    </PathFigure>
+                </PathGeometry>
+            </Path.Data>
+        </Path>
+        <Path Name="debug" Stroke="#FFDADCE4" StrokeThickness="5" Fill="#FFE1E3E8" Visibility="Collapsed">
+            <Path.Data>
+                <PathGeometry>
+                    <PathFigure IsFilled="False" StartPoint="{Binding ParentPos, Mode=OneWay}"  IsClosed="False">
+                        <LineSegment Point="{Binding FirstCorner, Mode=OneWay}" />
+                        <LineSegment Point="{Binding SecondCorner, Mode=OneWay}" />
+                        <LineSegment Point="{Binding ChildPos, Mode=OneWay}" />
+                    </PathFigure>
+                </PathGeometry>
+            </Path.Data>
+        </Path>
+    </Grid>
+</local:UIConnectionBase>

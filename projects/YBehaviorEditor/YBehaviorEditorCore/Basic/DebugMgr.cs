@@ -25,7 +25,12 @@ namespace YBehavior.Editor.Core.New
 
     public class TreeRunInfo
     {
-        public Dictionary<uint, int> info = new Dictionary<uint, int>();
+        public struct ResultState
+        {
+            public int Self;
+            public int Final;
+        }
+        public Dictionary<uint, ResultState> info = new Dictionary<uint, ResultState>();
         public string treeName;
         public TreeMemory sharedData;
 
@@ -73,7 +78,7 @@ namespace YBehavior.Editor.Core.New
 
         public FSMRunInfo FSMRunInfo { get; } = new FSMRunInfo();
 
-        public NodeState GetRunState(uint uid)
+        public NodeState GetRunState(uint uid, bool self)
         {
             WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
             if (bench == null)
@@ -83,9 +88,9 @@ namespace YBehavior.Editor.Core.New
             {
                 if (m_RunInfo.TryGetValue(bench.FileInfo.Name, out TreeRunInfo runInfo))
                 {
-                    if (runInfo.info.TryGetValue(uid, out int state))
+                    if (runInfo.info.TryGetValue(uid, out var state))
                     {
-                        return (NodeState)state;
+                        return self ? (NodeState)state.Self : (NodeState)state.Final;
                     }
                 }
             }

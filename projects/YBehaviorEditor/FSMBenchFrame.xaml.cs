@@ -72,46 +72,6 @@ namespace YBehavior.Editor
             }
         }
 
-        protected override void _OnTickResult(EventArg arg)
-        {
-            if (DebugMgr.Instance.IsDebugging())
-            {
-                TickResultArg oArg = arg as TickResultArg;
-
-                _RefreshMainFSMDebug(oArg.Token);
-                //this.nodeLayer.Dispatcher.BeginInvoke(new Action<bool, uint>(_RefreshMainTreeDebug), oArg.bInstant, oArg.Token);
-            }
-        }
-
-        void _RefreshMainFSMDebug(uint token)
-        {
-            if (token != NetworkMgr.Instance.MessageProcessor.TickResultToken)
-            {
-                return;
-            }
-
-            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            if (bench != null && bench is FSMBench)
-            {
-                _RefreshDebug((bench as FSMBench).CurMachine);
-            }
-        }
-
-        protected override void _OnDebugTargetChanged(EventArg arg)
-        {
-            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            if (bench != null && bench is FSMBench)
-            {
-                _RefreshDebug((bench as FSMBench).CurMachine);
-            }
-        }
-
-        void _RefreshDebug(FSMMachineNode machine)
-        {
-            foreach (FSMStateNode state in machine.States)
-                state.Renderer.DebugTrigger = !state.Renderer.DebugTrigger;
-        }
-
         private void OnMachineStackItemClicked(object sender, RoutedEventArgs e)
         {
             FSMMachineNode node = (sender as Button).DataContext as FSMMachineNode;

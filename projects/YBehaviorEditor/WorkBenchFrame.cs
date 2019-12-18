@@ -29,9 +29,7 @@ namespace YBehavior.Editor
         public void Enable()
         {
             EventMgr.Instance.Register(EventType.NewNodeAdded, _OnNewNodeAdded);
-            EventMgr.Instance.Register(EventType.TickResult, _OnTickResult);
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
-            EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.CommentCreated, _OnCommentCreated);
             EventMgr.Instance.Register(EventType.MakeCenter, _OnMakeCenter);
             Focus();
@@ -40,9 +38,7 @@ namespace YBehavior.Editor
         public void Disable()
         {
             EventMgr.Instance.Unregister(EventType.NewNodeAdded, _OnNewNodeAdded);
-            EventMgr.Instance.Unregister(EventType.TickResult, _OnTickResult);
             EventMgr.Instance.Unregister(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
-            EventMgr.Instance.Unregister(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Unregister(EventType.CommentCreated, _OnCommentCreated);
             EventMgr.Instance.Unregister(EventType.MakeCenter, _OnMakeCenter);
         }

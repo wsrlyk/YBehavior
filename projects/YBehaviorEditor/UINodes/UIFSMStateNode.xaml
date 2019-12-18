@@ -8,8 +8,8 @@
              MinWidth="60" MinHeight="80" HorizontalAlignment="Center">
     <UserControl.Style>
         <Style>
-            <Setter Property="local:UIFSMStateNode.DebugTrigger" Value="{Binding Path=DebugTrigger}" />
             <Setter Property="local:UIFSMStateNode.SelectTrigger" Value="{Binding Path=SelectTrigger}" />
+            <!--<Setter Property="local:UIFSMStateNode.DebugTrigger" Value="{Binding Path=DebugTrigger}" />-->
             <!--<Setter Property="local:UINode.DebugConstant" Value="{Binding Path=DebugConstant}" />-->
         </Style>
     </UserControl.Style>
