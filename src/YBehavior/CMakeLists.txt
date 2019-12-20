@@ -1,5 +1,4 @@
 set(ProjectName YBehavior)  
-#PROJECT(${ProjectName})  
   
 INCLUDE_DIRECTORIES(../../include)  
   
@@ -10,19 +9,7 @@ AUX_SOURCE_DIRECTORY(./tools DIR_SRCS)
 AUX_SOURCE_DIRECTORY(./network DIR_SRCS)  
 AUX_SOURCE_DIRECTORY(./fsm DIR_SRCS)  
 
-#SET(CMAKE_CXX_COMPILER ${CompilerSetting})  
-  
-IF ($ENV{Configuration} STREQUAL Debug)  
-    SET(CMAKE_BUILD_TYPE Debug)  
-ELSE()  
-    SET(CMAKE_BUILD_TYPE Release)  
-ENDIF()  
-
 SET(LIBRARY_OUTPUT_PATH ../lib/) 
-ADD_DEFINITIONS(-DDEBUGGER)  
-LINK_DIRECTORIES(${LINK_LIBPATH})  
   
-#ADD_EXECUTABLE(${ProjectName} ${DIR_SRCS})    
-#TARGET_LINK_LIBRARIES ( ${ProjectName} pthread) 
 ADD_LIBRARY(${PROJECT_NAME} STATIC ${DIR_SRCS})
 

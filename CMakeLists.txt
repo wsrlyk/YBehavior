@@ -2,13 +2,16 @@ PROJECT(YBehavior)
   
 cmake_minimum_required(VERSION 2.8)  
   
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++17")  
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -std=c++17")
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -g")
+SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2 -g")
 
-SET(ENV{Platform} x64)  
-SET(ENV{Configuration} Debug)  
- 
 SET(EXECUTABLE_OUTPUT_PATH  bin/)  
 SET(LINK_LIBPATH ${CMAKE_CURRENT_SOURCE_DIR}/lib/)  
+
+IF (CMAKE_BUILD_TYPE STREQUAL Debug)
+ADD_DEFINITIONS(-DDEBUGGER)  
+ENDIF()
 
 add_subdirectory(src/YBehavior)  
 add_Subdirectory(src/Test)
