@@ -54,7 +54,7 @@ namespace YBehavior
 				fp = FP_Normal;
 				if (ns == NS_FAILURE)
 				{
-					BOOL bExit;
+					BOOL bExit = Utility::FALSE_VALUE;
 					m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
 					if (bExit)
 					{
@@ -182,7 +182,7 @@ namespace YBehavior
 				{
 				case YBehavior::NS_FAILURE:
 				{
-					BOOL bExit;
+					BOOL bExit = Utility::FALSE_VALUE;
 					m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
 					if (bExit)
 					{
@@ -278,7 +278,7 @@ namespace YBehavior
 				{
 				case YBehavior::NS_FAILURE:
 				{
-					BOOL bExit;
+					BOOL bExit = Utility::FALSE_VALUE;
 					m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
 					if (bExit)
 					{
