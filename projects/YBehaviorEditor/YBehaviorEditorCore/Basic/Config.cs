@@ -9,6 +9,7 @@ namespace YBehavior.Editor.Core.New
 {
     public class Config : Singleton<Config>
     {
+        public string WorkingDirWin { get; set; }
         public string WorkingDir { get; set; }
         public string ExportingDir { get; set; }
 
@@ -66,23 +67,23 @@ namespace YBehavior.Editor.Core.New
         void Load()
         {
             IniFile configFile = new IniFile(Environment.CurrentDirectory + "\\config.ini");
-            WorkingDir = configFile.ReadString("Config", "WorkingDir", "");
+            WorkingDirWin = configFile.ReadString("Config", "WorkingDir", "");
             ExportingDir = configFile.ReadString("Config", "ExportingDir", "");
             DescriptionMgr.Instance.Load(Environment.CurrentDirectory + "\\description.xml");
 
             New.ExternalActionMgr.Instance.Load(configFile.ReadString("Config", "ExternalAction", "actions.xml"));
 
 
-            DirectoryInfo workingDir = new DirectoryInfo(WorkingDir);
-            WorkingDir = workingDir.FullName;
-            if (!WorkingDir.EndsWith("\\"))
-                WorkingDir = WorkingDir + "\\";
+            DirectoryInfo workingDir = new DirectoryInfo(WorkingDirWin);
+            WorkingDirWin = workingDir.FullName;
+            if (!WorkingDirWin.EndsWith("\\"))
+                WorkingDirWin = WorkingDirWin + "\\";
             DirectoryInfo exportDir = new DirectoryInfo(ExportingDir);
             ExportingDir = exportDir.FullName;
             if (!ExportingDir.EndsWith("\\"))
                 ExportingDir = ExportingDir + "\\";
 
-            WorkingDir = WorkingDir.Replace("\\", "/");
+            WorkingDir = WorkingDirWin.Replace("\\", "/");
             ExportingDir = ExportingDir.Replace("\\", "/");
 
             ////////////////////////////////////////////////////////////////////////////

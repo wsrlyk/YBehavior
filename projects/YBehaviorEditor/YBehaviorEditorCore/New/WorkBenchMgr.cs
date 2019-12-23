@@ -298,12 +298,12 @@ namespace YBehavior.Editor.Core.New
             {
                 ///> Pop the save dialog
                 Microsoft.Win32.SaveFileDialog sfd = new Microsoft.Win32.SaveFileDialog();
-                sfd.InitialDirectory = Config.Instance.WorkingDir;
-                sfd.Filter = bench is TreeBench ? "TREE|*.tree" : "FSM|*.fsm";
+                sfd.InitialDirectory = Config.Instance.WorkingDirWin;
+                sfd.Filter = bench is TreeBench ? "TREE|*" + FileMgr.TreeExtension : "FSM|*.fsm";
                 if (sfd.ShowDialog() == true)
                 {
                     bench.FileInfo.Path = sfd.FileName;
-                    bench.FileInfo.Name = sfd.SafeFileName.Remove(sfd.SafeFileName.LastIndexOf(bench is TreeBench ? ".tree" : ".fsm"));
+                    bench.FileInfo.Name = sfd.SafeFileName.Remove(sfd.SafeFileName.LastIndexOf(bench is TreeBench ? FileMgr.TreeExtension : ".fsm"));
 
                     res |= SaveResultFlag_NewFile;
                 }
@@ -530,7 +530,7 @@ namespace YBehavior.Editor.Core.New
 
                 foreach (string toloadtree in toload)
                 {
-                    System.IO.FileInfo file = new System.IO.FileInfo(Config.Instance.WorkingDir + toloadtree + ".xml");
+                    System.IO.FileInfo file = new System.IO.FileInfo(Config.Instance.WorkingDirWin + toloadtree + FileMgr.TreeExtension);
                     if (!file.Exists || loaded.Contains(file.FullName))
                         continue;
 
@@ -559,9 +559,9 @@ namespace YBehavior.Editor.Core.New
             {
                 System.IO.FileInfo file = null;
                 if (info.Type == GraphType.TREE)
-                    file = new System.IO.FileInfo(Config.Instance.WorkingDir + info.Name + ".tree");
+                    file = new System.IO.FileInfo(Config.Instance.WorkingDirWin + info.Name + FileMgr.TreeExtension);
                 else
-                    file = new System.IO.FileInfo(Config.Instance.WorkingDir + info.Name + ".fsm");
+                    file = new System.IO.FileInfo(Config.Instance.WorkingDirWin + info.Name + ".fsm");
                 if (!file.Exists)
                 {
                     LogMgr.Instance.Error("File not exists: " + file.FullName);

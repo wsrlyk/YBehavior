@@ -33,7 +33,7 @@ namespace YBehavior.Editor.Core.New
 
         private bool _Load(string name, InOutMemory inOutMemory)
         {
-            string path = Config.Instance.WorkingDir + name + ".tree";
+            string path = Config.Instance.WorkingDir + name + FileMgr.TreeExtension;
             try
             {
                 XmlDocument xmlDoc = new XmlDocument();

@@ -128,8 +128,8 @@ namespace YBehavior.Editor.Core.New
     public class NodeBase
     {
         private uint m_UID = 0;
-        protected string m_Name = "";
-        protected string m_NickName;
+        protected string m_Name = string.Empty;
+        protected string m_NickName = string.Empty;
         protected string m_Comment = string.Empty;// "This is a node comment test.";
         protected int m_DisableCount = 0;
         protected NodeDescription m_NodeDescripion;

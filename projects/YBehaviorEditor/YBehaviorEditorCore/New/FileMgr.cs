@@ -13,13 +13,15 @@ namespace YBehavior.Editor.Core.New
 
     public class FileMgr : Singleton<FileMgr>
     {
+        public static readonly string TreeExtension = ".tree";
+
         public void Load()
         {
             if (m_FileInfos.Children != null)
                 m_FileInfos.Children.Clear();
             m_FileDic.Clear();
             
-            System.IO.DirectoryInfo TheFolder = new System.IO.DirectoryInfo(Config.Instance.WorkingDir);
+            System.IO.DirectoryInfo TheFolder = new System.IO.DirectoryInfo(Config.Instance.WorkingDirWin);
             if (!TheFolder.Exists)
                 return;
 
