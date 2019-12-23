@@ -23,8 +23,7 @@ namespace YBehavior
 		inline void SetIsLocal(bool local) { m_IsLocal = local; }
 		inline bool IsLocal() { return m_IsLocal; }
 		virtual bool IsConst() = 0;
-#ifdef DEBUGGER
-		inline void SetReferenceName(const STRING& name) { m_ReferenceName = name; }
+
 		void SetName(const STRING& name, const STRING& nodeName)
 		{
 			m_Name = name;
@@ -42,7 +41,7 @@ namespace YBehavior
 		}
 		inline const STRING& GetName() { return m_Name; }
 		inline const STRING& GetLogName() { return m_LogName; }
-#endif
+
 		virtual void SetVectorIndex(const STRING& vbType, const STRING& s) { }
 		virtual void SetKeyFromString(const STRING& s) = 0;
 		virtual const void* GetValue(IMemory* pMemory) = 0;
@@ -67,11 +66,9 @@ namespace YBehavior
 	protected:
 		KEY m_Key;
 		bool m_IsLocal;
-#ifdef DEBUGGER
 		STRING m_Name;
 		STRING m_LogName;
 		STRING m_ReferenceName;
-#endif
 	};
 
 	class IDataArrayIterator

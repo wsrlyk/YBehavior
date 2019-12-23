@@ -23,7 +23,7 @@ namespace YBehavior
 		return (finalres);\
 	}
 #else
-#define DEBUG_RETURN(helper, res)\
+#define DEBUG_RETURN(helper, res, finalres)\
 	return (res)
 #endif
 	//////////////////////////////////////////////////////////////////////////
