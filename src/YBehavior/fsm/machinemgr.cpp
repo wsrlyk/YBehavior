@@ -125,7 +125,7 @@ namespace YBehavior
 			name = attr.value();
 		}
 
-		MachineState* pState;
+		MachineState* pState = nullptr;
 		switch (type)
 		{
 		case YBehavior::MST_Entry:
