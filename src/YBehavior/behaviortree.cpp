@@ -23,8 +23,8 @@ namespace YBehavior
 		return (finalres);\
 	}
 #else
-#define DEBUG_RETURN(helper, res, finalres)\
-	return (res)
+#define DEBUG_RETURN(helper, rawres, finalres)\
+	return (finalres)
 #endif
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
@@ -142,8 +142,6 @@ namespace YBehavior
 
 			///> postprocessing
 #ifdef DEBUGGER
-			//DEBUG_LOG_INFO(" Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
-
 			dbgHelper.TryPause();
 			m_pDebugHelper = nullptr;
 #endif
@@ -158,15 +156,12 @@ namespace YBehavior
 				finalState = NS_FAILURE;
 			else if (state == NS_FAILURE)
 				finalState = NS_SUCCESS;
-			//DEBUG_LOG_INFO(", Force Invert to " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 			break;
 		case YBehavior::RT_SUCCESS:
 			finalState = NS_SUCCESS;
-			//DEBUG_LOG_INFO(", Force Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 			break;
 		case YBehavior::RT_FAILURE:
 			finalState = NS_FAILURE;
-			//DEBUG_LOG_INFO(", Force Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 			break;
 		default:
 			break;
