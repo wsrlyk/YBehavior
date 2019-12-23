@@ -818,6 +818,7 @@ namespace YBehavior.Editor.Core.New
             if (!res)
             {
                 LogMgr.Instance.Error("Must have a NAME: " + Renderer.UITitle);
+                return false;
             }
             if (!VariableCollection.IsValidVariableName(m_NickName))
             {
