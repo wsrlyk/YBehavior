@@ -170,27 +170,38 @@ namespace YBehavior
 			return m_Key == Utility::INVALID_KEY;
 		}
 
+		StdVector<ElementType>* _Convert2Vector(IMemory* pMemory)
+		{
+			if (IsVector<T>::Result)
+			{
+				///> would have compile error if directly operate the m_Value when T is not a StdVector<XX>
+				StdVector<ElementType>* mValue;
+				if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
+					mValue = (StdVector<ElementType>*)_GetValuePtr();
+				else
+					mValue = (StdVector<ElementType>*)const_cast<void*>(GetValue(pMemory));
+
+				return mValue;
+			}
+			else
+				return nullptr;
+		}
 		INT VectorSize(IMemory* pMemory) override
 		{
-			if constexpr (IsVector<T>::Result)
-			{
-				StdVector<ElementType>* mValue = _GetCastedValue(pMemory);
+			const StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
 
-				if (mValue != nullptr)
-					return (INT)mValue->size();
-			}
+			if (mValue != nullptr)
+				return (INT)mValue->size();
+
 			return 0;
 		}
 
 		void Clear(IMemory* pMemory) override
 		{
-			if constexpr (IsVector<T>::Result)
-			{
-				StdVector<ElementType>* mValue = _GetCastedValue(pMemory);
+			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
 
-				if (mValue != nullptr)
-					mValue->clear();
-			}
+			if (mValue != nullptr)
+				mValue->clear();
 		}
 
 		STRING GetValueToSTRING(IMemory* pMemory) override
@@ -202,55 +213,48 @@ namespace YBehavior
 		}
 		const void* GetElement(IMemory* pMemory, INT index) override
 		{
-			if constexpr (IsVector<T>::Result)
-			{
-				StdVector<ElementType>* mValue = _GetCastedValue(pMemory);
+			const StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
 
-				if (mValue != nullptr)
+			if (mValue != nullptr)
+			{
+				if ((INT)mValue->size() <= index)
 				{
-					if ((INT)mValue->size() <= index)
-					{
-						ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << " at " << this->GetLogName() << ERROR_END;
-						return nullptr;
-					}
-					else
-					{
-						return &(*mValue)[index];
-					}
+					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << " at " << this->GetLogName() << ERROR_END;
+					return nullptr;
+				}
+				else
+				{
+					return &(*mValue)[index];
 				}
 			}
-		
-			return nullptr;
+			else
+			{
+				return nullptr;
+			}
 		}
 		void SetElement(IMemory* pMemory, const void* v, INT index) override
 		{
-			if constexpr (IsVector<T>::Result)
-			{
-				StdVector<ElementType>* mValue = _GetCastedValue(pMemory);
+			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
 
-				if (mValue != nullptr && v != nullptr)
+			if (mValue != nullptr && v != nullptr)
+			{
+				if ((INT)mValue->size() <= index)
 				{
-					if ((INT)mValue->size() <= index)
-					{
-						ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << " at " << this->GetLogName() << ERROR_END;
-					}
-					else
-					{
-						(*mValue)[index] = *((const ElementType*)v);
-					}
+					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << " at " << this->GetLogName() << ERROR_END;
+				}
+				else
+				{
+					(*mValue)[index] = *((const ElementType*)v);
 				}
 			}
 		}
 		void PushBackElement(IMemory* pMemory, const void* v) override
 		{
-			if constexpr (IsVector<T>::Result)
-			{
-				StdVector<ElementType>* mValue = _GetCastedValue(pMemory);
+			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
 
-				if (mValue != nullptr && v != nullptr)
-				{
-					mValue->push_back(*((const ElementType*)v));
-				}
+			if (mValue != nullptr && v != nullptr)
+			{
+				mValue->push_back(*((const ElementType*)v));
 			}
 		}
 
@@ -267,10 +271,10 @@ namespace YBehavior
 		{
 			if (CanFromString<ElementType>::Result)
 			{
-				if constexpr (IsVector<T>::Result)
+				if (IsVector<T>::Result)
 				{
 					///> would have compile error if directly operate the m_Value when T is not a StdVector<XX>
-					StdVector<ElementType>& mValue = _GetValue();
+					StdVector<ElementType>& mValue = *((StdVector<ElementType>*)_GetValuePtr());
 					mValue.clear();
 					StdVector<STRING> res;
 					Utility::SplitString(str, res, '|');
@@ -282,7 +286,7 @@ namespace YBehavior
 				else
 				{
 					ElementType res = Utility::ToType<ElementType>(str);
-					_SetValue(res);
+					_SetValue((const void*)&res);
 				}
 			}
 		}
