@@ -1,3 +1,4 @@
+#ifdef DEBUGGER
 #include "YBehavior/debugger.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/tools/objectpool.h"
@@ -9,7 +10,6 @@
 #include "YBehavior/memory.h"
 #include "YBehavior/fsm/behavior.h"
 
-#ifdef DEBUGGER
 namespace YBehavior
 {
 	const STRING NodeRunInfo::ToString() const
