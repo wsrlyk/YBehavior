@@ -45,7 +45,7 @@ namespace YBehavior
 
 		//int m_SortValue;
 		StateMachine* m_pParentMachine;
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 	protected:
 		std::stringstream m_DebugLogInfo;
 		DebugFSMHelper* m_pDebugHelper;

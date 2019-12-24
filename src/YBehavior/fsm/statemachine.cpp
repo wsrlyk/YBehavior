@@ -5,7 +5,7 @@
 #include "YBehavior/agent.h"
 #include <list>
 #include "YBehavior/fsm/context.h"
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #include "YBehavior/debugger.h"
 #endif
 #include <algorithm>
@@ -134,7 +134,7 @@ namespace YBehavior
 		//MachineContext& context = *pAgent->GetMachineContext();
 		//context.GetTransition().Reset();
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		if (DebugMgr::Instance()->GetTargetAgent() == pAgent->GetDebugUID())
 		{
 			DebugMgr::Instance()->SendInfos(pAgent, true);

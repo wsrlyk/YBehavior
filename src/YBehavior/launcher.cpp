@@ -25,7 +25,7 @@ namespace YBehavior
 		core.RegisterActions();
 		Mgrs::Instance()->GetTreeMgr()->SetWorkingDir(core.WorkingDir());
 		Mgrs::Instance()->GetMachineMgr()->SetWorkingDir(core.WorkingDir());
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		if (core.StartWithDebugListeningPort())
 			Network::Instance()->InitAndCreateThread(core.StartWithDebugListeningPort());
 #endif

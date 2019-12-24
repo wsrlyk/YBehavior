@@ -43,7 +43,7 @@ namespace YBehavior
 	class ISharedVariableEx;
 	class SharedDataEx;
 	struct NameKeyMgr;
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 	class DebugTreeHelper;
 #endif
 	class BehaviorTree;
@@ -64,7 +64,7 @@ namespace YBehavior
 		RunningContext* m_RunningContext;
 		IContextCreator* m_ContextCreator;
 		ReturnType m_ReturnType;
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 	protected:
 		std::stringstream m_DebugLogInfo;
 		DebugTreeHelper* m_pDebugHelper;
@@ -164,7 +164,7 @@ namespace YBehavior
 			{
 				op = new SharedVariableEx<T>();
 				m_Variables.push_back(op);
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 				op->SetName(attriName, GetClassName());
 #endif
 				return GetTypeID<T>();
@@ -240,7 +240,7 @@ namespace YBehavior
 		STRING GetClassName() const override { return "Tree"; }
 		inline void SetVersion(void* v) { m_Version = v; }
 		inline void* GetVersion() const { return m_Version; }
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		inline UINT GetHash() { return m_Hash; }
 		inline void SetHash(UINT hash) { m_Hash = hash; }
 #endif
@@ -252,7 +252,7 @@ namespace YBehavior
 		STRING m_TreeName;	///> Only File
 		void* m_Version;
 		TreeMap m_TreeMap;
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		UINT m_Hash;
 #endif
 

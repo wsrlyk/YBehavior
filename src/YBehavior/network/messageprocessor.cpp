@@ -1,4 +1,4 @@
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #include "YBehavior/network/messageprocessor.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
@@ -127,4 +127,4 @@ namespace YBehavior
 	}
 
 }
-#endif // DEBUGGER
+#endif // YDEBUGGER

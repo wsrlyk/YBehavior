@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_DEBUGGER_H_
 #define _YBEHAVIOR_DEBUGGER_H_
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 
 #include "YBehavior/define.h"
 #include "YBehavior/singleton.h"
@@ -240,6 +240,6 @@ namespace YBehavior
 
 }
 
-#endif // DEBUGGER
+#endif // YDEBUGGER
 
 #endif

@@ -5,13 +5,13 @@
 #include "YBehavior/fsm/statemachine.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/behaviortree.h"
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #include "YBehavior/debugger.h"
 #endif
 
 namespace YBehavior
 {
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 	bool MachineState::_HasLogPoint()
 	{
 		return m_pDebugHelper && m_pDebugHelper->HasDebugPoint();
@@ -63,20 +63,20 @@ namespace YBehavior
 
 	MachineRunRes MachineState::Execute(AgentPtr pAgent, MachineRunRes previousState)
 	{
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		DebugFSMHelper dbgHelper(pAgent, this);
 		m_pDebugHelper = &dbgHelper;
 #endif
 
 		///> check breakpoint
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		dbgHelper.TryBreaking();
 #endif
 
 		auto res = _OnUpdate(pAgent);
 
 		///> postprocessing
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 			//DEBUG_LOG_INFO(" Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 
 		dbgHelper.TryPause();

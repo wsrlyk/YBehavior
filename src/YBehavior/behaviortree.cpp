@@ -6,7 +6,7 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariablecreatehelper.h"
 #include "YBehavior/sharedvariableex.h"
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #include "YBehavior/debugger.h"
 #endif
 #include "YBehavior/shareddataex.h"
@@ -16,7 +16,7 @@
 
 namespace YBehavior
 {
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #define DEBUG_RETURN(helper, rawres, finalres)\
 	{\
 		helper.SetResult(rawres, finalres);\
@@ -59,7 +59,7 @@ namespace YBehavior
 
 	std::unordered_set<STRING> BehaviorNode::KEY_WORDS = { "Class", "Pos", "NickName" };
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 	bool BehaviorNode::_HasLogPoint()
 	{
 		return m_pDebugHelper && m_pDebugHelper->HasDebugPoint();
@@ -77,7 +77,7 @@ namespace YBehavior
 
 	YBehavior::NodeState BehaviorNode::Execute(AgentPtr pAgent, NodeState parentState)
 	{
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		DebugTreeHelper dbgHelper(pAgent, this);
 		m_pDebugHelper = &dbgHelper;
 #endif
@@ -119,7 +119,7 @@ namespace YBehavior
 			}
 
 			///> check breakpoint
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 			dbgHelper.TryBreaking();
 #endif
 
@@ -141,7 +141,7 @@ namespace YBehavior
 			}
 
 			///> postprocessing
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 			dbgHelper.TryPause();
 			m_pDebugHelper = nullptr;
 #endif
@@ -339,7 +339,7 @@ namespace YBehavior
 					op = helper->CreateVariable();
 					m_Variables.push_back(op);
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 					op->SetName(attriName, this->GetClassName());
 #endif
 
@@ -383,7 +383,7 @@ namespace YBehavior
 			else
 				op->SetValueFromString(buffer[1]);
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 			op->SetName(attrOptr.name(), this->GetClassName());
 #endif
 

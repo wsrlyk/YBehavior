@@ -89,7 +89,7 @@ namespace YBehavior
 		ConditionMgr m_ConditionMgr;
 		TreeMap m_TreeMap;
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		UINT m_Hash;
 #endif
 	public:
@@ -109,7 +109,7 @@ namespace YBehavior
 		RootMachine* CreateMachine();
 
 		void Update(float fDeltaT, AgentPtr pAgent);
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		inline UINT GetHash() { return m_Hash; }
 		inline void SetHash(UINT hash) { m_Hash = hash; }
 #endif

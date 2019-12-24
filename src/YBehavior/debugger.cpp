@@ -1,4 +1,4 @@
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #include "YBehavior/debugger.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/tools/objectpool.h"
@@ -731,4 +731,4 @@ namespace YBehavior
 
 
 }
-#endif // DEBUGGER
+#endif // YDEBUGGER
