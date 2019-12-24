@@ -437,7 +437,7 @@ namespace YBehavior.Editor.Core.New
 
         public static int SortByPosX(Connection aa, Connection bb)
         {
-            return aa.Ctr.To.Geo.Pos.X.CompareTo(bb.Ctr.To.Geo.Pos.X);
+            return aa.Ctr.To.Owner.Geo.Pos.X.CompareTo(bb.Ctr.To.Owner.Geo.Pos.X);
         }
     }
 
