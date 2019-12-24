@@ -427,7 +427,7 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    class AlwaysSuccessTreeNode : LeafNode
+    class AlwaysSuccessTreeNode : SingleChildNode
     {
         public override string Icon => "T";
 
@@ -438,7 +438,7 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    class AlwaysFailureTreeNode : LeafNode
+    class AlwaysFailureTreeNode : SingleChildNode
     {
         public override string Icon => "F";
 
@@ -449,7 +449,7 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    class InvertorTreeNode : LeafNode
+    class InvertorTreeNode : SingleChildNode
     {
         public override string Icon => "!";
 
