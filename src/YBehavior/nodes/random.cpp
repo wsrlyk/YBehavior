@@ -137,10 +137,9 @@ namespace YBehavior
 			pTargetVariable = m_Input;
 		}
 
-		void* pTemp = nullptr;
 		IVariableOperationHelper* pHelper = m_Input->GetElementOperation();
 		//if (m_bSameArray)
-		pTemp = pHelper->AllocData();
+		auto temp = pHelper->AllocTempData();
 
 		for (int i = length - 1; i > 0; --i)
 		{
@@ -151,13 +150,10 @@ namespace YBehavior
 				continue;
 			}
 
-			pHelper->Set(pTemp, pTargetVariable->GetElement(pAgent->GetMemory(), j));
+			pHelper->Set(temp.pData, pTargetVariable->GetElement(pAgent->GetMemory(), j));
 			pHelper->Set(const_cast<void*>(pTargetVariable->GetElement(pAgent->GetMemory(), j)), pTargetVariable->GetElement(pAgent->GetMemory(), i));
-			pHelper->Set(const_cast<void*>(pTargetVariable->GetElement(pAgent->GetMemory(), i)), pTemp);
+			pHelper->Set(const_cast<void*>(pTargetVariable->GetElement(pAgent->GetMemory(), i)), temp.pData);
 		}
-
-		//if (!pTemp)
-		pHelper->RecycleData(pTemp);
 
 		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Output, false);
 

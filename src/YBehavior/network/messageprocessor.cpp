@@ -1,4 +1,4 @@
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #include "YBehavior/network/messageprocessor.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
@@ -6,21 +6,31 @@
 
 namespace YBehavior
 {
-	void DebugTreeWithAgent(const StdVector<STRING>& datas)
+	void DebugAgent(const StdVector<STRING>& datas)
 	{
-		DebugMgr::Instance()->SetTarget(datas[1], Utility::ToType<UINT64>(datas[2]));
+		DebugMgr::Instance()->SetTarget(Utility::ToType<UINT64>(datas[1]));
+
+	}
+	void DebugTree(const StdVector<STRING>& datas)
+	{
+		DebugMgr::Instance()->SetTarget({ DebugTargetType::TREE, datas[1] });
+
+	}
+	void DebugFSM(const StdVector<STRING>& datas)
+	{
+		DebugMgr::Instance()->SetTarget({ DebugTargetType::FSM, datas[1] });
 
 	}
 
 	void DebugBegin(const StdVector<STRING>& datas)
 	{
-		DebugMgr::Instance()->ClearTreeDebugInfo();
+		DebugMgr::Instance()->ClearDebugInfos();
 		StdVector<STRING> treedata;
 		for (unsigned i = 1; i < datas.size(); ++i)
 		{
 			treedata.clear();
-			Utility::SplitString(datas[i], treedata, DebugHelper::s_SequenceSpliter);
-			TreeDebugInfo info;
+			Utility::SplitString(datas[i], treedata, IDebugHelper::s_SequenceSpliter);
+			GraphDebugInfo info;
 			STRING name = treedata[0];
 			//info.Hash = Utility::ToType<UINT>(treedata[1]);
 
@@ -35,7 +45,7 @@ namespace YBehavior
 				info.DebugPointInfos[uid] = dbginfo;
 			}
 
-			DebugMgr::Instance()->AddTreeDebugInfo(std::move(name), std::move(info));
+			DebugMgr::Instance()->AddTreeDebugInfo({ i == 1 ? DebugTargetType::FSM : DebugTargetType::TREE, name }, std::move(info));
 		}
 		DebugMgr::Instance()->Begin();
 	}
@@ -54,28 +64,36 @@ namespace YBehavior
 		DebugMgr::Instance()->SetCommand(DC_StepInto);
 	}
 
-	void ProcessDebugPoint(const StdVector<STRING>& datas)
+	void ProcessDebugPoint(DebugTargetType type, const StdVector<STRING>& datas)
 	{
 		const STRING& treeName = datas[1];
 		UINT uid = Utility::ToType<UINT>(datas[2]);
 		INT count = Utility::ToType<INT>(datas[3]);
 
 		if (count > 0)
-			DebugMgr::Instance()->AddBreakPoint(treeName, uid);
+			DebugMgr::Instance()->AddBreakPoint({ type, treeName }, uid);
 		else if (count < 0)
-			DebugMgr::Instance()->AddLogPoint(treeName, uid);
+			DebugMgr::Instance()->AddLogPoint({ type, treeName }, uid);
 		else
-			DebugMgr::Instance()->RemoveDebugPoint(treeName, uid);
+			DebugMgr::Instance()->RemoveDebugPoint({ type, treeName }, uid);
 	}
 
 	void MessageProcessor::ProcessOne(const STRING& s)
 	{
 		StdVector<STRING> datas;
-		Utility::SplitString(s, datas, DebugHelper::s_ContentSpliter, false);
+		Utility::SplitString(s, datas, IDebugHelper::s_ContentSpliter, false);
 
-		if (datas[0] == "[DebugTreeWithAgent]")
+		if (datas[0] == "[DebugAgent]")
 		{
-			DebugTreeWithAgent(datas);
+			DebugAgent(datas);
+		}
+		if (datas[0] == "[DebugTree]")
+		{
+			DebugTree(datas);
+		}
+		if (datas[0] == "[DebugFSM]")
+		{
+			DebugFSM(datas);
 		}
 		else if (datas[0] == "[Continue]")
 		{
@@ -89,9 +107,13 @@ namespace YBehavior
 		{
 			StepOver();
 		}
-		else if (datas[0] == "[DebugPoint]")
+		else if (datas[0] == "[DebugTreePoint]")
 		{
-			ProcessDebugPoint(datas);
+			ProcessDebugPoint(DebugTargetType::TREE, datas);
+		}
+		else if (datas[0] == "[DebugFSMPoint]")
+		{
+			ProcessDebugPoint(DebugTargetType::FSM, datas);
 		}
 		else if (datas[0] == "[DebugBegin]")
 		{
@@ -105,4 +127,4 @@ namespace YBehavior
 	}
 
 }
-#endif // DEBUGGER
+#endif // YDEBUGGER

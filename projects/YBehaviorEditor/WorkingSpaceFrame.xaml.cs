@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -29,8 +22,8 @@ namespace YBehavior.Editor
             public DelayableNotificationCollection<FileInfo> Children { get { return m_children; } }
             public string Name { get; set; }
             public string Icon { get; set; }
-            TreeFileMgr.TreeFileInfo source;
-            public TreeFileMgr.TreeFileInfo Source { get { return source; } }
+            FileMgr.FileInfo source;
+            public FileMgr.FileInfo Source { get { return source; } }
             private bool exp = false;
             public bool Expanded
             {
@@ -41,7 +34,7 @@ namespace YBehavior.Editor
                 }
             }
 
-            public void Build(TreeFileMgr.TreeFileInfo data, HashSet<string> expandedItems = null)
+            public void Build(FileMgr.FileInfo data, HashSet<string> expandedItems = null)
             {
                 using (var handler = Children.Delay())
                 {
@@ -52,8 +45,20 @@ namespace YBehavior.Editor
 
                     source = data;
                     Name = data.Name;
-                    Icon = !data.bIsFolder ? "📃"
-                                            : "📁";
+                    switch(data.FileType)
+                    {
+                        case FileType.FOLDER:
+                            Icon = "📁";
+                            break;
+                        case FileType.TREE:
+                            Icon = "🌿";
+                            break;
+                        case FileType.FSM:
+                            Icon = "♻";
+                            break;
+                        default:
+                            break;
+                    }
 
                     if (Name == null)
                         Expanded = true;
@@ -63,7 +68,7 @@ namespace YBehavior.Editor
                     if (data.Children == null)
                         return;
 
-                    foreach (TreeFileMgr.TreeFileInfo child in data.Children)
+                    foreach (FileMgr.FileInfo child in data.Children)
                     {
                         FileInfo info = new FileInfo();
                         this.Children.Add(info);
@@ -109,7 +114,7 @@ namespace YBehavior.Editor
             m_ExpandedItems.Clear();
             _GetExpandedItems(this.Files, m_ExpandedItems);
 
-            m_FileInfos.Build(bReload ? TreeFileMgr.Instance.ReloadAndGetAllTrees() : TreeFileMgr.Instance.AllTrees, m_ExpandedItems);
+            m_FileInfos.Build(bReload ? FileMgr.Instance.ReloadAndGetAllFiles() : FileMgr.Instance.AllFiles, m_ExpandedItems);
 //            this.Files.ItemsSource = m_FileInfos.Children;
         }
 
@@ -123,7 +128,7 @@ namespace YBehavior.Editor
                 m_ExpandedItems.Add(s);
             }
 
-            m_FileInfos.Build(TreeFileMgr.Instance.ReloadAndGetAllTrees(), m_ExpandedItems);
+            m_FileInfos.Build(FileMgr.Instance.ReloadAndGetAllFiles(), m_ExpandedItems);
         }
 
         private void OnFilesItemDoubleClick(object sender, MouseButtonEventArgs e)
@@ -160,8 +165,8 @@ namespace YBehavior.Editor
             WorkBench bench = oArg.Bench;
             if (bench == null)
                 return;
-            ///> Rename the tab title
-            if (oArg.bCreate)
+            ///> Rename the tab title, refresh the references to the TreeMgr
+            //if (oArg.bCreate)
             {
                 _RefreshWorkingSpace(false);
             }
@@ -187,10 +192,21 @@ namespace YBehavior.Editor
             //    _RefreshWorkingSpace(false);
         }
 
-        private void btnNew_Click(object sender, RoutedEventArgs e)
+        private void btnNewTree_Click(object sender, RoutedEventArgs e)
         {
             WorkBench bench = null;
-            if ((bench = WorkBenchMgr.Instance.CreateNewBench()) != null)
+            if ((bench = WorkBenchMgr.Instance.CreateNewBench(FileType.TREE)) != null)
+            {
+                WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
+                arg.Bench = bench;
+                EventMgr.Instance.Send(arg);
+            }
+        }
+
+        private void btnNewFSM_Click(object sender, RoutedEventArgs e)
+        {
+            WorkBench bench = null;
+            if ((bench = WorkBenchMgr.Instance.CreateNewBench(FileType.FSM)) != null)
             {
                 WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
                 arg.Bench = bench;

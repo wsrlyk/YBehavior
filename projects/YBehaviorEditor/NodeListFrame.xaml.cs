@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -26,14 +26,14 @@ namespace YBehavior.Editor
             public DelayableNotificationCollection<NodeInfo> Children { get { return m_children; } }
             public string Name { get; set; }
             public string Icon { get; set; }
-            public Node Source { get { return m_Source; } }
-            Node m_Source;
-            NodeHierachy m_Hierachy;
+            public NodeBase Source { get { return m_Source; } }
+            NodeBase m_Source;
+            int m_Hierachy;
             int m_Level;
             public string Description { get; set; }
 
-            public bool bIsFolder { get { return m_Hierachy != NodeHierachy.NH_None; } }
-            private bool exp = false;
+            public bool bIsFolder { get { return m_Hierachy != 0; } }
+            private bool exp = true;
             public bool Expanded
             {
                 get { return exp; }
@@ -60,29 +60,29 @@ namespace YBehavior.Editor
             }
 
             ///> Folder
-            public NodeInfo(NodeHierachy hierachy, int level)
+            public NodeInfo(int hierachy, int level)
             {
                 m_Hierachy = hierachy;
                 m_Source = null;
-                Name = Core.DescriptionMgr.Instance.GetHierachyDescription((int)hierachy);
+                Name = DescriptionMgr.Instance.GetHierachyDescription((int)hierachy);
                 m_Level = level;
                 Icon = "📁";
                 Description = null;
             }
 
             ///> Node
-            public NodeInfo(Node data)
+            public NodeInfo(NodeBase data)
             {
                 m_Source = data;
-                m_Hierachy = NodeHierachy.NH_None;
+                m_Hierachy = 0;
                 Name = data.Name;
                 Icon = "▶";
                 Description = data.Description;
             }
 
-            public void Build(Node data, HashSet<string> expandedItems)
+            public void Build(TreeNode data, HashSet<string> expandedItems)
             {
-                if (data == null || data.Type == NodeType.NT_Root)
+                if (data == null || data.Type == TreeNodeType.TNT_Root)
                     return;
 
                 NodeInfo child;
@@ -94,7 +94,7 @@ namespace YBehavior.Editor
                 else
                 {
                     int nextLevel = m_Level + 1;
-                    NodeHierachy subHierachy = (NodeHierachy)((int)data.Hierachy % (int)Math.Pow(10, nextLevel));
+                    int subHierachy = ((int)data.Hierachy % (int)Math.Pow(10, nextLevel));
                     child = null;
                     foreach (var chi in m_children)
                     {
@@ -107,10 +107,22 @@ namespace YBehavior.Editor
                     if (child == null)
                     {
                         child = new NodeInfo(subHierachy, nextLevel);
-                        child.Expanded = expandedItems.Contains(child.Name);
+                        //child.Expanded = expandedItems.Contains(child.Name);
                         m_children.Add(child);
                     }
                     child.Build(data, expandedItems);
+                }
+            }
+
+            public void Build(FSMStateNode data, HashSet<string> expandedItems)
+            {
+                if (data == null || data.Type != FSMStateType.User)
+                    return;
+
+                NodeInfo child;
+                {
+                    child = new NodeInfo(data);
+                    m_children.Add(child);
                 }
             }
 
@@ -129,25 +141,41 @@ namespace YBehavior.Editor
         public NodeListFrame()
         {
             InitializeComponent();
-            m_NodeInfos = new NodeInfo(NodeHierachy.NH_None, 0);
+            m_NodeInfos = new NodeInfo(0, 0);
             this.Nodes.ItemsSource = m_NodeInfos.Children;
             _FilterNodes(null);
+            EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
+        }
+
+        private void _OnWorkBenchSelected(EventArg arg)
+        {
+            _FilterNodes(this.SearchText.Text);
         }
 
         private void _FilterNodes(string keyword)
         {
-            _GetExpandedItems(this.Nodes, m_ExpandedItems);
+            //_GetExpandedItems(this.Nodes, m_ExpandedItems);
 
             using (var handler = m_NodeInfos.Children.Delay())
             {
                 m_NodeInfos.Children.Clear();
                 if (!string.IsNullOrEmpty(keyword))
                     keyword = keyword.ToLower();
-                foreach (var node in Core.NodeMgr.Instance.NodeList)
+                if (WorkBenchMgr.Instance.ActiveWorkBench != null && WorkBenchMgr.Instance.ActiveWorkBench is TreeBench)
                 {
-                    if (!string.IsNullOrEmpty(keyword) && !node.Name.ToLower().Contains(keyword))
-                        continue;
-                    m_NodeInfos.Build(node, m_ExpandedItems);
+                    foreach (var node in TreeNodeMgr.Instance.NodeList)
+                    {
+                        if (!string.IsNullOrEmpty(keyword) && !node.Name.ToLower().Contains(keyword))
+                            continue;
+                        m_NodeInfos.Build(node, m_ExpandedItems);
+                    }
+                }
+                else
+                {
+                    foreach (var node in FSMNodeMgr.Instance.NodeList)
+                    {
+                        m_NodeInfos.Build(node, m_ExpandedItems);
+                    }
                 }
             }
 

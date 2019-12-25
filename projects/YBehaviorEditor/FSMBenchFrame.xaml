@@ -1,0 +1,121 @@
+﻿<local:WorkBenchFrame x:Class="YBehavior.Editor.FSMBenchFrame"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:YBehavior.Editor"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             MouseWheel="_MouseWheel"
+             Focusable="True">
+    <UserControl.Resources>
+        <DataTemplate x:Key="Normal">
+            <local:UIFSMUserStateNode>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="20"/>
+                </Style>
+            </local:UIFSMUserStateNode>
+        </DataTemplate>
+        <DataTemplate x:Key="Meta">
+            <local:UIFSMMetaStateNode/>
+        </DataTemplate>
+        <DataTemplate x:Key="Special">
+            <local:UIFSMSpecialStateNode/>
+        </DataTemplate>
+        <DataTemplate x:Key="SpecialVirtual">
+            <local:UIFSMSpecialVirtualStateNode/>
+        </DataTemplate>
+
+        <SolidColorBrush x:Key="defaultBackground"  Color="#FF7E8081"/>
+        <SolidColorBrush x:Key="normalBackground"  Color="#FFB4B7B9"/>
+
+    </UserControl.Resources>
+    <Grid>
+        <!--<Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="20"/>
+            </Grid.ColumnDefinitions>
+            <Button Name="Operation0" Grid.Row="0" Grid.Column="0" Width="20" HorizontalAlignment="Left" Click="Operation0_Click"></Button>
+            <Button Name="Operation1" Grid.Row="0" Grid.Column="1" Width="20" HorizontalAlignment="Left"></Button>
+        </Grid>-->
+        <Grid Background="#FF555353" Name="CanvasBoard" ClipToBounds ="True">
+            <Canvas Focusable="True" Name="canvas">
+                <ItemsControl Focusable="True" Name="commentLayer">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <local:UIComment/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="Canvas.Left" Value="{Binding Geo.Pos.X}" />
+                            <Setter Property="Canvas.Top" Value="{Binding Geo.Pos.Y}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                </ItemsControl>
+                <ItemsControl Focusable="True" Name="connectionLayer">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <local:FSMUIConnection/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <ItemsControl Focusable="True" Name="nodeLayer">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <!--<ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <local:UIFSMState/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>-->
+                    <ItemsControl.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="Canvas.Left" Value="{Binding Owner.Geo.Pos.X}" />
+                            <Setter Property="Canvas.Top" Value="{Binding Owner.Geo.Pos.Y}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplateSelector>
+                        <local:FSMStateTypeTemplateSelector
+                            NormalTemplate="{StaticResource Normal}"
+                            MetaTemplate="{StaticResource Meta}"
+                            SpecialTemplate="{StaticResource Special}"
+                            SpecialVirtualTemplate="{StaticResource SpecialVirtual}"/>
+                    </ItemsControl.ItemTemplateSelector>
+                </ItemsControl>
+                <Canvas Focusable="True" Name="nodeLayer_old"/>
+            </Canvas>
+            <ItemsControl Name="MachineStack" Height="30" VerticalAlignment="Top" HorizontalAlignment="Right"
+                          Margin="5,5">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="2,0">
+                            <Button Click="OnMachineStackItemClicked" Height="25">
+                                <TextBlock Text="{Binding Path=ForceGetRenderer.UITitle, Mode=OneWay}"/>
+                            </Button>
+                        </Grid>
+                        <!--TextBlock Text = "{Binding Name}"/-->
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </Grid>
+</local:WorkBenchFrame>

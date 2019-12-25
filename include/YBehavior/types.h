@@ -6,6 +6,7 @@
 #include "define.h"
 #include <sstream>
 #include <memory>
+#include <unordered_map>
 
 namespace YBehavior
 {
@@ -206,6 +207,7 @@ namespace YBehavior
 	typedef unsigned char       BYTE;
 	typedef bool				BOOL_REAL;
 	typedef unsigned short		BOOL;	///> WARNING: bool is defined by short. Cause bool in vector is specialized and has quite different behaviors with others.
+	typedef unsigned short		USHORT;
 	typedef float				FLOAT;
 	typedef char				CHAR;
 
@@ -217,6 +219,7 @@ namespace YBehavior
 	typedef UINT64				Ulong;
 	typedef BYTE				Byte;
 	typedef BOOL				Bool;
+	typedef USHORT				Ushort;
 	typedef FLOAT				Float;
 	typedef StdVector<STRING>	VecString;
 	typedef StdVector<INT>	VecInt;
@@ -259,6 +262,34 @@ namespace YBehavior
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecString, 105);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecEntityWrapper, 106);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecVector3, 107);
+
+	typedef const void* NodePtr;
+	struct TreeMap
+	{
+		typedef std::tuple<NodePtr, STRING> NodeDesc;
+
+		struct key_hash
+		{
+			std::size_t operator()(const NodeDesc& k) const
+			{
+				return std::hash<NodePtr>{}(std::get<0>(k)) ^ std::hash<STRING>{}(std::get<1>(k));
+			}
+		};
+
+		struct key_equal
+		{
+			bool operator()(const NodeDesc& v0, const NodeDesc& v1) const
+			{
+				return (
+					std::get<0>(v0) == std::get<0>(v1) &&
+					std::get<1>(v0) == std::get<1>(v1)
+					);
+			}
+		};
+
+		std::unordered_map<NodePtr, STRING> Node2Trees;
+		std::unordered_map<NodeDesc, STRING, key_hash, key_equal> Name2Trees;
+	};
 }
 
 namespace YB = YBehavior;

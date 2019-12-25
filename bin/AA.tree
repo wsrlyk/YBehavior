@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AA>
+  <Node Class="Root" Pos="0,0">
+    <Local d="_Ic 0" />
+    <Node Class="Sequence" Pos="30,166">
+      <Node Class="Dice" Pos="42,321" Distribution="IIC 5|3|1" Values="IIC 1|2|3" Input="_IC 0" Output="_Ip d" IgnoreInput="_BC T" />
+      <Node Class="FSMSetCondition" Pos="194,243" Conditions="_SC ToB" Operator="_EC On" />
+    </Node>
+  </Node>
+</AA>

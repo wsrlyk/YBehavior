@@ -26,10 +26,10 @@ int main(int argc, char** argv)
 	std::vector<std::string> subtest{ "Sub0", "SubTree", "Sub1", "Test" };
 	XEntity* pEntity = new XEntity("Hehe", tree, &subtest);
 
-	XEntity* pEntity1 = new XEntity("Haha", tree, &subtest);
+	//XEntity* pEntity1 = new XEntity("Haha", tree, &subtest);
 
-	std::vector<std::string> subtest2{ "Sub0", "SubTree", "Sub1", "G", "Sub2", "Test" };
-	XEntity* pEntity2 = new XEntity("Haha", tree, &subtest2);
+	//std::vector<std::string> subtest2{ "Sub0", "SubTree", "Sub1", "G", "Sub2", "Test" };
+	//XEntity* pEntity2 = new XEntity("Haha", tree, &subtest2);
 
 	//pEntity1->GetAgent()->SetEntity(pEntity1);
 	LOG_FORMAT("te%dst%s abc", 1, "++");
@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 			break;
 	}
 
-	unsigned long t1, t2;
+	unsigned long t1 = 0, t2 = 0;
 
 #if _MSC_VER
 #pragma comment(lib, "winmm.lib ")

@@ -27,7 +27,7 @@ namespace YBehavior
 			LOG_SHARED_DATA(m_Cases, true);
 		}
 
-		if (m_CasesChilds.size() != m_Cases->VectorSize(pAgent->GetMemory()))
+		if ((INT)m_CasesChilds.size() != m_Cases->VectorSize(pAgent->GetMemory()))
 		{
 			ERROR_BEGIN << "Cases size not match in SwitchCase" << ERROR_END;
 			return NS_FAILURE;
@@ -43,7 +43,7 @@ namespace YBehavior
 			current = m_RCContainer.GetRC()->Current;
 		}
 
-		INT size = m_CasesChilds.size();
+		INT size = (INT)m_CasesChilds.size();
 		BehaviorNodePtr targetNode = nullptr;
 		switch (current)
 		{

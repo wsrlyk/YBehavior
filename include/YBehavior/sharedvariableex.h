@@ -34,9 +34,20 @@ namespace YBehavior
 		{
 			m_Value = *((const T*)pValue);
 		}
-		inline void* _GetValue()
+
+		inline void _SetValue(const T& value)
+		{
+			m_Value = value;
+		}
+
+		inline void* _GetValuePtr()
 		{
 			return &m_Value;
+		}
+
+		inline T& _GetValue()
+		{
+			return m_Value;
 		}
 
 		void _SetCastedValue(IMemory* pMemory, const ElementType* src)
@@ -65,7 +76,7 @@ namespace YBehavior
 				(*const_cast<StdVector<ElementType>*>(pVector))[index] = *src;
 		}
 
-		const ElementType* _GetCastedValue(IMemory* pMemory)
+		const ElementType* _GetCastedElement(IMemory* pMemory)
 		{
 			INT index = -1;
 			m_VectorIndex->GetCastedValue(pMemory, index);
@@ -100,6 +111,31 @@ namespace YBehavior
 			}
 			return nullptr;
 		}
+
+		T* _GetCastedValue(IMemory* pMemory)
+		{
+			if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
+				return &m_Value;
+			///> It's an element of a vector
+			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
+			{
+				return (T*)_GetCastedElement(pMemory);
+			}
+
+			SharedDataEx* pData;
+			if (!IsLocal())
+				pData = pMemory->GetMainData();
+			else
+				pData = pMemory->GetStackTop();
+
+			if (!pData)
+			{
+				ERROR_BEGIN << "SharedData NULL at " << this->GetLogName() << ERROR_END;
+				return nullptr;
+			}
+			return (T*)pData->Get<T>(m_Key);
+		}
+
 	public:
 		TYPEID TypeID() const { return GetTypeID<T>(); }
 		TYPEID GetReferenceSharedDataSelfID()
@@ -141,10 +177,10 @@ namespace YBehavior
 				///> would have compile error if directly operate the m_Value when T is not a StdVector<XX>
 				StdVector<ElementType>* mValue;
 				if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
-					mValue = (StdVector<ElementType>*)_GetValue();
+					mValue = (StdVector<ElementType>*)_GetValuePtr();
 				else
 					mValue = (StdVector<ElementType>*)const_cast<void*>(GetValue(pMemory));
-				
+
 				return mValue;
 			}
 			else
@@ -238,7 +274,7 @@ namespace YBehavior
 				if (IsVector<T>::Result)
 				{
 					///> would have compile error if directly operate the m_Value when T is not a StdVector<XX>
-					StdVector<ElementType>& mValue = *((StdVector<ElementType>*)_GetValue());
+					StdVector<ElementType>& mValue = *((StdVector<ElementType>*)_GetValuePtr());
 					mValue.clear();
 					StdVector<STRING> res;
 					Utility::SplitString(str, res, '|');
@@ -250,7 +286,7 @@ namespace YBehavior
 				else
 				{
 					ElementType res = Utility::ToType<ElementType>(str);
-					_SetValue((const void*)(&res));
+					_SetValue((const void*)&res);
 				}
 			}
 		}
@@ -277,26 +313,7 @@ namespace YBehavior
 
 		const T* GetCastedValue(IMemory* pMemory)
 		{
-			if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
-				return &m_Value;
-			///> It's an element of a vector
-			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
-			{
-				return (const T*)_GetCastedValue(pMemory);
-			}
-
-			SharedDataEx* pData;
-			if (!IsLocal())
-				pData = pMemory->GetMainData();
-			else
-				pData = pMemory->GetStackTop();
-
-			if (!pData)
-			{
-				ERROR_BEGIN << "SharedData NULL at " << this->GetLogName() << ERROR_END;
-				return nullptr;
-			}
-			return (const T*)pData->Get<T>(m_Key);
+			return (const T*)_GetCastedValue(pMemory);
 		}
 
 		void GetCastedValue(IMemory* pMemory, T& t)

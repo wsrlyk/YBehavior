@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SimpleFSM>
+  <Machine Default="A">
+    <State Type="Entry" />
+    <State Type="Exit" />
+    <State Name="A" Tree="AA" />
+    <State Name="B" Tree="BB" />
+    <State Name="C" Tree="CC" />
+    <Trans To="A">
+      <ToA />
+    </Trans>
+    <Trans To="B">
+      <ToB />
+    </Trans>
+    <Trans To="C">
+      <ToC />
+    </Trans>
+  </Machine>
+</SimpleFSM>

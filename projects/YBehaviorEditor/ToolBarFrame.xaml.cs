@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -33,6 +33,13 @@ namespace YBehavior.Editor
             {
                 this.btnUndo.DataContext = oArg.Bench.CommandMgr;
                 this.btnRedo.DataContext = oArg.Bench.CommandMgr;
+
+                Visibility treeVisibility = oArg.Bench is TreeBench ? Visibility.Visible : Visibility.Collapsed;
+                Visibility fsmVisibility = oArg.Bench is FSMBench ? Visibility.Visible : Visibility.Collapsed;
+
+                btnFold.Visibility = treeVisibility;
+                btnCondition.Visibility = treeVisibility;
+                btnMakeDefault.Visibility = fsmVisibility;
             }
         }
 
@@ -99,6 +106,16 @@ namespace YBehavior.Editor
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
             MainWindow.ProcessKeyDown(Key.F2, ModifierKeys.None);
+        }
+
+        private void btnMakeDefault_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.ProcessKeyDown(Key.F7, ModifierKeys.None);
+        }
+
+        private void btnSearch_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.ProcessKeyDown(Key.F, ModifierKeys.Control);
         }
     }
 }

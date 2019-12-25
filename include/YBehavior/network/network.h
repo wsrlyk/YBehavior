@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_NETWORK_H_
 #define _YBEHAVIOR_NETWORK_H_
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #include "YBehavior/types.h"
 #include <vector>
 #include <sstream>
@@ -125,6 +125,6 @@ namespace YBehavior
 		void OnRecieveMessages(const STRING& msg);
 	};
 }
-#endif // DEBUGGER
+#endif // YDEBUGGER
 
 #endif

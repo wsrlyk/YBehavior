@@ -43,6 +43,12 @@
     <Filter Include="源文件\tools">
       <UniqueIdentifier>{82bdd3ff-c222-40d1-b868-cdd73fdca0e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\fsm">
+      <UniqueIdentifier>{6bad1811-28f4-4d48-a5aa-776e64cc74b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\fsm">
+      <UniqueIdentifier>{6a753cef-9e2d-4dee-8e9f-e3e108704aff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\YBehavior\agent.h">
@@ -189,8 +195,41 @@
     <ClInclude Include="..\include\YBehavior\memory.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\YBehavior\treeid.h">
+    <ClInclude Include="..\include\YBehavior\fsm\statemachine.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\machinestate.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\metastate.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\machinemgr.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\behaviorprocess.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\mgrs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\transition.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\context.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\nodes\fsmrelated.h">
+      <Filter>头文件\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\version.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\behavior.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\behaviormgr.h">
+      <Filter>头文件\fsm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -208,9 +247,6 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodes\sequence.cpp">
       <Filter>源文件\nodes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\factory.cpp">
-      <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\utility.cpp">
       <Filter>源文件</Filter>
@@ -314,8 +350,38 @@
     <ClCompile Include="..\src\YBehavior\SharedVariableCreateHelper.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\YBehavior\treeid.cpp">
+    <ClCompile Include="..\src\YBehavior\fsm\statemachine.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\machinestate.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\metastate.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\machinemgr.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\behaviorprocess.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\mgrs.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\transition.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\context.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\nodes\fsmrelated.cpp">
+      <Filter>源文件\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\behavior.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\behaviormgr.cpp">
+      <Filter>源文件\fsm</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

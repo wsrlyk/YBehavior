@@ -11,7 +11,7 @@ namespace YBehavior
 	struct YBEHAVIOR_API NameKeyInfo
 	{
 		std::unordered_map<STRING, KEY> mNameHash;
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		std::unordered_map<KEY, STRING> mReverseNameHash;
 #endif
 		KEY mKeyCounter;
@@ -24,7 +24,7 @@ namespace YBehavior
 		void Reset()
 		{
 			mNameHash.clear();
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 			mReverseNameHash.clear();
 #endif
 			mKeyCounter = 0;
@@ -37,7 +37,7 @@ namespace YBehavior
 				return it->second;
 			return Utility::INVALID_KEY;
 		}
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		const STRING& Get(const KEY& key)
 		{
 			auto it = mReverseNameHash.find(key);
@@ -80,7 +80,7 @@ namespace YBehavior
 			return info.Get(name);
 		}
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		template<typename T>
 		const STRING& GetName(const KEY& key)
 		{
@@ -103,7 +103,7 @@ namespace YBehavior
 		KEY GetKeyByName(const STRING& name);
 		KEY GetKeyByName(const STRING& name, TYPEID typeID);
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		template<typename T>
 		const STRING& GetNameByKey(KEY key);
 		const STRING& GetNameByKey(KEY key, TYPEID typeID);
@@ -119,7 +119,7 @@ namespace YBehavior
 		return GetKeyByName(name, GetTypeID<T>());
 	}
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 	template<typename T>
 	const STRING& TreeKeyMgr::GetNameByKey(KEY key)
 	{
@@ -147,7 +147,7 @@ namespace YBehavior
 #endif
 			curActiveNameKeyInfo.mNameHash[name] = key;
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 			curActiveNameKeyInfo.mReverseNameHash[key] = name;
 #endif
 		}

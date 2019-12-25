@@ -151,13 +151,27 @@ namespace YBehavior
 
 	UINT Utility::Hash(const STRING& str)
 	{
-		UINT len = str.length();
+		UINT len = (UINT)str.length();
 		UINT hash = 0;
 		for (UINT i = 0; i < len; ++i)
 		{
 			hash = (hash << 5) + hash + (UINT)str[i];
 		}
 		return hash;
+	}
+
+	YBehavior::STRING Utility::GetNameFromPath(const STRING& path)
+	{
+		STRING res;
+		auto it = path.find_last_of('/');
+		if (it != STRING::npos)
+			res = path.substr(it + 1);
+		else
+			res = path;
+		it = res.find_last_of('\\');
+		if (it != STRING::npos)
+			res = res.substr(it + 1);
+		return res;
 	}
 
 	template<>

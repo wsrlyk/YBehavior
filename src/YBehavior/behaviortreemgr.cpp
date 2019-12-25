@@ -7,26 +7,16 @@
 #include <string.h>
 #include "YBehavior/tools/common.h"
 #include "YBehavior/tools/treemgrhelper.hpp"
-#include "YBehavior/treeid.h"
+#include "YBehavior/mgrs.h"
 
 namespace YBehavior
 {
-
-	TreeMgr* TreeMgr::Instance()
-	{
-		if (!s_Instance)
-		{
-			s_Instance = new TreeMgr();
-		}
-		return s_Instance;
-	}
-
-	BehaviorTree * TreeMgr::_LoadTree(TreeID* id)
+	BehaviorTree * TreeMgr::_LoadTree(const STRING& name)
 	{
 		pugi::xml_document doc;
 
-		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + id->GetName() + ".xml").c_str());
-		LOG_BEGIN << "Loading: " << id->GetName() << ".xml" << LOG_END;
+		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + ".tree").c_str());
+		LOG_BEGIN << "Loading: " << name << ".tree" << LOG_END;
 		if (result.status)
 		{
 			ERROR_BEGIN << "Load result: " << result.description() << ERROR_END;
@@ -37,17 +27,17 @@ namespace YBehavior
 		if (rootData == nullptr)
 			return nullptr;
 
-		BehaviorTree* tree = new BehaviorTree(id);
+		BehaviorTree* tree = new BehaviorTree(name);
 
 		UINT uid = 0;
 		if (!_LoadOneNode(tree, rootData.first_child(), uid, tree))
 		{
-			ERROR_BEGIN << "Load xml failed: " << id->GetName() << ERROR_END;
+			ERROR_BEGIN << "Load tree failed: " << name << ERROR_END;
 			delete tree;
 			return nullptr;
 		}
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		xml_string_writer writer;
 		rootData.print(writer, PUGIXML_TEXT("\t"), pugi::format_indent | pugi::format_raw);
 		writer.result.erase(std::remove_if(writer.result.begin(), writer.result.end(), ::isspace), writer.result.end());
@@ -64,12 +54,12 @@ namespace YBehavior
 			return false;
 		}
 		node->SetRoot(root);
+		node->SetUID(++parentUID);
 		if (!node->Load(data))
 		{
-			ERROR_BEGIN << "Failed when load " << data.name() << ", uid " << (parentUID + 1) << ERROR_END;
+			ERROR_BEGIN << "Failed when load " << data.name() << ", uid " << (parentUID) << ERROR_END;
 			return false;
 		}
-		node->SetUID(++parentUID);
 		for (auto it = data.begin(); it != data.end(); ++it)
 		{
 			if (strcmp(it->name(), "Node") == 0)
@@ -111,215 +101,49 @@ namespace YBehavior
 		return true;
 	}
 
-	BehaviorTree * TreeMgr::GetTree(const STRING& name, const std::vector<STRING>* subs)
+	BehaviorTree * TreeMgr::GetTree(const STRING& name)
 	{
 		BehaviorTree *tree;
-		m_ToBeReplacedSubs = subs;
-		if (_GetTree(name, tree, true))
+		TreeInfoType* info;
+		if (!m_VersionMgr.GetData(name, tree, info))
 		{
-			m_ToBeReplacedSubs = nullptr;
-			return tree;
-		}
+			tree = _LoadTree(name);
+			if (!tree)
+				return nullptr;
 
-		m_ToBeReplacedSubs = nullptr;
+			info->SetLatest(tree);
+			info->ChangeReferenceCount(true);
 
-		CurrentBuildingInfo buildingInfo;
-		if (!_BuildSharedData(tree, nullptr, buildingInfo))
-		{
-			//_ProcessCycle(buildingInfo);
-			//_FinalBuild(tree, buildingInfo);
-			BuildMergedTree(tree, buildingInfo);
-			FinalBuild(buildingInfo);
 		}
 
 		return tree;
 	}
 
-	bool TreeMgr::_GetTree(const STRING& name, BehaviorTree* &tree, bool bToAgent)
-	{
-		TreeInfo* info = nullptr;
-		TreeID* id = nullptr;
-		auto it = m_TreeIDs.find(name);
-		if (it != m_TreeIDs.end())
-		{
-			for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2)
-			{
-				id = *it2;
-				if (!id->IsSameTree(name, m_ToBeReplacedSubs))
-					continue;
-				auto it3 = m_Trees.find(id);
-				if (it3 != m_Trees.end())
-				{
-					tree = it3->second->GetLatestTree();
-					if (tree)
-					{
-						it3->second->ChangeReferenceCount(true, bToAgent);
-						return true;
-					}
-					else
-						info = it3->second;
-
-					break;
-				}
-			}
-		}
-		
-		if (info == nullptr)
-		{
-			info = new TreeInfo();
-			id = new TreeID(name);
-			if (m_ToBeReplacedSubs != nullptr)
-				id->SetSubTrees(*m_ToBeReplacedSubs);
-			m_TreeIDs[name].push_back(id);
-			m_Trees[id] = info;
-		}
-
-
-		tree = _LoadTree(id);
-		if (!tree)
-			return true;
-		info->SetLatestTree(tree);
-		info->ChangeReferenceCount(true, bToAgent);
-
-		bool bNoChildren = true;
-		if (m_ToBeLoadedTree.size() > 0)
-		{
-			bool bLoadChidrenFailed = false;
-			std::unordered_set<STRING> tobeload;
-			tobeload.swap(m_ToBeLoadedTree);
-			for (auto it2 = tobeload.begin(); it2 != tobeload.end(); ++it2)
-			{
-				BehaviorTree* subTree;
-
-				_GetTree(*it2, subTree, false);
-				if (subTree)
-				{
-					tree->AddSubTree(subTree);
-					id->Merge(*subTree->GetTreeID());
-				}
-				else
-				{
-					bLoadChidrenFailed = true;
-					break;
-				}
-			}
-			if (bLoadChidrenFailed)
-			{
-				info->ChangeReferenceCount(false, bToAgent);
-				info->RevertVersion();
-				tree = nullptr;
-				return true;
-			}
-			bNoChildren = false;
-		}
-
-		id->BuildID();
-		return bNoChildren;
-	}
-
-	void TreeMgr::_CheckSubTree(const STRING& name, BehaviorTree* current, std::unordered_set<BehaviorTree*>& visited, std::list<BehaviorTree*>& visitedStack)
-	{
-		if (visited.count(current))
-			return;
-		visitedStack.push_back(current);
-		visited.insert(current);
-		for (auto it = current->GetSubTrees().begin(); it != current->GetSubTrees().end(); ++it)
-		{
-			if ((*it)->GetTreeNameWithPath() == name)
-			{
-				///> increase all the ancestors's version
-				for (auto it2 = visitedStack.rbegin(); it2 != visitedStack.rend(); ++it2)
-				{
-					auto it3 = m_Trees.find((*it2)->GetTreeID());
-					if (it3 != m_Trees.end())
-					{
-						it3->second->IncreaseLatestVesion();
-					}
-				}
-			}
-			else
-			{
-				_CheckSubTree(name, *it, visited, visitedStack);
-			}
-		}
-
-		visitedStack.pop_back();
-	}
-
 	void TreeMgr::ReloadTree(const STRING& name)
 	{
-		auto it = m_TreeIDs.find(name);
-		if (it != m_TreeIDs.end())
-		{
-			for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2)
-			{
-				auto it3 = m_Trees.find(*it2);
-				if (it3 == m_Trees.end())
-					continue;
-				it3->second->IncreaseLatestVesion();
-			}
-		}
-
-		///> find all trees reference to this tree, and inc their version
-
-		std::unordered_set<BehaviorTree*> visited;
-		std::list<BehaviorTree*> visitedStack;
-		for (auto it = m_Trees.begin(); it != m_Trees.end(); ++it)
-		{
-			BehaviorTree* tree = it->second->GetLatestTree();
-			if (tree == nullptr)
-			{
-				///> Already reloaded.
-				continue;
-			}
-
-			if (tree->GetSubTrees().size() == 0)
-				continue;
-
-			visited.clear();
-			visitedStack.push_back(tree);
-
-			_CheckSubTree(name, tree, visited, visitedStack);
-		}
+		m_VersionMgr.Reload(name);
 	}
 
 	void TreeMgr::ReloadAll()
 	{
-		for (auto it = m_Trees.begin(); it != m_Trees.end(); ++it)
-		{
-			it->second->IncreaseLatestVesion();
-		}
+		m_VersionMgr.ReloadAll();
 	}
 
-	void TreeMgr::ReturnTree(BehaviorTree* tree, bool bFromAgent)
+	void TreeMgr::ReturnTree(BehaviorTree* tree)
 	{
-		if (tree == nullptr)
-			return;
-
-		auto it = m_Trees.find(tree->GetTreeID());
-		if (it != m_Trees.end())
-		{
-			it->second->ChangeReferenceCount(false, bFromAgent, tree->GetVersion());
-		}
+		m_VersionMgr.Return(tree);
 	}
 
 	TreeMgr::~TreeMgr()
 	{
-		for (auto it = m_Trees.begin(); it != m_Trees.end(); ++it)
-		{
-			delete it->first;
-			delete it->second;
-		}
-		m_Trees.clear();
-		m_TreeIDs.clear();
 	}
 
-	TreeMgr* TreeMgr::s_Instance;
+	//TreeMgr* TreeMgr::s_Instance;
 
 	void TreeMgr::Print()
 	{
 		std::cout << "Print all trees" << std::endl;
-		for (auto it = m_Trees.begin(); it != m_Trees.end(); ++it)
+		for (auto it = m_VersionMgr.GetInfos().begin(); it != m_VersionMgr.GetInfos().end(); ++it)
 		{
 			std::cout << it->first << std::endl;
 			it->second->Print();
@@ -340,207 +164,4 @@ namespace YBehavior
 			m_WorkingDir.append(1, '/');
 		}
 	}
-
-	void TreeMgr::GarbageCollection()
-	{
-		std::unordered_set<BehaviorTree*> hasAgent;
-		std::unordered_set<BehaviorTree*> noAgent;
-
-		std::list<BehaviorTree*> temp;
-
-		for (auto it = m_Trees.begin(); it != m_Trees.end(); ++it)
-		{
-			TreeInfo* info = it->second;
-			for (auto it2 = info->GetVersions().begin(); it2 != info->GetVersions().end(); ++it2)
-			{
-				TreeVersion* version = it2->second;
-				if (version == info->GetLatestVersion())
-					continue;
-
-				if (version->agentReferenceCount > 0)
-				{
-					hasAgent.insert(version->tree);
-					///> Get all children and mark them as having reference.
-					temp.clear();
-					temp.push_back(version->tree);
-					while (!temp.empty())
-					{
-						BehaviorTree* tree = temp.front();
-						temp.pop_front();
-						if (hasAgent.count(tree))
-							continue;
-						hasAgent.insert(tree);
-						noAgent.erase(tree);
-
-						for (auto it3 = tree->GetSubTrees().begin(); it3 != tree->GetSubTrees().end(); ++it3)
-						{
-							temp.push_back(*it3);
-						}
-					}
-				}
-				else
-				{
-					noAgent.insert(version->tree);
-				}
-			}
-		}
-
-		for (auto it = noAgent.begin(); it != noAgent.end(); ++it)
-		{
-			(*it)->ClearSubTree();
-
-			auto it2 = m_Trees.find((*it)->GetTreeID());
-			if (it2 == m_Trees.end())
-			{
-				ERROR_BEGIN << "Cant find info about tree: " << (*it)->GetTreeNameWithPath() << ERROR_END;
-				continue;
-			}
-
-			it2->second->RemoveVersion((*it)->GetVersion());
-		}
-	}
-
-	///>//////////////////////////////////////////////////////////////////////////////////////////
-	///>//////////////////////////////////////////////////////////////////////////////////////////
-	///>//////////////////////////////////////////////////////////////////////////////////////////
-
-	void TreeInfo::Print()
-	{
-		for (auto it = m_TreeVersions.begin(); it != m_TreeVersions.end(); ++it)
-		{
-			std::cout << "version " << it->first << ", agentcount " << it->second->agentReferenceCount << ", treecount " << it->second->treeReferenceCount << std::endl;
-		}
-	}
-
-	TreeInfo::TreeInfo()
-		: m_LatestVersion(nullptr)
-		, m_PreviousVersion(nullptr)
-	{
-		CreateVersion();
-	}
-
-	TreeInfo::~TreeInfo()
-	{
-		for (auto it = m_TreeVersions.begin(); it != m_TreeVersions.end(); ++it)
-		{
-			delete it->second->tree;
-			delete it->second;
-		}
-		m_TreeVersions.clear();
-	}
-
-	void TreeInfo::TryRemoveVersion(TreeVersion* version)
-	{
-		if (version == nullptr || version->tree == nullptr || version->GetReferenceCount() > 0)
-			return;
-		RemoveVersion(version);
-	}
-
-	void TreeInfo::RemoveVersion(TreeVersion* version)
-	{
-		if (version)
-		{
-			if (version->tree->GetSubTrees().size() > 0)
-			{
-				for (auto it = version->tree->GetSubTrees().begin(); it != version->tree->GetSubTrees().end(); ++it)
-				{
-					TreeMgr::Instance()->ReturnTree(*it, false);
-				}
-			}
-
-			m_TreeVersions.erase(version->version);
-
-			if (version->tree)
-				delete version->tree;
-
-			if (m_PreviousVersion == version)
-				m_PreviousVersion = nullptr;
-			if (m_LatestVersion == version)
-				m_LatestVersion = nullptr;
-			delete version;
-		}
-	}
-
-	TreeVersion* TreeInfo::CreateVersion()
-	{
-		TreeVersion* pVersion = new TreeVersion();
-		if (m_LatestVersion == nullptr)
-		{
-			pVersion->version = 0;
-		}
-		else
-		{
-			pVersion->version = m_LatestVersion->version + 1;
-
-			///> Check if the current latest version has no reference. Remove it if true
-			{
-				TryRemoveVersion(m_LatestVersion);
-			}
-		}
-		m_PreviousVersion = m_LatestVersion;
-		m_LatestVersion = pVersion;
-		m_TreeVersions[pVersion->version] = pVersion;
-
-		return pVersion;
-	}
-
-	void TreeInfo::RevertVersion()
-	{
-		TryRemoveVersion(m_LatestVersion);
-		m_LatestVersion = m_PreviousVersion;
-		m_PreviousVersion = nullptr;
-	}
-
-	void TreeInfo::IncreaseLatestVesion()
-	{
-		if (m_LatestVersion == nullptr || m_LatestVersion->tree == nullptr)
-			return;
-
-		CreateVersion();
-	}
-
-	void TreeInfo::SetLatestTree(BehaviorTree* tree)
-	{
-		if (m_LatestVersion == nullptr)
-			CreateVersion();
-		m_LatestVersion->tree = tree;
-		tree->SetVersion(m_LatestVersion);
-	}
-
-	void TreeInfo::ChangeReferenceCount(bool bInc, bool bAgent, TreeVersion* version)
-	{
-		if (version == nullptr)
-			version = m_LatestVersion;
-		else
-		{
-			auto it = m_TreeVersions.find(version->version);
-			if (it != m_TreeVersions.end() && it->second != version)
-				version = nullptr;
-		}
-
-		if (version == nullptr)
-			return;
-
-		if (bInc)
-		{
-			if (bAgent)
-				++(version->agentReferenceCount);
-			else
-				++(version->treeReferenceCount);
-		}
-		else
-		{
-			if (bAgent)
-				--(version->agentReferenceCount);
-			else
-				--(version->treeReferenceCount);
-
-			if (m_LatestVersion != version)
-			{
-				///> Old version has no reference, remove it
-				TryRemoveVersion(version);
-			}
-		}
-	}
-
 }

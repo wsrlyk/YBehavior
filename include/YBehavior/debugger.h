@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_DEBUGGER_H_
 #define _YBEHAVIOR_DEBUGGER_H_
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 
 #include "YBehavior/define.h"
 #include "YBehavior/singleton.h"
@@ -10,16 +10,19 @@
 #include <list>
 #include <unordered_map>
 #include "YBehavior/network/network.h"
+#include "YBehavior/fsm/statemachine.h"
 
 namespace YBehavior
 {
+	enum struct DebugTargetType;
+	
 	struct NodeRunInfo
 	{
 		UINT nodeUID;
-		NodeState rawRunState;
-		NodeState finalRunState;
-		BehaviorTree* tree;
-
+		int rawRunState;
+		int finalRunState;
+		const void* pNode;
+		DebugTargetType type;
 		const STRING ToString() const;
 	};
 	struct NodeLogInfo
@@ -57,10 +60,16 @@ namespace YBehavior
 		inline bool NoDebugPoint() { return count == 0; }
 	};
 
-	struct TreeDebugInfo
+	struct GraphDebugInfo
 	{
 		std::unordered_map<UINT, DebugPointInfo> DebugPointInfos;
 		UINT Hash;
+
+		void Reset()
+		{
+			Hash = 0;
+			DebugPointInfos.clear();
+		}
 	};
 
 	enum DebugCommand
@@ -70,48 +79,84 @@ namespace YBehavior
 		DC_StepInto,
 		DC_StepOver,
 	};
+	enum struct DebugTargetType
+	{
+		INVALID = -1,
+		TREE,
+		FSM,
+	};
+	struct DebugTargetID
+	{
+		DebugTargetID()
+			: Type(DebugTargetType::INVALID)
+			, Name(Utility::StringEmpty)
+		{}
+		DebugTargetID(DebugTargetType type, const STRING& name)
+			: Type(type)
+			, Name(name)
+		{}
+		DebugTargetType Type;
+		STRING Name;
+		bool operator==(const DebugTargetID& other) const
+		{
+			return Type == other.Type && Name == other.Name;
+		}
+		class Hash
+		{
+		public:
+			size_t operator()(const DebugTargetID& o) const
+			{
+				return Utility::hash_val(o.Name, o.Type);
+			}
+		};
+	};
 
-	class DebugHelper;
+	class IDebugHelper;
 	class DebugMgr: public Singleton<DebugMgr>
 	{
 		UINT64 m_TargetAgent = 0;
 		UINT64 m_TryTarget = 0;
 		//UINT m_TargetHash;
-		STRING m_TargetTree;
+		DebugTargetID m_Target;
 		bool m_bTargetDirty = false;
 
 		Mutex m_Mutex;
-		std::list<NodeRunInfo*> m_RunInfos;
+		///> Node(Tree or FSM) => RunInfo, one node has only one info
+		std::unordered_map<const void*, NodeRunInfo*> m_RunInfos;
 		//std::unordered_map<UINT, DebugPointInfo> m_DebugPointInfos;
 
-		std::unordered_map<STRING, TreeDebugInfo> m_TreeDebugInfo;
+		std::unordered_map<STRING, GraphDebugInfo> m_TreeDebugInfo;
+		GraphDebugInfo m_FSMDebugInfo;
 
 		STRING m_SendBuffer;
 
 		bool m_bPaused = false;
 
 		DebugCommand m_Command = DC_None;
-		DebugHelper* m_StepOverHelper = nullptr;
+		IDebugHelper* m_StepOverHelper = nullptr;
 	public:
 		~DebugMgr();
-		void SetTarget(const STRING& tree, UINT64 agent);
+		void SetTarget(const DebugTargetID& target);
+		void SetTarget(UINT64 target);
 		void Begin();
 		void ResetTarget();
 		void Stop();
 		bool IsValidTarget(Agent* pAgent, BehaviorTree* pTree);
-		inline const STRING& GetTargetTree() { return m_TargetTree; }
+		bool IsValidTarget(Agent* pAgent, FSM* pFSM);
+		inline const DebugTargetID& GetTarget() { return m_Target; }
 		inline UINT64 GetTargetAgent() { return m_TargetAgent; }
-		inline const std::list<NodeRunInfo*>& GetRunInfos() { return m_RunInfos; }
+
 		inline Mutex& GetMutex() { return m_Mutex; }
-		bool HasBreakPoint(const STRING& treeName, UINT nodeUID);
-		bool HasLogPoint(const STRING& treeName, UINT nodeUID);
-		bool HasDebugPoint(const STRING& treeName, UINT nodeUID);
-		void ClearTreeDebugInfo() { m_TreeDebugInfo.clear(); }
-		void AddBreakPoint(const STRING& treeName, UINT nodeUID);
-		void AddLogPoint(const STRING& treeName, UINT nodeUID);
-		void AddTreeDebugInfo(STRING&& name, TreeDebugInfo&& info);
-		void RemoveDebugPoint(const STRING& treeName, UINT nodeUID);
-		NodeRunInfo* CreateAndAppendRunInfo();
+		bool HasBreakPoint(const DebugTargetID& target, UINT nodeUID);
+		bool HasLogPoint(const DebugTargetID& target, UINT nodeUID);
+		bool HasDebugPoint(const DebugTargetID& target, UINT nodeUID);
+		void ClearDebugInfos() { m_TreeDebugInfo.clear(); m_FSMDebugInfo.Reset(); }
+		void AddBreakPoint(const DebugTargetID& target, UINT nodeUID);
+		void AddLogPoint(const DebugTargetID& target, UINT nodeUID);
+		void AddTreeDebugInfo(const DebugTargetID& target, GraphDebugInfo&& info);
+		void RemoveDebugPoint(const DebugTargetID& target, UINT nodeUID);
+		GraphDebugInfo* FindGraphDebugInfo(const DebugTargetID& target);
+		NodeRunInfo* CreateAndAppendRunInfo(const void* pNode);
 		void Clear();
 
 		inline void TogglePause(bool bPaused) { m_bPaused = bPaused; }
@@ -121,50 +166,80 @@ namespace YBehavior
 		void AppendSendContent(const char c) { m_SendBuffer += c; }
 		void Send(bool bClearRunInfo);
 
+		void SendInfos(AgentPtr pTarget, bool clear);
 		inline void SetCommand(DebugCommand cmd) { m_Command = cmd; }
 		inline DebugCommand GetCommand() const { return m_Command; }
-		inline void SetStepOverHelper(DebugHelper* helper) { m_StepOverHelper = helper; }
-		inline DebugHelper* GetStepOverHelper() const { return m_StepOverHelper; }
+		inline void SetStepOverHelper(IDebugHelper* helper) { m_StepOverHelper = helper; }
+		inline IDebugHelper* GetStepOverHelper() const { return m_StepOverHelper; }
+	private:
+		void _TryDebug(AgentPtr pAgent);
 	};
 
-	class Agent;
-	class DebugHelper
+	class IDebugHelper
 	{
+	protected:
 		static unsigned s_Token;
 
+		NodeRunInfo* m_pRunInfo;
 		unsigned m_Token;
 		Agent* m_Target;
-		BehaviorNode* m_pNode;
-		NodeRunInfo* m_pRunInfo;
-		NodeLogInfo* m_pLogInfo;
-
-		void _SendInfos(bool clear);
-		void _SendCurrentInfos();
-		void _SendPause();
-		void _SendLogPoint();
+		DebugTargetType m_Type;
 	public:
-		DebugHelper(Agent* pAgent, BehaviorNode* pNode);
-		~DebugHelper();
+		IDebugHelper(Agent* pAgent) : m_Target(pAgent){}
+		virtual ~IDebugHelper() {}
 		inline bool IsValid() { return m_Target != nullptr; }
-		void CreateRunInfo();
-		void SetResult(NodeState rawState, NodeState finalState);
-		void TestBreaking();
-		void TestPause();
+		void CreateRunInfo(const void* pNode);
+		void SetResult(int rawState, int finalState);
+		void TryBreaking();
+		void TryPause();
 		bool HasLogPoint();
 		bool HasDebugPoint();
-		void Breaking();
-		void SetBreak();
+		virtual const STRING& GetRootName() = 0;
+	protected:
+		void _SendPause();
+		void _AssignToken() { m_Token = ++s_Token; }
+		void _SetBreak();
+		void _Breaking();
+		void _SendCurrentInfos();
 	public:
-		void LogSharedData(ISharedVariableEx* pVariable, bool bBefore);
-		
 		static const char s_HeadSpliter = (char)3;
 		static const char s_ContentSpliter = (char)4;
-		static const char s_SectionSpliter = (char)5;
+		//static const char s_SectionSpliter = (char)5;
 		static const char s_SequenceSpliter = (char)6;
 		static const char s_ListSpliter = (char)7;
 	};
+
+	class Agent;
+	class DebugTreeHelper : public IDebugHelper
+	{
+		BehaviorNode* m_pNode;
+		NodeLogInfo* m_pLogInfo;
+
+		void _SendLogPoint();
+	public:
+		DebugTreeHelper(Agent* pAgent, BehaviorNode* pNode);
+		~DebugTreeHelper();
+		const STRING& GetRootName() override;
+	public:
+		void LogSharedData(ISharedVariableEx* pVariable, bool bBefore);
+		
+	};
+
+	class DebugFSMHelper : public IDebugHelper
+	{
+		MachineState* m_pNode;
+		NodeLogInfo* m_pLogInfo;
+
+		void _SendLogPoint();
+	public:
+		DebugFSMHelper(Agent* pAgent, MachineState* pNode);
+		~DebugFSMHelper();
+		const STRING& GetRootName() override;
+
+	};
+
 }
 
-#endif // DEBUGGER
+#endif // YDEBUGGER
 
 #endif

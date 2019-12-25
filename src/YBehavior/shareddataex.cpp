@@ -59,4 +59,12 @@ namespace YBehavior
 		}
 	}
 
+	void SharedDataEx::Clear()
+	{
+		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
+		{
+			m_Datas[i]->Clear();
+		}
+	}
+
 }

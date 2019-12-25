@@ -35,6 +35,7 @@ namespace YBehavior
 		return info.Get(name);
 	}
 
+#ifdef YDEBUGGER
 	const STRING& TreeKeyMgr::GetNameByKey(KEY key, TYPEID typeID)
 	{
 		NameKeyInfo& info = mCommonNameKeyInfo.Get(typeID);
@@ -46,7 +47,7 @@ namespace YBehavior
 		info = mpCurActiveNameKeyInfo->Get(typeID);
 		return info.Get(key);
 	}
-
+#endif
 	TreeKeyMgr::TreeKeyMgr()
 	{
 		mCommonNameKeyInfo.Reset();

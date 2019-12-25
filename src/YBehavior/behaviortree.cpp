@@ -6,26 +6,25 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariablecreatehelper.h"
 #include "YBehavior/sharedvariableex.h"
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #include "YBehavior/debugger.h"
 #endif
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/agent.h"
 #include <string.h>
 #include "YBehavior/runningcontext.h"
-#include "YBehavior/treeid.h"
 
 namespace YBehavior
 {
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #define DEBUG_RETURN(helper, rawres, finalres)\
 	{\
 		helper.SetResult(rawres, finalres);\
 		return (finalres);\
 	}
 #else
-#define DEBUG_RETURN(helper, res)\
-	return (res)
+#define DEBUG_RETURN(helper, rawres, finalres)\
+	return (finalres)
 #endif
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
@@ -60,7 +59,7 @@ namespace YBehavior
 
 	std::unordered_set<STRING> BehaviorNode::KEY_WORDS = { "Class", "Pos", "NickName" };
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 	bool BehaviorNode::_HasLogPoint()
 	{
 		return m_pDebugHelper && m_pDebugHelper->HasDebugPoint();
@@ -78,8 +77,8 @@ namespace YBehavior
 
 	YBehavior::NodeState BehaviorNode::Execute(AgentPtr pAgent, NodeState parentState)
 	{
-#ifdef DEBUGGER
-		DebugHelper dbgHelper(pAgent, this);
+#ifdef YDEBUGGER
+		DebugTreeHelper dbgHelper(pAgent, this);
 		m_pDebugHelper = &dbgHelper;
 #endif
 		NodeState state = NS_INVALID;
@@ -120,8 +119,8 @@ namespace YBehavior
 			}
 
 			///> check breakpoint
-#ifdef DEBUGGER
-			dbgHelper.TestBreaking();
+#ifdef YDEBUGGER
+			dbgHelper.TryBreaking();
 #endif
 
 			//////////////////////////////////////////////////////////////////////////
@@ -142,10 +141,8 @@ namespace YBehavior
 			}
 
 			///> postprocessing
-#ifdef DEBUGGER
-			//DEBUG_LOG_INFO(" Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
-
-			dbgHelper.TestPause();
+#ifdef YDEBUGGER
+			dbgHelper.TryPause();
 			m_pDebugHelper = nullptr;
 #endif
 		} while (false);
@@ -159,15 +156,12 @@ namespace YBehavior
 				finalState = NS_FAILURE;
 			else if (state == NS_FAILURE)
 				finalState = NS_SUCCESS;
-			//DEBUG_LOG_INFO(", Force Invert to " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 			break;
 		case YBehavior::RT_SUCCESS:
 			finalState = NS_SUCCESS;
-			//DEBUG_LOG_INFO(", Force Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 			break;
 		case YBehavior::RT_FAILURE:
 			finalState = NS_FAILURE;
-			//DEBUG_LOG_INFO(", Force Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 			break;
 		default:
 			break;
@@ -345,7 +339,7 @@ namespace YBehavior
 					op = helper->CreateVariable();
 					m_Variables.push_back(op);
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 					op->SetName(attriName, this->GetClassName());
 #endif
 
@@ -389,7 +383,7 @@ namespace YBehavior
 			else
 				op->SetValueFromString(buffer[1]);
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 			op->SetName(attrOptr.name(), this->GetClassName());
 #endif
 
@@ -407,20 +401,11 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 
 
-	BehaviorTree::BehaviorTree(TreeID* id)
+	BehaviorTree::BehaviorTree(const STRING& name)
 	{
-		m_ID = id;
-		m_TreeNameWithPath = id->GetName();
-		{
-			auto it = id->GetName().find_last_of('/');
-			if (it != STRING::npos)
-				m_TreeName = id->GetName().substr(it + 1);
-			else
-				m_TreeName = id->GetName();
-			it = m_TreeName.find_last_of('\\');
-			if (it != STRING::npos)
-				m_TreeName = m_TreeName.substr(it + 1);
-		}
+		m_TreeNameWithPath = name;
+		m_TreeName = Utility::GetNameFromPath(m_TreeNameWithPath);
+		
 		m_SharedData = new SharedDataEx();
 		m_LocalData = nullptr;
 		//m_NameKeyMgr = new NameKeyMgr();
@@ -497,6 +482,11 @@ namespace YBehavior
 		destination.CloneFrom(*m_SharedData);
 	}
 
+	void BehaviorTree::MergeDataTo(SharedDataEx& destination)
+	{
+		destination.MergeFrom(*m_SharedData, false);
+	}
+
 
 	YBehavior::NodeState BehaviorTree::RootExecute(AgentPtr pAgent, NodeState parentState, LocalMemoryInOut* pInOut)
 	{
@@ -544,7 +534,7 @@ namespace YBehavior
 				ISharedVariableEx* pTo = it2->second;
 				if (pFrom->TypeID() != pTo->TypeID())
 				{
-					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetTree()->GetTreeName() << ERROR_END;
+					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetRunningTree()->GetTreeName() << ERROR_END;
 					continue;
 				}
 				pTo->SetValue(m_pAgent->GetMemory(), pFrom->GetValue(&m_TempMemory));
@@ -565,7 +555,7 @@ namespace YBehavior
 				ISharedVariableEx* pFrom = it2->second;
 				if (pFrom->TypeID() != pTo->TypeID())
 				{
-					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetTree()->GetTreeName() << ERROR_END;
+					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetRunningTree()->GetTreeName() << ERROR_END;
 					continue;
 				}
 				pTo->SetValue(&m_TempMemory, pFrom->GetValue(m_pAgent->GetMemory()));

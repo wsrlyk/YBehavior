@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SimpleFSM>
+  <Machine Default="A">
+    <State Type="Entry" Pos="100,100" />
+    <State Type="Exit" Pos="400,400" />
+    <State Type="Any" Pos="250,250" />
+    <State Name="A" Tree="AA" Pos="81,281" />
+    <State Name="B" Tree="BB" Pos="116,417" />
+    <State Name="C" Tree="CC" Pos="295,454" />
+    <Trans To="A">
+      <ToA />
+    </Trans>
+    <Trans To="B">
+      <ToB />
+    </Trans>
+    <Trans To="C">
+      <ToC />
+    </Trans>
+  </Machine>
+</SimpleFSM>

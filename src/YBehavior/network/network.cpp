@@ -1,4 +1,4 @@
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #include "YBehavior/network/network.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/network/messageprocessor.h"
@@ -209,7 +209,7 @@ namespace YBehavior
 		{
 			ScopedLock lock(m_Mutex);
 
-			HalfWord halfword(text.size());
+			HalfWord halfword((INT)text.size());
 			ms_sendBuffer += halfword.ToString();
 			ms_sendBuffer += text;
 #ifdef PRINT_INTERMEDIATE_INFO
@@ -245,4 +245,4 @@ namespace YBehavior
 	}
 
 }
-#endif // DEBUGGER
+#endif // YDEBUGGER

@@ -8,17 +8,29 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
     /// <summary>
     /// UIConnection.xaml 的交互逻辑
     /// </summary>
-    public partial class UIConnection : YUserControl, ISelectable, IDeletable
+
+    public abstract class UIConnectionBase : DebugControl<UIConnectionBase>
+    {
+        public UIConnectionBase()
+        { }
+
+        public UIConnectionBase(bool bHasOperation)
+            :base (bHasOperation)
+        { }
+    }
+
+    public partial class UIConnection : UIConnectionBase, ISelectable, IDeletable, IDraggingConnection
     {
         static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
         //static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
@@ -29,7 +41,20 @@ namespace YBehavior.Editor
         SelectionStateChangeHandler SelectHandler { get; set; }
         Operation m_Operation;
 
-        public ConnectionHolder ChildHolder { get; set; }
+        public override FrameworkElement DebugUI { get { return this.debug; } }
+        public override Brush DebugBrush
+        {
+            get { return this.debug.Stroke; }
+            set
+            {
+                this.debug.Stroke = value;
+            }
+        }
+        Storyboard m_InstantAnim;
+        public override Storyboard InstantAnim { get { return m_InstantAnim; } }
+
+        public override NodeState RunState => m_Renderer.RunState;
+        ConnectionRenderer m_Renderer;
 
         public UIConnection()
         {
@@ -38,11 +63,19 @@ namespace YBehavior.Editor
             //Clear();
             normalStrokeBrush = this.path.Stroke;
 
+            m_InstantAnim = Application.Current.Resources["InstantShowAnim"] as Storyboard;
+
             SelectHandler = new SelectionStateChangeHandler(defaultSelectHandler);
 
             m_Operation = new Operation(this);
             m_Operation.RegisterLeftClick(_OnClick);
             this.DataContextChanged += _DataContextChangedEventHandler;
+
+            this.SetBinding(DebugTriggerProperty, new Binding()
+            {
+                Path = new PropertyPath("DebugTrigger"),
+                Mode = BindingMode.OneWay,
+            });
         }
 
         public UIConnection(bool bHasOperation)
@@ -65,8 +98,7 @@ namespace YBehavior.Editor
 
         void _DataContextChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e)
         {
-            ConnectionRenderer renderer = this.DataContext as ConnectionRenderer;
-            ChildHolder = renderer.ChildConn;
+            m_Renderer = this.DataContext as ConnectionRenderer;
 
             //SetCanvas((renderer.ChildConn.Owner as Node).Renderer.RenderCanvas);
         }
@@ -79,7 +111,7 @@ namespace YBehavior.Editor
         //    figure.StartPoint = new Point();
         //}
 
-        public void SetWithMidY(Point start, Point end, double midY)
+        public void Set(Point start, Point end, double midY)
         {
             //Clear();
             figure.StartPoint = start;
@@ -112,7 +144,8 @@ namespace YBehavior.Editor
             if (DebugMgr.Instance.IsDebugging())
                 return;
 
-            WorkBenchMgr.Instance.DisconnectNodes(this.ChildHolder);
+            WorkBenchMgr.Instance.DisconnectNodes((this.DataContext as ConnectionRenderer).Owner.Ctr);
         }
+
     }
 }

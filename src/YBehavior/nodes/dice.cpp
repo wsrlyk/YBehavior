@@ -43,64 +43,51 @@ namespace YBehavior
 
 		IVariableOperationHelper* pHelper = m_Input->GetOperation();
 
-		const void* x0 = m_Distribution->GetElement(pAgent->GetMemory(), 0);
-		void* pZero = pHelper->AllocData();
-		pHelper->Set(pZero, x0);
-		pHelper->Calculate(pZero, pZero, pZero, OT_SUB);
+		auto zero = pHelper->AllocTempData();
 
 		const void* input;
-		void* randRes;
-		
-		BOOL bIgnoreInput = false;
+		auto res = pHelper->AllocTempData();
+
+		BOOL bIgnoreInput = Utility::FALSE_VALUE;
 		m_IgnoreInput->GetCastedValue(pAgent->GetMemory(), bIgnoreInput);
 		if (bIgnoreInput)
 		{
-			void* pSum = pHelper->AllocData();
-			pHelper->Set(pSum, pZero);
+			auto sum = pHelper->AllocTempData();
+
 			for (INT i = 0; i < sizeX; ++i)
 			{
 				const void* x1 = m_Distribution->GetElement(pAgent->GetMemory(), i);
-				pHelper->Calculate(pSum, pSum, x1, OT_ADD);
+				pHelper->Calculate(sum.pData, sum.pData, x1, OT_ADD);
 			}
-			randRes = pHelper->AllocData();
-			pHelper->Random(randRes, pZero, pSum);
-			input = randRes;
-			pHelper->RecycleData(pSum);
+			pHelper->Random(res.pData, zero.pData, sum.pData);
+			input = res.pData;
 		}
 		else
 		{
 			input = m_Input->GetValue(pAgent->GetMemory());
 		}
-		///>   y = y0 + (y1 - y0) * (x - x0) / (x1 - x0)
-		///>   y = y0 + pDeltaY * pOffsetX / pDeltaX
-		///>   y = y0 + pDeltaY * pRatio  (Here we wont calc pRatio first, in case that offsetX and DeltaX are intergers, leading to inaccurate division.
-		///>								Instead, we calc pDeltaY * pOffsetX first
-		///>   y = y0 + pOffsetY
 
-		if (pHelper->Compare(input, pZero, OT_LESS))
+		if (pHelper->Compare(input, zero.pData, OT_LESS))
 		{
 			DEBUG_LOG_INFO("Input below zero; ");
 			return NS_FAILURE;
 		}
 
-		void* pCurrent = pHelper->AllocData();
+		auto current = pHelper->AllocTempData();
 
 		for (INT i = 0; i < sizeX; ++i)
 		{
 			const void* x0 = m_Distribution->GetElement(pAgent->GetMemory(), i);
-			pHelper->Calculate(pCurrent, pCurrent, x0, OT_ADD);
+			pHelper->Calculate(current.pData, current.pData, x0, OT_ADD);
 
 			///> in the range of this (x0, x1)
-			if (pHelper->Compare(input, pCurrent, OT_LESS))
+			if (pHelper->Compare(input, current.pData, OT_LESS))
 			{
 				ns = NS_SUCCESS;
 				m_Output->SetValue(pAgent->GetMemory(), m_Values->GetElement(pAgent->GetMemory(), i));
 				break;
 			}
 		}
-		pHelper->RecycleData(pZero);
-		pHelper->RecycleData(randRes);
-		pHelper->RecycleData(pCurrent);
 
 		if (ns == NS_FAILURE)
 		{
@@ -157,7 +144,7 @@ namespace YBehavior
 			return false;
 		}
 
-		TYPEID bType = CreateVariable(m_IgnoreInput, "IgnoreInput", data);
+		CreateVariable(m_IgnoreInput, "IgnoreInput", data);
 		if (!m_IgnoreInput)
 		{
 			return false;

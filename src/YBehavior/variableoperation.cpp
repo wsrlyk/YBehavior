@@ -47,4 +47,10 @@ namespace YBehavior
 	{
 	}
 
+	TempObject::~TempObject()
+	{
+		if (pData && pHelper)
+			pHelper->RecycleData(pData);
+	}
+
 }

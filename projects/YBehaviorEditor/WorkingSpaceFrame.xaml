@@ -8,11 +8,14 @@
              d:DesignHeight="300" d:DesignWidth="200">
     <DockPanel>
         <StackPanel Name="FileOperatePanel" Orientation="Horizontal" Height="30" HorizontalAlignment="Left" Width="200"  DockPanel.Dock="Top">
-            <Button Name="btnNew" Click="btnNew_Click">New</Button>
+            <Button Name="btnNewTree" Click="btnNewTree_Click">NewTree</Button>
+            <Button Name="btnNewFSM" Click="btnNewFSM_Click">NewFSM</Button>
             <Button Name="btnSave" Click="btnSave_Click">Save</Button>
             <Button Name="btnRefresh" Click="btnRefresh_Click">Refresh</Button>
         </StackPanel>
-        <TreeView Name="Files" MouseDoubleClick="OnFilesItemDoubleClick" Background="DarkGray" LostFocus="Files_LostFocus">
+        <TreeView Name="Files" MouseDoubleClick="OnFilesItemDoubleClick" Background="DarkGray" LostFocus="Files_LostFocus"
+                  ScrollViewer.HorizontalScrollBarVisibility="Auto" 
+                  ScrollViewer.VerticalScrollBarVisibility="Auto">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding Expanded, Mode=TwoWay}"/>

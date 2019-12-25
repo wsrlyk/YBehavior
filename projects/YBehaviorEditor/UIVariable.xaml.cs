@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -26,10 +27,10 @@ namespace YBehavior.Editor
 
         private void Remover_Click(object sender, RoutedEventArgs e)
         {
-            if (Core.DebugMgr.Instance.IsDebugging())
+            if (DebugMgr.Instance.IsDebugging())
                 return;
 
-            Core.Variable v = DataContext as Core.Variable;
+            Variable v = DataContext as Variable;
             if (v == null)
                 return;
 
@@ -37,7 +38,7 @@ namespace YBehavior.Editor
             if (dr == MessageBoxResult.Yes)
             {
 
-                if (v is Core.InOutVariable)
+                if (v is InOutVariable)
                 {
                     if (v.SharedDataSource.InOutData != null)
                         v.SharedDataSource.InOutData.RemoveVariable(v);
@@ -52,7 +53,7 @@ namespace YBehavior.Editor
 
         private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            Core.Variable v = e.NewValue as Core.Variable;
+            Variable v = e.NewValue as Variable;
             if (v == null)
                 return;
 
@@ -61,22 +62,22 @@ namespace YBehavior.Editor
 
         private void VTypes_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Core.Variable v = DataContext as Core.Variable;
+            Variable v = DataContext as Variable;
             if (v == null)
                 return;
 
             _RefreshVType(v);
         }
 
-        void _RefreshVType(Core.Variable v)
+        void _RefreshVType(Variable v)
         {
-            if (v.vType == Core.Variable.ValueType.VT_ENUM)
+            if (v.vType == Variable.ValueType.VT_ENUM)
             {
                 this.VConst.Visibility = Visibility.Collapsed;
                 this.VBool.Visibility = Visibility.Collapsed;
                 this.VEnum.Visibility = Visibility.Visible;
             }
-            else if (v.vType == Core.Variable.ValueType.VT_BOOL && v.cType == Core.Variable.CountType.CT_SINGLE)
+            else if (v.vType == Variable.ValueType.VT_BOOL && v.cType == Variable.CountType.CT_SINGLE)
             {
                 this.VConst.Visibility = Visibility.Collapsed;
                 this.VBool.Visibility = Visibility.Visible;
@@ -92,11 +93,11 @@ namespace YBehavior.Editor
 
         private void CSwitcher_Click(object sender, RoutedEventArgs e)
         {
-            Core.Variable v = DataContext as Core.Variable;
+            Variable v = DataContext as Variable;
             if (v == null)
                 return;
 
-            v.cType = v.cType == Core.Variable.CountType.CT_LIST ? Core.Variable.CountType.CT_SINGLE : Core.Variable.CountType.CT_LIST;
+            v.cType = v.cType == Variable.CountType.CT_LIST ? Variable.CountType.CT_SINGLE : Variable.CountType.CT_LIST;
             _RefreshVType(v);
         }
 

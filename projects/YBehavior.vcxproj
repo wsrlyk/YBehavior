@@ -5,24 +5,42 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugiconfig.hpp" />
     <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugixml.hpp" />
     <ClInclude Include="..\include\YBehavior\agent.h" />
+    <ClInclude Include="..\include\YBehavior\behaviorprocess.h" />
     <ClInclude Include="..\include\YBehavior\behaviortree.h" />
     <ClInclude Include="..\include\YBehavior\behaviortreemgr.h" />
     <ClInclude Include="..\include\YBehavior\debugger.h" />
     <ClInclude Include="..\include\YBehavior\define.h" />
     <ClInclude Include="..\include\YBehavior\factory.h" />
+    <ClInclude Include="..\include\YBehavior\fsm\context.h" />
+    <ClInclude Include="..\include\YBehavior\fsm\machinemgr.h" />
+    <ClInclude Include="..\include\YBehavior\fsm\machinestate.h" />
+    <ClInclude Include="..\include\YBehavior\fsm\behavior.h" />
+    <ClInclude Include="..\include\YBehavior\fsm\behaviormgr.h" />
+    <ClInclude Include="..\include\YBehavior\fsm\metastate.h" />
+    <ClInclude Include="..\include\YBehavior\fsm\statemachine.h" />
+    <ClInclude Include="..\include\YBehavior\fsm\transition.h" />
     <ClInclude Include="..\include\YBehavior\interface.h" />
     <ClInclude Include="..\include\YBehavior\launcher.h" />
     <ClInclude Include="..\include\YBehavior\logger.h" />
     <ClInclude Include="..\include\YBehavior\memory.h" />
+    <ClInclude Include="..\include\YBehavior\mgrs.h" />
     <ClInclude Include="..\include\YBehavior\network\messageprocessor.h" />
     <ClInclude Include="..\include\YBehavior\network\network.h" />
     <ClInclude Include="..\include\YBehavior\nodefactory.h" />
@@ -32,6 +50,7 @@
     <ClInclude Include="..\include\YBehavior\nodes\comparer.h" />
     <ClInclude Include="..\include\YBehavior\nodes\decorator.h" />
     <ClInclude Include="..\include\YBehavior\nodes\dice.h" />
+    <ClInclude Include="..\include\YBehavior\nodes\fsmrelated.h" />
     <ClInclude Include="..\include\YBehavior\nodes\loop.h" />
     <ClInclude Include="..\include\YBehavior\nodes\ifthenelse.h" />
     <ClInclude Include="..\include\YBehavior\nodes\piecewisefunction.h" />
@@ -55,22 +74,31 @@
     <ClInclude Include="..\include\YBehavior\tools\meta.h" />
     <ClInclude Include="..\include\YBehavior\tools\objectpool.h" />
     <ClInclude Include="..\include\YBehavior\tools\treemgrhelper.hpp" />
-    <ClInclude Include="..\include\YBehavior\treeid.h" />
     <ClInclude Include="..\include\YBehavior\treekeymgr.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />
     <ClInclude Include="..\include\YBehavior\variableoperation.h" />
+    <ClInclude Include="..\include\YBehavior\version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\3rd\pugixml\pugixml.cpp" />
     <ClCompile Include="..\src\YBehavior\agent.cpp" />
+    <ClCompile Include="..\src\YBehavior\behaviorprocess.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviortree.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviortreemgr.cpp" />
     <ClCompile Include="..\src\YBehavior\debugger.cpp" />
-    <ClCompile Include="..\src\YBehavior\factory.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\context.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\machinemgr.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\machinestate.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\behaviormgr.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\behavior.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\metastate.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\statemachine.cpp" />
+    <ClCompile Include="..\src\YBehavior\fsm\transition.cpp" />
     <ClCompile Include="..\src\YBehavior\launcher.cpp" />
     <ClCompile Include="..\src\YBehavior\logger.cpp" />
     <ClCompile Include="..\src\YBehavior\memory.cpp" />
+    <ClCompile Include="..\src\YBehavior\mgrs.cpp" />
     <ClCompile Include="..\src\YBehavior\network\messageprocessor.cpp" />
     <ClCompile Include="..\src\YBehavior\network\network.cpp" />
     <ClCompile Include="..\src\YBehavior\network\network_msvc.cpp" />
@@ -81,6 +109,7 @@
     <ClCompile Include="..\src\YBehavior\nodes\comparer.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\decorator.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\dice.cpp" />
+    <ClCompile Include="..\src\YBehavior\nodes\fsmrelated.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\loop.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\ifthenelse.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\piecewisefunction.cpp" />
@@ -98,7 +127,6 @@
     <ClCompile Include="..\src\YBehavior\SharedVariableCreateHelper.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\common.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\objectpool.cpp" />
-    <ClCompile Include="..\src\YBehavior\treeid.cpp" />
     <ClCompile Include="..\src\YBehavior\treekeymgr.cpp" />
     <ClCompile Include="..\src\YBehavior\types.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />
@@ -116,7 +144,20 @@
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -129,12 +170,21 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>..\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..\bin</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\bin\</OutDir>
@@ -142,16 +192,52 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>YBEHAVIOR_EXPORTS;DEBUGGER;PRINT_INTERMEDIATE_INFO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>YBEHAVIOR_EXPORTS;YDEBUGGER;PRINT_INTERMEDIATE_INFO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MinSpace</Optimization>
+      <PreprocessorDefinitions>YBEHAVIOR_EXPORTS;YDEBUGGER;PRINT_INTERMEDIATE_INFO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>YBEHAVIOR_EXPORTS;DEBUGGER;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>

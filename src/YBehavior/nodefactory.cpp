@@ -16,6 +16,7 @@
 #include "YBehavior/nodes/subtree.h"
 #include "YBehavior/nodes/wait.h"
 #include "YBehavior/nodes/array.h"
+#include "YBehavior/nodes/fsmrelated.h"
 namespace YBehavior
 {
 	NodeFactory* CreateNodeFactory()
@@ -49,6 +50,8 @@ namespace YBehavior
 		REGISTER_TYPE(factory, IsArrayEmpty);
 		REGISTER_TYPE(factory, ArrayPushElement);
 		REGISTER_TYPE(factory, Shuffle);
+		REGISTER_TYPE(factory, FSMSetCondition);
+		REGISTER_TYPE(factory, FSMClearConditions);
 
 		return factory;
 	}

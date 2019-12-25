@@ -54,7 +54,7 @@ namespace YBehavior
 				fp = FP_Normal;
 				if (ns == NS_FAILURE)
 				{
-					BOOL bExit;
+					BOOL bExit = Utility::FALSE_VALUE;
 					m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
 					if (bExit)
 					{
@@ -90,7 +90,7 @@ namespace YBehavior
 
 	bool For::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
+		CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
 		if (!m_ExitWhenFailure)
 		{
 			return false;
@@ -182,7 +182,7 @@ namespace YBehavior
 				{
 				case YBehavior::NS_FAILURE:
 				{
-					BOOL bExit;
+					BOOL bExit = Utility::FALSE_VALUE;
 					m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
 					if (bExit)
 					{
@@ -214,7 +214,7 @@ namespace YBehavior
 			return false;
 		}
 
-		TYPEID type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
+		CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
 		if (!m_ExitWhenFailure)
 		{
 			return false;
@@ -229,18 +229,18 @@ namespace YBehavior
 
 	bool Loop::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID type = CreateVariable(m_Current, "Current", data);
+		CreateVariable(m_Current, "Current", data);
 		if (!m_Current)
 		{
 			return false;
 		}
-		type = CreateVariable(m_Count, "Count", data);
+		CreateVariable(m_Count, "Count", data);
 		if (!m_Count)
 		{
 			return false;
 		}
 
-		type = CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
+		CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
 		if (!m_ExitWhenFailure)
 		{
 			return false;
@@ -278,7 +278,7 @@ namespace YBehavior
 				{
 				case YBehavior::NS_FAILURE:
 				{
-					BOOL bExit;
+					BOOL bExit = Utility::FALSE_VALUE;
 					m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
 					if (bExit)
 					{

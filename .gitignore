@@ -53,3 +53,4 @@
 *.iobj
 *.ipdb
 projects/YBehaviorEditor/bin/user.ini
+/projects/x64

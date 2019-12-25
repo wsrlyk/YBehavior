@@ -11,7 +11,7 @@ namespace YBehavior
 	bool Wait::OnLoaded(const pugi::xml_node& data)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		TYPEID type = CreateVariable(m_TickCount, "TickCount", data);
+		CreateVariable(m_TickCount, "TickCount", data);
 		if (!m_TickCount)
 		{
 			return false;

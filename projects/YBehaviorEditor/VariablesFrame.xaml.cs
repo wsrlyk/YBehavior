@@ -11,13 +11,24 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
-    /// <summary>
-    /// SharedDataFrame.xaml 的交互逻辑
-    /// </summary>
+    public class VariableTypeSelector : DataTemplateSelector
+    {
+        public DataTemplate NormalTemplate { get; set; }
+
+        public DataTemplate TreeTemplate { get; set; }
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            VariableHolder holder = item as VariableHolder;
+            if (holder.Variable is SubTreeNode.TreeVariable)
+                return TreeTemplate;
+            return NormalTemplate;
+        }
+    }
+
     public partial class VariablesFrame : UserControl
     {
         public VariablesFrame()
@@ -25,16 +36,38 @@ namespace YBehavior.Editor
             InitializeComponent();
 
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
+        }
+
+        public void Enable()
+        {
             EventMgr.Instance.Register(EventType.SelectionChanged, _OnSelectionChanged);
             EventMgr.Instance.Register(EventType.SharedVariableChanged, _OnSharedVariableChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
         }
 
+        public void Disable()
+        {
+            EventMgr.Instance.Unregister(EventType.SelectionChanged, _OnSelectionChanged);
+            EventMgr.Instance.Unregister(EventType.SharedVariableChanged, _OnSharedVariableChanged);
+            EventMgr.Instance.Unregister(EventType.DebugTargetChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Unregister(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
+        }
+
         private void _OnWorkBenchSelected(EventArg arg)
         {
             this.DataContext = null;
             this.VariableContainer.ItemsSource = null;
+
+            WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
+            if (oArg.Bench == null || !(oArg.Bench is TreeBench))
+            {
+                Disable();
+            }
+            else
+            {
+                Enable();
+            }
         }
         private void _OnSelectionChanged(EventArg arg)
         {
@@ -42,7 +75,7 @@ namespace YBehavior.Editor
             //if (oArg.Target == null)
             //    return;
 
-            UINode node = oArg.Target as UINode;
+            UITreeNode node = oArg.Target as UITreeNode;
             if (node == null)
             {
                 // Clear
@@ -53,12 +86,12 @@ namespace YBehavior.Editor
             }
             else
             {
-                this.VariableTab.DataContext = node.Node;
+                this.VariableTab.DataContext = node.Node.Renderer;
                 this.VariableContainer.ItemsSource = node.Node.Variables.Datas;
 
                 this.VariableTab.IsSelected = true;
 
-                if (node.Node is Core.SubTreeNode)
+                if (node.Node is SubTreeNode)
                 {
                     this.InOutTab.Visibility = Visibility.Visible;
                     this.InOutTab.DataContext = node.Node;
@@ -87,7 +120,7 @@ namespace YBehavior.Editor
 
         private void _OnSharedVariableChanged(EventArg arg)
         {
-            Node node = this.VariableTab.DataContext as Node;
+            TreeNode node = this.VariableTab.DataContext as TreeNode;
             if (node == null)
                 return;
 
@@ -103,7 +136,7 @@ namespace YBehavior.Editor
             this.Dispatcher.BeginInvoke(new Action
                 (() =>
                 {
-                    Node node = this.VariableTab.DataContext as Node;
+                    TreeNode node = this.VariableTab.DataContext as TreeNode;
                     if (node == null)
                         return;
 
@@ -145,7 +178,7 @@ namespace YBehavior.Editor
             {
                 if (this.InOutTab.IsSelected)
                 {
-                    if((this.InOutTab.DataContext as Core.SubTreeNode).LoadInOut())
+                    if((this.InOutTab.DataContext as SubTreeNode).LoadInOut())
                     {
                         ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
                         {

@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -24,6 +24,8 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
+
+            UnityCoroutines.CoroutineManager.Instance.Run();
         }
 
         public static void ProcessKeyDown(Key key, ModifierKeys modifier)
@@ -36,12 +38,12 @@ namespace YBehavior.Editor
                     if ((modifier & ModifierKeys.Shift) != ModifierKeys.None)
                     {
                         ///> Duplicate all children
-                        Core.SelectionMgr.Instance.TryDeleteSelection(1);
+                        SelectionMgr.Instance.TryDeleteSelection(1);
                     }
                     else
                     {
                         ///> Duplicate only one
-                        Core.SelectionMgr.Instance.TryDeleteSelection(0);
+                        SelectionMgr.Instance.TryDeleteSelection(0);
                     }
                     break;
                 case Key.D:
@@ -52,12 +54,12 @@ namespace YBehavior.Editor
                         if ((modifier & ModifierKeys.Shift) != ModifierKeys.None)
                         {
                             ///> Duplicate all children
-                            Core.SelectionMgr.Instance.TryDuplicateSelection(1);
+                            SelectionMgr.Instance.TryDuplicateSelection(1);
                         }
                         else
                         {
                             ///> Duplicate only one
-                            Core.SelectionMgr.Instance.TryDuplicateSelection(0);
+                            SelectionMgr.Instance.TryDuplicateSelection(0);
                         }
                     }
                     break;
@@ -69,12 +71,12 @@ namespace YBehavior.Editor
                         if ((modifier & ModifierKeys.Shift) != ModifierKeys.None)
                         {
                             ///> Duplicate all children
-                            Core.SelectionMgr.Instance.TryCopySelection(1);
+                            SelectionMgr.Instance.TryCopySelection(1);
                         }
                         else
                         {
                             ///> Duplicate only one
-                            Core.SelectionMgr.Instance.TryCopySelection(0);
+                            SelectionMgr.Instance.TryCopySelection(0);
                         }
                     }
                     break;
@@ -108,26 +110,34 @@ namespace YBehavior.Editor
                         WorkBenchMgr.Instance.TrySaveAndExport();
                     }
                     break;
+                case Key.F:
+                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
+                    {
+                        SearchFrame searchFrame = (App.Current.MainWindow as MainWindow).SearchFrame;
+                        searchFrame.Visibility = searchFrame.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+                    }
+                    break;
                 case Key.F9:
-                    Core.SelectionMgr.Instance.TryToggleBreakPoint();
+                    SelectionMgr.Instance.TryToggleBreakPoint();
                     break;
                 case Key.F8:
-                    Core.SelectionMgr.Instance.TryToggleLogPoint();
+                    SelectionMgr.Instance.TryToggleLogPoint();
                     break;
                 case Key.F12:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
-                    Core.SelectionMgr.Instance.TryToggleDisable();
+                    SelectionMgr.Instance.TryToggleDisable();
                     break;
                 case Key.F6:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
-                    Core.SelectionMgr.Instance.TryToggleCondition();
+                    SelectionMgr.Instance.TryToggleCondition();
                     break;
                 case Key.F7:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
-                    Core.SelectionMgr.Instance.TryToggleFold();
+                    SelectionMgr.Instance.TryToggleFold();
+                    SelectionMgr.Instance.TryMakeDefault();
                     break;
                 case Key.F1:
                     {
@@ -192,11 +202,17 @@ namespace YBehavior.Editor
                 //    _RefreshMainTreeDebug(false, NetworkMgr.Instance.MessageProcessor.TickResultToken);
                 //}
                 this.Title = oArg.Bench.DisplayName + " - YBehaviorEditor";
+
+                Visibility treeVisibility = oArg.Bench is TreeBench ? Visibility.Visible : Visibility.Collapsed;
+                this.TreeRightPanel.Visibility = treeVisibility;
+                //this.NodeListPanel.Visibility = treeVisibility;
+                this.FSMRightPanel.Visibility = oArg.Bench is FSMBench ? Visibility.Visible : Visibility.Collapsed;
             }
             else
             {
                 this.Title = "YBehaviorEditor";
             }
+
         }
     }
 }

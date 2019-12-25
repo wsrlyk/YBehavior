@@ -63,13 +63,38 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DebugControl.cs" />
     <Compile Include="DebugFrame.xaml.cs">
       <DependentUpon>DebugFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="DraggingConnection.cs" />
+    <Compile Include="FSMConnectionDataFrame.xaml.cs">
+      <DependentUpon>FSMConnectionDataFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMSelectionFrame.xaml.cs">
+      <DependentUpon>FSMSelectionFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMStateFrame.xaml.cs">
+      <DependentUpon>FSMStateFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SearchFrame.xaml.cs">
+      <DependentUpon>SearchFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UINodes\UINodeBase.cs" />
+    <Compile Include="UINodes\UIFSMStateNode.xaml.cs">
+      <DependentUpon>UIFSMStateNode.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMUIOutConnector.xaml.cs">
+      <DependentUpon>FSMUIOutConnector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\InputBinding.cs" />
     <Compile Include="Helpers\VariableHelper.cs" />
     <Compile Include="NodeListFrame.xaml.cs">
       <DependentUpon>NodeListFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PopMenu.cs" />
+    <Compile Include="PopMenuFrame.xaml.cs">
+      <DependentUpon>PopMenuFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -79,20 +104,36 @@
     <Compile Include="SystemTipsFrame.xaml.cs">
       <DependentUpon>SystemTipsFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TabBarFrame.xaml.cs">
+      <DependentUpon>TabBarFrame.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ToolBarFrame.xaml.cs">
       <DependentUpon>ToolBarFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMBenchFrame.xaml.cs">
+      <DependentUpon>FSMBenchFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMUIInConnector.xaml.cs">
+      <DependentUpon>FSMUIInConnector.xaml</DependentUpon>
     </Compile>
     <Compile Include="UIComment.xaml.cs">
       <DependentUpon>UIComment.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FSMUIConnection.xaml.cs">
+      <DependentUpon>FSMUIConnection.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UIConnection.xaml.cs">
       <DependentUpon>UIConnection.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UIConnector.xaml.cs">
-      <DependentUpon>UIConnector.xaml</DependentUpon>
+    <Compile Include="TreeUIConnector.xaml.cs">
+      <DependentUpon>TreeUIConnector.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UINode.xaml.cs">
-      <DependentUpon>UINode.xaml</DependentUpon>
+    <Compile Include="UIConnector.cs" />
+    <Compile Include="UINodes\UITreeNode.xaml.cs">
+      <DependentUpon>UITreeNode.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UISelectTreeVariable.xaml.cs">
+      <DependentUpon>UISelectTreeVariable.xaml</DependentUpon>
     </Compile>
     <Compile Include="VariablesFrame.xaml.cs">
       <DependentUpon>VariablesFrame.xaml</DependentUpon>
@@ -109,9 +150,10 @@
     <Compile Include="UIVariable.xaml.cs">
       <DependentUpon>UIVariable.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WorkBenchFrame.xaml.cs">
-      <DependentUpon>WorkBenchFrame.xaml</DependentUpon>
+    <Compile Include="TreeBenchFrame.xaml.cs">
+      <DependentUpon>TreeBenchFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WorkBenchFrame.cs" />
     <Compile Include="WorkingSpaceFrame.xaml.cs">
       <DependentUpon>WorkingSpaceFrame.xaml</DependentUpon>
     </Compile>
@@ -119,6 +161,30 @@
     <Page Include="DebugFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FSMConnectionDataFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FSMSelectionFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FSMStateFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SearchFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UINodes\UIFSMStateNode.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="FSMUIOutConnector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -136,7 +202,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="PopMenuFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SystemTipsFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TabBarFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -144,19 +218,35 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="FSMBenchFrame.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="FSMUIInConnector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UIComment.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FSMUIConnection.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UIConnection.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UIConnector.xaml">
+    <Page Include="TreeUIConnector.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UINode.xaml">
+    <Page Include="UINodes\UITreeNode.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UISelectTreeVariable.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -180,9 +270,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="WorkBenchFrame.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="TreeBenchFrame.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="WorkingSpaceFrame.xaml">
       <SubType>Designer</SubType>
