@@ -65,7 +65,7 @@ namespace YBehavior.Editor
         public void SetDropped(bool bDropped)
         {
             if (bDropped)
-                this.Main.BorderBrush = new SolidColorBrush(Colors.Chocolate);
+                this.Main.BorderBrush = App.Current.FindResource("ConnectorIn") as SolidColorBrush;
             else
                 this.Main.BorderBrush = normalBorderBrush;
         }

@@ -28,5 +28,7 @@
                 <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
             </ObjectAnimationUsingKeyFrames>
         </Storyboard>
+        <SolidColorBrush x:Key="ConnectorOut" Color="#E5A351C9"/>
+        <SolidColorBrush x:Key="ConnectorIn" Color="#E5C1349B"/>
     </Application.Resources>
 </Application>

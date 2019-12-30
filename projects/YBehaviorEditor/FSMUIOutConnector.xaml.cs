@@ -40,7 +40,7 @@ namespace YBehavior.Editor
                 DropHandler = new DropHandler(defaultDropHandler);
                 HoverHandler = new DropHandler(defaultHoverHandler);
 
-                m_Operation.RegisterRightDrag(_OnDragged, _OnStartDragged, _OnFinishDragged);
+                m_Operation.RegisterLeftDrag(_OnDragged, _OnStartDragged, _OnFinishDragged);
             }
         }
 
@@ -103,10 +103,9 @@ namespace YBehavior.Editor
         public void SetDragged(bool bDragged)
         {
             if (bDragged)
-                this.Main.BorderBrush = new SolidColorBrush(Colors.Magenta);
+                this.Main.BorderBrush = App.Current.FindResource("ConnectorOut") as SolidColorBrush;
             else
                 this.Main.BorderBrush = normalBorderBrush;
         }
-
     }
 }

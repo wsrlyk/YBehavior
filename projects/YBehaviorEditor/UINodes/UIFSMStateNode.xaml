@@ -65,7 +65,7 @@
                         <SolidColorBrush Color="Purple" Opacity="0.6" />
                     </Ellipse.Fill>
                 </Ellipse>
-                <Grid Name="connectors"/>
+                <Grid Name="connectors" HorizontalAlignment="Center" VerticalAlignment="Center" Width="30" Height="30"/>
             </Grid>
         </Border>
     </DockPanel>
