@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Xml;
 
@@ -59,6 +61,10 @@ namespace YBehavior.Editor.Core.New
                 }
             }
         }
+
+        public Suo Suo { get { return m_Suo; } }
+        private Suo m_Suo;
+
         public Config()
         {
             Load();
@@ -96,6 +102,35 @@ namespace YBehavior.Editor.Core.New
             PrintIntermediateInfo = configFile.ReadInt("Debug", "PrintIntermediateInfo", 0) != 0;
 
             m_ExpandedFolders = configFile.ReadString("Editor", "ExpandedFolders", "");
+
+            ////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////
+
+            try
+            {
+                IFormatter formatter = new BinaryFormatter();
+                using (Stream stream = new FileStream(Environment.CurrentDirectory + "\\.suo", FileMode.Open, FileAccess.Read))
+                {
+                    m_Suo = formatter.Deserialize(stream) as Suo;
+                }
+            }
+            catch (Exception)
+            {
+                m_Suo = new Suo();
+            }
+        }
+
+        public void Save()
+        {
+            WorkBenchMgr.Instance.SaveAllSuos();
+            IFormatter formatter = new BinaryFormatter();
+
+            {
+                using (Stream stream = new FileStream(Environment.CurrentDirectory + "\\.suo", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
+                {
+                    formatter.Serialize(stream, m_Suo);
+                }
+            }
         }
     }
 }

@@ -52,6 +52,7 @@ namespace YBehavior.Editor.Core.New
         public virtual void AddRenderers(NodeBase node, bool batchAdd, bool excludeRoot = false) { }
         public virtual void RemoveRenderers(NodeBase node, bool excludeRoot = false) { }
         public virtual void InitEmpty() { }
+        public virtual void SaveSuo() { }
         public void PushDoneCommand(ICommand command)
         {
             bool bOldDirty = CommandMgr.Dirty;

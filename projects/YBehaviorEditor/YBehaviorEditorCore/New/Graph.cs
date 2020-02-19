@@ -17,7 +17,7 @@ namespace YBehavior.Editor.Core.New
 
         protected List<NodeBase> m_NodeList = new List<NodeBase>();
 
-        public virtual void RefreshNodeUID() { }
+        public virtual void RefreshNodeUID(uint startUID) { }
         int m_State = 0;
         public void SetFlag(int flag)
         {
@@ -58,22 +58,22 @@ namespace YBehavior.Editor.Core.New
             m_InOutMemory = new InOutMemory(this, true);
         }
 
-        public override void RefreshNodeUID()
+        public override void RefreshNodeUID(uint startUID)
         {
             if (IsInState(FLAG_LOADING))
                 return;
-            RefreshNodeUIDFromRoot(Root);
+            RefreshNodeUIDFromRoot(Root, startUID);
         }
 
-        public void RefreshNodeUIDFromRoot(TreeNode node)
+        public void RefreshNodeUIDFromRoot(NodeBase node, uint startUID)
         {
             if (IsInState(FLAG_LOADING))
                 return;
-            uint uid = 0;
+            uint uid = startUID;
             _RefreshNodeUID(node, ref uid);
         }
 
-        public void RefreshNodeUIDFromMiddle(TreeNode node)
+        public void RefreshNodeUIDFromMiddle(NodeBase node)
         {
             if (IsInState(FLAG_LOADING))
                 return;
@@ -81,14 +81,14 @@ namespace YBehavior.Editor.Core.New
             _RefreshNodeUID(node, ref uid);
         }
 
-        void _RefreshNodeUID(TreeNode node, ref uint uid)
+        void _RefreshNodeUID(NodeBase node, ref uint uid)
         {
             if (node.Disabled)
                 node.UID = 0;
             else
                 node.UID = ++uid;
 
-            foreach (TreeNode chi in node.Conns)
+            foreach (NodeBase chi in node.Conns)
             {
                 _RefreshNodeUID(chi, ref uid);
             }

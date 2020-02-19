@@ -22,8 +22,22 @@ namespace YBehavior.Editor.Core.New
         public override void InitEmpty()
         {
             Utility.OperateNode(m_FSM.RootMachine, m_Graph, false, NodeBase.OnAddToGraph);
-            m_FSM.RefreshNodeUID();
+            m_FSM.RefreshNodeUID(0);
             AddRenderers(m_FSM.RootMachine, true);
+        }
+
+        void _LoadSuo()
+        {
+            string fileName = this.FileInfo.RelativeName;
+            var map = Config.Instance.Suo.GetDebugPointInfo(fileName);
+            if (map != null)
+            {
+                Action<FSMStateNode> action = (FSMStateNode node) =>
+                {
+                    node.DebugPointInfo.HitCount = map.GetDebugPoint(node.UID);
+                };
+                Utility.ForEachFSMState(m_FSM, action);
+            }
         }
 
         public override bool Load(XmlElement data)
@@ -46,9 +60,11 @@ namespace YBehavior.Editor.Core.New
             }
             m_FSM.RemoveFlag(Graph.FLAG_LOADING);
 
-            m_FSM.RefreshNodeUID();
+            m_FSM.RefreshNodeUID(0);
 
             CommandMgr.Blocked = false;
+
+            _LoadSuo();
             return true;
         }
 
@@ -251,8 +267,22 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        public override void SaveSuo()
+        {
+            string fileName = this.FileInfo.RelativeName;
+            Config.Instance.Suo.ResetFile(fileName);
+            Action<FSMStateNode> func = (FSMStateNode node) =>
+            {
+                if (!node.DebugPointInfo.NoDebugPoint)
+                {
+                    Config.Instance.Suo.SetDebugPointInfo(fileName, node.UID, node.DebugPointInfo.HitCount);
+                }
+            };
+            Utility.ForEachFSMState(m_FSM, func);
+        }
         public override void Save(XmlElement data, XmlDocument xmlDoc)
         {
+            SaveSuo();
             CommandMgr.Blocked = true;
             _SaveMachine(m_FSM.RootMachine, data, xmlDoc, false);
             CommandMgr.Blocked = false;
@@ -598,7 +628,7 @@ namespace YBehavior.Editor.Core.New
 
             NodeList.Dispose();
 
-            m_FSM.RefreshNodeUID();
+            m_FSM.RefreshNodeUID(0);
 
 
             AddNodeCommand addNodeCommand = new AddNodeCommand()

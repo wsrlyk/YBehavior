@@ -25,11 +25,35 @@ namespace YBehavior.Editor.Core.New
             if (!TheFolder.Exists)
                 return;
 
-            using (var h = m_TreeList.Delay())
+            using (var h = m_FileList.Delay())
             {
-                m_TreeList.Clear();
-                m_TreeList.Add(string.Empty);
+                m_FileList.Clear();
+                m_FileList.Add(string.Empty);
                 _LoadDir(TheFolder, m_FileInfos);
+            }
+
+            _CheckSuo();
+        }
+
+        void _CheckSuo()
+        {
+            List<string> notexist = null;
+            foreach (var file in Config.Instance.Suo.Files)
+            {
+                if (!m_FileDic.ContainsKey(file))
+                {
+                    if (notexist == null)
+                        notexist = new List<string>();
+                    notexist.Add(file);
+                }
+            }
+
+            if (notexist != null)
+            {
+                foreach (var file in notexist)
+                {
+                    Config.Instance.Suo.ResetFile(file);
+                }
             }
         }
 
@@ -65,9 +89,9 @@ namespace YBehavior.Editor.Core.New
                 };
                 thisFolder.Children.Add(thisFile);
 
-                m_FileDic.Add(thisFile.Path.ToLower(), thisFile);
+                m_FileDic.Add(thisFile.RelativeName, thisFile);
                 if (thisFile.FileType == FileType.TREE)
-                    m_TreeList.Add(thisFile.RelativeName);
+                    m_FileList.Add(thisFile.RelativeName);
             }
         }
 
@@ -100,7 +124,7 @@ namespace YBehavior.Editor.Core.New
             public static string UntitledName { get { return "Untitled" + s_UntitledIndex++; } }
         }
         private FileInfo m_FileInfos = new FileInfo();
-        private DelayableNotificationCollection<string> m_TreeList = new DelayableNotificationCollection<string>();
+        private DelayableNotificationCollection<string> m_FileList = new DelayableNotificationCollection<string>();
         private Dictionary<string, FileInfo> m_FileDic = new Dictionary<string, FileInfo>();
 
         public FileInfo ReloadAndGetAllFiles()
@@ -112,13 +136,13 @@ namespace YBehavior.Editor.Core.New
         {
             get { return m_FileInfos; }
         }
-        public DelayableNotificationCollection<string> TreeList
+        public DelayableNotificationCollection<string> FileList
         {
-            get { return m_TreeList; }
+            get { return m_FileList; }
         }
         public FileInfo GetFileInfo(string path)
         {
-            if (m_FileDic.TryGetValue(path.Replace("\\", "/").ToLower(), out FileInfo info))
+            if (m_FileDic.TryGetValue(path, out FileInfo info))
                 return info;
             return null;
         }

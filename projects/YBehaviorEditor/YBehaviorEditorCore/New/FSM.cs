@@ -25,12 +25,12 @@ namespace YBehavior.Editor.Core.New
             m_RootMachines.Add(root);
         }
 
-        public override void RefreshNodeUID()
+        public override void RefreshNodeUID(uint startUID)
         {
             if (IsInState(FLAG_LOADING))
                 return;
 
-            uint uid = 0;
+            uint uid = startUID;
 
             foreach (FSMRootMachineNode machine in m_RootMachines)
             {

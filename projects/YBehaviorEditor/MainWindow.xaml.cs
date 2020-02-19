@@ -191,6 +191,11 @@ namespace YBehavior.Editor
             }
         }
 
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Core.New.Config.Instance.Save();
+        }
+
         private void _OnWorkBenchSelected(EventArg arg)
         {
             WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;

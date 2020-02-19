@@ -178,7 +178,7 @@ namespace YBehavior.Editor.Core.New
                 m_DisableCount = newValue;
                 PropertyChange(RenderProperty.Disable);
 
-                Graph.RefreshNodeUID();
+                Graph.RefreshNodeUID(0);
             }
         }
 

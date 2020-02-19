@@ -226,17 +226,11 @@ namespace YBehavior.Editor.Core.New
                 case "NickName":
                     m_NickName = attr.Value;
                     break;
-                case "DebugPoint":
-                    DebugPointInfo.HitCount = int.Parse(attr.Value);
-                    break;
                 case "Comment":
                     Comment = attr.Value;
                     break;
                 case "Disabled":
                     Disabled = bool.Parse(attr.Value);
-                    break;
-                case "Folded":
-                    m_Folded = bool.Parse(attr.Value);
                     break;
                 case "Return":
                     m_ReturnType = attr.Value;
@@ -283,8 +277,8 @@ namespace YBehavior.Editor.Core.New
             if (!string.IsNullOrEmpty(m_NickName))
                 data.SetAttribute("NickName", m_NickName);
 
-            if (!DebugPointInfo.NoDebugPoint)
-                data.SetAttribute("DebugPoint", DebugPointInfo.HitCount.ToString());
+            //if (!DebugPointInfo.NoDebugPoint)
+            //    data.SetAttribute("DebugPoint", DebugPointInfo.HitCount.ToString());
 
             if (!string.IsNullOrEmpty(Comment))
             {
@@ -294,11 +288,6 @@ namespace YBehavior.Editor.Core.New
             if (SelfDisabled)
             {
                 data.SetAttribute("Disabled", "true");
-            }
-
-            if (Folded)
-            {
-                data.SetAttribute("Folded", "true");
             }
 
             _OnSaveVariables(data, xmlDoc);
@@ -426,7 +415,7 @@ namespace YBehavior.Editor.Core.New
                     Utility.OperateNode(this, true, _DecreaseDisable);
 
                 if (Graph != null)
-                    Graph.RefreshNodeUID();
+                    Graph.RefreshNodeUID(0);
             }
         }
 

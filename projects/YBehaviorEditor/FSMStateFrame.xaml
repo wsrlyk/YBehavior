@@ -15,7 +15,7 @@
         </DockPanel>
         <DockPanel Name="TreePanel">
             <TextBlock Text="Tree" Background="LightBlue" Width="90"/>
-            <ComboBox Name="Tree" ItemsSource="{Binding TreeList}" SelectedItem="{Binding Tree}">
+            <ComboBox Name="Tree" ItemsSource="{Binding FileList}" SelectedItem="{Binding Tree}">
                 <!--IsEditable="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}"
                       Focusable="False"
                       -->

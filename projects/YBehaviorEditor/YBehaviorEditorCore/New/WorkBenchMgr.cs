@@ -90,7 +90,7 @@ namespace YBehavior.Editor.Core.New
         public void RefreshNodeUID()
         {
             if (m_ActiveWorkBench != null)
-                m_ActiveWorkBench.MainGraph.RefreshNodeUID();
+                m_ActiveWorkBench.MainGraph.RefreshNodeUID(0);
         }
         public void Remove(WorkBench target)
         {
@@ -177,14 +177,14 @@ namespace YBehavior.Editor.Core.New
             {
                 workBench = new TreeBench
                 {
-                    FilePath = file.Path
+                    FilePath = file.RelativeName
                 };
             }
             else
             {
                 workBench = new FSMBench
                 {
-                    FilePath = file.Path
+                    FilePath = file.RelativeName
                 };
             }
 
@@ -237,7 +237,7 @@ namespace YBehavior.Editor.Core.New
 
                 if (bench == null)
                     bench = ActiveWorkBench;
-                bench.FilePath = bench.FileInfo.Path;
+                bench.FilePath = bench.FileInfo.RelativeName;
 
                 FileMgr.Instance.Load();
 
@@ -581,6 +581,14 @@ namespace YBehavior.Editor.Core.New
             return res;
         }
 
+        public void SaveAllSuos()
+        {
+            foreach (var bench in m_OpenedWorkBenchs)
+            {
+                if (!bench.CommandMgr.Dirty)
+                    bench.SaveSuo();
+            }
+        }
     }
 
     public struct BenchInfo

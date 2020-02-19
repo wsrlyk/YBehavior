@@ -193,15 +193,19 @@ namespace YBehavior.Editor
 
                     else if (dr == MessageBoxResult.No)
                     {
-                        WorkBenchMgr.Instance.Remove(bench);
                     }
                     else
                     {
                         return false;
                     }
                 }
+                else
+                {
+                    bench.SaveSuo();
+                }
             }
 
+            WorkBenchMgr.Instance.Remove(bench);
             m_PageDataDic.Remove(tab);
 
             if (m_PageDataDic.Count == 0)

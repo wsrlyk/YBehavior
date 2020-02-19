@@ -9,6 +9,11 @@ namespace YBehavior.Editor.Core.New
 {
     public class TreeBench : WorkBench
     {
+        /// <summary>
+        /// This will not be decreased when removing a tree in the forest.
+        /// Just for getting a proper start uid for the forest.
+        /// </summary>
+        uint m_TotalForestCount = 0;
         List<TreeNode> m_Forest = new List<TreeNode>();
         public List<TreeNode> Forest { get { return m_Forest; } }
 
@@ -23,7 +28,7 @@ namespace YBehavior.Editor.Core.New
         public override void InitEmpty()
         {
             Utility.OperateNode(m_Tree.Root, m_Graph, false, NodeBase.OnAddToGraph);
-            m_Tree.RefreshNodeUID();
+            m_Tree.RefreshNodeUID(0);
             AddRenderers(m_Tree.Root, true);
         }
 
@@ -44,7 +49,7 @@ namespace YBehavior.Editor.Core.New
                 TreeNode childNode = child.Owner as TreeNode;
                 RemoveForestTree(childNode, false);
 
-                m_Tree.RefreshNodeUID();
+                m_Tree.RefreshNodeUID(0);
 
                 ConnectNodeCommand connectNodeCommand = new ConnectNodeCommand
                 {
@@ -70,7 +75,8 @@ namespace YBehavior.Editor.Core.New
                 TreeNode childNode = connection.To.Owner as TreeNode;
                 AddForestTree(childNode, false);
 
-                m_Tree.RefreshNodeUID();
+                m_Tree.RefreshNodeUID(0);
+                _RefreshForestUID(childNode);
 
                 DisconnectNodeCommand disconnectNodeCommand = new DisconnectNodeCommand
                 {
@@ -99,6 +105,7 @@ namespace YBehavior.Editor.Core.New
         public override void AddNode(NodeBase node)
         {
             Utility.OperateNode(node, m_Graph, true, NodeBase.OnAddToGraph);
+            _RefreshForestUID(node);
             AddForestTree(node as TreeNode, true);
 
             AddNodeCommand addNodeCommand = new AddNodeCommand()
@@ -130,6 +137,8 @@ namespace YBehavior.Editor.Core.New
                     if (attr.Value == "Root")
                     {
                         _LoadTree(m_Tree.Root, chi);
+                        m_Tree.RefreshNodeUID(0);
+                        _LoadSuo(m_Tree.Root);
                         AddRenderers(m_Tree.Root, false);
                     }
                     else
@@ -141,6 +150,8 @@ namespace YBehavior.Editor.Core.New
                             return false;
                         }
                         _LoadTree(node, chi);
+                        _RefreshForestUID(node);
+                        _LoadSuo(node);
                         AddForestTree(node, true);
                     }
                 }
@@ -154,13 +165,28 @@ namespace YBehavior.Editor.Core.New
             return true;
         }
 
+        void _LoadSuo(TreeNode tree)
+        {
+            string fileName = this.FileInfo.RelativeName;
+            var map = Config.Instance.Suo.GetDebugPointInfo(fileName);
+            if (map != null)
+            {
+                Action<NodeBase> action = (NodeBase node) =>
+                {
+                    node.DebugPointInfo.HitCount = map.GetDebugPoint(node.UID);
+                    if (map.GetFold(node.UID))
+                        (node as TreeNode).Folded = true;
+                };
+                Utility.OperateNode(tree, true, action);
+            }
+        }
+
         private bool _LoadTree(TreeNode tree, XmlNode data)
         {
             m_Tree.SetFlag(Graph.FLAG_LOADING);
             bool bRes = _LoadOneNode(tree, data);
             m_Tree.RemoveFlag(Graph.FLAG_LOADING);
             ////Utility.InitNode(tree, true);
-            m_Tree.RefreshNodeUID();
             return bRes;
         }
 
@@ -205,8 +231,32 @@ namespace YBehavior.Editor.Core.New
             return true;
         }
 
+        public override void SaveSuo()
+        {
+            string fileName = this.FileInfo.RelativeName;
+            Config.Instance.Suo.ResetFile(fileName);
+            Action<NodeBase> func = (NodeBase node) =>
+            {
+                if (!node.DebugPointInfo.NoDebugPoint)
+                {
+                    Config.Instance.Suo.SetDebugPointInfo(fileName, node.UID, node.DebugPointInfo.HitCount);
+                }
+                if ((node as TreeNode).Folded)
+                    Config.Instance.Suo.SetFoldInfo(fileName, node.UID, true);
+            };
+
+            Utility.OperateNode(m_Tree.Root, true, func);
+            m_TotalForestCount = 0;
+            foreach (var tree in m_Forest)
+            {
+                _RefreshForestUID(tree);
+                Utility.OperateNode(tree, true, func);
+            }
+        }
+
         public override void Save(XmlElement data, XmlDocument xmlDoc) 
         {
+            SaveSuo();
             _SaveNode(m_Tree.Root, data, xmlDoc);
 
             foreach (var tree in m_Forest)
@@ -215,7 +265,7 @@ namespace YBehavior.Editor.Core.New
             }
 
             _SaveComments(data, xmlDoc);
-            m_Tree.RefreshNodeUID();
+            m_Tree.RefreshNodeUID(0);
 
             CommandMgr.Dirty = false;
             m_ExportFileHash = 0;
@@ -242,7 +292,6 @@ namespace YBehavior.Editor.Core.New
             _ExportNode(m_Tree.Root, data, xmlDoc);
 
             m_ExportFileHash = GenerateHash(data.OuterXml.Replace(" ", string.Empty));
-            m_Tree.RefreshNodeUID();
         }
 
         void _ExportNode(TreeNode node, XmlElement data, XmlDocument xmlDoc)
@@ -281,8 +330,11 @@ namespace YBehavior.Editor.Core.New
 
             if (bAddRenderer)
                 AddRenderers(root, true);
+        }
 
-            m_Tree.RefreshNodeUIDFromRoot(root);
+        void _RefreshForestUID(NodeBase root)
+        {
+            m_Tree.RefreshNodeUIDFromRoot(root, ++m_TotalForestCount * 1000);
         }
 
         public override void AddRenderers(NodeBase node, bool batchAdd, bool excludeRoot = false)
