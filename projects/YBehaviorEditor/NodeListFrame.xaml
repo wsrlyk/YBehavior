@@ -6,42 +6,12 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <UserControl.Resources>
-        <local:ValueConverterGroup x:Key="stringEmptyVisibilityConvertor">
-            <local:StringNullOrEmptyConvertor/>
-            <local:InvertBoolConverter/>
-            <BooleanToVisibilityConverter/>
-        </local:ValueConverterGroup>
-        <local:ValueConverterGroup x:Key="stringNotEmptyVisibilityConvertor">
-            <local:StringNullOrEmptyConvertor/>
-            <BooleanToVisibilityConverter/>
-        </local:ValueConverterGroup>
-        <Style x:Key="TransparentStyle" TargetType="{x:Type Button}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border>
-                            <Grid Background="Transparent">
-                                <ContentPresenter/>
-                            </Grid>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
     <DockPanel>
         <StackPanel Orientation="Horizontal" Height="30" HorizontalAlignment="Left" Width="200" DockPanel.Dock="Top">
             <Button Name="AddComment" Click="AddComment_Click">Add Comment</Button>
         </StackPanel>
-        <Grid DockPanel.Dock="Top">
-            <Border Background="White"/>
-            <TextBlock Name="Hint" Text="Searching" Background="Transparent" Foreground="#FFA2A2A2"  Visibility="{Binding ElementName=SearchText, Path=Text,Converter={StaticResource stringNotEmptyVisibilityConvertor}}"/>
-            <TextBox Name="SearchText" Text="" Background="Transparent" TextChanged="SearchText_TextChanged"/>
-            <Button Style="{StaticResource TransparentStyle}" Width="20" Name="ClearSearch" Click="ClearSearch_Click" HorizontalAlignment="Right" Visibility="{Binding ElementName=SearchText, Path=Text,Converter={StaticResource stringEmptyVisibilityConvertor}}">
-                ⓧ
-            </Button>
-        </Grid>
+        <local:FilterBox x:Name="SearchText" DockPanel.Dock="Top" 
+                         TextChangedHandler="SearchText_TextChanged"/>
         <TreeView Name="Nodes" Margin="0,5,0,0" MouseDoubleClick="OnNodesItemDoubleClick" Background="DarkGray" DockPanel.Dock="Bottom">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">

@@ -68,6 +68,9 @@
       <DependentUpon>DebugFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="DraggingConnection.cs" />
+    <Compile Include="FilterBox.xaml.cs">
+      <DependentUpon>FilterBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FSMConnectionDataFrame.xaml.cs">
       <DependentUpon>FSMConnectionDataFrame.xaml</DependentUpon>
     </Compile>
@@ -159,6 +162,10 @@
     </Compile>
     <Compile Include="YUserControl.cs" />
     <Page Include="DebugFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FilterBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

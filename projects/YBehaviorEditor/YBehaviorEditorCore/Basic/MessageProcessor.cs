@@ -55,7 +55,7 @@ namespace YBehavior.Editor.Core.New
             StringBuilder sb = new StringBuilder();
             string head;
             string content;
-            if (agentUID != 0 || fileInfo == null || fileInfo.FileType == FileType.FOLDER)
+            if (agentUID != 0 || fileInfo == null)
             {
                 head = "[DebugAgent]";
                 content = agentUID.ToString();

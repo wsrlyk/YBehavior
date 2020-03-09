@@ -208,7 +208,7 @@ namespace YBehavior.Editor.Core.New
         {
             public TreeVariable(IVariableDataSource source) : base(source)
             { }
-            public DelayableNotificationCollection<string> TreeList { get { return FileMgr.Instance.FileList; } }
+            public DelayableNotificationCollection<string> TreeList { get { return FileMgr.Instance.TreeList; } }
         }
         InOutMemory m_InOutMemory;
         public InOutMemory InOutMemory { get { return m_InOutMemory; } }

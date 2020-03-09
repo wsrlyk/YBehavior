@@ -235,11 +235,6 @@ namespace YBehavior.Editor
             WorkBenchMgr.Instance.CreateComment();
         }
 
-        private void ClearSearch_Click(object sender, RoutedEventArgs e)
-        {
-            this.SearchText.Text = string.Empty;
-        }
-
         private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
         {
             _FilterNodes(this.SearchText.Text);

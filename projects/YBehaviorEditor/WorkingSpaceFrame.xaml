@@ -13,6 +13,8 @@
             <Button Name="btnSave" Click="btnSave_Click">Save</Button>
             <Button Name="btnRefresh" Click="btnRefresh_Click">Refresh</Button>
         </StackPanel>
+        <local:FilterBox x:Name="SearchText" DockPanel.Dock="Top" 
+                         TextChangedHandler="SearchText_TextChanged"/>
         <TreeView Name="Files" MouseDoubleClick="OnFilesItemDoubleClick" Background="DarkGray" LostFocus="Files_LostFocus"
                   ScrollViewer.HorizontalScrollBarVisibility="Auto" 
                   ScrollViewer.VerticalScrollBarVisibility="Auto">

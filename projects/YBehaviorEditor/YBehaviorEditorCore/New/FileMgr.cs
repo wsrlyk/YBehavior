@@ -8,28 +8,28 @@ namespace YBehavior.Editor.Core.New
     {
         TREE,
         FSM,
-        FOLDER
     }
 
     public class FileMgr : Singleton<FileMgr>
     {
         public static readonly string TreeExtension = ".tree";
 
+        private List<List<string>> m_Folders = new List<List<string>>();
+
         public void Load()
         {
-            if (m_FileInfos.Children != null)
-                m_FileInfos.Children.Clear();
-            m_FileDic.Clear();
-            
-            System.IO.DirectoryInfo TheFolder = new System.IO.DirectoryInfo(Config.Instance.WorkingDirWin);
-            if (!TheFolder.Exists)
-                return;
-
-            using (var h = m_FileList.Delay())
+            using (var h = m_TreeList.Delay())
             {
-                m_FileList.Clear();
-                m_FileList.Add(string.Empty);
-                _LoadDir(TheFolder, m_FileInfos);
+                m_TreeList.Clear();
+                m_FileInfos.Clear();
+                m_FileDic.Clear();
+            
+                System.IO.DirectoryInfo TheFolder = new System.IO.DirectoryInfo(Config.Instance.WorkingDirWin);
+                if (!TheFolder.Exists)
+                    return;
+
+                List<string> folderStack = new List<string>();
+                _LoadDir(TheFolder, folderStack);
             }
 
             _CheckSuo();
@@ -57,29 +57,24 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        private void _LoadDir(System.IO.DirectoryInfo TheFolder, FileInfo thisFolder)
+        private void _LoadDir(System.IO.DirectoryInfo TheFolder, List<string> folderStack)
         {
-            if (thisFolder.Children == null)
-                thisFolder.Children = new List<FileInfo>();
-
             foreach (System.IO.DirectoryInfo nextDir in TheFolder.GetDirectories())
             {
-                FileInfo childFolder = new FileInfo
-                {
-                    Name = nextDir.Name,
-                    FileType = FileType.FOLDER,
-                };
-                thisFolder.Children.Add(childFolder);
-
-                _LoadDir(nextDir, childFolder);
+                folderStack.Add(nextDir.Name);
+                _LoadDir(nextDir, folderStack);
+                folderStack.RemoveAt(folderStack.Count - 1);
             }
+            bool bFolderStored = false;
             foreach (System.IO.FileInfo NextFile in TheFolder.GetFiles())
             {
-                if (thisFolder.Children == null)
-                    thisFolder.Children = new List<FileInfo>();
-
                 if (NextFile.Extension != ".tree" && NextFile.Extension != ".fsm" && NextFile.Extension != ".xml")
                     continue;
+                if (!bFolderStored)
+                {
+                    _StoreFolderStack(folderStack);
+                    bFolderStored = true;
+                }
                 FileInfo thisFile = new FileInfo
                 {
                     Name = NextFile.Name.Remove(NextFile.Name.LastIndexOf(NextFile.Extension)),
@@ -87,11 +82,40 @@ namespace YBehavior.Editor.Core.New
                     Path = NextFile.FullName,
                     FileType = NextFile.Extension == ".fsm" ? FileType.FSM : FileType.TREE,
                 };
-                thisFolder.Children.Add(thisFile);
+
+                _GetFolderStack(ref thisFile.FolderStack, folderStack.Count);
+
+                m_FileInfos.Add(thisFile);
 
                 m_FileDic.Add(thisFile.RelativeName, thisFile);
                 if (thisFile.FileType == FileType.TREE)
-                    m_FileList.Add(thisFile.RelativeName);
+                    m_TreeList.Add(thisFile.RelativeName);
+            }
+        }
+
+        private void _StoreFolderStack(List<string> folderStack)
+        {
+            for (int i = 0; i < folderStack.Count; ++i)
+            {
+                if (m_Folders.Count <= i)
+                    m_Folders.Add(new List<string>());
+                if (m_Folders[i].Count == 0 || m_Folders[i][m_Folders[i].Count - 1] != folderStack[i])
+                    m_Folders[i].Add(folderStack[i]);
+            }
+        }
+
+        private void _GetFolderStack(ref List<string> folderStack, int deep)
+        {
+            if (deep == 0)
+                return;
+
+            folderStack = new List<string>();
+
+            for(int i = 0; i < deep; ++i)
+            {
+                if (m_Folders[i].Count == 0)
+                    throw new Exception("There's no folder but try to get one.");
+                folderStack.Add(m_Folders[i][m_Folders[i].Count - 1]);
             }
         }
 
@@ -103,8 +127,8 @@ namespace YBehavior.Editor.Core.New
             public string Extension { get; set; } = string.Empty;
             public string Name { get; set; } = string.Empty;
             public string RelativeName { get; set; } = string.Empty;
-            public List<FileInfo> Children { get; set; }
-            public FileType FileType = FileType.FOLDER;
+            
+            public FileType FileType = FileType.TREE;
             private string m_Path = null;
             public string Path
             {
@@ -122,23 +146,26 @@ namespace YBehavior.Editor.Core.New
             public string ExportingPath { get; set; }
             private static int s_UntitledIndex = 0;
             public static string UntitledName { get { return "Untitled" + s_UntitledIndex++; } }
+
+            public List<string> FolderStack;
+            public int FolderDepth { get { return FolderStack == null ? 0 : FolderStack.Count; } }
         }
-        private FileInfo m_FileInfos = new FileInfo();
-        private DelayableNotificationCollection<string> m_FileList = new DelayableNotificationCollection<string>();
+        private List<FileInfo> m_FileInfos = new List<FileInfo>();
+        private DelayableNotificationCollection<string> m_TreeList = new DelayableNotificationCollection<string>();
         private Dictionary<string, FileInfo> m_FileDic = new Dictionary<string, FileInfo>();
 
-        public FileInfo ReloadAndGetAllFiles()
+        public List<FileInfo> ReloadAndGetAllFiles()
         {
             Load();
             return m_FileInfos;
         }
-        public FileInfo AllFiles
+        public List<FileInfo> AllFiles
         {
             get { return m_FileInfos; }
         }
-        public DelayableNotificationCollection<string> FileList
+        public DelayableNotificationCollection<string> TreeList
         {
-            get { return m_FileList; }
+            get { return m_TreeList; }
         }
         public FileInfo GetFileInfo(string path)
         {

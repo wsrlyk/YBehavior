@@ -15,7 +15,7 @@
             <Grid DockPanel.Dock="Left">
                 <TextBlock Name="VKey" Text="{Binding DisplayName}" FontSize="13" Width="150" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}"/>
             </Grid>
-            <ComboBox IsEnabled="{Binding IsEditable}" Name="Candidates" ItemsSource="{Binding FileList}" SelectedItem="{Binding DisplayValue}">
+            <ComboBox IsEnabled="{Binding IsEditable}" Name="Candidates" ItemsSource="{Binding TreeList}" SelectedItem="{Binding DisplayValue}">
                 <!--IsEditable="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}"
                       Focusable="False"
                       -->
