@@ -109,13 +109,14 @@ namespace YBehavior.Editor.Core.New
             try
             {
                 IFormatter formatter = new BinaryFormatter();
-                using (Stream stream = new FileStream(Environment.CurrentDirectory + "\\.suo", FileMode.Open, FileAccess.Read))
+                using (StreamReader stream = new StreamReader(Environment.CurrentDirectory + "\\.suo"))
                 {
-                    m_Suo = formatter.Deserialize(stream) as Suo;
+                    m_Suo = Newtonsoft.Json.JsonConvert.DeserializeObject<Suo>(stream.ReadToEnd());
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                //LogMgr.Instance.Log(e.ToString());
                 m_Suo = new Suo();
             }
         }
@@ -123,12 +124,11 @@ namespace YBehavior.Editor.Core.New
         public void Save()
         {
             WorkBenchMgr.Instance.SaveAllSuos();
-            IFormatter formatter = new BinaryFormatter();
-
+            string json2 = Newtonsoft.Json.JsonConvert.SerializeObject(m_Suo);
             {
-                using (Stream stream = new FileStream(Environment.CurrentDirectory + "\\.suo", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
+                using (StreamWriter stream = new StreamWriter(Environment.CurrentDirectory + "\\.suo"))
                 {
-                    formatter.Serialize(stream, m_Suo);
+                    stream.Write(json2);
                 }
             }
         }

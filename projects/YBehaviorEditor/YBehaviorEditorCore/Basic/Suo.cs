@@ -1,19 +1,18 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
-    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
     public class Suo
     {
-        [Serializable]
+        [JsonObject]
         public class SuoData
         {
+            [JsonProperty]
             Dictionary<uint, int> m_DebugPoints = null;
+            [JsonProperty]
             HashSet<uint> m_Fold = null;
 
             public int GetDebugPoint(uint uid)
@@ -54,8 +53,10 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        [JsonProperty]
         Dictionary<string, SuoData> m_Suos = new Dictionary<string, SuoData>();
 
+        [JsonIgnore]
         public IEnumerable<string> Files { get { return m_Suos.Keys; } }
 
         public SuoData GetDebugPointInfo(string fileName)
@@ -114,9 +115,7 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        [NonSerialized]
         string m_CachedFileName;
-        [NonSerialized]
         SuoData m_CachedData;
     }
 }
