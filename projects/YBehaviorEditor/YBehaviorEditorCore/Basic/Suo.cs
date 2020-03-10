@@ -10,9 +10,9 @@ namespace YBehavior.Editor.Core.New
         [JsonObject]
         public class SuoData
         {
-            [JsonProperty]
+            [JsonProperty(PropertyName = "DebugPoints")]
             Dictionary<uint, int> m_DebugPoints = null;
-            [JsonProperty]
+            [JsonProperty(PropertyName = "Fold")]
             HashSet<uint> m_Fold = null;
 
             public int GetDebugPoint(uint uid)
@@ -53,7 +53,7 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        [JsonProperty]
+        [JsonProperty(PropertyName = "Suos")]
         Dictionary<string, SuoData> m_Suos = new Dictionary<string, SuoData>();
 
         [JsonIgnore]

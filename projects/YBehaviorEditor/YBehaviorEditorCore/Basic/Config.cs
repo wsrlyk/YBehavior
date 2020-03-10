@@ -124,7 +124,9 @@ namespace YBehavior.Editor.Core.New
         public void Save()
         {
             WorkBenchMgr.Instance.SaveAllSuos();
-            string json2 = Newtonsoft.Json.JsonConvert.SerializeObject(m_Suo);
+            Newtonsoft.Json.JsonSerializerSettings jsetting = new Newtonsoft.Json.JsonSerializerSettings();
+            jsetting.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+            string json2 = Newtonsoft.Json.JsonConvert.SerializeObject(m_Suo, Newtonsoft.Json.Formatting.Indented, jsetting);
             {
                 using (StreamWriter stream = new StreamWriter(Environment.CurrentDirectory + "\\.suo"))
                 {
