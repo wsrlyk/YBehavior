@@ -89,7 +89,7 @@ namespace YBehavior
 		rootData.print(writer, PUGIXML_TEXT("\t"), pugi::format_indent | pugi::format_raw);
 		writer.result.erase(std::remove_if(writer.result.begin(), writer.result.end(), ::isspace), writer.result.end());
 		pFSM->SetHash(Utility::Hash(writer.result));
-		LOG_BEGIN << writer.result << LOG_END;
+		//LOG_BEGIN << writer.result << LOG_END;
 #endif
 		return pFSM;
 	}
@@ -287,7 +287,7 @@ namespace YBehavior
 					}
 				}
 
-				LOG_BEGIN << "Load State " << pState->ToString() << LOG_END;
+				//LOG_BEGIN << "Load State " << pState->ToString() << LOG_END;
 
 				if (pState->GetType() == MST_Meta)
 				{
