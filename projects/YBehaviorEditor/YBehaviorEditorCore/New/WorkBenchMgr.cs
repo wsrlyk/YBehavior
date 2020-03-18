@@ -501,56 +501,6 @@ namespace YBehavior.Editor.Core.New
             ActiveWorkBench.CommandMgr.Redo();
         }
 
-        public List<WorkBench> OpenAllRelated()
-        {
-            if (ActiveWorkBench == null)
-                return null;
-
-            HashSet<string> loaded = new HashSet<string>();
-            Queue<WorkBench> loading = new Queue<WorkBench>();
-            HashSet<string> toload = new HashSet<string>();
-            List<WorkBench> res = new List<WorkBench>();
-            Action<NodeBase> action = new Action<NodeBase>
-                (
-                    (NodeBase node) =>
-                    {
-                        SubTreeNode subTreeNode = node as SubTreeNode;
-                        if (subTreeNode != null)
-                            toload.Add(subTreeNode.Variables.GetVariable("Tree").Value);
-                    }
-                );
-
-            loading.Enqueue(ActiveWorkBench);
-            loaded.Add(ActiveWorkBench.FilePath);
-            res.Add(ActiveWorkBench);
-            while (loading.Count > 0)
-            {
-                TreeBench bench = loading.Dequeue() as TreeBench;
-                Utility.OperateNode(bench.Tree.Root, true, action);
-
-                foreach (string toloadtree in toload)
-                {
-                    System.IO.FileInfo file = new System.IO.FileInfo(Config.Instance.WorkingDirWin + toloadtree + FileMgr.TreeExtension);
-                    if (!file.Exists || loaded.Contains(file.FullName))
-                        continue;
-
-                    FileMgr.FileInfo fileInfo = FileMgr.Instance.GetFileInfo(file.FullName);
-                    WorkBench newBench = OpenWorkBenchInBackGround(fileInfo);
-
-                    WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
-                    arg.Bench = newBench;
-                    EventMgr.Instance.Send(arg);
-
-                    res.Add(newBench);
-                    loaded.Add(newBench.FilePath);
-                    loading.Enqueue(newBench);
-                }
-
-                toload.Clear();
-            }
-
-            return res;
-        }
         public List<WorkBench> OpenAList(IEnumerable<BenchInfo> list)
         {
             List<WorkBench> res = new List<WorkBench>();

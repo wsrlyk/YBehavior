@@ -114,7 +114,7 @@ namespace YBehavior.Editor.Core.New
                     m_Suo = Newtonsoft.Json.JsonConvert.DeserializeObject<Suo>(stream.ReadToEnd());
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //LogMgr.Instance.Log(e.ToString());
                 m_Suo = new Suo();
