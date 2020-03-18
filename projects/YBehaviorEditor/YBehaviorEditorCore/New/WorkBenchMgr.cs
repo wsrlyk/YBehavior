@@ -568,7 +568,7 @@ namespace YBehavior.Editor.Core.New
                     continue;
                 }
 
-                FileMgr.FileInfo fileInfo = FileMgr.Instance.GetFileInfo(file.FullName);
+                FileMgr.FileInfo fileInfo = FileMgr.Instance.GetFileInfo(info.Name);
                 WorkBench newBench = OpenWorkBenchInBackGround(fileInfo);
 
                 WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
