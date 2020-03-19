@@ -14,15 +14,6 @@ namespace YBehavior.Editor.Core.New
         {
         }
 
-        public ActionTreeNode GetNode(string name)
-        {
-            if (m_ActionDic.TryGetValue(name, out ActionTreeNode node))
-            {
-                return node.Clone() as ActionTreeNode;
-            }
-            return null;
-        }
-
         public New.ActionTreeNode GetTreeNode(string name)
         {
             if (m_ActionDic.TryGetValue(name, out New.ActionTreeNode node))

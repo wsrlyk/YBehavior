@@ -120,10 +120,11 @@ namespace YBehavior.Editor
 
         private void _OnSharedVariableChanged(EventArg arg)
         {
-            TreeNode node = this.VariableTab.DataContext as TreeNode;
-            if (node == null)
+            TreeNodeRenderer renderer = this.VariableTab.DataContext as TreeNodeRenderer;
+            if (renderer == null)
                 return;
 
+            TreeNode node = renderer.TreeOwner;
             node.NodeMemory.RefreshVariables();
             if (node is SubTreeNode)
             {

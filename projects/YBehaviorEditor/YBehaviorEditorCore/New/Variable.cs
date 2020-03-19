@@ -286,6 +286,7 @@ namespace YBehavior.Editor.Core.New
                         Candidates = SharedDataSource.SharedData.Candidatas.GetIndex();
                     else
                         Candidates = SharedDataSource.SharedData.Candidatas.Get(this);
+                    OnPropertyChanged("Candidates");
                 }
             }
         }

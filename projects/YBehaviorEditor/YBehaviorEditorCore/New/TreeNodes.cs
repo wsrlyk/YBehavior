@@ -155,6 +155,20 @@ namespace YBehavior.Editor.Core.New
 
             return node;
         }
+
+        public override string Note
+        {
+            get
+            {
+                string[] values = new string[m_Variables.Datas.Count];
+                int i = 0;
+                foreach (var v in m_Variables.Datas)
+                {
+                    values[i++] = v.Variable.NoteValue;
+                }
+                return string.Format(NoteFormat, values);
+            }
+        }
     }
 
     public class SequenceTreeNode : CompositeNode
