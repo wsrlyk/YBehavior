@@ -22,6 +22,19 @@ namespace YBehavior.Editor.Core.New
             }
         }
         public FromTo Ctr { get; set; }
+
+        private string m_Note = string.Empty;
+        public string Note
+        {
+            get { return m_Note; }
+            set
+            {
+                if (m_Note == value)
+                    return;
+                m_Note = value;
+                Renderer.OnPropertyChanged("Note");
+            }
+        }
         public ConnectionRenderer Renderer { get; set; }
 
         public Connection(Connector from, Connector to)

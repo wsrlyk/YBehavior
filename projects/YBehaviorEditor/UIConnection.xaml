@@ -6,13 +6,13 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              >
-    <Grid>
+    <Canvas>
         <Path Name="path" Stroke="#FFDADCE4" StrokeThickness="5" Fill="#FFE1E3E8">
             <Path.Data>
                 <PathGeometry>
                     <PathFigure IsFilled="False" StartPoint="{Binding ParentPos, Mode=OneWay}"  IsClosed="False">
                         <LineSegment Point="{Binding FirstCorner, Mode=OneWay}" />
-                        <LineSegment Point="{Binding SecondCorner, Mode=OneWay}" />
+                        <LineSegment x:Name="Corner2nd" Point="{Binding SecondCorner, Mode=OneWay}" />
                         <LineSegment Point="{Binding ChildPos, Mode=OneWay}" />
                     </PathFigure>
                 </PathGeometry>
@@ -29,5 +29,9 @@
                 </PathGeometry>
             </Path.Data>
         </Path>
-    </Grid>
+        <TextBlock Text="{Binding Note}" Background="#B2979797" Foreground="#FFE6E6E6" 
+                   Canvas.Left="{Binding NotePos.X}" Canvas.Top="{Binding NotePos.Y}"
+                   Visibility="{Binding Note, Converter={StaticResource invertStringEmptyAndVisibilityConvertor}}"/>
+
+    </Canvas>
 </local:UIConnectionBase>

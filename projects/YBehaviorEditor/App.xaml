@@ -11,6 +11,10 @@
             <local:InvertBoolConverter/>
             <BooleanToVisibilityConverter/>
         </local:ValueConverterGroup>
+        <local:ValueConverterGroup x:Key="stringEmptyVisibilityConvertor">
+            <local:StringNullOrEmptyConvertor/>
+            <BooleanToVisibilityConverter/>
+        </local:ValueConverterGroup>
         <Storyboard x:Key="InstantShowAnim" FillBehavior="Stop">
             <!--            <DoubleAnimation Storyboard.TargetProperty="Opacity"
                              From="0.0" To="1.0" Duration="0:0:0.1"/>   -->

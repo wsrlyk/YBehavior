@@ -475,9 +475,13 @@ namespace YBehavior.Editor.Core.New
                         des.vType = item.DesVType;
                 }
             }
+            _OnVariableValueChanged(v);
             PropertyChange(RenderProperty.Note);
         }
+        protected virtual void _OnVariableValueChanged(Variable v)
+        {
 
+        }
 
         #region CONDITION
         Connector m_ConditonConnector;

@@ -907,14 +907,64 @@ namespace YBehavior.Editor.Core.New
         {
             if (m_Cases.vbType == Variable.VariableType.VBT_Const)
             {
+                return _GetCasesValue() != null;
+            }
+            return true;
+        }
+
+        protected override void _OnVariableValueChanged(Variable v)
+        {
+            if (v == m_Cases)
+            {
+                _RefreshChildrenNotes();
+            }
+        }
+
+        public override void OnConnectToChanged()
+        {
+            base.OnConnectToChanged();
+            _RefreshChildrenNotes();
+        }
+
+        string[] _GetCasesValue()
+        {
+            if (m_Cases.vbType == Variable.VariableType.VBT_Const)
+            {
                 string[] ss = m_Cases.Value.Split(Variable.ListSpliter);
                 if (ss.Length != this.m_Connections.GetConnector(Connector.IdentifierChildren).Conns.Count)
                 {
-                    LogMgr.Instance.Error("Cases size not match in " + this.Renderer.UITitle);
-                    return false;
+                    if (!Tree.IsInState(Graph.FLAG_LOADING))
+                        LogMgr.Instance.Error("Cases size not match in " + (this.Renderer == null ? this.NickName : this.Renderer.UITitle));
+                    return null;
+                }
+                return ss;
+            }
+            return null;
+        }
+
+        protected void _RefreshChildrenNotes()
+        {
+            var conns = m_Connections.GetConnector(Connector.IdentifierChildren).Conns;
+            var values = _GetCasesValue();
+            if (values != null)
+            {
+                for (int i = 0; i < conns.Count; ++i)
+                {
+                    conns[i].Note = values[i];
                 }
             }
-            return true;
+            else
+            {
+                if (conns.Count == 1)
+                    conns[0].Note = string.Empty;
+                else
+                {
+                    for (int i = 0; i < conns.Count; ++i)
+                    {
+                        conns[i].Note = "No." + i;
+                    }
+                }
+            }
         }
     }
 
