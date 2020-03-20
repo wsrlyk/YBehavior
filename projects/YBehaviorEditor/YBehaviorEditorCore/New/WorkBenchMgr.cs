@@ -251,7 +251,7 @@ namespace YBehavior.Editor.Core.New
                 ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg();
                 if ((res & SaveResultFlag_WithError) != 0)
                 {
-                    showSystemTipsArg.Content = "Saved with some errors.";
+                    showSystemTipsArg.Content = "Saved with some errors. \nCheck logs for details.";
                     showSystemTipsArg.TipType = ShowSystemTipsArg.TipsType.TT_Error;
                 }
                 else

@@ -860,7 +860,7 @@ namespace YBehavior.Editor.Core.New
     class SwitchCaseTreeNode : CompositeNode
     {
         public override string Icon => "↙↓↘";
-
+        Variable m_Cases;
         public SwitchCaseTreeNode()
         {
             m_Name = "SwitchCase";
@@ -880,6 +880,7 @@ namespace YBehavior.Editor.Core.New
                 1
             );
 
+            m_Cases = 
             NodeMemory.CreateVariable(
                 "Cases",
                 "",
@@ -900,6 +901,20 @@ namespace YBehavior.Editor.Core.New
                     Variables.GetVariable("Cases").NoteValue);
                 return sb.ToString();
             }
+        }
+
+        protected override bool _OnCheckValid()
+        {
+            if (m_Cases.vbType == Variable.VariableType.VBT_Const)
+            {
+                string[] ss = m_Cases.Value.Split(Variable.ListSpliter);
+                if (ss.Length != this.m_Connections.GetConnector(Connector.IdentifierChildren).Conns.Count)
+                {
+                    LogMgr.Instance.Error("Cases size not match in " + this.Renderer.UITitle);
+                    return false;
+                }
+            }
+            return true;
         }
     }
 
