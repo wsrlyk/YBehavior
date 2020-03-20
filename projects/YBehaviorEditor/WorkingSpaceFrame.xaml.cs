@@ -46,7 +46,7 @@ namespace YBehavior.Editor
 
                     foreach (var data in datas)
                     {
-                        if (!string.IsNullOrEmpty(filter) && !data.Name.Contains(filter))
+                        if (!string.IsNullOrEmpty(filter) && !data.Name.ToLower().Contains(filter.ToLower()))
                             continue;
                         _Build(data, expandedItems);
                     }

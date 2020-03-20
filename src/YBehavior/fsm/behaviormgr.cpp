@@ -72,7 +72,7 @@ namespace YBehavior
 		{
 			for (UINT i = 0; i < key.SubTrees()->size(); i += 2)
 			{
-				m2t[(*key.SubTrees())[i]] = (*key.SubTrees())[i + 1];
+				t2t[(*key.SubTrees())[i]] = (*key.SubTrees())[i + 1];
 			}
 		}
 
