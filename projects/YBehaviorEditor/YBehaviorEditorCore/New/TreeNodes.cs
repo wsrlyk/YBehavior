@@ -933,7 +933,7 @@ namespace YBehavior.Editor.Core.New
                 string[] ss = m_Cases.Value.Split(Variable.ListSpliter);
                 if (ss.Length != this.m_Connections.GetConnector(Connector.IdentifierChildren).Conns.Count)
                 {
-                    if (!Tree.IsInState(Graph.FLAG_LOADING))
+                    if (Tree != null && !Tree.IsInState(Graph.FLAG_LOADING))
                         LogMgr.Instance.Error("Cases size not match in " + (this.Renderer == null ? this.NickName : this.Renderer.UITitle));
                     return null;
                 }
