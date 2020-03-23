@@ -32,6 +32,11 @@ namespace YBehavior.Editor
         }
         private void Previous_Click(object sender, RoutedEventArgs e)
         {
+            _SearchPrevious();
+        }
+
+        private void _SearchPrevious()
+        {
             if (!_TrySearch())
             {
                 --m_Index;
@@ -44,6 +49,11 @@ namespace YBehavior.Editor
         }
 
         private void Next_Click(object sender, RoutedEventArgs e)
+        {
+            _SearchNext();
+        }
+
+        private void _SearchNext()
         {
             if (!_TrySearch())
             {
@@ -168,6 +178,12 @@ namespace YBehavior.Editor
                     System.Windows.Input.Keyboard.Focus(this.Input);
                 }, System.Windows.Threading.DispatcherPriority.Render);
             }
+        }
+
+        private void Input_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+                _SearchNext();
         }
     }
 }

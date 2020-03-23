@@ -16,7 +16,7 @@
                     <Button Width="60" MaxHeight="30" DockPanel.Dock="Right" Click="Search_Click">
                         Search
                     </Button>
-                    <TextBox Name="Input" />
+                    <TextBox Name="Input" KeyDown="Input_KeyDown" />
                 </DockPanel>
                 <Grid>
                     <TextBlock Text="&lt;                &gt;" />
