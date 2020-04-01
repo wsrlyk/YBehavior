@@ -302,8 +302,8 @@ namespace YBehavior.Editor.Core.New
                 sfd.Filter = bench is TreeBench ? "TREE|*" + FileMgr.TreeExtension : "FSM|*.fsm";
                 if (sfd.ShowDialog() == true)
                 {
+                    string extension = bench is TreeBench ? FileMgr.TreeExtension : ".fsm";
                     bench.FileInfo.Path = sfd.FileName;
-                    bench.FileInfo.Name = sfd.SafeFileName.Remove(sfd.SafeFileName.LastIndexOf(bench is TreeBench ? FileMgr.TreeExtension : ".fsm"));
 
                     res |= SaveResultFlag_NewFile;
                 }
@@ -448,7 +448,6 @@ namespace YBehavior.Editor.Core.New
                     FilePath = string.Empty,
                     FileInfo = new FileMgr.FileInfo()
                     {
-                        Name = FileMgr.FileInfo.UntitledName,
                         Path = string.Empty,
                         FileType = type,
                     }
@@ -461,7 +460,6 @@ namespace YBehavior.Editor.Core.New
                     FilePath = string.Empty,
                     FileInfo = new FileMgr.FileInfo()
                     {
-                        Name = FileMgr.FileInfo.UntitledName,
                         Path = string.Empty,
                         FileType = type,
                     }

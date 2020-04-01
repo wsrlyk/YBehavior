@@ -77,8 +77,6 @@ namespace YBehavior.Editor.Core.New
                 }
                 FileInfo thisFile = new FileInfo
                 {
-                    Name = NextFile.Name.Remove(NextFile.Name.LastIndexOf(NextFile.Extension)),
-                    Extension = NextFile.Extension,
                     Path = NextFile.FullName,
                     FileType = NextFile.Extension == ".fsm" ? FileType.FSM : FileType.TREE,
                 };
@@ -124,9 +122,8 @@ namespace YBehavior.Editor.Core.New
             public string DisplayName { get { return Name; } }
             public string DisplayPath { get { return Path ?? "NULL"; } }
 
-            public string Extension { get; set; } = string.Empty;
-            public string Name { get; set; } = string.Empty;
-            public string RelativeName { get; set; } = string.Empty;
+            public string Name { get; private set; } = string.Empty;
+            public string RelativeName { get; private set; } = string.Empty;
             
             public FileType FileType = FileType.TREE;
             private string m_Path = null;
@@ -136,11 +133,33 @@ namespace YBehavior.Editor.Core.New
                 set
                 {
                     m_Path = value.Replace("\\", "/");
+                    
                     ExportingPath = m_Path.Replace(Config.Instance.WorkingDir, Config.Instance.ExportingDir);
                     RelativeName = m_Path.Replace(Config.Instance.WorkingDir, string.Empty);
-                    int extIdx = RelativeName.LastIndexOf(Extension);
-                    if (extIdx >= 0 && extIdx < RelativeName.Length)
-                        RelativeName = RelativeName.Remove(extIdx);
+
+                    if (string.IsNullOrEmpty(m_Path))
+                    {
+                        Name = UntitledName;
+                        RelativeName = Name;
+                    }
+                    else
+                    {
+                        int extIdx = RelativeName.LastIndexOf('.');
+                        if (extIdx >= 0)
+                        {
+                            RelativeName = RelativeName.Remove(extIdx);
+                        }
+
+                        int slashIdx = RelativeName.LastIndexOf('/');
+                        if (slashIdx >= 0)
+                        {
+                            Name = RelativeName.Substring(slashIdx + 1);
+                        }
+                        else
+                        {
+                            Name = RelativeName;
+                        }
+                    }
                 }
             }
             public string ExportingPath { get; set; }
