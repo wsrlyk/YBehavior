@@ -29,7 +29,7 @@ namespace YBehavior
 
 		if ((INT)m_CasesChilds.size() != m_Cases->VectorSize(pAgent->GetMemory()))
 		{
-			ERROR_BEGIN << "Cases size not match in SwitchCase" << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Cases size not match" << ERROR_END;
 			return NS_FAILURE;
 		}
 
@@ -107,19 +107,19 @@ namespace YBehavior
 		TYPEID switchType = CreateVariable(m_Switch, "Switch", data);
 		if (s_ValidTypes.find(switchType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for Switch in SwitchCase: " << switchType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Switch: " << switchType << ERROR_END;
 			return false;
 		}
 		TYPEID casesType = CreateVariable(m_Cases, "Cases", data);
 		if (s_ValidVecTypes.find(casesType) == s_ValidVecTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for Cases in SwitchCase: " << casesType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Cases: " << casesType << ERROR_END;
 			return false;
 		}
 
 		if (!Utility::IsElement(switchType, casesType))
 		{
-			ERROR_BEGIN << "Different types in SwitchCase:  " << switchType << " and " << casesType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types: Switch & Cases " << ERROR_END;
 			return false;
 		}
 
@@ -132,7 +132,7 @@ namespace YBehavior
 		{
 			if (m_DefaultChild != nullptr)
 			{
-				ERROR_BEGIN << "Too many default case in SwitchCase" << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Too many default case" << ERROR_END;
 			}
 			else
 			{

@@ -209,7 +209,7 @@ namespace YBehavior
 				return true;
 			}
 
-			ERROR_BEGIN << "Too many Condition Node for node " << this->GetNodeInfoForPrint() << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Too many Condition Node" << ERROR_END;
 			return false;
 		}
 		else
@@ -220,7 +220,7 @@ namespace YBehavior
 
 	bool BehaviorNode::_AddChild(BehaviorNode* child, const STRING& connection)
 	{
-		ERROR_BEGIN << "Cant add child to this node: " << ERROR_END;
+		ERROR_BEGIN_NODE_HEAD << "Cant add child to this node" << ERROR_END;
 		return false;
 	}
 
@@ -231,7 +231,7 @@ namespace YBehavior
 		Utility::SplitString(tempChar, buffer, Utility::SpaceSpliter);
 		if (buffer.size() == 0 || buffer[0].length() != 3)
 		{
-			ERROR_BEGIN << "Format Error, " << attri.name() << " in " << data.name() << " in Node " << this->GetClassName() << ": " << tempChar << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Format Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
 			return false;
 		}
 
@@ -239,7 +239,7 @@ namespace YBehavior
 		{
 			if (!((single == ST_SINGLE) ^ (buffer[0][0] == buffer[0][1])))
 			{
-				ERROR_BEGIN << "Single or Vector Error, " << attri.name() << " in " << data.name() << " in Node " << this->GetClassName() << ": " << tempChar << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Single or Vector Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
 				return false;
 			}
 		}
@@ -248,7 +248,7 @@ namespace YBehavior
 		{
 			if (Utility::ToLower(buffer[0][2]) != Utility::ToLower(variableType))
 			{
-				ERROR_BEGIN << "VariableType Error, " << attri.name() << " in " << data.name() << " in Node " << this->GetClassName() << ": " << tempChar << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "VariableType Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
 				return false;
 			}
 		}
@@ -315,7 +315,7 @@ namespace YBehavior
 
 		if (attrOptr.empty())
 		{
-			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << " in Node " << this->GetClassName() << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
 			return "";
 		}
 		StdVector<STRING> buffer;
@@ -347,11 +347,11 @@ namespace YBehavior
 				}
 				else
 				{
-					ERROR_BEGIN << "DefaultCreateStr " << defaultCreateStr << " ERROR for attribute" << attriName << " in " << data.name() << " in Node " << this->GetClassName() << ERROR_END;
+					ERROR_BEGIN_NODE_HEAD << "DefaultCreateStr " << defaultCreateStr << " ERROR for attribute" << attriName << " in " << data.name() << ERROR_END;
 					return -1;
 				}
 			}
-			ERROR_BEGIN << "Cant Find Attribute " << attriName << " in " << data.name() << " in Node " << this->GetClassName() << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
 			return -1;
 		}
 		return _CreateVariable(op, attrOptr, data, variableType);
@@ -391,7 +391,7 @@ namespace YBehavior
 		}
 		else
 		{
-			ERROR_BEGIN << "Get VariableCreateHelper Failed in Node " << this->GetClassName() << ": " << buffer[0].substr(0, 2) << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Get VariableCreateHelper Failed: " << buffer[0].substr(0, 2) << ERROR_END;
 			return -1;
 		}
 	}
@@ -456,12 +456,12 @@ namespace YBehavior
 				CreateVariable(pVariable, it->name(), data, ST_NONE);
 				if (!pVariable)
 				{
-					ERROR_BEGIN << "Failed to Create " << data.name() << ERROR_END;
+					ERROR_BEGIN_NODE_HEAD << "Failed to Create " << data.name() << ERROR_END;
 					return false;
 				}
 				if (container.count(it->name()) > 0)
 				{
-					ERROR_BEGIN << "Duplicate "<< data.name() << " Variable: " << it->name() << ERROR_END;
+					ERROR_BEGIN_NODE_HEAD << "Duplicate "<< data.name() << " Variable: " << it->name() << ERROR_END;
 					return false;
 				}
 				container[it->name()] = pVariable;
@@ -578,7 +578,7 @@ namespace YBehavior
 			m_Child = child;
 		else
 		{
-			ERROR_BEGIN << "There're more than 1 children for this sinlgechild node: " << GetNodeInfoForPrint() << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "There're more than 1 children" << ERROR_END;
 			return;
 		}
 	}

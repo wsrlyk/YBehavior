@@ -30,14 +30,14 @@ namespace YBehavior
 		m_DataType = CreateVariable(m_Opl, "Opl", data, Utility::POINTER_CHAR);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right
 		TYPEID dataType = CreateVariable(m_Opr, "Opr", data);
 		if (m_DataType != dataType)
 		{
-			ERROR_BEGIN << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types:  Opl & Opr" << ERROR_END;
 			return false;
 		}
 

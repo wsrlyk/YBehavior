@@ -15,14 +15,14 @@ namespace YBehavior
 		TYPEID leftType = CreateVariable(m_Opl, "Target", data, Utility::POINTER_CHAR);
 		if (leftType == Utility::INVALID_TYPE)
 		{
-			ERROR_BEGIN << "Invalid type for Opl in SetData: " << leftType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in SetData: " << leftType << ERROR_END;
 			return false;
 		}
 		///> Right
 		TYPEID rightType = CreateVariable(m_Opr, "Source", data);
 		if (leftType != rightType)
 		{
-			ERROR_BEGIN << "Different types:  " << leftType << " and " << rightType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types:  Opl & Opr" << ERROR_END;
 			return false;
 		}
 

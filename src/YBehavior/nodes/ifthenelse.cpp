@@ -72,25 +72,25 @@ namespace YBehavior
 			if (m_If == nullptr)
 				m_If = child;
 			else
-				ERROR_BEGIN << "Too many IF nodes for this ifthenelse node: " << GetNodeInfoForPrint() << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Too many IF nodes" << ERROR_END;
 		}
 		else if (connection == "then")
 		{
 			if (m_Then == nullptr)
 				m_Then = child;
 			else
-				ERROR_BEGIN << "Too many THEN nodes for this ifthenelse node: " << GetNodeInfoForPrint() << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Too many THEN nodes" << ERROR_END;
 		}
 		else if (connection == "else")
 		{
 			if (m_Else == nullptr)
 				m_Else = child;
 			else
-				ERROR_BEGIN << "Too many ELSE nodes for this ifthenelse node: " << GetNodeInfoForPrint() << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Too many ELSE nodes" << ERROR_END;
 		}
 		else
 		{
-			ERROR_BEGIN << "Unknown connection for this ifthenelse node: " << GetNodeInfoForPrint() << "with connection: " << connection << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Unknown connection with connection: " << connection << ERROR_END;
 		}
 	}
 

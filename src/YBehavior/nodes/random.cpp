@@ -20,21 +20,21 @@ namespace YBehavior
 		m_DataType = CreateVariable(m_Opl, "Target", data, Utility::POINTER_CHAR);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right1
 		TYPEID dataType = CreateVariable(m_Opr1, "Bound1", data);
 		if (m_DataType != dataType)
 		{
-			ERROR_BEGIN << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right2
 		dataType = CreateVariable(m_Opr2, "Bound2", data);
 		if (m_DataType != dataType)
 		{
-			ERROR_BEGIN << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
 			return false;
 		}
 
@@ -72,7 +72,7 @@ namespace YBehavior
 		TYPEID typeID = CreateVariable(m_Output, "Output", data);
 		if (!Utility::IsElement(typeID, typeIDArray))
 		{
-			ERROR_BEGIN << "RandomSelect types not match " << typeID << " and " << typeIDArray << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "RandomSelect types not match " << typeID << " and " << typeIDArray << ERROR_END;
 			return false;
 		}
 		return true;
@@ -106,7 +106,7 @@ namespace YBehavior
 		TYPEID typeIDOutput = CreateVariable(m_Output, "Output", data, Utility::POINTER_CHAR);
 		if (typeIDOutput != typeIDInput)
 		{
-			ERROR_BEGIN << "Permulation types not match " << typeIDOutput << " and " << typeIDInput << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Permulation types not match " << typeIDOutput << " and " << typeIDInput << ERROR_END;
 			return false;
 		}
 

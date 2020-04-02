@@ -65,7 +65,7 @@ namespace YBehavior
 		TYPEID typeID = CreateVariable(m_Element, "Element", data);
 		if (!Utility::IsElement(typeID, typeIDArray))
 		{
-			ERROR_BEGIN << "ArrayPushElement types not match " << typeID << " and " << typeIDArray << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "ArrayPushElement types not match " << typeID << " and " << typeIDArray << ERROR_END;
 			return false;
 		}
 		return true;

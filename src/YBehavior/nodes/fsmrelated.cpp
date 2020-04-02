@@ -14,7 +14,7 @@ namespace YBehavior
 		TYPEID type = CreateVariable(m_Conditions, "Conditions", data);
 		if (type == Utility::INVALID_TYPE)
 		{
-			ERROR_BEGIN << "Invalid type for Conditions in FSMSetCondition: " << type << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Conditions in FSMSetCondition: " << type << ERROR_END;
 			return false;
 		}
 
@@ -25,7 +25,7 @@ namespace YBehavior
 			m_IsOn = false;
 		else
 		{
-			ERROR_BEGIN << "Invalid value for Operator in FSMSetCondition: " << op << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid value for Operator in FSMSetCondition: " << op << ERROR_END;
 			return false;
 		}
 

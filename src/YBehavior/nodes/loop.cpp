@@ -105,7 +105,7 @@ namespace YBehavior
 		{
 			if (m_InitChild != nullptr)
 			{
-				ERROR_BEGIN << "Too many init in For" << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Too many init" << ERROR_END;
 			}
 			else
 			{
@@ -116,7 +116,7 @@ namespace YBehavior
 		{
 			if (m_CondChild != nullptr)
 			{
-				ERROR_BEGIN << "Too many cond in For" << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Too many cond" << ERROR_END;
 			}
 			else
 			{
@@ -127,7 +127,7 @@ namespace YBehavior
 		{
 			if (m_IncChild != nullptr)
 			{
-				ERROR_BEGIN << "Too many inc in For" << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Too many inc" << ERROR_END;
 			}
 			else
 			{
@@ -138,7 +138,7 @@ namespace YBehavior
 		{
 			if (m_MainChild != nullptr)
 			{
-				ERROR_BEGIN << "Too many children in For" << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Too many children" << ERROR_END;
 			}
 			else
 			{
@@ -210,7 +210,7 @@ namespace YBehavior
 		TYPEID currentType = CreateVariable(m_Current, "Current", data);
 		if (!Utility::IsElement(currentType, collectionType))
 		{
-			ERROR_BEGIN << "Types not match in ForEach: " << currentType << " and " << collectionType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Types not match: " << currentType << " and " << collectionType << ERROR_END;
 			return false;
 		}
 

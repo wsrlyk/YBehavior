@@ -16,7 +16,7 @@ namespace YBehavior
 	{
 		if (!m_Root)
 		{
-			ERROR_BEGIN << "No Root" << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "No Root" << ERROR_END;
 			return false;
 		}
 
@@ -41,7 +41,7 @@ namespace YBehavior
 		
 		if (m_FinalTreeName == Utility::StringEmpty)
 		{
-			ERROR_BEGIN << "Null Value for Tree in " << this->GetClassName() << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Null Value for Tree in " << this->GetClassName() << ERROR_END;
 			return false;
 		}
 
@@ -51,7 +51,7 @@ namespace YBehavior
 		{
 			if (defaultTreeName.empty())
 			{
-				ERROR_BEGIN << "Null Value for Tree in " << this->GetClassName() << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Null Value for Tree in " << this->GetClassName() << ERROR_END;
 				return false;
 			}
 			m_Root->GetTreeMap().Node2Trees[this] = defaultTreeName;
@@ -84,12 +84,12 @@ namespace YBehavior
 			CreateVariable(pVariable, it->name(), data, ST_NONE);
 			if (!pVariable)
 			{
-				ERROR_BEGIN << "Failed to Create " << data.name() << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Failed to Create " << data.name() << ERROR_END;
 				return false;
 			}
 			//if (container.count(it->name()) > 0)
 			//{
-			//	ERROR_BEGIN << "Duplicate " << data.name() << " Variable: " << it->name() << ERROR_END;
+			//	ERROR_BEGIN_NODE_HEAD << "Duplicate " << data.name() << " Variable: " << it->name() << ERROR_END;
 			//	return false;
 			//}
 			container.push_back(pVariable);

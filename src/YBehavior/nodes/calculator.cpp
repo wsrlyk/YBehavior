@@ -28,21 +28,21 @@ namespace YBehavior
 		m_DataType = CreateVariable(m_Opl, "Opl", data, Utility::POINTER_CHAR);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for Opl in calculator: " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in calculator: " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right1
 		TYPEID dataType = CreateVariable(m_Opr1, "Opr1", data);
 		if (dataType != m_DataType)
 		{
-			ERROR_BEGIN << "Different types:  " << dataType << " with " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types:  Opl & Opr1" << ERROR_END;
 			return false;
 		}
 		///> Right2
 		dataType = CreateVariable(m_Opr2, "Opr2", data);
 		if (m_DataType != dataType)
 		{
-			ERROR_BEGIN << "Different types:  " << dataType << " with " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types: Opl & Opr2" << ERROR_END;
 			return false;
 		}
 

@@ -52,6 +52,9 @@ namespace YBehavior
 	class BehaviorNode;
 	typedef BehaviorNode* BehaviorNodePtr;
 
+#define ERROR_BEGIN_NODE_HEAD ERROR_BEGIN << m_UID << "." << GetClassName() << " "
+#define LOG_BEGIN_NODE_HEAD LOG_BEGIN << m_UID << "." << GetClassName() << " "
+
 	class YBEHAVIOR_API BehaviorNode
 	{
 	protected:
@@ -111,8 +114,6 @@ namespace YBehavior
 		static BehaviorNode* CreateNodeByName(const STRING& name);
 		bool AddChild(BehaviorNode* child, const STRING& connection);
 
-		virtual STRING GetNodeInfoForPrint() { return "";}
-
 		void TryCreateRC();
 		RunningContext* GetRC() { return m_RunningContext; }
 		void SetRCCreator(IContextCreator* rcc) { m_ContextCreator = rcc; }
@@ -149,7 +150,7 @@ namespace YBehavior
 		if (strMap.TryGetKey(s, outValue))
 			return true;
 
-		ERROR_BEGIN << attriName << " Error: " << s << " in " << this->GetClassName() << ERROR_END;
+		ERROR_BEGIN_NODE_HEAD << attriName << " Error: " << s << ERROR_END;
 		return false;
 	}
 
@@ -170,7 +171,7 @@ namespace YBehavior
 				return GetTypeID<T>();
 			}
 
-			ERROR_BEGIN << "Cant create default variable for " << attriName << " with typeid = " << GetTypeID<T>() << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Cant create default variable for " << attriName << " with typeid = " << GetTypeID<T>() << ERROR_END;
 			return -1;
 		}
 
@@ -183,7 +184,7 @@ namespace YBehavior
 		else
 		{
 			op = nullptr;
-			ERROR_BEGIN << "Invalid type for " << attriName << " with type " << typeID << " in Node " << this->GetClassName() << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for " << attriName << " with type " << typeID << ERROR_END;
 		}
 		return typeID;
 	}
