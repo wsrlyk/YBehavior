@@ -133,9 +133,7 @@ namespace YBehavior.Editor.Core.New
                 set
                 {
                     m_Path = value.Replace("\\", "/");
-                    
-                    ExportingPath = m_Path.Replace(Config.Instance.WorkingDir, Config.Instance.ExportingDir);
-                    RelativeName = m_Path.Replace(Config.Instance.WorkingDir, string.Empty);
+
 
                     if (string.IsNullOrEmpty(m_Path))
                     {
@@ -144,6 +142,9 @@ namespace YBehavior.Editor.Core.New
                     }
                     else
                     {
+                        RelativeName = m_Path.Substring(Config.Instance.WorkingDir.Length);
+                        ExportingPath = Config.Instance.ExportingDir + RelativeName;
+
                         int extIdx = RelativeName.LastIndexOf('.');
                         if (extIdx >= 0)
                         {
