@@ -237,9 +237,10 @@ namespace YBehavior.Editor.Core.New
 
                 if (bench == null)
                     bench = ActiveWorkBench;
+                var relativePath = bench.FileInfo.RelativePath;
                 bench.FilePath = bench.FileInfo.RelativeName;
 
-                FileMgr.Instance.Load();
+                FileMgr.Instance.Load(relativePath, bench.FilePath);
 
                 WorkBenchSavedArg arg = new WorkBenchSavedArg()
                 {

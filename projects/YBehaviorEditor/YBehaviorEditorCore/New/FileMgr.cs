@@ -14,8 +14,57 @@ namespace YBehavior.Editor.Core.New
     {
         public static readonly string TreeExtension = ".tree";
 
-        private List<List<string>> m_Folders = new List<List<string>>();
+        ////private List<List<string>> m_Folders = new List<List<string>>();
 
+        public void Load(string relativePath, string relativeName)
+        {
+            if (m_FileDic.ContainsKey(relativeName))
+            {
+                return;
+            }
+
+            System.IO.DirectoryInfo TheFolder = new System.IO.DirectoryInfo(Config.Instance.WorkingDirWin);
+            if (!TheFolder.Exists)
+                return;
+
+            FileInfo thisFile = new FileInfo();
+
+            int slashIdx = relativePath.IndexOf('/');
+            while (slashIdx >= 0)
+            {
+                string folderName = relativePath.Substring(0, slashIdx);
+
+                var res = TheFolder.GetDirectories(folderName);
+                if (res == null || res.Length == 0)
+                {
+                    LogMgr.Instance.Error("Folder not exist: " + folderName);
+                    return;
+                }
+                TheFolder = res[0];
+
+                relativePath = relativePath.Substring(slashIdx + 1);
+                if (thisFile.FolderStack == null)
+                    thisFile.FolderStack = new List<string>();
+                thisFile.FolderStack.Add(folderName);
+
+                slashIdx = relativePath.IndexOf('/');
+            }
+
+            var fileres = TheFolder.GetFiles(relativePath);
+            if (fileres == null || fileres.Length == 0)
+            {
+                LogMgr.Instance.Error("File not exist: " + relativePath);
+                return;
+            }
+            System.IO.FileInfo file = fileres[0];
+            thisFile.Path = file.FullName;
+            thisFile.FileType = file.Extension == ".fsm" ? FileType.FSM : FileType.TREE;
+
+            m_FileInfos.Add(thisFile);
+            m_FileDic.Add(thisFile.RelativeName, thisFile);
+            if (thisFile.FileType == FileType.TREE)
+                m_TreeList.Add(thisFile.RelativeName);
+        }
         public void Load()
         {
             using (var h = m_TreeList.Delay())
@@ -65,23 +114,27 @@ namespace YBehavior.Editor.Core.New
                 _LoadDir(nextDir, folderStack);
                 folderStack.RemoveAt(folderStack.Count - 1);
             }
-            bool bFolderStored = false;
+            ////bool bFolderStored = false;
             foreach (System.IO.FileInfo NextFile in TheFolder.GetFiles())
             {
                 if (NextFile.Extension != ".tree" && NextFile.Extension != ".fsm" && NextFile.Extension != ".xml")
                     continue;
-                if (!bFolderStored)
-                {
-                    _StoreFolderStack(folderStack);
-                    bFolderStored = true;
-                }
+                ////if (!bFolderStored)
+                ////{
+                ////    _StoreFolderStack(folderStack);
+                ////    bFolderStored = true;
+                ////}
                 FileInfo thisFile = new FileInfo
                 {
                     Path = NextFile.FullName,
                     FileType = NextFile.Extension == ".fsm" ? FileType.FSM : FileType.TREE,
                 };
 
-                _GetFolderStack(ref thisFile.FolderStack, folderStack.Count);
+                if (folderStack.Count > 0)
+                {
+                    thisFile.FolderStack = new List<string>(folderStack);
+                }
+                ////_GetFolderStack(ref thisFile.FolderStack, folderStack.Count);
 
                 m_FileInfos.Add(thisFile);
 
@@ -91,31 +144,31 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        private void _StoreFolderStack(List<string> folderStack)
-        {
-            for (int i = 0; i < folderStack.Count; ++i)
-            {
-                if (m_Folders.Count <= i)
-                    m_Folders.Add(new List<string>());
-                if (m_Folders[i].Count == 0 || m_Folders[i][m_Folders[i].Count - 1] != folderStack[i])
-                    m_Folders[i].Add(folderStack[i]);
-            }
-        }
+        ////private void _StoreFolderStack(List<string> folderStack)
+        ////{
+        ////    for (int i = 0; i < folderStack.Count; ++i)
+        ////    {
+        ////        if (m_Folders.Count <= i)
+        ////            m_Folders.Add(new List<string>());
+        ////        if (m_Folders[i].Count == 0 || m_Folders[i][m_Folders[i].Count - 1] != folderStack[i])
+        ////            m_Folders[i].Add(folderStack[i]);
+        ////    }
+        ////}
 
-        private void _GetFolderStack(ref List<string> folderStack, int deep)
-        {
-            if (deep == 0)
-                return;
+        ////private void _GetFolderStack(ref List<string> folderStack, int deep)
+        ////{
+        ////    if (deep == 0)
+        ////        return;
 
-            folderStack = new List<string>();
+        ////    folderStack = new List<string>();
 
-            for(int i = 0; i < deep; ++i)
-            {
-                if (m_Folders[i].Count == 0)
-                    throw new Exception("There's no folder but try to get one.");
-                folderStack.Add(m_Folders[i][m_Folders[i].Count - 1]);
-            }
-        }
+        ////    for(int i = 0; i < deep; ++i)
+        ////    {
+        ////        if (m_Folders[i].Count == 0)
+        ////            throw new Exception("There's no folder but try to get one.");
+        ////        folderStack.Add(m_Folders[i][m_Folders[i].Count - 1]);
+        ////    }
+        ////}
 
         public class FileInfo
         {
@@ -124,7 +177,8 @@ namespace YBehavior.Editor.Core.New
 
             public string Name { get; private set; } = string.Empty;
             public string RelativeName { get; private set; } = string.Empty;
-            
+            public string RelativePath { get; private set; } = string.Empty;
+
             public FileType FileType = FileType.TREE;
             private string m_Path = null;
             public string Path
@@ -139,16 +193,17 @@ namespace YBehavior.Editor.Core.New
                     {
                         Name = UntitledName;
                         RelativeName = Name;
+                        RelativePath = m_Path;
                     }
                     else
                     {
-                        RelativeName = m_Path.Substring(Config.Instance.WorkingDir.Length);
-                        ExportingPath = Config.Instance.ExportingDir + RelativeName;
+                        RelativePath = m_Path.Substring(Config.Instance.WorkingDir.Length);
+                        ExportingPath = Config.Instance.ExportingDir + RelativePath;
 
-                        int extIdx = RelativeName.LastIndexOf('.');
+                        int extIdx = RelativePath.LastIndexOf('.');
                         if (extIdx >= 0)
                         {
-                            RelativeName = RelativeName.Remove(extIdx);
+                            RelativeName = RelativePath.Remove(extIdx);
                         }
 
                         int slashIdx = RelativeName.LastIndexOf('/');
