@@ -78,8 +78,10 @@ namespace YBehavior.Editor.Core.New
                 if (m_Ops.Count < Step)
                     _ProcessOp();
                 else
+                {
+                    m_Oping = true;
                     UnityCoroutines.CoroutineManager.Instance.StartCoroutine(_SlowProcessOp(Step));
-
+                }
             }
         }
 
@@ -98,7 +100,6 @@ namespace YBehavior.Editor.Core.New
         private System.Collections.IEnumerator _SlowProcessOp(int count)
         {
             int counter = count;
-            m_Oping = true;
             while (m_Ops.Count > 0)
             {
                 if (--counter < 0)
