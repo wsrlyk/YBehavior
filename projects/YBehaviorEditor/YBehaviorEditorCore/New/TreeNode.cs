@@ -44,6 +44,8 @@ namespace YBehavior.Editor.Core.New
                 TreeNode node = Activator.CreateInstance(type) as TreeNode;
                 if (node.Type == TreeNodeType.TNT_Invalid)
                     continue;
+                node.CreateBase();
+                node.CreateVariables();
                 node.LoadDescription();
                 m_NodeList.Add(node);
                 m_TypeDic.Add(node.Name, type);
@@ -92,6 +94,8 @@ namespace YBehavior.Editor.Core.New
         public TypeMap TypeMap { get { return m_TypeMap; } }
 
         public Tree Tree { get { return Graph as Tree; } }
+
+        public override IEnumerable<string> TextForFilter { get { return new TextForFilterGetter<TreeNodeTextForFilter>(this); } }
 
         public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class", "Connection" });
         public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName", "Connection", "DebugPoint", "Comment" });

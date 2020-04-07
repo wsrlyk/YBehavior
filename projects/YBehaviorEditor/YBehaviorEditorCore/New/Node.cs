@@ -137,6 +137,9 @@ namespace YBehavior.Editor.Core.New
         public DebugPointInfo DebugPointInfo { get; } = new DebugPointInfo();
 
         public virtual string Name { get { return m_Name; } }
+
+        public virtual IEnumerable<string> TextForFilter { get { return new TextForFilterGetter<BaseTextForFilter>(this); } }
+
         public string NickName
         {
             get { return m_NickName; }
@@ -281,7 +284,4 @@ namespace YBehavior.Editor.Core.New
             node.OnAddToGraph();
         }
     }
-
-
-
 }

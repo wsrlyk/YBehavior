@@ -165,8 +165,20 @@ namespace YBehavior.Editor
                 {
                     foreach (var node in TreeNodeMgr.Instance.NodeList)
                     {
-                        if (!string.IsNullOrEmpty(keyword) && !node.Name.ToLower().Contains(keyword))
-                            continue;
+                        if (!string.IsNullOrEmpty(keyword))
+                        {
+                            bool bFound = false;
+                            foreach (var t in node.TextForFilter)
+                            {
+                                if (t.ToLower().Contains(keyword))
+                                {
+                                    bFound = true;
+                                    break;
+                                }
+                            }
+                            if (!bFound)
+                                continue;
+                        }
                         m_NodeInfos.Build(node, m_ExpandedItems);
                     }
                 }

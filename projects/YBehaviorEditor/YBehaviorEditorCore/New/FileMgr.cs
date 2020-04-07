@@ -72,7 +72,8 @@ namespace YBehavior.Editor.Core.New
                 m_TreeList.Clear();
                 m_FileInfos.Clear();
                 m_FileDic.Clear();
-            
+                m_TreeList.Add(string.Empty);
+
                 System.IO.DirectoryInfo TheFolder = new System.IO.DirectoryInfo(Config.Instance.WorkingDirWin);
                 if (!TheFolder.Exists)
                     return;
