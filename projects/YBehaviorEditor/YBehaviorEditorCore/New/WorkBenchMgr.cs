@@ -376,6 +376,7 @@ namespace YBehavior.Editor.Core.New
 
             NewNodeAddedArg arg = new NewNodeAddedArg();
             arg.Node = node;
+            arg.From = NewNodeAddedArg.AddMethod.New;
             EventMgr.Instance.Send(arg);
 
             return node;
@@ -400,6 +401,7 @@ namespace YBehavior.Editor.Core.New
 
             NewNodeAddedArg arg = new NewNodeAddedArg();
             arg.Node = node;
+            arg.From = NewNodeAddedArg.AddMethod.Duplicate;
             EventMgr.Instance.Send(arg);
 
             return node;
@@ -434,6 +436,7 @@ namespace YBehavior.Editor.Core.New
 
             NewNodeAddedArg arg = new NewNodeAddedArg();
             arg.Node = node;
+            arg.From = NewNodeAddedArg.AddMethod.Paste;
             EventMgr.Instance.Send(arg);
 
             return node;

@@ -98,7 +98,14 @@ namespace YBehavior.Editor.Core.New
     public class NewNodeAddedArg : EventArg
     {
         public NodeBase Node { get; set; }
+        public AddMethod From { get; set; }
         public override EventType Type => EventType.NewNodeAdded;
+        public enum AddMethod
+        {
+            New,
+            Duplicate,
+            Paste,
+        }
     }
 
     /// <summary>

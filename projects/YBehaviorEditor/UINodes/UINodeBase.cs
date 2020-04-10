@@ -142,7 +142,7 @@ namespace YBehavior.Editor
                 return;
             if (Node != null)
             {
-                Node.Renderer.DragMain(delta, 1);
+                Node.Renderer.DragMain(delta, (System.Windows.Input.Keyboard.Modifiers & System.Windows.Input.ModifierKeys.Shift) != 0 ? 0 : 1);
             }
         }
 

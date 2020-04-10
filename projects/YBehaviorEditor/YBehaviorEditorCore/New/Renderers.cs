@@ -314,7 +314,7 @@ namespace YBehavior.Editor.Core.New
         }
         public void SetPos(Point pos)
         {
-            _Move(pos - Owner.Geo.Pos, m_DragParam);
+            _Move(pos - Owner.Geo.Pos, 0);
         }
 
         void _Move(Vector delta, int param)

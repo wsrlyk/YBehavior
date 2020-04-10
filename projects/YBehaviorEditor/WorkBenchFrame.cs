@@ -64,9 +64,10 @@ namespace YBehavior.Editor
                 return;
 
             ///> move the node to the topleft of the canvas
-            oArg.Node.Renderer.SetPos(new Point(
-                -m_CurPageData.TranslateTransform.X / m_CurPageData.ScaleTransform.ScaleX,
-                -m_CurPageData.TranslateTransform.Y / m_CurPageData.ScaleTransform.ScaleY));
+            if (oArg.From != NewNodeAddedArg.AddMethod.Duplicate)
+                oArg.Node.Renderer.SetPos(new Point(
+                    -m_CurPageData.TranslateTransform.X / m_CurPageData.ScaleTransform.ScaleX,
+                    -m_CurPageData.TranslateTransform.Y / m_CurPageData.ScaleTransform.ScaleY));
 
             //_CreateNode(oArg.Node);
             //this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<Node>(_ThreadRefreshConnection), oArg.Node);
