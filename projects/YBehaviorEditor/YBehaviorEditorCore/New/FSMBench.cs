@@ -525,6 +525,10 @@ namespace YBehavior.Editor.Core.New
         {
             if (from == null || to == null || from.GetDir != Connector.Dir.OUT || to.GetDir != Connector.Dir.IN)
                 return null;
+            ///>From same owner. For now we dont support this.
+            if (from.Owner == to.Owner)
+                return null;
+
             var fromNode = from.Owner as FSMStateNode;
             var toNode = to.Owner as FSMStateNode;
             if (fromNode.Type == FSMStateType.Special && toNode is FSMExitStateNode)
@@ -537,6 +541,9 @@ namespace YBehavior.Editor.Core.New
         public Transition MakeTrans(Connector from, Connector to, Transition existTrans)
         {
             if (from == null || to == null || from.GetDir != Connector.Dir.OUT || to.GetDir != Connector.Dir.IN)
+                return null;
+            ///>From same owner. For now we dont support this.
+            if (from.Owner == to.Owner)
                 return null;
             var fromNode = from.Owner as FSMStateNode;
             var toNode = to.Owner as FSMStateNode;
