@@ -31,7 +31,7 @@ namespace YBehavior
 		m_TickCount->GetCastedValue(pAgent->GetMemory(), tickCount);
 		m_RCContainer.CreateRC(this);
 
-		if (++m_RCContainer.GetRC()->Current > tickCount)
+		if (++m_RCContainer.GetRC()->Current >= tickCount)
 			return NS_SUCCESS;
 		DEBUG_LOG_INFO("Tick " << m_RCContainer.GetRC()->Current << "; ");
 		return NS_RUNNING;
