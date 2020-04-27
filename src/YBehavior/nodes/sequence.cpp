@@ -1,10 +1,12 @@
 #include "YBehavior/nodes/sequence.h"
 #include "YBehavior/runningcontext.h"
+#include "YBehavior/profile/profileheader.h"
 
 namespace YBehavior
 {
 	NodeState Sequence::Update(AgentPtr pAgent)
 	{
+		PROFILER_ENABLE_TOTAL;
 		NodeState ns = NS_SUCCESS;
 		if (m_Childs == nullptr)
 			return ns;
@@ -24,7 +26,9 @@ namespace YBehavior
 		for (int i = m_Iterator.GetStart(); i < (int)m_Childs->size(); ++i)
 		{
 			BehaviorNodePtr node = (*m_Childs)[m_Iterator.GetIndex(i)];
+			PROFILER_PAUSE;
 			ns = node->Execute(pAgent, ns);
+			PROFILER_RESUME;
 			switch (ns)
 			{
 			case YBehavior::NS_FAILURE:
@@ -46,6 +50,7 @@ namespace YBehavior
 
 	NodeState RandomSequence::Update(AgentPtr pAgent)
 	{
+		PROFILER_ENABLE_TOTAL;
 		NodeState ns = NS_SUCCESS;
 		if (m_Childs == nullptr)
 			return ns;
@@ -73,7 +78,9 @@ namespace YBehavior
 			
 			BehaviorNodePtr node = (*m_Childs)[index];
 
+			PROFILER_PAUSE;
 			ns = node->Execute(pAgent, ns);
+			PROFILER_RESUME;
 			switch (ns)
 			{
 			case YBehavior::NS_FAILURE:

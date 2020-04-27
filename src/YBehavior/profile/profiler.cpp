@@ -37,7 +37,7 @@ namespace YBehavior
 		STRING ProfileMgr::Print()
 		{
 			std::stringstream ss;
-			ss << "==================VVV======BEGIN======VVV================" << std::endl;
+			ss << "==================VVV======BEGIN======VVV==================" << std::endl;
 			for (auto it = m_Profiles.begin(); it != m_Profiles.end(); ++it)
 			{
 				ProfileProcessor processor(it->second);
@@ -45,33 +45,51 @@ namespace YBehavior
 
 				ss << res.agentUID << "." << res.name << std::endl;
 				ss << "TickCount " << res.tickCount << std::endl;
-				ss << "Time" << std::endl;
+				ss << "Time(ms)" << std::endl;
 				ss << '\t' << res.time << std::endl;
-				ss << std::endl;
+				ss << std::endl << "Data per tick" << std::endl;
 
 				for (auto& tree : res.trees)
 				{
 					ss << '\t' << tree.treeName << std::endl;
-					ss << '\t' << "TickCount " << std::endl;
+					ss << '\t' << "RunCount" << std::endl;
 					ss << "\t\t" << tree.runCount << std::endl;
-					ss << '\t' << "Time " << std::endl;
-					ss << "\t\t" << tree.time << std::endl;
+					if (tree.totalTime.IsValid())
+					{
+						ss << '\t' << "Total Time(ms)" << std::endl;
+						ss << "\t\t" << tree.totalTime << std::endl;
+						ss << '\t' << "Self Time(ms)" << std::endl;
+						ss << "\t\t" << tree.selfTime << std::endl;
+					}
+					else
+					{
+						ss << '\t' << "Time(ms)" << std::endl;
+						ss << "\t\t" << tree.selfTime << std::endl;
+					}
 					ss << std::endl;
 
 					for (auto& node : tree.nodes)
 					{
 						ss << "\t\t" << node.uid << '.' << node.nodeName << std::endl;
-						ss << "\t\t" << "TickCount " << std::endl;
+						ss << "\t\t" << "RunCount" << std::endl;
 						ss << "\t\t\t" << node.runCount << std::endl;
-						ss << "\t\t" << "Total Time " << std::endl;
-						ss << "\t\t\t" << node.totalTime << std::endl;
-						ss << "\t\t" << "Self Time " << std::endl;
-						ss << "\t\t\t" << node.selfTime << std::endl;
+						if (node.totalTime.IsValid())
+						{
+							ss << "\t\t" << "Total Time(ms)" << std::endl;
+							ss << "\t\t\t" << node.totalTime << std::endl;
+							ss << "\t\t" << "Self Time(ms)" << std::endl;
+							ss << "\t\t\t" << node.selfTime << std::endl;
+						}
+						else
+						{
+							ss << "\t\t" << "Time(ms)" << std::endl;
+							ss << "\t\t\t" << node.selfTime << std::endl;
+						}
 						ss << std::endl;
 					}
 				}
 			}
-			ss << "==================^^^======END======^^^================" << std::endl;
+			ss << "==================^^^======END======^^^==================" << std::endl;
 			return ss.str();
 		}
 

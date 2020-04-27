@@ -67,8 +67,10 @@ namespace YBehavior
 		};
 		class ProfileMgr : public Singleton<ProfileMgr>
 		{
+		protected:
 			std::unordered_map<UINT64, Profile> m_Profiles;
-			//std::unordered_map<UINT, DebugPointInfo> m_DebugPointInfos;
+			bool m_bProfiling{ false };
+			ProfileTick* m_pProfileTickCache;
 
 		public:
 			void Start() { m_bProfiling = true; }
@@ -79,10 +81,7 @@ namespace YBehavior
 			inline bool IsProfiling() const { return m_bProfiling; }
 			ProfileTick* NewTick(UINT64 agentUID, const STRING& name);
 			inline ProfileTick* GetCachedTick() { return m_pProfileTickCache; }
-		private:
-			bool m_bProfiling{ false };
-
-			ProfileTick* m_pProfileTickCache;
+			inline std::unordered_map<UINT64, Profile>& GetProfiles() { return m_Profiles; }
 		};
 	}
 }

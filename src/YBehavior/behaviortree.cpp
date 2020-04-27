@@ -509,6 +509,7 @@ namespace YBehavior
 	{
 #ifdef YPROFILER
 		Profiler::TreeProfileHelper profiler(this);
+		profiler.CalcTotal();
 #endif
 		///> Push the local data to the stack of the agent memory
 		if (parentState != NS_RUNNING)

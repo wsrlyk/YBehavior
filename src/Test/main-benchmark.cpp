@@ -19,24 +19,15 @@ int main(int argc, char** argv)
 	MyLaunchCore core;
 	YBehavior::Launcher::Launch(core);
 
-	auto beginTime = Utility::GetTime();
-#if _MSC_VER
-	Sleep(300);
-#else
-	usleep(1000000);
-#endif
-	auto endTime = Utility::GetTime();
-	auto dur = Utility::GetMicroDuration(beginTime, endTime);
-	LOG_BEGIN << "duration " << dur << LOG_END;
-
 	XAgent::InitData();
 
 	XEntity* pEntity = new XEntity("Hehe", "StateMachine/BenchMarkFSM");
 
 	char ch;
 	bool notexit = true;
+#ifdef YPROFILER
 	Profiler::ProfileMgr::Instance()->Start();
-
+#endif
 	while (notexit)
 	{
 #if _MSC_VER
@@ -49,14 +40,18 @@ int main(int argc, char** argv)
 			{
 			case 'e':
 			{
+#ifdef YPROFILER
 				Profiler::ProfileMgr::Instance()->Stop();
 				Profiler::ProfileMgr::Instance()->Output("", "profile");
 				Profiler::ProfileMgr::Instance()->Clear();
+#endif
 				break;
 			}
 			case 'b':
 			{
+#ifdef YPROFILER
 				Profiler::ProfileMgr::Instance()->Start();
+#endif
 				break;
 			}
 			case 27:
@@ -72,7 +67,7 @@ int main(int argc, char** argv)
 #else
 		usleep(1000000);
 #endif
-		auto test = Profiler::ProfileMgr::Instance();
+
 		pEntity->GetAgent()->Update();
 	}
 	return 0;

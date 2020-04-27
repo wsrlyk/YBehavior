@@ -15,15 +15,42 @@ namespace YBehavior
 		struct ProfileTick;
 		struct StatisticResult
 		{
-			UINT Min{};
-			UINT Max{};
+			UINT Min{1};
+			UINT Max{0};
 			UINT Avg{};
 			UINT Med{};
+			float Ratio{ 0.0f };
 			friend std::ostream & operator<<(std::ostream &ss, const StatisticResult &res)
 			{
-				ss << "Med " << res.Med << "; Avg " << res.Avg << "; Min " << res.Min << "; Max " << res.Max;
+				if (res.Min == res.Max)
+				{
+					if (res.Ratio != 0.0f)
+						_FillWithSameValue(ss, res.Min * res.Ratio);
+					else
+						_FillWithSameValue(ss, res.Min);
+				}
+				else
+				{
+					if (res.Ratio != 0.0f)
+						_FillWithDiffValue(ss, res.Med * res.Ratio, res.Avg * res.Ratio, res.Min * res.Ratio, res.Max * res.Ratio);
+					else
+						_FillWithDiffValue(ss, res.Med, res.Avg, res.Min, res.Max);
+				}
+
 				return ss;
 			}
+			template<typename T>
+			static void _FillWithSameValue(std::ostream &ss, T v)
+			{
+				ss << v;
+			}
+			template<typename T>
+			static void _FillWithDiffValue(std::ostream &ss, T med, T avg, T min, T max)
+			{
+				ss << "Med " << med << "  Avg " << avg << "  Min " << min << "  Max " << max;
+			}
+
+			inline bool IsValid() const { return Max >= Min; }
 		};
 
 		class StatisticResultHelper
@@ -31,8 +58,8 @@ namespace YBehavior
 			std::vector<UINT> nums;
 			public:
 				void Push(UINT n) { nums.push_back(n); }
-				UINT size() { return nums.size(); }
-				StatisticResult Calc();
+				UINT size() { return (UINT)nums.size(); }
+				StatisticResult Calc(float ratio = 0.0f);
 		};
 
 		struct ProfileStatistic
@@ -57,7 +84,8 @@ namespace YBehavior
 				STRING treeName;
 
 				StatisticResult runCount;
-				StatisticResult time;
+				StatisticResult selfTime;
+				StatisticResult totalTime;
 
 				std::vector<TreeNodeStatistic> nodes;
 			};
@@ -86,7 +114,8 @@ namespace YBehavior
 			struct TreeData
 			{
 				STRING treeName;
-				StatisticResultHelper time;
+				StatisticResultHelper selfTime;
+				StatisticResultHelper totalTime;
 				StatisticResultHelper runCount;
 				std::unordered_map<const void*, TreeNodeData> nodes;
 			};

@@ -246,6 +246,9 @@
     <ClInclude Include="..\include\YBehavior\profile\profileprocessor.h">
       <Filter>头文件\profile</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\profile\profileheader.h">
+      <Filter>头文件\profile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">

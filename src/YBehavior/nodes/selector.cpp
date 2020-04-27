@@ -1,9 +1,11 @@
 #include "YBehavior/nodes/selector.h"
+#include "YBehavior/profile/profileheader.h"
 
 namespace YBehavior
 {
 	YBehavior::NodeState Selector::Update(AgentPtr pAgent)
 	{
+		PROFILER_ENABLE_TOTAL;
 		NodeState ns = NS_FAILURE;
 		if (m_Childs == nullptr)
 			return ns;
@@ -22,8 +24,9 @@ namespace YBehavior
 		for (int i = m_Iterator.GetStart(); i < (int)m_Childs->size(); ++i)
 		{
 			BehaviorNodePtr node = (*m_Childs)[m_Iterator.GetIndex(i)];
+			PROFILER_PAUSE;
 			ns = node->Execute(pAgent, ns);
-
+			PROFILER_RESUME;
 			switch (ns)
 			{
 			case YBehavior::NS_SUCCESS:
@@ -45,6 +48,7 @@ namespace YBehavior
 
 	NodeState RandomSelector::Update(AgentPtr pAgent)
 	{
+		PROFILER_ENABLE_TOTAL;
 		NodeState ns = NS_SUCCESS;
 		if (m_Childs == nullptr)
 			return ns;
@@ -72,7 +76,9 @@ namespace YBehavior
 
 				BehaviorNodePtr node = (*m_Childs)[index];
 
+			PROFILER_PAUSE;
 			ns = node->Execute(pAgent, ns);
+			PROFILER_RESUME;
 			switch (ns)
 			{
 			case YBehavior::NS_SUCCESS:

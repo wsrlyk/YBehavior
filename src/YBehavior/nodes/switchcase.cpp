@@ -1,5 +1,6 @@
 #include "YBehavior/nodes/switchcase.h"
 #include "YBehavior/agent.h"
+#include "YBehavior/profile/profileheader.h"
 
 namespace YBehavior
 {
@@ -21,6 +22,7 @@ namespace YBehavior
 
 	NodeState SwitchCase::Update(AgentPtr pAgent)
 	{
+		PROFILER_ENABLE_TOTAL;
 		IF_HAS_LOG_POINT
 		{
 			LOG_SHARED_DATA(m_Switch, true);
@@ -91,7 +93,9 @@ namespace YBehavior
 
 		if (targetNode)
 		{
+			PROFILER_PAUSE;
 			ns = targetNode->Execute(pAgent, ns);
+			PROFILER_RESUME;
 			if (ns == NS_RUNNING)
 			{
 				m_RCContainer.CreateRC(this);

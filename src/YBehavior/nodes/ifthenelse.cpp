@@ -1,5 +1,6 @@
 #include "YBehavior/nodes/ifthenelse.h"
 #include "YBehavior/logger.h"
+#include "YBehavior/profile/profileheader.h"
 
 namespace YBehavior
 {
@@ -18,6 +19,7 @@ namespace YBehavior
 
 	NodeState IfThenElse::Update(AgentPtr pAgent)
 	{
+		PROFILER_ENABLE_TOTAL;
 		if (m_If == nullptr)
 			return NS_FAILURE;
 
@@ -34,7 +36,9 @@ namespace YBehavior
 
 		if (itep == ITE_Normal || itep == ITE_If)
 		{
+			PROFILER_PAUSE;
 			ns = m_If->Execute(pAgent, ns);
+			PROFILER_RESUME;
 			if (_CheckRunningNodeState(ITE_If, ns))
 				return ns;
 			itep = ITE_Normal;
@@ -45,7 +49,9 @@ namespace YBehavior
 			if (m_Then)
 			{
 				DEBUG_LOG_INFO("Run [THEN]; ");
+				PROFILER_PAUSE;
 				ns = m_Then->Execute(pAgent, ns);
+				PROFILER_RESUME;
 				_CheckRunningNodeState(ITE_Then, ns);
 				return ns;
 			}
@@ -56,7 +62,9 @@ namespace YBehavior
 			if (m_Else)
 			{
 				DEBUG_LOG_INFO("Run [ELSE]; ");
+				PROFILER_PAUSE;
 				ns = m_Else->Execute(pAgent, ns);
+				PROFILER_RESUME;
 				_CheckRunningNodeState(ITE_Else, ns);
 				return ns;
 			}

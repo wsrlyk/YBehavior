@@ -177,21 +177,23 @@ namespace YBehavior
 	STRING Utility::GetDay(const STRING& format)
 	{
 		auto tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-		struct tm* ptm = localtime(&tt);
-		char date[11] = { 0 };
-		sprintf(date, format.c_str(),
-			(int)ptm->tm_year + 1900, (int)ptm->tm_mon + 1, (int)ptm->tm_mday);
+		struct tm t;
+		localtime_s(&t, &tt);
+		char date[15] = { 0 };
+		sprintf_s(date, 15, format.c_str(),
+			(int)t.tm_year + 1900, (int)t.tm_mon + 1, (int)t.tm_mday);
 		return std::string(date);
 	}
 
 	STRING Utility::GetDayTime(const STRING& format)
 	{
 		auto tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-		struct tm* ptm = localtime(&tt);
+		struct tm t;
+		localtime_s(&t, &tt);
 		char date[60] = { 0 };
-		sprintf(date, format.c_str(),
-			(int)ptm->tm_year + 1900, (int)ptm->tm_mon + 1, (int)ptm->tm_mday,
-			(int)ptm->tm_hour, (int)ptm->tm_min, (int)ptm->tm_sec);
+		sprintf_s(date, 60, format.c_str(),
+			(int)t.tm_year + 1900, (int)t.tm_mon + 1, (int)t.tm_mday,
+			(int)t.tm_hour, (int)t.tm_min, (int)t.tm_sec);
 		return std::string(date);
 	}
 

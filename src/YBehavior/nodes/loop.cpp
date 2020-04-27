@@ -1,11 +1,13 @@
 #include "YBehavior/nodes/loop.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/agent.h"
+#include "YBehavior/profile/profileheader.h"
 
 namespace YBehavior
 {
 	NodeState For::Update(AgentPtr pAgent)
 	{
+		PROFILER_ENABLE_TOTAL;
 		NodeState ns = NS_INVALID;
 		NodeState res = NS_SUCCESS;
 		ForPhase fp = FP_Normal;
@@ -22,7 +24,9 @@ namespace YBehavior
 
 		if (m_InitChild != nullptr && (fp == FP_Normal || fp == FP_Init))
 		{
+			PROFILER_PAUSE;
 			ns = m_InitChild->Execute(pAgent, ns);
+			PROFILER_RESUME;
 			if (_CheckRunningNodeState(FP_Init, ns, loopTimes))
 				return ns;
 			fp = FP_Normal;
@@ -32,7 +36,9 @@ namespace YBehavior
 		{
 			if (m_CondChild != nullptr && (fp == FP_Normal || fp == FP_Cond))
 			{
+				PROFILER_PAUSE;
 				ns = m_CondChild->Execute(pAgent, ns);
+				PROFILER_RESUME;
 				if (_CheckRunningNodeState(FP_Cond, ns, loopTimes))
 					return ns;
 				fp = FP_Normal;
@@ -48,7 +54,9 @@ namespace YBehavior
 
 			if (m_MainChild != nullptr && (fp == FP_Normal || fp == FP_Main))
 			{
+				PROFILER_PAUSE;
 				ns = m_MainChild->Execute(pAgent, ns);
+				PROFILER_RESUME;
 				if (_CheckRunningNodeState(FP_Cond, ns, loopTimes))
 					return ns;
 				fp = FP_Normal;
@@ -67,7 +75,9 @@ namespace YBehavior
 
 			if (m_IncChild != nullptr && (fp == FP_Normal || fp == FP_Inc))
 			{
+				PROFILER_PAUSE;
 				ns = m_IncChild->Execute(pAgent, ns);
+				PROFILER_RESUME;
 				if (_CheckRunningNodeState(FP_Cond, ns, loopTimes))
 					return ns;
 				fp = FP_Normal;
@@ -153,6 +163,7 @@ namespace YBehavior
 
 	NodeState ForEach::Update(AgentPtr pAgent)
 	{
+		PROFILER_ENABLE_TOTAL;
 		INT size = m_Collection->VectorSize(pAgent->GetMemory());
 		INT start = 0;
 		NodeState ns = NS_INVALID;
@@ -177,7 +188,9 @@ namespace YBehavior
 
 			if (m_Child != nullptr)
 			{
+				PROFILER_PAUSE;
 				ns = m_Child->Execute(pAgent, ns);
+				PROFILER_RESUME;
 				switch (ns)
 				{
 				case YBehavior::NS_FAILURE:
@@ -251,6 +264,7 @@ namespace YBehavior
 
 	YBehavior::NodeState Loop::Update(AgentPtr pAgent)
 	{
+		PROFILER_ENABLE_TOTAL;
 		INT size = 0;
 		m_Count->GetCastedValue(pAgent->GetMemory(), size);
 
@@ -273,7 +287,9 @@ namespace YBehavior
 
 			if (m_Child != nullptr)
 			{
+				PROFILER_PAUSE;
 				ns = m_Child->Execute(pAgent, ns);
+				PROFILER_RESUME;
 				switch (ns)
 				{
 				case YBehavior::NS_FAILURE:

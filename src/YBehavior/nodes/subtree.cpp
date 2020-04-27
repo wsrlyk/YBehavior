@@ -9,6 +9,7 @@
 #include <string.h>
 #include "YBehavior/mgrs.h"
 #include "YBehavior/fsm/behavior.h"
+#include "YBehavior/profile/profileheader.h"
 
 namespace YBehavior
 {
@@ -100,17 +101,24 @@ namespace YBehavior
 
 	YBehavior::NodeState SubTree::Update(AgentPtr pAgent)
 	{
+		PROFILER_ENABLE_TOTAL;
 		auto tree = pAgent->GetBehavior()->GetMappedTree(this);
 		if (tree != nullptr)
 		{
 			if (m_Inputs.size() > 0 || m_Outputs.size() > 0)
 			{
 				LocalMemoryInOut inout(pAgent, m_Inputs.size() > 0 ? &m_Inputs : nullptr, m_Outputs.size() > 0 ? &m_Outputs : nullptr);
-				return tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID, &inout);
+				PROFILER_PAUSE;
+				auto res = tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID, &inout);
+				PROFILER_RESUME;
+				return res;
 			}
 			else
 			{
-				return tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID);
+				PROFILER_PAUSE;
+				auto res = tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID);
+				PROFILER_RESUME;
+				return res;
 			}
 		}
 		return NS_FAILURE;

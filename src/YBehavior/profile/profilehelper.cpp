@@ -23,6 +23,7 @@ namespace YBehavior
 		{
 			IS_PROFILING
 			{
+				m_bPausing = true;
 				m_TimePoints.endTime = Utility::GetTime();
 				m_Duration.durationMiliSelf += Utility::GetMicroDuration(m_TimePoints.middleTime, m_TimePoints.endTime);
 			}
@@ -32,6 +33,7 @@ namespace YBehavior
 		{
 			IS_PROFILING
 			{
+				m_bPausing = false;
 				m_TimePoints.middleTime = Utility::GetTime();
 			}
 		}
@@ -41,8 +43,9 @@ namespace YBehavior
 			assert(!m_bPausing);
 			m_TimePoints.endTime = Utility::GetTime();
 			m_Duration.durationMiliSelf += Utility::GetMicroDuration(m_TimePoints.middleTime, m_TimePoints.endTime);
-			m_Duration.durationMiliTotal += Utility::GetMicroDuration(m_TimePoints.startTime, m_TimePoints.endTime);
-			LOG_BEGIN << "self " << m_Duration.durationMiliSelf << " total " << m_Duration.durationMiliTotal << LOG_END;
+			if (NeedCalcTotal())
+				m_Duration.durationMiliTotal += Utility::GetMicroDuration(m_TimePoints.startTime, m_TimePoints.endTime);
+			//LOG_BEGIN << "self " << m_Duration.durationMiliSelf << " total " << m_Duration.durationMiliTotal << LOG_END;
 		}
 
 		AgentProfileHelper::AgentProfileHelper(AgentPtr pAgent)
