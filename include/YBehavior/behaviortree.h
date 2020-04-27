@@ -46,6 +46,12 @@ namespace YBehavior
 #ifdef YDEBUGGER
 	class DebugTreeHelper;
 #endif
+#ifdef YPROFILER
+	namespace Profiler
+	{
+		class TreeNodeProfileHelper;
+	}
+#endif
 	class BehaviorTree;
 	class RunningContext;
 	class IContextCreator;
@@ -93,6 +99,12 @@ namespace YBehavior
 #define LOG_SHARED_DATA(variable, isbefore)
 #define LOG_SHARED_DATA_IF_HAS_LOG_POINT(variable, isbefore)
 #endif 
+
+#ifdef YPROFILER
+	protected:
+		Profiler::TreeNodeProfileHelper* m_pProfileHelper;
+#endif
+
 	public:
 		BehaviorNode();
 		virtual ~BehaviorNode();
@@ -263,9 +275,9 @@ namespace YBehavior
 	public:
 		BehaviorTree(const STRING& name);
 		~BehaviorTree();
-		inline const STRING& GetKey() { return m_TreeNameWithPath; }
-		inline const STRING& GetFullName() { return m_TreeNameWithPath; }
-		inline const STRING& GetTreeName() { return m_TreeName; }
+		inline const STRING& GetKey() const { return m_TreeNameWithPath; }
+		inline const STRING& GetFullName() const { return m_TreeNameWithPath; }
+		inline const STRING& GetTreeName() const { return m_TreeName; }
 		inline SharedDataEx* GetSharedData() { return m_SharedData; }
 		SharedDataEx* GetLocalData();
 		inline SharedDataEx* GetLocalDataIfExists() { return m_LocalData; }

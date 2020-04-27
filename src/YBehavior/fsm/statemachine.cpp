@@ -327,7 +327,7 @@ namespace YBehavior
 	void RootMachine::Update(float fDeltaT, AgentPtr pAgent)
 	{
 		MachineContext& context = *pAgent->GetMachineContext();
-		LOG_BEGIN << "Update Machine" << LOG_END;
+		////LOG_BEGIN << "Update Machine" << LOG_END;
 
 		if (context.GetCurState() == nullptr)
 			context.GetTransQueue().push_back(m_EntryState);

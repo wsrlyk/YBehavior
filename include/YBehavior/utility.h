@@ -5,6 +5,8 @@
 #include <vector>
 #include <sstream>
 #include <random>
+#include <chrono>
+
 namespace YBehavior
 {
 #define FOR_EACH_SINGLE_NORMAL_TYPE(func)	\
@@ -127,6 +129,13 @@ namespace YBehavior
 		}
 
 		static STRING GetNameFromPath(const STRING& path);
+		
+		using TimePointType = std::chrono::steady_clock::time_point;
+		static TimePointType GetTime() { return std::chrono::steady_clock::now(); }
+		static STRING GetDay(const STRING& format = "%d-%02d-%02d");
+		static STRING GetDayTime(const STRING& format = "%d-%02d-%02d  %02d:%02d:%02d");
+		static UINT GetMicroDuration(const TimePointType& start, const TimePointType& end);
+
 	private:
 		static std::random_device rd;
 		static std::default_random_engine mt;
@@ -202,7 +211,6 @@ namespace YBehavior
 
 	template<>
 	Bool Utility::Rand<Bool>(const Bool& smallNum, const Bool& largeNum);
-
 
 #define DEFAULT_DECLARE(type)\
 	template<>\

@@ -9,6 +9,9 @@
 #include "YBehavior/fsm/statemachine.h"
 #include "YBehavior/mgrs.h"
 #include "YBehavior/fsm/behaviormgr.h"
+#ifdef YPROFILER
+#include "YBehavior/profile/profilehelper.h"
+#endif
 
 YBehavior::UINT64 YBehavior::Agent::s_UID = 0;
 
@@ -64,6 +67,9 @@ void YBehavior::Agent::Tick()
 	//{
 	//	m_Tree->RootExecute(this, m_RunningContexts.empty() ? NS_INVALID : NS_RUNNING);
 	//}
+#ifdef YPROFILER
+	Profiler::AgentProfileHelper helper(this);
+#endif
 	BehaviorProcessHelper::Execute(this);
 }
 

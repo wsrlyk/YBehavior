@@ -88,7 +88,7 @@ namespace YBehavior
 
 	MachineRunRes MachineState::_OnUpdate(AgentPtr pAgent)
 	{
-		LOG_BEGIN << ToString() << " OnUpdate" << LOG_END;
+		////LOG_BEGIN << ToString() << " OnUpdate" << LOG_END;
 
 		return _RunTree(pAgent);
 	}

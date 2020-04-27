@@ -13,6 +13,9 @@
 #include "YBehavior/agent.h"
 #include <string.h>
 #include "YBehavior/runningcontext.h"
+#ifdef YPROFILER
+#include "YBehavior/profile/profilehelper.h"
+#endif
 
 namespace YBehavior
 {
@@ -77,6 +80,10 @@ namespace YBehavior
 
 	YBehavior::NodeState BehaviorNode::Execute(AgentPtr pAgent, NodeState parentState)
 	{
+#ifdef YPROFILER
+		Profiler::TreeNodeProfileHelper pfHelper(this);
+		m_pProfileHelper = &pfHelper;
+#endif
 #ifdef YDEBUGGER
 		DebugTreeHelper dbgHelper(pAgent, this);
 		m_pDebugHelper = &dbgHelper;
@@ -93,7 +100,13 @@ namespace YBehavior
 			if (m_Condition != nullptr)
 			{
 				bool bBreak = false;
+#ifdef YPROFILER
+				pfHelper.Pause();
+#endif
 				state = m_Condition->Execute(pAgent, m_RunningContext && m_RunningContext->IsRunningInCondition() ? NS_RUNNING : NS_INVALID);
+#ifdef YPROFILER
+				pfHelper.Resume();
+#endif
 				switch (state)
 				{
 				case YBehavior::NS_FAILURE:
@@ -146,6 +159,10 @@ namespace YBehavior
 			m_pDebugHelper = nullptr;
 #endif
 		} while (false);
+
+#ifdef YPROFILER
+		m_pProfileHelper = nullptr;
+#endif
 
 		NodeState finalState = state;
 
@@ -490,6 +507,9 @@ namespace YBehavior
 
 	YBehavior::NodeState BehaviorTree::RootExecute(AgentPtr pAgent, NodeState parentState, LocalMemoryInOut* pInOut)
 	{
+#ifdef YPROFILER
+		Profiler::TreeProfileHelper profiler(this);
+#endif
 		///> Push the local data to the stack of the agent memory
 		if (parentState != NS_RUNNING)
 		{
@@ -498,8 +518,14 @@ namespace YBehavior
 			if (pInOut)
 				pInOut->OnInput(&m_Inputs);
 		}
-
+#ifdef YPROFILER
+		profiler.Pause();
+#endif
 		NodeState res = Execute(pAgent, parentState);
+
+#ifdef YPROFILER
+		profiler.Resume();
+#endif
 
 		if (res != NS_RUNNING)
 		{

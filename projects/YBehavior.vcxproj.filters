@@ -49,6 +49,12 @@
     <Filter Include="源文件\fsm">
       <UniqueIdentifier>{6a753cef-9e2d-4dee-8e9f-e3e108704aff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\profile">
+      <UniqueIdentifier>{cb0d4d5c-3ead-4c95-ae7f-dbd32c4ad72b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\profile">
+      <UniqueIdentifier>{5ec45306-d381-4459-b54d-8df2766af1c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\YBehavior\agent.h">
@@ -231,6 +237,15 @@
     <ClInclude Include="..\include\YBehavior\fsm\behaviormgr.h">
       <Filter>头文件\fsm</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\profile\profiler.h">
+      <Filter>头文件\profile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\profile\profilehelper.h">
+      <Filter>头文件\profile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\profile\profileprocessor.h">
+      <Filter>头文件\profile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -382,6 +397,15 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\fsm\behaviormgr.cpp">
       <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\profile\profiler.cpp">
+      <Filter>源文件\profile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\profile\profilehelper.cpp">
+      <Filter>源文件\profile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\profile\profileprocessor.cpp">
+      <Filter>源文件\profile</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

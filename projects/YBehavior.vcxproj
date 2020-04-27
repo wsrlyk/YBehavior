@@ -62,6 +62,9 @@
     <ClInclude Include="..\include\YBehavior\nodes\subtree.h" />
     <ClInclude Include="..\include\YBehavior\nodes\switchcase.h" />
     <ClInclude Include="..\include\YBehavior\nodes\wait.h" />
+    <ClInclude Include="..\include\YBehavior\profile\profilehelper.h" />
+    <ClInclude Include="..\include\YBehavior\profile\profileprocessor.h" />
+    <ClInclude Include="..\include\YBehavior\profile\profiler.h" />
     <ClInclude Include="..\include\YBehavior\registerdata.h" />
     <ClInclude Include="..\include\YBehavior\runningcontext.h" />
     <ClInclude Include="..\include\YBehavior\shareddataex.h" />
@@ -121,6 +124,9 @@
     <ClCompile Include="..\src\YBehavior\nodes\subtree.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\switchcase.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\wait.cpp" />
+    <ClCompile Include="..\src\YBehavior\profile\profilehelper.cpp" />
+    <ClCompile Include="..\src\YBehavior\profile\profileprocessor.cpp" />
+    <ClCompile Include="..\src\YBehavior\profile\profiler.cpp" />
     <ClCompile Include="..\src\YBehavior\registerdata.cpp" />
     <ClCompile Include="..\src\YBehavior\runningcontext.cpp" />
     <ClCompile Include="..\src\YBehavior\shareddataex.cpp" />
@@ -208,7 +214,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MinSpace</Optimization>
-      <PreprocessorDefinitions>YBEHAVIOR_EXPORTS;YDEBUGGER;PRINT_INTERMEDIATE_INFO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>YBEHAVIOR_EXPORTS;YDEBUGGER;PRINT_INTERMEDIATE_INFO;YPROFILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>

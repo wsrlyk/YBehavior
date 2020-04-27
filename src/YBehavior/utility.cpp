@@ -174,6 +174,34 @@ namespace YBehavior
 		return res;
 	}
 
+	STRING Utility::GetDay(const STRING& format)
+	{
+		auto tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		struct tm* ptm = localtime(&tt);
+		char date[11] = { 0 };
+		sprintf(date, format.c_str(),
+			(int)ptm->tm_year + 1900, (int)ptm->tm_mon + 1, (int)ptm->tm_mday);
+		return std::string(date);
+	}
+
+	STRING Utility::GetDayTime(const STRING& format)
+	{
+		auto tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		struct tm* ptm = localtime(&tt);
+		char date[60] = { 0 };
+		sprintf(date, format.c_str(),
+			(int)ptm->tm_year + 1900, (int)ptm->tm_mon + 1, (int)ptm->tm_mday,
+			(int)ptm->tm_hour, (int)ptm->tm_min, (int)ptm->tm_sec);
+		return std::string(date);
+	}
+
+	UINT Utility::GetMicroDuration(const Utility::TimePointType& start, const Utility::TimePointType& end)
+	{
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+		return (UINT)duration.count();
+		//return (UINT)(duration.count() * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den);
+	}
+
 	template<>
 	Float Utility::Rand<Float>(const Float& small, const Float& large)
 	{

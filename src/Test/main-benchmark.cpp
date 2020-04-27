@@ -10,6 +10,7 @@
 #else
 #include <unistd.h>
 #endif
+#include "YBehavior/profile/profiler.h"
 
 using namespace YBehavior;
 
@@ -18,43 +19,24 @@ int main(int argc, char** argv)
 	MyLaunchCore core;
 	YBehavior::Launcher::Launch(core);
 
+	auto beginTime = Utility::GetTime();
+#if _MSC_VER
+	Sleep(300);
+#else
+	usleep(1000000);
+#endif
+	auto endTime = Utility::GetTime();
+	auto dur = Utility::GetMicroDuration(beginTime, endTime);
+	LOG_BEGIN << "duration " << dur << LOG_END;
+
 	XAgent::InitData();
 
-	std::string tree("Monster_BlackCrystal3");
-	if (argc >= 2)
-		tree = argv[1];
-	StdVector<int> a(1);
-	XEntity* pEntity = new XEntity("Hehe", tree);
-	//pEntity->GetAgent()->SetEntity(pEntity);
+	XEntity* pEntity = new XEntity("Hehe", "StateMachine/BenchMarkFSM");
 
-	XEntity* pEntity1 = new XEntity("Haha", tree);
-	//pEntity1->GetAgent()->SetEntity(pEntity1);
-
-	LOG_BEGIN << "wrapper begin" << LOG_END;
-	EntityWrapper wrapper = pEntity->GetAgent()->GetEntity()->GetWrapper();
-	LOG_BEGIN << "{" << LOG_END;
-	{
-		EntityWrapper wrapper0 = pEntity->GetAgent()->GetEntity()->GetWrapper();
-		LOG_BEGIN << "wrapper00" << LOG_END;
-		EntityWrapper wrapper00 = wrapper0;
-		LOG_BEGIN << "wrapper_0" << LOG_END;
-		EntityWrapper wrapper_0 = wrapper;
-	}
-	LOG_BEGIN << "}" << LOG_END;
-	EntityWrapper wrapper1 = pEntity->GetAgent()->GetEntity()->GetWrapper();
-	LOG_BEGIN << "wrapper_1" << LOG_END;
-	EntityWrapper wrapper_1 = wrapper;
-
-	//LOG_BEGIN << "delete entity" << LOG_END;
-	//delete pEntity;
-	//return 0;
-	//pEntity->GetAgent()->GetSharedData()->GetBool(3);
-
-	//aa.GetValue(pEntity->GetAgent()->GetSharedData());
-	//TreeMgr::Instance()->LoadOneTree("Monster_BlackCrystal");
-	std::list<XEntity*> entityList;
 	char ch;
 	bool notexit = true;
+	Profiler::ProfileMgr::Instance()->Start();
+
 	while (notexit)
 	{
 #if _MSC_VER
@@ -65,23 +47,16 @@ int main(int argc, char** argv)
 			ch = _getch();
 			switch (ch)
 			{
-			case 'a':
+			case 'e':
 			{
-				for (int i = 0; i < 1000; ++i)
-				{
-					XEntity* entity = new XEntity("hehe", tree);
-					entityList.push_back(entity);
-				}
+				Profiler::ProfileMgr::Instance()->Stop();
+				Profiler::ProfileMgr::Instance()->Output("", "profile");
+				Profiler::ProfileMgr::Instance()->Clear();
 				break;
 			}
-			case 'd':
+			case 'b':
 			{
-				for (int i = 0; i < 1000 && !entityList.empty(); ++i)
-				{
-					XEntity* entity = entityList.front();
-					entityList.pop_front();
-					delete entity;
-				}
+				Profiler::ProfileMgr::Instance()->Start();
 				break;
 			}
 			case 27:
@@ -97,11 +72,8 @@ int main(int argc, char** argv)
 #else
 		usleep(1000000);
 #endif
-
-		for (auto it = entityList.begin();it != entityList.end();++it)
-		{
-			(*it)->GetAgent()->Update();
-		}
+		auto test = Profiler::ProfileMgr::Instance();
+		pEntity->GetAgent()->Update();
 	}
 	return 0;
 }
