@@ -2,6 +2,8 @@
 #include <vector>
 #include "YBehavior/types.h"
 #include "YBehavior/shareddataex.h"
+#include <time.h>
+#include <stdio.h>
 
 namespace YBehavior
 {
