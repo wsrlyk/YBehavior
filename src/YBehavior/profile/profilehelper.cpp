@@ -1,6 +1,5 @@
 #ifdef YPROFILER
 #include "YBehavior/profile/profilehelper.h"
-#include <assert.h>
 #include "YBehavior/agent.h"
 #include "YBehavior/behaviortree.h"
 
@@ -40,9 +39,10 @@ namespace YBehavior
 
 		void ProfileHelper::_Finish()
 		{
-			assert(!m_bPausing);
 			m_TimePoints.endTime = Utility::GetTime();
-			m_Duration.durationMiliSelf += Utility::GetMicroDuration(m_TimePoints.middleTime, m_TimePoints.endTime);
+			///> if not resume, ignore the time for self duration
+			if (!m_bPausing)
+				m_Duration.durationMiliSelf += Utility::GetMicroDuration(m_TimePoints.middleTime, m_TimePoints.endTime);
 			m_Duration.durationMiliTotal += Utility::GetMicroDuration(m_TimePoints.startTime, m_TimePoints.endTime);
 			//LOG_BEGIN << "self " << m_Duration.durationMiliSelf << " total " << m_Duration.durationMiliTotal << LOG_END;
 		}
