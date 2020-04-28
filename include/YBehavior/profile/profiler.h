@@ -107,7 +107,7 @@ namespace YBehavior
 			void _Print(OutputRow& row, std::stringstream& ss);
 		public:
 			void Start() { m_bProfiling = true; }
-			void Stop();
+			void Stop() { m_bProfiling = false; }
 			void Clear();
 			STRING Print();
 			void Output(const STRING& path, const STRING& fileNamePrefix);

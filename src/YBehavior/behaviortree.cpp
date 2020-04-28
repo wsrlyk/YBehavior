@@ -13,9 +13,8 @@
 #include "YBehavior/agent.h"
 #include <string.h>
 #include "YBehavior/runningcontext.h"
-#ifdef YPROFILER
-#include "YBehavior/profile/profilehelper.h"
-#endif
+#include "YBehavior/profile/profileheader.h"
+
 
 namespace YBehavior
 {
@@ -100,13 +99,10 @@ namespace YBehavior
 			if (m_Condition != nullptr)
 			{
 				bool bBreak = false;
-#ifdef YPROFILER
-				pfHelper.Pause();
-#endif
+				PROFILER_PAUSE;
 				state = m_Condition->Execute(pAgent, m_RunningContext && m_RunningContext->IsRunningInCondition() ? NS_RUNNING : NS_INVALID);
-#ifdef YPROFILER
-				pfHelper.Resume();
-#endif
+				PROFILER_RESUME;
+
 				switch (state)
 				{
 				case YBehavior::NS_FAILURE:
@@ -140,6 +136,8 @@ namespace YBehavior
 
 
 			state = this->Update(pAgent);
+			///> If not resume in the Update, resume here
+			PROFILER_RESUME;
 
 			switch (state)
 			{

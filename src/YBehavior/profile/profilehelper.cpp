@@ -22,9 +22,12 @@ namespace YBehavior
 		{
 			IS_PROFILING
 			{
-				m_bPausing = true;
-				m_TimePoints.endTime = Utility::GetTime();
-				m_Duration.durationMiliSelf += Utility::GetMicroDuration(m_TimePoints.middleTime, m_TimePoints.endTime);
+				if (!m_bPausing)
+				{
+					m_bPausing = true;
+					m_TimePoints.endTime = Utility::GetTime();
+					m_Duration.durationMiliSelf += Utility::GetMicroDuration(m_TimePoints.middleTime, m_TimePoints.endTime);
+				}
 			}
 		}
 
@@ -32,8 +35,11 @@ namespace YBehavior
 		{
 			IS_PROFILING
 			{
-				m_bPausing = false;
-				m_TimePoints.middleTime = Utility::GetTime();
+				if (m_bPausing)
+				{
+					m_bPausing = false;
+					m_TimePoints.middleTime = Utility::GetTime();
+				}
 			}
 		}
 

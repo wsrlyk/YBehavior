@@ -10,13 +10,6 @@ namespace YBehavior
 {
 	namespace Profiler
 	{
-		void ProfileMgr::Stop()
-		{
-			m_bProfiling = false;
-
-			///> Process each agent
-		}
-
 		void ProfileMgr::Clear()
 		{
 			m_Profiles.clear();
