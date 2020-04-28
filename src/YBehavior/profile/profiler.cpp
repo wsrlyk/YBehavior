@@ -40,7 +40,7 @@ namespace YBehavior
 			std::stringstream sstemp;
 
 			OutputRow row;
-			row.time = Utility::GetDayTime();
+			row.time = Utility::GetTime(Utility::TIME_FORMAT_SECOND);
 			for (auto it = m_Profiles.begin(); it != m_Profiles.end(); ++it)
 			{
 				row.ClearAgent();
@@ -97,7 +97,7 @@ namespace YBehavior
 		void ProfileMgr::Output(const STRING& path, const STRING& fileNamePrefix)
 		{
 			std::stringstream fileSS;
-			fileSS << path << '/' << fileNamePrefix << '_' << Utility::GetDay() << ".txt";
+			fileSS << path << '/' << fileNamePrefix << '_' << Utility::GetTime(Utility::TIME_FORMAT_DAY) << ".txt";
 			std::ofstream fs(fileSS.str(), std::ios::ate | std::ios::app);
 			if (fs.tellp() == 0)
 			{

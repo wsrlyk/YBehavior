@@ -176,27 +176,22 @@ namespace YBehavior
 		return res;
 	}
 
-	STRING Utility::GetDay(const STRING& format)
-	{
-		auto tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-		struct tm t;
-		localtime_s(&t, &tt);
-		char date[15] = { 0 };
-		sprintf_s(date, 15, format.c_str(),
-			(int)t.tm_year + 1900, (int)t.tm_mon + 1, (int)t.tm_mday);
-		return std::string(date);
-	}
 
-	STRING Utility::GetDayTime(const STRING& format)
+	const YBehavior::STRING Utility::TIME_FORMAT_DAY("%Y-%m-%d");
+	const YBehavior::STRING Utility::TIME_FORMAT_SECOND("%Y-%m-%d_%H:%M:%S");
+	STRING Utility::GetTime(const STRING& format)
 	{
-		auto tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		time_t tNow = time(NULL);
 		struct tm t;
-		localtime_s(&t, &tt);
-		char date[60] = { 0 };
-		sprintf_s(date, 60, format.c_str(),
-			(int)t.tm_year + 1900, (int)t.tm_mon + 1, (int)t.tm_mday,
-			(int)t.tm_hour, (int)t.tm_min, (int)t.tm_sec);
-		return std::string(date);
+#ifdef MSVC
+		localtime_s(&t, &tNow);
+#else
+		localtime_r(%tNow, &t);
+#endif
+		char buffer[40] = { 0 };
+		
+		strftime(buffer, sizeof(buffer), format.c_str(), &t);
+		return std::string(buffer);
 	}
 
 	UINT Utility::GetMicroDuration(const Utility::TimePointType& start, const Utility::TimePointType& end)
@@ -205,6 +200,7 @@ namespace YBehavior
 		return (UINT)duration.count();
 		//return (UINT)(duration.count() * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den);
 	}
+
 
 	template<>
 	Float Utility::Rand<Float>(const Float& small, const Float& large)
