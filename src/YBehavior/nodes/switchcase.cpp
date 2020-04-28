@@ -22,7 +22,6 @@ namespace YBehavior
 
 	NodeState SwitchCase::Update(AgentPtr pAgent)
 	{
-		PROFILER_ENABLE_TOTAL;
 		IF_HAS_LOG_POINT
 		{
 			LOG_SHARED_DATA(m_Switch, true);

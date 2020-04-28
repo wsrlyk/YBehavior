@@ -101,7 +101,6 @@ namespace YBehavior
 
 	YBehavior::NodeState SubTree::Update(AgentPtr pAgent)
 	{
-		PROFILER_ENABLE_TOTAL;
 		auto tree = pAgent->GetBehavior()->GetMappedTree(this);
 		if (tree != nullptr)
 		{

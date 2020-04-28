@@ -7,7 +7,6 @@ namespace YBehavior
 {
 	NodeState For::Update(AgentPtr pAgent)
 	{
-		PROFILER_ENABLE_TOTAL;
 		NodeState ns = NS_INVALID;
 		NodeState res = NS_SUCCESS;
 		ForPhase fp = FP_Normal;
@@ -163,7 +162,6 @@ namespace YBehavior
 
 	NodeState ForEach::Update(AgentPtr pAgent)
 	{
-		PROFILER_ENABLE_TOTAL;
 		INT size = m_Collection->VectorSize(pAgent->GetMemory());
 		INT start = 0;
 		NodeState ns = NS_INVALID;
@@ -264,7 +262,6 @@ namespace YBehavior
 
 	YBehavior::NodeState Loop::Update(AgentPtr pAgent)
 	{
-		PROFILER_ENABLE_TOTAL;
 		INT size = 0;
 		m_Count->GetCastedValue(pAgent->GetMemory(), size);
 

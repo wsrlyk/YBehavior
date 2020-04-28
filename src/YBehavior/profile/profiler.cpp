@@ -37,69 +37,77 @@ namespace YBehavior
 		STRING ProfileMgr::Print()
 		{
 			std::stringstream ss;
-			ss << "==================VVV======BEGIN======VVV==================" << std::endl;
+			std::stringstream sstemp;
+
+			OutputRow row;
+			row.date = Utility::GetDayTime();
 			for (auto it = m_Profiles.begin(); it != m_Profiles.end(); ++it)
 			{
+				row.ClearAgent();
+
 				ProfileProcessor processor(it->second);
 				auto& res = processor.GetStatistics();
+				sstemp.str("");
+				sstemp << res.agentUID << "." << res.name;
+				row.agent = sstemp.str();
 
-				ss << res.agentUID << "." << res.name << std::endl;
-				ss << "TickCount " << res.tickCount << std::endl;
-				ss << "Time(ms)" << std::endl;
-				ss << '\t' << res.time << std::endl;
-				ss << std::endl << "Data per tick" << std::endl;
+				row.count[0] = res.tickCount;
+				row.totalTime << res.time;
 
+				_Print(row, ss);
 				for (auto& tree : res.trees)
 				{
-					ss << '\t' << tree.treeName << std::endl;
-					ss << '\t' << "RunCount" << std::endl;
-					ss << "\t\t" << tree.runCount << std::endl;
-					if (tree.totalTime.IsValid())
-					{
-						ss << '\t' << "Total Time(ms)" << std::endl;
-						ss << "\t\t" << tree.totalTime << std::endl;
-						ss << '\t' << "Self Time(ms)" << std::endl;
-						ss << "\t\t" << tree.selfTime << std::endl;
-					}
-					else
-					{
-						ss << '\t' << "Time(ms)" << std::endl;
-						ss << "\t\t" << tree.selfTime << std::endl;
-					}
-					ss << std::endl;
+					row.ClearTree();
+					row.tree = tree.treeName;
+					row.count << tree.runCount;
+					row.totalTime << tree.totalTime;
+					row.selfTime << tree.selfTime;
+					_Print(row, ss);
 
 					for (auto& node : tree.nodes)
 					{
-						ss << "\t\t" << node.uid << '.' << node.nodeName << std::endl;
-						ss << "\t\t" << "RunCount" << std::endl;
-						ss << "\t\t\t" << node.runCount << std::endl;
-						if (node.totalTime.IsValid())
-						{
-							ss << "\t\t" << "Total Time(ms)" << std::endl;
-							ss << "\t\t\t" << node.totalTime << std::endl;
-							ss << "\t\t" << "Self Time(ms)" << std::endl;
-							ss << "\t\t\t" << node.selfTime << std::endl;
-						}
-						else
-						{
-							ss << "\t\t" << "Time(ms)" << std::endl;
-							ss << "\t\t\t" << node.selfTime << std::endl;
-						}
-						ss << std::endl;
+						row.ClearNode();
+						sstemp.str("");
+						sstemp << node.uid << '.' << node.nodeName;
+						row.node = sstemp.str();
+						row.count << node.runCount;
+						row.totalTime << node.totalTime;
+						row.selfTime << node.selfTime;
+						_Print(row, ss);
 					}
 				}
 			}
-			ss << "==================^^^======END======^^^==================" << std::endl;
 			return ss.str();
+		}
+
+		void ProfileMgr::_Print(OutputRow& row, std::stringstream& ss)
+		{
+			if (row.count[1] > 0)
+			{
+				row.totalTime[4] = row.totalTime[1] / row.count[1];
+				row.selfTime[4] = row.selfTime[1] / row.count[1];
+			}
+			ss << row.date << '\t' << row.agent << '\t' << row.tree << '\t' << row.node
+				<< '\t' << row.count[0] << '\t' << row.count[1] << '\t' << row.count[2] << '\t' << row.count[3]
+				<< '\t' << row.totalTime[0] * 0.001f << '\t' << row.totalTime[1] * 0.001f << '\t' << row.totalTime[2] * 0.001f << '\t' << row.totalTime[3] * 0.001f << '\t' << row.totalTime[4] * 0.001f
+				<< '\t' << row.selfTime[0] * 0.001f << '\t' << row.selfTime[1] * 0.001f << '\t' << row.selfTime[2] * 0.001f << '\t' << row.selfTime[3] * 0.001f << '\t' << row.selfTime[4] * 0.001f
+				<< std::endl;
 		}
 
 		void ProfileMgr::Output(const STRING& path, const STRING& fileNamePrefix)
 		{
 			std::stringstream fileSS;
-			fileSS << path << '/' << fileNamePrefix << '_' << Utility::GetDay() << ".aip";
-			std::ofstream fs(fileSS.str(), std::ios::app);
-
-			fs << std::endl << Utility::GetDayTime() << std::endl << std::endl;
+			fileSS << path << '/' << fileNamePrefix << '_' << Utility::GetDay() << ".txt";
+			std::ofstream fs(fileSS.str(), std::ios::ate | std::ios::app);
+			if (fs.tellp() == 0)
+			{
+				///> Column Head
+				fs << "Date" << '\t' << "Agent" << '\t' << "Tree" << '\t' << "Node"
+					<< '\t' << "Count(Med)" << '\t' << "Count(Avg)" << '\t' << "Count(Min)" << '\t' << "Count(Max)"
+					<< '\t' << "TotalTime(Med)(ms)" << '\t' << "TotalTime(Avg)(ms)" << '\t' << "TotalTime(Min)(ms)" << '\t' << "TotalTime(Max)(ms)" << '\t' << "TotalTime(UnitAvg)(ms)"
+					<< '\t' << "SelfTime(Med)(ms)" << '\t' << "SelfTime(Avg)(ms)" << '\t' << "SelfTime(Min)(ms)" << '\t' << "SelfTime(Max)(ms)" << '\t' << "SelfTime(UnitAvg)(ms)"
+					<< std::endl;
+			}
 			fs << Print();
 			fs.close();
 		}

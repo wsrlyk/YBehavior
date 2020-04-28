@@ -19,7 +19,6 @@ namespace YBehavior
 
 	NodeState IfThenElse::Update(AgentPtr pAgent)
 	{
-		PROFILER_ENABLE_TOTAL;
 		if (m_If == nullptr)
 			return NS_FAILURE;
 

@@ -19,14 +19,11 @@ namespace YBehavior
 			virtual ~ProfileHelper() {}
 			void Pause();
 			void Resume();
-			inline bool NeedCalcTotal() const { return m_bCalcTotal; };
-			void CalcTotal() { m_bCalcTotal = true; }
 		protected:
 			void _Finish();
 			TimePoints m_TimePoints;
 			Duration m_Duration;
 			bool m_bPausing{ false };
-			bool m_bCalcTotal{ false };
 		};
 
 		class AgentProfileHelper : public ProfileHelper

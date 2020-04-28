@@ -20,34 +20,12 @@ namespace YBehavior
 			UINT Avg{};
 			UINT Med{};
 			float Ratio{ 0.0f };
-			friend std::ostream & operator<<(std::ostream &ss, const StatisticResult &res)
+			friend void operator<<(UINT target[], const StatisticResult &res)
 			{
-				if (res.Min == res.Max)
-				{
-					if (res.Ratio != 0.0f)
-						_FillWithSameValue(ss, res.Min * res.Ratio);
-					else
-						_FillWithSameValue(ss, res.Min);
-				}
-				else
-				{
-					if (res.Ratio != 0.0f)
-						_FillWithDiffValue(ss, res.Med * res.Ratio, res.Avg * res.Ratio, res.Min * res.Ratio, res.Max * res.Ratio);
-					else
-						_FillWithDiffValue(ss, res.Med, res.Avg, res.Min, res.Max);
-				}
-
-				return ss;
-			}
-			template<typename T>
-			static void _FillWithSameValue(std::ostream &ss, T v)
-			{
-				ss << v;
-			}
-			template<typename T>
-			static void _FillWithDiffValue(std::ostream &ss, T med, T avg, T min, T max)
-			{
-				ss << "Med " << med << "  Avg " << avg << "  Min " << min << "  Max " << max;
+				target[0] = res.Med;
+				target[1] = res.Avg;
+				target[2] = res.Min;
+				target[3] = res.Max;
 			}
 
 			inline bool IsValid() const { return Max >= Min; }

@@ -43,8 +43,7 @@ namespace YBehavior
 			assert(!m_bPausing);
 			m_TimePoints.endTime = Utility::GetTime();
 			m_Duration.durationMiliSelf += Utility::GetMicroDuration(m_TimePoints.middleTime, m_TimePoints.endTime);
-			if (NeedCalcTotal())
-				m_Duration.durationMiliTotal += Utility::GetMicroDuration(m_TimePoints.startTime, m_TimePoints.endTime);
+			m_Duration.durationMiliTotal += Utility::GetMicroDuration(m_TimePoints.startTime, m_TimePoints.endTime);
 			//LOG_BEGIN << "self " << m_Duration.durationMiliSelf << " total " << m_Duration.durationMiliTotal << LOG_END;
 		}
 

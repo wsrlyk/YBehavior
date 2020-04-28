@@ -6,7 +6,6 @@ namespace YBehavior
 {
 	NodeState Sequence::Update(AgentPtr pAgent)
 	{
-		PROFILER_ENABLE_TOTAL;
 		NodeState ns = NS_SUCCESS;
 		if (m_Childs == nullptr)
 			return ns;
@@ -50,7 +49,6 @@ namespace YBehavior
 
 	NodeState RandomSequence::Update(AgentPtr pAgent)
 	{
-		PROFILER_ENABLE_TOTAL;
 		NodeState ns = NS_SUCCESS;
 		if (m_Childs == nullptr)
 			return ns;

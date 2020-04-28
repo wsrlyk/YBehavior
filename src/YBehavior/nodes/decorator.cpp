@@ -5,7 +5,6 @@ namespace YBehavior
 {
 	NodeState AlwaysSuccess::Update(AgentPtr pAgent)
 	{
-		PROFILER_ENABLE_TOTAL;
 		PROFILER_PAUSE;
 		NodeState ns = SingleChildNode::Update(pAgent);
 		PROFILER_RESUME;
@@ -13,7 +12,6 @@ namespace YBehavior
 	}
 	NodeState AlwaysFailure::Update(AgentPtr pAgent)
 	{
-		PROFILER_ENABLE_TOTAL;
 		PROFILER_PAUSE;
 		NodeState ns = SingleChildNode::Update(pAgent);
 		PROFILER_RESUME;
@@ -22,7 +20,6 @@ namespace YBehavior
 
 	YBehavior::NodeState Invertor::Update(AgentPtr pAgent)
 	{
-		PROFILER_ENABLE_TOTAL;
 		PROFILER_PAUSE;
 		NodeState ns = SingleChildNode::Update(pAgent);
 		PROFILER_RESUME;
