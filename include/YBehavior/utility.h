@@ -133,7 +133,7 @@ namespace YBehavior
 		using TimePointType = std::chrono::steady_clock::time_point;
 		static TimePointType GetTime() { return std::chrono::steady_clock::now(); }
 		static STRING GetDay(const STRING& format = "%d-%02d-%02d");
-		static STRING GetDayTime(const STRING& format = "%d-%02d-%02d  %02d:%02d:%02d");
+		static STRING GetDayTime(const STRING& format = "%d-%02d-%02d_%02d:%02d:%02d");
 		static UINT GetMicroDuration(const TimePointType& start, const TimePointType& end);
 
 	private:

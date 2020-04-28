@@ -40,7 +40,7 @@ namespace YBehavior
 			std::stringstream sstemp;
 
 			OutputRow row;
-			row.date = Utility::GetDayTime();
+			row.time = Utility::GetDayTime();
 			for (auto it = m_Profiles.begin(); it != m_Profiles.end(); ++it)
 			{
 				row.ClearAgent();
@@ -87,7 +87,7 @@ namespace YBehavior
 				row.totalTime[4] = row.totalTime[1] / row.count[1];
 				row.selfTime[4] = row.selfTime[1] / row.count[1];
 			}
-			ss << row.date << '\t' << row.agent << '\t' << row.tree << '\t' << row.node
+			ss << row.time << '\t' << row.agent << '\t' << row.tree << '\t' << row.node
 				<< '\t' << row.count[0] << '\t' << row.count[1] << '\t' << row.count[2] << '\t' << row.count[3]
 				<< '\t' << row.totalTime[0] * 0.001f << '\t' << row.totalTime[1] * 0.001f << '\t' << row.totalTime[2] * 0.001f << '\t' << row.totalTime[3] * 0.001f << '\t' << row.totalTime[4] * 0.001f
 				<< '\t' << row.selfTime[0] * 0.001f << '\t' << row.selfTime[1] * 0.001f << '\t' << row.selfTime[2] * 0.001f << '\t' << row.selfTime[3] * 0.001f << '\t' << row.selfTime[4] * 0.001f
@@ -102,7 +102,7 @@ namespace YBehavior
 			if (fs.tellp() == 0)
 			{
 				///> Column Head
-				fs << "Date" << '\t' << "Agent" << '\t' << "Tree" << '\t' << "Node"
+				fs << "Time" << '\t' << "Agent" << '\t' << "Tree" << '\t' << "Node"
 					<< '\t' << "Count(Med)" << '\t' << "Count(Avg)" << '\t' << "Count(Min)" << '\t' << "Count(Max)"
 					<< '\t' << "TotalTime(Med)(ms)" << '\t' << "TotalTime(Avg)(ms)" << '\t' << "TotalTime(Min)(ms)" << '\t' << "TotalTime(Max)(ms)" << '\t' << "TotalTime(UnitAvg)(ms)"
 					<< '\t' << "SelfTime(Med)(ms)" << '\t' << "SelfTime(Avg)(ms)" << '\t' << "SelfTime(Min)(ms)" << '\t' << "SelfTime(Max)(ms)" << '\t' << "SelfTime(UnitAvg)(ms)"

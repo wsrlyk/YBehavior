@@ -69,7 +69,7 @@ namespace YBehavior
 		{
 			struct OutputRow
 			{
-				STRING date;
+				STRING time;
 				STRING agent;
 				STRING tree;
 				STRING node;

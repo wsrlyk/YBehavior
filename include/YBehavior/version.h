@@ -50,7 +50,7 @@ namespace YBehavior
 	}
 
 	template<typename T>
-	void Info<T>::ChangeReferenceCount(bool bInc, Info<T>::VersionType* version /*= nullptr*/)
+	void Info<T>::ChangeReferenceCount(bool bInc, typename Info<T>::VersionType* version /*= nullptr*/)
 	{
 		if (version == nullptr)
 			version = m_LatestVersion;
@@ -136,7 +136,7 @@ namespace YBehavior
 
 
 	template<typename T>
-	void Info<T>::TryRemoveVersion(Info<T>::VersionType* version)
+	void Info<T>::TryRemoveVersion(typename Info<T>::VersionType* version)
 	{
 		if (version == nullptr || version->referenceCount > 0)
 			return;
