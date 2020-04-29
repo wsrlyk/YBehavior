@@ -146,7 +146,11 @@ namespace YBehavior.Editor.Core.New
                         TreeNode node = TreeNodeMgr.Instance.CreateNodeByName(attr.Value);
                         if (node == null)
                         {
-                            LogMgr.Instance.Error("Cant create node: " + attr.Value);
+                            EventMgr.Instance.Send(new ShowSystemTipsArg
+                            {
+                                Content = "Unknown node: " + attr.Value,
+                                TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                            });
                             return false;
                         }
                         _LoadTree(node, chi);
@@ -208,7 +212,11 @@ namespace YBehavior.Editor.Core.New
                     TreeNode childNode = TreeNodeMgr.Instance.CreateNodeByName(attr.Value);
                     if (childNode == null)
                     {
-                        LogMgr.Instance.Error("Cant create node: " + attr.Value);
+                        EventMgr.Instance.Send(new ShowSystemTipsArg
+                        {
+                            Content = "Unknown node: " + attr.Value,
+                            TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                        });
                         return false;
                     }
 
