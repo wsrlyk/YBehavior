@@ -412,7 +412,7 @@ namespace YBehavior.Editor.Core.New
                     return;
 
                 m_SelfDisabled = newValue;
-                PropertyChange(RenderProperty.Disable);
+                PropertyChange(RenderProperty.Disabled);
                 if (value)
                     Utility.OperateNode(this, true, _IncreaseDisable);
                 else
@@ -427,7 +427,7 @@ namespace YBehavior.Editor.Core.New
         {
             TreeNode treeNode = node as TreeNode;
             ++treeNode.m_DisableCount;
-            treeNode.PropertyChange(RenderProperty.Disable);
+            treeNode.PropertyChange(RenderProperty.Disabled);
         }
         static void _DecreaseDisable(NodeBase node)
         {
@@ -435,7 +435,7 @@ namespace YBehavior.Editor.Core.New
             if (treeNode.m_DisableCount > 0)
             {
                 --treeNode.m_DisableCount;
-                treeNode.PropertyChange(RenderProperty.Disable);
+                treeNode.PropertyChange(RenderProperty.Disabled);
             }
         }
 

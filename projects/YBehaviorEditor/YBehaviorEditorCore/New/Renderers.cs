@@ -116,7 +116,7 @@ namespace YBehavior.Editor.Core.New
         NickName,
         Comment,
         UID,
-        Disable,
+        Disabled,
         Note,
         DebugPoint,
 
@@ -145,8 +145,8 @@ namespace YBehavior.Editor.Core.New
                 case RenderProperty.UID:
                     OnPropertyChanged("UITitle");
                     break;
-                case RenderProperty.Disable:
-                    OnPropertyChanged("Disable");
+                case RenderProperty.Disabled:
+                    OnPropertyChanged("Disabled");
                     break;
                 case RenderProperty.DebugPoint:
                     OnPropertyChanged("DebugPointInfo");
