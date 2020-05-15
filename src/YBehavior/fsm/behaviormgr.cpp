@@ -43,6 +43,11 @@ namespace YBehavior
 			auto it2 = n2t.find(std::get<1>(it.first));
 			if (it2 != n2t.end())
 				name = it2->second;
+			if (name.empty())
+			{
+				ERROR_BEGIN << "No tree for node " << std::get<1>(it.first) << ERROR_END;
+				continue;
+			}
 			toLoadTrees.emplace_back(std::get<0>(it.first), name);
 		}
 	}
