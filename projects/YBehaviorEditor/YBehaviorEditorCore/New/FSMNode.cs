@@ -523,15 +523,15 @@ namespace YBehavior.Editor.Core.New
 
         public bool RemoveTrans(Transition t)
         {
-            if ((t.Key.FromState != null && t.Key.FromState.Type == FSMStateType.Special)
-               || (t.Key.ToState != null && t.Key.ToState.Type == FSMStateType.Special))
+            if ((t.Key.FromState != null && t.Key.FromState.Type == FSMStateType.Special && !(t.Key.FromState is FSMAnyStateNode))
+                || (t.Key.ToState != null && t.Key.ToState.Type == FSMStateType.Special))
                 return RemoveLocalTrans(t);
             return RootMachine.RemoveGlobalTrans(t);
         }
 
         public TransitionResult MakeTrans(FSMStateNode fromState, FSMStateNode toState)
         {
-            if ((fromState != null && fromState.Type == FSMStateType.Special)
+            if ((fromState != null && fromState.Type == FSMStateType.Special && !(fromState is FSMAnyStateNode))
                 || (toState != null && toState.Type == FSMStateType.Special))
                 return MakeLocalTrans(fromState, toState);
             return RootMachine.MakeGlobalTrans(fromState, toState);
@@ -541,7 +541,7 @@ namespace YBehavior.Editor.Core.New
         {
             if (existTrans == null)
                 return new TransitionResult();
-            if ((existTrans.Key.FromState != null && existTrans.Key.FromState.Type == FSMStateType.Special)
+            if ((existTrans.Key.FromState != null && existTrans.Key.FromState.Type == FSMStateType.Special && !(existTrans.Key.FromState is FSMAnyStateNode))
                 || (existTrans.Key.ToState != null && existTrans.Key.ToState.Type == FSMStateType.Special))
                 return MakeLocalTrans(existTrans);
             return RootMachine.MakeGlobalTrans(existTrans);
