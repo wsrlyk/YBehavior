@@ -146,7 +146,7 @@ namespace YBehavior
 	bool Network::ReceivePackets(const char* msgCheck /*= 0*/)
 	{
 		const int kBufferLen = 2048;
-		char buffer[kBufferLen];
+		char buffer[kBufferLen + 1];
 
 		bool found = false;
 

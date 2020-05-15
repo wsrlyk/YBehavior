@@ -373,7 +373,8 @@ namespace YBehavior
 			}
 			else
 			{
-				pFSM->GetTreeMap().Name2Trees[{pState, pState->GetName()}] = pState->GetTree();
+				if (pState->GetType() == MST_Normal)
+					pFSM->GetTreeMap().Name2Trees[{pState, pState->GetName()}] = pState->GetTree();
 			}
 		}
 	}
