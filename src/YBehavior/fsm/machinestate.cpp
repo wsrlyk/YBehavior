@@ -49,18 +49,6 @@ namespace YBehavior
 		return m_Name + " " + Utility::ToString(m_UID);
 	}
 
-	MachineRunRes MachineState::OnEnter(AgentPtr pAgent)
-	{
-		LOG_BEGIN << ToString() << " OnEnter" << LOG_END;
-		return MRR_Normal;
-	}
-
-	MachineRunRes MachineState::OnExit(AgentPtr pAgent)
-	{
-		LOG_BEGIN << ToString() << " OnExit" << LOG_END;
-		return MRR_Normal;
-	}
-
 	MachineRunRes MachineState::Execute(AgentPtr pAgent, MachineRunRes previousState)
 	{
 #ifdef YDEBUGGER

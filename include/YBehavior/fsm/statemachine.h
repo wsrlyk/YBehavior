@@ -37,11 +37,12 @@ namespace YBehavior
 		inline RootMachine* GetRootMachine() const { return m_pRootMachine; }
 		StateMachine* GetParentMachine() const;
 		inline void SetDefault(MachineState* pState) { m_pDefaultState = pState; }
-		bool SetSpecialState(MachineState* pState);
+		bool SetSpecialState(MachineState* pState, UINT uid);
 
 		virtual void OnLoadFinish();
 
 		void EnterDefaultOrExit(AgentPtr pAgent);
+		void EnterEntry(AgentPtr pAgent);
 	protected:
 	};
 

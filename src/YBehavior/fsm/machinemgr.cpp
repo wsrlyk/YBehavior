@@ -218,12 +218,12 @@ namespace YBehavior
 		return true;
 	}
 
-	bool MachineMgr::_CreateSpecialStates(StateMachine* pMachine)
+	bool MachineMgr::_CreateSpecialStates(StateMachine* pMachine, UINT uid)
 	{
 		MachineState* pState;
 
 		pState = new MachineState(Utility::StringEmpty, MST_Entry);
-		if (!pMachine->SetSpecialState(pState) || !pMachine->GetRootMachine()->InsertState(pState))
+		if (!pMachine->SetSpecialState(pState, uid) || !pMachine->GetRootMachine()->InsertState(pState))
 		{
 			delete pState;
 			return false;
@@ -231,7 +231,7 @@ namespace YBehavior
 		pState->SetParentMachine(pMachine);
 
 		pState = new MachineState(Utility::StringEmpty, MST_Exit);
-		if (!pMachine->SetSpecialState(pState) || !pMachine->GetRootMachine()->InsertState(pState))
+		if (!pMachine->SetSpecialState(pState, uid) || !pMachine->GetRootMachine()->InsertState(pState))
 		{
 			delete pState;
 			return false;
@@ -249,13 +249,16 @@ namespace YBehavior
 			return false;
 		}
 
-		if (!_CreateSpecialStates(pMachine))
+		if (!_CreateSpecialStates(pMachine, uid))
 		{
 			ERROR_BEGIN << "Create special states failed. " << data.name() << ERROR_END;
 			return false;
 		}
 
 		uid += pMachine->GetUIDOffset();
+
+		std::vector<std::tuple<MachineState*, pugi::xml_node>> submachines;
+		std::vector<pugi::xml_node> trans;
 
 		bool bErr = false;
 		///> Start from 3. 1 for EntryState, and 2 for ExitState
@@ -291,28 +294,39 @@ namespace YBehavior
 
 				if (pState->GetType() == MST_Meta)
 				{
-					StateMachine* pSubMachine = new StateMachine(
-						uid,
-						pMachine->GetLevel() + 1);
-					pSubMachine->SetMetaState((MetaState*)pState);
-					((MetaState*)pState)->SetSubMachine(pSubMachine);
-
-					if (!_LoadMachine(pSubMachine, it->first_child(), uid))
-					{
-						ERROR_BEGIN << "Load SubMachine Failed." << ERROR_END;
-						bErr = true;
-						break;
-					}
+					submachines.emplace_back(pState, it->first_child());
 				}
 			}
 			else if (strcmp(it->name(), "Trans") == 0)
 			{
-				if (!_LoadTrans(pMachine, *it))
-				{
-					ERROR_BEGIN << "Load Trans Failed." << ERROR_END;
-					bErr = true;
-					break;
-				}
+				trans.push_back(*it);
+			}
+		}
+
+		for (auto it = submachines.begin(); it != submachines.end(); ++it)
+		{
+			MetaState* pMetaState = static_cast<MetaState*>(std::get<0>(*it));
+			StateMachine* pSubMachine = new StateMachine(
+				pMetaState->GetUID(),
+				pMachine->GetLevel() + 1);
+			pSubMachine->SetMetaState(pMetaState);
+			pMetaState->SetSubMachine(pSubMachine);
+
+			if (!_LoadMachine(pSubMachine, std::get<1>(*it), uid))
+			{
+				ERROR_BEGIN << "Load SubMachine Failed." << ERROR_END;
+				bErr = true;
+				break;
+			}
+		}
+
+		for (auto it = trans.begin(); it != trans.end(); ++it)
+		{
+			if (!_LoadTrans(pMachine, *it))
+			{
+				ERROR_BEGIN << "Load Trans Failed." << ERROR_END;
+				bErr = true;
+				break;
 			}
 		}
 

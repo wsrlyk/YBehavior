@@ -74,8 +74,6 @@ namespace YBehavior
 		inline StateMachine* GetParentMachine() const { return m_pParentMachine; }
 		inline MachineStateType GetType() const { return m_Type; }
 		virtual STRING ToString() const;
-		virtual MachineRunRes OnEnter(AgentPtr pAgent);
-		virtual MachineRunRes OnExit(AgentPtr pAgent);
 		MachineRunRes Execute(AgentPtr pAgent, MachineRunRes previousState);
 		inline void SetTree(const STRING& tree) { m_Tree = tree; }
 		inline const STRING& GetTree() { return m_Tree; }

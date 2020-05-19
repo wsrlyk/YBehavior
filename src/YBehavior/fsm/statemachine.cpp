@@ -44,7 +44,7 @@ namespace YBehavior
 		return m_pMetaState->GetParentMachine();
 	}
 
-	bool StateMachine::SetSpecialState(MachineState* pState)
+	bool StateMachine::SetSpecialState(MachineState* pState, UINT uid)
 	{
 		if (pState == nullptr)
 			return false;
@@ -57,7 +57,7 @@ namespace YBehavior
 				return false;
 			}
 			m_EntryState = pState;
-			m_EntryState->SetUID(m_UID + 1);
+			m_EntryState->SetUID(uid + 1);
 			//GetRootMachine()->PushState(pState);
 		}
 		else if (pState->GetType() == MST_Exit)
@@ -68,7 +68,7 @@ namespace YBehavior
 				return false;
 			}
 			m_ExitState = pState;
-			m_ExitState->SetUID(m_UID + 2);
+			m_ExitState->SetUID(uid + 2);
 			//GetRootMachine()->PushState(pState);
 		}
 		else
@@ -102,6 +102,12 @@ namespace YBehavior
 		}
 	}
 
+
+	void StateMachine::EnterEntry(AgentPtr pAgent)
+	{
+		MachineContext& context = *pAgent->GetMachineContext();
+		context.GetTransQueue().push_back(m_EntryState);
+	}
 
 	FSM::FSM(const STRING& name)
 		: m_Version(nullptr)
@@ -330,7 +336,7 @@ namespace YBehavior
 		////LOG_BEGIN << "Update Machine" << LOG_END;
 
 		if (context.GetCurState() == nullptr)
-			context.GetTransQueue().push_back(m_EntryState);
+			EnterEntry(pAgent);
 		else if (context.LastRunRes == MRR_Running || context.LastRunRes == MRR_Break)
 		{
 			context.LastRunRes = context.GetCurState()->Execute(pAgent, context.LastRunRes);
@@ -386,6 +392,10 @@ namespace YBehavior
 				{
 					context.GetCurState()->GetParentMachine()->GetMetaState()->GetParentMachine()->EnterDefaultOrExit(pAgent);
 				}
+			}
+			else if (context.GetCurState()->GetType() == MST_Meta)
+			{
+				((MetaState*)context.GetCurState())->GetSubMachine()->EnterEntry(pAgent);
 			}
 		}
 	}
