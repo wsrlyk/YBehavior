@@ -93,7 +93,7 @@ namespace YBehavior.Editor
 
         private void _MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (m_CurPageData == null)
+            if (m_CurPageData == null || e.Delta == 0)
                 return;
 
             Point pos = e.GetPosition(this.GetCanvasBoard);
