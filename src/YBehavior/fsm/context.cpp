@@ -29,6 +29,7 @@ namespace YBehavior
 
 	MachineContext::MachineContext()
 		: m_pCurState (nullptr)
+		, m_pCurRunningTree(nullptr)
 		, LastRunRes(MRR_Invalid)
 	{
 
@@ -42,6 +43,9 @@ namespace YBehavior
 	void MachineContext::Reset()
 	{
 		m_pCurState = nullptr;
+		LastRunRes = MRR_Invalid;
 		m_Trans.Reset();
+		m_pTransQueue.clear();
+		m_pCurRunningTree = nullptr;
 	}
 }
