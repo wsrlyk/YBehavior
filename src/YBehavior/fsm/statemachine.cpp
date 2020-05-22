@@ -361,6 +361,8 @@ namespace YBehavior
 				{
 					MachineState* pNextState = context.GetTransQueue().front().pState;
 					context.GetTransQueue().pop_front();
+					if (pNextState == nullptr)
+						continue;
 					context.SetCurState(pNextState);
 				}
 
