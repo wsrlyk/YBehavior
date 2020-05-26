@@ -16,12 +16,13 @@ namespace YBehavior
 		pugi::xml_document doc;
 
 		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + ".tree").c_str());
-		LOG_BEGIN << "Loading: " << name << ".tree" << LOG_END;
 		if (result.status)
 		{
-			ERROR_BEGIN << "Load result: " << result.description() << ERROR_END;
+			ERROR_BEGIN << "Loading " << name << ".tree: " << result.description() << ERROR_END;
 			return nullptr;
 		}
+
+		LOG_BEGIN << "Loading: " << name << ".tree" << LOG_END;
 
 		auto rootData = doc.first_child();
 		if (rootData == nullptr)
