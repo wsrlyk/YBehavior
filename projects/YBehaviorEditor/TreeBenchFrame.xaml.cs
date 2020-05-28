@@ -36,26 +36,23 @@ namespace YBehavior.Editor
             _Init();
         }
 
-        public override void OnWorkBenchSelected(EventArg arg)
+        public override void OnWorkBenchLoaded(WorkBench bench)
         {
+            base.OnWorkBenchLoaded(bench);
 
-            base.OnWorkBenchSelected(arg);
-            WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
-
-            if (oArg.Bench != null)
+            if (bench != null)
             {
                 //if (DebugMgr.Instance.IsDebugging(oArg.Bench.FileInfo.Name) && DebugMgr.Instance.bBreaked)
                 //{
                 //    _RefreshMainTreeDebug(false, NetworkMgr.Instance.MessageProcessor.TickResultToken);
                 //}
 
-                oArg.Bench.NodeList.ReAdd();
-                oArg.Bench.ConnectionList.ReAdd();
-                this.nodeLayer.ItemsSource = oArg.Bench.NodeList.Collection;
-                this.commentLayer.ItemsSource = oArg.Bench.Comments;
-                this.connectionLayer.ItemsSource = oArg.Bench.ConnectionList.Collection;
+                bench.NodeList.ReAdd();
+                bench.ConnectionList.ReAdd();
+                this.nodeLayer.ItemsSource = bench.NodeList.Collection;
+                this.commentLayer.ItemsSource = bench.Comments;
+                this.connectionLayer.ItemsSource = bench.ConnectionList.Collection;
 
-                DraggingConnection<UIConnection>.Instance.SetCanvas(this.canvas);
             }
             else
             {
@@ -63,6 +60,12 @@ namespace YBehavior.Editor
                 this.commentLayer.ItemsSource = null;
                 this.connectionLayer.ItemsSource = null;
             }
+        }
+
+        public override void OnWorkBenchSelected()
+        {
+            base.OnWorkBenchSelected();
+            DraggingConnection<UIConnection>.Instance.SetCanvas(this.canvas);
         }
     }
 }

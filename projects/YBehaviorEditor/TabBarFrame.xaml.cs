@@ -22,14 +22,19 @@ namespace YBehavior.Editor
             TransGroup.Children.Add(TranslateTransform);
         }
     }
+
+    public class TabData
+    {
+        public WorkBenchFrame Frame;
+    }
     /// <summary>
     /// TabBarFrame.xaml 的交互逻辑
     /// </summary>
     public partial class TabBarFrame : UserControl
     {
-        Dictionary<TabItem, PageData> m_PageDataDic = new Dictionary<TabItem, PageData>();
+        Dictionary<TabItem, TabData> m_TabDataDic = new Dictionary<TabItem, TabData>();
 
-        PageData m_CurPageData;
+        TabData m_CurTabData;
         WorkBenchFrame m_CurBench;
 
         public TabBarFrame()
@@ -38,10 +43,6 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.WorkBenchLoaded, _OnWorkBenchLoaded);
             EventMgr.Instance.Register(EventType.WorkBenchSaved, _OnWorkBenchSaved);
             EventMgr.Instance.Register(EventType.SelectWorkBench, _OnSelectWorkBench);
-            EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
-
-            this.TreeBench.Visibility = Visibility.Collapsed;
-            this.FSMBench.Visibility = Visibility.Collapsed;
         }
 
         private void _OnWorkBenchLoaded(EventArg arg)
@@ -74,7 +75,17 @@ namespace YBehavior.Editor
                 activeTab.PreviewMouseLeftButtonDown += TabItem_PreviewMouseLeftButtonDown;
                 activeTab.Drop += TabItem_Drop;
                 activeTab.AllowDrop = true;
-                m_PageDataDic[activeTab] = new PageData();
+
+                TabData tabData = new TabData();
+                if (oArg.Bench is TreeBench)
+                    tabData.Frame = new TreeBenchFrame();
+                else
+                    tabData.Frame = new FSMBenchFrame();
+
+                m_TabDataDic[activeTab] = tabData;
+                this.BenchContainer.Children.Add(tabData.Frame);
+
+                tabData.Frame.OnWorkBenchLoaded(oArg.Bench);
 
                 activeTab.DataContext = oArg.Bench;
                 activeTab.SetBinding(UCTabItemWithClose.HeaderProperty, new Binding()
@@ -129,44 +140,6 @@ namespace YBehavior.Editor
             }
         }
 
-        void _OnWorkBenchSelected(EventArg arg)
-        {
-            WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
-
-            WorkBenchFrame nextBench = null;
-            if (oArg.Bench != null)
-            {
-                if (oArg.Bench is TreeBench)
-                {
-                    nextBench = this.TreeBench;
-                }
-                else if (oArg.Bench is FSMBench)
-                {
-                    nextBench = this.FSMBench;
-                }
-            }
-
-            if (nextBench != m_CurBench)
-            {
-                if (m_CurBench != null)
-                {
-                    m_CurBench.Disable();
-                    m_CurBench.Visibility = Visibility.Collapsed;
-                }
-                m_CurBench = nextBench;
-                if (m_CurBench != null)
-                {
-                    m_CurBench.Enable();
-                    m_CurBench.Visibility = Visibility.Visible;
-                }
-            }
-
-            if (m_CurBench != null)
-            {
-                m_CurBench.CurPageData = m_CurPageData;
-                m_CurBench.OnWorkBenchSelected(arg);
-            }
-        }
         private bool _TabCloseClicked(UCTabItemWithClose tab)
         {
             if (tab == null)
@@ -206,9 +179,11 @@ namespace YBehavior.Editor
             }
 
             WorkBenchMgr.Instance.Remove(bench);
-            m_PageDataDic.Remove(tab);
+            TabData tabData = m_TabDataDic[tab];
+            m_TabDataDic.Remove(tab);
+            BenchContainer.Children.Remove(tabData.Frame);
 
-            if (m_PageDataDic.Count == 0)
+            if (m_TabDataDic.Count == 0)
             {
                 WorkBenchSelectedArg arg = new WorkBenchSelectedArg()
                 {
@@ -273,9 +248,12 @@ namespace YBehavior.Editor
                         //LogMgr.Instance.Log("Tab selected: " + tab.Header);
                         if (WorkBenchMgr.Instance.Switch(tab.Content as WorkBench))
                         {
-                            m_CurPageData = m_PageDataDic[tab];
-                            m_CurBench.CurPageData = m_CurPageData;
-                            m_CurBench.GetCanvas.RenderTransform = m_CurPageData.TransGroup;
+                            if (m_CurTabData != null)
+                                m_CurTabData.Frame.Visibility = Visibility.Collapsed;
+                            m_CurTabData = m_TabDataDic[tab];
+
+                            m_CurTabData.Frame.Visibility = Visibility.Visible;
+                            m_CurTabData.Frame.OnWorkBenchSelected();
                             return;
                         }
                     }
@@ -283,7 +261,7 @@ namespace YBehavior.Editor
                     LogMgr.Instance.Error("Tab switch failed.");
                 }
 
-                m_CurPageData = null;
+                m_CurTabData = null;
             }
 
         }

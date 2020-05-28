@@ -13,9 +13,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <TabControl Name="TabController" Grid.Row="0" Tag="200" SelectionChanged="TabController_SelectionChanged" Background="DarkGray"/>
-        <Grid Grid.Row="1">
-            <local:TreeBenchFrame x:Name="TreeBench"/>
-            <local:FSMBenchFrame x:Name="FSMBench"/>
+        <Grid Name="BenchContainer" Grid.Row="1">
         </Grid>
     </Grid>
 </UserControl>
