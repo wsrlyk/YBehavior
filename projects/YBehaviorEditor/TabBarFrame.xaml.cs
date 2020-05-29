@@ -35,7 +35,6 @@ namespace YBehavior.Editor
         Dictionary<TabItem, TabData> m_TabDataDic = new Dictionary<TabItem, TabData>();
 
         TabData m_CurTabData;
-        WorkBenchFrame m_CurBench;
 
         public TabBarFrame()
         {
@@ -84,6 +83,7 @@ namespace YBehavior.Editor
 
                 m_TabDataDic[activeTab] = tabData;
                 this.BenchContainer.Children.Add(tabData.Frame);
+                tabData.Frame.Visibility = Visibility.Collapsed;
 
                 tabData.Frame.OnWorkBenchLoaded(oArg.Bench);
 
