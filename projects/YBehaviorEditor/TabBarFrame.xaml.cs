@@ -249,10 +249,14 @@ namespace YBehavior.Editor
                         if (WorkBenchMgr.Instance.Switch(tab.Content as WorkBench))
                         {
                             if (m_CurTabData != null)
+                            {
+                                m_CurTabData.Frame.Disable();
                                 m_CurTabData.Frame.Visibility = Visibility.Collapsed;
+                            }
                             m_CurTabData = m_TabDataDic[tab];
 
                             m_CurTabData.Frame.Visibility = Visibility.Visible;
+                            m_CurTabData.Frame.Enable();
                             m_CurTabData.Frame.OnWorkBenchSelected();
                             return;
                         }
