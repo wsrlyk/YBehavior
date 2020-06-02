@@ -188,6 +188,7 @@ namespace YBehavior.Editor.Core.New
         private bool _LoadTree(TreeNode tree, XmlNode data)
         {
             m_Tree.SetFlag(Graph.FLAG_LOADING);
+            tree.Load(data);
             bool bRes = _LoadOneNode(tree, data);
             m_Tree.RemoveFlag(Graph.FLAG_LOADING);
             ////Utility.InitNode(tree, true);
@@ -199,7 +200,9 @@ namespace YBehavior.Editor.Core.New
             if (node == null)
                 return false;
 
-            node.Load(data);
+            ///> We have to load the data BEFORE connecting it to its parent, 
+            ///  to make sure all its own properties are correctly set
+            //node.Load(data);
             Utility.OperateNode(node, m_Graph, false, NodeBase.OnAddToGraph);
 
             foreach (XmlNode chi in data.ChildNodes)
@@ -225,6 +228,7 @@ namespace YBehavior.Editor.Core.New
                     if (attr != null)
                         connectionIdentifier = attr.Value;
 
+                    childNode.Load(chi);
                     node.Conns.Connect(childNode, connectionIdentifier);
                     _LoadOneNode(childNode, chi);
                 }
