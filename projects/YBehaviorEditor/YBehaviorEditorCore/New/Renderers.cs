@@ -287,6 +287,10 @@ namespace YBehavior.Editor.Core.New
 
         public void FinishDrag(Vector delta, Point pos)
         {
+            Point finalPos = new Point((int)(Owner.Geo.Pos.X / 10) * 10, (int)(Owner.Geo.Pos.Y / 10) * 10);
+            Vector delta2 = finalPos - Owner.Geo.Pos;
+            _Move(delta2, 0);
+
             if (m_Owner.Conns.ParentConnector != null)
             {
                 ///> let the parent node sort the chilren
@@ -305,8 +309,8 @@ namespace YBehavior.Editor.Core.New
             MoveNodeCommand moveNodeCommand = new MoveNodeCommand()
             {
                 NodeRenderer = this,
-                OriginPos = pos - delta,
-                FinalPos = pos,
+                OriginPos = finalPos - delta - delta2,
+                FinalPos = finalPos,
                 DragParam = m_DragParam,
             };
             WorkBenchMgr.Instance.PushCommand(moveNodeCommand);

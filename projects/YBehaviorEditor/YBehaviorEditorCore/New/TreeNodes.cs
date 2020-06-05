@@ -891,6 +891,12 @@ namespace YBehavior.Editor.Core.New
             );
         }
 
+        protected override void _OnCloned()
+        {
+            base._OnCloned();
+            m_Cases = NodeMemory.GetVariable("Cases");
+        }
+
         public override string Note
         {
             get

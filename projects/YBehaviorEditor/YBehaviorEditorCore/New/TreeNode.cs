@@ -115,9 +115,11 @@ namespace YBehavior.Editor.Core.New
             }
             other.TypeMap.CloneFrom(TypeMap);
 
+            other._OnCloned();
             return other;
         }
 
+        virtual protected void _OnCloned() { }
         protected override void _CreateWrapper()
         {
             m_Wrapper = new TreeNodeWrapper();
