@@ -1045,7 +1045,7 @@ namespace YBehavior.Editor.Core.New
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} from {{ {1} }}",
+                sb.AppendFormat("{0} << {{ {1} }}",
                     Variables.GetVariable("Current").NoteValue,
                     Variables.GetVariable("Collection").NoteValue);
                 return sb.ToString();
@@ -1095,7 +1095,7 @@ namespace YBehavior.Editor.Core.New
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} at [0, {1})",
+                sb.AppendFormat("{0} << [0, {1})",
                     Variables.GetVariable("Current").NoteValue,
                     Variables.GetVariable("Count").NoteValue);
                 return sb.ToString();
@@ -1416,7 +1416,7 @@ namespace YBehavior.Editor.Core.New
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("[{0}] add {1}",
+                sb.AppendFormat("[{0}] <= {1}",
                     Variables.GetVariable("Array").NoteValue,
                     Variables.GetVariable("Element").NoteValue
                     );
@@ -1519,14 +1519,6 @@ namespace YBehavior.Editor.Core.New
         {
             m_Name = "FSMClearConditions";
             Type = TreeNodeType.TNT_Default;
-        }
-
-        public override string Note
-        {
-            get
-            {
-                return "Clear Conditions.";
-            }
         }
     }
 }
