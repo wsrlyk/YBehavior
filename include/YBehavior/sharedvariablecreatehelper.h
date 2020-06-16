@@ -36,7 +36,7 @@ namespace YBehavior
 			KEY key = TreeKeyMgr::Instance()->GetKeyByName<valueType>(name);
 			if (key == Utility::INVALID_KEY)
 				return false;
-			return pData->Set(key, Utility::ToType<valueType>(str));
+			return pData->TrySet(key, Utility::ToType<valueType>(str));
 		}
 	};
 
@@ -72,7 +72,7 @@ namespace YBehavior
 			{
 				res.push_back(Utility::ToType<elementType>(*it));
 			}
-			return pData->Set(key, std::move(res));
+			return pData->TrySet(key, std::move(res));
 		}
 	};
 

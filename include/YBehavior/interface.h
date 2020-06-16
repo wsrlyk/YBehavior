@@ -126,6 +126,7 @@ namespace YBehavior
 		virtual const void* Get(KEY key) const = 0;
 		virtual const STRING GetToString(KEY key) const = 0;
 		virtual bool Set(KEY key, const void* src) = 0;
+		virtual bool TrySet(KEY key, const void* src) = 0;
 		virtual void CloneFrom(const IDataArray*) = 0;
 		virtual void MergeFrom(const IDataArray* other, bool bOverride) = 0;
 		virtual SIZE_KEY Length() const = 0;

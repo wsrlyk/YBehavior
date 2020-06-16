@@ -163,7 +163,7 @@ namespace YBehavior
 			return true;
 		}
 
-		virtual bool Set(KEY key, const void* src) override
+		bool Set(KEY key, const void* src) override
 		{
 			//if (key < 0 || src == nullptr)
 			//	return false;
@@ -181,6 +181,31 @@ namespace YBehavior
 				m_Datas[key] = *((T*)src);
 			return true;
 		}
+		bool TrySet(KEY key, const T& src)
+		{
+			if (m_Datas.find(key) == m_Datas.end())
+				return false;
+			m_Datas[key] = src;
+			return true;
+		}
+
+		bool TrySet(KEY key, T&& src)
+		{
+			if (m_Datas.find(key) == m_Datas.end())
+				return false;
+			m_Datas[key] = src;
+			return true;
+		}
+
+		bool TrySet(KEY key, const void* src) override
+		{
+			if (m_Datas.find(key) == m_Datas.end())
+				return false;
+			if (src != nullptr)
+				m_Datas[key] = *((T*)src);
+			return true;
+		}
+
 
 		void Clear() override
 		{
@@ -237,7 +262,6 @@ namespace YBehavior
 		template<typename T>
 		bool Set(KEY key, const T& src);
 
-
 		template<typename T>
 		bool Set(KEY key, const T* src);
 
@@ -248,6 +272,21 @@ namespace YBehavior
 		{
 			IDataArray* iarray = m_Datas[typeKey];
 			return iarray->Set(key, src);
+		}
+
+		template<typename T>
+		bool TrySet(KEY key, const T& src);
+
+		template<typename T>
+		bool TrySet(KEY key, const T* src);
+
+		template<typename T>
+		bool TrySet(KEY key, T&& src);
+
+		bool TrySet(KEY key, KEY typeKey, void* src)
+		{
+			IDataArray* iarray = m_Datas[typeKey];
+			return iarray->TrySet(key, src);
 		}
 
 		void Clear();
@@ -304,7 +343,6 @@ namespace YBehavior
 		return parray->Set(key, src);
 	}
 
-
 	template<typename T>
 	bool SharedDataEx::Set(KEY key, const T* src)
 	{
@@ -321,6 +359,32 @@ namespace YBehavior
 		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
 		DataArray<T>* parray = (DataArray<T>*)iarray;
 		return parray->Set(key, src);
+	}
+
+	template<typename T>
+	bool SharedDataEx::TrySet(KEY key, const T& src)
+	{
+		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
+		DataArray<T>* parray = (DataArray<T>*)iarray;
+		return parray->TrySet(key, src);
+	}
+
+	template<typename T>
+	bool SharedDataEx::TrySet(KEY key, const T* src)
+	{
+		if (src == nullptr)
+			return false;
+		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
+		DataArray<T>* parray = (DataArray<T>*)iarray;
+		return parray->TrySet(key, *src);
+	}
+
+	template<typename T>
+	bool SharedDataEx::TrySet(KEY key, T&& src)
+	{
+		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
+		DataArray<T>* parray = (DataArray<T>*)iarray;
+		return parray->TrySet(key, src);
 	}
 
 	///
