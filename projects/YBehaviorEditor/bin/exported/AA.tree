@@ -3,8 +3,8 @@
   <Node Class="Root">
     <Local d="_Ic 0" />
     <Node Class="Sequence">
+      <Node Class="SubTree" Tree="_SC " Identification="_SC " />
       <Node Class="Dice" Distribution="IIC 5|3|1" Values="IIC 1|2|3" Input="_IC 0" Output="_Ip d" IgnoreInput="_BC T" />
-      <Node Class="FSMSetCondition" Conditions="_SC ToB" Operator="_EC On" />
     </Node>
   </Node>
 </AA>

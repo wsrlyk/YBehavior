@@ -52,8 +52,10 @@ namespace YBehavior
 		{
 			if (defaultTreeName.empty())
 			{
-				ERROR_BEGIN_NODE_HEAD << "Null Value for Tree in " << this->GetClassName() << ERROR_END;
-				return false;
+				//ERROR_BEGIN_NODE_HEAD << "Null Value for Tree in " << this->GetClassName() << ERROR_END;
+				//return false;
+				LOG_BEGIN_NODE_HEAD << "Null Value for Tree in " << this->GetClassName() << LOG_END;
+				return true;
 			}
 			m_Root->GetTreeMap().Node2Trees[this] = defaultTreeName;
 		}
