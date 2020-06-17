@@ -40,7 +40,7 @@ namespace YBehavior
 
 	bool ClearArray::OnLoaded(const pugi::xml_node& data)
 	{
-		CreateVariable(m_Array, "Array", data);
+		CreateVariable(m_Array, "Array", data, Utility::POINTER_CHAR);
 		if (m_Array == nullptr)
 		{
 			return false;
@@ -56,7 +56,7 @@ namespace YBehavior
 
 	bool ArrayPushElement::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeIDArray = CreateVariable(m_Array, "Array", data);
+		TYPEID typeIDArray = CreateVariable(m_Array, "Array", data, Utility::POINTER_CHAR);
 		if (m_Array == nullptr)
 		{
 			return false;
@@ -65,7 +65,7 @@ namespace YBehavior
 		TYPEID typeID = CreateVariable(m_Element, "Element", data);
 		if (!Utility::IsElement(typeID, typeIDArray))
 		{
-			ERROR_BEGIN_NODE_HEAD << "ArrayPushElement types not match " << typeID << " and " << typeIDArray << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "types not match " << typeID << " and " << typeIDArray << ERROR_END;
 			return false;
 		}
 		return true;
@@ -108,4 +108,58 @@ namespace YBehavior
 			return NS_FAILURE;
 		return NS_SUCCESS;
 	}
+
+	bool GenIndexArray::OnLoaded(const pugi::xml_node& data)
+	{
+		TYPEID inputType = CreateVariable(m_Input, "Input", data);
+		if (m_Input == nullptr)
+		{
+			return false;
+		}
+		CreateVariable(m_Output, "Output", data, Utility::POINTER_CHAR);
+		if (m_Output == nullptr)
+		{
+			return false;
+		}
+		if (!m_Input->IsThisVector() && inputType != GetTypeID<INT>())
+		{
+			ERROR_BEGIN_NODE_HEAD << "Invalid type of Input " << inputType << ERROR_END;
+			return false;
+		}
+
+		return true;
+	}
+
+	YBehavior::NodeState GenIndexArray::Update(AgentPtr pAgent)
+	{
+		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Input, true);
+		INT size = 0;
+		if (m_Input->IsThisVector())
+		{
+			size = m_Input->VectorSize(pAgent->GetMemory());
+		}
+		else
+		{
+			auto v = m_Input->GetValue(pAgent->GetMemory());
+			if (v)
+			{
+				size = *((INT*)v);
+			}
+			else
+			{
+				DEBUG_LOG_INFO("Cant get value from Input; ");
+				return NS_FAILURE;
+			}
+		}
+
+		std::vector<INT> o;
+		for (INT i = 0; i < size; ++i)
+		{
+			o.push_back(i);
+		}
+		m_Output->SetCastedValue(pAgent->GetMemory(), o);
+		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Output, false);
+		return NS_SUCCESS;
+	}
+
 }

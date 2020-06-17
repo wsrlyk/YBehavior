@@ -55,6 +55,19 @@ namespace YBehavior
 		ISharedVariableEx* m_Array;
 	};
 
+	class YBEHAVIOR_API GenIndexArray : public LeafNode
+	{
+	public:
+		STRING GetClassName() const override { return "GenIndexArray"; }
+	protected:
+		virtual bool OnLoaded(const pugi::xml_node& data);
+		virtual NodeState Update(AgentPtr pAgent);
+
+	private:
+		ISharedVariableEx* m_Input;
+		SharedVariableEx<VecInt>* m_Output;
+	};
+
 }
 
 #endif

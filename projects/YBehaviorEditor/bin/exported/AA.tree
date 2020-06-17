@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <AA>
   <Node Class="Root">
-    <Local d="_Ic 0" />
+    <Local d="_Ic 0" a="IIc " />
     <Node Class="Sequence">
-      <Node Class="SubTree" Tree="_SC " Identification="_SC " />
-      <Node Class="Dice" Distribution="IIC 5|3|1" Values="IIC 1|2|3" Input="_IC 0" Output="_Ip d" IgnoreInput="_BC T" />
+      <Node Class="GenIndexArray" Input="_IC 3" Output="IIp a" />
+      <Node Class="Dice" Distribution="IIC 5|3|1" Values="IIp a" Input="_IC 0" Output="_Ip d" IgnoreInput="_BC T" />
     </Node>
   </Node>
 </AA>

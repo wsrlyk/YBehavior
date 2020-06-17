@@ -1425,6 +1425,67 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
+    class GenIndexArrayTreeNode : LeafNode
+    {
+        public override string Icon => "[012..]";
+
+        public GenIndexArrayTreeNode()
+        {
+            m_Name = "GenIndexArray";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable input = NodeMemory.CreateVariable(
+                "Input",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_NONE,
+                Variable.VariableType.VBT_NONE
+            );
+
+            Variable output = NodeMemory.CreateVariable(
+                "Output",
+                "",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                var v = Variables.GetVariable("Input");
+                if (v.cType == Variable.CountType.CT_LIST)
+                    sb.AppendFormat("{0} will have same length with {1}",
+                        Variables.GetVariable("Output").NoteValue,
+                        v.NoteValue
+                        );
+                else
+                    sb.AppendFormat("{0} will have length of {1}",
+                        Variables.GetVariable("Output").NoteValue,
+                        v.NoteValue
+                        );
+                return sb.ToString();
+            }
+        }
+
+        protected override bool _OnCheckValid()
+        {
+            var v = Variables.GetVariable("Input");
+            if (v.cType == Variable.CountType.CT_SINGLE && v.vType != Variable.ValueType.VT_INT)
+            {
+                LogMgr.Instance.Error("Input can only be INT when it's not an array");
+                return false;
+            }
+            return true;
+        }
+    }
+
     class ShuffleTreeNode : LeafNode
     {
         public override string Icon => "[x]<??<[y]";
