@@ -340,6 +340,20 @@ namespace YBehavior
 		return buffer[1];
 	}
 
+	bool BehaviorNode::TryGetValue(const STRING & attriName, const pugi::xml_node & data, STRING& output)
+	{
+		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
+
+		if (attrOptr.empty())
+			return false;
+		StdVector<STRING> buffer;
+		if (!ParseVariable(attrOptr, data, buffer, ST_SINGLE, Utility::CONST_CHAR))
+			return false;
+
+		output = buffer[1];
+		return true;
+	}
+
 	TYPEID BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType, const STRING& defaultCreateStr)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());

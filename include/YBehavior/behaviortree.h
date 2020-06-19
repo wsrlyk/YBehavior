@@ -138,6 +138,9 @@ namespace YBehavior
 		virtual void OnAddChild(BehaviorNode* child, const STRING& connection) {}
 
 		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
+		bool TryGetValue(const STRING & attriName, const pugi::xml_node & data, STRING& output);
+		template<typename T>
+		bool GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T defaultValue, T& outValue);
 		template<typename T>
 		bool GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T& outValue);
 
@@ -158,6 +161,22 @@ namespace YBehavior
 	bool BehaviorNode::GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T& outValue)
 	{
 		STRING s(GetValue(attriName, data));
+		if (strMap.TryGetKey(s, outValue))
+			return true;
+
+		ERROR_BEGIN_NODE_HEAD << attriName << " Error: " << s << ERROR_END;
+		return false;
+	}
+
+	template<typename T>
+	bool BehaviorNode::GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T defaultValue, T& outValue)
+	{
+		STRING s;
+		if (!TryGetValue(attriName, data, s))
+		{
+			outValue = defaultValue;
+			return true;
+		}
 
 		if (strMap.TryGetKey(s, outValue))
 			return true;
