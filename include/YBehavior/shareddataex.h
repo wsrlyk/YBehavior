@@ -260,9 +260,6 @@ namespace YBehavior
 		}
 
 		template<typename T>
-		bool Set(KEY key, const T& src);
-
-		template<typename T>
 		bool Set(KEY key, const T* src);
 
 		template<typename T>
@@ -273,9 +270,6 @@ namespace YBehavior
 			IDataArray* iarray = m_Datas[typeKey];
 			return iarray->Set(key, src);
 		}
-
-		template<typename T>
-		bool TrySet(KEY key, const T& src);
 
 		template<typename T>
 		bool TrySet(KEY key, const T* src);
@@ -323,24 +317,22 @@ namespace YBehavior
 	template<typename T>
 	bool SharedDataEx::Get(KEY key, T& res)
 	{
-		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
+		KEY idx = GetTypeKey<T>();
+		if (idx < 0)
+			return false;
+		IDataArray* iarray = m_Datas[idx];
 		DataArray<T>* parray = (DataArray<T>*)iarray;
 		return parray->Get(key, res);
 	}
 	template<typename T>
 	T* SharedDataEx::Get(KEY key)
 	{
-		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
+		KEY idx = GetTypeKey<T>();
+		if (idx < 0)
+			return nullptr;
+		IDataArray* iarray = m_Datas[idx];
 		DataArray<T>* parray = (DataArray<T>*)iarray;
 		return (T*)parray->Get(key);
-	}
-
-	template<typename T>
-	bool SharedDataEx::Set(KEY key, const T& src)
-	{
-		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return parray->Set(key, src);
 	}
 
 	template<typename T>
@@ -348,7 +340,10 @@ namespace YBehavior
 	{
 		if (src == nullptr)
 			return false;
-		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
+		KEY idx = GetTypeKey<T>();
+		if (idx < 0)
+			return false;
+		IDataArray* iarray = m_Datas[idx];
 		DataArray<T>* parray = (DataArray<T>*)iarray;
 		return parray->Set(key, *src);
 	}
@@ -356,17 +351,14 @@ namespace YBehavior
 	template<typename T>
 	bool SharedDataEx::Set(KEY key, T&& src)
 	{
-		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return parray->Set(key, src);
-	}
+		using t_type = typename std::remove_const<std::remove_reference<T>::type>::type;
+		KEY idx = GetTypeKey<t_type>();
+		if (idx < 0)
+			return false;
 
-	template<typename T>
-	bool SharedDataEx::TrySet(KEY key, const T& src)
-	{
-		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return parray->TrySet(key, src);
+		IDataArray* iarray = m_Datas[idx];
+		DataArray<t_type>* parray = (DataArray<t_type>*)iarray;
+		return parray->Set(key, src);
 	}
 
 	template<typename T>
@@ -374,7 +366,10 @@ namespace YBehavior
 	{
 		if (src == nullptr)
 			return false;
-		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
+		KEY idx = GetTypeKey<T>();
+		if (idx < 0)
+			return false;
+		IDataArray* iarray = m_Datas[idx];
 		DataArray<T>* parray = (DataArray<T>*)iarray;
 		return parray->TrySet(key, *src);
 	}
@@ -382,8 +377,13 @@ namespace YBehavior
 	template<typename T>
 	bool SharedDataEx::TrySet(KEY key, T&& src)
 	{
-		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
+		using t_type = typename std::remove_const<std::remove_reference<T>::type>::type;
+		KEY idx = GetTypeKey<t_type>();
+		if (idx < 0)
+			return false;
+
+		IDataArray* iarray = m_Datas[idx];
+		DataArray<t_type>* parray = (DataArray<t_type>*)iarray;
 		return parray->TrySet(key, src);
 	}
 
