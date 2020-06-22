@@ -320,8 +320,7 @@ namespace YBehavior
 		KEY idx = GetTypeKey<T>();
 		if (idx < 0)
 			return false;
-		IDataArray* iarray = m_Datas[idx];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
+		DataArray<T>* parray = (DataArray<T>*)m_Datas[idx];
 		return parray->Get(key, res);
 	}
 	template<typename T>
@@ -330,8 +329,7 @@ namespace YBehavior
 		KEY idx = GetTypeKey<T>();
 		if (idx < 0)
 			return nullptr;
-		IDataArray* iarray = m_Datas[idx];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
+		DataArray<T>* parray = (DataArray<T>*)m_Datas[idx];
 		return (T*)parray->Get(key);
 	}
 
@@ -343,21 +341,19 @@ namespace YBehavior
 		KEY idx = GetTypeKey<T>();
 		if (idx < 0)
 			return false;
-		IDataArray* iarray = m_Datas[idx];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
+		DataArray<T>* parray = (DataArray<T>*)m_Datas[idx];
 		return parray->Set(key, *src);
 	}
 
 	template<typename T>
 	bool SharedDataEx::Set(KEY key, T&& src)
 	{
-		using t_type = typename std::remove_const<std::remove_reference<T>::type>::type;
+		using t_type = typename std::remove_const<typename std::remove_reference<T>::type>::type;
 		KEY idx = GetTypeKey<t_type>();
 		if (idx < 0)
 			return false;
 
-		IDataArray* iarray = m_Datas[idx];
-		DataArray<t_type>* parray = (DataArray<t_type>*)iarray;
+		DataArray<t_type>* parray = (DataArray<t_type>*)m_Datas[idx];
 		return parray->Set(key, src);
 	}
 
@@ -369,21 +365,20 @@ namespace YBehavior
 		KEY idx = GetTypeKey<T>();
 		if (idx < 0)
 			return false;
-		IDataArray* iarray = m_Datas[idx];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
+
+		DataArray<T>* parray = (DataArray<T>*)m_Datas[idx];
 		return parray->TrySet(key, *src);
 	}
 
 	template<typename T>
 	bool SharedDataEx::TrySet(KEY key, T&& src)
 	{
-		using t_type = typename std::remove_const<std::remove_reference<T>::type>::type;
+		using t_type = typename std::remove_const<typename std::remove_reference<T>::type>::type;
 		KEY idx = GetTypeKey<t_type>();
 		if (idx < 0)
 			return false;
 
-		IDataArray* iarray = m_Datas[idx];
-		DataArray<t_type>* parray = (DataArray<t_type>*)iarray;
+		DataArray<t_type>* parray = (DataArray<t_type>*)m_Datas[idx];
 		return parray->TrySet(key, src);
 	}
 
