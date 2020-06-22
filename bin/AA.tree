@@ -3,9 +3,7 @@
   <Node Class="Root" Pos="0,0">
     <Local d="_Ic 0" a="IIc " />
     <Node Class="Sequence" Pos="30,166">
-      <Node Class="SubTree" Pos="-80,320" Disabled="true" Tree="_SC " Identification="_SC " />
-      <Node Class="GenIndexArray" Pos="-50,440" Input="_IC 3" Output="IIp a" />
-      <Node Class="Dice" Pos="42,321" Distribution="IIC 5|3|1" Values="IIp a" Input="_IC 0" Output="_Ip d" IgnoreInput="_BC T" />
+      <Node Class="SubTree" Pos="-80,320" Tree="_SC " Identification="_SC " />
       <Node Class="FSMSetCondition" Pos="194,243" Disabled="true" Conditions="_SC ToB" Operator="_EC On" />
     </Node>
   </Node>

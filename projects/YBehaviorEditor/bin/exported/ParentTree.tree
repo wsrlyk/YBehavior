@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ParentTree>
   <Node Class="Root">
-    <Node Class="SubTree" Tree="_SC G" Identification="_SC Sub0" />
+    <Node Class="SubTree" Tree="_SC " Identification="_SC Sub0" />
   </Node>
 </ParentTree>

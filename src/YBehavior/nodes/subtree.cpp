@@ -48,19 +48,21 @@ namespace YBehavior
 
 		if (m_Root->GetTreeNameWithPath() != m_FinalTreeName)
 			Mgrs::Instance()->GetTreeMgr()->PushToBeLoadedTree(m_FinalTreeName);*/
+		if (defaultTreeName.empty())
+		{
+			//ERROR_BEGIN_NODE_HEAD << "Null Value for Tree in " << this->GetClassName() << ERROR_END;
+			//return false;
+			return true;
+		}
+
 		if (id.empty())
 		{
-			if (defaultTreeName.empty())
-			{
-				//ERROR_BEGIN_NODE_HEAD << "Null Value for Tree in " << this->GetClassName() << ERROR_END;
-				//return false;
-				LOG_BEGIN_NODE_HEAD << "Null Value for Tree in " << this->GetClassName() << LOG_END;
-				return true;
-			}
 			m_Root->GetTreeMap().Node2Trees[this] = defaultTreeName;
 		}
 		else
+		{
 			m_Root->GetTreeMap().Name2Trees[{this, id}] = defaultTreeName;
+		}
 
 		return true;
 	}
