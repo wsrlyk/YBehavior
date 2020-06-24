@@ -35,7 +35,8 @@ namespace YBehavior
 	{
 		for (auto it : treemap.Node2Trees)
 		{
-			toLoadTrees.emplace_back(it.first, it.second);
+			if (!it.second.empty())
+				toLoadTrees.emplace_back(it.first, it.second);
 		}
 		for (auto it : treemap.Name2Trees)
 		{
@@ -45,7 +46,7 @@ namespace YBehavior
 				name = it2->second;
 			if (name.empty())
 			{
-				ERROR_BEGIN << "No tree for node " << std::get<1>(it.first) << ERROR_END;
+				//ERROR_BEGIN << "No tree for node " << std::get<1>(it.first) << ERROR_END;
 				continue;
 			}
 			toLoadTrees.emplace_back(std::get<0>(it.first), name);
