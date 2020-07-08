@@ -164,11 +164,17 @@ namespace YBehavior.Editor.Core.New
                 param = attr.Value;
             }
 
-            int typeGroup = 0;
-            attr = xml.Attributes["TypeGroup"];
+            int vTypeGroup = 0;
+            attr = xml.Attributes["vTypeGroup"];
             if (attr != null)
             {
-                int.TryParse(attr.Value, out typeGroup);
+                int.TryParse(attr.Value, out vTypeGroup);
+            }
+            int cTypeGroup = 0;
+            attr = xml.Attributes["cTypeGroup"];
+            if (attr != null)
+            {
+                int.TryParse(attr.Value, out cTypeGroup);
             }
 
             Variable v = action.NodeMemory.CreateVariable(
@@ -177,7 +183,8 @@ namespace YBehavior.Editor.Core.New
                 valueType,
                 countType,
                 vbType,
-                typeGroup,
+                vTypeGroup,
+                cTypeGroup,
                 param
             );
             v.IsLocal = bIsLocal;

@@ -32,7 +32,7 @@ namespace YBehavior.Editor.Core.New
 
             m_UndoCommands.Clear();
 
-            LogMgr.Instance.Log("Push command: " + command.ToString() + ", Total: " + m_DoneCommands.Count.ToString());
+            //LogMgr.Instance.Log("Push command: " + command.ToString() + ", Total: " + m_DoneCommands.Count.ToString());
 
             OnPropertyChanged("HasDoneCommands");
             OnPropertyChanged("HasUndoCommands");
@@ -51,7 +51,7 @@ namespace YBehavior.Editor.Core.New
                 m_UndoCommands.AddLast(last);
                 m_bDoing = false;
 
-                LogMgr.Instance.Log("Undo command: " + last.ToString());
+                //LogMgr.Instance.Log("Undo command: " + last.ToString());
 
                 OnPropertyChanged("HasDoneCommands");
                 OnPropertyChanged("HasUndoCommands");
@@ -69,7 +69,7 @@ namespace YBehavior.Editor.Core.New
                 m_DoneCommands.AddLast(last);
                 m_bDoing = false;
 
-                LogMgr.Instance.Log("Redo command: " + last.ToString());
+                //LogMgr.Instance.Log("Redo command: " + last.ToString());
 
                 OnPropertyChanged("HasDoneCommands");
                 OnPropertyChanged("HasUndoCommands");

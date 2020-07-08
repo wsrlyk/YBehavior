@@ -450,7 +450,8 @@ namespace YBehavior.Editor.Core.New
 
     public class NodeMemory : VariableCollection, IVariableCollection
     {
-        public SameTypeGroup SameTypeGroup { get; set; } = null;
+        public SameTypeGroup vTypeGroup { get; set; } = null;
+        public SameTypeGroup cTypeGroup { get; set; } = null;
 
         public NodeMemory(IVariableCollectionOwner owner) : base(owner)
         {
@@ -464,14 +465,15 @@ namespace YBehavior.Editor.Core.New
             Variable.ValueType[] valueType,
             Variable.CountType countType,
             Variable.VariableType vbType,
-            int typeGroup = 0,
+            int vTypeGroup = 0,
+            int cTypeGroup = 0,
             string param = null)
         {
             v.vTypeSet.AddRange(valueType);
 
             v.SetVariable(valueType[0], countType, vbType, false, defaultValue, param, name);
 
-            if (AddVariable(v, typeGroup))
+            if (AddVariable(v, vTypeGroup, cTypeGroup))
                 return true;
             return false;
         }
@@ -482,7 +484,8 @@ namespace YBehavior.Editor.Core.New
             Variable.ValueType[] valueType,
             Variable.CountType countType,
             Variable.VariableType vbType,
-            int typeGroup = 0,
+            int vTypeGroup = 0,
+            int cTypeGroup = 0,
             string param = null)
         {
             Variable v = new Variable(m_Owner);
@@ -490,12 +493,12 @@ namespace YBehavior.Editor.Core.New
 
             v.SetVariable(valueType[0], countType, vbType, false, defaultValue, param, name);
 
-            if (AddVariable(v, typeGroup))
+            if (AddVariable(v, vTypeGroup, cTypeGroup))
                 return v;
             return null;
         }
 
-        public bool AddVariable(Variable v, int sameTypeGroup = 0)
+        public bool AddVariable(Variable v, int vTypeGroup = 0, int cTypeGroup = 0)
         {
             if (v == null)
                 return false;
@@ -509,11 +512,18 @@ namespace YBehavior.Editor.Core.New
             if (DoAddVariable(v) == null)
                 return false;
 
-            if (sameTypeGroup != 0)
+            if (vTypeGroup != 0)
             {
-                if (SameTypeGroup == null)
-                    SameTypeGroup = new SameTypeGroup();
-                SameTypeGroup.Add(v.Name, sameTypeGroup);
+                if (this.vTypeGroup == null)
+                    this.vTypeGroup = new SameTypeGroup();
+                this.vTypeGroup.Add(v.Name, vTypeGroup);
+            }
+
+            if (cTypeGroup != 0)
+            {
+                if (this.cTypeGroup == null)
+                    this.cTypeGroup = new SameTypeGroup();
+                this.cTypeGroup.Add(v.Name, cTypeGroup);
             }
 
             return true;
@@ -530,8 +540,10 @@ namespace YBehavior.Editor.Core.New
         public void CloneFrom(NodeMemory other)
         {
             base.CloneFrom(other);
-            if (other.SameTypeGroup != null)
-                SameTypeGroup = other.SameTypeGroup.Clone();
+            if (other.vTypeGroup != null)
+                vTypeGroup = other.vTypeGroup.Clone();
+            if (other.cTypeGroup != null)
+                cTypeGroup = other.cTypeGroup.Clone();
         }
     }
 }

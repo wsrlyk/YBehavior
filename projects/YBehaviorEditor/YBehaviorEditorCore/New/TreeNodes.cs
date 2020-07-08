@@ -395,6 +395,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
                 0,
+                0,
                 "+|-|*|/"
             );
 
@@ -493,6 +494,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_Enum,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
+                0,
                 0,
                 "==|!=|>|<|>=|<="
             );
@@ -1555,6 +1557,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_Enum,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
+                0,
                 0,
                 "On|Off"
             );

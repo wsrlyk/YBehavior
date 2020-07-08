@@ -334,10 +334,10 @@ namespace YBehavior.Editor.Core.New
             if (m_Variables is NodeMemory)
             {
                 NodeMemory memory = m_Variables as NodeMemory;
-                SameTypeGroup sameTypeGroup = memory.SameTypeGroup;
-                if (sameTypeGroup != null)
+                SameTypeGroup vTypeGroup = memory.vTypeGroup;
+                if (vTypeGroup != null)
                 {
-                    foreach (HashSet<string> group in sameTypeGroup)
+                    foreach (HashSet<string> group in vTypeGroup)
                     {
                         Variable.ValueType valueType = Variable.ValueType.VT_NONE;
                         foreach (string vName in group)
@@ -351,6 +351,28 @@ namespace YBehavior.Editor.Core.New
                             else if (valueType != v.vType)
                             {
                                 LogMgr.Instance.Log("ValueType not match in Node: " + Renderer.UITitle + "." + vName);
+                                bRes = false;
+                            }
+                        }
+                    }
+                }
+                SameTypeGroup cTypeGroup = memory.cTypeGroup;
+                if (cTypeGroup != null)
+                {
+                    foreach (HashSet<string> group in cTypeGroup)
+                    {
+                        Variable.CountType countType = Variable.CountType.CT_NONE;
+                        foreach (string vName in group)
+                        {
+                            Variable v = memory.GetVariable(vName);
+                            if (v == null)
+                                continue;
+
+                            if (countType == Variable.CountType.CT_NONE)
+                                countType = v.cType;
+                            else if (countType != v.cType)
+                            {
+                                LogMgr.Instance.Log("CountType not match in Node: " + Renderer.UITitle + "." + vName);
                                 bRes = false;
                             }
                         }
