@@ -9,44 +9,56 @@
 #else
 #include <unistd.h>
 #endif
-
-using namespace YBehavior;
+#include "YBehavior/sharedvariablecreatehelper.h"
 
 int main(int argc, char** argv)
 {
 	MyLaunchCore core;
-	YBehavior::Launcher::Launch(core);
+	YB::Launcher::Launch(core);
 
 	XAgent::InitData();
 
 	std::string tree("Monster_BlackCrystal3");
 	if (argc >= 2)
 		tree = argv[1];
-	std::vector<int> a(1);
-	XEntity* pEntity = new XEntity("Hehe", tree);
-	//pEntity->GetAgent()->SetEntity(pEntity);
+	StdVector<int> a(1);
+	//XEntity* pEntity = new XEntity("Hehe", tree);
+	std::vector<std::string> subtest{ "Sub0", "SubTree", "Sub1", "Test" };
+	XEntity* pEntity = new XEntity("Hehe", tree, &subtest);
 
-	XEntity* pEntity1 = new XEntity("Haha", tree);
+	//XEntity* pEntity1 = new XEntity("Haha", tree, &subtest);
+
+	//std::vector<std::string> subtest2{ "Sub0", "SubTree", "Sub1", "G", "Sub2", "Test" };
+	//XEntity* pEntity2 = new XEntity("Haha", tree, &subtest2);
+
 	//pEntity1->GetAgent()->SetEntity(pEntity1);
+	LOG_FORMAT("te%dst%s abc", 1, "++");
 
 	LOG_BEGIN << "wrapper begin" << LOG_END;
-	EntityWrapper wrapper = pEntity->GetAgent()->GetEntity()->CreateWrapper();
+	YB::EntityWrapper wrapper = pEntity->GetAgent()->GetEntity()->GetWrapper();
 	LOG_BEGIN << "{" << LOG_END;
 	{
-		EntityWrapper wrapper0 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
+		YB::EntityWrapper wrapper0 = pEntity->GetAgent()->GetEntity()->GetWrapper();
 		LOG_BEGIN << "wrapper00" << LOG_END;
-		EntityWrapper wrapper00 = wrapper0;
+		YB::EntityWrapper wrapper00 = wrapper0;
 		LOG_BEGIN << "wrapper_0" << LOG_END;
-		EntityWrapper wrapper_0 = wrapper;
+		YB::EntityWrapper wrapper_0 = wrapper;
 	}
 	LOG_BEGIN << "}" << LOG_END;
-	EntityWrapper wrapper1 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
+	YB::EntityWrapper wrapper1 = pEntity->GetAgent()->GetEntity()->GetWrapper();
 	LOG_BEGIN << "wrapper_1" << LOG_END;
-	EntityWrapper wrapper_1 = wrapper;
+	YB::EntityWrapper wrapper_1 = wrapper;
 
 	YBehavior::KEY f = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::INT>("b");
+	YBehavior::TreeKeyMgr::Instance()->CreateKeyByName<int>("a");
+	const YB::SharedVariableCreateHelperMgr::HelperMapType& maps = YB::SharedVariableCreateHelperMgr::GetAllHelpers();
+	for (auto it = maps.begin(); it != maps.end(); ++it)
+	{
+		if (it->second->TrySetSharedData(pEntity->GetAgent()->GetMemory()->GetMainData(), "a", "444"))
+			break;
+	}
 
-	unsigned long t1, t2;
+	unsigned long t1 = 0, t2 = 0;
 
 #if _MSC_VER
 #pragma comment(lib, "winmm.lib ")
@@ -56,7 +68,7 @@ int main(int argc, char** argv)
 
 	for (int i = 0; i < 10000; ++i)
 	{
-		pEntity->GetAgent()->GetSharedData()->Get<YBehavior::INT>(f);
+		pEntity->GetAgent()->GetMemory()->GetMainData()->Get<YBehavior::INT>(f);
 	}
 #if _MSC_VER
 	t2 = (unsigned long)timeGetTime();

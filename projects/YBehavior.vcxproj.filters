@@ -43,6 +43,18 @@
     <Filter Include="源文件\tools">
       <UniqueIdentifier>{82bdd3ff-c222-40d1-b868-cdd73fdca0e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\fsm">
+      <UniqueIdentifier>{6bad1811-28f4-4d48-a5aa-776e64cc74b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\fsm">
+      <UniqueIdentifier>{6a753cef-9e2d-4dee-8e9f-e3e108704aff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\profile">
+      <UniqueIdentifier>{cb0d4d5c-3ead-4c95-ae7f-dbd32c4ad72b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\profile">
+      <UniqueIdentifier>{5ec45306-d381-4459-b54d-8df2766af1c6}</UniqueIdentifier>
+    </Filter>
     <Filter Include="头文件\sharp">
       <UniqueIdentifier>{8d9120ff-5bc2-4670-95f6-f285ace91bd6}</UniqueIdentifier>
     </Filter>
@@ -189,6 +201,60 @@
     <ClInclude Include="..\include\YBehavior\nodes\wait.h">
       <Filter>头文件\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\nodes\array.h">
+      <Filter>头文件\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\memory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\statemachine.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\machinestate.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\metastate.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\machinemgr.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\behaviorprocess.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\mgrs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\transition.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\context.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\nodes\fsmrelated.h">
+      <Filter>头文件\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\version.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\behavior.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\fsm\behaviormgr.h">
+      <Filter>头文件\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\profile\profiler.h">
+      <Filter>头文件\profile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\profile\profilehelper.h">
+      <Filter>头文件\profile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\profile\profileprocessor.h">
+      <Filter>头文件\profile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\profile\profileheader.h">
+      <Filter>头文件\profile</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\YBehavior\sharp\sharpnode.h">
       <Filter>头文件\sharp</Filter>
     </ClInclude>
@@ -220,9 +286,6 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodes\sequence.cpp">
       <Filter>源文件\nodes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\factory.cpp">
-      <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\utility.cpp">
       <Filter>源文件</Filter>
@@ -310,6 +373,63 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodes\wait.cpp">
       <Filter>源文件\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\logger.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\nodes\array.cpp">
+      <Filter>源文件\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\memory.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\tools\objectpool.cpp">
+      <Filter>源文件\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\SharedVariableCreateHelper.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\statemachine.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\machinestate.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\metastate.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\machinemgr.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\behaviorprocess.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\mgrs.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\transition.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\context.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\nodes\fsmrelated.cpp">
+      <Filter>源文件\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\behavior.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\fsm\behaviormgr.cpp">
+      <Filter>源文件\fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\profile\profiler.cpp">
+      <Filter>源文件\profile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\profile\profilehelper.cpp">
+      <Filter>源文件\profile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\profile\profileprocessor.cpp">
+      <Filter>源文件\profile</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\sharp\sharpnode.cpp">
       <Filter>源文件\sharp</Filter>

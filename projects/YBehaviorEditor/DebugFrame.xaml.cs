@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -67,17 +59,17 @@ namespace YBehavior.Editor
 
         private void btnStartDebug_Click(object sender, RoutedEventArgs e)
         {
-            WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            if (bench == null)
-            {
-                ShowSystemTipsArg arg = new ShowSystemTipsArg()
-                {
-                    Content = "Should Open A Tree.",
-                    TipType = ShowSystemTipsArg.TipsType.TT_Error,
-                };
-                EventMgr.Instance.Send(arg);
-                return;
-            }
+            //WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
+            //if (bench == null)
+            //{
+            //    ShowSystemTipsArg arg = new ShowSystemTipsArg()
+            //    {
+            //        Content = "Should Open A Tree.",
+            //        TipType = ShowSystemTipsArg.TipsType.TT_Error,
+            //    };
+            //    EventMgr.Instance.Send(arg);
+            //    return;
+            //}
             foreach (WorkBench openedBench in WorkBenchMgr.Instance.OpenedBenches)
             {
                 if (openedBench.CommandMgr.Dirty)
@@ -104,7 +96,7 @@ namespace YBehavior.Editor
             string ip = this.IP.Text;
             string port = this.Port.Text;
 
-            Core.NetworkMgr.Instance.Connect(ip, int.Parse(port));
+            NetworkMgr.Instance.Connect(ip, int.Parse(port));
         }
 
         private void btnStopDebug_Click(object sender, RoutedEventArgs e)
@@ -114,27 +106,38 @@ namespace YBehavior.Editor
 
         private void btnDebugThisTree_Click(object sender, RoutedEventArgs e)
         {
-            if (WorkBenchMgr.Instance.ActiveWorkBench == null || WorkBenchMgr.Instance.ActiveWorkBench.FileInfo == null)
-                return;
-
-            uint.TryParse(this.debugAgentUID.Text, out uint uid);
-            DebugMgr.Instance.StartDebugTreeWithAgent(
+            //if (WorkBenchMgr.Instance.ActiveWorkBench == null || WorkBenchMgr.Instance.ActiveWorkBench.FileInfo == null)
+            //    return;
+            ulong uid = 0;
+            if (!string.IsNullOrEmpty(this.debugAgentUID.Text) && !ulong.TryParse(this.debugAgentUID.Text, out uid))
+            {
+                ShowSystemTipsArg arg = new ShowSystemTipsArg()
+                {
+                    Content = "Failed parsing the ID.",
+                    TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                };
+                EventMgr.Instance.Send(arg);
+            }
+            else
+            {
+                DebugMgr.Instance.StartDebugTreeWithAgent(
                 uid);
+            }
         }
 
         private void btnContinue_Click(object sender, RoutedEventArgs e)
         {
-            DebugMgr.Instance.Continue();
+            MainWindow.ProcessKeyDown(Key.F5, ModifierKeys.None);
         }
 
         private void btnStepInto_Click(object sender, RoutedEventArgs e)
         {
-            DebugMgr.Instance.StepInto();
+            MainWindow.ProcessKeyDown(Key.F11, ModifierKeys.None);
         }
 
         private void btnStepOver_Click(object sender, RoutedEventArgs e)
         {
-            DebugMgr.Instance.StepOver();
+            MainWindow.ProcessKeyDown(Key.F10, ModifierKeys.None);
         }
     }
 }

@@ -1,4 +1,4 @@
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #include "YBehavior/define.h"
 
 #ifdef GCC
@@ -51,7 +51,7 @@ namespace YBehavior
 
 			if (res > 0)
 			{
-				LOG_BEGIN << "Select Res: " << res << LOG_END;
+				LOG_BEGIN << "Select Res: " << res << LOG_THREAD_END;
 				if (FD_ISSET(winSocket, &readSet)) 
 				{
 					return true;
@@ -134,7 +134,7 @@ namespace YBehavior
 			if (res)
 			{
 				Close(h);
-				LOG_BEGIN << "Listen failed at bind, " << strerror(res) << LOG_END;
+				LOG_BEGIN << "Listen failed at bind, " << strerror(res) << LOG_THREAD_END;
 				return false;
 			}
 
@@ -142,7 +142,7 @@ namespace YBehavior
 			if (res)
 			{
 				Close(h);
-				LOG_BEGIN << "Listen failed at listen, " << strerror(res) << LOG_END;
+				LOG_BEGIN << "Listen failed at listen, " << strerror(res) << LOG_THREAD_END;
 				return false;
 			}
 
@@ -219,7 +219,7 @@ namespace YBehavior
 
 				if (res <= 0)
 				{
-					LOG_BEGIN << "Recv Error: " << strerror(res) << LOG_END;
+					LOG_BEGIN << "Recv Error: " << strerror(res) << LOG_THREAD_END;
 					// int err = WSAGetLastError();
 
 					// if (err == WSAECONNRESET || err == WSAECONNABORTED)
@@ -298,14 +298,14 @@ namespace YBehavior
 
 	void Mutex::Lock()
 	{
-		int rval = pthread_mutex_lock(&_impl->_mutex);
+		pthread_mutex_lock(&_impl->_mutex);
 	}
 
 	void Mutex::Unlock()
 	{
-		int rval = pthread_mutex_unlock(&_impl->_mutex);
+		pthread_mutex_unlock(&_impl->_mutex);
 	}
 }
 
 #endif
-#endif // DEBUGGER
+#endif // YDEBUGGER

@@ -5,19 +5,15 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#endif // DEBUGGER
 
 namespace YBehavior
 {
 	bool Wait::OnLoaded(const pugi::xml_node& data)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		TYPEID type = CreateVariable(m_TickCount, "TickCount", data, true);
-		if (type != GetClassTypeNumberId<INT>())
+		CreateVariable(m_TickCount, "TickCount", data);
+		if (!m_TickCount)
 		{
-			ERROR_BEGIN << "Invalid type for TickCount in Wait: " << type << ERROR_END;
 			return false;
 		}
 
@@ -32,10 +28,10 @@ namespace YBehavior
 		}
 
 		INT tickCount = 0;
-		m_TickCount->GetCastedValue(pAgent->GetSharedData(), tickCount);
+		m_TickCount->GetCastedValue(pAgent->GetMemory(), tickCount);
 		m_RCContainer.CreateRC(this);
 
-		if (++m_RCContainer.GetRC()->Current > tickCount)
+		if (++m_RCContainer.GetRC()->Current >= tickCount)
 			return NS_SUCCESS;
 		DEBUG_LOG_INFO("Tick " << m_RCContainer.GetRC()->Current << "; ");
 		return NS_RUNNING;

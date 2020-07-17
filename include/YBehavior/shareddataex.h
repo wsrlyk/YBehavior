@@ -5,38 +5,8 @@
 #include "YBehavior/utility.h"
 #include "YBehavior/tools/meta.h"
 #include "YBehavior/interface.h"
-
-#define FOR_EACH_SINGLE_NORMAL_TYPE(func)	\
-	func(Int);	\
-	func(Ulong);	\
-	func(Bool);	\
-	func(Float);	\
-	func(String);	\
-	func(Vector3);	\
-	func(EntityWrapper);	
-#define FOR_EACH_VECTOR_NORMAL_TYPE(func)	\
-	func(VecInt);\
-	func(VecUlong);\
-	func(VecBool);\
-	func(VecFloat);\
-	func(VecString);\
-	func(VecVector3);\
-	func(VecEntityWrapper);
-#define FOR_EACH_TYPE(func)    \
-    func(Int);    \
-    func(Ulong);    \
-    func(Bool);    \
-    func(Float);    \
-    func(String);    \
-    func(EntityWrapper);    \
-    func(Vector3);\
-    func(VecInt);\
-    func(VecUlong);\
-    func(VecBool);\
-    func(VecFloat);\
-    func(VecString);\
-    func(VecEntityWrapper);\
-    func(VecVector3);
+#include <unordered_map>
+#include "tools/objectpool.h"
 
 namespace YBehavior
 {
@@ -52,15 +22,20 @@ namespace YBehavior
 		typename DataArrayMapDef<KEY, T>::type::const_iterator m_It;
 		typename DataArrayMapDef<KEY, T>::type::const_iterator m_End;
 	public:
-		DataArrayIterator(typename DataArrayMapDef<KEY, T>::type::const_iterator begin, typename DataArrayMapDef<KEY, T>::type::const_iterator end)
-			: m_It(begin)
-			, m_End(end)
+		void Set(const typename DataArrayMapDef<KEY, T>::type::const_iterator& begin, const typename DataArrayMapDef<KEY, T>::type::const_iterator& end)
 		{
+			m_It = begin;
+			m_End = end;
 		}
 
 		bool IsEnd() override { return m_It == m_End; }
 		IDataArrayIterator& operator ++() override { ++m_It; return *this; }
 		const KEY Value() { return m_It->first; }
+
+		void Recycle() override
+		{
+			ObjectPool<DataArrayIterator<T>>::Recycle(this);
+		}
 	};
 
 	template<typename T>
@@ -68,25 +43,32 @@ namespace YBehavior
 	{
 		typename DataArrayMapDef<KEY, T>::type m_Datas;
 	public:
-		IDataArray * Clone() const override
+		void CloneFrom(const IDataArray* pOther) override
 		{
-			DataArray<T>* newArray = new DataArray<T>();
-			newArray->m_Datas = m_Datas;
-			return newArray;
+			if (pOther == nullptr)
+				return;
+
+			const DataArray<T>* other = static_cast<const DataArray<T>*>(pOther);
+
+			m_Datas = other->m_Datas;
 		}
 
 		Iterator Iter() const override
 		{
 			typename DataArrayMapDef<KEY, T>::type::const_iterator itBegin = m_Datas.begin();
 			typename DataArrayMapDef<KEY, T>::type::const_iterator itEnd = m_Datas.end();
-			DataArrayIterator<T>* innerIt = new DataArrayIterator<T>(itBegin, itEnd);
+			DataArrayIterator<T>* innerIt = ObjectPool<DataArrayIterator<T>>::Get();
+			innerIt->Set(itBegin, itEnd);
 			Iterator it(innerIt);
 			return std::move(it);
 		}
 
-		void Merge(IDataArray* other, bool bOverride) override
+		void MergeFrom(const IDataArray* other, bool bOverride) override
 		{
-			DataArray<T>* otherArray = (DataArray<T>*) other;
+			if (other == nullptr)
+				return;
+
+			const DataArray<T>* otherArray = (const DataArray<T>*) other;
 			for (auto it = otherArray->m_Datas.begin(); it != otherArray->m_Datas.end(); ++it)
 			{
 				if (!bOverride)
@@ -98,12 +80,11 @@ namespace YBehavior
 					m_Datas.insert(std::make_pair<KEY, T>(std::move(key), std::move(val)));
 				}
 			}
-			DataArrayMapDef<KEY, T>::type::iterator it2; otherArray->m_Datas.end();
 		}
 
-		TYPEID GetTypeID() const override
+		TYPEID TypeID() const override
 		{
-			return GetClassTypeNumberId<T>();
+			return GetTypeID<T>();
 		}
 
 		SIZE_KEY Length() const override { return (SIZE_KEY)m_Datas.size(); }
@@ -141,7 +122,7 @@ namespace YBehavior
 			//return Utility::ToString(data);
 			auto it = m_Datas.find(key);
 			if (it == m_Datas.end())
-				return Types::StringEmpty;
+				return Utility::StringEmpty;
 			const T& data = it->second;
 			return Utility::ToString(data);
 		}
@@ -182,7 +163,7 @@ namespace YBehavior
 			return true;
 		}
 
-		virtual bool Set(KEY key, const void* src) override
+		bool Set(KEY key, const void* src) override
 		{
 			//if (key < 0 || src == nullptr)
 			//	return false;
@@ -200,13 +181,43 @@ namespace YBehavior
 				m_Datas[key] = *((T*)src);
 			return true;
 		}
+		bool TrySet(KEY key, const T& src)
+		{
+			if (m_Datas.find(key) == m_Datas.end())
+				return false;
+			m_Datas[key] = src;
+			return true;
+		}
+
+		bool TrySet(KEY key, T&& src)
+		{
+			if (m_Datas.find(key) == m_Datas.end())
+				return false;
+			m_Datas[key] = src;
+			return true;
+		}
+
+		bool TrySet(KEY key, const void* src) override
+		{
+			if (m_Datas.find(key) == m_Datas.end())
+				return false;
+			if (src != nullptr)
+				m_Datas[key] = *((T*)src);
+			return true;
+		}
+
+
+		void Clear() override
+		{
+			m_Datas.clear();
+		}
 	};
 
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 
 #define MAX_TYPE_KEY 14
-
+#define DATAARRAY_ONETYPE_DEFINE(type) 		DataArray<type> m_Data##type;
 	class SharedDataEx
 	{
 	public:
@@ -218,38 +229,35 @@ namespace YBehavior
 	protected:
 		IDataArray* m_Datas[MAX_TYPE_KEY];
 
+		FOR_EACH_TYPE(DATAARRAY_ONETYPE_DEFINE)
 	public:
 		SharedDataEx();
-		SharedDataEx(SharedDataEx&& other);
+		SharedDataEx(const SharedDataEx& other);
 
 		~SharedDataEx();
 
 		inline const IDataArray* GetDataArray(KEY typeKey) { return m_Datas[typeKey]; }
 
-		void Clone(const SharedDataEx& other);
+		void CloneFrom(const SharedDataEx& other);
 
-		void Merge(const SharedDataEx& other, bool bOverride);
+		void MergeFrom(const SharedDataEx& other, bool bOverride);
 
 		template<typename T>
 		bool Get(KEY key, T& res);
 
 		template<typename T>
-		const T* Get(KEY key);
+		T* Get(KEY key);
 
-		const void* Get(KEY key, KEY typeKey)
+		void* Get(KEY key, KEY typeKey)
 		{
 			IDataArray* iarray = m_Datas[typeKey];
-			return (const void*)iarray->Get(key);
+			return (void*)iarray->Get(key);
 		}
 		STRING GetToString(KEY key, KEY typeKey)
 		{
 			IDataArray* iarray = m_Datas[typeKey];
 			return iarray->GetToString(key);
 		}
-
-		template<typename T>
-		bool Set(KEY key, const T& src);
-
 
 		template<typename T>
 		bool Set(KEY key, const T* src);
@@ -262,6 +270,20 @@ namespace YBehavior
 			IDataArray* iarray = m_Datas[typeKey];
 			return iarray->Set(key, src);
 		}
+
+		template<typename T>
+		bool TrySet(KEY key, const T* src);
+
+		template<typename T>
+		bool TrySet(KEY key, T&& src);
+
+		bool TrySet(KEY key, KEY typeKey, void* src)
+		{
+			IDataArray* iarray = m_Datas[typeKey];
+			return iarray->TrySet(key, src);
+		}
+
+		void Clear();
 	};
 
 	template<typename T>
@@ -295,41 +317,69 @@ namespace YBehavior
 	template<typename T>
 	bool SharedDataEx::Get(KEY key, T& res)
 	{
-		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
+		KEY idx = GetTypeKey<T>();
+		if (idx < 0)
+			return false;
+		DataArray<T>* parray = (DataArray<T>*)m_Datas[idx];
 		return parray->Get(key, res);
 	}
 	template<typename T>
-	const T* SharedDataEx::Get(KEY key)
+	T* SharedDataEx::Get(KEY key)
 	{
-		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return (const T*)parray->Get(key);
+		KEY idx = GetTypeKey<T>();
+		if (idx < 0)
+			return nullptr;
+		DataArray<T>* parray = (DataArray<T>*)m_Datas[idx];
+		return (T*)parray->Get(key);
 	}
-
-	template<typename T>
-	bool SharedDataEx::Set(KEY key, const T& src)
-	{
-		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return parray->Set(key, src);
-	}
-
 
 	template<typename T>
 	bool SharedDataEx::Set(KEY key, const T* src)
 	{
-		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
+		if (src == nullptr)
+			return false;
+		KEY idx = GetTypeKey<T>();
+		if (idx < 0)
+			return false;
+		DataArray<T>* parray = (DataArray<T>*)m_Datas[idx];
 		return parray->Set(key, *src);
 	}
 
 	template<typename T>
 	bool SharedDataEx::Set(KEY key, T&& src)
 	{
-		IDataArray* iarray = m_Datas[GetTypeKey<T>()];
-		DataArray<T>* parray = (DataArray<T>*)iarray;
-		return parray->Set(key, src);
+		using t_type = typename std::remove_const<typename std::remove_reference<T>::type>::type;
+		KEY idx = GetTypeKey<t_type>();
+		if (idx < 0)
+			return false;
+
+		DataArray<t_type>* parray = (DataArray<t_type>*)m_Datas[idx];
+		return parray->Set(key, std::forward<T>(src));
+	}
+
+	template<typename T>
+	bool SharedDataEx::TrySet(KEY key, const T* src)
+	{
+		if (src == nullptr)
+			return false;
+		KEY idx = GetTypeKey<T>();
+		if (idx < 0)
+			return false;
+
+		DataArray<T>* parray = (DataArray<T>*)m_Datas[idx];
+		return parray->TrySet(key, *src);
+	}
+
+	template<typename T>
+	bool SharedDataEx::TrySet(KEY key, T&& src)
+	{
+		using t_type = typename std::remove_const<typename std::remove_reference<T>::type>::type;
+		KEY idx = GetTypeKey<t_type>();
+		if (idx < 0)
+			return false;
+
+		DataArray<t_type>* parray = (DataArray<t_type>*)m_Datas[idx];
+		return parray->TrySet(key, src);
 	}
 
 	///

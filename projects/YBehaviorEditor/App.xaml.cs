@@ -11,5 +11,16 @@ namespace YBehavior.Editor
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            AppDomain.CurrentDomain.UnhandledException +=
+                new UnhandledExceptionEventHandler(OnUnhandledException);
+        }
+
+        private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            string exceptionStr = e.ExceptionObject.ToString();
+            MessageBox.Show(exceptionStr);
+        }
     }
 }

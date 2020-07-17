@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 
-namespace YBehavior.Editor.Core
+namespace YBehavior.Editor.Core.New
 {
     class IniFile
     {

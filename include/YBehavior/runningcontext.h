@@ -16,14 +16,18 @@ namespace YBehavior
 		inline bool IsRunningInCondition() const { return m_bRunningInCondition; }
 		inline void SetUID(UINT uid) { m_UID = uid; }
 		inline UINT GetUID() const { return m_UID; }
-
+		void Reset();
 		virtual ~RunningContext(){}
+	protected:
+		virtual void _OnReset() {};
 	};
 
 	class YBEHAVIOR_API IContextCreator
 	{
 	public:
+		virtual ~IContextCreator() {}
 		virtual RunningContext* NewRC() const = 0;
+		virtual void ReleaseRC(RunningContext* pRC) const = 0;
 	};
 	template<typename T>
 	class ContextContainer : public IContextCreator
@@ -34,8 +38,21 @@ namespace YBehavior
 		T * ConvertRC(BehaviorNodePtr node);
 		T * CreateRC(BehaviorNodePtr node);
 		inline T* GetRC() { return m_RC; }
-		RunningContext* NewRC() const { return new T(); }
+		RunningContext* NewRC() const override;
+		void ReleaseRC(RunningContext* pRC) const override;
 	};
+
+	template<typename T>
+	RunningContext* YBehavior::ContextContainer<T>::NewRC() const
+	{
+		return ObjectPool<T>::Get();
+	}
+
+	template<typename T>
+	void YBehavior::ContextContainer<T>::ReleaseRC(RunningContext* pRC) const
+	{
+		ObjectPool<T>::Recycle(static_cast<T*>(pRC));
+	}
 
 	template<typename T>
 	T * YBehavior::ContextContainer<T>::CreateRC(BehaviorNodePtr node)
@@ -69,12 +86,18 @@ namespace YBehavior
 	{
 	public:
 		int Current;
+
+	protected:
+		void _OnReset() override;
 	};
 
 	class YBEHAVIOR_API RandomVectorTraversalContext : public VectorTraversalContext
 	{
 	public:
-		std::vector<int> IndexList;
+		StdVector<int> IndexList;
+
+	protected:
+		void _OnReset() override;
 	};
 }
 

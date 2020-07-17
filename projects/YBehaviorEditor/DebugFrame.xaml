@@ -8,9 +8,9 @@
              Height="30" d:DesignWidth="800">
     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
         <StackPanel Name="ConnectFrame" Orientation="Horizontal">
-            <Button Name="btnStartDebug" Click="btnStartDebug_Click" Width="30">Dbg</Button>
+            <Button Name="btnStartDebug" Click="btnStartDebug_Click" Width="54">Connect</Button>
             <TextBlock Text="IP" Width="20" VerticalAlignment="Center"/>
-            <TextBox Name="IP" Text="127.0.0.1" Width="200" VerticalAlignment="Center"/>
+            <TextBox Name="IP" Text="127.0.0.1" Width="98" VerticalAlignment="Center" Margin="0,6"/>
             <TextBlock Text="Port" Width="30" VerticalAlignment="Center"/>
             <TextBox Name="Port" Width="50" Text="444" VerticalAlignment="Center"/>
         </StackPanel>
@@ -19,13 +19,19 @@
 
             <Border BorderBrush="Blue" BorderThickness="1">
                 <StackPanel Orientation="Horizontal">
-                    <Button Name="btnDebugThisTree" Click="btnDebugThisTree_Click">DebugThisAgentID:</Button>
-                    <TextBox Name="debugAgentUID" Text="0" Width="50"/>
+                    <Button Name="btnDebugThisTree" Click="btnDebugThisTree_Click">Start Debug UID :</Button>
+                    <TextBox Name="debugAgentUID" Text="" Width="150" MaxLines="1" Margin="0,6"/>
                 </StackPanel>
             </Border>
-            <Button Name="btnContinue" Click="btnContinue_Click">Continue</Button>
-            <Button Name="btnStepInto" Click="btnStepInto_Click">StepInto</Button>
-            <Button Name="btnStepOver" Click="btnStepOver_Click">StepOver</Button>
+            <Button Name="btnContinue" Click="btnContinue_Click">
+                <TextBlock Text ="Continue&#x0a;     F5" FontSize="10"/>
+            </Button>
+            <Button Name="btnStepOver" Click="btnStepOver_Click">
+                <TextBlock Text ="StepOver&#x0a;     F10" FontSize="10"/>
+            </Button>
+            <Button Name="btnStepInto" Click="btnStepInto_Click">
+                <TextBlock Text ="StepInto&#x0a;     F11" FontSize="10"/>
+            </Button>
         </StackPanel>
     </StackPanel>
 </UserControl>

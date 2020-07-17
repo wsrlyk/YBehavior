@@ -6,57 +6,43 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
 
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#endif // DEBUGGER
-
 namespace YBehavior
 {
 	///> Too lazy to create a file for just this line. Temporarily put it here
 	Bimap<OperationType, STRING, EnumClassHash> IVariableOperationHelper::s_OperatorMap = {
-		{ OT_ADD, "ADD" },{ OT_SUB, "SUB" },{ OT_MUL, "MUL" },{ OT_DIV, "DIV" },
+		{ OT_ADD, "+" },{ OT_SUB, "-" },{ OT_MUL, "*" },{ OT_DIV, "/" },
 	{ OT_EQUAL, "==" },{ OT_GREATER, ">" },{ OT_LESS, "<" },{ OT_NOT_EQUAL, "!=" },{ OT_LESS_EQUAL, "<=" },{ OT_GREATER_EQUAL, ">=" }
 	};
 
 	//////////////////////////////////////////////////////////////////////////////////////////
-	static std::unordered_set<TYPEID> s_ValidTypes = { GetClassTypeNumberId<Int>(), GetClassTypeNumberId<Float>() };
+	static std::unordered_set<TYPEID> s_ValidTypes = { GetTypeID<Int>(), GetTypeID<Float>(), GetTypeID<String>()};
 
 	bool Calculator::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Operator
-		auto attrOptr = data.attribute("Operator");
-		if (attrOptr.empty())
-		{
-			ERROR_BEGIN << "Cant Find Calculator Operator: " << data.name() << ERROR_END;
+		if (!GetValue("Operator", data, IVariableOperationHelper::s_OperatorMap, m_Operator))
 			return false;
-		}
-		STRING tempChar = GetValue("Operator", data);
-		if (!IVariableOperationHelper::s_OperatorMap.TryGetKey(tempChar, m_Operator))
-		{
-			ERROR_BEGIN << "Operator Error: " << tempChar << ERROR_END;
-			return false;
-		}
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = CreateVariable(m_Opl, "Opl", data, true, Utility::POINTER_CHAR);
+		m_DataType = CreateVariable(m_Opl, "Opl", data, Utility::POINTER_CHAR);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for Opl in calculator: " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in calculator: " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right1
-		TYPEID dataType = CreateVariable(m_Opr1, "Opr1", data, true);
+		TYPEID dataType = CreateVariable(m_Opr1, "Opr1", data);
 		if (dataType != m_DataType)
 		{
-			ERROR_BEGIN << "Different types:  " << dataType << " with " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types:  Opl & Opr1" << ERROR_END;
 			return false;
 		}
 		///> Right2
-		dataType = CreateVariable(m_Opr2, "Opr2", data, true);
+		dataType = CreateVariable(m_Opr2, "Opr2", data);
 		if (m_DataType != dataType)
 		{
-			ERROR_BEGIN << "Different types:  " << dataType << " with " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types: Opl & Opr2" << ERROR_END;
 			return false;
 		}
 
@@ -73,7 +59,7 @@ namespace YBehavior
 		}
 
 		IVariableOperationHelper* pHelper = m_Opl->GetOperation();
-		pHelper->Calculate(pAgent->GetSharedData(), m_Opl, m_Opr1, m_Opr2, m_Operator);
+		pHelper->Calculate(pAgent->GetMemory(), m_Opl, m_Opr1, m_Opr2, m_Operator);
 
 		IF_HAS_LOG_POINT
 		{

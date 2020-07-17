@@ -8,6 +8,16 @@ using System.Reflection;
 using System.Collections.ObjectModel;
 using System;
 
+public static class DelayableNotificationCollectionExtension
+{
+    public static void Sort<T>(this DelayableNotificationCollection<T> observable) where T : IComparable<T>, IEquatable<T>
+    {
+        List<T> sorted = observable.OrderBy(x => x).ToList();
+        for (int i = 0; i < sorted.Count(); i++)
+            observable.Move(observable.IndexOf(sorted[i]), i);
+    }
+}
+
 public class DelayableNotificationCollection<T> : ObservableCollection<T>
 {
     #region Types

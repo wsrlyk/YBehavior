@@ -4,6 +4,7 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/behaviortreemgr.h"
 #include "YBehavior/interface.h"
+#include "YBehavior/mgrs.h"
 
 extern "C" YBEHAVIOR_API YBehavior::Entity* CreateEntity()
 {
@@ -42,12 +43,14 @@ extern "C" YBEHAVIOR_API void RegisterSharpNode(
 
 extern "C" YBEHAVIOR_API void RegisterLoadData(YBehavior::LoadDataDelegate loaddata)
 {
-	YBehavior::TreeMgr::Instance()->SetLoadDataCallback(loaddata);
+	YBehavior::Mgrs::Instance()->GetTreeMgr()->SetLoadDataCallback(loaddata);
+	//YBehavior::TreeMgr::Instance()->SetLoadDataCallback(loaddata);
 }
 
 extern "C" YBEHAVIOR_API void SetTree(YBehavior::Agent* pAgent, YBehavior::CSTRING treeName)
 {
-	pAgent->SetTree(treeName);
+	///> TODO
+	//pAgent->SetTree(treeName);
 }
 
 extern "C" YBEHAVIOR_API void Tick(YBehavior::Agent* pAgent)
@@ -65,7 +68,7 @@ extern "C" YBEHAVIOR_API YBehavior::ISharedVariableEx* CreateVariable(
 	if (pNode != nullptr)
 	{
 		YBehavior::ISharedVariableEx* v;
-		YBehavior::TYPEID res = pNode->CreateVariable(v, attrName, *data, bSingle, variableType);
+		YBehavior::TYPEID res = pNode->CreateVariable(v, attrName, *data, variableType);
 		return v;
 	}
 	return nullptr;

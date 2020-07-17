@@ -10,7 +10,9 @@ namespace YBehavior
 		func(Float);    \
 		func(String);    \
 		func(Bool);    \
-		func(Ulong);    
+		func(Ulong);   \
+		func(EntityWrapper);   \
+		func(Vector3);
 
 	class YBEHAVIOR_API RegisterData
 	{
@@ -63,6 +65,10 @@ namespace YBehavior
 		void Push(const TYPE& data)\
 		{\
 			m_Vec##TYPE.push_back(data);\
+		}\
+		void Assign(const StdVector<TYPE>& data)\
+		{\
+			m_Vec##TYPE.assign(data.begin(), data.end()); \
 		}
 
 		FOR_EACH_REGISTER_TYPE(PUSH_FUNCTION);

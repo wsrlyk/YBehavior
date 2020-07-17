@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BenchMarkTree1>
+  <Node Class="Root" Pos="0,0">
+    <Shared sharedarray="IIC " />
+    <Local localarray="IIc 0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0" v="_Ic 0" />
+    <Node Class="Sequence" Pos="-69,250">
+      <Node Class="ClearArray" Pos="-216,396" Array="IIP sharedarray" />
+      <Node Class="ForEach" Pos="-19,363" Collection="IIp localarray" Current="_Ip v" ExitWhenFailure="_BC F">
+        <Node Class="ArrayPushElement" Pos="-48,520" Array="IIP sharedarray" Element="_Ip v" />
+      </Node>
+      <Node Class="Loop" Return="Success" Pos="207,379" Count="_IC 100000" Current="_Ip v" ExitWhenFailure="_BC F" />
+    </Node>
+  </Node>
+</BenchMarkTree1>

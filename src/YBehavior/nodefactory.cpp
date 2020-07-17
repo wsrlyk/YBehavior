@@ -15,6 +15,8 @@
 #include "YBehavior/nodes/dice.h"
 #include "YBehavior/nodes/subtree.h"
 #include "YBehavior/nodes/wait.h"
+#include "YBehavior/nodes/array.h"
+#include "YBehavior/nodes/fsmrelated.h"
 namespace YBehavior
 {
 	NodeFactory* CreateNodeFactory()
@@ -32,15 +34,25 @@ namespace YBehavior
 		REGISTER_TYPE(factory, Invertor);
 		REGISTER_TYPE(factory, SetData);
 		REGISTER_TYPE(factory, Random);
+		REGISTER_TYPE(factory, RandomSelect);
 		REGISTER_TYPE(factory, ReadRegister);
 		REGISTER_TYPE(factory, WriteRegister);
 		REGISTER_TYPE(factory, SwitchCase);
 		REGISTER_TYPE(factory, For);
 		REGISTER_TYPE(factory, ForEach);
+		REGISTER_TYPE(factory, Loop);
 		REGISTER_TYPE(factory, PiecewiseFunction);
 		REGISTER_TYPE(factory, Dice);
 		REGISTER_TYPE(factory, SubTree);
 		REGISTER_TYPE(factory, Wait);
+		REGISTER_TYPE(factory, ClearArray);
+		REGISTER_TYPE(factory, GetArrayLength);
+		REGISTER_TYPE(factory, IsArrayEmpty);
+		REGISTER_TYPE(factory, ArrayPushElement);
+		REGISTER_TYPE(factory, GenIndexArray);
+		REGISTER_TYPE(factory, Shuffle);
+		REGISTER_TYPE(factory, FSMSetCondition);
+		REGISTER_TYPE(factory, FSMClearConditions);
 
 		return factory;
 	}

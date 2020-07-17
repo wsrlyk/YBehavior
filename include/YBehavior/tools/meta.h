@@ -12,7 +12,7 @@ namespace YBehavior
 		typedef T ElementType;
 	};
 	template<typename T>
-	struct IsVector<std::vector<T>>
+	struct IsVector<StdVector<T>>
 	{
 		const static bool Result = true;
 		typedef T ElementType;

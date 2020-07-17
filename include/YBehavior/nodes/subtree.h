@@ -12,11 +12,16 @@ namespace YBehavior
 	protected:
 		virtual NodeState Update(AgentPtr pAgent);
 		virtual bool OnLoaded(const pugi::xml_node& data);
-
+		bool OnLoadChild(const pugi::xml_node& data) override;
+		bool _TryCreateFromTo(const pugi::xml_node& data, std::vector<ISharedVariableEx*>& container);
 	private:
 		SharedVariableEx<STRING>* m_TreeName;
+		SharedVariableEx<STRING>* m_Identification;
 
-		BehaviorTree* m_Tree = nullptr;
+		std::vector<ISharedVariableEx* > m_Inputs;
+		std::vector<ISharedVariableEx* > m_Outputs;
+
+		STRING m_FinalTreeName;
 	};
 }
 

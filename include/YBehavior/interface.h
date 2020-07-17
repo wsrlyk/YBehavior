@@ -7,36 +7,68 @@ namespace YBehavior
 {
 	class IVariableOperationHelper;
 	class SharedDataEx;
+	class IMemory
+	{
+	public:
+		virtual SharedDataEx* GetMainData() = 0;
+		virtual SharedDataEx* GetStackTop() = 0;
+		virtual ~IMemory() {}
+	};
 	class ISharedVariableEx
 	{
 	public:
 		virtual ~ISharedVariableEx() {}
 		inline void SetKey(KEY key) { m_Key = key; }
 		inline KEY GetKey() { return m_Key; }
+		inline void SetIsLocal(bool local) { m_IsLocal = local; }
+		inline bool IsLocal() { return m_IsLocal; }
 		virtual bool IsConst() = 0;
-#ifdef DEBUGGER
-		inline void SetName(const STRING& name) { m_Name = name; }
+
+		void SetName(const STRING& name, const STRING& nodeName)
+		{
+			m_Name = name;
+			m_LogName = nodeName + "." + name;
+			if (m_ReferenceName.size() > 0)
+			{
+				m_LogName += " (";
+				m_LogName += m_ReferenceName;
+				if (IsLocal())
+				{
+					m_LogName += "'";
+				}
+				m_LogName += ")";
+			}
+		}
 		inline const STRING& GetName() { return m_Name; }
-#endif
+		inline const STRING& GetLogName() { return m_LogName; }
+
 		virtual void SetVectorIndex(const STRING& vbType, const STRING& s) { }
 		virtual void SetKeyFromString(const STRING& s) = 0;
-		virtual const void* GetValue(SharedDataEx* pData) = 0;
-		virtual const void* GetElement(SharedDataEx* pData, INT index) = 0;
-		virtual void SetValue(SharedDataEx* pData, const void* src) = 0;
+		virtual const void* GetValue(IMemory* pMemory) = 0;
+		virtual void SetValue(IMemory* pMemory, const void* src) = 0;
 		virtual void SetValueFromString(const STRING& str) = 0;
-		virtual TYPEID GetTypeID() = 0;
+		virtual TYPEID TypeID() const = 0;
 		///> if this variable is an INT, and it refers to an element of an INT[], this method will return the type of INT[] instead of INT;   Used in log..
 		virtual TYPEID GetReferenceSharedDataSelfID() = 0;
 
-		virtual IVariableOperationHelper* GetOperation() = 0;
+		virtual IVariableOperationHelper* GetOperation() const = 0;
+		virtual IVariableOperationHelper* GetElementOperation() const = 0;
 		virtual ISharedVariableEx* GetVectorIndex() = 0;
-		virtual STRING GetValueToSTRING(SharedDataEx* pData) = 0;
-		virtual INT VectorSize(SharedDataEx* pData) = 0;
+		virtual STRING GetValueToSTRING(IMemory* pMemory) = 0;
+
+		virtual bool IsThisVector() const = 0;
+		///> Belows are functions for vector
+		virtual INT VectorSize(IMemory* pMemory) = 0;
+		virtual void Clear(IMemory* pMemory) = 0;
+		virtual const void* GetElement(IMemory* pMemory, INT index) = 0;
+		virtual void SetElement(IMemory* pMemory, const void* v, INT index) = 0;
+		virtual void PushBackElement(IMemory* pMemory, const void* v) = 0;
 	protected:
 		KEY m_Key;
-#ifdef DEBUGGER
+		bool m_IsLocal;
 		STRING m_Name;
-#endif
+		STRING m_LogName;
+		STRING m_ReferenceName;
 	};
 
 	class IDataArrayIterator
@@ -46,6 +78,7 @@ namespace YBehavior
 		virtual IDataArrayIterator& operator ++() { return *this; }
 		virtual const KEY Value() { return 0; }
 		virtual ~IDataArrayIterator(){}
+		virtual void Recycle() {}
 	};
 
 	class IDataArray
@@ -68,8 +101,12 @@ namespace YBehavior
 			~Iterator()
 			{
 				if (innerIter != nullptr)
-					delete innerIter;
+				{
+					innerIter->Recycle();
+					innerIter = nullptr;
+				}
 			}
+
 			bool IsEnd() override { return innerIter->IsEnd(); }
 			IDataArrayIterator& operator ++() override { ++(*innerIter); return *this; }
 			const KEY Value() override { return innerIter->Value(); }
@@ -89,11 +126,13 @@ namespace YBehavior
 		virtual const void* Get(KEY key) const = 0;
 		virtual const STRING GetToString(KEY key) const = 0;
 		virtual bool Set(KEY key, const void* src) = 0;
-		virtual IDataArray* Clone() const = 0;
-		virtual void Merge(IDataArray* other, bool bOverride) = 0;
+		virtual bool TrySet(KEY key, const void* src) = 0;
+		virtual void CloneFrom(const IDataArray*) = 0;
+		virtual void MergeFrom(const IDataArray* other, bool bOverride) = 0;
 		virtual SIZE_KEY Length() const = 0;
-		virtual TYPEID GetTypeID() const = 0;
+		virtual TYPEID TypeID() const = 0;
 		virtual Iterator Iter() const = 0;
+		virtual void Clear() = 0;
 	};
 
 }

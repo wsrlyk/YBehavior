@@ -4,13 +4,14 @@
 #include "YBehavior/types.h"
 #include "utility.h"
 #include "singleton.h"
+#include <unordered_map>
 
 namespace YBehavior
 {
 	struct YBEHAVIOR_API NameKeyInfo
 	{
 		std::unordered_map<STRING, KEY> mNameHash;
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		std::unordered_map<KEY, STRING> mReverseNameHash;
 #endif
 		KEY mKeyCounter;
@@ -23,7 +24,7 @@ namespace YBehavior
 		void Reset()
 		{
 			mNameHash.clear();
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 			mReverseNameHash.clear();
 #endif
 			mKeyCounter = 0;
@@ -36,13 +37,13 @@ namespace YBehavior
 				return it->second;
 			return Utility::INVALID_KEY;
 		}
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		const STRING& Get(const KEY& key)
 		{
 			auto it = mReverseNameHash.find(key);
 			if (it != mReverseNameHash.end())
 				return it->second;
-			return Types::StringEmpty;
+			return Utility::StringEmpty;
 		}
 #endif
 	};
@@ -74,18 +75,20 @@ namespace YBehavior
 		template<typename T>
 		KEY GetKey(const STRING& name)
 		{
-			TYPEID typeNumberId = GetClassTypeNumberId<T>();
+			TYPEID typeNumberId = GetTypeID<T>();
 			NameKeyInfo& info = Get(typeNumberId);
 			return info.Get(name);
 		}
 
+#ifdef YDEBUGGER
 		template<typename T>
 		const STRING& GetName(const KEY& key)
 		{
-			TYPEID typeNumberId = GetClassTypeNumberId<T>();
+			TYPEID typeNumberId = GetTypeID<T>();
 			NameKeyInfo& info = Get(typeNumberId);
 			return info.Get(key);
 		}
+#endif
 	};
 
 	class YBEHAVIOR_API TreeKeyMgr: public Singleton<TreeKeyMgr>
@@ -100,7 +103,7 @@ namespace YBehavior
 		KEY GetKeyByName(const STRING& name);
 		KEY GetKeyByName(const STRING& name, TYPEID typeID);
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 		template<typename T>
 		const STRING& GetNameByKey(KEY key);
 		const STRING& GetNameByKey(KEY key, TYPEID typeID);
@@ -113,14 +116,14 @@ namespace YBehavior
 	template<typename T>
 	KEY TreeKeyMgr::GetKeyByName(const STRING& name)
 	{
-		return GetKeyByName(name, GetClassTypeNumberId<T>());
+		return GetKeyByName(name, GetTypeID<T>());
 	}
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 	template<typename T>
 	const STRING& TreeKeyMgr::GetNameByKey(KEY key)
 	{
-		return GetNameByKey(key, GetClassTypeNumberId<T>());
+		return GetNameByKey(key, GetTypeID<T>());
 	}
 #endif
 
@@ -133,7 +136,7 @@ namespace YBehavior
 		if (mpCurActiveNameKeyInfo == NULL)
 			return Utility::INVALID_KEY;
 
-		TYPEID typeNumberId = GetClassTypeNumberId<T>();
+		TYPEID typeNumberId = GetTypeID<T>();
 		NameKeyInfo& curActiveNameKeyInfo = mpCurActiveNameKeyInfo->Get(typeNumberId);
 
 		if (mpCurActiveNameKeyInfo == &mCommonNameKeyInfo || curActiveNameKeyInfo.Get(name) == Utility::INVALID_KEY)
@@ -144,7 +147,7 @@ namespace YBehavior
 #endif
 			curActiveNameKeyInfo.mNameHash[name] = key;
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 			curActiveNameKeyInfo.mReverseNameHash[key] = name;
 #endif
 		}

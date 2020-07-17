@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -20,38 +20,49 @@ namespace YBehavior.Editor
     /// </summary>
     public partial class SharedDataFrame : UserControl
     {
-        List<string> m_Types = new List<string>();
+        //List<string> m_Types = new List<string>();
         Tree m_CurTree = null;
         public SharedDataFrame()
         {
             InitializeComponent();
 
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
+        }
+
+        public void Enable()
+        {
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Register(EventType.SharedVariableChanged, _OnSharedVariableChanged);
+        }
 
-            foreach (KeyValuePair<Variable.ValueType, string> pair in Variable.ValueTypeDic2)
-            {
-                m_Types.Add(pair.Value);
-            }
-
-            this.VType.ItemsSource = m_Types;
+        public void Disable()
+        {
+            EventMgr.Instance.Unregister(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);
+            EventMgr.Instance.Unregister(EventType.DebugTargetChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Unregister(EventType.SharedVariableChanged, _OnSharedVariableChanged);
         }
 
         private void _OnWorkBenchSelected(EventArg arg)
         {
             WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
-            if (oArg.Bench == null)
+            if (oArg.Bench == null || !(oArg.Bench is TreeBench))
             {
+                this.InOutPanel.DataContext = null;
                 this.DataContext = null;
+                Disable();
                 return;
             }
-            m_CurTree = oArg.Bench.MainTree;
-            //this.VariableContainer.SetBinding(ComboBox.ItemsSourceProperty, new Binding("Datas"));
+            Enable();
+            m_CurTree = oArg.Bench.MainGraph as Tree;
+            if (m_CurTree == null)
+                return;
+            this.InOutPanel.DataContext = m_CurTree.InOutMemory;
+
             if (DebugMgr.Instance.IsDebugging())
                 this.DataContext = DebugMgr.Instance.DebugSharedData;
             else
-                this.DataContext = m_CurTree.Variables;
+                this.DataContext = m_CurTree.SharedData;
         }
 
         private void _OnNetworkConnectionChanged(EventArg arg)
@@ -68,7 +79,7 @@ namespace YBehavior.Editor
                         }
                         else
                         {
-                            this.DataContext = m_CurTree.Variables;
+                            this.DataContext = m_CurTree == null ? null : m_CurTree.SharedData;
                         }
                     }
                 ),
@@ -82,29 +93,70 @@ namespace YBehavior.Editor
             this.DataContext = DebugMgr.Instance.DebugSharedData;
         }
 
-        private void Add_Click(object sender, RoutedEventArgs e)
+        private void _OnSharedVariableChanged(EventArg arg)
         {
-            if (m_CurTree == null)
+            if (m_CurTree != null)
+                m_CurTree.InOutMemory.RefreshVariables();
+        }
+
+        private void AddSharedVariable_Click(object sender, RoutedEventArgs e)
+        {
+            string name = this.NewSharedVariableName.Text;
+            bool res = (m_CurTree.SharedData).TryCreateVariable(
+                name,
+                "0",
+                Variable.ValueType.VT_INT,
+                Variable.CountType.CT_NONE,
+                false);
+            if (res)
+                this.NewSharedVariableName.Text = string.Empty;
+            _OnAddVariable(res);
+        }
+
+        private void AddLocalVariable_Click(object sender, RoutedEventArgs e)
+        {
+            string name = this.NewLocalVariableName.Text;
+            bool res = (m_CurTree.SharedData).TryCreateVariable(
+                name,
+                "0",
+                Variable.ValueType.VT_INT,
+                Variable.CountType.CT_NONE,
+                true);
+            if (res)
+                this.NewLocalVariableName.Text = string.Empty;
+            _OnAddVariable(res);
+        }
+
+        private void AddInput_Click(object sender, RoutedEventArgs e)
+        {
+            string name = this.NewInputName.Text;
+            bool res = m_CurTree.InOutMemory.TryCreateVariable(
+                name,
+                Variable.ValueType.VT_INT,
+                Variable.CountType.CT_NONE,
+                true);
+            if (res)
+                this.NewInputName.Text = string.Empty;
+            _OnAddVariable(res);
+        }
+
+        private void AddOutput_Click(object sender, RoutedEventArgs e)
+        {
+            string name = this.NewOutputName.Text;
+            bool res = m_CurTree.InOutMemory.TryCreateVariable(
+                name,
+                Variable.ValueType.VT_INT,
+                Variable.CountType.CT_NONE,
+                false);
+            if (res)
+                this.NewOutputName.Text = string.Empty;
+            _OnAddVariable(res);
+        }
+
+        private void _OnAddVariable(bool res)
+        {
+            if (res)
             {
-                LogMgr.Instance.Error("There's no active tree.");
-                return;
-            }
-
-            if (DebugMgr.Instance.IsDebugging())
-                return;
-
-            string name = this.VName.Text;
-            string value = this.VValue.Text;
-            string type = this.VType.SelectedValue as string;
-            int isarray = this.VIsArray.SelectedIndex;
-
-            if (m_CurTree.Variables.TryCreateVariable(
-                name, 
-                value, 
-                Variable.ValueTypeDic2.GetKey(type, Variable.ValueType.VT_NONE),
-                isarray == 1 ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE))
-            {
-                this.VName.Text = string.Empty;
                 ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
                 {
                     Content = "Created successfully.",
@@ -114,8 +166,6 @@ namespace YBehavior.Editor
             }
             else
             {
-                LogMgr.Instance.Error("Variable creation failed. Check the params.");
-
                 ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
                 {
                     Content = "Variable creation failed. Check the params.",

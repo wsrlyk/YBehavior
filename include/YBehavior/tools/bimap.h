@@ -22,7 +22,8 @@ namespace YBehavior
 		std::unordered_map<T1, T0, Hasher1> map1;
 
 	public:
-		Bimap(std::initializer_list<std::pair<T0, T1> > list)
+		typedef std::pair<T0, T1> Pair;
+		Bimap(const std::initializer_list<Pair>& list)
 		{
 			for (auto it = list.begin(); it != list.end(); ++it)
 			{
@@ -65,7 +66,7 @@ namespace YBehavior
 			return false;
 		}
 		
-		bool TryGetValue(const T0& t0, T1& t1)
+		bool TryGetValue(const T0& t0, T1& t1) const
 		{
 			auto it = map0.find(t0);
 			if (it == map0.end())
@@ -74,7 +75,7 @@ namespace YBehavior
 			t1 = it->second;
 			return true;
 		}
-		bool TryGetKey(const T1& t1, T0& t0)
+		bool TryGetKey(const T1& t1, T0& t0) const
 		{
 			auto it = map1.find(t1);
 			if (it == map1.end())
@@ -84,7 +85,7 @@ namespace YBehavior
 			return true;
 		}
 
-		const T1& GetValue(const T0& t0, const T1& defaultRes)
+		const T1& GetValue(const T0& t0, const T1& defaultRes) const
 		{
 			auto it = map0.find(t0);
 			if (it == map0.end())
@@ -92,7 +93,7 @@ namespace YBehavior
 			return it->second;
 		}
 
-		const T0& GetKey(const T1& t1, const T0& defaultRes)
+		const T0& GetKey(const T1& t1, const T0& defaultRes) const
 		{
 			auto it = map1.find(t1);
 			if (it == map1.end())

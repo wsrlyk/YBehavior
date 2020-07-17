@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_MESSAGEPROCESSOR_H_
 #define _YBEHAVIOR_MESSAGEPROCESSOR_H_
 
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #include "YBehavior/types.h"
 #include "YBehavior/singleton.h"
 

@@ -1,22 +1,18 @@
 #include "YBehavior/nodes/dice.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#include "YBehavior/utility.h"
-#endif // DEBUGGER
 #include "YBehavior/agent.h"
 
 namespace YBehavior
 {
 	static std::unordered_set<TYPEID> s_ValidVecTypes = {
-		GetClassTypeNumberId<VecInt>(),
-		GetClassTypeNumberId<VecFloat>(),
-		GetClassTypeNumberId<VecUint64>(),
+		GetTypeID<VecInt>(),
+		GetTypeID<VecFloat>(),
+		GetTypeID<VecUint64>(),
 	};
 
 	static std::unordered_set<TYPEID> s_ValidTypes = {
-		GetClassTypeNumberId<Int>(),
-		GetClassTypeNumberId<Float>(),
-		GetClassTypeNumberId<Uint64>(),
+		GetTypeID<Int>(),
+		GetTypeID<Float>(),
+		GetTypeID<Uint64>(),
 	};
 
 	NodeState Dice::Update(AgentPtr pAgent)
@@ -32,8 +28,8 @@ namespace YBehavior
 			LOG_SHARED_DATA(m_IgnoreInput, true);
 		}
 
-		INT sizeX = m_Distribution->VectorSize(pAgent->GetSharedData());
-		INT sizeY = m_Values->VectorSize(pAgent->GetSharedData());
+		INT sizeX = m_Distribution->VectorSize(pAgent->GetMemory());
+		INT sizeY = m_Values->VectorSize(pAgent->GetMemory());
 		if (sizeX != sizeY)
 		{
 			DEBUG_LOG_INFO("Different length of X and Y; ");
@@ -47,64 +43,51 @@ namespace YBehavior
 
 		IVariableOperationHelper* pHelper = m_Input->GetOperation();
 
-		const void* x0 = m_Distribution->GetElement(pAgent->GetSharedData(), 0);
-		void* pZero = pHelper->AllocData();
-		pHelper->Set(pZero, x0);
-		pHelper->Calculate(pZero, pZero, pZero, OT_SUB);
+		auto zero = pHelper->AllocTempData();
 
 		const void* input;
-		void* randRes;
-		
-		BOOL bIgnoreInput = false;
-		m_IgnoreInput->GetCastedValue(pAgent->GetSharedData(), bIgnoreInput);
+		auto res = pHelper->AllocTempData();
+
+		BOOL bIgnoreInput = Utility::FALSE_VALUE;
+		m_IgnoreInput->GetCastedValue(pAgent->GetMemory(), bIgnoreInput);
 		if (bIgnoreInput)
 		{
-			void* pSum = pHelper->AllocData();
-			pHelper->Set(pSum, pZero);
+			auto sum = pHelper->AllocTempData();
+
 			for (INT i = 0; i < sizeX; ++i)
 			{
-				const void* x1 = m_Distribution->GetElement(pAgent->GetSharedData(), i);
-				pHelper->Calculate(pSum, pSum, x1, OT_ADD);
+				const void* x1 = m_Distribution->GetElement(pAgent->GetMemory(), i);
+				pHelper->Calculate(sum.pData, sum.pData, x1, OT_ADD);
 			}
-			randRes = pHelper->AllocData();
-			pHelper->Random(randRes, pZero, pSum);
-			input = randRes;
-			pHelper->RecycleData(pSum);
+			pHelper->Random(res.pData, zero.pData, sum.pData);
+			input = res.pData;
 		}
 		else
 		{
-			input = m_Input->GetValue(pAgent->GetSharedData());
+			input = m_Input->GetValue(pAgent->GetMemory());
 		}
-		///>   y = y0 + (y1 - y0) * (x - x0) / (x1 - x0)
-		///>   y = y0 + pDeltaY * pOffsetX / pDeltaX
-		///>   y = y0 + pDeltaY * pRatio  (Here we wont calc pRatio first, in case that offsetX and DeltaX are intergers, leading to inaccurate division.
-		///>								Instead, we calc pDeltaY * pOffsetX first
-		///>   y = y0 + pOffsetY
 
-		if (pHelper->Compare(input, pZero, OT_LESS))
+		if (pHelper->Compare(input, zero.pData, OT_LESS))
 		{
 			DEBUG_LOG_INFO("Input below zero; ");
 			return NS_FAILURE;
 		}
 
-		void* pCurrent = pHelper->AllocData();
+		auto current = pHelper->AllocTempData();
 
 		for (INT i = 0; i < sizeX; ++i)
 		{
-			const void* x0 = m_Distribution->GetElement(pAgent->GetSharedData(), i);
-			pHelper->Calculate(pCurrent, pCurrent, x0, OT_ADD);
+			const void* x0 = m_Distribution->GetElement(pAgent->GetMemory(), i);
+			pHelper->Calculate(current.pData, current.pData, x0, OT_ADD);
 
 			///> in the range of this (x0, x1)
-			if (pHelper->Compare(input, pCurrent, OT_LESS))
+			if (pHelper->Compare(input, current.pData, OT_LESS))
 			{
 				ns = NS_SUCCESS;
-				m_Output->SetValue(pAgent->GetSharedData(), m_Values->GetElement(pAgent->GetSharedData(), i));
+				m_Output->SetValue(pAgent->GetMemory(), m_Values->GetElement(pAgent->GetMemory(), i));
 				break;
 			}
 		}
-		pHelper->RecycleData(pZero);
-		pHelper->RecycleData(randRes);
-		pHelper->RecycleData(pCurrent);
 
 		if (ns == NS_FAILURE)
 		{
@@ -123,48 +106,47 @@ namespace YBehavior
 
 	bool Dice::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID xVecType = CreateVariable(m_Distribution, "Distribution", data, false);
+		TYPEID xVecType = CreateVariable(m_Distribution, "Distribution", data);
 		if (s_ValidVecTypes.find(xVecType) == s_ValidVecTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for Distribution in Dice: " << xVecType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Distribution in Dice: " << xVecType << ERROR_END;
 			return false;
 		}
-		TYPEID yVecType = CreateVariable(m_Values, "Values", data, false);
+		TYPEID yVecType = CreateVariable(m_Values, "Values", data);
 		if (s_ValidVecTypes.find(yVecType) == s_ValidVecTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for Values in Dice: " << yVecType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Values in Dice: " << yVecType << ERROR_END;
 			return false;
 		}
 
-		TYPEID xType = CreateVariable(m_Input, "Input", data, true);
+		TYPEID xType = CreateVariable(m_Input, "Input", data);
 		if (s_ValidTypes.find(xType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for Input in Dice: " << xType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Input in Dice: " << xType << ERROR_END;
 			return false;
 		}
-		TYPEID yType = CreateVariable(m_Output, "Output", data, true);
+		TYPEID yType = CreateVariable(m_Output, "Output", data);
 		if (s_ValidTypes.find(yType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for Output in Dice: " << yType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Output in Dice: " << yType << ERROR_END;
 			return false;
 		}
 
 		if (!Utility::IsElement(xType, xVecType))
 		{
-			ERROR_BEGIN << "Different types in Dice:  " << xType << " and " << xVecType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types in Dice:  " << xType << " and " << xVecType << ERROR_END;
 			return false;
 		}
 
 		if (!Utility::IsElement(yType, yVecType))
 		{
-			ERROR_BEGIN << "Different types in Dice:  " << yType << " and " << yVecType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types in Dice:  " << yType << " and " << yVecType << ERROR_END;
 			return false;
 		}
 
-		TYPEID bType = CreateVariable(m_IgnoreInput, "IgnoreInput", data, true);
-		if (bType != GetClassTypeNumberId<BOOL>())
+		CreateVariable(m_IgnoreInput, "IgnoreInput", data);
+		if (!m_IgnoreInput)
 		{
-			ERROR_BEGIN << "Invalid type for IgnoreInput in Dice: " << yType << ERROR_END;
 			return false;
 		}
 

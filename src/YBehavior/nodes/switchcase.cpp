@@ -1,26 +1,23 @@
 #include "YBehavior/nodes/switchcase.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#include "YBehavior/utility.h"
-#endif // DEBUGGER
 #include "YBehavior/agent.h"
+#include "YBehavior/profile/profileheader.h"
 
 namespace YBehavior
 {
 	static std::unordered_set<TYPEID> s_ValidTypes = {
-		GetClassTypeNumberId<Int>(),
-		GetClassTypeNumberId<Float>(),
-		GetClassTypeNumberId<Bool>(),
-		GetClassTypeNumberId<String>(),
-		GetClassTypeNumberId<Uint64>(),
+		GetTypeID<Int>(),
+		GetTypeID<Float>(),
+		GetTypeID<Bool>(),
+		GetTypeID<String>(),
+		GetTypeID<Uint64>(),
 	};
 
 	static std::unordered_set<TYPEID> s_ValidVecTypes = {
-		GetClassTypeNumberId<VecInt>(),
-		GetClassTypeNumberId<VecFloat>(),
-		GetClassTypeNumberId<VecBool>(),
-		GetClassTypeNumberId<VecString>(),
-		GetClassTypeNumberId<VecUint64>(),
+		GetTypeID<VecInt>(),
+		GetTypeID<VecFloat>(),
+		GetTypeID<VecBool>(),
+		GetTypeID<VecString>(),
+		GetTypeID<VecUint64>(),
 	};
 
 	NodeState SwitchCase::Update(AgentPtr pAgent)
@@ -31,9 +28,9 @@ namespace YBehavior
 			LOG_SHARED_DATA(m_Cases, true);
 		}
 
-		if (m_CasesChilds.size() != m_Cases->VectorSize(pAgent->GetSharedData()))
+		if ((INT)m_CasesChilds.size() != m_Cases->VectorSize(pAgent->GetMemory()))
 		{
-			ERROR_BEGIN << "Cases size not match in SwitchCase" << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Cases size not match" << ERROR_END;
 			return NS_FAILURE;
 		}
 
@@ -47,7 +44,7 @@ namespace YBehavior
 			current = m_RCContainer.GetRC()->Current;
 		}
 
-		INT size = m_CasesChilds.size();
+		INT size = (INT)m_CasesChilds.size();
 		BehaviorNodePtr targetNode = nullptr;
 		switch (current)
 		{
@@ -57,11 +54,11 @@ namespace YBehavior
 
 			for (INT i = 0; i < size; ++i)
 			{
-				const void* onecase = m_Cases->GetElement(pAgent->GetSharedData(), i);
+				const void* onecase = m_Cases->GetElement(pAgent->GetMemory(), i);
 				if (onecase == nullptr)
 					continue;
 
-				if (pHelper->Compare(m_Switch->GetValue(pAgent->GetSharedData()), onecase, OT_EQUAL))
+				if (pHelper->Compare(m_Switch->GetValue(pAgent->GetMemory()), onecase, OT_EQUAL))
 				{
 					DEBUG_LOG_INFO("Switch to case " << Utility::ToString(m_CasesChilds[i]->GetUID()) << "; ");
 					targetNode = m_CasesChilds[i];
@@ -95,7 +92,9 @@ namespace YBehavior
 
 		if (targetNode)
 		{
+			PROFILER_PAUSE;
 			ns = targetNode->Execute(pAgent, ns);
+			PROFILER_RESUME;
 			if (ns == NS_RUNNING)
 			{
 				m_RCContainer.CreateRC(this);
@@ -108,22 +107,22 @@ namespace YBehavior
 
 	bool SwitchCase::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID switchType = CreateVariable(m_Switch, "Switch", data, true);
+		TYPEID switchType = CreateVariable(m_Switch, "Switch", data);
 		if (s_ValidTypes.find(switchType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for Switch in SwitchCase: " << switchType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Switch: " << switchType << ERROR_END;
 			return false;
 		}
-		TYPEID casesType = CreateVariable(m_Cases, "Cases", data, false);
+		TYPEID casesType = CreateVariable(m_Cases, "Cases", data);
 		if (s_ValidVecTypes.find(casesType) == s_ValidVecTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for Cases in SwitchCase: " << casesType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Cases: " << casesType << ERROR_END;
 			return false;
 		}
 
 		if (!Utility::IsElement(switchType, casesType))
 		{
-			ERROR_BEGIN << "Different types in SwitchCase:  " << switchType << " and " << casesType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types: Switch & Cases " << ERROR_END;
 			return false;
 		}
 
@@ -136,7 +135,7 @@ namespace YBehavior
 		{
 			if (m_DefaultChild != nullptr)
 			{
-				ERROR_BEGIN << "Too many default case in SwitchCase" << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Too many default case" << ERROR_END;
 			}
 			else
 			{

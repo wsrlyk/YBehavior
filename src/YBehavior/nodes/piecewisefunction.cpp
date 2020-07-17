@@ -1,22 +1,18 @@
 #include "YBehavior/nodes/piecewisefunction.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#include "YBehavior/utility.h"
-#endif // DEBUGGER
 #include "YBehavior/agent.h"
 
 namespace YBehavior
 {
 	static std::unordered_set<TYPEID> s_ValidVecTypes = {
-		GetClassTypeNumberId<VecInt>(),
-		GetClassTypeNumberId<VecFloat>(),
-		GetClassTypeNumberId<VecUint64>(),
+		GetTypeID<VecInt>(),
+		GetTypeID<VecFloat>(),
+		GetTypeID<VecUint64>(),
 	};
 
 	static std::unordered_set<TYPEID> s_ValidTypes = {
-		GetClassTypeNumberId<Int>(),
-		GetClassTypeNumberId<Float>(),
-		GetClassTypeNumberId<Uint64>(),
+		GetTypeID<Int>(),
+		GetTypeID<Float>(),
+		GetTypeID<Uint64>(),
 	};
 
 	NodeState PiecewiseFunction::Update(AgentPtr pAgent)
@@ -31,8 +27,8 @@ namespace YBehavior
 			LOG_SHARED_DATA(m_OutputY, true);
 		}
 
-		INT sizeX = m_KeyPointX->VectorSize(pAgent->GetSharedData());
-		INT sizeY = m_KeyPointY->VectorSize(pAgent->GetSharedData());
+		INT sizeX = m_KeyPointX->VectorSize(pAgent->GetMemory());
+		INT sizeY = m_KeyPointY->VectorSize(pAgent->GetMemory());
 		if (sizeX != sizeY)
 		{
 			DEBUG_LOG_INFO("Different length of X and Y; ");
@@ -46,7 +42,7 @@ namespace YBehavior
 		else if (sizeX == 1)
 		{
 			DEBUG_LOG_INFO("Only one key point, return it; ");
-			m_OutputY->SetValue(pAgent->GetSharedData(), m_KeyPointY->GetValue(pAgent->GetSharedData()));
+			m_OutputY->SetValue(pAgent->GetMemory(), m_KeyPointY->GetValue(pAgent->GetMemory()));
 			return NS_SUCCESS;
 		}
 
@@ -58,23 +54,23 @@ namespace YBehavior
 		///>								Instead, we calc pDeltaY * pOffsetX first
 		///>   y = y0 + pOffsetY
 
-		void* pDeltaX = pHelper->AllocData();
-		void* pDeltaY = pHelper->AllocData();
-		void* pOffsetX = pHelper->AllocData();
-		void* pDeltaYxpOffsetX = pHelper->AllocData();
-		void* pOffsetY = pHelper->AllocData();
+		auto deltaX = pHelper->AllocTempData();
+		auto deltaY = pHelper->AllocTempData();
+		auto offsetX = pHelper->AllocTempData();
+		auto deltaYxpOffsetX = pHelper->AllocTempData();
+		auto offsetY = pHelper->AllocTempData();
 
-		const void* x = m_InputX->GetValue(pAgent->GetSharedData());
+		const void* x = m_InputX->GetValue(pAgent->GetMemory());
 		for (INT i = 0; i < sizeX - 1; ++i)
 		{
-			const void* x0 = m_KeyPointX->GetElement(pAgent->GetSharedData(), i);
-			const void* x1 = m_KeyPointX->GetElement(pAgent->GetSharedData(), i + 1);
+			const void* x0 = m_KeyPointX->GetElement(pAgent->GetMemory(), i);
+			const void* x1 = m_KeyPointX->GetElement(pAgent->GetMemory(), i + 1);
 
 			///> Not in the range of this (x0, x1]
 			if (pHelper->Compare(x, x1, OT_GREATER) && i < sizeX - 2)
 				continue;
-			const void* y0 = m_KeyPointY->GetElement(pAgent->GetSharedData(), i);
-			const void* y1 = m_KeyPointY->GetElement(pAgent->GetSharedData(), i + 1);
+			const void* y0 = m_KeyPointY->GetElement(pAgent->GetMemory(), i);
+			const void* y1 = m_KeyPointY->GetElement(pAgent->GetMemory(), i + 1);
 
 			if (x0 == nullptr || x1 == nullptr || y0 == nullptr || y1 == nullptr)
 			{
@@ -82,14 +78,14 @@ namespace YBehavior
 				continue;
 			}
 
-			pHelper->Calculate(pDeltaX, x1, x0, OT_SUB);
-			pHelper->Calculate(pOffsetX, x, x0, OT_SUB);
-			pHelper->Calculate(pDeltaY, y1, y0, OT_SUB);
-			pHelper->Calculate(pDeltaYxpOffsetX, pDeltaY, pOffsetX, OT_MUL);
-			pHelper->Calculate(pOffsetY, pDeltaYxpOffsetX, pDeltaX, OT_DIV);
-			const void* res = pHelper->Calculate(y0, pOffsetY, OT_ADD);
+			pHelper->Calculate(deltaX.pData, x1, x0, OT_SUB);
+			pHelper->Calculate(offsetX.pData, x, x0, OT_SUB);
+			pHelper->Calculate(deltaY.pData, y1, y0, OT_SUB);
+			pHelper->Calculate(deltaYxpOffsetX.pData, deltaY.pData, offsetX.pData, OT_MUL);
+			pHelper->Calculate(offsetY.pData, deltaYxpOffsetX.pData, deltaX.pData, OT_DIV);
+			const void* res = pHelper->Calculate(y0, offsetY.pData, OT_ADD);
 
-			m_OutputY->SetValue(pAgent->GetSharedData(), res);
+			m_OutputY->SetValue(pAgent->GetMemory(), res);
 			ns = NS_SUCCESS;
 			break;
 			//if (onecase == nullptr)
@@ -103,11 +99,7 @@ namespace YBehavior
 			//	return ns;
 			//}
 		}
-		pHelper->RecycleData(pDeltaX);
-		pHelper->RecycleData(pDeltaY);
-		pHelper->RecycleData(pOffsetX);
-		pHelper->RecycleData(pOffsetY);
-		pHelper->RecycleData(pDeltaYxpOffsetX);
+
 		//if (m_DefaultChild != nullptr)
 		//{
 		//	DEBUG_LOG_INFO("Switch to default; ");
@@ -121,41 +113,41 @@ namespace YBehavior
 
 	bool PiecewiseFunction::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID xVecType = CreateVariable(m_KeyPointX, "KeyPointX", data, false);
+		TYPEID xVecType = CreateVariable(m_KeyPointX, "KeyPointX", data);
 		if (s_ValidVecTypes.find(xVecType) == s_ValidVecTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for KeyPointX in PiecewiseFunction: " << xVecType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for KeyPointX: " << xVecType << ERROR_END;
 			return false;
 		}
-		TYPEID yVecType = CreateVariable(m_KeyPointY, "KeyPointY", data, false);
+		TYPEID yVecType = CreateVariable(m_KeyPointY, "KeyPointY", data);
 		if (s_ValidVecTypes.find(yVecType) == s_ValidVecTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for KeyPointY in PiecewiseFunction: " << yVecType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for KeyPointY: " << yVecType << ERROR_END;
 			return false;
 		}
 
-		TYPEID xType = CreateVariable(m_InputX, "InputX", data, true);
+		TYPEID xType = CreateVariable(m_InputX, "InputX", data);
 		if (s_ValidTypes.find(xType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for InputX in PiecewiseFunction: " << xType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for InputX: " << xType << ERROR_END;
 			return false;
 		}
-		TYPEID yType = CreateVariable(m_OutputY, "OutputY", data, true);
+		TYPEID yType = CreateVariable(m_OutputY, "OutputY", data);
 		if (s_ValidTypes.find(yType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for OutputY in PiecewiseFunction: " << yType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for OutputY: " << yType << ERROR_END;
 			return false;
 		}
 
 		if (!Utility::IsElement(xType, xVecType))
 		{
-			ERROR_BEGIN << "Different types in PiecewiseFunction:  " << xType << " and " << xVecType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types:  " << xType << " and " << xVecType << ERROR_END;
 			return false;
 		}
 
 		if (!Utility::IsElement(yType, yVecType))
 		{
-			ERROR_BEGIN << "Different types in PiecewiseFunction:  " << yType << " and " << yVecType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types:  " << yType << " and " << yVecType << ERROR_END;
 			return false;
 		}
 

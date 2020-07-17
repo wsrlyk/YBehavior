@@ -6,40 +6,42 @@
 #include "define.h"
 #include <sstream>
 #include <memory>
-#include "tools/linkedlist.h"
+#include <unordered_map>
 
 namespace YBehavior
 {
+#define StdVector std::vector
+
 	struct YBEHAVIOR_API Vector3
 	{
 		float x;
 		float y;
 		float z;
 
-		friend std::stringstream & operator<<(std::stringstream &out, const Vector3 &obj)
+		friend std::stringstream & operator<<(std::stringstream &outstream, const Vector3 &obj)
 		{
-			out << obj.x << '=' << obj.y << '=' << obj.z;
-			return out;
+			outstream << obj.x << ',' << obj.y << ',' << obj.z;
+			return outstream;
 		}
 
-		friend std::stringstream & operator >> (std::stringstream &in, Vector3 &obj)
+		friend std::stringstream & operator >> (std::stringstream &instream, Vector3 &obj)
 		{
 			char c;
-			in >> obj.x >> c >> obj.y >> c >> obj.z;
-			return in;
+			instream >> obj.x >> c >> obj.y >> c >> obj.z;
+			return instream;
 		}
 
-		friend std::ostream & operator<<(std::ostream &out, const Vector3 &obj)
+		friend std::ostream & operator<<(std::ostream &outstream, const Vector3 &obj)
 		{
-			out << obj.x << '=' << obj.y << '=' << obj.z;
-			return out;
+			outstream << obj.x << ',' << obj.y << ',' << obj.z;
+			return outstream;
 		}
 
-		friend std::istream & operator >> (std::istream &in, Vector3 &obj)
+		friend std::istream & operator >> (std::istream &instream, Vector3 &obj)
 		{
 			char c;
-			in >> obj.x >> c >> obj.y >> c >> obj.z;
-			return in;
+			instream >> obj.x >> c >> obj.y >> c >> obj.z;
+			return instream;
 		}
 
 		bool operator == (const Vector3& other) const
@@ -101,43 +103,60 @@ namespace YBehavior
 	protected:
 		Entity* m_Data;
 		std::shared_ptr<bool> m_IsValid;
-		LinkedListNode<EntityWrapper>* m_Reference;
 
-	protected:
-		bool _CheckValidAndReset();
 	public:
 		EntityWrapper()
 			: m_Data(nullptr)
 			, m_IsValid(new bool(false))
-			, m_Reference(nullptr)
 		{
 		}
 		EntityWrapper(Entity* pEntity)
 			: m_Data(pEntity)
-			, m_IsValid(new bool(true))
-			, m_Reference(nullptr)
+			, m_IsValid(new bool(pEntity != nullptr))
 		{
 		}
 
 		EntityWrapper(const EntityWrapper& other)
 			: m_Data(other.m_Data)
 			, m_IsValid(other.m_IsValid)
-			, m_Reference(other.m_Reference)
 		{
 			//LOG_BEGIN << "Copy Construct" << LOG_END;
 		}
 
+		EntityWrapper(EntityWrapper&& other)
+			: m_Data(other.m_Data)
+			, m_IsValid(other.m_IsValid)
+		{
+			//LOG_BEGIN << "Move Construct" << LOG_END;
+			other.m_Data = nullptr;
+			other.m_IsValid.reset();
+		}
+
 		EntityWrapper& operator = (const EntityWrapper& other)
 		{
-			if (m_Reference != other.m_Reference)
-			{
-				_CheckValidAndReset();
-			}
 			m_Data = other.m_Data;
 			m_IsValid = other.m_IsValid;
-			m_Reference = other.m_Reference;
 			return *this;
 		}
+
+		bool operator ==(const EntityWrapper& other) const
+		{
+			if (!IsValid() || !other.IsValid())
+				return false;
+			return Get() == other.Get();
+		}
+
+		bool operator !=(const EntityWrapper& other) const
+		{
+			if (!IsValid() || !other.IsValid())
+				return true;
+			return Get() != other.Get();
+		}
+
+		bool operator >(const EntityWrapper& other) const { return false; }
+		bool operator <(const EntityWrapper& other) const { return false; }
+		bool operator >=(const EntityWrapper& other) const { return false; }
+		bool operator <=(const EntityWrapper& other) const { return false; }
 
 		~EntityWrapper();
 
@@ -153,7 +172,6 @@ namespace YBehavior
 		inline Entity* Get() const { return m_Data; }
 		inline bool IsValid() const { return *m_IsValid; }
 		inline void SetValid(bool b) { *m_IsValid = b; }
-		inline void SetReference(LinkedListNode<EntityWrapper>* r) { m_Reference = r; }
 	};
 
 	typedef int					KEY;	///> Key to get value from the shareddata
@@ -165,11 +183,12 @@ namespace YBehavior
 	typedef const char*			CSTRING;
 	typedef int					INT;
 	typedef unsigned int		UINT;
-	typedef unsigned long		UINT64;
-	typedef unsigned long		ULONG;
+	typedef unsigned long long	UINT64;
+	typedef unsigned long long	ULONG;
 	typedef unsigned char       BYTE;
 	typedef bool				BOOL_REAL;
 	typedef unsigned short		BOOL;	///> WARNING: bool is defined by short. Cause bool in vector is specialized and has quite different behaviors with others.
+	typedef unsigned short		USHORT;
 	typedef float				FLOAT;
 	typedef char				CHAR;
 
@@ -181,45 +200,31 @@ namespace YBehavior
 	typedef UINT64				Ulong;
 	typedef BYTE				Byte;
 	typedef BOOL				Bool;
+	typedef USHORT				Ushort;
 	typedef FLOAT				Float;
-	typedef std::vector<STRING>	VecString;
-	typedef std::vector<INT>	VecInt;
-	typedef std::vector<UINT>	VecUint;
-	typedef std::vector<UINT64>	VecUint64;
-	typedef std::vector<ULONG>	VecUlong;
-	typedef std::vector<BYTE>	VecByte;
-	typedef std::vector<BOOL>	VecBool;
-	typedef std::vector<FLOAT>	VecFloat;
-	typedef std::vector<EntityWrapper>	VecEntityWrapper;
-	typedef std::vector<Vector3>	VecVector3;
-
-	class Types
-	{
-	public:
-		static const BOOL DefaultBool;
-		static const INT DefaultInt;
-		static const ULONG DefaultUlong;
-		static const FLOAT DefaultFloat;
-		static const STRING StringEmpty;
-		static const VecInt VecIntEmpty;
-		static const VecFloat VecFloatEmpty;
-		static const VecBool VecBoolEmpty;
-		static const VecString VecStringEmpty;
-		static const VecUlong VecUlongEmpty;
-	};
+	typedef StdVector<STRING>	VecString;
+	typedef StdVector<INT>	VecInt;
+	typedef StdVector<UINT>	VecUint;
+	typedef StdVector<UINT64>	VecUint64;
+	typedef StdVector<ULONG>	VecUlong;
+	typedef StdVector<BYTE>	VecByte;
+	typedef StdVector<BOOL>	VecBool;
+	typedef StdVector<FLOAT>	VecFloat;
+	typedef StdVector<EntityWrapper>	VecEntityWrapper;
+	typedef StdVector<Vector3>	VecVector3;
 
 #define YBEHAVIOR_BASICTYPE_NUMBER_ID(type, id)			\
-	template<> inline TYPEID GetClassTypeNumberId<type>() \
+	template<> inline TYPEID GetTypeID<type>() \
 	{\
 		return id;\
 	}\
-	template<> inline TYPEID GetClassTypeNumberId<const type>() \
+	template<> inline TYPEID GetTypeID<const type>() \
 	{\
 		return id; \
 	}
 
 	template<typename T>
-	inline TYPEID GetClassTypeNumberId() {
+	inline TYPEID GetTypeID() {
 		return -1;
 	}
 
@@ -239,28 +244,35 @@ namespace YBehavior
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecEntityWrapper, 106);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecVector3, 107);
 
+	typedef const void* NodePtr;
+	struct TreeMap
+	{
+		typedef std::tuple<NodePtr, STRING> NodeDesc;
 
-#define YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(type, value)			\
-	template<> inline const type& GetTypeDefaultValue<type>() \
-	{\
-		return value;\
-	}\
-	template<> inline const type& GetTypeDefaultValue<const type>() \
-	{\
-		return value; \
-	}
+		struct key_hash
+		{
+			std::size_t operator()(const NodeDesc& k) const
+			{
+				return std::hash<NodePtr>{}(std::get<0>(k)) ^ std::hash<STRING>{}(std::get<1>(k));
+			}
+		};
 
-	template<typename T>
-	inline const T& GetTypeDefaultValue() {
-	}
+		struct key_equal
+		{
+			bool operator()(const NodeDesc& v0, const NodeDesc& v1) const
+			{
+				return (
+					std::get<0>(v0) == std::get<0>(v1) &&
+					std::get<1>(v0) == std::get<1>(v1)
+					);
+			}
+		};
 
-	YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(Bool, Types::DefaultBool);
-	YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(Int, Types::DefaultInt);
-	YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(Ulong, Types::DefaultUlong);
-	YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(Float, Types::DefaultFloat);
-	YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(String, Types::StringEmpty);
-	YBEHAVIOR_BASICTYPE_DEFAULT_VALUE(Vector3, Vector3::zero);
-
+		std::unordered_map<NodePtr, STRING> Node2Trees;
+		std::unordered_map<NodeDesc, STRING, key_hash, key_equal> Name2Trees;
+	};
 }
+
+namespace YB = YBehavior;
 
 #endif

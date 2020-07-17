@@ -1,59 +1,48 @@
 #include "YBehavior/nodes/register.h"
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/logger.h"
-#include "YBehavior/utility.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#endif // DEBUGGER
 #include "YBehavior/registerdata.h"
 
 namespace YBehavior
 {
 	bool ReadRegister::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeID;
-		typeID = CreateVariable(m_Event, "Event", data, true, Utility::POINTER_CHAR);
+		CreateVariable(m_Event, "Event", data, Utility::POINTER_CHAR);
 		if (!m_Event)
 		{
-			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
 			return false;
 		}
 
-		typeID = CreateVariable(m_Int, "Int", data, false, Utility::POINTER_CHAR);
+		CreateVariable(m_Int, "Int", data, Utility::POINTER_CHAR);
 		if (!m_Int)
 		{
-			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
 			return false;
 		}
 
-		typeID = CreateVariable(m_Float, "Float", data, false, Utility::POINTER_CHAR);
+		CreateVariable(m_Float, "Float", data, Utility::POINTER_CHAR);
 		if (!m_Float)
 		{
-			ERROR_BEGIN << "Invalid type for Float in ReadRegister " << typeID << ERROR_END;
 			return false;
 		}
 
-		typeID = CreateVariable(m_Bool, "Bool", data, false, Utility::POINTER_CHAR);
+		CreateVariable(m_Bool, "Bool", data, Utility::POINTER_CHAR);
 		if (!m_Bool)
 		{
-			ERROR_BEGIN << "Invalid type for Bool in ReadRegister " << typeID << ERROR_END;
 			return false;
 		}
 
-		typeID = CreateVariable(m_Ulong, "Ulong", data, false, Utility::POINTER_CHAR);
+		CreateVariable(m_Ulong, "Ulong", data, Utility::POINTER_CHAR);
 		if (!m_Ulong)
 		{
-			ERROR_BEGIN << "Invalid type for Ulong in ReadRegister " << typeID << ERROR_END;
 			return false;
 		}
 
-		typeID = CreateVariable(m_String, "String", data, false, Utility::POINTER_CHAR);
+		CreateVariable(m_String, "String", data, Utility::POINTER_CHAR);
 		if (!m_String)
 		{
-			ERROR_BEGIN << "Invalid type for String in ReadRegister " << typeID << ERROR_END;
 			return false;
 		}
 
@@ -68,12 +57,12 @@ namespace YBehavior
 			DEBUG_LOG_INFO("No Event.");
 			return NS_FAILURE;
 		}
-		m_Event->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pEvent);
-		m_Int->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecInt);
-		m_Float->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecFloat);
-		m_Bool->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecBool);
-		m_Ulong->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecUlong);
-		m_String->SetValue(pAgent->GetSharedData(), pRegister->GetReceiveData().pVecString);
+		m_Event->SetValue(pAgent->GetMemory(), pRegister->GetReceiveData().pEvent);
+		m_Int->SetValue(pAgent->GetMemory(), pRegister->GetReceiveData().pVecInt);
+		m_Float->SetValue(pAgent->GetMemory(), pRegister->GetReceiveData().pVecFloat);
+		m_Bool->SetValue(pAgent->GetMemory(), pRegister->GetReceiveData().pVecBool);
+		m_Ulong->SetValue(pAgent->GetMemory(), pRegister->GetReceiveData().pVecUlong);
+		m_String->SetValue(pAgent->GetMemory(), pRegister->GetReceiveData().pVecString);
 
 		pRegister->Clear();
 
@@ -99,46 +88,39 @@ namespace YBehavior
 
 	bool WriteRegister::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeID;
-		typeID = CreateVariable(m_Event, "Event", data, true);
+		CreateVariable(m_Event, "Event", data);
 		if (!m_Event)
 		{
-			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
 			return false;
 		}
 
-		typeID = CreateVariable(m_Int, "Int", data, false);
+		CreateVariable(m_Int, "Int", data);
 		if (!m_Int)
 		{
-			ERROR_BEGIN << "Invalid type for Event in ReadRegister " << typeID << ERROR_END;
 			return false;
 		}
 
-		typeID = CreateVariable(m_Float, "Float", data, false);
+		CreateVariable(m_Float, "Float", data);
 		if (!m_Float)
 		{
-			ERROR_BEGIN << "Invalid type for Float in ReadRegister " << typeID << ERROR_END;
 			return false;
 		}
 
-		typeID = CreateVariable(m_Bool, "Bool", data, false);
+		CreateVariable(m_Bool, "Bool", data);
 		if (!m_Bool)
 		{
-			ERROR_BEGIN << "Invalid type for Bool in ReadRegister " << typeID << ERROR_END;
 			return false;
 		}
 
-		typeID = CreateVariable(m_Ulong, "Ulong", data, false);
+		CreateVariable(m_Ulong, "Ulong", data);
 		if (!m_Ulong)
 		{
-			ERROR_BEGIN << "Invalid type for Ulong in ReadRegister " << typeID << ERROR_END;
 			return false;
 		}
 
-		typeID = CreateVariable(m_String, "String", data, false);
+		CreateVariable(m_String, "String", data);
 		if (!m_String)
 		{
-			ERROR_BEGIN << "Invalid type for String in ReadRegister " << typeID << ERROR_END;
 			return false;
 		}
 
@@ -149,12 +131,12 @@ namespace YBehavior
 	{
 		RegisterData* pRegister = pAgent->GetRegister();
 
-		pRegister->GetSendData().pEvent = m_Event->GetCastedValue(pAgent->GetSharedData());
-		pRegister->GetSendData().pVecInt = m_Int->GetCastedValue(pAgent->GetSharedData());
-		pRegister->GetSendData().pVecFloat = m_Float->GetCastedValue(pAgent->GetSharedData());
-		pRegister->GetSendData().pVecBool = m_Bool->GetCastedValue(pAgent->GetSharedData());
-		pRegister->GetSendData().pVecUlong = m_Ulong->GetCastedValue(pAgent->GetSharedData());
-		pRegister->GetSendData().pVecString = m_String->GetCastedValue(pAgent->GetSharedData());
+		pRegister->GetSendData().pEvent = m_Event->GetCastedValue(pAgent->GetMemory());
+		pRegister->GetSendData().pVecInt = m_Int->GetCastedValue(pAgent->GetMemory());
+		pRegister->GetSendData().pVecFloat = m_Float->GetCastedValue(pAgent->GetMemory());
+		pRegister->GetSendData().pVecBool = m_Bool->GetCastedValue(pAgent->GetMemory());
+		pRegister->GetSendData().pVecUlong = m_Ulong->GetCastedValue(pAgent->GetMemory());
+		pRegister->GetSendData().pVecString = m_String->GetCastedValue(pAgent->GetMemory());
 
 		IF_HAS_LOG_POINT
 		{
@@ -166,11 +148,11 @@ namespace YBehavior
 			LOG_SHARED_DATA(m_Ulong, true);
 		};
 
-		m_Int->SetCastedValue(pAgent->GetSharedData(), &Types::VecIntEmpty);
-		m_Float->SetCastedValue(pAgent->GetSharedData(), &Types::VecFloatEmpty);
-		m_Bool->SetCastedValue(pAgent->GetSharedData(), &Types::VecBoolEmpty);
-		m_Ulong->SetCastedValue(pAgent->GetSharedData(), &Types::VecUlongEmpty);
-		m_String->SetCastedValue(pAgent->GetSharedData(), &Types::VecStringEmpty);
+		m_Int->SetCastedValue(pAgent->GetMemory(), &Utility::VecIntEmpty);
+		m_Float->SetCastedValue(pAgent->GetMemory(), &Utility::VecFloatEmpty);
+		m_Bool->SetCastedValue(pAgent->GetMemory(), &Utility::VecBoolEmpty);
+		m_Ulong->SetCastedValue(pAgent->GetMemory(), &Utility::VecUlongEmpty);
+		m_String->SetCastedValue(pAgent->GetMemory(), &Utility::VecStringEmpty);
 
 		pAgent->ProcessRegister();
 

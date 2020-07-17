@@ -1,9 +1,6 @@
 #include "YBehavior/nodes/sequence.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#include "YBehavior/utility.h"
-#endif // DEBUGGER
 #include "YBehavior/runningcontext.h"
+#include "YBehavior/profile/profileheader.h"
 
 namespace YBehavior
 {
@@ -28,7 +25,9 @@ namespace YBehavior
 		for (int i = m_Iterator.GetStart(); i < (int)m_Childs->size(); ++i)
 		{
 			BehaviorNodePtr node = (*m_Childs)[m_Iterator.GetIndex(i)];
+			PROFILER_PAUSE;
 			ns = node->Execute(pAgent, ns);
+			PROFILER_RESUME;
 			switch (ns)
 			{
 			case YBehavior::NS_FAILURE:
@@ -77,7 +76,9 @@ namespace YBehavior
 			
 			BehaviorNodePtr node = (*m_Childs)[index];
 
+			PROFILER_PAUSE;
 			ns = node->Execute(pAgent, ns);
+			PROFILER_RESUME;
 			switch (ns)
 			{
 			case YBehavior::NS_FAILURE:

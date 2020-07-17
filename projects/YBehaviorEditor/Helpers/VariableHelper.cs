@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Data;
 using System.Windows.Media;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -111,7 +111,7 @@ namespace YBehavior.Editor
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (!(value is Variable.VariableType))
-                return string.Empty;
+                return false;
             Variable.VariableType type = (Variable.VariableType)value;
             return type == Variable.VariableType.VBT_Pointer;
         }
@@ -139,6 +139,140 @@ namespace YBehavior.Editor
         }
     }
 
+    [ValueConversion(typeof(string), typeof(bool))]
+    public class StringBoolConvertor : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string s = value as string;
+            return s == "T";
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool b = (bool)value;
+            return b ? "T" : "F";
+            //string s = (string)value;
+            //return ValueTypeDic.GetKey(s, Variable.ValueType.VT_NONE);
+        }
+    }
+
+    [ValueConversion(typeof(string), typeof(string))]
+    public class ReturnTypeConvertor : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string s = value as string;
+            if (string.IsNullOrEmpty(s))
+                return "D";
+            return s.ToUpper()[0];
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+    }
+
+
+    [ValueConversion(typeof(System.Windows.Vector), typeof(System.Windows.Vector))]
+    public class FSMUIConnectionOffsetConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            System.Windows.Point startPos = (System.Windows.Point)values[0];
+            System.Windows.Point endPos = (System.Windows.Point)values[1];
+            var dir = (endPos - startPos);
+            dir.Normalize();
+            var offset = new System.Windows.Vector(dir.Y, -dir.X) * 4;
+
+            if ((string)parameter == "0")
+                return startPos + offset;
+            else
+                return startPos - offset;
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
+    [ValueConversion(typeof(bool), typeof(System.Windows.FrameworkElement))]
+    public class FSMStateBackGroundConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool isdefault = (bool)values[0];
+            System.Windows.FrameworkElement o = values[1] as System.Windows.FrameworkElement;
+            if ((bool)isdefault)
+                return o.FindResource("defaultBackground");
+            return o.FindResource("normalBackground");
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
+    [ValueConversion(typeof(object), typeof(System.Windows.FrameworkElement))]
+    public class FSMStateBorderColorConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            FSMStateNode node = (values[0] as FSMStateRenderer).FSMStateOwner;
+            System.Windows.FrameworkElement o = values[1] as System.Windows.FrameworkElement;
+            if (node is FSMNormalStateNode)
+                return o.FindResource("normalColor");
+            if (node is FSMMetaStateNode)
+                return o.FindResource("metaColor");
+            if (node is FSMEntryStateNode)
+                return o.FindResource("entryColor");
+            if (node is FSMExitStateNode)
+                return o.FindResource("exitColor");
+            if (node is FSMAnyStateNode)
+                return o.FindResource("anyColor");
+            if (node is FSMUpperStateNode)
+                return o.FindResource("upperColor");
+
+            return o.FindResource("normalColor");
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
+    [ValueConversion(typeof(string), typeof(string))]
+    public class FSMStateBorderCornerRadiusConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            FSMStateNode node = (value as FSMStateRenderer).FSMStateOwner;
+            if (node is FSMNormalStateNode)
+                return 5;
+            if (node is FSMMetaStateNode)
+                return 20;
+            return 0;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+    }
+
+    [ValueConversion(typeof(int), typeof(bool))]
+    public class IsTwoOrMoreConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (int)value > 1;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+    }
 
     public class ValueConverterGroup : List<IValueConverter>, IValueConverter
     {

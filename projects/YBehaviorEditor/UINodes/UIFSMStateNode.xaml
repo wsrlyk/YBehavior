@@ -1,0 +1,72 @@
+﻿<local:UIFSMStateNodeBase x:Class="YBehavior.Editor.UIFSMStateNode"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:YBehavior.Editor"
+             mc:Ignorable="d"
+             MinWidth="60" MinHeight="80" HorizontalAlignment="Center">
+    <UserControl.Style>
+        <Style>
+            <Setter Property="local:UIFSMStateNode.SelectTrigger" Value="{Binding Path=SelectTrigger}" />
+            <!--<Setter Property="local:UIFSMStateNode.DebugTrigger" Value="{Binding Path=DebugTrigger}" />-->
+            <!--<Setter Property="local:UINode.DebugConstant" Value="{Binding Path=DebugConstant}" />-->
+        </Style>
+    </UserControl.Style>
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="normalColor"  Color="#FFC2C3C5"/>
+        <SolidColorBrush x:Key="metaColor"  Color="#FFCFCA60"/>
+        <SolidColorBrush x:Key="entryColor"  Color="#FF74C555"/>
+        <SolidColorBrush x:Key="exitColor"  Color="#FFC14D4D"/>
+        <SolidColorBrush x:Key="anyColor"  Color="#FF53CDCD"/>
+        <SolidColorBrush x:Key="upperColor"  Color="#FFD48739"/>
+        <local:FSMStateBackGroundConverter x:Key="backgroundConvertor"/>
+        <local:FSMStateBorderColorConverter x:Key="borderColorConvertor"/>
+        <local:FSMStateBorderCornerRadiusConverter x:Key="cornerRadiusConverter"/>
+    </UserControl.Resources>
+    <DockPanel>
+        <Border Name="commentBorder" DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="#FFE8D3AF" Background="#DDF1E0C6"
+                Visibility="{Binding Path=Comment, Converter={StaticResource invertStringEmptyAndVisibilityConvertor}}"
+                CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}">
+            <TextBlock Text="{Binding Comment, Mode=OneWay}" FontSize="10"/>
+        </Border>
+        <Border Name="border" BorderThickness="4"
+                MinWidth="80" CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}">
+            <Border.Background>
+                <MultiBinding Converter="{StaticResource backgroundConvertor}" Mode="OneWay">
+                    <Binding Path="IsDefaultState"/>
+                    <Binding RelativeSource="{RelativeSource Self}"/>
+                </MultiBinding>
+            </Border.Background>
+            <Border.BorderBrush>
+                <MultiBinding Converter="{StaticResource borderColorConvertor}" Mode="OneWay">
+                    <Binding Path=""/>
+                    <Binding RelativeSource="{RelativeSource Self}"/>
+                </MultiBinding>
+            </Border.BorderBrush>
+            <Grid>
+                <Border Name="disableCover" BorderThickness="0" Background="#FF4B4B4B" Visibility="{Binding Disabled, Converter={StaticResource visibilityConvertor}}"
+                        CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}"/>
+                <Border Name="debugCover" BorderThickness="0" Background="#FFDA3F1C"
+                        CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}"/>
+                <Border Name="selectCover" BorderThickness="3" BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"
+                        CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}"/>
+                <StackPanel Name="mainPanel" Margin="3">
+                    <TextBlock Name="name" Text="{Binding UITitle}"></TextBlock>
+                    <TextBlock Name="note" Text="{Binding Note}"></TextBlock>
+                </StackPanel>
+                <Ellipse Name="breakPoint" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Visibility="{Binding Path=DebugPointInfo.HasBreakPoint, Converter={StaticResource visibilityConvertor}}" >
+                    <Ellipse.Fill>
+                        <SolidColorBrush Color="Red" Opacity="0.6" />
+                    </Ellipse.Fill>
+                </Ellipse>
+                <Ellipse Name="logPoint" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Visibility="{Binding Path=DebugPointInfo.HasLogPoint, Converter={StaticResource visibilityConvertor}}" >
+                    <Ellipse.Fill>
+                        <SolidColorBrush Color="Purple" Opacity="0.6" />
+                    </Ellipse.Fill>
+                </Ellipse>
+                <Grid Name="connectors" HorizontalAlignment="Center" VerticalAlignment="Center" Width="30" Height="30"/>
+            </Grid>
+        </Border>
+    </DockPanel>
+</local:UIFSMStateNodeBase>

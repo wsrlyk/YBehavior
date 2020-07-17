@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<F>
+  <Node Class="Root">
+    <Local f="_Ic 0" />
+    <Node Class="GetNameAction" Var0="_Ip f" Var1="_EC Enum0" Var2="SSC 1|2|3|4" Var3="_IC 0" />
+  </Node>
+</F>

@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="YBehavior.Editor.SearchFrame"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:YBehavior.Editor"
+             mc:Ignorable="d"
+             MaxHeight="50" MaxWidth="200"
+             MinHeight="50" MinWidth="200"
+             d:DesignHeight="50" d:DesignWidth="200"
+             IsVisibleChanged="UserControl_IsVisibleChanged">
+    <Grid>
+        <Border BorderBrush="CadetBlue" BorderThickness="3" Background="LightGray">
+            <StackPanel Margin="5">
+                <DockPanel>
+                    <Button Width="60" MaxHeight="30" DockPanel.Dock="Right" Click="Search_Click">
+                        Search
+                    </Button>
+                    <TextBox Name="Input" KeyDown="Input_KeyDown" />
+                </DockPanel>
+                <Grid>
+                    <TextBlock Text="&lt;                &gt;" />
+                    <TextBlock Name="Info" Text="0/0"
+                               TextAlignment="Center" Margin="-8,0,106,0"/>
+                    <Button MinWidth="30" MaxHeight="15" HorizontalAlignment="Right" Click="Previous_Click" Margin="0,0,30,0">
+                        &lt;-
+                    </Button>
+                    <Button MinWidth="30" MaxHeight="15" HorizontalAlignment="Right" Click="Next_Click">
+                        -&gt;
+                    </Button>
+                </Grid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

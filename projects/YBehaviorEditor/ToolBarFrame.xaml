@@ -25,20 +25,29 @@
         <Button Name="btnDelete" Width="50" Click="btnDelete_Click">
             <TextBlock Text ="Delete&#x0a;Delete&#x0a;(shift)" HorizontalAlignment="Center"/>
         </Button>
+        <Button Name="btnSearch" Width="50" Click="btnSearch_Click">
+            <TextBlock Text ="Search&#x0a; Ctrl-F"/>
+        </Button>
         <Button Name="btnCenter" Width="50" Click="btnCenter_Click">
             <TextBlock Text ="Center&#x0a;    F1"/>
         </Button>
+        <Button Name="btnClear" Width="50" Click="btnClear_Click">
+            <TextBlock Text ="Clear&#x0a;   F2"/>
+        </Button>
+        <Button Name="btnCondition" Width="60" Click="btnCondition_Click">
+            <TextBlock Text ="Condition&#x0a;      F6"/>
+        </Button>
         <Button Name="btnFold" Width="50" Click="btnFold_Click">
             <TextBlock Text ="Fold&#x0a;  F7 "/>
+        </Button>
+        <Button Name="btnMakeDefault" Width="50" Click="btnMakeDefault_Click">
+            <TextBlock Text ="  Make&#x0a; Default&#x0a;     F7" />
         </Button>
         <Button Name="btnLog" Width="60" Click="btnLog_Click">
             <TextBlock Text ="LogPoint&#x0a;    F8"/>
         </Button>
         <Button Name="btnDebug" Width="60" Click="btnDebug_Click">
             <TextBlock Text ="DbgPoint&#x0a;    F9"/>
-        </Button>
-        <Button Name="btnCondition" Width="60" Click="btnCondition_Click">
-            <TextBlock Text ="Condition&#x0a;    F11"/>
         </Button>
         <Button Name="btnDisable" Width="50" Click="btnDisable_Click">
             <TextBlock Text ="Disable&#x0a;    F12"/>

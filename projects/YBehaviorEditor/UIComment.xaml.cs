@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -39,16 +39,16 @@ namespace YBehavior.Editor
             SelectHandler = defaultSelectHandler;
 
             m_Move0Operation = new Operation(this.moveBottomLeft);
-            m_Move0Operation.RegisterClick(_OnClick);
-            m_Move0Operation.RegisterDrag(_OnDrag, _OnDragFinish);
+            m_Move0Operation.RegisterLeftClick(_OnClick);
+            m_Move0Operation.RegisterLeftDrag(_OnDrag, null, _OnDragFinish);
             m_Move1Operation = new Operation(this.moveTopRight);
-            m_Move1Operation.RegisterClick(_OnClick);
-            m_Move1Operation.RegisterDrag(_OnDrag, _OnDragFinish);
+            m_Move1Operation.RegisterLeftClick(_OnClick);
+            m_Move1Operation.RegisterLeftDrag(_OnDrag, null, _OnDragFinish);
 
             m_Resize0Operation = new Operation(this.resizeBottomRight);
-            m_Resize0Operation.RegisterDrag(_OnResizeDrag0, _OnDragFinish);
+            m_Resize0Operation.RegisterLeftDrag(_OnResizeDrag0, null, _OnDragFinish);
             m_Resize1Operation = new Operation(this.resizeTopLeft);
-            m_Resize1Operation.RegisterDrag(_OnResizeDrag1, _OnDragFinish);
+            m_Resize1Operation.RegisterLeftDrag(_OnResizeDrag1, null, _OnDragFinish);
         }
 
         private void _OnDragFinish(Vector delta, Point pos)

@@ -6,14 +6,14 @@
 extern "C" YBEHAVIOR_API const void* GetVariableValue(YBehavior::Agent* pAgent, YBehavior::ISharedVariableEx* pVariable)
 {
 	if (pVariable != nullptr && pAgent != nullptr)
-		return pVariable->GetValue(pAgent->GetSharedData());
+		return pVariable->GetValue(pAgent->GetMemory());
 	return nullptr;
 }
 
 extern "C" YBEHAVIOR_API void SetVariableValue(YBehavior::Agent* pAgent, YBehavior::ISharedVariableEx* pVariable, void* value)
 {
 	if (pVariable != nullptr && pAgent != nullptr)
-		pVariable->SetValue(pAgent->GetSharedData(), value);
+		pVariable->SetValue(pAgent->GetMemory(), value);
 }
 
 template<typename T>
@@ -21,11 +21,11 @@ T GetVariableValue(YBehavior::Agent* pAgent, YBehavior::SharedVariableEx<T>* pVa
 {
 	if (pVariable != nullptr && pAgent != nullptr)
 	{
-		T res = YBehavior::GetTypeDefaultValue<T>();
-		pVariable->GetCastedValue(pAgent->GetSharedData(), res);
+		T res = YBehavior::Utility::Default<T>();
+		pVariable->GetCastedValue(pAgent->GetMemory(), res);
 		return res;
 	}
-	return YBehavior::GetTypeDefaultValue<T>();
+	return YBehavior::Utility::Default<T>();
 }
 
 template<typename T>
@@ -33,13 +33,13 @@ void SetVariableValue(YBehavior::Agent* pAgent, YBehavior::SharedVariableEx<T>* 
 {
 	if (pVariable != nullptr && pAgent != nullptr)
 	{
-		pVariable->SetCastedValue(pAgent->GetSharedData(), &value);
+		pVariable->SetCastedValue(pAgent->GetMemory(), &value);
 	}
 }
 
 extern "C" YBEHAVIOR_API YBehavior::TYPEID GetVariableTypeID(YBehavior::ISharedVariableEx* pVariable)
 {
-	return pVariable->GetTypeID();
+	return pVariable->TypeID();
 }
 
 #define VARIABLE_SIMPLETYPES_OPERATIONS(TYPE)\
@@ -62,7 +62,7 @@ extern "C" YBEHAVIOR_API YBehavior::CSTRING GetVariableString(YBehavior::Agent* 
 {
 	if (pVariable != nullptr && pAgent != nullptr)
 	{
-		const YBehavior::STRING* res = pVariable->GetCastedValue(pAgent->GetSharedData());
+		const YBehavior::STRING* res = pVariable->GetCastedValue(pAgent->GetMemory());
 		return res ? res->c_str() : nullptr;
 	}
 	return nullptr;
@@ -83,7 +83,7 @@ extern "C" YBEHAVIOR_API YBehavior::Entity* GetEntityFromVariable(YBehavior::Age
 {
 	if (pVariable != nullptr && pAgent != nullptr)
 	{
-		const YBehavior::EntityWrapper* res = pVariable->GetCastedValue(pAgent->GetSharedData());
+		const YBehavior::EntityWrapper* res = pVariable->GetCastedValue(pAgent->GetMemory());
 		if (res)
 			return res->Get();
 		return nullptr;
@@ -95,7 +95,7 @@ extern "C" YBEHAVIOR_API void SetEntityToVariable(YBehavior::Agent* pAgent, YBeh
 {
 	if (pVariable != nullptr && pAgent != nullptr && pEntity != nullptr)
 	{
-		YBehavior::EntityWrapper wrapper(pEntity->CreateWrapper());
-		pVariable->SetCastedValue(pAgent->GetSharedData(), &wrapper);
+		YBehavior::EntityWrapper wrapper(pEntity->GetWrapper());
+		pVariable->SetCastedValue(pAgent->GetMemory(), &wrapper);
 	}
 }

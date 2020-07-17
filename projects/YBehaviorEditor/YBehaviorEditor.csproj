@@ -35,6 +35,9 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\Illustrator_128px_1180059_easyicon.net.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -60,15 +63,43 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DebugControl.cs" />
     <Compile Include="DebugFrame.xaml.cs">
       <DependentUpon>DebugFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="DraggingConnection.cs" />
+    <Compile Include="FilterBox.xaml.cs">
+      <DependentUpon>FilterBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMConnectionDataFrame.xaml.cs">
+      <DependentUpon>FSMConnectionDataFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMSelectionFrame.xaml.cs">
+      <DependentUpon>FSMSelectionFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMStateFrame.xaml.cs">
+      <DependentUpon>FSMStateFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SearchFrame.xaml.cs">
+      <DependentUpon>SearchFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UINodes\UINodeBase.cs" />
+    <Compile Include="UINodes\UIFSMStateNode.xaml.cs">
+      <DependentUpon>UIFSMStateNode.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMUIOutConnector.xaml.cs">
+      <DependentUpon>FSMUIOutConnector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\InputBinding.cs" />
     <Compile Include="Helpers\VariableHelper.cs" />
     <Compile Include="NodeListFrame.xaml.cs">
       <DependentUpon>NodeListFrame.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Resources.Designer.cs">
+    <Compile Include="PopMenu.cs" />
+    <Compile Include="PopMenuFrame.xaml.cs">
+      <DependentUpon>PopMenuFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
@@ -76,20 +107,36 @@
     <Compile Include="SystemTipsFrame.xaml.cs">
       <DependentUpon>SystemTipsFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TabBarFrame.xaml.cs">
+      <DependentUpon>TabBarFrame.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ToolBarFrame.xaml.cs">
       <DependentUpon>ToolBarFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMBenchFrame.xaml.cs">
+      <DependentUpon>FSMBenchFrame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FSMUIInConnector.xaml.cs">
+      <DependentUpon>FSMUIInConnector.xaml</DependentUpon>
     </Compile>
     <Compile Include="UIComment.xaml.cs">
       <DependentUpon>UIComment.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FSMUIConnection.xaml.cs">
+      <DependentUpon>FSMUIConnection.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UIConnection.xaml.cs">
       <DependentUpon>UIConnection.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UIConnector.xaml.cs">
-      <DependentUpon>UIConnector.xaml</DependentUpon>
+    <Compile Include="TreeUIConnector.xaml.cs">
+      <DependentUpon>TreeUIConnector.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UINode.xaml.cs">
-      <DependentUpon>UINode.xaml</DependentUpon>
+    <Compile Include="UIConnector.cs" />
+    <Compile Include="UINodes\UITreeNode.xaml.cs">
+      <DependentUpon>UITreeNode.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UISelectTreeVariable.xaml.cs">
+      <DependentUpon>UISelectTreeVariable.xaml</DependentUpon>
     </Compile>
     <Compile Include="VariablesFrame.xaml.cs">
       <DependentUpon>VariablesFrame.xaml</DependentUpon>
@@ -106,9 +153,10 @@
     <Compile Include="UIVariable.xaml.cs">
       <DependentUpon>UIVariable.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WorkBenchFrame.xaml.cs">
-      <DependentUpon>WorkBenchFrame.xaml</DependentUpon>
+    <Compile Include="TreeBenchFrame.xaml.cs">
+      <DependentUpon>TreeBenchFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WorkBenchFrame.cs" />
     <Compile Include="WorkingSpaceFrame.xaml.cs">
       <DependentUpon>WorkingSpaceFrame.xaml</DependentUpon>
     </Compile>
@@ -116,6 +164,34 @@
     <Page Include="DebugFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FilterBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FSMConnectionDataFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FSMSelectionFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FSMStateFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SearchFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UINodes\UIFSMStateNode.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="FSMUIOutConnector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -133,7 +209,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="PopMenuFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SystemTipsFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TabBarFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -141,19 +225,35 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="FSMBenchFrame.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="FSMUIInConnector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UIComment.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FSMUIConnection.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UIConnection.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UIConnector.xaml">
+    <Page Include="TreeUIConnector.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UINode.xaml">
+    <Page Include="UINodes\UITreeNode.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UISelectTreeVariable.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -177,9 +277,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="WorkBenchFrame.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="TreeBenchFrame.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="WorkingSpaceFrame.xaml">
       <SubType>Designer</SubType>
@@ -190,11 +290,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -204,115 +299,14 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Resource Include="Resources\action.png" />
-    <Resource Include="Resources\audio.ico" />
-    <Resource Include="Resources\Backward.png" />
-    <Resource Include="Resources\BT.ico" />
-    <Resource Include="Resources\connect.png" />
-    <Resource Include="Resources\crashdump.ico" />
-    <Resource Include="Resources\DeleteAll.png" />
-    <Resource Include="Resources\Disable.png" />
-    <Resource Include="Resources\DisableAll.png" />
-    <Resource Include="Resources\disconnect.png" />
-    <Resource Include="Resources\document_new.png" />
-    <Resource Include="Resources\edit.png" />
-    <Resource Include="Resources\EnableAll.png" />
-    <Resource Include="Resources\Expand.ico" />
-    <Resource Include="Resources\export.ico" />
-    <Resource Include="Resources\export.png" />
-    <Resource Include="Resources\Eye.ico" />
-    <Resource Include="Resources\File-Delete.png" />
-    <Resource Include="Resources\File-Open.png" />
-    <Resource Include="Resources\filter.ico" />
-    <Resource Include="Resources\findfile-icon.ico" />
-    <Resource Include="Resources\findfile.png" />
-    <Resource Include="Resources\Fit.png" />
-    <Resource Include="Resources\folder_new.png" />
-    <Resource Include="Resources\Forward.png" />
-    <Resource Include="Resources\ICON__0000_46.png" />
-    <Resource Include="Resources\ICON__0001_45.png" />
-    <Resource Include="Resources\ICON__0002_44.png" />
-    <Resource Include="Resources\ICON__0003_43.png" />
-    <Resource Include="Resources\ICON__0004_42.png" />
-    <Resource Include="Resources\ICON__0005_41.png" />
-    <Resource Include="Resources\ICON__0006_40.png" />
-    <Resource Include="Resources\ICON__0007_39.png" />
-    <Resource Include="Resources\ICON__0008_38.png" />
-    <Resource Include="Resources\ICON__0009_37.png" />
-    <Resource Include="Resources\ICON__0010_36.png" />
-    <Resource Include="Resources\ICON__0011_35.png" />
-    <Resource Include="Resources\ICON__0012_34.png" />
-    <Resource Include="Resources\ICON__0013_33.png" />
-    <Resource Include="Resources\ICON__0014_32.png" />
-    <Resource Include="Resources\ICON__0015_31.png" />
-    <Resource Include="Resources\ICON__0016_30.png" />
-    <Resource Include="Resources\ICON__0017_29.png" />
-    <Resource Include="Resources\ICON__0018_28.png" />
-    <Resource Include="Resources\ICON__0019_27.png" />
-    <Resource Include="Resources\ICON__0020_26.png" />
-    <Resource Include="Resources\ICON__0021_25.png" />
-    <Resource Include="Resources\ICON__0021_25b.png" />
-    <Resource Include="Resources\ICON__0022_24.png" />
-    <Resource Include="Resources\ICON__0023_23.png" />
-    <Resource Include="Resources\ICON__0024_22.png" />
-    <Resource Include="Resources\ICON__0025_21.png" />
-    <Resource Include="Resources\ICON__0026_20.png" />
-    <Resource Include="Resources\ICON__0027_19.png" />
-    <Resource Include="Resources\ICON__0028_18.png" />
-    <Resource Include="Resources\ICON__0029_17.png" />
-    <Resource Include="Resources\ICON__0030_16.png" />
-    <Resource Include="Resources\ICON__0031_15.png" />
-    <Resource Include="Resources\ICON__0032_14.png" />
-    <Resource Include="Resources\ICON__0033_13.png" />
-    <Resource Include="Resources\ICON__0034_12.png" />
-    <Resource Include="Resources\ICON__0035_11.png" />
-    <Resource Include="Resources\ICON__0036_10.png" />
-    <Resource Include="Resources\ICON__0037_09.png" />
-    <Resource Include="Resources\ICON__0038_08.png" />
-    <Resource Include="Resources\ICON__0039_07.png" />
-    <Resource Include="Resources\ICON__0040_06.png" />
-    <Resource Include="Resources\ICON__0041_05.png" />
-    <Resource Include="Resources\ICON__0042_04.png" />
-    <Resource Include="Resources\ICON__0043_03.png" />
-    <Resource Include="Resources\ICON__0044_02.png" />
-    <Resource Include="Resources\ICON__0045_01.png" />
-    <Resource Include="Resources\loop.png" />
-    <Resource Include="Resources\method.png" />
-    <Resource Include="Resources\newfile.png" />
-    <Resource Include="Resources\Pause.png" />
-    <Resource Include="Resources\Play.png" />
-    <Resource Include="Resources\postaction.png" />
-    <Resource Include="Resources\preaction.png" />
-    <Resource Include="Resources\prefab.ico" />
-    <Resource Include="Resources\repeat.png" />
-    <Resource Include="Resources\Save.ico" />
-    <Resource Include="Resources\saveall.ico" />
-    <Resource Include="Resources\saveall.png" />
-    <Resource Include="Resources\Search.png" />
-    <Resource Include="Resources\Skip-backward.png" />
-    <Resource Include="Resources\Skip-forward.png" />
-    <Resource Include="Resources\sort.png" />
-    <Resource Include="Resources\state.png" />
-    <Resource Include="Resources\Stop-icon.png" />
-    <Resource Include="Resources\Stop.ico" />
-    <Resource Include="Resources\Stop.png" />
-    <Resource Include="Resources\task.png" />
-    <Resource Include="Resources\Transform-move1.png" />
-    <Resource Include="Resources\Transform-move2.png" />
-    <Resource Include="Resources\transition.png" />
-    <Resource Include="Resources\try.png" />
-    <Resource Include="Resources\Zoom-In.ico" />
-    <Resource Include="Resources\Zoom-Out.ico" />
+    <None Include="Resources\Illustrator_128px_1180059_easyicon.net.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

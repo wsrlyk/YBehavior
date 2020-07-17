@@ -5,51 +5,39 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
-#ifdef DEBUGGER
-#include "YBehavior/debugger.h"
-#endif // DEBUGGER
-
+#include "YBehavior/tools/common.h"
 
 namespace YBehavior
 {
 	static std::unordered_set<TYPEID> s_ValidTypes = {
-		GetClassTypeNumberId<Int>(),
-		GetClassTypeNumberId<Float>(),
-		GetClassTypeNumberId<Bool>(),
-		GetClassTypeNumberId<String>(),
-		GetClassTypeNumberId<Vector3>(),
-		GetClassTypeNumberId<Uint64>()
+		GetTypeID<Int>(),
+		GetTypeID<Float>(),
+		GetTypeID<Bool>(),
+		GetTypeID<String>(),
+		GetTypeID<Vector3>(),
+		GetTypeID<Uint64>(),
+		GetTypeID<EntityWrapper>()
 	};
 
 	bool Comparer::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Operator
-		auto attrOptr = data.attribute("Operator");
-		if (attrOptr.empty())
-		{
-			ERROR_BEGIN << "Cant Find Comparer Operator: " << data.name() << ERROR_END;
+		if (!GetValue("Operator", data, IVariableOperationHelper::s_OperatorMap, m_Operator))
 			return false;
-		}
-		STRING tempChar = GetValue("Operator", data);
-		if (!IVariableOperationHelper::s_OperatorMap.TryGetKey(tempChar, m_Operator))
-		{
-			ERROR_BEGIN << "Operator Error: " << tempChar << ERROR_END;
-			return false;
-		}
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = CreateVariable(m_Opl, "Opl", data, true, Utility::POINTER_CHAR);
+		m_DataType = CreateVariable(m_Opl, "Opl", data, Utility::POINTER_CHAR);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right
-		TYPEID dataType = CreateVariable(m_Opr, "Opr", data, true);
+		TYPEID dataType = CreateVariable(m_Opr, "Opr", data);
 		if (m_DataType != dataType)
 		{
-			ERROR_BEGIN << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types:  Opl & Opr" << ERROR_END;
 			return false;
 		}
 
@@ -65,7 +53,7 @@ namespace YBehavior
 		}
 
 		IVariableOperationHelper* pHelper = m_Opl->GetOperation();
-		return pHelper->Compare(pAgent->GetSharedData(), m_Opl, m_Opr, m_Operator) ? NS_SUCCESS : NS_FAILURE;
+		return pHelper->Compare(pAgent->GetMemory(), m_Opl, m_Opr, m_Operator) ? NS_SUCCESS : NS_FAILURE;
 	}
 
 }

@@ -8,11 +8,16 @@
              d:DesignHeight="300" d:DesignWidth="200">
     <DockPanel>
         <StackPanel Name="FileOperatePanel" Orientation="Horizontal" Height="30" HorizontalAlignment="Left" Width="200"  DockPanel.Dock="Top">
-            <Button Name="btnNew" Click="btnNew_Click">New</Button>
+            <Button Name="btnNewTree" Click="btnNewTree_Click">NewTree</Button>
+            <Button Name="btnNewFSM" Click="btnNewFSM_Click">NewFSM</Button>
             <Button Name="btnSave" Click="btnSave_Click">Save</Button>
             <Button Name="btnRefresh" Click="btnRefresh_Click">Refresh</Button>
         </StackPanel>
-        <TreeView Name="Files" MouseDoubleClick="OnFilesItemDoubleClick" Background="DarkGray" LostFocus="Files_LostFocus">
+        <local:FilterBox x:Name="SearchText" DockPanel.Dock="Top" 
+                         TextChangedHandler="SearchText_TextChanged"/>
+        <TreeView Name="Files" MouseDoubleClick="OnFilesItemDoubleClick" Background="DarkGray" LostFocus="Files_LostFocus"
+                  ScrollViewer.HorizontalScrollBarVisibility="Auto" 
+                  ScrollViewer.VerticalScrollBarVisibility="Auto">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding Expanded, Mode=TwoWay}"/>
@@ -22,8 +27,8 @@
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
-                        <Image Width="20" Height="20" Stretch="Fill" Source="{Binding Icon}" ></Image>
-                        <TextBlock FontSize="14" Text="{Binding Name}" Margin="2,0,0,0"></TextBlock>
+                        <TextBlock FontSize="14" Width="20" Height="20" Text="{Binding Icon}" />
+                        <TextBlock FontSize="14" Text="{Binding Name}" Margin="2,0,0,0" ToolTip="{Binding Name}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>

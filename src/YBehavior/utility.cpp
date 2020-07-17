@@ -2,19 +2,38 @@
 #include <vector>
 #include "YBehavior/types.h"
 #include "YBehavior/shareddataex.h"
+#include <time.h>
+#include <stdio.h>
 
 namespace YBehavior
 {
+
+	const INT Utility::IntEmpty(0);
+	const FLOAT Utility::FloatEmpty(0.0f);
+	const BOOL Utility::BoolEmpty(Utility::FALSE_VALUE);
+	const ULONG Utility::UlongEmpty(0);
+	const STRING Utility::StringEmpty("");
+	const EntityWrapper Utility::EntityWrapperEmpty;
+	const Vector3 Utility::Vector3Empty;
+	const VecInt Utility::VecIntEmpty;
+	const VecFloat Utility::VecFloatEmpty;
+	const VecBool Utility::VecBoolEmpty;
+	const VecString Utility::VecStringEmpty;
+	const VecUlong Utility::VecUlongEmpty;
+	const VecVector3 Utility::VecVector3Empty;
+	const VecEntityWrapper Utility::VecEntityWrapperEmpty;
+
 	const char Utility::POINTER_CHAR = 'P';
 	const char Utility::CONST_CHAR = 'C';
 	const BOOL Utility::TRUE_VALUE = 1;
 	const BOOL Utility::FALSE_VALUE = 0;
 	const KEY Utility::INVALID_KEY = -1;
+	const YBehavior::TYPEID Utility::INVALID_TYPE = -1;
 
 	std::random_device Utility::rd;
 	std::default_random_engine Utility::mt(rd());
 
-	void Utility::SplitString(const STRING& s, std::vector<STRING>& output, CHAR c, int count)
+	void Utility::SplitString(const STRING& s, StdVector<STRING>& output, CHAR c, bool RemoveEmptyEntries, int count)
 	{
 		int counter = 0;
 		output.clear();
@@ -23,8 +42,11 @@ namespace YBehavior
 		pos1 = 0;
 		while(STRING::npos != pos2)
 		{
-			output.push_back(s.substr(pos1, pos2-pos1));
-			++counter;
+			if (!RemoveEmptyEntries || pos2 > pos1)
+			{
+				output.push_back(s.substr(pos1, pos2 - pos1));
+				++counter;
+			}
 
 			pos1 = pos2 + 1;
 
@@ -38,7 +60,7 @@ namespace YBehavior
 	}
 
 
-	void Utility::CreateVector3(const std::vector<STRING>& data, Vector3& vector3)
+	void Utility::CreateVector3(const StdVector<STRING>& data, Vector3& vector3)
 	{
 		if (data.size() < 3)
 		{
@@ -61,7 +83,7 @@ namespace YBehavior
 		vector3.z = static_cast<float>(strtod(data[2].c_str(), 0));
 	}
 
-	YBehavior::Vector3 Utility::CreateVector3(const std::vector<STRING>& data)
+	YBehavior::Vector3 Utility::CreateVector3(const StdVector<STRING>& data)
 	{
 		Vector3 vec;
 		CreateVector3(data, vec);
@@ -73,28 +95,49 @@ namespace YBehavior
 		return ((vectorType % 10) == eleType) && (eleType != vectorType);
 	}
 
+	char Utility::ToLower(char c)
+	{
+		if ('A' <= c && c <= 'Z')
+			return c - 'A' + 'a';
+		return c;
+	}
+
+	char Utility::ToUpper(char c)
+	{
+		if ('a' <= c && c <= 'z')
+			return c + 'A' - 'a';
+		return c;
+	}
+
+	bool Utility::IsLower(char c)
+	{
+		return 'a' <= c && c <= 'z';
+	}
+
 	template<>
 	BOOL Utility::ToType(const STRING& str)
 	{
-		bool t;
-		std::stringstream ss;
-		ss << str;
-		ss >> std::boolalpha >> t;
-		return t ? 1 : 0;
+		return str == "T" ? 1 : 0;
+		//bool t;
+		//std::stringstream ss;
+		//ss << str;
+		//ss >> std::boolalpha >> t;
+		//return t ? 1 : 0;
 	}
 
 	template<>
 	STRING Utility::ToString(const BOOL& t)
 	{
-		STRING str;
-		std::stringstream ss;
-		ss << std::boolalpha << (t > 0);
-		ss >> str;
-		return str;
+		return t > 0 ? "T" : "F";
+		//STRING str;
+		//std::stringstream ss;
+		//ss << std::boolalpha << (t > 0);
+		//ss >> str;
+		//return str;
 	}
 
 	template<>
-	STRING Utility::ToString(const std::vector<BOOL>& t)
+	STRING Utility::ToString(const StdVector<BOOL>& t)
 	{
 		STRING str;
 		std::stringstream ss;
@@ -110,7 +153,7 @@ namespace YBehavior
 
 	UINT Utility::Hash(const STRING& str)
 	{
-		UINT len = str.length();
+		UINT len = (UINT)str.length();
 		UINT hash = 0;
 		for (UINT i = 0; i < len; ++i)
 		{
@@ -118,6 +161,46 @@ namespace YBehavior
 		}
 		return hash;
 	}
+
+	YBehavior::STRING Utility::GetNameFromPath(const STRING& path)
+	{
+		STRING res;
+		auto it = path.find_last_of('/');
+		if (it != STRING::npos)
+			res = path.substr(it + 1);
+		else
+			res = path;
+		it = res.find_last_of('\\');
+		if (it != STRING::npos)
+			res = res.substr(it + 1);
+		return res;
+	}
+
+
+	const YBehavior::STRING Utility::TIME_FORMAT_DAY("%Y-%m-%d");
+	const YBehavior::STRING Utility::TIME_FORMAT_SECOND("%Y-%m-%d_%H:%M:%S");
+	STRING Utility::GetTime(const STRING& format)
+	{
+		time_t tNow = time(NULL);
+		struct tm t;
+#ifdef MSVC
+		localtime_s(&t, &tNow);
+#else
+		localtime_r(&tNow, &t);
+#endif
+		char buffer[40] = { 0 };
+		
+		strftime(buffer, sizeof(buffer), format.c_str(), &t);
+		return std::string(buffer);
+	}
+
+	UINT Utility::GetMicroDuration(const Utility::TimePointType& start, const Utility::TimePointType& end)
+	{
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+		return (UINT)duration.count();
+		//return (UINT)(duration.count() * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den);
+	}
+
 
 	template<>
 	Float Utility::Rand<Float>(const Float& small, const Float& large)
@@ -132,4 +215,40 @@ namespace YBehavior
 		std::uniform_int_distribution<Int> dist(small, large);
 		return dist(mt);
 	}
+
+#define DEFAULT_DEFINE(type)\
+	template<>\
+	const type& Utility::Default() { return Utility::type##Empty; }\
+	template<>\
+	bool Utility::SetDefault(type& t)\
+	{\
+		t = Utility::type##Empty;\
+		return true;\
+	}
+
+	FOR_EACH_TYPE(DEFAULT_DEFINE)
+
+#define TYPES_DEFINE_CREATE_STR_FUNC(type, str)\
+	template<>\
+	const STRING& Utility::GetCreateStr<type>() \
+	{\
+		static const STRING type##CreateStr(str);\
+		return type##CreateStr;\
+	}
+	
+	TYPES_DEFINE_CREATE_STR_FUNC(Int, "_I");
+	TYPES_DEFINE_CREATE_STR_FUNC(Ulong, "_U");
+	TYPES_DEFINE_CREATE_STR_FUNC(Bool, "_B");
+	TYPES_DEFINE_CREATE_STR_FUNC(Float, "_F");
+	TYPES_DEFINE_CREATE_STR_FUNC(String, "_S");
+	TYPES_DEFINE_CREATE_STR_FUNC(EntityWrapper, "_A");
+	TYPES_DEFINE_CREATE_STR_FUNC(Vector3, "_V");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecInt, "II");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecUlong, "UU");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecBool, "BB");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecFloat, "FF");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecString, "SS");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecEntityWrapper, "AA");
+	TYPES_DEFINE_CREATE_STR_FUNC(VecVector3, "VV");
+
 }

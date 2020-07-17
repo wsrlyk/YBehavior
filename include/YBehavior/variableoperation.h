@@ -25,19 +25,41 @@ namespace YBehavior
 		OT_DIV
 	};
 
+	class IVariableOperationHelper;
+	struct TempObject
+	{
+		void* pData{ nullptr };
+		IVariableOperationHelper* pHelper{ nullptr };
+
+		TempObject(void* data, IVariableOperationHelper* helper)
+			: pData(data), pHelper(helper)
+		{}
+		TempObject(TempObject&& o)
+		{
+			pData = o.pData;
+			o.pData = nullptr;
+		}
+		~TempObject();
+
+	private:
+		TempObject(const TempObject& o) = delete;
+		TempObject& operator=(const TempObject& o) = delete;
+	};
+
 	class IVariableOperationHelper
 	{
 	public:
 		static Bimap<OperationType, STRING, EnumClassHash> s_OperatorMap;
 		virtual bool Compare(const void* pLeft, const void* pRight, OperationType op) = 0;
-		virtual bool Compare(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op) = 0;
+		virtual bool Compare(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op) = 0;
 		virtual void Calculate(void* pLeft, const void* pRight0, const void* pRight1, OperationType op) = 0;
 		virtual const void* Calculate(const void* pRight0, const void* pRight1, OperationType op) = 0;
-		virtual void Calculate(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op) = 0;
+		virtual void Calculate(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op) = 0;
 		virtual void Random(void* pLeft, const void* pRight0, const void* pRight1) = 0;
-		virtual void Random(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1) = 0;
+		virtual void Random(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1) = 0;
 		virtual void Set(void* pLeft, const void* pRight0) = 0;
 		virtual void* AllocData() = 0;
+		virtual TempObject AllocTempData() = 0;
 		virtual void RecycleData(void* pData) = 0;
 	};
 
@@ -69,6 +91,15 @@ namespace YBehavior
 	private:
 		template<typename T>
 		static void _DoRandom(void* pLeft, const void* pRight0, const void* pRight1);
+
+		template<typename T>
+		static void _Add(const T& left, const T& right, T& output);
+		template<typename T>
+		static void _Sub(const T& left, const T& right, T& output);
+		template<typename T>
+		static void _Mul(const T& left, const T& right, T& output);
+		template<typename T>
+		static void _Div(const T& left, const T& right, T& output);
 	};
 
 	template<typename T>
@@ -149,16 +180,20 @@ namespace YBehavior
 		switch (op)
 		{
 		case YBehavior::OT_ADD:
-			left = right0 + right1;
+			_Add(right0, right1, left);
+			//left = right0 + right1;
 			break;
 		case YBehavior::OT_SUB:
-			left = right0 - right1;
+			_Sub(right0, right1, left);
+			//left = right0 - right1;
 			break;
 		case YBehavior::OT_MUL:
-			left = right0 * right1;
+			_Mul(right0, right1, left);
+			//left = right0 * right1;
 			break;
 		case YBehavior::OT_DIV:
-			left = right0 / right1;
+			_Div(right0, right1, left);
+			//left = right0 / right1;
 			break;
 		default:
 			return;
@@ -223,12 +258,29 @@ namespace YBehavior
 		////LOG_BEGIN << " => " << left << LOG_END;
 	}
 
-	template<>
-	bool ValueHandler::Compare<EntityWrapper>(const void* pLeft, const void* pRight, OperationType op);
+	template<typename T>
+	void ValueHandler::_Add(const T& left, const T& right, T& output)
+	{
+		output = left + right;
+	}
 
+	template<typename T>
+	void ValueHandler::_Sub(const T& left, const T& right, T& output)
+	{
+		output = left - right;
+	}
 
-	template<>
-	void ValueHandler::Calculate<String>(void* pLeft, const void* pRight0, const void* pRight1, OperationType op);
+	template<typename T>
+	void ValueHandler::_Mul(const T& left, const T& right, T& output)
+	{
+		output = left * right;
+	}
+
+	template<typename T>
+	void ValueHandler::_Div(const T& left, const T& right, T& output)
+	{
+		output = left / right;
+	}
 
 	template<>
 	void ValueHandler::Calculate<EntityWrapper>(void* pLeft, const void* pRight0, const void* pRight1, OperationType op);
@@ -246,6 +298,13 @@ namespace YBehavior
 	template<>
 	void ValueHandler::Random<Bool>(void* pLeft, const void* pRight0, const void* pRight1);
 
+	template<>
+	void ValueHandler::_Sub<String>(const String& left, const String& right, String& output);
+	template<>
+	void ValueHandler::_Mul<String>(const String& left, const String& right, String& output);
+	template<>
+	void ValueHandler::_Div<String>(const String& left, const String& right, String& output);
+
 	/////////////////////////////////////
 	/////////////////////////////////////
 	/////////////////////////////////////
@@ -257,9 +316,9 @@ namespace YBehavior
 	public:
 		static IVariableOperationHelper* Get() { return &s_Instance; }
 
-		bool Compare(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op)
+		bool Compare(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op)
 		{
-			return ValueHandler::Compare<T>(pLeft->GetValue(pData), pRight->GetValue(pData), op);
+			return ValueHandler::Compare<T>(pLeft->GetValue(pMemory), pRight->GetValue(pMemory), op);
 		}
 
 		bool Compare(const void* pLeftValue, const void* pRightValue, OperationType op)
@@ -279,11 +338,11 @@ namespace YBehavior
 			return &left;
 		}
 
-		void Calculate(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op)
+		void Calculate(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op)
 		{
 			T left;
-			ValueHandler::Calculate<T>(&left, pRight0->GetValue(pData), pRight1->GetValue(pData), op);
-			pLeft->SetValue(pData, &left);
+			ValueHandler::Calculate<T>(&left, pRight0->GetValue(pMemory), pRight1->GetValue(pMemory), op);
+			pLeft->SetValue(pMemory, &left);
 		}
 
 		void Random(void* pLeft, const void* pRight0, const void* pRight1)
@@ -291,11 +350,11 @@ namespace YBehavior
 			ValueHandler::Random<T>(pLeft, pRight0, pRight1);
 		}
 
-		void Random(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
+		void Random(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
 		{
 			T left;
-			ValueHandler::Random<T>(&left, pRight0->GetValue(pData), pRight1->GetValue(pData));
-			pLeft->SetValue(pData, &left);
+			ValueHandler::Random<T>(&left, pRight0->GetValue(pMemory), pRight1->GetValue(pMemory));
+			pLeft->SetValue(pMemory, &left);
 		}
 
 		void Set(void* pLeft, const void* pRight0)
@@ -303,10 +362,16 @@ namespace YBehavior
 			ValueHandler::Set<T>(pLeft, pRight0);
 		}
 
+		TempObject AllocTempData()
+		{
+			return TempObject(ObjectPool<T>::Get(), this);
+		}
+
 		void* AllocData()
 		{
 			return ObjectPool<T>::Get();
 		}
+
 		void RecycleData(void* pData)
 		{
 			if (pData != nullptr)
@@ -316,11 +381,11 @@ namespace YBehavior
 	};
 	template<typename T> VariableOperationHelper<T> VariableOperationHelper<T>::s_Instance;
 
-	///> Exclude vector
+	///> vector
 	template<typename elementType>
-	class VariableOperationHelper<std::vector<elementType>> : public IVariableOperationHelper
+	class VariableOperationHelper<StdVector<elementType>> : public IVariableOperationHelper
 	{
-		static VariableOperationHelper<std::vector<elementType>> s_Instance;
+		static VariableOperationHelper<StdVector<elementType>> s_Instance;
 	public:
 		static IVariableOperationHelper* Get() { return &s_Instance; }
 
@@ -329,7 +394,7 @@ namespace YBehavior
 			return false;
 		}
 
-		bool Compare(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op)
+		bool Compare(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op)
 		{
 			return false;
 		}
@@ -343,7 +408,7 @@ namespace YBehavior
 		{
 		}
 
-		void Calculate(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op)
+		void Calculate(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, OperationType op)
 		{
 		}
 
@@ -351,26 +416,31 @@ namespace YBehavior
 		{
 		}
 
-		void Random(SharedDataEx* pData, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
+		void Random(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1)
 		{
 		}
 
 		void Set(void* pLeft, const void* pRight0)
 		{
-			ValueHandler::Set<std::vector<elementType>>(pLeft, pRight0);
+			ValueHandler::Set<StdVector<elementType>>(pLeft, pRight0);
+		}
+
+		TempObject AllocTempData()
+		{
+			return TempObject(ObjectPool<StdVector<elementType>>::Get(), this);
 		}
 
 		void* AllocData()
 		{
-			return ObjectPool<std::vector<elementType>>::Get();
+			return ObjectPool<StdVector<elementType>>::Get();
 		}
 		void RecycleData(void* pData)
 		{
 			if (pData != nullptr)
-				ObjectPool<std::vector<elementType>>::Recycle((std::vector<elementType>*)pData);
+				ObjectPool<StdVector<elementType>>::Recycle((StdVector<elementType>*)pData);
 		}
 	};
-	template<typename elementType> VariableOperationHelper<std::vector<elementType>> VariableOperationHelper<std::vector<elementType>>::s_Instance;
+	template<typename elementType> VariableOperationHelper<StdVector<elementType>> VariableOperationHelper<StdVector<elementType>>::s_Instance;
 
 }
 

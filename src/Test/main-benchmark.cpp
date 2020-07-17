@@ -10,6 +10,7 @@
 #else
 #include <unistd.h>
 #endif
+#include "YBehavior/profile/profiler.h"
 
 using namespace YBehavior;
 
@@ -20,41 +21,13 @@ int main(int argc, char** argv)
 
 	XAgent::InitData();
 
-	std::string tree("Monster_BlackCrystal3");
-	if (argc >= 2)
-		tree = argv[1];
-	std::vector<int> a(1);
-	XEntity* pEntity = new XEntity("Hehe", tree);
-	//pEntity->GetAgent()->SetEntity(pEntity);
+	XEntity* pEntity = new XEntity("Hehe", "StateMachine/BenchMarkFSM");
 
-	XEntity* pEntity1 = new XEntity("Haha", tree);
-	//pEntity1->GetAgent()->SetEntity(pEntity1);
-
-	LOG_BEGIN << "wrapper begin" << LOG_END;
-	EntityWrapper wrapper = pEntity->GetAgent()->GetEntity()->CreateWrapper();
-	LOG_BEGIN << "{" << LOG_END;
-	{
-		EntityWrapper wrapper0 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
-		LOG_BEGIN << "wrapper00" << LOG_END;
-		EntityWrapper wrapper00 = wrapper0;
-		LOG_BEGIN << "wrapper_0" << LOG_END;
-		EntityWrapper wrapper_0 = wrapper;
-	}
-	LOG_BEGIN << "}" << LOG_END;
-	EntityWrapper wrapper1 = pEntity->GetAgent()->GetEntity()->CreateWrapper();
-	LOG_BEGIN << "wrapper_1" << LOG_END;
-	EntityWrapper wrapper_1 = wrapper;
-
-	//LOG_BEGIN << "delete entity" << LOG_END;
-	//delete pEntity;
-	//return 0;
-	//pEntity->GetAgent()->GetSharedData()->GetBool(3);
-
-	//aa.GetValue(pEntity->GetAgent()->GetSharedData());
-	//TreeMgr::Instance()->LoadOneTree("Monster_BlackCrystal");
-	std::list<XEntity*> entityList;
 	char ch;
 	bool notexit = true;
+#ifdef YPROFILER
+	Profiler::ProfileMgr::Instance()->Start();
+#endif
 	while (notexit)
 	{
 #if _MSC_VER
@@ -65,23 +38,20 @@ int main(int argc, char** argv)
 			ch = _getch();
 			switch (ch)
 			{
-			case 'a':
+			case 'e':
 			{
-				for (int i = 0; i < 1000; ++i)
-				{
-					XEntity* entity = new XEntity("hehe", tree);
-					entityList.push_back(entity);
-				}
+#ifdef YPROFILER
+				Profiler::ProfileMgr::Instance()->Stop();
+				Profiler::ProfileMgr::Instance()->Output("", "profile");
+				Profiler::ProfileMgr::Instance()->Clear();
+#endif
 				break;
 			}
-			case 'd':
+			case 'b':
 			{
-				for (int i = 0; i < 1000 && !entityList.empty(); ++i)
-				{
-					XEntity* entity = entityList.front();
-					entityList.pop_front();
-					delete entity;
-				}
+#ifdef YPROFILER
+				Profiler::ProfileMgr::Instance()->Start();
+#endif
 				break;
 			}
 			case 27:
@@ -98,10 +68,7 @@ int main(int argc, char** argv)
 		usleep(1000000);
 #endif
 
-		for (auto it = entityList.begin();it != entityList.end();++it)
-		{
-			(*it)->GetAgent()->Update();
-		}
+		pEntity->GetAgent()->Update();
 	}
 	return 0;
 }

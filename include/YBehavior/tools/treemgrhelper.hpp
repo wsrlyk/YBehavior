@@ -7,7 +7,7 @@ namespace YBehavior
 	struct MergedTreeNode
 	{
 		std::list<BehaviorTree*> trees;
-		std::vector<MergedTreeNode*> children;
+		StdVector<MergedTreeNode*> children;
 
 		~MergedTreeNode()
 		{
@@ -216,7 +216,7 @@ namespace YBehavior
 			{
 				bool built = _BuildSharedData(*it, current, builingInfo);
 				if (built)
-					current->GetSharedData()->Merge(*(*it)->GetSharedData(), false);
+					current->GetSharedData()->MergeFrom(*(*it)->GetSharedData(), false);
 
 				allChildrenBuilt &= built;
 			}
@@ -305,7 +305,7 @@ namespace YBehavior
 			commonData = node->CreateMergedSharedData();
 			for (auto it = node->trees.begin(); it != node->trees.end(); ++it)
 			{
-				commonData->Merge(*(*it)->GetSharedData(), false);
+				commonData->MergeFrom(*(*it)->GetSharedData(), false);
 			}
 		}
 		else
@@ -318,7 +318,7 @@ namespace YBehavior
 			for (auto it = node->children.begin(); it != node->children.end(); ++it)
 			{
 				_FinalBuild(*it, buildingInfo);
-				commonData->Merge(*(*it)->GetSharedData(), false);
+				commonData->MergeFrom(*(*it)->GetSharedData(), false);
 			}
 		}
 
@@ -326,7 +326,7 @@ namespace YBehavior
 		{
 			for (auto it = node->trees.begin(); it != node->trees.end(); ++it)
 			{
-				(*it)->GetSharedData()->Merge(*commonData, true);
+				(*it)->GetSharedData()->MergeFrom(*commonData, true);
 			}
 		}
 	}

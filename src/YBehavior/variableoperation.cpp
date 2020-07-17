@@ -3,17 +3,6 @@
 namespace YBehavior
 {
 	template<>
-	bool ValueHandler::Compare<EntityWrapper>(const void* pLeft, const void* pRight, OperationType op)
-	{
-		return false;
-	}
-
-	template<>
-	void ValueHandler::Calculate<String>(void* pLeft, const void* pRight0, const void* pRight1, OperationType op)
-	{
-
-	}
-	template<>
 	void ValueHandler::Calculate<EntityWrapper>( void* pLeft, const void* pRight0, const void* pRight1, OperationType op)
 	{
 
@@ -40,6 +29,28 @@ namespace YBehavior
 	void ValueHandler::Random<Bool>(void* pLeft, const void* pRight0, const void* pRight1)
 	{
 		_DoRandom<Bool>(pLeft, pRight0, pRight1);
+	}
+
+
+	template<>
+	void ValueHandler::_Sub<String>(const String& left, const String& right, String& output)
+	{
+	}
+
+	template<>
+	void ValueHandler::_Mul<String>(const String& left, const String& right, String& output)
+	{
+	}
+
+	template<>
+	void ValueHandler::_Div<String>(const String& left, const String& right, String& output)
+	{
+	}
+
+	TempObject::~TempObject()
+	{
+		if (pData && pHelper)
+			pHelper->RecycleData(pData);
 	}
 
 }

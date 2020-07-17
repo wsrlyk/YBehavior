@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
@@ -29,8 +22,9 @@ namespace YBehavior.Editor
             public DelayableNotificationCollection<FileInfo> Children { get { return m_children; } }
             public string Name { get; set; }
             public string Icon { get; set; }
-            TreeFileMgr.TreeFileInfo source;
-            public TreeFileMgr.TreeFileInfo Source { get { return source; } }
+            FileMgr.FileInfo source;
+            public FileMgr.FileInfo Source { get { return source; } }
+            private int m_Depth = 0;
             private bool exp = false;
             public bool Expanded
             {
@@ -41,34 +35,69 @@ namespace YBehavior.Editor
                 }
             }
 
-            public void Build(TreeFileMgr.TreeFileInfo data, HashSet<string> expandedItems = null)
+            public void Build(List<FileMgr.FileInfo> datas, string filter, HashSet<string> expandedItems = null)
             {
                 using (var handler = Children.Delay())
                 {
                     Children.Clear();
 
-                    if (data == null)
+                    if (datas == null)
                         return;
 
-                    source = data;
-                    Name = data.Name;
-                    Icon = !data.bIsFolder ? "Resources/ICON__0000_46.png"
-                                            : "Resources/ICON__0009_37.png";
-
-                    if (Name == null)
-                        Expanded = true;
-                    else
-                        Expanded = expandedItems != null ? expandedItems.Contains(Name) : false;
-
-                    if (data.Children == null)
-                        return;
-
-                    foreach (TreeFileMgr.TreeFileInfo child in data.Children)
+                    foreach (var data in datas)
                     {
-                        FileInfo info = new FileInfo();
-                        this.Children.Add(info);
-                        info.Build(child, expandedItems);
+                        if (!string.IsNullOrEmpty(filter) && !data.Name.ToLower().Contains(filter.ToLower()))
+                            continue;
+                        _Build(data, expandedItems);
                     }
+                }
+            }
+            void _Build(FileMgr.FileInfo data, HashSet<string> expandedItems = null)
+            {
+                if (m_Depth == data.FolderDepth)
+                {
+                    // Create this File
+                    FileInfo info = new FileInfo();
+                    switch (data.FileType)
+                    {
+                        case FileType.TREE:
+                            info.Icon = "🌿";
+                            break;
+                        case FileType.FSM:
+                            info.Icon = "♻";
+                            break;
+                        default:
+                            break;
+                    }
+                    info.source = data;
+                    info.Name = data.Name;
+                    this.Children.Add(info);
+                }
+                else
+                {
+                    // Create Sub Folder If Not Exist
+                    FileInfo folder = null;
+                    foreach (FileInfo child in this.Children)
+                    {
+                        if (child.source != null)
+                            continue;
+
+                        if (child.Name == data.FolderStack[m_Depth])
+                        {
+                            folder = child;
+                            break;
+                        }
+                    }
+                    if (folder == null)
+                    {
+                        folder = new FileInfo();
+                        folder.Icon = "📁";
+                        folder.m_Depth = m_Depth + 1;
+                        folder.Name = data.FolderStack[m_Depth];
+                        this.Children.Add(folder);
+                        folder.Expanded = expandedItems != null ? expandedItems.Contains(folder.Name) : false;
+                    }
+                    folder._Build(data, expandedItems);
                 }
             }
         }
@@ -95,10 +124,16 @@ namespace YBehavior.Editor
                 {
                     _GetExpandedItems(childControl, expandedItems);
                 }
-                if (childControl is TreeViewItem item && item.IsExpanded)
+                if (childControl is TreeViewItem item && item.DataContext is FileInfo info)
                 {
-                    if (item.DataContext is FileInfo info)
+                    if (item.IsExpanded)
+                    {
                         expandedItems.Add(info.Name);
+                    }
+                    else
+                    {
+                        expandedItems.Remove(info.Name);
+                    }
                 }
             }
         }
@@ -106,10 +141,11 @@ namespace YBehavior.Editor
         HashSet<string> m_ExpandedItems = new HashSet<string>();
         private void _RefreshWorkingSpace(bool bReload)
         {
-            m_ExpandedItems.Clear();
+            if (bReload)
+                m_ExpandedItems.Clear();
             _GetExpandedItems(this.Files, m_ExpandedItems);
 
-            m_FileInfos.Build(bReload ? TreeFileMgr.Instance.ReloadAndGetAllTrees() : TreeFileMgr.Instance.AllTrees, m_ExpandedItems);
+            m_FileInfos.Build(bReload ? FileMgr.Instance.ReloadAndGetAllFiles() : FileMgr.Instance.AllFiles, _Filter, m_ExpandedItems);
 //            this.Files.ItemsSource = m_FileInfos.Children;
         }
 
@@ -123,7 +159,7 @@ namespace YBehavior.Editor
                 m_ExpandedItems.Add(s);
             }
 
-            m_FileInfos.Build(TreeFileMgr.Instance.ReloadAndGetAllTrees(), m_ExpandedItems);
+            m_FileInfos.Build(FileMgr.Instance.ReloadAndGetAllFiles(), _Filter, m_ExpandedItems);
         }
 
         private void OnFilesItemDoubleClick(object sender, MouseButtonEventArgs e)
@@ -134,7 +170,7 @@ namespace YBehavior.Editor
                 if (obj.GetType() == typeof(TreeViewItem))
                 {
                     FileInfo item = this.Files.SelectedItem as FileInfo;
-                    if (item != null && item.Source.Path != null)
+                    if (item != null && item.Source != null && item.Source.Path != null)
                     {
                         string nodeText = item.Name;
 
@@ -160,8 +196,8 @@ namespace YBehavior.Editor
             WorkBench bench = oArg.Bench;
             if (bench == null)
                 return;
-            ///> Rename the tab title
-            if (oArg.bCreate)
+            ///> Rename the tab title, refresh the references to the TreeMgr
+            //if (oArg.bCreate)
             {
                 _RefreshWorkingSpace(false);
             }
@@ -187,10 +223,21 @@ namespace YBehavior.Editor
             //    _RefreshWorkingSpace(false);
         }
 
-        private void btnNew_Click(object sender, RoutedEventArgs e)
+        private void btnNewTree_Click(object sender, RoutedEventArgs e)
         {
             WorkBench bench = null;
-            if ((bench = WorkBenchMgr.Instance.CreateNewBench()) != null)
+            if ((bench = WorkBenchMgr.Instance.CreateNewBench(FileType.TREE)) != null)
+            {
+                WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
+                arg.Bench = bench;
+                EventMgr.Instance.Send(arg);
+            }
+        }
+
+        private void btnNewFSM_Click(object sender, RoutedEventArgs e)
+        {
+            WorkBench bench = null;
+            if ((bench = WorkBenchMgr.Instance.CreateNewBench(FileType.FSM)) != null)
             {
                 WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
                 arg.Bench = bench;
@@ -205,7 +252,7 @@ namespace YBehavior.Editor
 
         private void Files_LostFocus(object sender, RoutedEventArgs e)
         {
-            m_ExpandedItems.Clear();
+            //m_ExpandedItems.Clear();
             _GetExpandedItems(this.Files, m_ExpandedItems);
             StringBuilder sb = new StringBuilder();
             foreach (string s in m_ExpandedItems)
@@ -215,6 +262,13 @@ namespace YBehavior.Editor
                 sb.Append(s);
             }
             Config.Instance.ExpandedFolders = sb.ToString();
+        }
+
+        private string _Filter { get { return this.SearchText.Text; } }
+
+        private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _RefreshWorkingSpace(false);
         }
     }
 }

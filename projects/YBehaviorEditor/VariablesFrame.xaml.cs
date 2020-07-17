@@ -11,13 +11,24 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
-    /// <summary>
-    /// SharedDataFrame.xaml 的交互逻辑
-    /// </summary>
+    public class VariableTypeSelector : DataTemplateSelector
+    {
+        public DataTemplate NormalTemplate { get; set; }
+
+        public DataTemplate TreeTemplate { get; set; }
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            VariableHolder holder = item as VariableHolder;
+            if (holder.Variable is SubTreeNode.TreeVariable)
+                return TreeTemplate;
+            return NormalTemplate;
+        }
+    }
+
     public partial class VariablesFrame : UserControl
     {
         public VariablesFrame()
@@ -25,16 +36,38 @@ namespace YBehavior.Editor
             InitializeComponent();
 
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
+        }
+
+        public void Enable()
+        {
             EventMgr.Instance.Register(EventType.SelectionChanged, _OnSelectionChanged);
             EventMgr.Instance.Register(EventType.SharedVariableChanged, _OnSharedVariableChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
         }
 
+        public void Disable()
+        {
+            EventMgr.Instance.Unregister(EventType.SelectionChanged, _OnSelectionChanged);
+            EventMgr.Instance.Unregister(EventType.SharedVariableChanged, _OnSharedVariableChanged);
+            EventMgr.Instance.Unregister(EventType.DebugTargetChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Unregister(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
+        }
+
         private void _OnWorkBenchSelected(EventArg arg)
         {
             this.DataContext = null;
             this.VariableContainer.ItemsSource = null;
+
+            WorkBenchSelectedArg oArg = arg as WorkBenchSelectedArg;
+            if (oArg.Bench == null || !(oArg.Bench is TreeBench))
+            {
+                Disable();
+            }
+            else
+            {
+                Enable();
+            }
         }
         private void _OnSelectionChanged(EventArg arg)
         {
@@ -42,19 +75,32 @@ namespace YBehavior.Editor
             //if (oArg.Target == null)
             //    return;
 
-            UINode node = oArg.Target as UINode;
+            UITreeNode node = oArg.Target as UITreeNode;
             if (node == null)
             {
                 // Clear
                 this.VariableContainer.ItemsSource = null;
                 this.VariableTab.DataContext = null;
+                this.InOutTab.Visibility = Visibility.Collapsed;
+                this.InOutTab.DataContext = null;
             }
             else
             {
-                this.VariableTab.DataContext = node.Node;
+                this.VariableTab.DataContext = node.Node.Renderer;
                 this.VariableContainer.ItemsSource = node.Node.Variables.Datas;
 
                 this.VariableTab.IsSelected = true;
+
+                if (node.Node is SubTreeNode)
+                {
+                    this.InOutTab.Visibility = Visibility.Visible;
+                    this.InOutTab.DataContext = node.Node;
+                }
+                else
+                {
+                    this.InOutTab.Visibility = Visibility.Collapsed;
+                    this.InOutTab.DataContext = null;
+                }
             }
 
             UIComment comment = oArg.Target as UIComment;
@@ -74,11 +120,16 @@ namespace YBehavior.Editor
 
         private void _OnSharedVariableChanged(EventArg arg)
         {
-            Node node = this.VariableTab.DataContext as Node;
-            if (node == null)
+            TreeNodeRenderer renderer = this.VariableTab.DataContext as TreeNodeRenderer;
+            if (renderer == null)
                 return;
 
-            node.Variables.RefreshVariables();
+            TreeNode node = renderer.TreeOwner;
+            node.NodeMemory.RefreshVariables();
+            if (node is SubTreeNode)
+            {
+                (node as SubTreeNode).InOutMemory.RefreshVariables();
+            }
         }
 
         private void _OnDebugTargetChanged(EventArg arg)
@@ -86,7 +137,7 @@ namespace YBehavior.Editor
             this.Dispatcher.BeginInvoke(new Action
                 (() =>
                 {
-                    Node node = this.VariableTab.DataContext as Node;
+                    TreeNode node = this.VariableTab.DataContext as TreeNode;
                     if (node == null)
                         return;
 
@@ -95,10 +146,51 @@ namespace YBehavior.Editor
                         v.Variable.DebugStateChanged();
                     }
 
-                    this.NickName.IsReadOnly = DebugMgr.Instance.IsDebugging();
-                    this.Comment.IsReadOnly = DebugMgr.Instance.IsDebugging();
+                    bool isReadOnly = DebugMgr.Instance.IsDebugging();
+                    this.NickName.IsReadOnly = isReadOnly;
+                    this.Comment.IsReadOnly = isReadOnly;
+                    this.ReturnType.IsReadOnly = isReadOnly;
                 })
             );
+        }
+
+        private void RefreshInOutButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DebugMgr.Instance.IsDebugging())
+                return;
+            SubTreeNode node = this.InOutTab.DataContext as SubTreeNode;
+            if (node == null)
+                return;
+
+            if (node.ReloadInOut())
+            {
+                ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
+                {
+                    Content = "SubTree input/output reloaded.",
+                    TipType = ShowSystemTipsArg.TipsType.TT_Success,
+                };
+                EventMgr.Instance.Send(showSystemTipsArg);
+            }
+        }
+
+        private void TabController_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.Source is TabControl)
+            {
+                if (this.InOutTab.IsSelected)
+                {
+                    if((this.InOutTab.DataContext as SubTreeNode).LoadInOut())
+                    {
+                        ShowSystemTipsArg showSystemTipsArg = new ShowSystemTipsArg()
+                        {
+                            Content = "SubTree input/output auto loaded.",
+                            TipType = ShowSystemTipsArg.TipsType.TT_Success,
+                        };
+                        EventMgr.Instance.Send(showSystemTipsArg);
+                    }
+                }
+            }
+
         }
     }
 }

@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BenchMarkFSM>
+  <Machine Default="Main">
+    <State Type="Entry" />
+    <State Type="Exit" />
+    <State Name="Main" Tree="BenchMarkTree0" />
+  </Machine>
+</BenchMarkFSM>

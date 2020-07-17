@@ -1,19 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using YBehavior.Editor.Core;
+using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
-    public class DraggingConnection : Singleton<DraggingConnection>
+    public interface IDraggingConnection
+    {
+        void Set(Point start, Point end, double middle);
+    }
+
+    public class DraggingConnection<T> : Singleton<DraggingConnection<T>> where T: YUserControl, IDraggingConnection
     {
         Panel m_Canvas;
         public Panel Canvas { get { return m_Canvas; } }
 
-        UIConnection m_Connection;
+        T m_Connection;
 
         bool m_bDragging = false;
 
@@ -28,7 +30,7 @@ namespace YBehavior.Editor
                 return;
 
             if (m_Connection == null)
-                m_Connection = new UIConnection(false);
+                m_Connection = Activator.CreateInstance(typeof(T), new object[]{false}) as T;
 
             if (!m_bDragging)
             {
@@ -36,7 +38,7 @@ namespace YBehavior.Editor
                 m_Canvas.Children.Add(m_Connection);
             }
 
-            m_Connection.SetWithMidY(from, to, (from.Y + to.Y) / 2);
+            m_Connection.Set(from, to, (from.Y + to.Y) / 2);
 
         }
 

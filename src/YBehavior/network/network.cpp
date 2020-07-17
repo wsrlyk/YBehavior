@@ -1,4 +1,4 @@
-#ifdef DEBUGGER
+#ifdef YDEBUGGER
 #include "YBehavior/network/network.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/network/messageprocessor.h"
@@ -72,21 +72,6 @@ namespace YBehavior
 
 		while (!m_bTerminating)
 		{
-			//wait for connecting
-			//while (!m_bTerminating)
-			//{
-			//	//Log("Socket::TestConnection.\n");
-			//	LOG_BEGIN << "Socket::TestConnection" << LOG_END;
-
-			//	if (Socket::TestConnection(m_ListeningHandle))
-			//	{
-			//		break;
-			//	}
-
-			//	Thread::SleepMilli(100);
-			//}
-
-
 			if (!m_bTerminating)
 			{
 				{
@@ -99,7 +84,7 @@ namespace YBehavior
 					}
 					
 				}
-				LOG_BEGIN << "Socket::Connection Accept" << LOG_END;
+				LOG_BEGIN << "Socket::Connection Accept" << LOG_THREAD_END;
 
 				{
 
@@ -108,10 +93,7 @@ namespace YBehavior
 
 					OnConnection();
 
-					//AtomicInc(m_isConnectedFinished);
 					Thread::SleepMilli(1);
-
-					//this->OnConnectionFinished();
 				}
 
 				while (!m_bTerminating && this->m_WriteSocket)
@@ -120,19 +102,15 @@ namespace YBehavior
 					SendAllPackets();
 
 					ReceivePackets();
-
-					// LOG_BEGIN << "Socket::Send & Receive" << LOG_END;
-
 				}
 
-				// One last time, to send any outstanding packets out there.
 				if (this->m_WriteSocket)
 				{
 					SendAllPackets();
 
 					Socket::Close(m_WriteSocket);
 
-					LOG_BEGIN << "Socket::Close" << LOG_END;
+					LOG_BEGIN << "Socket::Close" << LOG_THREAD_END;
 
 				}
 
@@ -144,7 +122,7 @@ namespace YBehavior
 
 		this->ClearAll();
 
-		LOG_BEGIN << "Network Thread Shutdown" << LOG_END;
+		LOG_BEGIN << "Network Thread Shutdown" << LOG_THREAD_END;
 	}
 
 	void Network::SendAllPackets()
@@ -153,12 +131,12 @@ namespace YBehavior
 		{
 			ScopedLock lock(m_Mutex);
 #ifdef PRINT_INTERMEDIATE_INFO
-			LOG_BEGIN << "Try Send: " << ms_sendBuffer << LOG_END;
+			LOG_BEGIN << "Try Send: " << ms_sendBuffer << LOG_THREAD_END;
 #endif
 			size_t len;
 			if (Socket::Write(m_WriteSocket, ms_sendBuffer.c_str(), ms_sendBuffer.length(), len) && len != ms_sendBuffer.length())
 			{
-				ERROR_BEGIN << "Network Send Error: " << ms_sendBuffer << ERROR_END;
+				LOG_BEGIN << "Network Send Error: " << ms_sendBuffer << LOG_THREAD_END;
 			}
 
 			ms_sendBuffer = "";
@@ -168,7 +146,7 @@ namespace YBehavior
 	bool Network::ReceivePackets(CSTRING msgCheck /*= 0*/)
 	{
 		const int kBufferLen = 2048;
-		char buffer[kBufferLen];
+		char buffer[kBufferLen + 1];
 
 		bool found = false;
 
@@ -231,9 +209,12 @@ namespace YBehavior
 		{
 			ScopedLock lock(m_Mutex);
 
-			HalfWord halfword(text.size());
+			HalfWord halfword((INT)text.size());
 			ms_sendBuffer += halfword.ToString();
 			ms_sendBuffer += text;
+#ifdef PRINT_INTERMEDIATE_INFO
+			LOG_BEGIN << "Message: " << text.size() << ": " << ms_sendBuffer << LOG_THREAD_END;
+#endif
 
 			return true;
 		}
@@ -259,9 +240,9 @@ namespace YBehavior
 
 	void Network::OnRecieveMessages(const STRING& msg)
 	{
-		LOG_BEGIN << "Receive: " << msg << LOG_END;
+		LOG_BEGIN << "Receive: " << msg << LOG_THREAD_END;
 		MessageProcessor::Instance()->ProcessOne(msg);
 	}
 
 }
-#endif // DEBUGGER
+#endif // YDEBUGGER

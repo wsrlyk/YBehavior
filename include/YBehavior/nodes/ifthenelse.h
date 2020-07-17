@@ -18,6 +18,11 @@ namespace YBehavior
 	{
 	public:
 		IfThenElsePhase Current = ITE_Normal;
+	protected:
+		void _OnReset() override
+		{
+			Current = ITE_Normal;
+		}
 	};
 
 	class YBEHAVIOR_API IfThenElse : public BranchNode

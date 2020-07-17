@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="YBehavior.Editor.FilterBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:YBehavior.Editor"
+             mc:Ignorable="d" 
+             d:DesignHeight="30" d:DesignWidth="120">
+    <UserControl.Resources>
+        <Style x:Key="TransparentStyle" TargetType="{x:Type Button}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border>
+                            <Grid Background="Transparent">
+                                <ContentPresenter/>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Border Background="White"/>
+        <TextBlock Name="Hint" Text="Searching" Background="Transparent" Foreground="#FFA2A2A2"  Visibility="{Binding ElementName=SearchText, Path=Text,Converter={StaticResource stringEmptyVisibilityConvertor}}"/>
+        <TextBox Name="SearchText" Text="" Background="Transparent" TextChanged="SearchText_TextChanged"/>
+        <Button Style="{StaticResource TransparentStyle}" Width="20" Name="ClearSearch" Click="ClearSearch_Click" HorizontalAlignment="Right" Visibility="{Binding ElementName=SearchText, Path=Text,Converter={StaticResource invertStringEmptyAndVisibilityConvertor}}">
+            ⓧ
+        </Button>
+    </Grid>
+</UserControl>

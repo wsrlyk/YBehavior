@@ -12,38 +12,47 @@ namespace YBehavior
 	class ISharedVariableCreateHelper
 	{
 	public:
-		virtual ISharedVariableEx* CreateVariable() = 0;
-		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) = 0;
+		virtual ~ISharedVariableCreateHelper() {}
+		virtual ISharedVariableEx* CreateVariable() const = 0;
+		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) const = 0;
+		virtual bool TrySetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str, CHAR separator = '|') const = 0;
 	};
 
 	template<typename valueType>
 	class SharedVariableCreateHelper: public ISharedVariableCreateHelper
 	{
 	public:
-		virtual ISharedVariableEx* CreateVariable() override
+		ISharedVariableEx* CreateVariable() const override
 		{
 			return new SharedVariableEx<valueType>();
 		}
-		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) override
+		void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) const override
 		{
 			KEY key = TreeKeyMgr::Instance()->CreateKeyByName<valueType>(name);
 			pData->Set(key, Utility::ToType<valueType>(str));
 		}
+		bool TrySetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str, CHAR separator = '|') const override
+		{
+			KEY key = TreeKeyMgr::Instance()->GetKeyByName<valueType>(name);
+			if (key == Utility::INVALID_KEY)
+				return false;
+			return pData->TrySet(key, Utility::ToType<valueType>(str));
+		}
 	};
 
 	template<typename elementType>
-	class SharedVariableCreateHelper<std::vector<elementType>> : public ISharedVariableCreateHelper
+	class SharedVariableCreateHelper<StdVector<elementType>> : public ISharedVariableCreateHelper
 	{
 	public:
-		virtual ISharedVariableEx* CreateVariable() override
+		ISharedVariableEx* CreateVariable() const override
 		{
-			return new SharedVariableEx<std::vector<elementType>>();
+			return new SharedVariableEx<StdVector<elementType>>();
 		}
-		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) override
+		void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) const override
 		{
-			KEY key = TreeKeyMgr::Instance()->CreateKeyByName<std::vector<elementType>>(name);
-			std::vector<STRING> splitRes;
-			std::vector<elementType> res;
+			KEY key = TreeKeyMgr::Instance()->CreateKeyByName<StdVector<elementType>>(name);
+			StdVector<STRING> splitRes;
+			StdVector<elementType> res;
 			Utility::SplitString(str, splitRes, '|');
 			for (auto it = splitRes.begin(); it != splitRes.end(); ++it)
 			{
@@ -51,11 +60,27 @@ namespace YBehavior
 			}
 			pData->Set(key, std::move(res));
 		}
+		bool TrySetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str, CHAR separator = '|') const override
+		{
+			KEY key = TreeKeyMgr::Instance()->GetKeyByName<StdVector<elementType>>(name);
+			if (key == Utility::INVALID_KEY)
+				return false;
+			StdVector<STRING> splitRes;
+			StdVector<elementType> res;
+			Utility::SplitString(str, splitRes, separator);
+			for (auto it = splitRes.begin(); it != splitRes.end(); ++it)
+			{
+				res.push_back(Utility::ToType<elementType>(*it));
+			}
+			return pData->TrySet(key, std::move(res));
+		}
 	};
 
 	class SharedVariableCreateHelperMgr
 	{
+	public:
 		typedef std::unordered_map<STRING, ISharedVariableCreateHelper*> HelperMapType;
+	protected:
 		static HelperMapType* _Helpers;
 	public:
 		template<typename T>
@@ -74,6 +99,7 @@ namespace YBehavior
 			return nullptr;
 		}
 
+		static const HelperMapType& GetAllHelpers() { return *_Helpers; }
 		friend class Constructor;
 		class Constructor {
 		public:
@@ -102,9 +128,6 @@ namespace YBehavior
 		static Constructor cons;
 
 	};
-
-	SharedVariableCreateHelperMgr::Constructor SharedVariableCreateHelperMgr::cons;
-	SharedVariableCreateHelperMgr::HelperMapType* SharedVariableCreateHelperMgr::_Helpers;
 }
 
 #endif

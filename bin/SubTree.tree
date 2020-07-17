@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SubTree>
+  <Node Class="Root" Pos="85,-251">
+    <Local a="_Ic 0" b="_Ic 0" s="_Sc " />
+    <Input Input="_Ip b" />
+    <Output Output="_Ip b" />
+    <Node Class="SubTree" Pos="94,-57" Tree="_SC Test" Identification="_SC Sub1" />
+  </Node>
+</SubTree>

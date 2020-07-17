@@ -31,11 +31,11 @@ public:
 
 	void SetData()
 	{
-		this->GetSharedData()->Set<YBehavior::INT>(tickCount0, 3);
-		this->GetSharedData()->Set<YBehavior::BOOL>(isfighting, YBehavior::Utility::FALSE_VALUE);
-		this->GetSharedData()->Set<YBehavior::FLOAT>(heartrate, 2);
+		//this->GetSharedData()->Set<YBehavior::INT>(tickCount0, 3);
+		//this->GetSharedData()->Set<YBehavior::BOOL>(isfighting, YBehavior::Utility::FALSE_VALUE);
+		//this->GetSharedData()->Set<YBehavior::FLOAT>(heartrate, 2);
 
-		YBehavior::KEY f = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::FLOAT>("f");
+		/*YBehavior::KEY f = */YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::FLOAT>("f");
 		fftest = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::VecFloat>("fftest");
 	}
 
@@ -49,13 +49,15 @@ class XEntity : public YBehavior::Entity
 	XAgent* pAgent;
 	std::string m_Name;
 public:
-	XEntity(const std::string& name, const std::string& tree)
+	XEntity(const YBehavior::STRING& name, const YBehavior::STRING& machineName, const StdVector<YBehavior::STRING>* trees = nullptr, const StdVector<YBehavior::STRING>* subs = nullptr)
 	{
 		m_Name = name;
 		pAgent = new XAgent(this);
-		pAgent->SetTree(tree);
+		YBehavior::BehaviorKey key(machineName, trees, subs);
+		pAgent->SetBehavior(key);
 		pAgent->SetData();
 	}
+
 	~XEntity()
 	{
 		delete pAgent;
