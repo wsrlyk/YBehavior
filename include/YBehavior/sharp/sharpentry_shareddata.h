@@ -12,19 +12,6 @@ extern "C" YBEHAVIOR_API void SetSharedDataValue(YBehavior::Agent* pAgent, YBeha
 	pAgent->GetMemory()->GetMainData()->Set(key, type, value);
 }
 
-template<typename T>
-T GetSharedDataValue(YBehavior::Agent* pAgent, YBehavior::KEY key)
-{
-	T res = YBehavior::Utility::Default<T>();
-	pAgent->GetMemory()->GetMainData()->Get(key, res);
-	return res;
-}
-template<typename T>
-void SetSharedDataValue(YBehavior::Agent* pAgent, YBehavior::KEY key, const T& value)
-{
-	pAgent->GetMemory()->GetMainData()->Set(key, value);
-}
-
 #define SHAREDDATA_NORMALTYPES_OPERATIONS(TYPE)\
 extern "C" YBEHAVIOR_API YBehavior::KEY Get##TYPE##KeyByName(YBehavior::CSTRING name)\
 {\
@@ -40,21 +27,6 @@ extern "C" YBEHAVIOR_API YBehavior::TYPEID GetClassTypeNumberId##TYPE()\
 }
 
 
-#define SHAREDDATA_SIMPLETYPES_OPERATIONS(TYPE)\
-extern "C" YBEHAVIOR_API YBehavior::##TYPE GetSharedData##TYPE(YBehavior::Agent* pAgent, YBehavior::KEY key)\
-{\
-	return GetSharedDataValue<YBehavior::##TYPE>(pAgent, key);\
-}\
-extern "C" YBEHAVIOR_API void SetSharedData##TYPE(YBehavior::Agent* pAgent, YBehavior::KEY key, YBehavior::##TYPE value)\
-{\
-	SetSharedDataValue<YBehavior::##TYPE>(pAgent, key, value);\
-}
-SHAREDDATA_SIMPLETYPES_OPERATIONS(Int);
-SHAREDDATA_SIMPLETYPES_OPERATIONS(Ulong);
-SHAREDDATA_SIMPLETYPES_OPERATIONS(Float);
-SHAREDDATA_SIMPLETYPES_OPERATIONS(Bool);
-SHAREDDATA_SIMPLETYPES_OPERATIONS(Vector3);
-
 extern "C" YBEHAVIOR_API YBehavior::CSTRING GetSharedDataString(YBehavior::Agent* pAgent, YBehavior::KEY key)
 {
 	const YBehavior::STRING* str = pAgent->GetMemory()->GetMainData()->Get<YBehavior::STRING>(key);
@@ -64,17 +36,15 @@ extern "C" YBEHAVIOR_API YBehavior::CSTRING GetSharedDataString(YBehavior::Agent
 }
 extern "C" YBEHAVIOR_API void SetSharedDataString(YBehavior::Agent* pAgent, YBehavior::KEY key, YBehavior::CSTRING value)
 {
-	YBehavior::STRING str(value);
-	SetSharedDataValue<YBehavior::STRING>(pAgent, key, str);
+	pAgent->GetMemory()->GetMainData()->Set<YBehavior::STRING>(key, value);
 }
 
-
-extern "C" YBEHAVIOR_API YBehavior::Entity* GetEntityFromSharedData(YBehavior::Agent* pAgent, YBehavior::KEY key)
+extern "C" YBEHAVIOR_API YBehavior::Entity* GetSharedDataEntity(YBehavior::Agent* pAgent, YBehavior::KEY key)
 {
 	if (pAgent != nullptr)
 	{
 		const YBehavior::EntityWrapper* res = pAgent->GetMemory()->GetMainData()->Get<YBehavior::EntityWrapper>(key);
-		if (res)
+		if (res && res->IsValid())
 			return res->Get();
 		return nullptr;
 	}

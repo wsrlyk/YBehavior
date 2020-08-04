@@ -227,6 +227,17 @@ namespace YBehavior
 	inline TYPEID GetTypeID() {
 		return -1;
 	}
+	template<typename T>
+	KEY SharedDataEx::GetTypeKey() {
+		return -1;
+	}
+
+#define YBEHAVIOR_BASICTYPE_STORE_KEY(type, id)			\
+	template<> inline KEY SharedDataEx::GetTypeKey<type>() \
+	{\
+		return id;\
+	}
+
 
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Bool, 1);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Int, 2);

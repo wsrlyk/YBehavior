@@ -128,7 +128,11 @@ namespace YBehaviorSharp
         static public extern void RegisterLoadData(LoadDataCallback loaddata);
 
         [DllImport(VERSION.dll)]
-        static public extern void SetTree(IntPtr pAgent, string treename);
+        static public extern bool SetBehavior(
+            IntPtr pAgent, 
+            string treename, 
+            string[] state2Tree, uint stSize,
+            string[] tree2Tree, uint ttSize);
 
         [DllImport(VERSION.dll)]
         static public extern void Tick(IntPtr pAgent);

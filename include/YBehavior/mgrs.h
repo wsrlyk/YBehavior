@@ -5,6 +5,8 @@
 
 namespace YBehavior
 {
+	typedef const char* (_stdcall *LoadDataDelegate)(const char* name);
+
 	class TreeMgr;
 	class MachineMgr;
 	class BehaviorMgr;

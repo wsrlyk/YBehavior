@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include "version.h"
 #include "behaviortree.h"
+#include "YBehavior/mgrs.h"
 
 namespace pugi
 {
@@ -19,7 +20,6 @@ namespace YBehavior
 	typedef VersionMgr<BehaviorTree, STRING> TreeVersionMgrType;
 	typedef typename TreeVersionMgrType::InfoType TreeInfoType;
 	typedef typename TreeVersionMgrType::InfoType::VersionType TreeVersionType;
-	typedef const char* (_stdcall *LoadDataDelegate)(const char* treeName);
 
 	class YBEHAVIOR_API TreeMgr
 	{

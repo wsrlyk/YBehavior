@@ -286,17 +286,6 @@ namespace YBehavior
 		void Clear();
 	};
 
-	template<typename T>
-	KEY SharedDataEx::GetTypeKey() {
-		return -1;
-	}
-
-#define YBEHAVIOR_SHAREDDATA_STORE_KEY(type, id)			\
-		template<> inline KEY SharedDataEx::GetTypeKey<type>() \
-		{\
-			return id;\
-		}
-
 
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(Int, 0);
 	YBEHAVIOR_SHAREDDATA_STORE_KEY(Ulong, 1);

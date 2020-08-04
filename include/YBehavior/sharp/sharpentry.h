@@ -5,6 +5,7 @@
 #include "YBehavior/behaviortreemgr.h"
 #include "YBehavior/interface.h"
 #include "YBehavior/mgrs.h"
+#include "YBehavior/fsm/machinemgr.h"
 
 extern "C" YBEHAVIOR_API YBehavior::Entity* CreateEntity()
 {
@@ -44,13 +45,41 @@ extern "C" YBEHAVIOR_API void RegisterSharpNode(
 extern "C" YBEHAVIOR_API void RegisterLoadData(YBehavior::LoadDataDelegate loaddata)
 {
 	YBehavior::Mgrs::Instance()->GetTreeMgr()->SetLoadDataCallback(loaddata);
+	YBehavior::Mgrs::Instance()->GetMachineMgr()->SetLoadDataCallback(loaddata);
 	//YBehavior::TreeMgr::Instance()->SetLoadDataCallback(loaddata);
 }
 
-extern "C" YBEHAVIOR_API void SetTree(YBehavior::Agent* pAgent, YBehavior::CSTRING treeName)
+extern "C" YBEHAVIOR_API bool SetBehavior(
+	YBehavior::Agent* pAgent, 
+	YBehavior::CSTRING fsmName,
+	YBehavior::CSTRING* state2Tree, YBehavior::UINT stSize,
+	YBehavior::CSTRING* tree2Tree, YBehavior::UINT ttSize
+	)
 {
-	///> TODO
-	//pAgent->SetTree(treeName);
+	StdVector<YBehavior::STRING> s2t;
+	StdVector<YBehavior::STRING> *pS2t = nullptr;
+	if (stSize > 0 && state2Tree != nullptr && stSize % 2 == 0)
+	{
+		for (YBehavior::UINT i = 0; i < stSize; i += 2)
+		{
+			s2t.emplace_back(state2Tree[i]);
+			s2t.emplace_back(state2Tree[i + 1]);
+		}
+		pS2t = &s2t;
+	}
+	StdVector<YBehavior::STRING> t2t;
+	StdVector<YBehavior::STRING> *pT2t = nullptr;
+	if (ttSize > 0 && tree2Tree != nullptr && ttSize % 2 == 0)
+	{
+		for (YBehavior::UINT i = 0; i < ttSize; i += 2)
+		{
+			t2t.emplace_back(tree2Tree[i]);
+			t2t.emplace_back(tree2Tree[i + 1]);
+		}
+		pT2t = &t2t;
+	}
+	YBehavior::BehaviorKey key(fsmName, pS2t, pT2t);
+	return pAgent->SetBehavior(key);
 }
 
 extern "C" YBEHAVIOR_API void Tick(YBehavior::Agent* pAgent)

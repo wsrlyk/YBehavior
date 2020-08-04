@@ -60,8 +60,11 @@ namespace YBehavior
 	FSM * MachineMgr::_LoadFSM(const STRING& name)
 	{
 		pugi::xml_document doc;
-
-		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + ".fsm").c_str());
+		pugi::xml_parse_result result;
+		if (m_LoadDataCallback != nullptr)
+			result = doc.load_string(m_LoadDataCallback((m_WorkingDir + name + ".fsm").c_str()));
+		else
+			result = doc.load_file((m_WorkingDir + name + ".fsm").c_str());
 		LOG_BEGIN << "Loading: " << name << ".fsm" << LOG_END;
 		if (result.status)
 		{
