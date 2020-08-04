@@ -164,22 +164,25 @@ namespace YBehavior
 
 		NodeState finalState = state;
 
-		switch (m_ReturnType)
+		if (state != NS_RUNNING && state != NS_BREAK)
 		{
-		case YBehavior::RT_INVERT:
-			if (state == NS_SUCCESS)
-				finalState = NS_FAILURE;
-			else if (state == NS_FAILURE)
+			switch (m_ReturnType)
+			{
+			case YBehavior::RT_INVERT:
+				if (state == NS_SUCCESS)
+					finalState = NS_FAILURE;
+				else if (state == NS_FAILURE)
+					finalState = NS_SUCCESS;
+				break;
+			case YBehavior::RT_SUCCESS:
 				finalState = NS_SUCCESS;
-			break;
-		case YBehavior::RT_SUCCESS:
-			finalState = NS_SUCCESS;
-			break;
-		case YBehavior::RT_FAILURE:
-			finalState = NS_FAILURE;
-			break;
-		default:
-			break;
+				break;
+			case YBehavior::RT_FAILURE:
+				finalState = NS_FAILURE;
+				break;
+			default:
+				break;
+			}
 		}
 		DEBUG_RETURN(dbgHelper, state, finalState);
 	}
