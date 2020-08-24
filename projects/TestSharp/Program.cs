@@ -8,38 +8,27 @@ using YBehaviorSharp;
 
 namespace TestSharp
 {
-    public class SharpHelper
-    {
-        [DllImport(VERSION.dll)]
-        static public extern IntPtr CreateEntity();
-
-        [DllImport(VERSION.dll)]
-        static public extern void DeleteEntity(IntPtr pEntity);
-
-        [DllImport(VERSION.dll)]
-        static public extern IntPtr CreateAgent(IntPtr pEntity);
-
-        [DllImport(VERSION.dll)]
-        static public extern void DeleteAgent(IntPtr pAgent);
-    }
-
     class Program
     {
         static void Main(string[] args)
         {
             YBehaviorSharp.SharpHelper.LoadDataCallback = new YBehaviorSharp.LoadDataCallback(LoadData);
             YBehaviorSharp.SharpHelper.Init();
-            YBehaviorSharp.SharpHelper.CreateEntity();
             YBehaviorSharp.SEntity entity = new YBehaviorSharp.SEntity();
 
             YBehaviorSharp.SAgent agent = new YBehaviorSharp.SAgent(entity);
-            YBehaviorSharp.SharpHelper.SetTree(agent.Core, "Test0");
+            string[] state2tree = new string[] { "Main", "Test0"};
+            YBehaviorSharp.SharpHelper.SetBehavior(agent.Core, "EmptyFSM", state2tree, 2, null, 0);
 
             int i = 0;
-            while(++i < 3)
+            while(++i < 1000)
             {
                 YBehaviorSharp.SharpHelper.Tick(agent.Core);
+                System.Threading.Thread.Sleep(1000);
             }
+
+            YBehaviorSharp.SharpHelper.DeleteAgent(agent.Core);
+            YBehaviorSharp.SharpHelper.DeleteEntity(entity.Core);
             Console.Read();
         }
 

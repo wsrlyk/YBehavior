@@ -11,8 +11,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test.vcxproj", "{E2
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YBehaviorSharp", "YBehaviorSharp\YBehaviorSharp.csproj", "{F4A57B17-B56F-4EB0-8E31-D28AEF52553E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C1582006-77B9-497E-A630-43FC48DD4B18} = {C1582006-77B9-497E-A630-43FC48DD4B18}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSharp", "TestSharp\TestSharp.csproj", "{2DD56D37-98A8-43B4-A12E-1896480C65D3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F4A57B17-B56F-4EB0-8E31-D28AEF52553E} = {F4A57B17-B56F-4EB0-8E31-D28AEF52553E}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

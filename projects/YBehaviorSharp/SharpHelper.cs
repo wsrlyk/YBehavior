@@ -130,7 +130,7 @@ namespace YBehaviorSharp
         [DllImport(VERSION.dll)]
         static public extern bool SetBehavior(
             IntPtr pAgent, 
-            string treename, 
+            string fsmname, 
             string[] state2Tree, uint stSize,
             string[] tree2Tree, uint ttSize);
 

@@ -220,12 +220,6 @@ namespace YBehavior
 #define DATAARRAY_ONETYPE_DEFINE(type) 		DataArray<type> m_Data##type;
 	class SharedDataEx
 	{
-	public:
-
-		template<typename T>
-		KEY GetTypeKey();
-		
-
 	protected:
 		IDataArray* m_Datas[MAX_TYPE_KEY];
 
@@ -287,21 +281,6 @@ namespace YBehavior
 	};
 
 
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(Int, 0);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(Ulong, 1);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(Bool, 2);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(Float, 3);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(String, 4);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(EntityWrapper, 5);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(Vector3, 6);
-
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecInt, 7);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecUlong, 8);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecBool, 9);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecFloat, 10);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecString, 11);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecEntityWrapper, 12);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecVector3, 13);
 
 	template<typename T>
 	bool SharedDataEx::Get(KEY key, T& res)

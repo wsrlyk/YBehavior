@@ -227,16 +227,6 @@ namespace YBehavior
 	inline TYPEID GetTypeID() {
 		return -1;
 	}
-	template<typename T>
-	KEY SharedDataEx::GetTypeKey() {
-		return -1;
-	}
-
-#define YBEHAVIOR_BASICTYPE_STORE_KEY(type, id)			\
-	template<> inline KEY SharedDataEx::GetTypeKey<type>() \
-	{\
-		return id;\
-	}
 
 
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(Bool, 1);
@@ -254,6 +244,38 @@ namespace YBehavior
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecString, 105);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecEntityWrapper, 106);
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecVector3, 107);
+
+	//////////////////////////////////////////////////////////////////////////
+	template<typename T>
+	inline KEY GetTypeKey() {
+		return -1;
+	}
+
+#define YBEHAVIOR_BASICTYPE_STORE_KEY(type, id)			\
+	template<> inline KEY GetTypeKey<type>() \
+	{\
+		return id;\
+	}\
+	template<> inline TYPEID GetTypeKey<const type>() \
+	{\
+		return id; \
+	}
+
+	YBEHAVIOR_BASICTYPE_STORE_KEY(Int, 0);
+	YBEHAVIOR_BASICTYPE_STORE_KEY(Ulong, 1);
+	YBEHAVIOR_BASICTYPE_STORE_KEY(Bool, 2);
+	YBEHAVIOR_BASICTYPE_STORE_KEY(Float, 3);
+	YBEHAVIOR_BASICTYPE_STORE_KEY(String, 4);
+	YBEHAVIOR_BASICTYPE_STORE_KEY(EntityWrapper, 5);
+	YBEHAVIOR_BASICTYPE_STORE_KEY(Vector3, 6);
+
+	YBEHAVIOR_BASICTYPE_STORE_KEY(VecInt, 7);
+	YBEHAVIOR_BASICTYPE_STORE_KEY(VecUlong, 8);
+	YBEHAVIOR_BASICTYPE_STORE_KEY(VecBool, 9);
+	YBEHAVIOR_BASICTYPE_STORE_KEY(VecFloat, 10);
+	YBEHAVIOR_BASICTYPE_STORE_KEY(VecString, 11);
+	YBEHAVIOR_BASICTYPE_STORE_KEY(VecEntityWrapper, 12);
+	YBEHAVIOR_BASICTYPE_STORE_KEY(VecVector3, 13);
 
 	typedef const void* NodePtr;
 	struct TreeMap
