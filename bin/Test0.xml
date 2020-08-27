@@ -1,7 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Test0>
-  <Node Class="Root" Pos="0,0" >
-    <Shared Vec="_VC 0,0,0" />
-    <Node Class="SetVector3Action" Pos="154,267" Src="_VP Vec" Des="_VP Vec" />
+  <Node Class="Root">
+    <Shared Vec="_VC 0,7,0" S0="_SC string0"  S1="_SC string1"/>
+    <Node Class="Sequence">
+	    <Node Class="SetVector3Action" Src="_VP Vec" Des="_VP Vec" />
+	    <Node Class="XCustomAction" String0="_SP S0" String1="_SP S1" />
+    </Node>
   </Node>
 </Test0>

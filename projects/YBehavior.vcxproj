@@ -73,6 +73,7 @@
     <ClInclude Include="..\include\YBehavior\sharedvariableex.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry_array.h" />
+    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_buffer.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry_data.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry_shareddata.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry_variable.h" />

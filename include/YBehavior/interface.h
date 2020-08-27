@@ -48,6 +48,7 @@ namespace YBehavior
 		virtual void SetValue(IMemory* pMemory, const void* src) = 0;
 		virtual void SetValueFromString(const STRING& str) = 0;
 		virtual TYPEID TypeID() const = 0;
+		virtual TYPEID ElementTypeID() const = 0;
 		///> if this variable is an INT, and it refers to an element of an INT[], this method will return the type of INT[] instead of INT;   Used in log..
 		virtual TYPEID GetReferenceSharedDataSelfID() = 0;
 

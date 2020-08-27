@@ -143,7 +143,7 @@ namespace YBehavior
 		}
 	}
 
-	bool Network::ReceivePackets(CSTRING msgCheck /*= 0*/)
+	bool Network::ReceivePackets(CSTRING_CONST msgCheck /*= 0*/)
 	{
 		const int kBufferLen = 2048;
 		char buffer[kBufferLen + 1];

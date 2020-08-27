@@ -30,7 +30,7 @@ namespace YBehaviorSharp
 
         protected bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
-            m_Target = new SVariableEntity(YBehaviorSharp.SharpHelper.CreateVariable(pNode, "Target", pData, true, YBehaviorSharp.SUtility.POINTER_CHAR));
+            m_Target = new SVariableEntity(YBehaviorSharp.SharpHelper.CreateVariable(pNode, "Target", pData, YBehaviorSharp.SUtility.POINTER_CHAR));
             if (!m_Target.IsValid)
             {
                 return false;
@@ -70,8 +70,8 @@ namespace YBehaviorSharp
 
     public class SetVector3Action : SBehaviorNode
     {
-        IntPtr m_Src;
-        IntPtr m_Des;
+        SVariable m_Src;
+        SVariable m_Des;
 
         public SetVector3Action()
         {
@@ -82,8 +82,8 @@ namespace YBehaviorSharp
 
         protected bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
-            m_Src = YBehaviorSharp.SharpHelper.CreateVariable(pNode, "Src", pData, true, YBehaviorSharp.SUtility.POINTER_CHAR);
-            m_Des = YBehaviorSharp.SharpHelper.CreateVariable(pNode, "Des", pData, true, YBehaviorSharp.SUtility.POINTER_CHAR);
+            m_Src = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Src", pData, YBehaviorSharp.SUtility.POINTER_CHAR);
+            m_Des = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Des", pData, YBehaviorSharp.SUtility.POINTER_CHAR);
 
             return true;
         }
@@ -92,9 +92,9 @@ namespace YBehaviorSharp
         {
             Console.WriteLine("SetVector3Action Update");
 
-            Vector3 src = YBehaviorSharp.SharpHelper.GetVariableVector3(pAgent, m_Src);
+            Vector3 src = (m_Src as SVariableVector3).Get(pAgent);
             src.x += 1;
-            YBehaviorSharp.SharpHelper.SetVariableVector3(pAgent, m_Des, src);
+            (m_Des as SVariableVector3).Set(pAgent, src);
 
             return NodeState.NS_SUCCESS;
         }

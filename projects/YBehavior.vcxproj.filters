@@ -273,6 +273,9 @@
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry_data.h">
       <Filter>头文件\sharp</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_buffer.h">
+      <Filter>头文件\sharp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">

@@ -117,7 +117,7 @@ namespace YBehavior
 		void OnConnection() {} // used once after the connection is established, make some initialization between server and client;
 
 		void SendAllPackets();
-		bool ReceivePackets(CSTRING msgCheck = 0);
+		bool ReceivePackets(CSTRING_CONST msgCheck = 0);
 		bool ReadText(STRING& text);
 		bool SendText(const STRING& text);
 		void ClearOneConnection();

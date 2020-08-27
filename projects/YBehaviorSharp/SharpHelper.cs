@@ -7,6 +7,7 @@ using System.Linq;
 namespace YBehaviorSharp
 {
     using TYPEID = System.Int32;
+    using KEY = System.Int32;
     using INT = System.Int32;
     using BOOL = System.Int16;
     using FLOAT = System.Single;
@@ -31,27 +32,40 @@ namespace YBehaviorSharp
 		public float x;
         public float y;
         public float z;
+
+        public static Vector3 zero = new Vector3() { x = 0, y = 0, z = 0 };
     }
 
     public struct EntityWrapper
     {
-        IntPtr Core;
     }
 
-    class GetClassType<T>
+    public class GetClassType<T>
     {
-        static TYPEID id = 0;
+        static TYPEID id = -1;
+        static TYPEID vecid = -1;
         public static TYPEID ID { get { return id; } }
+        public static TYPEID VecID { get { return vecid; } }
 
         static GetClassType()
         {
             GetClassType<BOOL>.id = SharpHelper.GetClassTypeNumberIdBool();
+            GetClassType<bool>.id = SharpHelper.GetClassTypeNumberIdBool();
             GetClassType<INT>.id = SharpHelper.GetClassTypeNumberIdInt();
             GetClassType<FLOAT>.id = SharpHelper.GetClassTypeNumberIdFloat();
             GetClassType<ULONG>.id = SharpHelper.GetClassTypeNumberIdUlong();
             GetClassType<STRING>.id = SharpHelper.GetClassTypeNumberIdString();
             GetClassType<Vector3>.id = SharpHelper.GetClassTypeNumberIdVector3();
-            GetClassType<EntityWrapper>.id = SharpHelper.GetClassTypeNumberIdEntityWrapper();
+            GetClassType<SEntity>.id = SharpHelper.GetClassTypeNumberIdEntityWrapper();
+
+            GetClassType<BOOL>.vecid = SharpHelper.GetClassTypeNumberIdVecBool();
+            GetClassType<bool>.vecid = SharpHelper.GetClassTypeNumberIdVecBool();
+            GetClassType<INT>.vecid = SharpHelper.GetClassTypeNumberIdVecInt();
+            GetClassType<FLOAT>.vecid = SharpHelper.GetClassTypeNumberIdVecFloat();
+            GetClassType<ULONG>.vecid = SharpHelper.GetClassTypeNumberIdVecUlong();
+            GetClassType<STRING>.vecid = SharpHelper.GetClassTypeNumberIdVecString();
+            GetClassType<Vector3>.vecid = SharpHelper.GetClassTypeNumberIdVecVector3();
+            GetClassType<SEntity>.vecid = SharpHelper.GetClassTypeNumberIdVecEntityWrapper();
         }
     }
 
@@ -104,6 +118,13 @@ namespace YBehaviorSharp
             }
         }
 
+        public static void Register<T>() where T : SBehaviorNode
+        {
+            SBehaviorNode node = Activator.CreateInstance<T>();
+            node.Register();
+            s_NodeList.Add(node);
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [DllImport(VERSION.dll)]
@@ -142,11 +163,15 @@ namespace YBehaviorSharp
             IntPtr pNode,
             string attrName,
             IntPtr data,
-            bool bSingle,
             char variableType);
 
         [DllImport(VERSION.dll)]
         static public extern TYPEID GetVariableTypeID(IntPtr pVariable);
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetVariableElementTypeID(IntPtr pVariable);
+        [DllImport(VERSION.dll)]
+        static public extern KEY GetTypeKeyByName(string name, TYPEID type);
+
         [DllImport(VERSION.dll)]
         static public extern TYPEID GetClassTypeNumberIdInt();
         [DllImport(VERSION.dll)]
@@ -161,5 +186,19 @@ namespace YBehaviorSharp
         static public extern TYPEID GetClassTypeNumberIdEntityWrapper();
         [DllImport(VERSION.dll)]
         static public extern TYPEID GetClassTypeNumberIdVector3();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetClassTypeNumberIdVecInt();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetClassTypeNumberIdVecUlong();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetClassTypeNumberIdVecFloat();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetClassTypeNumberIdVecString();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetClassTypeNumberIdVecBool();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetClassTypeNumberIdVecEntityWrapper();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetClassTypeNumberIdVecVector3();
     }
 }

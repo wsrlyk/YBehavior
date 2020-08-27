@@ -35,7 +35,7 @@ extern "C" YBEHAVIOR_API void DeleteAgent(YBehavior::Agent* pObject)
 }
 
 extern "C" YBEHAVIOR_API void RegisterSharpNode(
-	YBehavior::CSTRING name,
+	YBehavior::CSTRING_CONST name,
 	YBehavior::OnSharpNodeLoadedDelegate onload,
 	YBehavior::OnSharpNodeUpdateDelegate onupdate)
 {
@@ -51,9 +51,9 @@ extern "C" YBEHAVIOR_API void RegisterLoadData(YBehavior::LoadDataDelegate loadd
 
 extern "C" YBEHAVIOR_API bool SetBehavior(
 	YBehavior::Agent* pAgent, 
-	YBehavior::CSTRING fsmName,
-	YBehavior::CSTRING* state2Tree, YBehavior::UINT stSize,
-	YBehavior::CSTRING* tree2Tree, YBehavior::UINT ttSize
+	YBehavior::CSTRING_CONST fsmName,
+	YBehavior::CSTRING_CONST* state2Tree, YBehavior::UINT stSize,
+	YBehavior::CSTRING_CONST* tree2Tree, YBehavior::UINT ttSize
 	)
 {
 	StdVector<YBehavior::STRING> s2t;
@@ -89,9 +89,8 @@ extern "C" YBEHAVIOR_API void Tick(YBehavior::Agent* pAgent)
 
 extern "C" YBEHAVIOR_API YBehavior::ISharedVariableEx* CreateVariable(
 	YBehavior::BehaviorNode* pNode,
-	YBehavior::CSTRING attrName,
+	YBehavior::CSTRING_CONST attrName,
 	const pugi::xml_node* data,
-	bool bSingle,
 	char variableType)
 {
 	if (pNode != nullptr)

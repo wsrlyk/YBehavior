@@ -138,6 +138,7 @@ namespace YBehavior
 
 	public:
 		TYPEID TypeID() const { return GetTypeID<T>(); }
+		TYPEID ElementTypeID() const { return GetTypeID<ElementType>(); }
 		TYPEID GetReferenceSharedDataSelfID()
 		{
 			///> it's const, just return itself

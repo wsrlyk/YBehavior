@@ -5,45 +5,116 @@ using System.Text;
 
 namespace YBehaviorSharp
 {
-    public class SEntity : IDisposable
+    public interface IPtr
     {
-        bool m_bReference = false;
+        IntPtr Ptr { get; }
+    }
 
-        IntPtr m_Core;
-        public IntPtr Core { get { return m_Core; } }
+    public class SPtr : IDisposable, IPtr
+    {
+        protected IntPtr m_Ptr;
+        public IntPtr Ptr { get { return m_Ptr; } }
+        #region IDisposable Support
+        private bool disposedValue = false;
 
-        public SEntity()
+        protected virtual void OnDispose(bool disposing) { }
+
+        protected void Dispose(bool disposing)
         {
-            m_Core = SharpHelper.CreateEntity();
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                }
+
+                if (m_Ptr != IntPtr.Zero)
+                {
+                    SPtrMgr.Instance.Remove(this);
+                    OnDispose(disposing);
+                    m_Ptr = IntPtr.Zero;
+                }
+
+                disposedValue = true;
+            }
         }
 
-        public SEntity(IntPtr core)
+        ~SPtr()
         {
-            m_Core = core;
-            m_bReference = true;
+            Dispose(false);
         }
 
         public void Dispose()
         {
-            if (!m_bReference)
-                SharpHelper.DeleteEntity(m_Core);
+            Dispose(true);
+
+            GC.SuppressFinalize(this);
+        }
+        #endregion
+
+    }
+    public class SEntity : SPtr
+    {
+        public IntPtr Core { get { return m_Ptr; } }
+
+        public SEntity()
+        {
+            m_Ptr = SharpHelper.CreateEntity();
+            SPtrMgr.Instance.Add(this);
+        }
+
+        protected override void OnDispose(bool disposing)
+        {
+            SharpHelper.DeleteEntity(m_Ptr);
         }
     }
 
-    public class SAgent : IDisposable
+    public class SAgent : SPtr
     {
         SEntity m_Entity;
-        IntPtr m_Core;
-        public IntPtr Core { get { return m_Core; } }
+        public SEntity Entity { get { return m_Entity; } }
+
+        public IntPtr Core { get { return m_Ptr; } }
 
         public SAgent(SEntity entity)
         {
             m_Entity = entity;
-            m_Core = SharpHelper.CreateAgent(entity.Core);
+            m_Ptr = SharpHelper.CreateAgent(m_Entity.Core);
+            SPtrMgr.Instance.Add(this);
         }
-        public void Dispose()
+        protected override void OnDispose(bool disposing)
         {
-            SharpHelper.DeleteAgent(m_Core);
+            SharpHelper.DeleteAgent(m_Ptr);
+        }
+    }
+
+    public class SPtrMgr
+    {
+        static SPtrMgr s_Mgr = new SPtrMgr();
+        public static SPtrMgr Instance { get { return s_Mgr; } }
+
+        Dictionary<IntPtr, IPtr> m_Dic = new Dictionary<IntPtr, IPtr>();
+
+        public void Add(IPtr entity)
+        {
+            if (entity == null)
+                return;
+
+            m_Dic.Add(entity.Ptr, entity);
+        }
+
+        public void Remove(IPtr entity)
+        {
+            if (entity == null)
+                return;
+
+            m_Dic.Remove(entity.Ptr);
+        }
+
+        public IPtr Get(IntPtr core)
+        {
+            if (m_Dic.TryGetValue(core, out IPtr entity))
+                return entity;
+            return null;
         }
     }
 }

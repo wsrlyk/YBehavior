@@ -16,176 +16,109 @@ namespace YBehaviorSharp
 
     public partial class SharpHelper
     {
+        static public bool ConvertBool(BOOL b) { return b != 0; }
+        static public BOOL ConvertBool(bool b) { return (BOOL)(b ? 1 : 0); }
+
+        [DllImport(VERSION.dll)]
+        static public extern int GetFromBufferInt();
+        [DllImport(VERSION.dll)]
+        static public extern void SetToBufferInt(int data);
+
+        [DllImport(VERSION.dll)]
+        static public extern float GetFromBufferFloat();
+        [DllImport(VERSION.dll)]
+        static public extern void SetToBufferFloat(float data);
+
+        [DllImport(VERSION.dll)]
+        static public extern ulong GetFromBufferUlong();
+        [DllImport(VERSION.dll)]
+        static public extern void SetToBufferUlong(ulong data);
+
+        [DllImport(VERSION.dll)]
+        static public extern Vector3 GetFromBufferVector3();
+        [DllImport(VERSION.dll)]
+        static public extern void SetToBufferVector3(Vector3 data);
+
+        [DllImport(VERSION.dll)]
+        static public extern BOOL GetFromBufferBool();
+        [DllImport(VERSION.dll)]
+        static public extern void SetToBufferBool(BOOL data);
+
+        [DllImport(VERSION.dll)]
+        static public extern IntPtr GetFromBufferEntity();
+        [DllImport(VERSION.dll)]
+        static public extern void SetToBufferEntity(IntPtr data);
+
+        [DllImport(VERSION.dll)]
+        static private extern void GetFromBufferString(StringBuilder sb, int len);
+        static StringBuilder sb = new StringBuilder(100);
+        static public string GetFromBufferString()
+        {
+            sb.Length = 0;
+            GetFromBufferString(sb, sb.Capacity);
+            return sb.ToString();
+        }
+        [DllImport(VERSION.dll)]
+        static public extern void SetToBufferString(string data);
+
+        [DllImport(VERSION.dll)]
+        static public extern IntPtr GetFromBufferVector(int type);
+
         ///////////////////////////////////////////////////////////////
-        
-        [DllImport(VERSION.dll)]
-        static public extern IntPtr GetVariableValue(IntPtr pAgent, IntPtr pVariable);
-        [DllImport(VERSION.dll)]
-        static public extern void SetVariableValue(IntPtr pAgent, IntPtr pVariable, IntPtr pValue);
 
         [DllImport(VERSION.dll)]
-        static public extern int GetVariableInt(IntPtr pAgent, IntPtr pVariable);
+        static public extern bool GetVariableValue(IntPtr pAgent, IntPtr pVariable);
         [DllImport(VERSION.dll)]
-        static public extern void SetVariableInt(IntPtr pAgent, IntPtr pVariable, int value);
+        static public extern IntPtr GetVariableValuePtr(IntPtr pAgent, IntPtr pVariable);
+        [DllImport(VERSION.dll)]
+        static public extern void SetVariableValue(IntPtr pAgent, IntPtr pVariable);
 
-        [DllImport(VERSION.dll)]
-        static public extern ulong GetVariableUlong(IntPtr pAgent, IntPtr pVariable);
-        [DllImport(VERSION.dll)]
-        static public extern void SetVariableUlong(IntPtr pAgent, IntPtr pVariable, ulong value);
-
-        [DllImport(VERSION.dll)]
-        static public extern float GetVariableFloat(IntPtr pAgent, IntPtr pVariable);
-        [DllImport(VERSION.dll)]
-        static public extern void SetVariableFloat(IntPtr pAgent, IntPtr pVariable, float value);
-
-        [DllImport(VERSION.dll)]
-        static public extern BOOL GetVariableBool(IntPtr pAgent, IntPtr pVariable);
-        [DllImport(VERSION.dll)]
-        static public extern void SetVariableBool(IntPtr pAgent, IntPtr pVariable, BOOL value);
-
-        [DllImport(VERSION.dll)]
-        static public extern string GetVariableString(IntPtr pAgent, IntPtr pVariable);
-        [DllImport(VERSION.dll)]
-        static public extern void SetVariableString(IntPtr pAgent, IntPtr pVariable, string value);
-
-        [DllImport(VERSION.dll)]
-        static public extern Vector3 GetVariableVector3(IntPtr pAgent, IntPtr pVariable);
-        [DllImport(VERSION.dll)]
-        static public extern void SetVariableVector3(IntPtr pAgent, IntPtr pVariable, Vector3 value);
-
-        [DllImport(VERSION.dll)]
-        static public extern IntPtr GetEntityFromWrapper(IntPtr pWrapper);
-        [DllImport(VERSION.dll)]
-        static public extern IntPtr GetEntityFromVariable(IntPtr pAgent, IntPtr pVariable);
-        [DllImport(VERSION.dll)]
-        static public extern void SetEntityToVariable(IntPtr pAgent, IntPtr pVariable, IntPtr value);
 
         ///////////////////////////////////////////////////////////////
         [DllImport(VERSION.dll)]
-        static public extern int GetSharedDataInt(IntPtr pAgent, int key);
+        static public extern void GetSharedData(IntPtr pAgent, int key, int type);
         [DllImport(VERSION.dll)]
-        static public extern void SetSharedDataInt(IntPtr pAgent, int key, int value);
+        static public extern IntPtr GetSharedDataPtr(IntPtr pAgent, int key, int type);
+        [DllImport(VERSION.dll)]
+        static public extern void SetSharedData(IntPtr pAgent, int key, int type);
 
-        [DllImport(VERSION.dll)]
-        static public extern ulong GetSharedDataUlong(IntPtr pAgent, int key);
-        [DllImport(VERSION.dll)]
-        static public extern void SetSharedDataUlong(IntPtr pAgent, int key, ulong value);
-
-        [DllImport(VERSION.dll)]
-        static public extern float GetSharedDataFloat(IntPtr pAgent, int key);
-        [DllImport(VERSION.dll)]
-        static public extern void SetSharedDataFloat(IntPtr pAgent, int key, float value);
-
-        [DllImport(VERSION.dll)]
-        static public extern BOOL GetSharedDataBool(IntPtr pAgent, int key);
-        [DllImport(VERSION.dll)]
-        static public extern void SetSharedDataBool(IntPtr pAgent, int key, BOOL value);
-
-        [DllImport(VERSION.dll)]
-        static public extern Vector3 GetSharedDataVector3(IntPtr pAgent, int key);
-        [DllImport(VERSION.dll)]
-        static public extern void SetSharedDataVector3(IntPtr pAgent, int key, Vector3 value);
-
-        [DllImport(VERSION.dll)]
-        static public extern string GetSharedDataString(IntPtr pAgent, int key);
-        [DllImport(VERSION.dll)]
-        static public extern void SetSharedDataString(IntPtr pAgent, int key, string value);
 
         ///////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////
         [DllImport(VERSION.dll)]
-        static public extern int GetIntVectorSize(IntPtr pVector);
+        static public extern int GetVectorSize(IntPtr pVector);
         [DllImport(VERSION.dll)]
-        static public extern void ClearIntVector(IntPtr pVector);
+        static public extern void ClearVector(IntPtr pVector);
         [DllImport(VERSION.dll)]
-        static public extern void PushBackIntVector(IntPtr pVector, int value);
+        static public extern void VectorPushBack(IntPtr pVector, int type);
         [DllImport(VERSION.dll)]
-        static public extern void SetIntVectorAtIndex(IntPtr pVector, int index, int value);
+        static public extern bool VectorSet(IntPtr pVector, int index, int type);
         [DllImport(VERSION.dll)]
-        static public extern int GetIntVectorAtIndex(IntPtr pVector, int index);
-
-        [DllImport(VERSION.dll)]
-        static public extern int GetUlongVectorSize(IntPtr pVector);
-        [DllImport(VERSION.dll)]
-        static public extern void ClearUlongVector(IntPtr pVector);
-        [DllImport(VERSION.dll)]
-        static public extern void PushBackUlongVector(IntPtr pVector, ulong value);
-        [DllImport(VERSION.dll)]
-        static public extern void SetUlongVectorAtIndex(IntPtr pVector, int index, ulong value);
-        [DllImport(VERSION.dll)]
-        static public extern ulong GetUlongVectorAtIndex(IntPtr pVector, int index);
-
-        [DllImport(VERSION.dll)]
-        static public extern int GetFloatVectorSize(IntPtr pVector);
-        [DllImport(VERSION.dll)]
-        static public extern void ClearFloatVector(IntPtr pVector);
-        [DllImport(VERSION.dll)]
-        static public extern void PushBackFloatVector(IntPtr pVector, float value);
-        [DllImport(VERSION.dll)]
-        static public extern void SetFloatVectorAtIndex(IntPtr pVector, int index, float value);
-        [DllImport(VERSION.dll)]
-        static public extern float GetFloatVectorAtIndex(IntPtr pVector, int index);
-
-        [DllImport(VERSION.dll)]
-        static public extern int GetBoolVectorSize(IntPtr pVector);
-        [DllImport(VERSION.dll)]
-        static public extern void ClearBoolVector(IntPtr pVector);
-        [DllImport(VERSION.dll)]
-        static public extern void PushBackBoolVector(IntPtr pVector, BOOL value);
-        [DllImport(VERSION.dll)]
-        static public extern void SetBoolVectorAtIndex(IntPtr pVector, int index, BOOL value);
-        [DllImport(VERSION.dll)]
-        static public extern BOOL GetBoolVectorAtIndex(IntPtr pVector, int index);
-
-        [DllImport(VERSION.dll)]
-        static public extern int GetVector3VectorSize(IntPtr pVector);
-        [DllImport(VERSION.dll)]
-        static public extern void ClearVector3Vector(IntPtr pVector);
-        [DllImport(VERSION.dll)]
-        static public extern void PushBackVector3Vector(IntPtr pVector, Vector3 value);
-        [DllImport(VERSION.dll)]
-        static public extern void SetVector3VectorAtIndex(IntPtr pVector, int index, Vector3 value);
-        [DllImport(VERSION.dll)]
-        static public extern Vector3 GetVector3VectorAtIndex(IntPtr pVector, int index);
-
-        [DllImport(VERSION.dll)]
-        static public extern int GetStringVectorSize(IntPtr pVector);
-        [DllImport(VERSION.dll)]
-        static public extern void ClearStringVector(IntPtr pVector);
-        [DllImport(VERSION.dll)]
-        static public extern void PushBackStringVector(IntPtr pVector, string value);
-        [DllImport(VERSION.dll)]
-        static public extern void SetStringVectorAtIndex(IntPtr pVector, int index, string value);
-        [DllImport(VERSION.dll)]
-        static public extern string GetStringVectorAtIndex(IntPtr pVector, int index);
-
-        [DllImport(VERSION.dll)]
-        static public extern int GetEntityVectorSize(IntPtr pVector);
-        [DllImport(VERSION.dll)]
-        static public extern void ClearEntityVector(IntPtr pVector);
-        [DllImport(VERSION.dll)]
-        static public extern void PushBackEntityVector(IntPtr pVector, IntPtr pEntity);
-        [DllImport(VERSION.dll)]
-        static public extern void SetEntityVectorAtIndex(IntPtr pVector, int index, IntPtr pEntity);
-        [DllImport(VERSION.dll)]
-        static public extern IntPtr GetEntityVectorAtIndex(IntPtr pVector, int index);
+        static public extern bool VectorGet(IntPtr pVector, int index, int type);
 
         ///////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////
+        [DllImport(VERSION.dll)]
+        static public extern int ToInt(IntPtr ptr);
+        [DllImport(VERSION.dll)]
+        static public extern float ToFloat(IntPtr ptr);
+        [DllImport(VERSION.dll)]
+        static public extern BOOL ToBool(IntPtr ptr);
+        [DllImport(VERSION.dll)]
+        static public extern ulong ToUlong(IntPtr ptr);
+        [DllImport(VERSION.dll)]
+        static public extern Vector3 ToVector3(IntPtr ptr);
+        [DllImport(VERSION.dll)]
+        static public extern IntPtr ToEntity(IntPtr ptr);
+        [DllImport(VERSION.dll)]
+        static private extern bool ToString(IntPtr ptr, StringBuilder sb, int len);
+        static public string ToString(IntPtr ptr)
+        {
+            sb.Length = 0;
+            if (ToString(ptr, sb, sb.Capacity))
+                return sb.ToString();
+            return string.Empty;
+        }
 
-        [DllImport(VERSION.dll)]
-        static public extern KEY GetIntKeyByName(string name);
-        [DllImport(VERSION.dll)]
-        static public extern KEY GetFloatKeyByName(string name);
-        [DllImport(VERSION.dll)]
-        static public extern KEY GetUlongKeyByName(string name);
-        [DllImport(VERSION.dll)]
-        static public extern KEY GetBoolKeyByName(string name);
-        [DllImport(VERSION.dll)]
-        static public extern KEY GetVector3KeyByName(string name);
-        [DllImport(VERSION.dll)]
-        static public extern KEY GetEntityWrapperKeyByName(string name);
-        [DllImport(VERSION.dll)]
-        static public extern KEY GetStringKeyByName(string name);
     }
 }

@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SharpHelper_TypeOperation.cs" />
+    <Compile Include="SArray.cs" />
     <Compile Include="SVariable.cs" />
     <Compile Include="SUtility.cs" />
     <Compile Include="SharpHelper.cs" />
