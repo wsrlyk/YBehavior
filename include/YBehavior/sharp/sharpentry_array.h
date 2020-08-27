@@ -80,7 +80,7 @@ namespace YBehavior
 	class VectorHelperMgr
 	{
 	protected:
-		static IVectorHelper* _Helpers[8];
+		static IVectorHelper* _Helpers[7];
 	public:
 
 		static IVectorHelper* Get(const TYPEID& k)
@@ -106,17 +106,15 @@ namespace YBehavior
 			REGISTER_VectorHelper(String);
 			REGISTER_VectorHelper(EntityWrapper);
 			REGISTER_VectorHelper(Vector3);
-
-			_Helpers[0] = nullptr;
 		}
 		static VectorHelperMgr s_Mgr;
 	};
 
-	YBehavior::IVectorHelper* VectorHelperMgr::_Helpers[8];
+	YBehavior::IVectorHelper* VectorHelperMgr::_Helpers[7];
 	YBehavior::VectorHelperMgr VectorHelperMgr::s_Mgr;
 }
 
-extern "C" YBEHAVIOR_API YBehavior::UINT VectorGetSize(const void* pVector, YBehavior::TYPEID type)
+extern "C" YBEHAVIOR_API YBehavior::UINT VectorGetSize(void* pVector, YBehavior::TYPEID type)
 {
 	return YBehavior::VectorHelperMgr::Get(type)->GetVectorSize(pVector);
 }

@@ -16,19 +16,23 @@ namespace TestSharp
             YBehaviorSharp.SharpHelper.Init();
             SharpHelper.Register<XCustomAction>();
 
-            XEntity entity = new XEntity("Hehe");
+            XEntity entity0 = new XEntity("Hehe");
+            XEntity entity1 = new XEntity("Haha");
+
+            Scene.Instance.entities[0] = entity0;
+            Scene.Instance.entities[1] = entity1;
 
             string[] state2tree = new string[] { "Main", "Test0"};
-            YBehaviorSharp.SharpHelper.SetBehavior(entity.Agent.Core, "EmptyFSM", state2tree, 2, null, 0);
+            YBehaviorSharp.SharpHelper.SetBehavior(entity0.Agent.Core, "EmptyFSM", state2tree, 2, null, 0);
 
             int i = 0;
             while(++i < 1000)
             {
-                YBehaviorSharp.SharpHelper.Tick(entity.Agent.Core);
+                YBehaviorSharp.SharpHelper.Tick(entity0.Agent.Core);
                 System.Threading.Thread.Sleep(1000);
             }
 
-            entity.Destroy();
+            entity0.Destroy();
             Console.Read();
         }
 
@@ -44,6 +48,11 @@ namespace TestSharp
         }
     }
 
+    class Scene
+    {
+        public XEntity[] entities = new XEntity[2];
+        public static Scene Instance = new Scene();
+    }
     /// <summary>
     /// Entity used in Real Game
     /// </summary>
@@ -52,6 +61,7 @@ namespace TestSharp
         XSEntity m_SEntity;
         XSAgent m_SAgent;
         public XSAgent Agent { get { return m_SAgent; } }
+        public XSEntity Entity { get { return m_SEntity; } }
         string m_Name;
         public string Name { get { return m_Name; } }
 
@@ -99,6 +109,10 @@ namespace TestSharp
         SVariableString m_String0;
         SVariableString m_String1;
 
+        SVariableEntity m_Entity0;
+
+        SVariable m_Array0;
+
         public XCustomAction()
         {
             m_OnLoadCallback = new OnNodeLoaded(OnNodeLoaded);
@@ -114,11 +128,20 @@ namespace TestSharp
             m_String1 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "String1", pData) as SVariableString;
             if (m_String1 == null)
                 return false;
+
+            m_Entity0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Entity0", pData) as SVariableEntity;
+            if (m_Entity0 == null)
+                return false;
+
+            m_Array0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Array0", pData);
+            if (m_Array0 == null)
+                return false;
             return true;
         }
 
         protected NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
         {
+            Console.WriteLine();
             Console.WriteLine("XCustomAction Update");
 
             XSAgent agent = YBehaviorSharp.SPtrMgr.Instance.Get(pAgent) as XSAgent;
@@ -130,13 +153,13 @@ namespace TestSharp
 
             SharpHelper.GetSharedData(pAgent, key0, GetClassType<string>.ID);
             string sharedData0 = SharpHelper.GetFromBufferString();
-            sharedData0 = sharedData0 + "0";
+            //sharedData0 = sharedData0 + "0";
             SharpHelper.SetToBufferString(sharedData0);
             SharpHelper.SetSharedData(pAgent, key0, GetClassType<string>.ID);
 
             SharpHelper.GetSharedData(pAgent, key1, GetClassType<string>.ID);
             string sharedData1 = SharpHelper.GetFromBufferString();
-            sharedData1 = sharedData1 + "1";
+            //sharedData1 = sharedData1 + "1";
             SharpHelper.SetToBufferString(sharedData1);
             SharpHelper.SetSharedData(pAgent, key1, GetClassType<string>.ID);
 
@@ -147,8 +170,44 @@ namespace TestSharp
             m_String1.Set(pAgent, name0);
 
             Console.WriteLine(string.Format("0: {0}, 1: {1}", name0, name1));
+
+            ////////////////////////////////////////////////////////////////////////////
+
+            XSEntity entity = m_Entity0.Get(pAgent) as XSEntity;
+            if (entity != null)
+            {
+                Console.WriteLine(string.Format("entity: {0}", entity.GetEntity.Name));
+            }
+            entity = Scene.Instance.entities[++counter % 2].Entity;
+            m_Entity0.Set(pAgent, entity);
+
+            ////////////////////////////////////////////////////////////////////////////
+            var keya = SharpHelper.GetTypeKeyByName("II0", GetClassType<int>.VecID);
+
+            SharpHelper.GetSharedData(pAgent, keya, GetClassType<int>.VecID);
+            SArrayInt arr = SArrayHelper.GetArray(SharpHelper.GetFromBufferVector(GetClassType<int>.VecID), GetClassType<int>.ID) as SArrayInt;
+            //arr.Clear();
+            arr.PushBack(100);
+            SharpHelper.SetSharedData(pAgent, keya, GetClassType<int>.VecID);
+
+            if (m_Array0 is SArrayVaraible)
+            {
+                SArrayVaraible av = m_Array0 as SArrayVaraible;
+                SArrayInt array = av.Get(pAgent) as SArrayInt;
+                if (array != null)
+                    array.PushBack(array.GetLength());
+
+                string s = array.Get(0).ToString();
+                for (int i = 1; i < array.GetLength(); ++i)
+                {
+                    s += "|";
+                    s += array.Get(i);
+                }
+                Console.WriteLine(string.Format("Array: {0}", s));
+            }
             return NodeState.NS_SUCCESS;
         }
 
+        static int counter = 0;
     }
 }

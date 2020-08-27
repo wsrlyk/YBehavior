@@ -25,12 +25,12 @@ namespace YBehaviorSharp
 
         public void Clear()
         {
-            SharpHelper.ClearVector(m_Core);
+            SharpHelper.VectorClear(m_Core, m_TypeID);
         }
 
         public int GetLength()
         {
-            return SharpHelper.GetVectorSize(m_Core);
+            return (int)SharpHelper.VectorGetSize(m_Core, m_TypeID);
         }
 
         abstract public void PushBack(T data);

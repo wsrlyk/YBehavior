@@ -86,9 +86,9 @@ namespace YBehaviorSharp
         ///////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////
         [DllImport(VERSION.dll)]
-        static public extern int GetVectorSize(IntPtr pVector);
+        static public extern uint VectorGetSize(IntPtr pVector, int type);
         [DllImport(VERSION.dll)]
-        static public extern void ClearVector(IntPtr pVector);
+        static public extern void VectorClear(IntPtr pVector, int type);
         [DllImport(VERSION.dll)]
         static public extern void VectorPushBack(IntPtr pVector, int type);
         [DllImport(VERSION.dll)]
