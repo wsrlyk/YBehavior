@@ -27,7 +27,7 @@ namespace YBehavior
 		UINT GetVectorSize(const void* pVector) override
 		{
 			if (pVector)
-				return ((const StdVector<T>*)pVector)->size();
+				return (UINT)((const StdVector<T>*)pVector)->size();
 			return 0;
 		}
 		void Clear(void* pVector) override

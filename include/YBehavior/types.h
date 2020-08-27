@@ -12,7 +12,7 @@ namespace YBehavior
 {
 #define StdVector std::vector
 
-	struct YBEHAVIOR_API Vector3
+	struct Vector3
 	{
 		float x;
 		float y;
@@ -98,7 +98,7 @@ namespace YBehavior
 
 	class Entity;
 	class Agent;
-	struct YBEHAVIOR_API EntityWrapper
+	struct EntityWrapper
 	{
 	protected:
 		Entity* m_Data;

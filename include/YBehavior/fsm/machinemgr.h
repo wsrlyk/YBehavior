@@ -26,7 +26,7 @@ namespace YBehavior
 	typedef typename MachineVersionMgrType::InfoType MachineInfoType;
 	typedef typename MachineVersionMgrType::InfoType::VersionType MachineVersionType;
 
-	class YBEHAVIOR_API MachineMgr
+	class MachineMgr
 	{
 		MachineVersionMgrType m_VersionMgr;
 

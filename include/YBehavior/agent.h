@@ -15,7 +15,7 @@ namespace YBehavior
 	class Memory;
 	class MachineContext;
 
-	class YBEHAVIOR_API Entity
+	class Entity
 	{
 	protected:
 		EntityWrapper* m_Wrapper;
@@ -26,7 +26,7 @@ namespace YBehavior
 		virtual STRING ToString() const;
 	};
 
-	class YBEHAVIOR_API Agent
+	class Agent
 	{
 		static UINT64 s_UID;
 		UINT64 m_UID;

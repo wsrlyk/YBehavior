@@ -61,7 +61,7 @@ namespace YBehavior
 #define ERROR_BEGIN_NODE_HEAD ERROR_BEGIN << m_UID << "." << GetClassName() << " "
 #define LOG_BEGIN_NODE_HEAD LOG_BEGIN << m_UID << "." << GetClassName() << " "
 
-	class YBEHAVIOR_API BehaviorNode
+	class BehaviorNode
 	{
 	protected:
 		BehaviorNodePtr m_Parent;
@@ -221,7 +221,7 @@ namespace YBehavior
 		return typeID;
 	}
 
-	class YBEHAVIOR_API BranchNode : public BehaviorNode
+	class BranchNode : public BehaviorNode
 	{
 	public:
 		BranchNode();
@@ -234,11 +234,11 @@ namespace YBehavior
 		void _DestroyChilds();
 	};
 
-	class YBEHAVIOR_API LeafNode: public BehaviorNode
+	class LeafNode: public BehaviorNode
 	{
 
 	};
-	class YBEHAVIOR_API SingleChildNode: public BranchNode
+	class SingleChildNode: public BranchNode
 	{
 	public:
 		SingleChildNode();
@@ -249,7 +249,7 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 	};
 
-	class YBEHAVIOR_API CompositeNode: public BranchNode
+	class CompositeNode: public BranchNode
 	{
 
 	};
@@ -267,7 +267,7 @@ namespace YBehavior
 		TempMemory m_TempMemory;
 	};
 
-	class YBEHAVIOR_API BehaviorTree : public SingleChildNode
+	class BehaviorTree : public SingleChildNode
 	{
 	public:
 		STRING GetClassName() const override { return "Tree"; }

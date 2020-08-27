@@ -21,7 +21,7 @@ namespace YBehavior
 	typedef typename TreeVersionMgrType::InfoType TreeInfoType;
 	typedef typename TreeVersionMgrType::InfoType::VersionType TreeVersionType;
 
-	class YBEHAVIOR_API TreeMgr
+	class TreeMgr
 	{
 	public:
 		TreeMgr() {}

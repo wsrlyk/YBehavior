@@ -16,7 +16,7 @@ namespace YBehavior
 		FP_Main,
 	};
 
-	class YBEHAVIOR_API ForContext : public RunningContext
+	class ForContext : public RunningContext
 	{
 	public:
 		int LoopTimes = 0;

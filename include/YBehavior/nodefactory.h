@@ -24,7 +24,7 @@ namespace YBehavior
 	};
 #endif
 
-	class YBEHAVIOR_API NodeFactory: public Factory<BehaviorNode>
+	class NodeFactory: public Factory<BehaviorNode>
 	{
 	protected:
 		static NodeFactory* s_NodeFactory;

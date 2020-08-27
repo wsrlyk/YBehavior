@@ -8,7 +8,7 @@
 
 namespace YBehavior
 {
-	struct YBEHAVIOR_API NameKeyInfo
+	struct NameKeyInfo
 	{
 		std::unordered_map<STRING, KEY> mNameHash;
 #ifdef YDEBUGGER
@@ -48,7 +48,7 @@ namespace YBehavior
 #endif
 	};
 
-	struct YBEHAVIOR_API NameKeyMgr
+	struct NameKeyMgr
 	{
 	private:
 		std::unordered_map<TYPEID, NameKeyInfo> m_Infos;
@@ -91,7 +91,7 @@ namespace YBehavior
 #endif
 	};
 
-	class YBEHAVIOR_API TreeKeyMgr: public Singleton<TreeKeyMgr>
+	class TreeKeyMgr: public Singleton<TreeKeyMgr>
 	{
 	public:
 		TreeKeyMgr();

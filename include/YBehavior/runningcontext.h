@@ -6,7 +6,7 @@
 
 namespace YBehavior
 {
-	class YBEHAVIOR_API RunningContext
+	class RunningContext
 	{
 	protected:
 		bool m_bRunningInCondition = false;
@@ -22,7 +22,7 @@ namespace YBehavior
 		virtual void _OnReset() {};
 	};
 
-	class YBEHAVIOR_API IContextCreator
+	class IContextCreator
 	{
 	public:
 		virtual ~IContextCreator() {}
@@ -82,7 +82,7 @@ namespace YBehavior
 		return m_RC;
 	}
 
-	class YBEHAVIOR_API VectorTraversalContext : public RunningContext
+	class VectorTraversalContext : public RunningContext
 	{
 	public:
 		int Current;
@@ -91,7 +91,7 @@ namespace YBehavior
 		void _OnReset() override;
 	};
 
-	class YBEHAVIOR_API RandomVectorTraversalContext : public VectorTraversalContext
+	class RandomVectorTraversalContext : public VectorTraversalContext
 	{
 	public:
 		StdVector<int> IndexList;

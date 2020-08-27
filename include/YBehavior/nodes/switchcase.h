@@ -7,7 +7,7 @@
 
 namespace YBehavior
 {
-	class YBEHAVIOR_API SwitchCaseContext : public RunningContext
+	class SwitchCaseContext : public RunningContext
 	{
 	public:
 		///> -2: normal: -1: default; 0~size-1: cases

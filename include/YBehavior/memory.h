@@ -8,7 +8,7 @@
 namespace YBehavior
 {
 	class BehaviorTree;
-	struct YBEHAVIOR_API StackInfo
+	struct StackInfo
 	{
 		StackInfo();
 		StackInfo(BehaviorTree* pTree);
@@ -21,7 +21,7 @@ namespace YBehavior
 	};
 
 	typedef std::list<StackInfo> MemoryStack;
-	class YBEHAVIOR_API Memory : public IMemory
+	class Memory : public IMemory
 	{
 	public:
 		Memory();

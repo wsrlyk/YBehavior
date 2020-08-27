@@ -14,7 +14,7 @@ namespace YBehavior
 		ITE_Else,
 	};
 
-	class YBEHAVIOR_API IfThenElseContext : public RunningContext
+	class IfThenElseContext : public RunningContext
 	{
 	public:
 		IfThenElsePhase Current = ITE_Normal;
@@ -25,7 +25,7 @@ namespace YBehavior
 		}
 	};
 
-	class YBEHAVIOR_API IfThenElse : public BranchNode
+	class IfThenElse : public BranchNode
 	{
 	public:
 		STRING GetClassName() const override { return "IfThenElse"; }
