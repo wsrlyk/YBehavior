@@ -31,7 +31,7 @@ namespace TestSharp
             YBehaviorSharp.SharpHelper.SetBehavior(entity0.Agent.Core, "EmptyFSM", state2tree, 2, null, 0);
 
             int i = 0;
-            while(++i < 1000)
+            while (++i > 0)
             {
                 YBehaviorSharp.SharpHelper.Tick(entity0.Agent.Core);
                 System.Threading.Thread.Sleep(1000);
@@ -126,12 +126,10 @@ namespace TestSharp
 
         public XCustomAction()
         {
-            m_OnLoadCallback = new OnNodeLoaded(OnNodeLoaded);
-            m_OnUpdateCallback = new OnNodeUpdate(OnNodeUpdate);
             m_Name = "XCustomAction";
         }
 
-        protected bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
+        protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
             m_String0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "String0", pData) as SVariableString;
             if (m_String0 == null)
@@ -150,11 +148,14 @@ namespace TestSharp
             return true;
         }
 
-        protected NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        protected override NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
         {
             Console.WriteLine();
             Console.WriteLine("XCustomAction Update");
 
+            this.LogSharedData(m_String0, true);
+            this.LogSharedData(m_Entity0, true);
+            this.LogSharedData(m_Array0, true);
             XSAgent agent = YBehaviorSharp.SPtrMgr.Instance.Get(pAgent) as XSAgent;
             if (agent == null)
                 return NodeState.NS_FAILURE;
@@ -182,6 +183,7 @@ namespace TestSharp
 
             Console.WriteLine(string.Format("0: {0}, 1: {1}", name0, name1));
 
+            this.LogDebugInfo(string.Format("0: {0}, 1: {1}", name0, name1));
             ////////////////////////////////////////////////////////////////////////////
 
             XSEntity entity = m_Entity0.Get(pAgent) as XSEntity;
@@ -206,16 +208,25 @@ namespace TestSharp
                 SArrayVaraible av = m_Array0 as SArrayVaraible;
                 SArrayInt array = av.Get(pAgent) as SArrayInt;
                 if (array != null)
+                {
+                    if (array.GetLength() > 10)
+                        array.Clear();
                     array.PushBack(array.GetLength());
 
-                string s = array.Get(0).ToString();
-                for (int i = 1; i < array.GetLength(); ++i)
-                {
-                    s += "|";
-                    s += array.Get(i);
+                    string s = array.Get(0).ToString();
+                    for (int i = 1; i < array.GetLength(); ++i)
+                    {
+                        s += "|";
+                        s += array.Get(i);
+                    }
+                    Console.WriteLine(string.Format("Array: {0}", s));
                 }
-                Console.WriteLine(string.Format("Array: {0}", s));
             }
+
+            this.LogSharedData(m_String0, false);
+            this.LogSharedData(m_Entity0, false);
+            this.LogSharedData(m_Array0, false);
+
             return NodeState.NS_SUCCESS;
         }
 

@@ -19,4 +19,10 @@
 		<Variable Name="Src" ValueType="V" IsArray="False" VariableType="P" Value=""/>
 		<Variable Name="Des" ValueType="V" IsArray="False" VariableType="P" Value=""/>
 	</Action>
+	<Action Class="XCustomAction" Note="{0}" Hierachy="121">
+		<Variable Name="String0" ValueType="S" IsArray="False" VariableType="P" Value=""/>
+		<Variable Name="String1" ValueType="S" IsArray="False" VariableType="P" Value=""/>
+		<Variable Name="Entity0" ValueType="A" IsArray="False" VariableType="P" Value=""/>
+		<Variable Name="Array0" ValueType="I" IsArray="True" VariableType="P" Value=""/>
+	</Action>
 </Actions>

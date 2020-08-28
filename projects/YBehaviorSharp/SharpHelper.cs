@@ -184,6 +184,15 @@ namespace YBehaviorSharp
             IntPtr data,
             char variableType);
 
+        #region DEBUGGER
+        [DllImport(VERSION.dll)]
+        static public extern void LogSharedData(IntPtr pNode, IntPtr pVariable, bool before);
+        [DllImport(VERSION.dll)]
+        static public extern bool HasLogPoint(IntPtr pNode);
+        [DllImport(VERSION.dll)]
+        static public extern void LogDebugInfo(IntPtr pNode, string info);
+        #endregion
+
         [DllImport(VERSION.dll)]
         static public extern TYPEID GetVariableTypeID(IntPtr pVariable);
         [DllImport(VERSION.dll)]

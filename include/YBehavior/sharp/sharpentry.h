@@ -8,6 +8,7 @@
 #include "YBehavior/mgrs.h"
 #include "YBehavior/fsm/machinemgr.h"
 #include "YBehavior/sharp/sharplaunch.h"
+#include "YBehavior/behaviortree.h"
 
 extern "C" YBEHAVIOR_API YBehavior::Entity* CreateEntity()
 {
@@ -116,6 +117,34 @@ extern "C" YBEHAVIOR_API YBehavior::ISharedVariableEx* CreateVariable(
 		return v;
 	}
 	return nullptr;
+}
+
+extern "C" YBEHAVIOR_API void LogSharedData(YBehavior::BehaviorNode* pNode, YBehavior::ISharedVariableEx* pVariable, bool before)
+{
+#ifdef YDEBUGGER
+	if (pNode->HasLogPoint())
+		pNode->LogSharedData(pVariable, before);
+#else
+#endif
+}
+
+
+extern "C" YBEHAVIOR_API bool HasLogPoint(YBehavior::BehaviorNode* pNode)
+{
+#ifdef YDEBUGGER
+	return pNode->HasLogPoint();
+#else
+	return false;
+#endif
+}
+extern "C" YBEHAVIOR_API void LogDebugInfo(YBehavior::BehaviorNode* pNode, YBehavior::CSTRING_CONST str)
+{
+#ifdef YDEBUGGER
+	if (pNode->HasLogPoint())
+		pNode->LogDebugInfo(str);
+#else
+	
+#endif
 }
 
 #endif

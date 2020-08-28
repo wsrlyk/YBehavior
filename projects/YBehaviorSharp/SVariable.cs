@@ -46,6 +46,8 @@ namespace YBehaviorSharp
     public class SVariable
     {
         protected IntPtr m_Core;
+        public IntPtr Core { get { return m_Core; } }
+
         protected TYPEID m_TypeID;
 
         public bool IsValid { get { return m_Core != IntPtr.Zero; } }

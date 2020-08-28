@@ -74,18 +74,20 @@ namespace YBehavior
 		IContextCreator* m_ContextCreator;
 		ReturnType m_ReturnType;
 #ifdef YDEBUGGER
+	public:
+		bool HasLogPoint();
+		void LogSharedData(ISharedVariableEx* pVariable, bool bIsBefore);
+		void LogDebugInfo(const STRING& str) { m_DebugLogInfo << str; }
 	protected:
 		std::stringstream m_DebugLogInfo;
 		DebugTreeHelper* m_pDebugHelper;
-		bool _HasLogPoint();
-		void _LogSharedData(ISharedVariableEx* pVariable, bool bIsBefore);
-#define IF_HAS_LOG_POINT if (_HasLogPoint())
+#define IF_HAS_LOG_POINT if (HasLogPoint())
 #define DEBUG_LOG_INFO(info)\
 	{\
 		IF_HAS_LOG_POINT\
 			m_DebugLogInfo << info;\
 	}
-#define LOG_SHARED_DATA(variable, isbefore) _LogSharedData(variable, isbefore);
+#define LOG_SHARED_DATA(variable, isbefore) LogSharedData(variable, isbefore);
 #define LOG_SHARED_DATA_IF_HAS_LOG_POINT(variable, isbefore) \
 	{\
 		IF_HAS_LOG_POINT\

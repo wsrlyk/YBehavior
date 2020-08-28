@@ -62,12 +62,12 @@ namespace YBehavior
 	std::unordered_set<STRING> BehaviorNode::KEY_WORDS = { "Class", "Pos", "NickName" };
 
 #ifdef YDEBUGGER
-	bool BehaviorNode::_HasLogPoint()
+	bool BehaviorNode::HasLogPoint()
 	{
 		return m_pDebugHelper && m_pDebugHelper->HasDebugPoint();
 	}
 
-	void BehaviorNode::_LogSharedData(ISharedVariableEx* pVariable, bool bIsBefore)
+	void BehaviorNode::LogSharedData(ISharedVariableEx* pVariable, bool bIsBefore)
 	{
 		m_pDebugHelper->LogSharedData(pVariable, bIsBefore);
 	}

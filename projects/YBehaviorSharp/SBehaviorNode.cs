@@ -5,16 +5,54 @@ using System.Text;
 
 namespace YBehaviorSharp
 {
-    public class SBehaviorNode
+    public abstract class SBehaviorNode
     {
         public void Register()
         {
-            SharpHelper.RegisterSharpNode(m_Name, m_OnLoadCallback, m_OnUpdateCallback);
+            OnNodeLoaded onload = NodeLoaded;
+            OnNodeUpdate onupdate = NodeUpdate;
+            s_OnLoadCallback.Add(onload);
+            s_OnUpdateCallback.Add(onupdate);
+            SharpHelper.RegisterSharpNode(m_Name, onload, onupdate);
         }
 
-        protected OnNodeLoaded m_OnLoadCallback;
-        protected OnNodeUpdate m_OnUpdateCallback;
+        static List<OnNodeLoaded> s_OnLoadCallback = new List<OnNodeLoaded>();
+        static List<OnNodeUpdate> s_OnUpdateCallback = new List<OnNodeUpdate>();
+        public SBehaviorNode()
+        {
+        }
+
+        protected bool NodeLoaded(IntPtr pNode, IntPtr pData)
+        {
+            m_pNode = pNode;
+            return OnNodeLoaded(pNode, pData);
+        }
+        protected NodeState NodeUpdate(IntPtr pNode, IntPtr pAgent)
+        {
+            return OnNodeUpdate(pNode, pAgent);
+        }
+
+        protected bool HasLogPoint()
+        {
+            return SharpHelper.HasLogPoint(m_pNode);
+        }
+
+        protected void LogSharedData(SVariable v, bool before)
+        {
+            SharpHelper.LogSharedData(m_pNode, v.Core, before);
+        }
+
+        protected void LogDebugInfo(string s)
+        {
+            SharpHelper.LogDebugInfo(m_pNode, s);
+        }
+
+        abstract protected bool OnNodeLoaded(IntPtr pNode, IntPtr pData);
+
+        abstract protected NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent);
+
         protected string m_Name;
+        protected IntPtr m_pNode;
     }
 
     public class SelectTargetAction : SBehaviorNode
@@ -23,12 +61,10 @@ namespace YBehaviorSharp
 
         public SelectTargetAction()
         {
-            m_OnLoadCallback = new OnNodeLoaded(OnNodeLoaded);
-            m_OnUpdateCallback = new OnNodeUpdate(OnNodeUpdate);
             m_Name = "SelectTargetAction";
         }
 
-        protected bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
+        protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
             m_Target = new SVariableEntity(YBehaviorSharp.SharpHelper.CreateVariable(pNode, "Target", pData, YBehaviorSharp.SUtility.POINTER_CHAR));
             if (!m_Target.IsValid)
@@ -39,7 +75,7 @@ namespace YBehaviorSharp
             return true;
         }
 
-        protected NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        protected override NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
         {
             Console.WriteLine("SelectTargetAction Update");
             SEntity entity = m_Target.Get(pAgent);
@@ -51,17 +87,15 @@ namespace YBehaviorSharp
     {
         public GetTargetNameAction()
         {
-            m_OnLoadCallback = new OnNodeLoaded(OnNodeLoaded);
-            m_OnUpdateCallback = new OnNodeUpdate(OnNodeUpdate);
             m_Name = "GetTargetNameAction";
         }
 
-        protected bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
+        protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
             return true;
         }
 
-        protected NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        protected override NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
         {
             Console.WriteLine("GetTargetNameAction Update");
             return NodeState.NS_SUCCESS;
@@ -75,12 +109,10 @@ namespace YBehaviorSharp
 
         public SetVector3Action()
         {
-            m_OnLoadCallback = new OnNodeLoaded(OnNodeLoaded);
-            m_OnUpdateCallback = new OnNodeUpdate(OnNodeUpdate);
             m_Name = "SetVector3Action";
         }
 
-        protected bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
+        protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
             m_Src = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Src", pData, YBehaviorSharp.SUtility.POINTER_CHAR);
             m_Des = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Des", pData, YBehaviorSharp.SUtility.POINTER_CHAR);
@@ -88,7 +120,7 @@ namespace YBehaviorSharp
             return true;
         }
 
-        protected NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        protected override NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
         {
             Console.WriteLine("SetVector3Action Update");
 

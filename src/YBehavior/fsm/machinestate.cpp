@@ -12,10 +12,10 @@
 namespace YBehavior
 {
 #ifdef YDEBUGGER
-	bool MachineState::_HasLogPoint()
-	{
-		return m_pDebugHelper && m_pDebugHelper->HasDebugPoint();
-	}
+	//bool MachineState::_HasLogPoint()
+	//{
+	//	return m_pDebugHelper && m_pDebugHelper->HasDebugPoint();
+	//}
 #define DEBUG_RETURN(helper, rawres)\
 	{\
 		helper.SetResult(rawres, rawres);\
