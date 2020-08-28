@@ -1,3 +1,4 @@
+#ifdef SHARP
 #pragma once
 #include "YBehavior/types.h"
 #include "Ybehavior/agent.h"
@@ -135,3 +136,4 @@ extern "C" YBEHAVIOR_API bool VectorGet(void* pVector, int index, YBehavior::TYP
 {
 	return YBehavior::VectorHelperMgr::Get(type)->Get(pVector, index);
 }
+#endif

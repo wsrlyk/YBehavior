@@ -1,3 +1,5 @@
+#ifdef SHARP
+
 #include "YBehavior/sharp/sharpnode.h"
 
 namespace YBehavior
@@ -23,3 +25,5 @@ namespace YBehavior
 		return true;
 	}
 }
+
+#endif

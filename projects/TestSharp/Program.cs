@@ -13,6 +13,11 @@ namespace TestSharp
         static void Main(string[] args)
         {
             YBehaviorSharp.SharpHelper.LoadDataCallback = new YBehaviorSharp.LoadDataCallback(LoadData);
+            YBehaviorSharp.SharpHelper.OnLogCallback = ShowLog;
+            YBehaviorSharp.SharpHelper.OnErrorCallback = ShowLog;
+            YBehaviorSharp.SharpHelper.OnThreadLogCallback = ShowLog;
+            YBehaviorSharp.SharpHelper.OnThreadErrorCallback = ShowLog;
+
             YBehaviorSharp.SharpHelper.Init();
             SharpHelper.Register<XCustomAction>();
 
@@ -45,6 +50,12 @@ namespace TestSharp
 
             string str = System.Text.Encoding.UTF8.GetString(bytes);
             return str;
+        }
+
+        static void ShowLog()
+        {
+            string data = YBehaviorSharp.SharpHelper.GetFromBufferString();
+            Console.WriteLine(data);
         }
     }
 

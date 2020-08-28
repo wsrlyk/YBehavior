@@ -1,3 +1,4 @@
+#ifdef SHARP
 #pragma once
 #include "YBehavior/types.h"
 #include "YBehavior/interface.h"
@@ -57,3 +58,4 @@ extern "C" YBEHAVIOR_API YBehavior::Entity* ToEntity(const void* ptr)
 	}
 	return nullptr;
 }
+#endif

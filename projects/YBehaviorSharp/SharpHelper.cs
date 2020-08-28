@@ -18,6 +18,7 @@ namespace YBehaviorSharp
     public delegate bool OnNodeLoaded(IntPtr pNode, IntPtr pData);
     public delegate NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent);
     public delegate string LoadDataCallback(string treeName);
+    public delegate void LogCallback();
 
     public enum NodeState
     {
@@ -93,18 +94,26 @@ namespace YBehaviorSharp
 
     public partial class SharpHelper
     {
-        public static LoadDataCallback LoadDataCallback
-        {
-            get { return s_LoadDataCallback; }
-            set { s_LoadDataCallback = value; }
-        }
-        private static LoadDataCallback s_LoadDataCallback = null;
+        public static LoadDataCallback LoadDataCallback { get; set; }
+
+        public static LogCallback OnLogCallback { get; set; }
+        public static LogCallback OnErrorCallback { get; set; }
+        public static LogCallback OnThreadLogCallback { get; set; }
+        public static LogCallback OnThreadErrorCallback { get; set; }
 
         static List<SBehaviorNode> s_NodeList = new List<SBehaviorNode>();
         public static void Init()
         {
+            InitSharp(444);
+
             if (LoadDataCallback != null)
                 RegisterLoadData(LoadDataCallback);
+
+            RegisterLogCallback(
+                OnLogCallback, 
+                OnErrorCallback,
+                OnThreadLogCallback, 
+                OnThreadErrorCallback);
 
             var subTypeQuery = from t in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
                                where SUtility.IsSubClassOf(t, typeof(SBehaviorNode))
@@ -126,6 +135,16 @@ namespace YBehaviorSharp
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////
+        [DllImport(VERSION.dll)]
+        static public extern void InitSharp(int debugPort);
+
+        [DllImport(VERSION.dll, CallingConvention = CallingConvention.StdCall)]
+        static public extern void RegisterLogCallback(
+            LogCallback log,
+            LogCallback error,
+            LogCallback threadlog,
+            LogCallback threaderror
+            );
 
         [DllImport(VERSION.dll)]
         static public extern IntPtr CreateEntity();

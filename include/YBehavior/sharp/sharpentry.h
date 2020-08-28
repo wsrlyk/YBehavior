@@ -1,3 +1,4 @@
+#ifdef SHARP
 #pragma once
 #include "Ybehavior/agent.h"
 #include "YBehavior/sharp/sharpnode.h"
@@ -6,6 +7,7 @@
 #include "YBehavior/interface.h"
 #include "YBehavior/mgrs.h"
 #include "YBehavior/fsm/machinemgr.h"
+#include "YBehavior/sharp/sharplaunch.h"
 
 extern "C" YBEHAVIOR_API YBehavior::Entity* CreateEntity()
 {
@@ -33,6 +35,11 @@ extern "C" YBEHAVIOR_API void DeleteAgent(YBehavior::Agent* pObject)
 		pObject = NULL;
 	}
 }
+extern "C" YBEHAVIOR_API void InitSharp(int debugPort)
+{
+	YBehavior::SharpLaunchCore core(debugPort);
+	YBehavior::Launcher::Launch(core);
+}
 
 extern "C" YBEHAVIOR_API void RegisterSharpNode(
 	YBehavior::CSTRING_CONST name,
@@ -47,6 +54,15 @@ extern "C" YBEHAVIOR_API void RegisterLoadData(YBehavior::LoadDataDelegate loadd
 	YBehavior::Mgrs::Instance()->GetTreeMgr()->SetLoadDataCallback(loaddata);
 	YBehavior::Mgrs::Instance()->GetMachineMgr()->SetLoadDataCallback(loaddata);
 	//YBehavior::TreeMgr::Instance()->SetLoadDataCallback(loaddata);
+}
+
+extern "C" YBEHAVIOR_API void RegisterLogCallback(
+	YBehavior::SharpLogDelegate log,
+	YBehavior::SharpLogDelegate error,
+	YBehavior::SharpLogDelegate threadlog,
+	YBehavior::SharpLogDelegate threaderror)
+{
+	YBehavior::SharpLaunchCore::SetCallback(log, error, threadlog, threaderror);
 }
 
 extern "C" YBEHAVIOR_API bool SetBehavior(
@@ -101,3 +117,5 @@ extern "C" YBEHAVIOR_API YBehavior::ISharedVariableEx* CreateVariable(
 	}
 	return nullptr;
 }
+
+#endif

@@ -1,3 +1,4 @@
+#ifdef SHARP
 #ifndef _SHARPNODE_H_
 #define _SHARPNODE_H_
 
@@ -31,3 +32,4 @@ namespace YBehavior
 
 
 #endif // _SHARPNODE_H_
+#endif

@@ -77,6 +77,7 @@
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry_data.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry_shareddata.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry_variable.h" />
+    <ClInclude Include="..\include\YBehavior\sharp\sharplaunch.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpnode.h" />
     <ClInclude Include="..\include\YBehavior\singleton.h" />
     <ClInclude Include="..\include\YBehavior\tools\bimap.h" />
@@ -140,6 +141,8 @@
     <ClCompile Include="..\src\YBehavior\shareddataex.cpp" />
     <ClCompile Include="..\src\YBehavior\SharedVariableCreateHelper.cpp" />
     <ClCompile Include="..\src\YBehavior\sharp\sharpentry.cpp" />
+    <ClCompile Include="..\src\YBehavior\sharp\sharpentry_buffer.cpp" />
+    <ClCompile Include="..\src\YBehavior\sharp\sharplaunch.cpp" />
     <ClCompile Include="..\src\YBehavior\sharp\sharpnode.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\common.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\objectpool.cpp" />
