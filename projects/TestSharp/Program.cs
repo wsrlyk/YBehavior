@@ -29,6 +29,7 @@ namespace TestSharp
 
             string[] state2tree = new string[] { "Main", "Test0"};
             YBehaviorSharp.SharpHelper.SetBehavior(entity0.Agent.Core, "EmptyFSM", state2tree, 2, null, 0);
+            YBehaviorSharp.SharpHelper.SetSharedDataByString(entity0.Agent.Core, "II0", "1342^32^643", '^');
 
             int i = 0;
             while (++i > 0)
@@ -38,6 +39,7 @@ namespace TestSharp
             }
 
             entity0.Destroy();
+            entity1.Destroy();
             Console.Read();
         }
 

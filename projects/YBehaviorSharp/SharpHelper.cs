@@ -110,9 +110,9 @@ namespace YBehaviorSharp
                 RegisterLoadData(LoadDataCallback);
 
             RegisterLogCallback(
-                OnLogCallback, 
+                OnLogCallback,
                 OnErrorCallback,
-                OnThreadLogCallback, 
+                OnThreadLogCallback,
                 OnThreadErrorCallback);
 
             var subTypeQuery = from t in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
@@ -169,8 +169,8 @@ namespace YBehaviorSharp
 
         [DllImport(VERSION.dll)]
         static public extern bool SetBehavior(
-            IntPtr pAgent, 
-            string fsmname, 
+            IntPtr pAgent,
+            string fsmname,
             string[] state2Tree, uint stSize,
             string[] tree2Tree, uint ttSize);
 
@@ -183,6 +183,14 @@ namespace YBehaviorSharp
             string attrName,
             IntPtr data,
             char variableType);
+
+        [DllImport(VERSION.dll)]
+        static public extern IntPtr SetSharedDataByString(
+            IntPtr pAgent,
+            string name,
+            string value,
+            char separator = '|'
+        );
 
         #region DEBUGGER
         [DllImport(VERSION.dll)]

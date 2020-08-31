@@ -9,6 +9,7 @@
 #include "YBehavior/fsm/machinemgr.h"
 #include "YBehavior/sharp/sharplaunch.h"
 #include "YBehavior/behaviortree.h"
+#include "YBehavior/sharedvariablecreatehelper.h"
 
 extern "C" YBEHAVIOR_API YBehavior::Entity* CreateEntity()
 {
@@ -117,6 +118,18 @@ extern "C" YBEHAVIOR_API YBehavior::ISharedVariableEx* CreateVariable(
 		return v;
 	}
 	return nullptr;
+}
+
+extern "C" YBEHAVIOR_API void SetSharedDataByString(YBehavior::Agent* pAgent, YBehavior::CSTRING name, YBehavior::CSTRING value, YBehavior::CHAR separator)
+{
+	auto& maps = YBehavior::SharedVariableCreateHelperMgr::GetAllHelpers();
+	for (auto it = maps.begin(); it != maps.end(); ++it)
+	{
+		if (it->second->TrySetSharedData(pAgent->GetMemory()->GetMainData(), name, value, separator))
+		{
+			break;
+		}
+	}
 }
 
 extern "C" YBEHAVIOR_API void LogSharedData(YBehavior::BehaviorNode* pNode, YBehavior::ISharedVariableEx* pVariable, bool before)
