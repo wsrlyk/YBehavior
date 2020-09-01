@@ -171,6 +171,7 @@ namespace YBehavior
 		void ReloadAll();
 		void Return(DataType* data);
 		inline InfoListType& GetInfos() { return m_Infos; }
+		void Clear();
 	private:
 		//static TreeMgr* s_Instance;
 
@@ -236,13 +237,19 @@ namespace YBehavior
 	}
 
 	template<typename DataType, typename KeyType>
-	VersionMgr<DataType, KeyType>::~VersionMgr()
+	void VersionMgr<DataType, KeyType>::Clear()
 	{
 		for (auto it = m_Infos.begin(); it != m_Infos.end(); ++it)
 		{
 			delete it->second;
 		}
 		m_Infos.clear();
+	}
+
+	template<typename DataType, typename KeyType>
+	VersionMgr<DataType, KeyType>::~VersionMgr()
+	{
+		Clear();
 	}
 
 }

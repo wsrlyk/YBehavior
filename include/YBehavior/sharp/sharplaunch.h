@@ -13,7 +13,7 @@ namespace YBehavior
 	private:
 		int m_Port{};
 	public:
-		SharpLaunchCore(int debugport) : m_Port(debugport) {}
+		SharpLaunchCore(int debugport);
 		int StartWithDebugListeningPort() const override;
 
 		void GetLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const override;

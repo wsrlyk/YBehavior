@@ -35,6 +35,8 @@ namespace YBehavior
 		void Print();
 		void SetWorkingDir(const STRING& dir);
 		void SetLoadDataCallback(LoadDataDelegate callback) { m_LoadDataCallback = callback; }
+	
+		void Clear();
 	protected:
 		bool _GetTree(const STRING& name, BehaviorTree * &tree, bool bToAgent);
 		BehaviorTree * _LoadTree(const STRING& name);

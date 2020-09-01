@@ -41,6 +41,8 @@ extern "C" YBEHAVIOR_API void InitSharp(int debugPort)
 {
 	YBehavior::SharpLaunchCore core(debugPort);
 	YBehavior::Launcher::Launch(core);
+
+	YBehavior::Mgrs::Instance()->Reset();
 }
 
 extern "C" YBEHAVIOR_API void RegisterSharpNode(

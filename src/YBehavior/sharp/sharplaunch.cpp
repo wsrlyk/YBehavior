@@ -10,6 +10,15 @@ namespace YBehavior
 	YBehavior::SharpLogDelegate SharpLaunchCore::s_ThreadLogCallback{};
 	YBehavior::SharpLogDelegate SharpLaunchCore::s_ThreadErrorCallback{};
 
+	SharpLaunchCore::SharpLaunchCore(int debugport)
+		: m_Port(debugport)
+	{
+		s_LogCallback = nullptr;
+		s_ErrorCallback = nullptr;
+		s_ThreadLogCallback = nullptr;
+		s_ThreadErrorCallback = nullptr;
+	}
+
 	int SharpLaunchCore::StartWithDebugListeningPort() const
 	{
 		return m_Port;

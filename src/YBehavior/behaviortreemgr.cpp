@@ -169,4 +169,10 @@ namespace YBehavior
 			m_WorkingDir.append(1, '/');
 		}
 	}
+
+	void TreeMgr::Clear()
+	{
+		m_VersionMgr.Clear();
+	}
+
 }

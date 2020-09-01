@@ -374,6 +374,11 @@ namespace YBehavior
 		std::cout << "Print all fsms end." << std::endl;
 	}
 
+	void MachineMgr::Clear()
+	{
+		m_VersionMgr.Clear();
+	}
+
 	void _BuildStateTreeMapping(FSM* pFSM)
 	{
 		RootMachine* pMachine = pFSM->GetMachine();

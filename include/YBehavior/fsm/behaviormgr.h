@@ -33,6 +33,8 @@ namespace YBehavior
 		void ReloadMachine(const STRING& name);
 		void ReloadAll();
 		void Print();
+
+		void Clear();
 	};
 }
 

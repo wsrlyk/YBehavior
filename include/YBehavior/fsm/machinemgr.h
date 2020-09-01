@@ -42,6 +42,8 @@ namespace YBehavior
 		void ReloadAll();
 		void Print();
 		void SetLoadDataCallback(LoadDataDelegate callback) { m_LoadDataCallback = callback; }
+	
+		void Clear();
 	protected:
 		FSM * _LoadFSM(const STRING& name);
 		bool _CreateSpecialStates(StateMachine* pMachine, UINT uid);
