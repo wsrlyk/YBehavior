@@ -1,7 +1,7 @@
 #ifdef SHARP
 #pragma once
 #include "YBehavior/types.h"
-#include "Ybehavior/agent.h"
+#include "YBehavior/agent.h"
 #include "YBehavior/interface.h"
 
 extern "C" YBEHAVIOR_API void GetSharedData(YBehavior::Agent* pAgent, YBehavior::KEY key, YBehavior::KEY type)
@@ -30,7 +30,7 @@ extern "C" YBEHAVIOR_API YBehavior::KEY GetTypeKeyByName(YBehavior::CSTRING name
 #define SHAREDDATA_ALLTYPES_OPERATIONS(TYPE)\
 extern "C" YBEHAVIOR_API YBehavior::TYPEID GetClassTypeNumberId##TYPE()\
 {\
-	return YBehavior::GetTypeID<YBehavior::##TYPE>();\
+	return YBehavior::GetTypeID<YB::TYPE>();\
 }
 FOR_EACH_TYPE(SHAREDDATA_ALLTYPES_OPERATIONS);
 

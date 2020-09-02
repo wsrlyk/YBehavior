@@ -12,8 +12,10 @@ namespace YBehavior
 #endif
 #ifdef _MSC_VER
 	#define MSVC
+	#define STDCALL _stdcall
 #else
 	#define GCC
+	#define STDCALL
 #endif
 //#else
 //#define YBEHAVIOR_DLL_ENTRY_IMPORT

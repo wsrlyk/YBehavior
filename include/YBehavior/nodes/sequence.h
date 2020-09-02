@@ -16,7 +16,7 @@ namespace YBehavior
 			SetRCCreator(&m_RCContainer);
 		}
 	protected:
-		virtual NodeState Update(AgentPtr pAgent);
+		NodeState Update(AgentPtr pAgent) override;
 		IndexIterator m_Iterator;
 		ContextContainer<VectorTraversalContext> m_RCContainer;
 	};
@@ -30,7 +30,7 @@ namespace YBehavior
 			SetRCCreator(&m_RCContainer);
 		}
 	protected:
-		virtual NodeState Update(AgentPtr pAgent);
+		NodeState Update(AgentPtr pAgent) override;
 		void OnAddChild(BehaviorNode* child, const STRING& connection) override;
 
 		IndexIterator m_Iterator;

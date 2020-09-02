@@ -6,7 +6,7 @@
 
 namespace YBehavior
 {
-	typedef void(_stdcall *SharpLogDelegate)();
+	typedef void(STDCALL *SharpLogDelegate)();
 
 	class SharpLaunchCore : public LaunchCore
 	{

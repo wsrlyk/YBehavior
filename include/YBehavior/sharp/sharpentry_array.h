@@ -1,7 +1,7 @@
 #ifdef SHARP
 #pragma once
 #include "YBehavior/types.h"
-#include "Ybehavior/agent.h"
+#include "YBehavior/agent.h"
 #include "YBehavior/interface.h"
 #include "sharpentry_buffer.h"
 

@@ -1,6 +1,6 @@
 #ifdef SHARP
 #pragma once
-#include "Ybehavior/agent.h"
+#include "YBehavior/agent.h"
 #include "YBehavior/sharp/sharpnode.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/behaviortreemgr.h"

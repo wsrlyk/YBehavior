@@ -17,16 +17,16 @@ namespace YBehavior
 
 		pugi::xml_parse_result result;
 		if (m_LoadDataCallback != nullptr)
-			result = doc.load_string(m_LoadDataCallback((m_WorkingDir + name + ".xml").c_str()));
+			result = doc.load_string(m_LoadDataCallback((m_WorkingDir + name + ".bytes").c_str()));
 		else
-			result = doc.load_file((m_WorkingDir + name + ".xml").c_str());
+			result = doc.load_file((m_WorkingDir + name + ".bytes").c_str());
 		if (result.status)
 		{
-			ERROR_BEGIN << "Loading " << name << ".tree: " << result.description() << ERROR_END;
+			ERROR_BEGIN << "Loading " << name << ".bytes: " << result.description() << ERROR_END;
 			return nullptr;
 		}
 
-		LOG_BEGIN << "Loading: " << name << ".tree" << LOG_END;
+		LOG_BEGIN << "Loading: " << name << ".bytes" << LOG_END;
 
 		auto rootData = doc.first_child();
 		if (rootData == nullptr)

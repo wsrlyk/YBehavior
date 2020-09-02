@@ -62,10 +62,10 @@ namespace YBehavior
 		pugi::xml_document doc;
 		pugi::xml_parse_result result;
 		if (m_LoadDataCallback != nullptr)
-			result = doc.load_string(m_LoadDataCallback((m_WorkingDir + name + ".fsm").c_str()));
+			result = doc.load_string(m_LoadDataCallback((m_WorkingDir + name + ".bytes").c_str()));
 		else
-			result = doc.load_file((m_WorkingDir + name + ".fsm").c_str());
-		LOG_BEGIN << "Loading: " << name << ".fsm" << LOG_END;
+			result = doc.load_file((m_WorkingDir + name + ".bytes").c_str());
+		LOG_BEGIN << "Loading: " << name << ".bytes" << LOG_END;
 		if (result.status)
 		{
 			ERROR_BEGIN << "Load result: " << result.description() << ERROR_END;

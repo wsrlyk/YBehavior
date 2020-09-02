@@ -30,7 +30,7 @@ namespace YBehavior
 
 		bool IsEnd() override { return m_It == m_End; }
 		IDataArrayIterator& operator ++() override { ++m_It; return *this; }
-		const KEY Value() { return m_It->first; }
+		const KEY Value() override { return m_It->first; }
 
 		void Recycle() override
 		{

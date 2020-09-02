@@ -10,7 +10,7 @@
 namespace YBehavior
 {
 #ifdef MSVC
-	typedef unsigned int (_stdcall ThreadFunction)(void* arg);
+	typedef unsigned int (STDCALL ThreadFunction)(void* arg);
 #else
 	typedef unsigned int (ThreadFunction)(void* arg);
 #endif

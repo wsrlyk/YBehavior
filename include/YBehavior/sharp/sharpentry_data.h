@@ -43,7 +43,7 @@ extern "C" YBEHAVIOR_API bool ToString(const void* ptr, char* output, int len)
 {
 	if (ptr && output)
 	{
-		strcpy_s(output, (unsigned)len, ((const YBehavior::STRING*)ptr)->c_str());
+		strncpy(output, ((const YBehavior::STRING*)ptr)->c_str(), (unsigned)len);
 		return true;
 	}
 	return false;

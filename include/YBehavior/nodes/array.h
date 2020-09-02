@@ -10,8 +10,8 @@ namespace YBehavior
 	public:
 		STRING GetClassName() const override { return "GetArrayLength"; }
 	protected:
-		virtual bool OnLoaded(const pugi::xml_node& data);
-		virtual NodeState Update(AgentPtr pAgent);
+		bool OnLoaded(const pugi::xml_node& data) override;
+		NodeState Update(AgentPtr pAgent) override;
 
 	private:
 		ISharedVariableEx* m_Array;
@@ -23,8 +23,8 @@ namespace YBehavior
 	public:
 		STRING GetClassName() const override { return "ClearArray"; }
 	protected:
-		virtual bool OnLoaded(const pugi::xml_node& data);
-		virtual NodeState Update(AgentPtr pAgent);
+		bool OnLoaded(const pugi::xml_node& data) override;
+		NodeState Update(AgentPtr pAgent) override;
 
 	private:
 		ISharedVariableEx* m_Array;
@@ -35,8 +35,8 @@ namespace YBehavior
 	public:
 		STRING GetClassName() const override { return "ArrayPushElement"; }
 	protected:
-		virtual bool OnLoaded(const pugi::xml_node& data);
-		virtual NodeState Update(AgentPtr pAgent);
+		bool OnLoaded(const pugi::xml_node& data) override;
+		NodeState Update(AgentPtr pAgent) override;
 
 	private:
 		ISharedVariableEx* m_Array;
@@ -48,8 +48,8 @@ namespace YBehavior
 	public:
 		STRING GetClassName() const override { return "IsArrayEmpty"; }
 	protected:
-		virtual bool OnLoaded(const pugi::xml_node& data);
-		virtual NodeState Update(AgentPtr pAgent);
+		bool OnLoaded(const pugi::xml_node& data) override;
+		NodeState Update(AgentPtr pAgent) override;
 
 	private:
 		ISharedVariableEx* m_Array;
@@ -60,8 +60,8 @@ namespace YBehavior
 	public:
 		STRING GetClassName() const override { return "GenIndexArray"; }
 	protected:
-		virtual bool OnLoaded(const pugi::xml_node& data);
-		virtual NodeState Update(AgentPtr pAgent);
+		bool OnLoaded(const pugi::xml_node& data) override;
+		NodeState Update(AgentPtr pAgent) override;
 
 	private:
 		ISharedVariableEx* m_Input;

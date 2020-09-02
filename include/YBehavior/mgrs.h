@@ -2,10 +2,11 @@
 #define _YBEHAVIOR_MGRS_H_
 
 #include "singleton.h"
+#include "define.h"
 
 namespace YBehavior
 {
-	typedef const char* (_stdcall *LoadDataDelegate)(const char* name);
+	typedef const char* (STDCALL *LoadDataDelegate)(const char* name);
 
 	class TreeMgr;
 	class MachineMgr;
