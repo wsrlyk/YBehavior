@@ -18,9 +18,6 @@ namespace YBehavior
 		float y{};
 		float z{};
 
-		Vector3() {}
-		Vector3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
-
 		friend std::stringstream & operator<<(std::stringstream &outstream, const Vector3 &obj)
 		{
 			outstream << obj.x << ',' << obj.y << ',' << obj.z;
@@ -59,13 +56,19 @@ namespace YBehavior
 
 		Vector3 operator + (const Vector3& other) const
 		{
-			Vector3 res = { x + other.x, y + other.y, z + other.z };
+			Vector3 res;
+			res.x = x + other.x;
+			res.y = y + other.y;
+			res.z = z + other.z;
 			return res;
 		}
 
 		Vector3 operator - (const Vector3& other) const
 		{
-			Vector3 res = { x - other.x, y - other.y, z - other.z };
+			Vector3 res;
+			res.x = x - other.x;
+			res.y = y - other.y;
+			res.z = z - other.z;
 			return res;
 		}
 

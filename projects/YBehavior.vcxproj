@@ -228,7 +228,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MinSpace</Optimization>
-      <PreprocessorDefinitions>YBEHAVIOR_EXPORTS;YDEBUGGER;PRINT_INTERMEDIATE_INFO;YPROFILER;SHARP;YBEHAVIOR_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>YDEBUGGER;PRINT_INTERMEDIATE_INFO;YPROFILER;SHARP;YBEHAVIOR_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
