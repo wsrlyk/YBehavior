@@ -55,6 +55,12 @@
     <Filter Include="源文件\profile">
       <UniqueIdentifier>{5ec45306-d381-4459-b54d-8df2766af1c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\sharp">
+      <UniqueIdentifier>{8d9120ff-5bc2-4670-95f6-f285ace91bd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\sharp">
+      <UniqueIdentifier>{c32dbd06-ebb5-41d6-8e53-b0f1566877fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\YBehavior\agent.h">
@@ -249,6 +255,30 @@
     <ClInclude Include="..\include\YBehavior\profile\profileheader.h">
       <Filter>头文件\profile</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\sharp\sharpnode.h">
+      <Filter>头文件\sharp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_shareddata.h">
+      <Filter>头文件\sharp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_variable.h">
+      <Filter>头文件\sharp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\sharp\sharpentry.h">
+      <Filter>头文件\sharp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_array.h">
+      <Filter>头文件\sharp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_data.h">
+      <Filter>头文件\sharp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_buffer.h">
+      <Filter>头文件\sharp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\sharp\sharplaunch.h">
+      <Filter>头文件\sharp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -409,6 +439,18 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\profile\profileprocessor.cpp">
       <Filter>源文件\profile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\sharp\sharpnode.cpp">
+      <Filter>源文件\sharp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\sharp\sharpentry.cpp">
+      <Filter>源文件\sharp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\sharp\sharplaunch.cpp">
+      <Filter>源文件\sharp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\sharp\sharpentry_buffer.cpp">
+      <Filter>源文件\sharp</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

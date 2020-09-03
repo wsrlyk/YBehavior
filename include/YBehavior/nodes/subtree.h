@@ -10,8 +10,8 @@ namespace YBehavior
 	public:
 		STRING GetClassName() const override { return "SubTree"; }
 	protected:
-		virtual NodeState Update(AgentPtr pAgent);
-		virtual bool OnLoaded(const pugi::xml_node& data);
+		NodeState Update(AgentPtr pAgent) override;
+		bool OnLoaded(const pugi::xml_node& data) override;
 		bool OnLoadChild(const pugi::xml_node& data) override;
 		bool _TryCreateFromTo(const pugi::xml_node& data, std::vector<ISharedVariableEx*>& container);
 	private:

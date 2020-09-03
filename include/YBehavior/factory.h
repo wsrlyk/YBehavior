@@ -30,7 +30,7 @@ namespace YBehavior
 			virtual T* Create() { return new finalType; }
 		};
 
-		T* Get(const STRING& name);
+		virtual T* Get(const STRING& name);
 
 		template<typename finalType>
 		void Create()

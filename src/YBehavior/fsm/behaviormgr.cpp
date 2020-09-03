@@ -184,4 +184,9 @@ namespace YBehavior
 		std::cout << "Print all fsms end." << std::endl;
 	}
 
+	void BehaviorMgr::Clear()
+	{
+		m_VersionMgr.Clear();
+	}
+
 }

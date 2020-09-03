@@ -21,7 +21,7 @@ namespace YBehavior
 	typedef typename BehaviorVersionMgrType::InfoType::VersionType BehaviorVersionType;
 
 	struct BehaviorKey;
-	class YBEHAVIOR_API BehaviorMgr
+	class BehaviorMgr
 	{
 		BehaviorVersionMgrType m_VersionMgr;
 
@@ -33,6 +33,8 @@ namespace YBehavior
 		void ReloadMachine(const STRING& name);
 		void ReloadAll();
 		void Print();
+
+		void Clear();
 	};
 }
 

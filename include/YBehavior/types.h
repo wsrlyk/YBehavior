@@ -12,31 +12,11 @@ namespace YBehavior
 {
 #define StdVector std::vector
 
-	struct YBEHAVIOR_API Vector3
+	struct Vector3
 	{
-		float x;
-		float y;
-		float z;
-
-		Vector3()
-			: x(0)
-			, y(0)
-			, z(0)
-		{
-
-		}
-		Vector3(float _x, float _y, float _z)
-			: x(_x)
-			, y(_y)
-			, z(_z)
-		{
-		}
-		Vector3(const Vector3& other)
-			: x(other.x)
-			, y(other.y)
-			, z(other.z)
-		{
-		}
+		float x{};
+		float y{};
+		float z{};
 
 		friend std::stringstream & operator<<(std::stringstream &outstream, const Vector3 &obj)
 		{
@@ -76,13 +56,19 @@ namespace YBehavior
 
 		Vector3 operator + (const Vector3& other) const
 		{
-			Vector3 res(x + other.x, y + other.y, z + other.z);
+			Vector3 res;
+			res.x = x + other.x;
+			res.y = y + other.y;
+			res.z = z + other.z;
 			return res;
 		}
 
 		Vector3 operator - (const Vector3& other) const
 		{
-			Vector3 res(x - other.x, y - other.y, z - other.z);
+			Vector3 res;
+			res.x = x - other.x;
+			res.y = y - other.y;
+			res.z = z - other.z;
 			return res;
 		}
 
@@ -118,7 +104,7 @@ namespace YBehavior
 
 	class Entity;
 	class Agent;
-	struct YBEHAVIOR_API EntityWrapper
+	struct EntityWrapper
 	{
 	protected:
 		Entity* m_Data;
@@ -200,6 +186,8 @@ namespace YBehavior
 
 
 	typedef std::string			STRING;
+	typedef const char*			CSTRING_CONST;
+	typedef char*				CSTRING;
 	typedef int					INT;
 	typedef unsigned int		UINT;
 	typedef unsigned long long	UINT64;
@@ -212,6 +200,7 @@ namespace YBehavior
 	typedef char				CHAR;
 
 	typedef Agent*				AgentPtr;
+	typedef Entity*				EntityPtr;
 	typedef STRING				String;
 	typedef INT					Int;
 	typedef UINT				Uint;
@@ -247,21 +236,42 @@ namespace YBehavior
 		return -1;
 	}
 
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(Bool, 1);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(Int, 2);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(Uint64, 3);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(Float, 4);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(String, 5);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(EntityWrapper, 6);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(Vector3, 7);
+	//////////////////////////////////////////////////////////////////////////
+	template<typename T>
+	inline KEY GetTypeKey() {
+		return -1;
+	}
 
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecBool, 101);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecInt, 102);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecUint64, 103);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecFloat, 104);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecString, 105);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecEntityWrapper, 106);
-	YBEHAVIOR_BASICTYPE_NUMBER_ID(VecVector3, 107);
+#define YBEHAVIOR_BASICTYPE_STORE_KEY(type, id)			\
+	template<> inline KEY GetTypeKey<type>() \
+	{\
+		return id;\
+	}\
+	template<> inline TYPEID GetTypeKey<const type>() \
+	{\
+		return id; \
+	}
+
+	///> Make these two numbers the same
+#define YBEHAVIOR_BASICTYPE_NUMBER(type, num)\
+	YBEHAVIOR_BASICTYPE_NUMBER_ID(type, num);\
+	YBEHAVIOR_BASICTYPE_STORE_KEY(type, num);
+
+	YBEHAVIOR_BASICTYPE_NUMBER(Int, 0);
+	YBEHAVIOR_BASICTYPE_NUMBER(Ulong, 1);
+	YBEHAVIOR_BASICTYPE_NUMBER(Bool, 2);
+	YBEHAVIOR_BASICTYPE_NUMBER(Float, 3);
+	YBEHAVIOR_BASICTYPE_NUMBER(String, 4);
+	YBEHAVIOR_BASICTYPE_NUMBER(EntityWrapper, 5);
+	YBEHAVIOR_BASICTYPE_NUMBER(Vector3, 6);
+
+	YBEHAVIOR_BASICTYPE_NUMBER(VecInt, 7);
+	YBEHAVIOR_BASICTYPE_NUMBER(VecUlong, 8);
+	YBEHAVIOR_BASICTYPE_NUMBER(VecBool, 9);
+	YBEHAVIOR_BASICTYPE_NUMBER(VecFloat, 10);
+	YBEHAVIOR_BASICTYPE_NUMBER(VecString, 11);
+	YBEHAVIOR_BASICTYPE_NUMBER(VecEntityWrapper, 12);
+	YBEHAVIOR_BASICTYPE_NUMBER(VecVector3, 13);
 
 	typedef const void* NodePtr;
 	struct TreeMap

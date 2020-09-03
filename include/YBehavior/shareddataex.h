@@ -30,7 +30,7 @@ namespace YBehavior
 
 		bool IsEnd() override { return m_It == m_End; }
 		IDataArrayIterator& operator ++() override { ++m_It; return *this; }
-		const KEY Value() { return m_It->first; }
+		const KEY Value() override { return m_It->first; }
 
 		void Recycle() override
 		{
@@ -117,7 +117,7 @@ namespace YBehavior
 		virtual const STRING GetToString(KEY key) const override
 		{
 			//if (key < 0 || key >= (KEY)m_Datas.size())
-			//	return Utility::StringEmpty;
+			//	return Types::StringEmpty;
 			//const T& data = m_Datas[key];
 			//return Utility::ToString(data);
 			auto it = m_Datas.find(key);
@@ -220,12 +220,6 @@ namespace YBehavior
 #define DATAARRAY_ONETYPE_DEFINE(type) 		DataArray<type> m_Data##type;
 	class SharedDataEx
 	{
-	public:
-
-		template<typename T>
-		KEY GetTypeKey();
-		
-
 	protected:
 		IDataArray* m_Datas[MAX_TYPE_KEY];
 
@@ -265,7 +259,7 @@ namespace YBehavior
 		template<typename T>
 		bool Set(KEY key, T&& src);
 
-		bool Set(KEY key, KEY typeKey, void* src)
+		bool Set(KEY key, KEY typeKey, const void* src)
 		{
 			IDataArray* iarray = m_Datas[typeKey];
 			return iarray->Set(key, src);
@@ -286,33 +280,7 @@ namespace YBehavior
 		void Clear();
 	};
 
-	template<typename T>
-	KEY SharedDataEx::GetTypeKey() {
-		return -1;
-	}
 
-#define YBEHAVIOR_SHAREDDATA_STORE_KEY(type, id)			\
-		template<> inline KEY SharedDataEx::GetTypeKey<type>() \
-		{\
-			return id;\
-		}
-
-
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(Int, 0);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(Ulong, 1);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(Bool, 2);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(Float, 3);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(String, 4);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(EntityWrapper, 5);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(Vector3, 6);
-
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecInt, 7);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecUlong, 8);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecBool, 9);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecFloat, 10);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecString, 11);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecEntityWrapper, 12);
-	YBEHAVIOR_SHAREDDATA_STORE_KEY(VecVector3, 13);
 
 	template<typename T>
 	bool SharedDataEx::Get(KEY key, T& res)
@@ -354,7 +322,7 @@ namespace YBehavior
 			return false;
 
 		DataArray<t_type>* parray = (DataArray<t_type>*)m_Datas[idx];
-		return parray->Set(key, src);
+		return parray->Set(key, std::forward<T>(src));
 	}
 
 	template<typename T>

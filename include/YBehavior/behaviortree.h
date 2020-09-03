@@ -61,7 +61,7 @@ namespace YBehavior
 #define ERROR_BEGIN_NODE_HEAD ERROR_BEGIN << m_UID << "." << GetClassName() << " "
 #define LOG_BEGIN_NODE_HEAD LOG_BEGIN << m_UID << "." << GetClassName() << " "
 
-	class YBEHAVIOR_API BehaviorNode
+	class BehaviorNode
 	{
 	protected:
 		BehaviorNodePtr m_Parent;
@@ -74,18 +74,20 @@ namespace YBehavior
 		IContextCreator* m_ContextCreator;
 		ReturnType m_ReturnType;
 #ifdef YDEBUGGER
+	public:
+		bool HasLogPoint();
+		void LogSharedData(ISharedVariableEx* pVariable, bool bIsBefore);
+		void LogDebugInfo(const STRING& str) { m_DebugLogInfo << str; }
 	protected:
 		std::stringstream m_DebugLogInfo;
 		DebugTreeHelper* m_pDebugHelper;
-		bool _HasLogPoint();
-		void _LogSharedData(ISharedVariableEx* pVariable, bool bIsBefore);
-#define IF_HAS_LOG_POINT if (_HasLogPoint())
+#define IF_HAS_LOG_POINT if (HasLogPoint())
 #define DEBUG_LOG_INFO(info)\
 	{\
 		IF_HAS_LOG_POINT\
 			m_DebugLogInfo << info;\
 	}
-#define LOG_SHARED_DATA(variable, isbefore) _LogSharedData(variable, isbefore);
+#define LOG_SHARED_DATA(variable, isbefore) LogSharedData(variable, isbefore);
 #define LOG_SHARED_DATA_IF_HAS_LOG_POINT(variable, isbefore) \
 	{\
 		IF_HAS_LOG_POINT\
@@ -129,6 +131,10 @@ namespace YBehavior
 		void TryCreateRC();
 		RunningContext* GetRC() { return m_RunningContext; }
 		void SetRCCreator(IContextCreator* rcc) { m_ContextCreator = rcc; }
+
+		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0, const STRING& defaultCreateStr = Utility::StringEmpty);
+		template <typename T>
+		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0);
 	protected:
 		virtual bool _AddChild(BehaviorNode* child, const STRING& connection);
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
@@ -144,9 +150,6 @@ namespace YBehavior
 		template<typename T>
 		bool GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T& outValue);
 
-		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0, const STRING& defaultCreateStr = Utility::StringEmpty);
-		template <typename T> 
-		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0);
 		TYPEID _CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, char variableType);
 		///>
 		/// single: 1, single; 0, vector; -1, dont care
@@ -220,7 +223,7 @@ namespace YBehavior
 		return typeID;
 	}
 
-	class YBEHAVIOR_API BranchNode : public BehaviorNode
+	class BranchNode : public BehaviorNode
 	{
 	public:
 		BranchNode();
@@ -233,11 +236,11 @@ namespace YBehavior
 		void _DestroyChilds();
 	};
 
-	class YBEHAVIOR_API LeafNode: public BehaviorNode
+	class LeafNode: public BehaviorNode
 	{
 
 	};
-	class YBEHAVIOR_API SingleChildNode: public BranchNode
+	class SingleChildNode: public BranchNode
 	{
 	public:
 		SingleChildNode();
@@ -248,7 +251,7 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 	};
 
-	class YBEHAVIOR_API CompositeNode: public BranchNode
+	class CompositeNode: public BranchNode
 	{
 
 	};
@@ -266,7 +269,7 @@ namespace YBehavior
 		TempMemory m_TempMemory;
 	};
 
-	class YBEHAVIOR_API BehaviorTree : public SingleChildNode
+	class BehaviorTree : public SingleChildNode
 	{
 	public:
 		STRING GetClassName() const override { return "Tree"; }

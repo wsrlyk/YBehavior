@@ -57,12 +57,20 @@ namespace YBehavior
 		return pFSM;
 	}
 
+#ifdef SHARP
+#define FSM_EXT TOSTRING(.bytes)
+#else
+#define FSM_EXT TOSTRING(.fsm)
+#endif
 	FSM * MachineMgr::_LoadFSM(const STRING& name)
 	{
 		pugi::xml_document doc;
-
-		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + ".fsm").c_str());
-		LOG_BEGIN << "Loading: " << name << ".fsm" << LOG_END;
+		pugi::xml_parse_result result;
+		if (m_LoadDataCallback != nullptr)
+			result = doc.load_string(m_LoadDataCallback((m_WorkingDir + name + FSM_EXT).c_str()));
+		else
+			result = doc.load_file((m_WorkingDir + name + FSM_EXT).c_str());
+		LOG_BEGIN << "Loading: " << name << FSM_EXT << LOG_END;
 		if (result.status)
 		{
 			ERROR_BEGIN << "Load result: " << result.description() << ERROR_END;
@@ -369,6 +377,11 @@ namespace YBehavior
 			it->second->Print();
 		}
 		std::cout << "Print all fsms end." << std::endl;
+	}
+
+	void MachineMgr::Clear()
+	{
+		m_VersionMgr.Clear();
 	}
 
 	void _BuildStateTreeMapping(FSM* pFSM)

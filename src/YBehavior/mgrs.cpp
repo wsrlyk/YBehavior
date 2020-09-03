@@ -19,4 +19,11 @@ namespace YBehavior
 		delete m_pTreeMgr;
 	}
 
+	void Mgrs::Reset()
+	{
+		m_pBehaviorMgr->Clear();
+		m_pMachineMgr->Clear();
+		m_pTreeMgr->Clear();
+	}
+
 }

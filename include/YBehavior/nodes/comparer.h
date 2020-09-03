@@ -12,8 +12,8 @@ namespace YBehavior
 	public:
 		STRING GetClassName() const override { return "Comparer"; }
 	protected:
-		virtual bool OnLoaded(const pugi::xml_node& data);
-		virtual NodeState Update(AgentPtr pAgent);
+		bool OnLoaded(const pugi::xml_node& data) override;
+		NodeState Update(AgentPtr pAgent) override;
 
 	private:
 		OperationType m_Operator;

@@ -137,8 +137,9 @@ namespace YBehavior
 		}
 
 	public:
-		TYPEID TypeID() const { return GetTypeID<T>(); }
-		TYPEID GetReferenceSharedDataSelfID()
+		TYPEID TypeID() const override{ return GetTypeID<T>(); }
+		TYPEID ElementTypeID() const override { return GetTypeID<ElementType>(); }
+		TYPEID GetReferenceSharedDataSelfID() override
 		{
 			///> it's const, just return itself
 			if (m_Key == Utility::INVALID_KEY)
@@ -155,8 +156,8 @@ namespace YBehavior
 		{
 			return IsVector<T>::Result;
 		}
-		IVariableOperationHelper* GetOperation() const { return VariableOperationHelper<T>::Get(); }
-		IVariableOperationHelper* GetElementOperation() const { return VariableOperationHelper<ElementType>::Get(); }
+		IVariableOperationHelper* GetOperation() const override { return VariableOperationHelper<T>::Get(); }
+		IVariableOperationHelper* GetElementOperation() const override { return VariableOperationHelper<ElementType>::Get(); }
 
 		ISharedVariableEx* GetVectorIndex() override
 		{
@@ -258,16 +259,16 @@ namespace YBehavior
 			}
 		}
 
-		const void* GetValue(IMemory* pMemory)
+		const void* GetValue(IMemory* pMemory) override
 		{
 			return GetCastedValue(pMemory);
 		}
-		void SetValue(IMemory* pMemory, const void* src)
+		void SetValue(IMemory* pMemory, const void* src) override
 		{
 			SetCastedValue(pMemory, (const T*)src);
 		}
 
-		void SetValueFromString(const STRING& str)
+		void SetValueFromString(const STRING& str) override
 		{
 			if (CanFromString<ElementType>::Result)
 			{
@@ -290,7 +291,7 @@ namespace YBehavior
 				}
 			}
 		}
-		void SetKeyFromString(const STRING& s)
+		void SetKeyFromString(const STRING& s) override
 		{
 			KEY key = Utility::INVALID_KEY;
 			///> if T is a single type but has vector index, it means this variable is an element of a vector.
@@ -367,7 +368,7 @@ namespace YBehavior
 		}
 
 		///> This function must be called BEFORE SetIndexFromString
-		void SetVectorIndex(const STRING& vbType, const STRING& s)
+		void SetVectorIndex(const STRING& vbType, const STRING& s) override
 		{
 			if (vbType.length() < 1)
 				return;

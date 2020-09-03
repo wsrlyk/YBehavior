@@ -7,7 +7,7 @@
 
 namespace YBehavior
 {
-	class YBEHAVIOR_API SwitchCaseContext : public RunningContext
+	class SwitchCaseContext : public RunningContext
 	{
 	public:
 		///> -2: normal: -1: default; 0~size-1: cases
@@ -28,8 +28,8 @@ namespace YBehavior
 			SetRCCreator(&m_RCContainer);
 		}
 	protected:
-		virtual NodeState Update(AgentPtr pAgent);
-		virtual bool OnLoaded(const pugi::xml_node& data);
+		NodeState Update(AgentPtr pAgent) override;
+		bool OnLoaded(const pugi::xml_node& data) override;
 		void OnAddChild(BehaviorNode * child, const STRING & connection) override;
 
 		ISharedVariableEx* m_Switch;

@@ -3,6 +3,8 @@
 
 namespace YBehavior
 {
+	const Vector3 Vector3::zero = {};
+
 	std::stringstream & operator<<(std::stringstream &out, const EntityWrapper &obj)
 	{
 		if (obj.IsValid() && obj.Get() != nullptr)

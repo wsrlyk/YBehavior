@@ -2,9 +2,12 @@
 #define _YBEHAVIOR_MGRS_H_
 
 #include "singleton.h"
+#include "define.h"
 
 namespace YBehavior
 {
+	typedef const char* (STDCALL *LoadDataDelegate)(const char* name);
+
 	class TreeMgr;
 	class MachineMgr;
 	class BehaviorMgr;
@@ -13,7 +16,7 @@ namespace YBehavior
 	public:
 		Mgrs();
 		~Mgrs();
-
+		void Reset();
 		inline TreeMgr* GetTreeMgr() { return m_pTreeMgr; }
 		inline MachineMgr* GetMachineMgr() { return m_pMachineMgr; }
 		inline BehaviorMgr* GetBehaviorMgr() { return m_pBehaviorMgr; }

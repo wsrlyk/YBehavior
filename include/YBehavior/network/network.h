@@ -10,7 +10,7 @@
 namespace YBehavior
 {
 #ifdef MSVC
-	typedef unsigned int (_stdcall ThreadFunction)(void* arg);
+	typedef unsigned int (STDCALL ThreadFunction)(void* arg);
 #else
 	typedef unsigned int (ThreadFunction)(void* arg);
 #endif
@@ -117,7 +117,7 @@ namespace YBehavior
 		void OnConnection() {} // used once after the connection is established, make some initialization between server and client;
 
 		void SendAllPackets();
-		bool ReceivePackets(const char* msgCheck = 0);
+		bool ReceivePackets(CSTRING_CONST msgCheck = 0);
 		bool ReadText(STRING& text);
 		bool SendText(const STRING& text);
 		void ClearOneConnection();

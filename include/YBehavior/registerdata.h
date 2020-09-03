@@ -14,7 +14,7 @@ namespace YBehavior
 		func(EntityWrapper);   \
 		func(Vector3);
 
-	class YBEHAVIOR_API RegisterData
+	class RegisterData
 	{
 		struct Datas
 		{

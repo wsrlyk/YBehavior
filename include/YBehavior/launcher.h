@@ -4,7 +4,7 @@
 #include "YBehavior/nodefactory.h"
 namespace YBehavior
 {
-	class YBEHAVIOR_API LaunchCore
+	class LaunchCore
 	{
 	public:
 		virtual void RegisterActions() const;
@@ -26,7 +26,7 @@ namespace YBehavior
 
 	//////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////
-	class YBEHAVIOR_API Launcher
+	class Launcher
 	{
 	public:
 		static bool Launch(const LaunchCore& core);
