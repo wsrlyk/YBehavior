@@ -55,7 +55,7 @@ extern "C" YBEHAVIOR_API void SetToBufferBool(YBehavior::BOOL data)
 
 extern "C" YBEHAVIOR_API void GetFromBufferString(char* output, int len)
 {
-	strncpy(output, YBehavior::SharpBuffer::s_Buffer.m_String.c_str(), (size_t)len);
+	snprintf(output, (size_t)len, "%s", YBehavior::SharpBuffer::s_Buffer.m_String.c_str());
 }
 
 extern "C" YBEHAVIOR_API void SetToBufferString(char* data)

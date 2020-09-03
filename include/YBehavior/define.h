@@ -20,6 +20,7 @@ namespace YBehavior
 //#define YBEHAVIOR_DLL_ENTRY_IMPORT
 //#define YBEHAVIOR_DLL_ENTRY_EXPORT
 //#endif
+#define TOSTRING(s) #s
 }
 
 #endif
