@@ -49,13 +49,13 @@ namespace YBehavior
 	protected:
 		std::stringstream m_DebugLogInfo;
 		DebugFSMHelper* m_pDebugHelper;
-//		bool _HasLogPoint();
-//#define IF_FSM_HAS_LOG_POINT if (_HasLogPoint())
-//#define FSM_DEBUG_LOG_INFO(info)\
-//	{\
-//		IF_FSM_HAS_LOG_POINT\
-//			m_DebugLogInfo << info;\
-//	}
+/*		bool _HasLogPoint();
+#define IF_FSM_HAS_LOG_POINT if (_HasLogPoint())
+#define FSM_DEBUG_LOG_INFO(info)\
+	{\
+		IF_FSM_HAS_LOG_POINT\
+			m_DebugLogInfo << info;\
+	}*/
 	public:
 		std::stringstream& GetDebugLogInfo() { return m_DebugLogInfo; }
 #else
