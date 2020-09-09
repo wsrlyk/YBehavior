@@ -29,6 +29,7 @@ namespace YBehavior
 	const BOOL Utility::FALSE_VALUE = 0;
 	const KEY Utility::INVALID_KEY = -1;
 	const YBehavior::TYPEID Utility::INVALID_TYPE = -1;
+	const YBehavior::TYPEID Utility::TYPE_NUM = 7;
 
 	std::random_device Utility::rd;
 	std::default_random_engine Utility::mt(rd());
@@ -92,7 +93,7 @@ namespace YBehavior
 
 	bool Utility::IsElement(TYPEID eleType, TYPEID vectorType)
 	{
-		return ((vectorType % 10) == eleType) && (eleType != vectorType);
+		return (vectorType - TYPE_NUM) == eleType;
 	}
 
 	char Utility::ToLower(char c)

@@ -56,6 +56,7 @@ namespace YBehavior
 		static const BOOL FALSE_VALUE;
 		static const KEY INVALID_KEY;
 		static const TYPEID INVALID_TYPE;
+		static const TYPEID TYPE_NUM;
 
 		static void SplitString(const STRING& s, StdVector<STRING>& v, CHAR c, bool RemoveEmptyEntries = false, int count = 0);
 		static Vector3 CreateVector3(const StdVector<STRING>& data);
