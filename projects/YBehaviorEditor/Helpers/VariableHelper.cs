@@ -90,14 +90,24 @@ namespace YBehavior.Editor
         }
     }
 
-    [ValueConversion(typeof(bool), typeof(Colors))]
-    public class VariableIsReferencedColorConvertor : IValueConverter
+    [ValueConversion(typeof(Variable.ReferencedType), typeof(Colors))]
+    public class VariableReferencedTypeColorConvertor : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (!(value is bool))
+            if (!(value is Variable.ReferencedType))
                 return new SolidColorBrush(Colors.LightCyan);
-            return new SolidColorBrush((bool)value ? Colors.DarkRed : Colors.LightCoral);
+            switch ((Variable.ReferencedType)value)
+            {
+                case Variable.ReferencedType.None:
+                    return new SolidColorBrush(Color.FromRgb(225, 225, 225));
+                case Variable.ReferencedType.Disactive:
+                    return new SolidColorBrush(Colors.DimGray);
+                case Variable.ReferencedType.Active:
+                    return new SolidColorBrush(Colors.LightCoral);
+                default:
+                    return new SolidColorBrush(Colors.LightCyan);
+            }
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {

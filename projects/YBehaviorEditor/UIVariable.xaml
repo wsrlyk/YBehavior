@@ -17,7 +17,7 @@
         <local:VariableValidColorConvertor x:Key="validConvertor"/>
         <local:VariableRefreshColorConvertor x:Key="refreshConvertor"/>
         <local:VariableCountTypeColorConvertor x:Key="countTypeConvertor"/>
-        <local:VariableIsReferencedColorConvertor x:Key="isReferencedConvertor"/>
+        <local:VariableReferencedTypeColorConvertor x:Key="referencedTypeConvertor"/>
         <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
         <local:VariableValueTypeConvertor x:Key="valueTypeConvertor"/>
         <local:VariableVariableTypeConvertor x:Key="variableTypeConvertor"/>
@@ -87,7 +87,7 @@
             </ComboBox>
             <StackPanel Orientation="Horizontal"  DockPanel.Dock="Right">
                 <CheckBox IsEnabled="{Binding IsEditable}" Width="20" Height="20" Name="VBSwitcher" Background="Orange" Foreground="GreenYellow" IsChecked="{Binding vbType, Converter={StaticResource variableTypeConvertor}}" Visibility="{Binding Path = CanSwitchConst, Converter={StaticResource visibilityConvertor}}"/>
-                <Button Width="20" Height="20" Name="Remover" Background="{Binding IsReferenced, Converter={StaticResource isReferencedConvertor}}" Visibility="{Binding Path = CanBeRemoved,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="Remover_Click">
+                <Button Width="20" Height="20" Name="Remover" Background="{Binding referencedType, Converter={StaticResource referencedTypeConvertor}}" Visibility="{Binding Path = CanBeRemoved,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="Remover_Click">
                     X
                 </Button>
             </StackPanel>

@@ -94,6 +94,19 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        public static void OperateNode(NodeBase node, object param0, object param1, bool bIncludeChildren, Action<NodeBase, object, object> action)
+        {
+            action(node, param0, param1);
+
+            if (bIncludeChildren)
+            {
+                foreach (NodeBase child in node.Conns)
+                {
+                    OperateNode(child, param0, param1, bIncludeChildren, action);
+                }
+            }
+        }
+
         public static void ForEachFSMState(FSM fsm, Action<FSMStateNode> action)
         {
             ForEachFSMState(fsm.RootMachine, action);

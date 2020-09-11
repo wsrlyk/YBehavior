@@ -523,17 +523,32 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        bool m_IsReferenced = false;
-        public bool IsReferenced
+        public enum ReferencedType
         {
-            get { return m_IsReferenced; }
+            None,
+            Disactive,
+            Active,
+        }
+
+        ReferencedType m_ReferencedType = ReferencedType.None;
+        public ReferencedType referencedType
+        {
+            get { return m_ReferencedType; }
             set
             {
-                if (m_IsReferenced != value)
+                if (m_ReferencedType != value)
                 {
-                    m_IsReferenced = value;
-                    OnPropertyChanged("IsReferenced");
+                    m_ReferencedType = value;
+                    OnPropertyChanged("referencedType");
                 }
+            }
+        }
+        public void TrySetReferencedType(ReferencedType t)
+        {
+            if (m_ReferencedType < t)
+            {
+                m_ReferencedType = t;
+                OnPropertyChanged("referencedType");
             }
         }
 

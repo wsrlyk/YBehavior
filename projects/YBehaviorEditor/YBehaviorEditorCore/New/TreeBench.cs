@@ -449,24 +449,26 @@ namespace YBehavior.Editor.Core.New
         {
             foreach (var v in m_Tree.TreeMemory.SharedMemory.Datas)
             {
-                v.Variable.IsReferenced = false;
+                v.Variable.referencedType = Variable.ReferencedType.None;
             }
             foreach (var v in m_Tree.TreeMemory.LocalMemory.Datas)
             {
-                v.Variable.IsReferenced = false;
+                v.Variable.referencedType = Variable.ReferencedType.None;
             }
 
-            Action<NodeBase, object> handler =
-            (NodeBase node, object o) =>
+            Action<NodeBase, object, object> handler =
+            (NodeBase node, object o0, object o1) =>
             {
                 if (node is TreeNode)
                 {
                     if (node is RootTreeNode)
                         return;
 
-                    TreeMemory treeMemory = o as TreeMemory;
+                    TreeMemory treeMemory = o0 as TreeMemory;
                     if (treeMemory == null)
                         return;
+
+                    bool isMainTree = (bool)o1;
 
                     Action<Variable, TreeMemory> variableHandler = (Variable v, TreeMemory memory) =>
                     {
@@ -478,7 +480,7 @@ namespace YBehavior.Editor.Core.New
 
                         Variable r = memory.GetVariable(v.Value, v.IsLocal);
                         if (r != null)
-                            r.IsReferenced = true;
+                            r.TrySetReferencedType(isMainTree && !node.Disabled ? Variable.ReferencedType.Active : Variable.ReferencedType.Disactive);
                     };
 
                     TreeNode tree = node as TreeNode;
@@ -493,12 +495,11 @@ namespace YBehavior.Editor.Core.New
                 }
             };
 
-            Utility.OperateNode(m_Tree.Root, m_Tree.TreeMemory, true, handler);
+            Utility.OperateNode(m_Tree.Root, m_Tree.TreeMemory, true, true, handler);
             foreach (var tree in m_Forest)
             {
-                Utility.OperateNode(tree, m_Tree.TreeMemory, true, handler);
+                Utility.OperateNode(tree, m_Tree.TreeMemory, false, true, handler);
             }
-
         }
     }
 }
