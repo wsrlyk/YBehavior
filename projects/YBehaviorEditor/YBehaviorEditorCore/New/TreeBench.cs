@@ -485,7 +485,7 @@ namespace YBehavior.Editor.Core.New
                     foreach (var v in tree.NodeMemory.Datas)
                     {
                         variableHandler(v.Variable, treeMemory);
-                        if (v.Variable.cType == Variable.CountType.CT_LIST)
+                        if (v.Variable.IsElement)
                         {
                             variableHandler(v.Variable.VectorIndex, treeMemory);
                         }
