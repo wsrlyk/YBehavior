@@ -523,6 +523,20 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        bool m_IsReferenced = false;
+        public bool IsReferenced
+        {
+            get { return m_IsReferenced; }
+            set
+            {
+                if (m_IsReferenced != value)
+                {
+                    m_IsReferenced = value;
+                    OnPropertyChanged("IsReferenced");
+                }
+            }
+        }
+
         public bool IsValid
         {
             get { return CheckValid(); }

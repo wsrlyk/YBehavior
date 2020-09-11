@@ -165,6 +165,7 @@ namespace YBehavior.Editor.Core.New
                 }
             }
 
+            RefreshReferenceStates();
             CommandMgr.Blocked = false;
             return true;
         }
@@ -283,6 +284,8 @@ namespace YBehavior.Editor.Core.New
             m_ExportFileHash = 0;
 
             OnPropertyChanged("DisplayName");
+
+            RefreshReferenceStates();
         }
 
         void _SaveNode(TreeNode node, XmlElement data, XmlDocument xmlDoc)
@@ -440,6 +443,62 @@ namespace YBehavior.Editor.Core.New
                     bRes = false;
             }
             return bRes;
+        }
+
+        public void RefreshReferenceStates()
+        {
+            foreach (var v in m_Tree.TreeMemory.SharedMemory.Datas)
+            {
+                v.Variable.IsReferenced = false;
+            }
+            foreach (var v in m_Tree.TreeMemory.LocalMemory.Datas)
+            {
+                v.Variable.IsReferenced = false;
+            }
+
+            Action<NodeBase, object> handler =
+            (NodeBase node, object o) =>
+            {
+                if (node is TreeNode)
+                {
+                    if (node is RootTreeNode)
+                        return;
+
+                    TreeMemory treeMemory = o as TreeMemory;
+                    if (treeMemory == null)
+                        return;
+
+                    Action<Variable, TreeMemory> variableHandler = (Variable v, TreeMemory memory) =>
+                    {
+                        if (v.vbType == Variable.VariableType.VBT_Const)
+                            return;
+
+                        if (!v.CheckValid())
+                            return;
+
+                        Variable r = memory.GetVariable(v.Value, v.IsLocal);
+                        if (r != null)
+                            r.IsReferenced = true;
+                    };
+
+                    TreeNode tree = node as TreeNode;
+                    foreach (var v in tree.NodeMemory.Datas)
+                    {
+                        variableHandler(v.Variable, treeMemory);
+                        if (v.Variable.cType == Variable.CountType.CT_LIST)
+                        {
+                            variableHandler(v.Variable.VectorIndex, treeMemory);
+                        }
+                    }
+                }
+            };
+
+            Utility.OperateNode(m_Tree.Root, m_Tree.TreeMemory, true, handler);
+            foreach (var tree in m_Forest)
+            {
+                Utility.OperateNode(tree, m_Tree.TreeMemory, true, handler);
+            }
+
         }
     }
 }

@@ -90,6 +90,21 @@ namespace YBehavior.Editor
         }
     }
 
+    [ValueConversion(typeof(bool), typeof(Colors))]
+    public class VariableIsReferencedColorConvertor : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!(value is bool))
+                return new SolidColorBrush(Colors.LightCyan);
+            return new SolidColorBrush((bool)value ? Colors.DarkRed : Colors.LightCoral);
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return true;
+        }
+    }
+
     [ValueConversion(typeof(bool), typeof(bool))]
     public class InvertBoolConverter : IValueConverter
     {

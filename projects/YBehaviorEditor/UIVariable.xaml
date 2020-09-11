@@ -17,6 +17,7 @@
         <local:VariableValidColorConvertor x:Key="validConvertor"/>
         <local:VariableRefreshColorConvertor x:Key="refreshConvertor"/>
         <local:VariableCountTypeColorConvertor x:Key="countTypeConvertor"/>
+        <local:VariableIsReferencedColorConvertor x:Key="isReferencedConvertor"/>
         <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
         <local:VariableValueTypeConvertor x:Key="valueTypeConvertor"/>
         <local:VariableVariableTypeConvertor x:Key="variableTypeConvertor"/>
@@ -86,7 +87,7 @@
             </ComboBox>
             <StackPanel Orientation="Horizontal"  DockPanel.Dock="Right">
                 <CheckBox IsEnabled="{Binding IsEditable}" Width="20" Height="20" Name="VBSwitcher" Background="Orange" Foreground="GreenYellow" IsChecked="{Binding vbType, Converter={StaticResource variableTypeConvertor}}" Visibility="{Binding Path = CanSwitchConst, Converter={StaticResource visibilityConvertor}}"/>
-                <Button Width="20" Height="20" Name="Remover" Background="IndianRed" Visibility="{Binding Path = CanBeRemoved,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="Remover_Click">
+                <Button Width="20" Height="20" Name="Remover" Background="{Binding IsReferenced, Converter={StaticResource isReferencedConvertor}}" Visibility="{Binding Path = CanBeRemoved,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="Remover_Click">
                     X
                 </Button>
             </StackPanel>
@@ -112,8 +113,8 @@
                 </Grid>
             </Grid>
         </DockPanel>
-        <DockPanel  Margin="52,2,2,2" Visibility="{Binding IsElement, Converter={StaticResource visibilityConvertor}}">
-            <TextBlock Text="VectorIndex" FontSize="13" Width="90" DockPanel.Dock="Left" Background="LightCyan"/>
+        <DockPanel  Margin="72,2,52,2" Visibility="{Binding IsElement, Converter={StaticResource visibilityConvertor}}">
+            <TextBlock Text="Index" FontSize="13" Width="40" DockPanel.Dock="Left" Background="LightCyan"/>
             <CheckBox IsEnabled="{Binding IsEditable}" Width="20" Height="20" Name="VectorIndexSwitcher" Background="Orange" Foreground="GreenYellow" DockPanel.Dock="Right" IsChecked="{Binding Path=VectorIndex.vbType, Converter={StaticResource variableTypeConvertor}}"/>
             <Grid>
                 <ComboBox IsEnabled="{Binding IsEditable}"
