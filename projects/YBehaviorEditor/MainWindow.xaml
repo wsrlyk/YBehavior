@@ -8,7 +8,8 @@
         KeyDown="_KeyDown"
         Closing="Window_Closing"
         Closed="Window_Closed"
-        Title="YBehaviorEditor" Height="1024" Width="1280">
+        Title="YBehaviorEditor" Height="1024" Width="1280"
+        >
     <Grid  Background="DimGray">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>

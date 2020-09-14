@@ -4,35 +4,40 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
-        <local:ReturnTypeConvertor x:Key="returnTypeConvertor"/>
-        <local:ValueConverterGroup x:Key="invertStringEmptyAndVisibilityConvertor">
-            <local:StringNullOrEmptyConvertor/>
-            <local:InvertBoolConverter/>
-            <BooleanToVisibilityConverter/>
-        </local:ValueConverterGroup>
-        <local:ValueConverterGroup x:Key="stringEmptyVisibilityConvertor">
-            <local:StringNullOrEmptyConvertor/>
-            <BooleanToVisibilityConverter/>
-        </local:ValueConverterGroup>
-        <Storyboard x:Key="InstantShowAnim" FillBehavior="Stop">
-            <!--            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources\Theme0.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
+            <local:ReturnTypeConvertor x:Key="returnTypeConvertor"/>
+            <local:ValueConverterGroup x:Key="invertStringEmptyAndVisibilityConvertor">
+                <local:StringNullOrEmptyConvertor/>
+                <local:InvertBoolConverter/>
+                <BooleanToVisibilityConverter/>
+            </local:ValueConverterGroup>
+            <local:ValueConverterGroup x:Key="stringEmptyVisibilityConvertor">
+                <local:StringNullOrEmptyConvertor/>
+                <BooleanToVisibilityConverter/>
+            </local:ValueConverterGroup>
+            <Storyboard x:Key="InstantShowAnim" FillBehavior="Stop">
+                <!--            <DoubleAnimation Storyboard.TargetProperty="Opacity"
                              From="0.0" To="1.0" Duration="0:0:0.1"/>   -->
-            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                <DoubleAnimation Storyboard.TargetProperty="Opacity"
                              From="1.0" To="0.0" Duration="0:0:0.1" BeginTime="0:0:0.8"/>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
-                <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
-                <!--<DiscreteObjectKeyFrame KeyTime="0:0:0.8" Value="{x:Static Visibility.Collapsed}"/> -->
-            </ObjectAnimationUsingKeyFrames>
-        </Storyboard>
-        <Storyboard x:Key="ConstantShowAnim">
-            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                    <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
+                    <!--<DiscreteObjectKeyFrame KeyTime="0:0:0.8" Value="{x:Static Visibility.Collapsed}"/> -->
+                </ObjectAnimationUsingKeyFrames>
+            </Storyboard>
+            <Storyboard x:Key="ConstantShowAnim">
+                <DoubleAnimation Storyboard.TargetProperty="Opacity"
                              From="0.0" To="1.0" Duration="0:0:0.1"/>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
-                <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
-            </ObjectAnimationUsingKeyFrames>
-        </Storyboard>
-        <SolidColorBrush x:Key="ConnectorOut" Color="#E5A351C9"/>
-        <SolidColorBrush x:Key="ConnectorIn" Color="#E5C1349B"/>
+                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                    <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
+                </ObjectAnimationUsingKeyFrames>
+            </Storyboard>
+            <SolidColorBrush x:Key="ConnectorOut" Color="#E5A351C9"/>
+            <SolidColorBrush x:Key="ConnectorIn" Color="#E5C1349B"/>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -108,8 +108,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="2,0">
-                            <Button Click="OnMachineStackItemClicked" Height="25">
-                                <TextBlock Text="{Binding Path=ForceGetRenderer.UITitle, Mode=OneWay}"/>
+                            <Button Click="OnMachineStackItemClicked" Height="25" Content="{Binding Path=ForceGetRenderer.UITitle, Mode=OneWay}">
                             </Button>
                         </Grid>
                         <!--TextBlock Text = "{Binding Name}"/-->

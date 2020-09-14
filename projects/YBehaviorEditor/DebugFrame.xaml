@@ -8,30 +8,23 @@
              Height="30" d:DesignWidth="800">
     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
         <StackPanel Name="ConnectFrame" Orientation="Horizontal">
-            <Button Name="btnStartDebug" Click="btnStartDebug_Click" Width="54">Connect</Button>
+            <Button Name="btnStartDebug" Click="btnStartDebug_Click" Width="54" Content="Connect" />
             <TextBlock Text="IP" Width="20" VerticalAlignment="Center"/>
             <TextBox Name="IP" Text="127.0.0.1" Width="98" VerticalAlignment="Center" Margin="0,6"/>
             <TextBlock Text="Port" Width="30" VerticalAlignment="Center"/>
             <TextBox Name="Port" Width="50" Text="444" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Name="DebuggingFrame" Orientation="Horizontal">
-            <Button Name="btnStopDebug" Click="btnStopDebug_Click" Background="Red">Quit</Button>
-
+            <Button Name="btnStopDebug" Click="btnStopDebug_Click" Content="Quit" Style="{StaticResource ButtonRed}"/>
             <Border BorderBrush="Blue" BorderThickness="1">
                 <StackPanel Orientation="Horizontal">
-                    <Button Name="btnDebugThisTree" Click="btnDebugThisTree_Click">Start Debug UID :</Button>
+                    <Button Name="btnDebugThisTree" Click="btnDebugThisTree_Click" Content="Start Debug UID :"/>
                     <TextBox Name="debugAgentUID" Text="" Width="150" MaxLines="1" Margin="0,6"/>
                 </StackPanel>
             </Border>
-            <Button Name="btnContinue" Click="btnContinue_Click">
-                <TextBlock Text ="Continue&#x0a;     F5" FontSize="10"/>
-            </Button>
-            <Button Name="btnStepOver" Click="btnStepOver_Click">
-                <TextBlock Text ="StepOver&#x0a;     F10" FontSize="10"/>
-            </Button>
-            <Button Name="btnStepInto" Click="btnStepInto_Click">
-                <TextBlock Text ="StepInto&#x0a;     F11" FontSize="10"/>
-            </Button>
+            <Button Name="btnContinue" Click="btnContinue_Click" Content="Continue&#x0a;  F5"/>
+            <Button Name="btnStepOver" Click="btnStepOver_Click" Content="StepOver&#x0a;  F10"/>
+            <Button Name="btnStepInto" Click="btnStepInto_Click" Content="StepInto&#x0a;  F11"/>
         </StackPanel>
     </StackPanel>
 </UserControl>

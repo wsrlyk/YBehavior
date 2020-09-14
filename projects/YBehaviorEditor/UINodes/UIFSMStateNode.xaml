@@ -27,46 +27,55 @@
     <DockPanel>
         <Border Name="commentBorder" DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="#FFE8D3AF" Background="#DDF1E0C6"
                 Visibility="{Binding Path=Comment, Converter={StaticResource invertStringEmptyAndVisibilityConvertor}}"
-                CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}">
+                CornerRadius="5" Margin="0,5">
             <TextBlock Text="{Binding Comment, Mode=OneWay}" FontSize="10"/>
         </Border>
-        <Border Name="border" BorderThickness="4"
+        <Grid>
+            <Border BorderBrush="Black" BorderThickness="1" Background="White" 
+                    MinWidth="80" CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}">
+                <Border.Effect>
+                    <DropShadowEffect ShadowDepth="4" Color="DimGray"/>
+                </Border.Effect>
+            </Border>
+
+            <Border Name="border" BorderThickness="4"
                 MinWidth="80" CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}">
-            <Border.Background>
-                <MultiBinding Converter="{StaticResource backgroundConvertor}" Mode="OneWay">
-                    <Binding Path="IsDefaultState"/>
-                    <Binding RelativeSource="{RelativeSource Self}"/>
-                </MultiBinding>
-            </Border.Background>
-            <Border.BorderBrush>
-                <MultiBinding Converter="{StaticResource borderColorConvertor}" Mode="OneWay">
-                    <Binding Path=""/>
-                    <Binding RelativeSource="{RelativeSource Self}"/>
-                </MultiBinding>
-            </Border.BorderBrush>
-            <Grid>
-                <Border Name="disableCover" BorderThickness="0" Background="#FF4B4B4B" Visibility="{Binding Disabled, Converter={StaticResource visibilityConvertor}}"
+                <Border.Background>
+                    <MultiBinding Converter="{StaticResource backgroundConvertor}" Mode="OneWay">
+                        <Binding Path="IsDefaultState"/>
+                        <Binding RelativeSource="{RelativeSource Self}"/>
+                    </MultiBinding>
+                </Border.Background>
+                <Border.BorderBrush>
+                    <MultiBinding Converter="{StaticResource borderColorConvertor}" Mode="OneWay">
+                        <Binding Path=""/>
+                        <Binding RelativeSource="{RelativeSource Self}"/>
+                    </MultiBinding>
+                </Border.BorderBrush>
+                <Grid>
+                    <Border Name="disableCover" BorderThickness="0" Background="#FF4B4B4B" Visibility="{Binding Disabled, Converter={StaticResource visibilityConvertor}}"
                         CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}"/>
-                <Border Name="debugCover" BorderThickness="0" Background="#FFDA3F1C"
+                    <Border Name="debugCover" BorderThickness="0" Background="#FFDA3F1C"
                         CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}"/>
-                <Border Name="selectCover" BorderThickness="3" BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"
+                    <Border Name="selectCover" BorderThickness="3" BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"
                         CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}"/>
-                <StackPanel Name="mainPanel" Margin="3">
-                    <TextBlock Name="name" Text="{Binding UITitle}"></TextBlock>
-                    <TextBlock Name="note" Text="{Binding Note}"></TextBlock>
-                </StackPanel>
-                <Ellipse Name="breakPoint" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Visibility="{Binding Path=DebugPointInfo.HasBreakPoint, Converter={StaticResource visibilityConvertor}}" >
-                    <Ellipse.Fill>
-                        <SolidColorBrush Color="Red" Opacity="0.6" />
-                    </Ellipse.Fill>
-                </Ellipse>
-                <Ellipse Name="logPoint" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Visibility="{Binding Path=DebugPointInfo.HasLogPoint, Converter={StaticResource visibilityConvertor}}" >
-                    <Ellipse.Fill>
-                        <SolidColorBrush Color="Purple" Opacity="0.6" />
-                    </Ellipse.Fill>
-                </Ellipse>
-                <Grid Name="connectors" HorizontalAlignment="Center" VerticalAlignment="Center" Width="30" Height="30"/>
-            </Grid>
-        </Border>
+                    <StackPanel Name="mainPanel" Margin="3">
+                        <TextBlock Name="name" Text="{Binding UITitle}"></TextBlock>
+                        <TextBlock Name="note" Text="{Binding Note}"></TextBlock>
+                    </StackPanel>
+                    <Ellipse Name="breakPoint" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Visibility="{Binding Path=DebugPointInfo.HasBreakPoint, Converter={StaticResource visibilityConvertor}}" >
+                        <Ellipse.Fill>
+                            <SolidColorBrush Color="Red" Opacity="0.6" />
+                        </Ellipse.Fill>
+                    </Ellipse>
+                    <Ellipse Name="logPoint" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Visibility="{Binding Path=DebugPointInfo.HasLogPoint, Converter={StaticResource visibilityConvertor}}" >
+                        <Ellipse.Fill>
+                            <SolidColorBrush Color="Purple" Opacity="0.6" />
+                        </Ellipse.Fill>
+                    </Ellipse>
+                    <Grid Name="connectors" HorizontalAlignment="Center" VerticalAlignment="Center" Width="30" Height="30"/>
+                </Grid>
+            </Border>
+        </Grid>
     </DockPanel>
 </local:UIFSMStateNodeBase>

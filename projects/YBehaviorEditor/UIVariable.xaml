@@ -87,9 +87,10 @@
             </ComboBox>
             <StackPanel Orientation="Horizontal"  DockPanel.Dock="Right">
                 <CheckBox IsEnabled="{Binding IsEditable}" Width="20" Height="20" Name="VBSwitcher" Background="Orange" Foreground="GreenYellow" IsChecked="{Binding vbType, Converter={StaticResource variableTypeConvertor}}" Visibility="{Binding Path = CanSwitchConst, Converter={StaticResource visibilityConvertor}}"/>
-                <Button Width="20" Height="20" Name="Remover" Background="{Binding referencedType, Converter={StaticResource referencedTypeConvertor}}" Visibility="{Binding Path = CanBeRemoved,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="Remover_Click">
-                    X
-                </Button>
+                <Button Width="20" Height="20" Name="Remover" Background="{Binding referencedType, Converter={StaticResource referencedTypeConvertor}}" Visibility="{Binding Path = CanBeRemoved,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="Remover_Click"
+                        Content="X" Foreground="Red"
+                        Style="{StaticResource ButtonNone}"/>
+
             </StackPanel>
             <Grid>
                 <ComboBox IsEnabled="{Binding IsEditable}" ItemsSource="{Binding Candidates.variables}" 

@@ -105,12 +105,12 @@ namespace YBehavior.Editor
             if (bottomConnectors.Children.Count > 0)
             {
                 DockPanel.SetDock(commentBorder, Dock.Right);
-                commentBorder.Margin = new Thickness(0, this.topConnectors.Height, 0, bottomConnectors.Height);
+                commentBorder.Margin = new Thickness(5, this.topConnectors.Height, 0, bottomConnectors.Height);
             }
             else
             {
                 DockPanel.SetDock(commentBorder, Dock.Bottom);
-                commentBorder.Margin = new Thickness(0);
+                commentBorder.Margin = new Thickness(0, -10, 0, 0);
             }
         }
 

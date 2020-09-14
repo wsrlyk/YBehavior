@@ -24,9 +24,7 @@
                         <Grid DockPanel.Dock="Top">
                             <TextBlock Text ="Shared Variables" FontSize="14" Height="20" HorizontalAlignment="Left" Margin="40,0,0,0"/>
                             <TextBox Name="NewSharedVariableName" HorizontalAlignment="Right" Width="80" Margin="0,0,20,0"/>
-                            <Button HorizontalAlignment="Right" Width="20" Click="AddSharedVariable_Click">
-                                +
-                            </Button>
+                            <Button HorizontalAlignment="Right" Width="20" Click="AddSharedVariable_Click" Content="+"/>
                         </Grid>
                         <ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
                             <ItemsControl Name="SharedContainer" ItemsSource="{Binding SharedMemory.Datas}">
@@ -51,9 +49,7 @@
                         <Grid DockPanel.Dock="Top">
                             <TextBlock Text ="Local Variables" FontSize="14" Height="20" HorizontalAlignment="Left" Margin="45,0,0,0"/>
                             <TextBox Name="NewLocalVariableName" HorizontalAlignment="Right" Width="80" Margin="0,0,20,0"/>
-                            <Button HorizontalAlignment="Right" Width="20" Click="AddLocalVariable_Click">
-                                +
-                            </Button>
+                            <Button HorizontalAlignment="Right" Width="20" Click="AddLocalVariable_Click" Content="+"/>
                         </Grid>
                         <ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
                             <ItemsControl Name="LocalContainer" ItemsSource="{Binding LocalMemory.Datas}">
