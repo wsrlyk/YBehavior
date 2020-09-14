@@ -34,7 +34,7 @@
             <Border BorderBrush="Black" BorderThickness="1" Background="White" 
                     MinWidth="80" CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}">
                 <Border.Effect>
-                    <DropShadowEffect ShadowDepth="4" Color="DimGray"/>
+                    <DropShadowEffect ShadowDepth="4" Color="Gray"/>
                 </Border.Effect>
             </Border>
 

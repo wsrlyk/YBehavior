@@ -27,7 +27,7 @@
         <Grid>
             <Border BorderBrush="Black" BorderThickness="1" Background="White" MinWidth="80" CornerRadius="3">
                 <Border.Effect>
-                    <DropShadowEffect ShadowDepth="4" Color="DimGray"/>
+                    <DropShadowEffect ShadowDepth="4" Color="Gray"/>
                 </Border.Effect>
             </Border>
             <Border Name="border" BorderThickness="2" BorderBrush="#FFC1C7CD" Background="#FFB4B7B9" MinWidth="80" CornerRadius="3">
