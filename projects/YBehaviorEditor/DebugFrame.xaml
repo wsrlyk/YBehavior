@@ -9,9 +9,9 @@
     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
         <StackPanel Name="ConnectFrame" Orientation="Horizontal">
             <Button Name="btnStartDebug" Click="btnStartDebug_Click" Width="54" Content="Connect" />
-            <TextBlock Text="IP" Width="20" VerticalAlignment="Center"/>
+            <TextBlock Text="IP" Width="20" VerticalAlignment="Center" Foreground="White"/>
             <TextBox Name="IP" Text="127.0.0.1" Width="98" VerticalAlignment="Center" Margin="0,6"/>
-            <TextBlock Text="Port" Width="30" VerticalAlignment="Center"/>
+            <TextBlock Text="Port" Width="30" VerticalAlignment="Center" Foreground="White"/>
             <TextBox Name="Port" Width="50" Text="444" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Name="DebuggingFrame" Orientation="Horizontal">

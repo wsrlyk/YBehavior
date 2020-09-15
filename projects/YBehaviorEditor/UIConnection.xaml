@@ -29,7 +29,7 @@
                 </PathGeometry>
             </Path.Data>
         </Path>
-        <TextBlock Text="{Binding Note}" Background="#B2979797" Foreground="#FFE6E6E6" 
+        <TextBlock Text="{Binding Note}" Background="Transparent" Foreground="#FFE6E6E6" 
                    Canvas.Left="{Binding NotePos.X}" Canvas.Top="{Binding NotePos.Y}"
                    Visibility="{Binding Note, Converter={StaticResource invertStringEmptyAndVisibilityConvertor}}"/>
 
