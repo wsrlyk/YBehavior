@@ -96,20 +96,4 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-    <Style TargetType="TextBox">
-        <Setter Property="FontFamily" Value="SketchFlow Print"/>
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="TextBox">
-                    <Border BorderBrush="DarkGreen" BorderThickness="0.5" Background="White" CornerRadius="2">
-                        <ScrollViewer x:Name="PART_ContentHost" Focusable="false" 
-          HorizontalScrollBarVisibility="Hidden" 
-          VerticalScrollBarVisibility="Hidden"></ScrollViewer>
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 </ResourceDictionary>
