@@ -1,6 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ParentTree>
   <Node Class="Root">
-    <Node Class="SubTree" Tree="_SC " Identification="_SC Sub0" />
+    <Local a="_Ic 0" b="_Ic 0" c="IIc " />
+    <Input aa="_Ip c VI p b" />
+    <Node Class="SubTree" Tree="_SC SubTree" Identification="_SC Sub0">
+      <Input Input="_Ip c VI p b" />
+      <Output Output="_Ip b" />
+    </Node>
   </Node>
 </ParentTree>

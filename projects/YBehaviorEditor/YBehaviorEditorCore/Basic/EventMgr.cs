@@ -24,6 +24,7 @@ namespace YBehavior.Editor.Core.New
         ShowSystemTips,
         MakeCenter,
         PopMenu,
+        SelectSharedDataTab,
     }
 
     public class EventMgr : Singleton<EventMgr>
@@ -178,5 +179,11 @@ namespace YBehavior.Editor.Core.New
         public override EventType Type => EventType.PopMenu;
         public object MenuModel { get; set; }
         public System.Windows.Point Pos { get; set; }
+    }
+
+    public class SelectSharedDataTab : EventArg
+    {
+        public override EventType Type => EventType.SelectSharedDataTab;
+        public int Tab { get; set; }
     }
 }

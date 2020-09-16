@@ -27,6 +27,7 @@ namespace YBehavior.Editor
             InitializeComponent();
 
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
+            EventMgr.Instance.Register(EventType.SelectSharedDataTab, _OnSelectTab);
         }
 
         public void Enable()
@@ -63,6 +64,11 @@ namespace YBehavior.Editor
                 this.DataContext = DebugMgr.Instance.DebugSharedData;
             else
                 this.DataContext = m_CurTree.SharedData;
+        }
+        private void _OnSelectTab(EventArg arg)
+        {
+            SelectSharedDataTab oArg = arg as SelectSharedDataTab;
+            this.TabController.SelectedIndex = oArg.Tab;
         }
 
         private void _OnNetworkConnectionChanged(EventArg arg)

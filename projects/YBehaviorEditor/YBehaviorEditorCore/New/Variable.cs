@@ -451,7 +451,7 @@ namespace YBehavior.Editor.Core.New
             OnPropertyChanged("IsElement");
             if (Container != null)
                 Container.OnVariableValueChanged(this);
-            else if (m_Parent != null)
+            else if (m_Parent != null && m_Parent.Container != null)
                 m_Parent.Container.OnVariableValueChanged(m_Parent);
         }
         private void _OnConditionChanged()

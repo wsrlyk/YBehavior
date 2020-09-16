@@ -445,6 +445,19 @@ namespace YBehavior.Editor.Core.New
             return bRes;
         }
 
+        public static void _ProcessReference(Variable v, TreeMemory memory, bool bIsMainTree, bool bIsDisabled)
+        {
+            if (v.vbType == Variable.VariableType.VBT_Const)
+                return;
+
+            if (!v.CheckValid())
+                return;
+
+            Variable r = memory.GetVariable(v.Value, v.IsLocal);
+            if (r != null)
+                r.TrySetReferencedType(bIsMainTree && !bIsDisabled ? Variable.ReferencedType.Active : Variable.ReferencedType.Disactive);
+        }
+
         public void RefreshReferenceStates()
         {
             foreach (var v in m_Tree.TreeMemory.SharedMemory.Datas)
@@ -464,42 +477,70 @@ namespace YBehavior.Editor.Core.New
                     if (node is RootTreeNode)
                         return;
 
-                    TreeMemory treeMemory = o0 as TreeMemory;
-                    if (treeMemory == null)
+                    Tree tree = o0 as Tree;
+                    if (tree == null)
                         return;
+
+                    TreeMemory treeMemory = tree.TreeMemory;
 
                     bool isMainTree = (bool)o1;
 
-                    Action<Variable, TreeMemory> variableHandler = (Variable v, TreeMemory memory) =>
+
+                    TreeNode treeNode = node as TreeNode;
+                    foreach (var v in treeNode.NodeMemory.Datas)
                     {
-                        if (v.vbType == Variable.VariableType.VBT_Const)
-                            return;
-
-                        if (!v.CheckValid())
-                            return;
-
-                        Variable r = memory.GetVariable(v.Value, v.IsLocal);
-                        if (r != null)
-                            r.TrySetReferencedType(isMainTree && !node.Disabled ? Variable.ReferencedType.Active : Variable.ReferencedType.Disactive);
-                    };
-
-                    TreeNode tree = node as TreeNode;
-                    foreach (var v in tree.NodeMemory.Datas)
-                    {
-                        variableHandler(v.Variable, treeMemory);
+                        _ProcessReference(v.Variable, treeMemory, isMainTree, node.Disabled);
                         if (v.Variable.IsElement)
                         {
-                            variableHandler(v.Variable.VectorIndex, treeMemory);
+                            _ProcessReference(v.Variable.VectorIndex, treeMemory, isMainTree, node.Disabled);
+                        }
+                    }
+
+                    if (treeNode is SubTreeNode)
+                    {
+                        foreach (var v in (treeNode as SubTreeNode).InOutMemory.InputMemory.Datas)
+                        {
+                            _ProcessReference(v.Variable, treeMemory, isMainTree, node.Disabled);
+                            if (v.Variable.IsElement)
+                            {
+                                _ProcessReference(v.Variable.VectorIndex, treeMemory, isMainTree, node.Disabled);
+                            }
+                        }
+                        foreach (var v in (treeNode as SubTreeNode).InOutMemory.OutputMemory.Datas)
+                        {
+                            _ProcessReference(v.Variable, treeMemory, isMainTree, node.Disabled);
+                            if (v.Variable.IsElement)
+                            {
+                                _ProcessReference(v.Variable.VectorIndex, treeMemory, isMainTree, node.Disabled);
+                            }
                         }
                     }
                 }
             };
 
-            Utility.OperateNode(m_Tree.Root, m_Tree.TreeMemory, true, true, handler);
+            Utility.OperateNode(m_Tree.Root, m_Tree, true, true, handler);
             foreach (var tree in m_Forest)
             {
-                Utility.OperateNode(tree, m_Tree.TreeMemory, false, true, handler);
+                Utility.OperateNode(tree, m_Tree, false, true, handler);
             }
+
+            foreach (var v in m_Tree.InOutMemory.InputMemory.Datas)
+            {
+                _ProcessReference(v.Variable, m_Tree.TreeMemory, true, false);
+                if (v.Variable.IsElement)
+                {
+                    _ProcessReference(v.Variable.VectorIndex, m_Tree.TreeMemory, true, false);
+                }
+            }
+            foreach (var v in m_Tree.InOutMemory.OutputMemory.Datas)
+            {
+                _ProcessReference(v.Variable, m_Tree.TreeMemory, true, false);
+                if (v.Variable.IsElement)
+                {
+                    _ProcessReference(v.Variable.VectorIndex, m_Tree.TreeMemory, true, false);
+                }
+            }
+
         }
     }
 }

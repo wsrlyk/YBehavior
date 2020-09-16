@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using YBehavior.Editor.Core.New;
@@ -106,6 +107,19 @@ namespace YBehavior.Editor
 
         void _SearchTree(WorkBench bench)
         {
+            Func<Variable, string, bool> handler = (Variable v, string s) =>
+            {
+                if (v.Value != null && v.Value.ToLower().Contains(s))
+                {
+                    return true;
+                }
+
+                if (v.IsElement && v.VectorIndex != null)
+                {
+                    return v.VectorIndex.Value.ToLower().Contains(s);
+                }
+                return false;
+            };
             foreach (var r in bench.NodeList.Collection)
             {
                 TreeNodeRenderer renderer = r as TreeNodeRenderer;
@@ -115,16 +129,69 @@ namespace YBehavior.Editor
                     continue;
                 }
 
+                bool bFound = false;
                 foreach (var v in renderer.TreeOwner.Variables.Datas)
                 {
-                    if (v.Variable.Value != null && v.Variable.Value.ToLower().Contains(m_SearchingText))
+                    if (handler(v.Variable, m_SearchingText))
                     {
-                        m_Results.Add(r);
+                        bFound = true;
+                        break;
+                    }
+                }
+
+                if (!bFound && renderer.TreeOwner is SubTreeNode)
+                {
+                    SubTreeNode subTreeNode = renderer.TreeOwner as SubTreeNode;
+                    foreach (var v in subTreeNode.InOutMemory.InputMemory.Datas)
+                    {
+                        if (handler(v.Variable, m_SearchingText))
+                        {
+                            m_Results.Add(r);
+                            bFound = true;
+                            break;
+                        }
+                    }
+
+                    if(!bFound)
+                    {
+                        foreach (var v in subTreeNode.InOutMemory.OutputMemory.Datas)
+                        {
+                            if (handler(v.Variable, m_SearchingText))
+                            {
+                                m_Results.Add(r);
+                                bFound = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            bool bFoundInOut = false;
+            InOutMemory inOutMemory = (bench.MainGraph as Tree).InOutMemory;
+            foreach (var v in inOutMemory.InputMemory.Datas)
+            {
+                if (handler(v.Variable, m_SearchingText))
+                {
+                    m_Results.Add(null);
+                    bFoundInOut = true;
+                    break;
+                }
+            }
+            if (!bFoundInOut)
+            {
+                foreach (var v in inOutMemory.OutputMemory.Datas)
+                {
+                    if (handler(v.Variable, m_SearchingText))
+                    {
+                        m_Results.Add(null);
+                        bFoundInOut = true;
                         break;
                     }
                 }
             }
         }
+
         void _SearchFSM(WorkBench bench)
         {
             foreach (var r in bench.NodeList.Collection)
@@ -149,24 +216,40 @@ namespace YBehavior.Editor
 
             var renderer = m_Results[m_Index];
 
-            foreach (var r in bench.NodeList.Collection)
+            if (renderer != null)
             {
-                if (r == renderer)
+                foreach (var r in bench.NodeList.Collection)
                 {
-                    r.SelectTrigger = !r.SelectTrigger;
-                    EventMgr.Instance.Send(new MakeCenterArg()
+                    if (r == renderer)
                     {
-                        Target = r
-                    });
-                    return;
+                        r.SelectTrigger = !r.SelectTrigger;
+                        EventMgr.Instance.Send(new MakeCenterArg()
+                        {
+                            Target = r
+                        });
+                        return;
+                    }
                 }
-            }
 
-            EventMgr.Instance.Send(new ShowSystemTipsArg()
+                EventMgr.Instance.Send(new ShowSystemTipsArg()
+                {
+                    TipType = ShowSystemTipsArg.TipsType.TT_Error,
+                    Content = "Cant find the searched node here. Maybe the node has been deleted, or here is another file."
+                });
+            }
+            else
             {
-                TipType = ShowSystemTipsArg.TipsType.TT_Error,
-                Content = "Cant find the searched node here. Maybe the node has been deleted, or here is another file."
-            });
+                EventMgr.Instance.Send(new SelectSharedDataTab()
+                {
+                    Tab = 1,
+                });
+                EventMgr.Instance.Send(new ShowSystemTipsArg()
+                {
+                    TipType = ShowSystemTipsArg.TipsType.TT_Success,
+                    Content = "See the InOut Panel ↗"
+                });
+
+            }
         }
 
         private void UserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
