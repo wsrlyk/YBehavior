@@ -146,7 +146,6 @@ namespace YBehavior.Editor
                     {
                         if (handler(v.Variable, m_SearchingText))
                         {
-                            m_Results.Add(r);
                             bFound = true;
                             break;
                         }
@@ -158,13 +157,15 @@ namespace YBehavior.Editor
                         {
                             if (handler(v.Variable, m_SearchingText))
                             {
-                                m_Results.Add(r);
                                 bFound = true;
                                 break;
                             }
                         }
                     }
                 }
+
+                if (bFound)
+                    m_Results.Add(r);
             }
 
             bool bFoundInOut = false;
