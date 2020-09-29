@@ -75,7 +75,7 @@ namespace YBehavior.Editor
 
         bool _TrySearch()
         {
-            if (this.Input.Text != m_SearchingText)
+            if (this.Input.Text.ToLower() != m_SearchingText)
             {
                 _Search();
                 return true;
