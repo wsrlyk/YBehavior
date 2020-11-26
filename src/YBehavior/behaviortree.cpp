@@ -283,7 +283,7 @@ namespace YBehavior
 		if (m_ContextCreator)
 			pRC = m_ContextCreator->NewRC();
 		else
-			pRC = ObjectPool<RunningContext>::Get();
+			pRC = ObjectPoolStatic<RunningContext>::Get();
 		pRC->Reset();
 		return pRC;
 	}
@@ -304,7 +304,7 @@ namespace YBehavior
 			if (m_ContextCreator)
 				m_ContextCreator->ReleaseRC(m_RunningContext);
 			else
-				ObjectPool<RunningContext>::Recycle(m_RunningContext);
+				ObjectPoolStatic<RunningContext>::Recycle(m_RunningContext);
 			m_RunningContext = nullptr;
 		}
 	}

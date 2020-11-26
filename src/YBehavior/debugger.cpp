@@ -262,7 +262,7 @@ namespace YBehavior
 			return it->second;
 			
 		ScopedLock lock(m_Mutex);
-		NodeRunInfo* pInfo = ObjectPool<NodeRunInfo>::Get();
+		NodeRunInfo* pInfo = ObjectPoolStatic<NodeRunInfo>::Get();
 		m_RunInfos[pNode] = pInfo;
 		return pInfo;
 	}
@@ -272,7 +272,7 @@ namespace YBehavior
 		ScopedLock lock(m_Mutex);
 		for (auto it = m_RunInfos.begin(); it != m_RunInfos.end(); ++it)
 		{
-			ObjectPool<NodeRunInfo>::Recycle(it->second);
+			ObjectPoolStatic<NodeRunInfo>::Recycle(it->second);
 		}
 		m_RunInfos.clear();
 	}
@@ -521,7 +521,7 @@ namespace YBehavior
 
 		if (DebugMgr::Instance()->HasDebugPoint({ DebugTargetType::TREE, pNode->GetRoot()->GetTreeName() }, pNode->GetUID()))
 		{
-			m_pLogInfo = ObjectPool<NodeLogInfo>::Get();
+			m_pLogInfo = ObjectPoolStatic<NodeLogInfo>::Get();
 			m_pLogInfo->Reset();
 			pNode->GetDebugLogInfo().str("");
 		}
@@ -543,7 +543,7 @@ namespace YBehavior
 		}
 
 		if (m_pLogInfo)
-			ObjectPool<NodeLogInfo>::Recycle(m_pLogInfo);
+			ObjectPoolStatic<NodeLogInfo>::Recycle(m_pLogInfo);
 	}
 
 	const YBehavior::STRING& DebugTreeHelper::GetRootName()
@@ -672,7 +672,7 @@ namespace YBehavior
 
 		if (DebugMgr::Instance()->HasDebugPoint({ DebugTargetType::FSM, pNode->GetParentMachine()->GetRootMachine()->GetFSM()->GetName() }, pNode->GetUID()))
 		{
-			m_pLogInfo = ObjectPool<NodeLogInfo>::Get();
+			m_pLogInfo = ObjectPoolStatic<NodeLogInfo>::Get();
 			m_pLogInfo->Reset();
 			pNode->GetDebugLogInfo().str("");
 		}
@@ -694,7 +694,7 @@ namespace YBehavior
 		}
 
 		if (m_pLogInfo)
-			ObjectPool<NodeLogInfo>::Recycle(m_pLogInfo);
+			ObjectPoolStatic<NodeLogInfo>::Recycle(m_pLogInfo);
 	}
 
 	const YBehavior::STRING& DebugFSMHelper::GetRootName()

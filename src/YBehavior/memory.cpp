@@ -6,6 +6,7 @@ namespace YBehavior
 	StackInfo::StackInfo()
 		: Owner(nullptr)
 		, Data(nullptr)
+		, m_DataPool(nullptr)
 	{
 
 	}
@@ -16,8 +17,9 @@ namespace YBehavior
 		Owner = pTree;
 		if (pTree && pTree->GetLocalDataIfExists())
 		{
-			Data = ObjectPool<SharedDataEx>::Get();
-			Data->CloneFrom(*pTree->GetLocalDataIfExists());
+			m_DataPool = &pTree->GetLocalDataPool();
+			Data = m_DataPool->Fetch();
+			Data->MergeFrom(*pTree->GetLocalDataIfExists(), false);
 		}
 		else
 		{
@@ -29,6 +31,7 @@ namespace YBehavior
 	{
 		Owner = other.Owner;
 		Data = other.Data;
+		m_DataPool = other.m_DataPool;
 
 		other.Data = nullptr;
 		other.Owner = nullptr;
@@ -37,10 +40,11 @@ namespace YBehavior
 	StackInfo::StackInfo(const StackInfo& other)
 	{
 		Owner = other.Owner;
-		if (other.Data)
+		if (other.Data && other.m_DataPool != nullptr)
 		{
-			Data = ObjectPool<SharedDataEx>::Get();
-			Data->CloneFrom(*other.Data);
+			m_DataPool = other.m_DataPool;
+			Data = m_DataPool->Fetch();
+			Data->MergeFrom(*other.Data, false);
 		}
 		else
 		{
@@ -51,10 +55,11 @@ namespace YBehavior
 	StackInfo& StackInfo::operator=(const StackInfo& other)
 	{
 		Owner = other.Owner;
-		if (other.Data)
+		if (other.Data && other.m_DataPool != nullptr)
 		{
-			Data = ObjectPool<SharedDataEx>::Get();
-			Data->CloneFrom(*other.Data);
+			m_DataPool = other.m_DataPool;
+			Data = m_DataPool->Fetch();
+			Data->MergeFrom(*other.Data, false);
 		}
 		else
 		{
@@ -66,7 +71,12 @@ namespace YBehavior
 	StackInfo::~StackInfo()
 	{
 		if (Data)
-			ObjectPool<SharedDataEx>::Recycle(Data);;
+		{
+			if (m_DataPool)
+				m_DataPool->Return(Data);
+			else
+				delete Data;
+		}
 	}
 
 	Memory::Memory()

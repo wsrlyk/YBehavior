@@ -45,13 +45,13 @@ namespace YBehavior
 	template<typename T>
 	RunningContext* YBehavior::ContextContainer<T>::NewRC() const
 	{
-		return ObjectPool<T>::Get();
+		return ObjectPoolStatic<T>::Get();
 	}
 
 	template<typename T>
 	void YBehavior::ContextContainer<T>::ReleaseRC(RunningContext* pRC) const
 	{
-		ObjectPool<T>::Recycle(static_cast<T*>(pRC));
+		ObjectPoolStatic<T>::Recycle(static_cast<T*>(pRC));
 	}
 
 	template<typename T>

@@ -282,6 +282,7 @@ namespace YBehavior
 	private:
 		SharedDataEx* m_SharedData;	///> Original data, copied to each agent using this tree
 		SharedDataEx* m_LocalData;	///> Original local data, pushed to the memory of an agent once run this tree
+		ObjectPool<SharedDataEx> m_LocalDataPool;
 		//NameKeyMgr* m_NameKeyMgr;
 		STRING m_TreeNameWithPath;	///> Full Path
 		STRING m_TreeName;	///> Only File
@@ -303,6 +304,8 @@ namespace YBehavior
 		inline SharedDataEx* GetSharedData() { return m_SharedData; }
 		SharedDataEx* GetLocalData();
 		inline SharedDataEx* GetLocalDataIfExists() { return m_LocalData; }
+		inline ObjectPool<SharedDataEx>& GetLocalDataPool() { return m_LocalDataPool; }
+
 		inline TreeMap& GetTreeMap() { return m_TreeMap; }
 		//inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }
 		void CloneDataTo(SharedDataEx& destination);

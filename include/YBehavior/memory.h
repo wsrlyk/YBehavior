@@ -18,6 +18,8 @@ namespace YBehavior
 		~StackInfo();
 		BehaviorTree* Owner;
 		SharedDataEx* Data;
+	private:
+		ObjectPool<SharedDataEx> *m_DataPool;
 	};
 
 	typedef std::list<StackInfo> MemoryStack;

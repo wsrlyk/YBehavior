@@ -34,7 +34,7 @@ namespace YBehavior
 
 		void Recycle() override
 		{
-			ObjectPool<DataArrayIterator<T>>::Recycle(this);
+			ObjectPoolStatic<DataArrayIterator<T>>::Recycle(this);
 		}
 	};
 
@@ -57,7 +57,7 @@ namespace YBehavior
 		{
 			typename DataArrayMapDef<KEY, T>::type::const_iterator itBegin = m_Datas.begin();
 			typename DataArrayMapDef<KEY, T>::type::const_iterator itEnd = m_Datas.end();
-			DataArrayIterator<T>* innerIt = ObjectPool<DataArrayIterator<T>>::Get();
+			DataArrayIterator<T>* innerIt = ObjectPoolStatic<DataArrayIterator<T>>::Get();
 			innerIt->Set(itBegin, itEnd);
 			Iterator it(innerIt);
 			return std::move(it);
@@ -75,9 +75,7 @@ namespace YBehavior
 					this->m_Datas[it->first] = it->second;
 				else
 				{
-					KEY key = it->first;
-					T val = it->second;
-					m_Datas.insert(std::make_pair<KEY, T>(std::move(key), std::move(val)));
+					m_Datas.insert(std::make_pair(it->first, it->second));
 				}
 			}
 		}

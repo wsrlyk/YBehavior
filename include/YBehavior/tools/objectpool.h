@@ -9,35 +9,60 @@ namespace YBehavior
 	template <typename T>
 	class ObjectPool
 	{
-		static std::list<T*> s_Pool;
+		std::list<T*> m_Pool;
 
 	public:
-		static T* Get()
-		{
-			if (s_Pool.empty())
-				return new T();
-			T* t = s_Pool.front();
-			s_Pool.pop_front();
-			Utility::SetDefault<T>(*t);
-			return t;
-		}
+		~ObjectPool();
+		T* Fetch();
 
-		static void Recycle(T* t);
+		void Return(T* t);
 	};
 
 	template <typename T>
-	std::list<T*> ObjectPool<T>::s_Pool;
+	ObjectPool<T>::~ObjectPool()
+	{
+		for (auto o : m_Pool)
+		{
+			delete o;
+		}
+		m_Pool.clear();
+	}
 
 	template <typename T>
-	void YBehavior::ObjectPool<T>::Recycle(T* t)
+	T* ObjectPool<T>::Fetch()
+	{
+		if (m_Pool.empty())
+			return new T();
+		T* t = m_Pool.front();
+		m_Pool.pop_front();
+		Utility::SetDefault<T>(*t);
+		return t;
+	}
+
+	template <typename T>
+	void ObjectPool<T>::Return(T* t)
 	{
 		if (t == nullptr)
 			return;
-		s_Pool.push_back(t);
+		m_Pool.push_back(t);
 	}
 
 	template<> 
-	void YBehavior::ObjectPool<EntityWrapper>::Recycle(EntityWrapper* t);
+	void ObjectPool<EntityWrapper>::Return(EntityWrapper* t);
+
+	//////////////////////////////////////////////////////////////////////////
+
+	template <typename T>
+	class ObjectPoolStatic : public ObjectPool<T>
+	{
+		static ObjectPoolStatic s_Pool;
+	public:
+		static T* Get() { return s_Pool.Fetch(); }
+		static void Recycle(T* t) { s_Pool.Return(t); }
+	};
+
+	template <typename T>
+	ObjectPoolStatic<T> ObjectPoolStatic<T>::s_Pool;
 
 }
 

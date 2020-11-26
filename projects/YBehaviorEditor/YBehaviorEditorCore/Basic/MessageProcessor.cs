@@ -393,6 +393,7 @@ namespace YBehavior.Editor.Core.New
             if (data.Length > 0)
             {
                 ///> Head
+                LogMgr.Instance.LogLineWithColor("\nEditor Time " + System.DateTime.Now.ToString("hh:mm:ss.fff"), ConsoleColor.DarkGreen);
                 LogMgr.Instance.LogWordWithColor("-------<LogPoint ", ConsoleColor.DarkGreen);
 
                 int index = 0;

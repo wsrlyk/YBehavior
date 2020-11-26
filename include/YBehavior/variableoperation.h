@@ -364,18 +364,18 @@ namespace YBehavior
 
 		TempObject AllocTempData()
 		{
-			return TempObject(ObjectPool<T>::Get(), this);
+			return TempObject(ObjectPoolStatic<T>::Get(), this);
 		}
 
 		void* AllocData()
 		{
-			return ObjectPool<T>::Get();
+			return ObjectPoolStatic<T>::Get();
 		}
 
 		void RecycleData(void* pData)
 		{
 			if (pData != nullptr)
-				ObjectPool<T>::Recycle((T*)pData);
+				ObjectPoolStatic<T>::Recycle((T*)pData);
 		}
 
 	};
@@ -427,17 +427,17 @@ namespace YBehavior
 
 		TempObject AllocTempData()
 		{
-			return TempObject(ObjectPool<StdVector<elementType>>::Get(), this);
+			return TempObject(ObjectPoolStatic<StdVector<elementType>>::Get(), this);
 		}
 
 		void* AllocData()
 		{
-			return ObjectPool<StdVector<elementType>>::Get();
+			return ObjectPoolStatic<StdVector<elementType>>::Get();
 		}
 		void RecycleData(void* pData)
 		{
 			if (pData != nullptr)
-				ObjectPool<StdVector<elementType>>::Recycle((StdVector<elementType>*)pData);
+				ObjectPoolStatic<StdVector<elementType>>::Recycle((StdVector<elementType>*)pData);
 		}
 	};
 	template<typename elementType> VariableOperationHelper<StdVector<elementType>> VariableOperationHelper<StdVector<elementType>>::s_Instance;
