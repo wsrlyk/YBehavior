@@ -14,6 +14,7 @@ namespace YBehavior
 	public:
 		virtual ~ISharedVariableCreateHelper() {}
 		virtual ISharedVariableEx* CreateVariable() const = 0;
+		virtual IDataArray* CreateDataArray() const = 0;
 		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) const = 0;
 		virtual bool TrySetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str, CHAR separator = '|') const = 0;
 	};
@@ -25,6 +26,10 @@ namespace YBehavior
 		ISharedVariableEx* CreateVariable() const override
 		{
 			return new SharedVariableEx<valueType>();
+		}
+		IDataArray* CreateDataArray() const override
+		{
+			return new DataArray<valueType>();
 		}
 		void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) const override
 		{
@@ -47,6 +52,10 @@ namespace YBehavior
 		ISharedVariableEx* CreateVariable() const override
 		{
 			return new SharedVariableEx<StdVector<elementType>>();
+		}
+		IDataArray* CreateDataArray() const override
+		{
+			return new DataArray<StdVector<elementType>>();
 		}
 		void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) const override
 		{
@@ -81,33 +90,45 @@ namespace YBehavior
 	public:
 		typedef std::unordered_map<STRING, ISharedVariableCreateHelper*> HelperMapType;
 	protected:
-		static HelperMapType* _Helpers;
+		static HelperMapType _Helpers;
+		static ISharedVariableCreateHelper* _HelperList[MAX_TYPE_KEY];
 	public:
-		template<typename T>
-		static void Register(const STRING& s)
-		{
-			(*_Helpers)[s] = new SharedVariableCreateHelper<T>();
-		}
 
-		static ISharedVariableCreateHelper* Get(const STRING& s)
+		static const ISharedVariableCreateHelper* Get(const STRING& s)
 		{
 			HelperMapType::iterator it;
-			if ((it = _Helpers->find(s)) != _Helpers->end())
+			if ((it = _Helpers.find(s)) != _Helpers.end())
 			{
 				return it->second;
 			}
 			return nullptr;
 		}
 
-		static const HelperMapType& GetAllHelpers() { return *_Helpers; }
+		template<typename T>
+		static const ISharedVariableCreateHelper* Get()
+		{
+			return _HelperList[GetTypeID<T>()];
+		}
+
+		static const ISharedVariableCreateHelper* Get(TYPEID id)
+		{
+			return _HelperList[id];
+		}
+
+		static ISharedVariableCreateHelper** GetAllHelpers() { return _HelperList; }
 		friend class Constructor;
 		class Constructor {
 		public:
 			Constructor()
 			{
-				_Helpers = new HelperMapType();
+#define CREATE_HELPER(T)\
+				_HelperList[GetTypeID<T>()] = new SharedVariableCreateHelper<T>();
+				FOR_EACH_TYPE(CREATE_HELPER);
+
+				//_Helpers = new HelperMapType();
 #define REGISTER_HELPER(T, s)\
-	SharedVariableCreateHelperMgr::Register<T>(s)
+				(_Helpers)[s] = _HelperList[GetTypeID<T>()];
+
 
 				REGISTER_HELPER(Int, "_I");
 				REGISTER_HELPER(Ulong, "_U");

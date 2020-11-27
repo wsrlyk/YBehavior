@@ -1,44 +1,51 @@
 #include "YBehavior/shareddataex.h"
+#include "YBehavior/sharedvariablecreatehelper.h"
 
 namespace YBehavior
 {
-#define DATAARRAY_ONETYPE_POINTER(T)\
-		m_Datas[GetTypeKey<T>()] = &m_Data##T;
-
 	SharedDataEx::SharedDataEx()
 	{
-		FOR_EACH_TYPE(DATAARRAY_ONETYPE_POINTER);
 	}
 
 	SharedDataEx::SharedDataEx(const SharedDataEx& other)
 	{
-#define DATAARRAY_COPYCONSTRUCTOR_ASSIGN(T)\
-		m_Data##T = other.m_Data##T;
-
-		FOR_EACH_TYPE(DATAARRAY_COPYCONSTRUCTOR_ASSIGN);
-		FOR_EACH_TYPE(DATAARRAY_ONETYPE_POINTER);
+		for (int i = 0; i < MAX_TYPE_KEY; ++i)
+		{
+			if (other.m_Datas[i])
+			{
+				m_Datas[i] = other.m_Datas[i]->Clone();
+			}
+		}
 	}
 
 	SharedDataEx::~SharedDataEx()
 	{
+		for (int i = 0; i < MAX_TYPE_KEY; ++i)
+		{
+			if (m_Datas[i])
+				delete m_Datas[i];
+		}
 	}
 
 	void SharedDataEx::CloneFrom(const SharedDataEx& other)
 	{
 		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
 		{
-			//if (m_Datas[i] != nullptr)
-			//	delete m_Datas[i];
-
-			//if (other.m_Datas[i] == nullptr)
-			//{
-			//	m_Datas[i] = nullptr;
-			//}
-			//else
-			//{
-			//	m_Datas[i] = other.m_Datas[i]->Clone();
-			//}
-			m_Datas[i]->CloneFrom(other.m_Datas[i]);
+			if (other.m_Datas[i])
+			{
+				if (m_Datas[i])
+					m_Datas[i]->CloneFrom(other.m_Datas[i]);
+				else
+					m_Datas[i] = other.m_Datas[i]->Clone();
+			}
+			else
+			{
+				if (m_Datas[i])
+				{
+					delete m_Datas[i];
+					m_Datas[i] = nullptr;
+				}
+			}
 		}
 	}
 
@@ -46,25 +53,64 @@ namespace YBehavior
 	{
 		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
 		{
-			//if (other.m_Datas[i] == nullptr)
-			//{
-			//	continue;
-			//}
-
-			//if (m_Datas[i] == nullptr)
-			//	m_Datas[i] = other.m_Datas[i]->Clone();
-			//else
-			//	m_Datas[i]->Merge(other.m_Datas[i], bOverride);
-			m_Datas[i]->MergeFrom(other.m_Datas[i], bOverride);
+			if (other.m_Datas[i])
+			{
+				if (m_Datas[i])
+					m_Datas[i]->MergeFrom(other.m_Datas[i], bOverride);
+				else
+					m_Datas[i] = other.m_Datas[i]->Clone();
+			}
 		}
+	}
+
+	void* SharedDataEx::Get(KEY key, TYPEID typeID)
+	{
+		IDataArray* iarray = m_Datas[typeID];
+		if (!iarray)
+			return nullptr;
+		return (void*)iarray->Get(key);
+	}
+
+	STRING SharedDataEx::GetToString(KEY key, TYPEID typeID)
+	{
+		IDataArray* iarray = m_Datas[typeID];
+		if (!iarray)
+			return Utility::StringEmpty;
+		return iarray->GetToString(key);
+	}
+
+	bool SharedDataEx::Set(KEY key, TYPEID typeID, const void* src)
+	{
+		IDataArray* iarray = _ForceGetDataArray(typeID);
+		return iarray->Set(key, src);
+	}
+
+	bool SharedDataEx::TrySet(KEY key, TYPEID typeKey, void* src)
+	{
+		IDataArray* iarray = m_Datas[typeKey];
+		if (!iarray)
+			return false;
+		return iarray->TrySet(key, src);
 	}
 
 	void SharedDataEx::Clear()
 	{
 		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
 		{
-			m_Datas[i]->Clear();
+			if (m_Datas[i])
+				m_Datas[i]->Clear();
 		}
+	}
+
+	YBehavior::IDataArray* SharedDataEx::_ForceGetDataArray(TYPEID typeID)
+	{
+		IDataArray* iarray = m_Datas[typeID];
+		if (iarray == nullptr)
+		{
+			iarray = SharedVariableCreateHelperMgr::Get(typeID)->CreateDataArray();
+			m_Datas[typeID] = iarray;
+		}
+		return iarray;
 	}
 
 }

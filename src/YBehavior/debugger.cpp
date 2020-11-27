@@ -296,6 +296,8 @@ namespace YBehavior
 		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
 		{
 			auto iarray = pSharedData->GetDataArray(i);
+			if (!iarray)
+				continue;
 			for (IDataArray::Iterator it = iarray->Iter(); !it.IsEnd(); ++it)
 			{
 				const STRING& name = TreeKeyMgr::Instance()->GetNameByKey(it.Value(), iarray->TypeID());

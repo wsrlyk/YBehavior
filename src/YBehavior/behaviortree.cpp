@@ -365,7 +365,7 @@ namespace YBehavior
 		{
 			if (variableType != Utility::POINTER_CHAR && defaultCreateStr.length() > 0)
 			{
-				ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(defaultCreateStr);
+				const ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(defaultCreateStr);
 				if (helper != nullptr)
 				{
 					op = helper->CreateVariable();
@@ -395,7 +395,7 @@ namespace YBehavior
 		if (!ParseVariable(attrOptr, data, buffer, ST_NONE, variableType))
 			return -1;
 
-		ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
+		const ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
 		if (helper != nullptr)
 		{
 			op = helper->CreateVariable();
@@ -467,7 +467,7 @@ namespace YBehavior
 					continue;
 				if (!ParseVariable(*it, data, buffer, ST_NONE))
 					return false;
-				ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
+				const ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
 				if (helper == nullptr)
 					continue;
 
@@ -507,11 +507,6 @@ namespace YBehavior
 		if (!m_LocalData)
 			m_LocalData = new SharedDataEx();
 		return m_LocalData;
-	}
-
-	void BehaviorTree::CloneDataTo(SharedDataEx& destination)
-	{
-		destination.CloneFrom(*m_SharedData);
 	}
 
 	void BehaviorTree::MergeDataTo(SharedDataEx& destination)

@@ -25,11 +25,12 @@ namespace YBehavior
 	{
 		if (behaviorProcess.pBehavior)
 		{
+			behaviorProcess.memory.GetStack().clear();
+			behaviorProcess.memory.GetMainData()->Clear();
+
 			Mgrs::Instance()->GetBehaviorMgr()->ReturnBehavior(behaviorProcess.pBehavior);
 			behaviorProcess.machineContext.Reset();
 
-			behaviorProcess.memory.GetMainData()->Clear();
-			behaviorProcess.memory.GetStack().clear();
 		}
 	}
 

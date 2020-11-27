@@ -308,7 +308,6 @@ namespace YBehavior
 
 		inline TreeMap& GetTreeMap() { return m_TreeMap; }
 		//inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }
-		void CloneDataTo(SharedDataEx& destination);
 
 		void MergeDataTo(SharedDataEx& destination);
 		void AddSubTree(BehaviorTree* sub) { m_SubTrees.push_back(sub); }

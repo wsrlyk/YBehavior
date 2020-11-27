@@ -350,7 +350,7 @@ namespace YBehavior
 					pData = pMemory->GetMainData();
 				}
 				if (pData)
-					pData->Set<T>(m_Key, src);
+					pData->TrySet<T>(m_Key, src);
 				else
 					ERROR_BEGIN << "SharedData NULL at " << this->GetLogName() << ERROR_END;
 			}

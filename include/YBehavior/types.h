@@ -237,25 +237,9 @@ namespace YBehavior
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	template<typename T>
-	inline KEY GetTypeKey() {
-		return -1;
-	}
-
-#define YBEHAVIOR_BASICTYPE_STORE_KEY(type, id)			\
-	template<> inline KEY GetTypeKey<type>() \
-	{\
-		return id;\
-	}\
-	template<> inline TYPEID GetTypeKey<const type>() \
-	{\
-		return id; \
-	}
-
 	///> Make these two numbers the same
 #define YBEHAVIOR_BASICTYPE_NUMBER(type, num)\
 	YBEHAVIOR_BASICTYPE_NUMBER_ID(type, num);\
-	YBEHAVIOR_BASICTYPE_STORE_KEY(type, num);
 
 	YBEHAVIOR_BASICTYPE_NUMBER(Int, 0);
 	YBEHAVIOR_BASICTYPE_NUMBER(Ulong, 1);
