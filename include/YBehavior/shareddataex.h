@@ -290,7 +290,7 @@ namespace YBehavior
 			return nullptr;
 		DataArray<T>* parray = (DataArray<T>*)m_Datas[typeID];
 		if (!parray)
-			return false;
+			return nullptr;
 		return (T*)parray->Get(key);
 	}
 
