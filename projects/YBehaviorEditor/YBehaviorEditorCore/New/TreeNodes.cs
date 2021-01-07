@@ -374,6 +374,11 @@ namespace YBehavior.Editor.Core.New
             return bRes;
         }
 
+        protected override void _OnCloned()
+        {
+            base._OnCloned();
+            m_Tree = Variables.GetVariable("Tree");
+        }
     }
 
     class CalculatorTreeNode : LeafNode
