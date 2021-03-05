@@ -113,11 +113,15 @@ namespace YBehavior
 			return false;
 		}
 		TYPEID yVecType = CreateVariable(m_Values, "Values", data);
-		if (s_ValidVecTypes.find(yVecType) == s_ValidVecTypes.end())
+		if (!m_Values)
 		{
-			ERROR_BEGIN_NODE_HEAD << "Invalid type for Values in Dice: " << yVecType << ERROR_END;
 			return false;
 		}
+		//if (s_ValidVecTypes.find(yVecType) == s_ValidVecTypes.end())
+		//{
+		//	ERROR_BEGIN_NODE_HEAD << "Invalid type for Values in Dice: " << yVecType << ERROR_END;
+		//	return false;
+		//}
 
 		TYPEID xType = CreateVariable(m_Input, "Input", data);
 		if (s_ValidTypes.find(xType) == s_ValidTypes.end())
@@ -126,11 +130,15 @@ namespace YBehavior
 			return false;
 		}
 		TYPEID yType = CreateVariable(m_Output, "Output", data);
-		if (s_ValidTypes.find(yType) == s_ValidTypes.end())
+		if (!m_Output)
 		{
-			ERROR_BEGIN_NODE_HEAD << "Invalid type for Output in Dice: " << yType << ERROR_END;
 			return false;
 		}
+		//if (s_ValidTypes.find(yType) == s_ValidTypes.end())
+		//{
+		//	ERROR_BEGIN_NODE_HEAD << "Invalid type for Output in Dice: " << yType << ERROR_END;
+		//	return false;
+		//}
 
 		if (!Utility::IsElement(xType, xVecType))
 		{
