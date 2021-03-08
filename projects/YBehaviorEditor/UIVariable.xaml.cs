@@ -115,5 +115,16 @@ namespace YBehavior.Editor
             get { return (bool)GetValue(CandidatesResetProperty); }
             set { SetValue(CandidatesResetProperty, value); }
         }
+
+        private void VKey_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Variable v = DataContext as Variable;
+            if (v == null)
+                return;
+            EventMgr.Instance.Send(new VariableClickedArg()
+            {
+                v = v,
+            });
+        }
     }
 }

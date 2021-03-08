@@ -67,7 +67,7 @@
     <StackPanel>
         <DockPanel Background="LightBlue" Margin="2,2,2,2">
             <Grid DockPanel.Dock="Left">
-                <TextBlock Name="VKey" Text="{Binding DisplayName}" FontSize="13" Width="150" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}"/>
+                <TextBlock Name="VKey" Text="{Binding DisplayName}" FontSize="13" Width="150" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}" MouseLeftButtonUp="VKey_MouseLeftButtonUp"/>
                 <Button Style="{StaticResource TransparentHoverStyle}" Name="CSwitcher" Click="CSwitcher_Click" IsEnabled="{Binding IsEditable}" Visibility="{Binding Path = CanSwitchList, Converter={StaticResource visibilityConvertor}}" ToolTip="{Binding Description}" Margin="126,0,0,0">
                 </Button>
             </Grid>

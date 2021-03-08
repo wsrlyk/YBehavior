@@ -105,6 +105,15 @@
                         <Array Content="目标数组"/>
                         <Element Content="新元素"/>
                 </ArrayPushElement>
+                <GenIndexArray Content="生成一个下标数组，长度由Int类型的Input指定，或和数组类型的Input一致">
+                        <Input Content="参考数组，或指定下标数组的长度"/>
+                        <Output Content="输出的下标数组，内容为[0,1,2，...]"/>
+                </GenIndexArray>
+                <FSMSetCondition Content="设置状态机转换条件">
+                        <Conditions Content="条件名"/>
+                        <Operator Content="开关"/>
+                </FSMSetCondition>
+                <FSMClearConditions Content="清空所有状态机转换条件" />
         </Nodes>
         <Hierachies>
                 <Hierachy Value = "1">Actions</Hierachy>

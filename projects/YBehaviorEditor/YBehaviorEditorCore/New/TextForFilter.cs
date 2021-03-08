@@ -65,6 +65,8 @@ namespace YBehavior.Editor.Core.New
                     case 1:
                         return m_Node.NickName;
                     case 2:
+                        return m_Node.Description;
+                    case 3:
                         return m_Enums.Current as string;
 
                 }
@@ -86,12 +88,19 @@ namespace YBehavior.Editor.Core.New
                 if (!string.IsNullOrEmpty(m_Node.NickName))
                     return true;
             }
+            ///> Description
             if (m_I < 2)
+            {
+                ++m_I;
+                if (!string.IsNullOrEmpty(m_Node.Description))
+                    return true;
+            }
+            if (m_I < 3)
             {
                 ++m_I;
                 m_Variables = m_Node.Variables.Datas.GetEnumerator();
             }
-            if (m_I == 2)
+            if (m_I == 3)
             {
                 while (true)
                 {

@@ -67,7 +67,7 @@ namespace YBehavior.Editor
         }
         private void _OnSelectTab(EventArg arg)
         {
-            SelectSharedDataTab oArg = arg as SelectSharedDataTab;
+            SelectSharedDataTabArg oArg = arg as SelectSharedDataTabArg;
             this.TabController.SelectedIndex = oArg.Tab;
         }
 

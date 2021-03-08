@@ -27,6 +27,25 @@ namespace YBehavior.Editor
             InitializeComponent();
         }
 
+        public void Enable()
+        {
+            EventMgr.Instance.Register(EventType.VariableClicked, _OnVariableClicked);
+        }
+
+        public void Disable()
+        {
+            EventMgr.Instance.Unregister(EventType.VariableClicked, _OnVariableClicked);
+        }
+
+        private void _OnVariableClicked(EventArg arg)
+        {
+            VariableClickedArg oArg = arg as VariableClickedArg;
+            if (oArg.v != null)
+            {
+                this.Input.Text = oArg.v.Name;
+            }
+        }
+
         void _UpdateSearchIndexCount()
         {
             this.Info.Text = SearchIndexCount;
@@ -123,7 +142,13 @@ namespace YBehavior.Editor
             foreach (var r in bench.NodeList.Collection)
             {
                 TreeNodeRenderer renderer = r as TreeNodeRenderer;
-                if (renderer.FullName.ToLower().Contains(m_SearchingText))
+                if (renderer.UITitle.ToLower().Contains(m_SearchingText))
+                {
+                    m_Results.Add(r);
+                    continue;
+                }
+
+                if (renderer.Owner.Description.ToLower().Contains(m_SearchingText))
                 {
                     m_Results.Add(r);
                     continue;
@@ -240,7 +265,7 @@ namespace YBehavior.Editor
             }
             else
             {
-                EventMgr.Instance.Send(new SelectSharedDataTab()
+                EventMgr.Instance.Send(new SelectSharedDataTabArg()
                 {
                     Tab = 1,
                 });
@@ -261,6 +286,12 @@ namespace YBehavior.Editor
                 {
                     System.Windows.Input.Keyboard.Focus(this.Input);
                 }, System.Windows.Threading.DispatcherPriority.Render);
+
+                Enable();
+            }
+            else
+            {
+                Disable();
             }
         }
 
