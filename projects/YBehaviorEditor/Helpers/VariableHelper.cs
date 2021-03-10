@@ -147,6 +147,35 @@ namespace YBehavior.Editor
             return booleanValue ? Variable.VariableType.VBT_Pointer : Variable.VariableType.VBT_Const;
         }
     }
+    [ValueConversion(typeof(Variable.EnableType), typeof(bool))]
+    public class VariableEnableTypeConvertor : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!(value is Variable.EnableType))
+                return false;
+            Variable.EnableType type = (Variable.EnableType)value;
+            return type == Variable.EnableType.ET_Disable;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool booleanValue = (bool)value;
+            return booleanValue ? Variable.EnableType.ET_Disable : Variable.EnableType.ET_Enable;
+        }
+    }
+    public class BoolOpacityConvertor : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool b = (bool)value;
+            return b ? 0.5f : 1.0f;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
 
     [ValueConversion(typeof(string), typeof(bool))]
     public class StringNullOrEmptyConvertor : IValueConverter

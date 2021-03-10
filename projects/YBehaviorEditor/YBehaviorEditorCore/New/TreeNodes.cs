@@ -58,28 +58,28 @@ namespace YBehavior.Editor.Core.New
                 XmlElement nodeEl = xmlDoc.CreateElement("Shared");
                 data.AppendChild(nodeEl);
 
-                _WriteVariables(Tree.SharedData.SharedMemory, nodeEl);
+                _SaveVariables(Tree.SharedData.SharedMemory, nodeEl);
             }
             if (Tree.SharedData.LocalMemory.Datas.Count > 0)
             {
                 XmlElement nodeEl = xmlDoc.CreateElement("Local");
                 data.AppendChild(nodeEl);
 
-                _WriteVariables(Tree.SharedData.LocalMemory, nodeEl);
+                _SaveVariables(Tree.SharedData.LocalMemory, nodeEl);
             }
             if (Tree.InOutMemory.InputMemory.Datas.Count > 0)
             {
                 XmlElement nodeEl = xmlDoc.CreateElement("Input");
                 data.AppendChild(nodeEl);
 
-                _WriteVariables(Tree.InOutMemory.InputMemory, nodeEl);
+                _SaveVariables(Tree.InOutMemory.InputMemory, nodeEl);
             }
             if (Tree.InOutMemory.OutputMemory.Datas.Count > 0)
             {
                 XmlElement nodeEl = xmlDoc.CreateElement("Output");
                 data.AppendChild(nodeEl);
 
-                _WriteVariables(Tree.InOutMemory.OutputMemory, nodeEl);
+                _SaveVariables(Tree.InOutMemory.OutputMemory, nodeEl);
             }
         }
 
@@ -253,7 +253,8 @@ namespace YBehavior.Editor.Core.New
                 "",
                 Variable.CreateParams_String,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const
+                Variable.VariableType.VBT_Const,
+                Variable.EnableType.ET_NONE
             );
 
             NodeMemory.CreateVariable(
@@ -261,7 +262,8 @@ namespace YBehavior.Editor.Core.New
                 "",
                 Variable.CreateParams_String,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Const
+                Variable.VariableType.VBT_Const,
+                Variable.EnableType.ET_NONE
             );
         }
 
@@ -331,12 +333,12 @@ namespace YBehavior.Editor.Core.New
 
         protected override void _OnSaveVariables(XmlElement data, XmlDocument xmlDoc)
         {
-            _WriteVariables(Variables, data);
+            _SaveVariables(Variables, data);
             _WriteMemory(data, xmlDoc);
         }
         protected override void _OnExportVariables(XmlElement data, XmlDocument xmlDoc)
         {
-            _WriteVariables(Variables, data);
+            _ExportVariables(Variables, data);
             _WriteMemory(data, xmlDoc);
         }
 
@@ -347,14 +349,14 @@ namespace YBehavior.Editor.Core.New
                 XmlElement nodeEl = xmlDoc.CreateElement("Input");
                 data.AppendChild(nodeEl);
 
-                _WriteVariables(InOutMemory.InputMemory, nodeEl);
+                _SaveVariables(InOutMemory.InputMemory, nodeEl);
             }
             if (InOutMemory.OutputMemory.Datas.Count > 0)
             {
                 XmlElement nodeEl = xmlDoc.CreateElement("Output");
                 data.AppendChild(nodeEl);
 
-                _WriteVariables(InOutMemory.OutputMemory, nodeEl);
+                _SaveVariables(InOutMemory.OutputMemory, nodeEl);
             }
         }
 
@@ -399,6 +401,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_Enum,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
+                Variable.EnableType.ET_NONE,
                 0,
                 0,
                 "+|-|*|/"
@@ -410,6 +413,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_CalculatorTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -419,6 +423,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_CalculatorTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -428,6 +433,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_CalculatorTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
         }
@@ -499,6 +505,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_Enum,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
+                Variable.EnableType.ET_NONE,
                 0,
                 0,
                 "==|!=|>|<|>=|<="
@@ -510,6 +517,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -519,6 +527,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
         }
@@ -556,6 +565,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_NONE,
                 Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -565,6 +575,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_NONE,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
         }
@@ -617,6 +628,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_RandomTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -626,6 +638,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_RandomTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -635,6 +648,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_RandomTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
         }
@@ -671,6 +685,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -680,6 +695,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE,
                 1
             );
         }
@@ -884,6 +900,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_SwitchTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -894,6 +911,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_SwitchTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
         }
@@ -1005,7 +1023,8 @@ namespace YBehavior.Editor.Core.New
                 "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_NONE
+                Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE
             );
         }
     }
@@ -1028,6 +1047,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
             NodeMemory.CreateVariable(
@@ -1036,6 +1056,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE,
                 1
             );
             NodeMemory.CreateVariable(
@@ -1043,7 +1064,8 @@ namespace YBehavior.Editor.Core.New
                 "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_NONE
+                Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE
             );
         }
 
@@ -1078,6 +1100,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
             NodeMemory.CreateVariable(
@@ -1086,6 +1109,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE,
                 1
             );
             NodeMemory.CreateVariable(
@@ -1093,7 +1117,8 @@ namespace YBehavior.Editor.Core.New
                 "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_NONE
+                Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE
             );
         }
 
@@ -1128,6 +1153,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -1137,6 +1163,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -1146,6 +1173,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -1155,6 +1183,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -1191,6 +1220,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -1200,6 +1230,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 2
             );
 
@@ -1209,6 +1240,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -1218,6 +1250,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE,
                 2
             );
 
@@ -1227,6 +1260,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 0
             );
 
@@ -1263,7 +1297,8 @@ namespace YBehavior.Editor.Core.New
                 "1",
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_NONE
+                Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE
             );
         }
 
@@ -1293,7 +1328,8 @@ namespace YBehavior.Editor.Core.New
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Pointer
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE
             );
         }
 
@@ -1327,7 +1363,8 @@ namespace YBehavior.Editor.Core.New
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Pointer
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE
             );
         }
 
@@ -1361,7 +1398,8 @@ namespace YBehavior.Editor.Core.New
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_NONE
+                Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE
             );
 
             Variable length = NodeMemory.CreateVariable(
@@ -1369,7 +1407,8 @@ namespace YBehavior.Editor.Core.New
                 "0",
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Pointer
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE
             );
         }
 
@@ -1405,6 +1444,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -1414,6 +1454,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
         }
@@ -1449,7 +1490,8 @@ namespace YBehavior.Editor.Core.New
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_NONE,
-                Variable.VariableType.VBT_NONE
+                Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE
             );
 
             Variable output = NodeMemory.CreateVariable(
@@ -1457,7 +1499,8 @@ namespace YBehavior.Editor.Core.New
                 "",
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Pointer
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE
             );
         }
 
@@ -1511,6 +1554,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
 
@@ -1520,6 +1564,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_NONE,
                 1
             );
         }
@@ -1554,6 +1599,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_String,
                 Variable.CountType.CT_NONE,
                 Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_NONE,
                 1
             );
             Variable optr = NodeMemory.CreateVariable(
@@ -1562,6 +1608,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_Enum,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Const,
+                Variable.EnableType.ET_NONE,
                 0,
                 0,
                 "On|Off"

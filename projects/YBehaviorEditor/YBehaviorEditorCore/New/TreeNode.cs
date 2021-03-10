@@ -299,16 +299,25 @@ namespace YBehavior.Editor.Core.New
             _OnSaveVariables(data, xmlDoc);
         }
 
-        protected void _WriteVariables(IVariableCollection collection, System.Xml.XmlElement data)
+        protected void _SaveVariables(IVariableCollection collection, System.Xml.XmlElement data)
         {
             foreach (VariableHolder v in collection.Datas)
             {
                 data.SetAttribute(v.Variable.Name, v.Variable.ValueInXml);
             }
         }
+        protected void _ExportVariables(IVariableCollection collection, System.Xml.XmlElement data)
+        {
+            foreach (VariableHolder v in collection.Datas)
+            {
+                if (v.Variable.eType == Variable.EnableType.ET_Disable)
+                    continue;
+                data.SetAttribute(v.Variable.Name, v.Variable.ValueInXml);
+            }
+        }
         protected virtual void _OnSaveVariables(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
         {
-            _WriteVariables(Variables, data);
+            _SaveVariables(Variables, data);
         }
         public void Export(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
         {
@@ -325,7 +334,7 @@ namespace YBehavior.Editor.Core.New
         }
         protected virtual void _OnExportVariables(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
         {
-            _WriteVariables(Variables, data);
+            _ExportVariables(Variables, data);
         }
 
         public override bool CheckValid()

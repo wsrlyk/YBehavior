@@ -34,6 +34,9 @@ namespace YBehavior.Editor.Core.New
 
         public static readonly char SINGLE = '_';
 
+        public static readonly char ENABLE = 'E';
+        public static readonly char DISABLE = 'D';
+
         public static readonly ValueType[] CreateParams_AllNumbers = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT };
         public static readonly ValueType[] CreateParams_Int = new ValueType[] { ValueType.VT_INT };
         public static readonly ValueType[] CreateParams_Ulong = new ValueType[] { ValueType.VT_ULONG };
@@ -140,6 +143,31 @@ namespace YBehavior.Editor.Core.New
         {
             return Char.IsLower(c);
         }
+
+        public enum EnableType
+        {
+            ET_NONE,    ///> This Variable is always enabled
+            ET_Enable,
+            ET_Disable,
+        }
+        public static Bimap<EnableType, char> EnableTypeDic = new Bimap<EnableType, char>
+        {
+            {EnableType.ET_Enable, ENABLE },
+            {EnableType.ET_Disable, DISABLE },
+            {EnableType.ET_NONE, NONE },
+        };
+        public static EnableType GetEnableType(char c, EnableType defaultType)
+        {
+            c = Char.ToUpper(c);
+            return EnableTypeDic.GetKey(c, defaultType);
+        }
+
+        public static char GetEnableChar(EnableType type, char defaultChar)
+        {
+            char c = EnableTypeDic.GetValue(type, defaultChar);
+            return c;
+        }
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -147,6 +175,8 @@ namespace YBehavior.Editor.Core.New
         ValueType m_vType = ValueType.VT_NONE;
         CountType m_cType = CountType.CT_NONE;
         VariableType m_vbType = VariableType.VBT_Const;
+        EnableType m_eType = EnableType.ET_NONE;
+
         public ValueType vType
         {
             get { return m_vType; }
@@ -204,6 +234,19 @@ namespace YBehavior.Editor.Core.New
                 _OnConditionChanged();
 
                 WorkBenchMgr.Instance.PushCommand(command);
+            }
+        }
+
+        public EnableType eType
+        {
+            get { return m_eType; }
+            set
+            {
+                if (m_eType == value)
+                    return;
+
+                m_eType = value;
+                OnPropertyChanged("eType");
             }
         }
         /// <summary>
@@ -426,7 +469,7 @@ namespace YBehavior.Editor.Core.New
                         {
                             m_VectorIndex = new Variable(SharedDataSource);
                             m_VectorIndex.m_Parent = this;
-                            m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, true, "0");
+                            m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, EnableType.ET_NONE, true, "0");
                             OnPropertyChanged("VectorIndex");
                         }
                         m_bVectorIndexEnabled = true;
@@ -464,6 +507,7 @@ namespace YBehavior.Editor.Core.New
         public bool CanBeRemoved { get { return m_bCanbeRemoved; } set { m_bCanbeRemoved = value; } }
         public bool CanSwitchConst { get { return !LockVBType; } }
         public bool CanSwitchList { get { return !LockCType; } }
+        public bool CanSwitchEnable { get { return eType != EnableType.ET_NONE; } }
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
@@ -481,8 +525,11 @@ namespace YBehavior.Editor.Core.New
                 char _vtype = ValueTypeDic.GetValue(m_vType, INT);
                 char _ctype = m_cType == CountType.CT_LIST ? _vtype : SINGLE;
                 char _vbtype = GetVariableChar(m_vbType, CONST, IsLocal);
+                char _eType = GetEnableChar(m_eType, NONE);
                 StringBuilder sb = new StringBuilder();
-                sb.Append(_ctype).Append(_vtype).Append(_vbtype).Append(' ').Append(Value);
+                sb.Append(_ctype).Append(_vtype).Append(_vbtype);
+                if (_eType != NONE) sb.Append(_eType);
+                sb.Append(' ').Append(Value);
 
                 if (m_bVectorIndexEnabled && m_VectorIndex != null)
                 {
@@ -561,6 +608,8 @@ namespace YBehavior.Editor.Core.New
         {
             if (SharedDataSource == null || SharedDataSource.SharedData == null)
                 return false;
+            if (eType == EnableType.ET_Disable)
+                return true;
             if (vbType == VariableType.VBT_Pointer)
             {
                 //if (AlwaysConst)
@@ -709,7 +758,7 @@ namespace YBehavior.Editor.Core.New
         public bool SetVariableInNode(string s, string newName = null)
         {
             string[] ss = s.Split(SpaceSpliter);
-            if (ss.Length == 0 || ss[0].Length != 3)
+            if (ss.Length == 0 || ss[0].Length < 3)
             {
                 LogMgr.Instance.Error("Format error when set variable from node: " + s);
                 return false;
@@ -717,7 +766,7 @@ namespace YBehavior.Editor.Core.New
             if (newName != null)
                 m_Name = newName;
 
-            if(!SetVariable(ss[0][1], ss[0][0], ss[0][2], ss.Length >= 2 ? ss[1] : string.Empty))
+            if(!SetVariable(ss[0][1], ss[0][0], ss[0][2], ss[0].Length > 3 ? ss[0][3] : NONE, ss.Length >= 2 ? ss[1] : string.Empty))
                 return false;
 
             if (ss.Length >= 5 && ss[2] == "VI")
@@ -736,11 +785,12 @@ namespace YBehavior.Editor.Core.New
                 ValueType.VT_INT, 
                 CountType.CT_SINGLE, 
                 GetVariableType(variableType[0],VariableType.VBT_NONE),
+                EnableType.ET_NONE,
                 GetLocal(variableType[0]), 
                 value);
             return true;
         }
-        public bool SetVariable(char valueType, char countType, char variableType, string value, string param = null)
+        public bool SetVariable(char valueType, char countType, char variableType, char enableType, string value, string param = null)
         {
             m_bInited = false;
             vType = ValueTypeDic.GetKey(valueType, ValueType.VT_NONE);
@@ -772,7 +822,7 @@ namespace YBehavior.Editor.Core.New
             RefreshCandidates(true);
             return true;
         }
-        public bool SetVariable(ValueType vtype, CountType ctype, VariableType vbtype, bool isLocal, string value, string param = null, string newName = null)
+        public bool SetVariable(ValueType vtype, CountType ctype, VariableType vbtype, EnableType etype, bool isLocal, string value, string param = null, string newName = null)
         {
             m_bInited = false;
             if (newName != null)
@@ -804,6 +854,8 @@ namespace YBehavior.Editor.Core.New
                 LockVBType = true;
             }
 
+            eType = etype;
+
             IsLocal = isLocal;
 
             m_Value = value;
@@ -825,6 +877,7 @@ namespace YBehavior.Editor.Core.New
             v.vType = vType;
             v.cType = cType;
             v.vbType = vbType;
+            v.eType = eType;
             v.m_Name = m_Name;
             v.m_Value = m_Value;
             v.m_bIsLocal = m_bIsLocal;

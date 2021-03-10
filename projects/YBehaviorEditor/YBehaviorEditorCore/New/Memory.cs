@@ -67,7 +67,7 @@ namespace YBehavior.Editor.Core.New
             {
                 v = new TreeVariable(m_Owner);
                 v.vTypeSet.AddRange(Variable.CreateParams_AllTypes);
-                if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, isLocal, value, null, name))
+                if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, Variable.EnableType.ET_NONE, isLocal, value, null, name))
                     return false;
 
                 v.LockVBType = true;
@@ -284,7 +284,7 @@ namespace YBehavior.Editor.Core.New
                 v = new InOutVariable(m_Owner);
                 if (m_bIsCore)
                     v.vTypeSet.AddRange(Variable.CreateParams_AllTypes);
-                if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Pointer, false, "", null, name))
+                if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Pointer, Variable.EnableType.ET_NONE, false, "", null, name))
                     return false;
 
                 if ((bIsInput && m_bIsCore) || (!bIsInput && !m_bIsCore))
@@ -465,13 +465,14 @@ namespace YBehavior.Editor.Core.New
             Variable.ValueType[] valueType,
             Variable.CountType countType,
             Variable.VariableType vbType,
+            Variable.EnableType eType = Variable.EnableType.ET_NONE,
             int vTypeGroup = 0,
             int cTypeGroup = 0,
             string param = null)
         {
             v.vTypeSet.AddRange(valueType);
 
-            v.SetVariable(valueType[0], countType, vbType, false, defaultValue, param, name);
+            v.SetVariable(valueType[0], countType, vbType, eType, false, defaultValue, param, name);
 
             if (AddVariable(v, vTypeGroup, cTypeGroup))
                 return true;
@@ -484,6 +485,7 @@ namespace YBehavior.Editor.Core.New
             Variable.ValueType[] valueType,
             Variable.CountType countType,
             Variable.VariableType vbType,
+            Variable.EnableType eType,
             int vTypeGroup = 0,
             int cTypeGroup = 0,
             string param = null)
@@ -491,7 +493,7 @@ namespace YBehavior.Editor.Core.New
             Variable v = new Variable(m_Owner);
             v.vTypeSet.AddRange(valueType);
 
-            v.SetVariable(valueType[0], countType, vbType, false, defaultValue, param, name);
+            v.SetVariable(valueType[0], countType, vbType, eType, false, defaultValue, param, name);
 
             if (AddVariable(v, vTypeGroup, cTypeGroup))
                 return v;

@@ -150,6 +150,14 @@ namespace YBehavior.Editor.Core.New
                 countType = attr.Value == "True" ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE;
             }
 
+            Variable.EnableType eType = Variable.EnableType.ET_NONE;
+            attr = xml.Attributes["IsEnable"];
+            if (attr != null)
+            {
+                bool b = attr.Value == "True";
+                eType = b ? Variable.EnableType.ET_Enable : Variable.EnableType.ET_Disable;
+            }
+
             string value = string.Empty;
             attr = xml.Attributes["Value"];
             if (attr != null)
@@ -183,6 +191,7 @@ namespace YBehavior.Editor.Core.New
                 valueType,
                 countType,
                 vbType,
+                eType,
                 vTypeGroup,
                 cTypeGroup,
                 param

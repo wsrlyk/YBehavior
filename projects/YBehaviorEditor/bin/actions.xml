@@ -10,7 +10,7 @@
 		<TypeMap SrcVariable="Var1" SrcValue="Enum2" DesVariable="Var0" DesType="FF" />
 	</Action>
 	<Action Class="GetTargetNameAction" Note="{0}" Hierachy="21">
-		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" Value="0"/>
+		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" IsEnable="False" Value="0"/>
 	</Action>
 	<Action Class="SelectTargetAction" Note="{0}" Hierachy="121">
 		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" Value="0"/>

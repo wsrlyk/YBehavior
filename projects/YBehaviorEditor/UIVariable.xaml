@@ -21,6 +21,8 @@
         <BooleanToVisibilityConverter x:Key="visibilityConvertor"/>
         <local:VariableValueTypeConvertor x:Key="valueTypeConvertor"/>
         <local:VariableVariableTypeConvertor x:Key="variableTypeConvertor"/>
+        <local:VariableEnableTypeConvertor x:Key="enableTypeConvertor"/>
+        <local:BoolOpacityConvertor x:Key="boolOpacityConvertor"/>
         <local:StringBoolConvertor x:Key="stringBoolConvertor"/>
         <local:VariableTypeCountConvertor x:Key="typeCountConvertor"/>
         <local:InvertBoolConverter x:Key="invertBoolConvertor"/>
@@ -64,7 +66,7 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <StackPanel>
+    <StackPanel Opacity ="{Binding ElementName=ESwitcher, Path=IsChecked, Converter={StaticResource boolOpacityConvertor}, Mode=OneWay}">
         <DockPanel Background="LightBlue" Margin="2,2,2,2">
             <Grid DockPanel.Dock="Left">
                 <TextBlock Name="VKey" Text="{Binding DisplayName}" FontSize="13" Width="150" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}" MouseLeftButtonUp="VKey_MouseLeftButtonUp"/>
@@ -87,6 +89,7 @@
             </ComboBox>
             <StackPanel Orientation="Horizontal"  DockPanel.Dock="Right">
                 <CheckBox IsEnabled="{Binding IsEditable}" Width="20" Height="20" Name="VBSwitcher" Background="Orange" Foreground="GreenYellow" IsChecked="{Binding vbType, Converter={StaticResource variableTypeConvertor}}" Visibility="{Binding Path = CanSwitchConst, Converter={StaticResource visibilityConvertor}}"/>
+                <CheckBox IsEnabled="{Binding IsEditable}" Width="20" Height="20" Name="ESwitcher" Background="Gray" Foreground="LightGray" IsChecked="{Binding eType, Converter={StaticResource enableTypeConvertor}}" Visibility="{Binding Path = CanSwitchEnable, Converter={StaticResource visibilityConvertor}}"/>
                 <Button Width="20" Height="20" Name="Remover" Background="{Binding referencedType, Converter={StaticResource referencedTypeConvertor}}" Visibility="{Binding Path = CanBeRemoved,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="Remover_Click"
                         Content="X" Foreground="Red"
                         Style="{StaticResource ButtonNone}"/>

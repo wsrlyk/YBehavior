@@ -455,7 +455,7 @@ namespace YBehavior.Editor.Core.New
 
             Variable r = memory.GetVariable(v.Value, v.IsLocal);
             if (r != null)
-                r.TrySetReferencedType(bIsMainTree && !bIsDisabled ? Variable.ReferencedType.Active : Variable.ReferencedType.Disactive);
+                r.TrySetReferencedType(bIsMainTree && !bIsDisabled && v.eType != Variable.EnableType.ET_Disable ? Variable.ReferencedType.Active : Variable.ReferencedType.Disactive);
         }
 
         public void RefreshReferenceStates()
