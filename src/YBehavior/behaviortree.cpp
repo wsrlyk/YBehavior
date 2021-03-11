@@ -247,7 +247,7 @@ namespace YBehavior
 		auto tempChar = attri.value();
 		///> split all spaces
 		Utility::SplitString(tempChar, buffer, Utility::SpaceSpliter);
-		if (buffer.size() == 0 || buffer[0].length() != 3)
+		if (buffer.size() == 0 || buffer[0].length() < 3)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Format Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
 			return false;
