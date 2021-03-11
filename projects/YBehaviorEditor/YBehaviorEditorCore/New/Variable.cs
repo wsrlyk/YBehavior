@@ -146,7 +146,8 @@ namespace YBehavior.Editor.Core.New
 
         public enum EnableType
         {
-            ET_NONE,    ///> This Variable is always enabled
+            ET_NONE,
+            ET_FIXED,   ///> This Variable is always enabled
             ET_Enable,
             ET_Disable,
         }
@@ -154,7 +155,7 @@ namespace YBehavior.Editor.Core.New
         {
             {EnableType.ET_Enable, ENABLE },
             {EnableType.ET_Disable, DISABLE },
-            {EnableType.ET_NONE, NONE },
+            {EnableType.ET_FIXED, NONE },
         };
         public static EnableType GetEnableType(char c, EnableType defaultType)
         {
@@ -364,8 +365,8 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return 
-                    m_bIsLocal && 
+                return
+                    m_bIsLocal &&
                     //SharedDataSource != null
                     //&& SharedDataSource is Tree &&
                     !(this is InOutVariable)
@@ -469,7 +470,7 @@ namespace YBehavior.Editor.Core.New
                         {
                             m_VectorIndex = new Variable(SharedDataSource);
                             m_VectorIndex.m_Parent = this;
-                            m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, EnableType.ET_NONE, true, "0");
+                            m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, EnableType.ET_FIXED, true, "0");
                             OnPropertyChanged("VectorIndex");
                         }
                         m_bVectorIndexEnabled = true;
@@ -504,10 +505,11 @@ namespace YBehavior.Editor.Core.New
 
         public bool LockVBType { get; set; } = false;
         public bool LockCType { get; set; } = false;
+        public bool LockEType { get { return eType == EnableType.ET_FIXED; } }
         public bool CanBeRemoved { get { return m_bCanbeRemoved; } set { m_bCanbeRemoved = value; } }
         public bool CanSwitchConst { get { return !LockVBType; } }
         public bool CanSwitchList { get { return !LockCType; } }
-        public bool CanSwitchEnable { get { return eType != EnableType.ET_NONE; } }
+        public bool CanSwitchEnable { get { return eType == EnableType.ET_Enable || eType == EnableType.ET_Disable; } }
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
@@ -785,7 +787,7 @@ namespace YBehavior.Editor.Core.New
                 ValueType.VT_INT, 
                 CountType.CT_SINGLE, 
                 GetVariableType(variableType[0],VariableType.VBT_NONE),
-                EnableType.ET_NONE,
+                EnableType.ET_FIXED,
                 GetLocal(variableType[0]), 
                 value);
             return true;
@@ -809,6 +811,17 @@ namespace YBehavior.Editor.Core.New
                 cType = GetCountType(valueType, countType);
                 if (cType == CountType.CT_NONE)
                     return false;
+            }
+
+            if (!LockEType)
+            {
+                var e = GetEnableType(enableType, EnableType.ET_NONE);
+                if (e == EnableType.ET_NONE)
+                    return false;
+                ///> Enable/Disable cant convert to Fixed
+                else if (eType == EnableType.ET_NONE || (e == EnableType.ET_Enable || e == EnableType.ET_Disable))
+                    eType = e;
+                ///> Else nothing changes, eType will NOT follow the configuration
             }
 
             IsLocal = Char.IsLower(variableType);

@@ -67,7 +67,7 @@ namespace YBehavior.Editor.Core.New
             {
                 v = new TreeVariable(m_Owner);
                 v.vTypeSet.AddRange(Variable.CreateParams_AllTypes);
-                if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, Variable.EnableType.ET_NONE, isLocal, value, null, name))
+                if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Const, Variable.EnableType.ET_FIXED, isLocal, value, null, name))
                     return false;
 
                 v.LockVBType = true;
@@ -284,7 +284,7 @@ namespace YBehavior.Editor.Core.New
                 v = new InOutVariable(m_Owner);
                 if (m_bIsCore)
                     v.vTypeSet.AddRange(Variable.CreateParams_AllTypes);
-                if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Pointer, Variable.EnableType.ET_NONE, false, "", null, name))
+                if (!v.SetVariable(vType, cType, Variable.VariableType.VBT_Pointer, Variable.EnableType.ET_FIXED, false, "", null, name))
                     return false;
 
                 if ((bIsInput && m_bIsCore) || (!bIsInput && !m_bIsCore))
@@ -465,7 +465,7 @@ namespace YBehavior.Editor.Core.New
             Variable.ValueType[] valueType,
             Variable.CountType countType,
             Variable.VariableType vbType,
-            Variable.EnableType eType = Variable.EnableType.ET_NONE,
+            Variable.EnableType eType,
             int vTypeGroup = 0,
             int cTypeGroup = 0,
             string param = null)
