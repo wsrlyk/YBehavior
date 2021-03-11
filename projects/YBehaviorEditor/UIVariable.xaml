@@ -65,12 +65,15 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="QuickToolTipStyle">
+            <Setter Property="ToolTipService.InitialShowDelay" Value="0"/>
+        </Style>
     </UserControl.Resources>
     <StackPanel Opacity ="{Binding ElementName=ESwitcher, Path=IsChecked, Converter={StaticResource boolOpacityConvertor}, Mode=OneWay}">
-        <DockPanel Background="LightBlue" Margin="2,2,2,2">
+        <DockPanel Background="LightBlue" Margin="0,1,0,1">
             <Grid DockPanel.Dock="Left">
-                <TextBlock Name="VKey" Text="{Binding DisplayName}" FontSize="13" Width="150" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}" MouseLeftButtonUp="VKey_MouseLeftButtonUp"/>
-                <Button Style="{StaticResource TransparentHoverStyle}" Name="CSwitcher" Click="CSwitcher_Click" IsEnabled="{Binding IsEditable}" Visibility="{Binding Path = CanSwitchList, Converter={StaticResource visibilityConvertor}}" ToolTip="{Binding Description}" Margin="126,0,0,0">
+                <TextBlock Name="VKey" Style="{StaticResource QuickToolTipStyle}" Text="{Binding DisplayName}" FontSize="13" Width="150" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}" MouseLeftButtonUp="VKey_MouseLeftButtonUp"/>
+                <Button Name="CSwitcher" Style="{StaticResource TransparentHoverStyle}" Click="CSwitcher_Click" IsEnabled="{Binding IsEditable}" Visibility="{Binding Path = CanSwitchList, Converter={StaticResource visibilityConvertor}}" ToolTip="{Binding Description}" Margin="126,0,0,0">
                 </Button>
             </Grid>
             <ComboBox IsEnabled="{Binding IsEditable}" Name="VTypes" Width="55" ItemsSource="{Binding vTypeSet}" SelectedItem="{Binding vType}"
