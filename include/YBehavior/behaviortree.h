@@ -132,9 +132,17 @@ namespace YBehavior
 		RunningContext* GetRC() { return m_RunningContext; }
 		void SetRCCreator(IContextCreator* rcc) { m_ContextCreator = rcc; }
 
+		///> If no config, a default CONST variable will be created
 		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0, const STRING& defaultCreateStr = Utility::StringEmpty);
+		///> If no config, a default CONST variable will be created
 		template <typename T>
 		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0);
+		
+		///> If no config, variable will NOT be created
+		TYPEID CreateVariableIfExist(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0);
+		///> If no config, variable will NOT be created
+		template <typename T>
+		TYPEID CreateVariableIfExist(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0);
 	protected:
 		virtual bool _AddChild(BehaviorNode* child, const STRING& connection);
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
@@ -208,6 +216,28 @@ namespace YBehavior
 			ERROR_BEGIN_NODE_HEAD << "Cant create default variable for " << attriName << " with typeid = " << GetTypeID<T>() << ERROR_END;
 			return -1;
 		}
+
+		ISharedVariableEx* pTemp = nullptr;
+		TYPEID typeID = _CreateVariable(pTemp, attrOptr, data, variableType);
+		if (typeID == GetTypeID<T>())
+		{
+			op = (SharedVariableEx<T>*)pTemp;
+		}
+		else
+		{
+			op = nullptr;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for " << attriName << " with type " << typeID << ERROR_END;
+		}
+		return typeID;
+	}
+
+	template <typename T>
+	TYPEID BehaviorNode::CreateVariableIfExist(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType /*= 0*/)
+	{
+		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
+		op = nullptr;
+		if (attrOptr.empty())
+			return -1;
 
 		ISharedVariableEx* pTemp = nullptr;
 		TYPEID typeID = _CreateVariable(pTemp, attrOptr, data, variableType);
