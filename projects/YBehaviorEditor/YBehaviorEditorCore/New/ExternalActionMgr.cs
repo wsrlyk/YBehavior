@@ -150,7 +150,7 @@ namespace YBehavior.Editor.Core.New
                 countType = attr.Value == "True" ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE;
             }
 
-            Variable.EnableType eType = Variable.EnableType.ET_NONE;
+            Variable.EnableType eType = Variable.EnableType.ET_FIXED;
             attr = xml.Attributes["IsEnable"];
             if (attr != null)
             {
