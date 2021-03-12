@@ -821,7 +821,9 @@ namespace YBehavior.Editor.Core.New
                 ///> Enable/Disable cant convert to Fixed
                 else if (eType == EnableType.ET_NONE || (e == EnableType.ET_Enable || e == EnableType.ET_Disable))
                     eType = e;
-                ///> Else nothing changes, eType will NOT follow the configuration
+                ///> Not a default value, Fixed convert to Enable
+                else if (m_Value != value)
+                    eType = EnableType.ET_Enable;
             }
 
             IsLocal = Char.IsLower(variableType);
