@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <A>
   <Node Class="Root">
-    <Shared a="_IC 11" />
-    <Local a="_Ic 1" e="_Ac " />
+    <Shared />
+    <Local />
     <Node Class="GetTargetNameAction" />
   </Node>
 </A>

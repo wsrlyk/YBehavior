@@ -44,42 +44,54 @@ namespace YBehavior.Editor.Core.New
 
         protected override void _OnSaveVariables(XmlElement data, XmlDocument xmlDoc)
         {
-            _WriteMemory(data, xmlDoc);
+            _WriteMemory(data, xmlDoc, false);
         }
         protected override void _OnExportVariables(XmlElement data, XmlDocument xmlDoc)
         {
-            _WriteMemory(data, xmlDoc);
+            _WriteMemory(data, xmlDoc, true);
         }
 
-        void _WriteMemory(XmlElement data, XmlDocument xmlDoc)
+        void _WriteMemory(XmlElement data, XmlDocument xmlDoc, bool export)
         {
             if (Tree.SharedData.SharedMemory.Datas.Count > 0)
             {
                 XmlElement nodeEl = xmlDoc.CreateElement("Shared");
                 data.AppendChild(nodeEl);
 
-                _SaveVariables(Tree.SharedData.SharedMemory, nodeEl);
+                if (!export)
+                    _SaveVariables(Tree.SharedData.SharedMemory, nodeEl);
+                else
+                    _ExportVariables(Tree.SharedData.SharedMemory, nodeEl);
             }
             if (Tree.SharedData.LocalMemory.Datas.Count > 0)
             {
                 XmlElement nodeEl = xmlDoc.CreateElement("Local");
                 data.AppendChild(nodeEl);
 
-                _SaveVariables(Tree.SharedData.LocalMemory, nodeEl);
+                if (!export)
+                    _SaveVariables(Tree.SharedData.LocalMemory, nodeEl);
+                else
+                    _ExportVariables(Tree.SharedData.LocalMemory, nodeEl);
             }
             if (Tree.InOutMemory.InputMemory.Datas.Count > 0)
             {
                 XmlElement nodeEl = xmlDoc.CreateElement("Input");
                 data.AppendChild(nodeEl);
 
-                _SaveVariables(Tree.InOutMemory.InputMemory, nodeEl);
+                if (!export)
+                    _SaveVariables(Tree.InOutMemory.InputMemory, nodeEl);
+                else
+                    _ExportVariables(Tree.InOutMemory.InputMemory, nodeEl);
             }
             if (Tree.InOutMemory.OutputMemory.Datas.Count > 0)
             {
                 XmlElement nodeEl = xmlDoc.CreateElement("Output");
                 data.AppendChild(nodeEl);
 
-                _SaveVariables(Tree.InOutMemory.OutputMemory, nodeEl);
+                if (!export)
+                    _SaveVariables(Tree.InOutMemory.OutputMemory, nodeEl);
+                else
+                    _ExportVariables(Tree.InOutMemory.OutputMemory, nodeEl);
             }
         }
 
