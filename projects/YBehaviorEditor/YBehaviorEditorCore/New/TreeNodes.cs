@@ -61,7 +61,7 @@ namespace YBehavior.Editor.Core.New
                 if (!export)
                     _SaveVariables(Tree.SharedData.SharedMemory, nodeEl);
                 else
-                    _ExportVariables(Tree.SharedData.SharedMemory, nodeEl);
+                    _ExportVariables(Tree.SharedData.SharedMemory, nodeEl, true);
             }
             if (Tree.SharedData.LocalMemory.Datas.Count > 0)
             {
@@ -71,7 +71,7 @@ namespace YBehavior.Editor.Core.New
                 if (!export)
                     _SaveVariables(Tree.SharedData.LocalMemory, nodeEl);
                 else
-                    _ExportVariables(Tree.SharedData.LocalMemory, nodeEl);
+                    _ExportVariables(Tree.SharedData.LocalMemory, nodeEl, true);
             }
             if (Tree.InOutMemory.InputMemory.Datas.Count > 0)
             {
@@ -81,7 +81,7 @@ namespace YBehavior.Editor.Core.New
                 if (!export)
                     _SaveVariables(Tree.InOutMemory.InputMemory, nodeEl);
                 else
-                    _ExportVariables(Tree.InOutMemory.InputMemory, nodeEl);
+                    _ExportVariables(Tree.InOutMemory.InputMemory, nodeEl, false);
             }
             if (Tree.InOutMemory.OutputMemory.Datas.Count > 0)
             {
@@ -91,7 +91,21 @@ namespace YBehavior.Editor.Core.New
                 if (!export)
                     _SaveVariables(Tree.InOutMemory.OutputMemory, nodeEl);
                 else
-                    _ExportVariables(Tree.InOutMemory.OutputMemory, nodeEl);
+                    _ExportVariables(Tree.InOutMemory.OutputMemory, nodeEl, false);
+            }
+        }
+
+        protected void _ExportVariables(IVariableCollection collection, System.Xml.XmlElement data, bool bOnlyActive)
+        {
+            foreach (VariableHolder v in collection.Datas)
+            {
+                if (v.Variable.eType == Variable.EnableType.ET_Disable)
+                    continue;
+
+                if (bOnlyActive && v.Variable.referencedType != Variable.ReferencedType.Active)
+                    continue;
+
+                data.SetAttribute(v.Variable.Name, v.Variable.ValueInXml);
             }
         }
 

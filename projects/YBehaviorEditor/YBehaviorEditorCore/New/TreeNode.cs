@@ -312,8 +312,6 @@ namespace YBehavior.Editor.Core.New
             {
                 if (v.Variable.eType == Variable.EnableType.ET_Disable)
                     continue;
-                if (v.Variable.referencedType != Variable.ReferencedType.Active)
-                    continue;
                 data.SetAttribute(v.Variable.Name, v.Variable.ValueInXml);
             }
         }
