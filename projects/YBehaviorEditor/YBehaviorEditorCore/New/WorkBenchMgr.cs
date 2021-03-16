@@ -195,7 +195,7 @@ namespace YBehavior.Editor.Core.New
             xmlDoc.Load(file.Path);
 
             XmlElement root = xmlDoc.DocumentElement;
-            if (!workBench.Load(root))
+            if (!workBench.Load(root, true))
             {
                 m_ActiveWorkBench = oldBench;
                 return null;
@@ -203,6 +203,50 @@ namespace YBehavior.Editor.Core.New
 
             m_ActiveWorkBench = oldBench;
             m_OpenedWorkBenchs.Add(workBench);
+
+            return workBench;
+        }
+
+        /// <summary>
+        /// WorkBench must be managed outside
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public WorkBench OpenWorkBenchTemp(FileMgr.FileInfo file)
+        {
+            if (file == null)
+                return null;
+
+            WorkBench workBench;
+            if (file.FileType == FileType.TREE)
+            {
+                workBench = new TreeBench
+                {
+                    FilePath = file.RelativeName
+                };
+            }
+            else
+            {
+                workBench = new FSMBench
+                {
+                    FilePath = file.RelativeName
+                };
+            }
+
+            WorkBench oldBench = m_ActiveWorkBench;
+            m_ActiveWorkBench = workBench;
+
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(file.Path);
+
+            XmlElement root = xmlDoc.DocumentElement;
+            if (!workBench.Load(root, false))
+            {
+                m_ActiveWorkBench = oldBench;
+                return null;
+            }
+
+            m_ActiveWorkBench = oldBench;
 
             return workBench;
         }

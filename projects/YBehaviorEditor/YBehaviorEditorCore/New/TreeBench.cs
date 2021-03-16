@@ -123,7 +123,7 @@ namespace YBehavior.Editor.Core.New
                 m_Tree.RefreshNodeUIDFromMiddle(parent);
         }
 
-        public override bool Load(XmlElement data)
+        public override bool Load(XmlElement data, bool bRendering)
         {
             CommandMgr.Blocked = true;
 

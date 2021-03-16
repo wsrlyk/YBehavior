@@ -40,7 +40,7 @@ namespace YBehavior.Editor.Core.New
             //ConnectionList.Step = 20;
         }
 
-        public virtual bool Load(XmlElement data) { return true; }
+        public virtual bool Load(XmlElement data, bool bRendering) { return true; }
         public virtual bool CheckError() { return true; }
         public virtual void Save(XmlElement data, XmlDocument xmlDoc) { }
         public virtual void Export(XmlElement data, XmlDocument xmlDoc) { }

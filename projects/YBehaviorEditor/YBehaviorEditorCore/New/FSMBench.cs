@@ -40,7 +40,7 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        public override bool Load(XmlElement data)
+        public override bool Load(XmlElement data, bool bRendering)
         {
             CommandMgr.Blocked = true;
             m_FSM.SetFlag(Graph.FLAG_LOADING);
