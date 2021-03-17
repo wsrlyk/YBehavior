@@ -11,6 +11,8 @@ namespace YBehavior.Editor.Core.New
         {
 
         }
+
+        public override bool CanSwitchContainer => true;
     }
 
     public class TreeMemory : IVariableCollection
@@ -169,6 +171,46 @@ namespace YBehavior.Editor.Core.New
                 VariableHolder = holder
             };
             WorkBenchMgr.Instance.PushCommand(removeSharedVariableCommand);
+
+            return true;
+        }
+
+        public bool SwitchVariable(Variable v)
+        {
+            if (v == null)
+                return false;
+
+            VariableHolder holder = GetVariableHolder(v.Name, v.IsLocal);
+            if (holder == null)
+                return false;
+            if (v.IsLocal)
+            {
+                if (!m_LocalVariables.DoRemove(holder))
+                    return false;
+            }
+            else
+            {
+                if (!m_SharedVariables.DoRemove(holder))
+                    return false;
+            }
+            m_DataList.Remove(holder);
+
+            v.IsLocal = !v.IsLocal;
+            if (v.IsLocal)
+            {
+                holder = m_LocalVariables.DoAddVariable(v);
+            }
+            else
+            {
+                holder = m_SharedVariables.DoAddVariable(v);
+            }
+
+            if (holder == null)
+                return false;
+
+            m_DataList.Add(holder);
+
+            RefreshCandidatas();
 
             return true;
         }

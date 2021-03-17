@@ -96,6 +96,9 @@
                 <Button Width="20" Height="20" Name="Remover" Background="{Binding referencedType, Converter={StaticResource referencedTypeConvertor}}" Visibility="{Binding Path = CanBeRemoved,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="Remover_Click"
                         Content="X" Foreground="Red"
                         Style="{StaticResource ButtonNone}"/>
+                <Button Width="20" Height="20" Name="ContainerSwitcher" Background="MediumPurple" Visibility="{Binding Path = CanSwitchContainer,  Converter={StaticResource visibilityConvertor}, Mode=OneWay}" Click="ContainerSwitcher_Click"
+                        Content="⇅" Foreground="Purple"
+                        Style="{StaticResource ButtonNone}"/>
 
             </StackPanel>
             <Grid>

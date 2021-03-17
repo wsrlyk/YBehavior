@@ -296,7 +296,20 @@ namespace YBehavior.Editor.Core.New
         public List<ValueType> vTypeSet { get { return m_vTypeSet; } }
         //public List<CountType> cTypeSet { get { return m_cTypeSet; } }
         bool m_bIsLocal = false;
-        public bool IsLocal { get { return m_bIsLocal; } set { m_bIsLocal = value; } }
+        public bool IsLocal
+        {
+            get { return m_bIsLocal; }
+            set
+            {
+                if (m_bIsLocal != value)
+                {
+                    m_bIsLocal = value;
+                    _RefreshDisplayValue();
+                    _OnValueChanged();
+                    OnPropertyChanged("DisplayName");
+                }
+            }
+        }
 
         /// <summary>
         /// To tell if it's local or not. Local: aaa'      Shared: aaa
@@ -510,6 +523,7 @@ namespace YBehavior.Editor.Core.New
         public bool CanSwitchConst { get { return !LockVBType; } }
         public bool CanSwitchList { get { return !LockCType; } }
         public bool CanSwitchEnable { get { return eType == EnableType.ET_Enable || eType == EnableType.ET_Disable; } }
+        public virtual bool CanSwitchContainer { get { return false; } }
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 

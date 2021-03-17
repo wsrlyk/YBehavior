@@ -126,5 +126,25 @@ namespace YBehavior.Editor
                 v = v,
             });
         }
+
+        private void ContainerSwitcher_Click(object sender, RoutedEventArgs e)
+        {
+            if (DebugMgr.Instance.IsDebugging())
+                return;
+
+            Variable v = DataContext as Variable;
+            if (v == null)
+                return;
+
+            MessageBoxResult dr = MessageBox.Show("Switch variable " + v.Name + "?", "Switch Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (dr == MessageBoxResult.Yes)
+            {
+                bool b = v.SharedDataSource.SharedData.SwitchVariable(v);
+                if (b && WorkBenchMgr.Instance.ActiveWorkBench is TreeBench)
+                {
+                    (WorkBenchMgr.Instance.ActiveWorkBench as TreeBench).RefreshAfterSwitchVariable(v);
+                }
+            }
+        }
     }
 }
