@@ -11,7 +11,7 @@ namespace YBehavior.Editor.Core.New
     {
         List<WorkBench> m_OpenedWorkBenchs = new List<WorkBench>();
         WorkBench m_ActiveWorkBench;
-        public WorkBench ActiveWorkBench { get { return m_ActiveWorkBench; } }
+        public WorkBench ActiveWorkBench { get { return m_ActiveWorkBench; } set { m_ActiveWorkBench = value; } }
         public List<WorkBench> OpenedBenches { get { return m_OpenedWorkBenchs; } }
         public string ActiveTreeName
         {
@@ -246,7 +246,7 @@ namespace YBehavior.Editor.Core.New
                 return null;
             }
 
-            m_ActiveWorkBench = oldBench;
+            //m_ActiveWorkBench = oldBench;
 
             return workBench;
         }

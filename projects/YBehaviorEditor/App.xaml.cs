@@ -68,11 +68,15 @@ namespace YBehavior.Editor
                 case "loadandsavealltrees":
                     _LoadAndSaveAll();
                     break;
+                case "checklocal":
+                    _CheckLocal();
+                    break;
             }
         }
 
         void _LoadAndSaveAll()
         {
+            WorkBench oldActiveBench = WorkBenchMgr.Instance.ActiveWorkBench;
             foreach (var treename in FileMgr.Instance.TreeList)
             {
                 var fileinfo = FileMgr.Instance.GetFileInfo(treename);
@@ -95,6 +99,36 @@ namespace YBehavior.Editor
                     Console.WriteLine(treename + " saved and exported.");
                 }
             }
+            WorkBenchMgr.Instance.ActiveWorkBench = oldActiveBench;
+        }
+        void _CheckLocal()
+        {
+            WorkBench oldActiveBench = WorkBenchMgr.Instance.ActiveWorkBench;
+            foreach (var treename in FileMgr.Instance.TreeList)
+            {
+                var fileinfo = FileMgr.Instance.GetFileInfo(treename);
+                if (fileinfo == null)
+                {
+                    Console.WriteLine("Cant find " + treename);
+                    continue;
+                }
+
+                var workbench = WorkBenchMgr.Instance.OpenWorkBenchTemp(fileinfo) as TreeBench;
+                workbench.CheckLocal();
+
+                int res = WorkBenchMgr.Instance.SaveWorkBench(workbench);
+                if ((res & WorkBenchMgr.SaveResultFlag_Saved) != 0)
+                {
+                    WorkBenchMgr.Instance.ExportWorkBench(workbench);
+
+                    var relativePath = workbench.FileInfo.RelativePath;
+                    workbench.FilePath = workbench.FileInfo.RelativeName;
+
+                    FileMgr.Instance.Load(relativePath, workbench.FilePath);
+                    Console.WriteLine(treename + " saved and exported.");
+                }
+            }
+            WorkBenchMgr.Instance.ActiveWorkBench = oldActiveBench;
         }
     }
 }

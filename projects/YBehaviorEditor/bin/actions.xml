@@ -13,7 +13,7 @@
 		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" IsEnable="False" Value="0"/>
 	</Action>
 	<Action Class="SelectTargetAction" Note="{0}" Hierachy="121">
-		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" Value="0"/>
+		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" IsInput="False" Value="0"/>
 	</Action>
 	<Action Class="SetVector3Action" Note="{0}" Hierachy="121">
 		<Variable Name="Src" ValueType="V" IsArray="False" VariableType="P" Value=""/>

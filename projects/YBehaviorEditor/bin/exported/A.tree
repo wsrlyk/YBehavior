@@ -2,7 +2,10 @@
 <A>
   <Node Class="Root">
     <Shared />
-    <Local />
-    <Node Class="GetTargetNameAction" />
+    <Local e="_Ac " />
+    <Node Class="Sequence">
+      <Node Class="SelectTargetAction" Target="_Ap e" />
+      <Node Class="GetTargetNameAction" Target="_ApE e" />
+    </Node>
   </Node>
 </A>

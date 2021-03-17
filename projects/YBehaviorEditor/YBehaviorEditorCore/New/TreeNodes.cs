@@ -442,6 +442,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 1
             );
+            opl.IsInput = false;
 
             Variable opr1 = NodeMemory.CreateVariable(
                 "Opr1",
@@ -594,6 +595,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 1
             );
+            opl.IsInput = false;
 
             Variable opr = NodeMemory.CreateVariable(
                 "Source",
@@ -657,6 +659,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 1
             );
+            opl.IsInput = false;
 
             Variable opr1 = NodeMemory.CreateVariable(
                 "Bound1",
@@ -705,7 +708,7 @@ namespace YBehavior.Editor.Core.New
 
         public override void CreateVariables()
         {
-            Variable opl = NodeMemory.CreateVariable(
+            Variable opr = NodeMemory.CreateVariable(
                 "Input",
                 "",
                 Variable.CreateParams_AllTypes,
@@ -715,7 +718,7 @@ namespace YBehavior.Editor.Core.New
                 1
             );
 
-            Variable opr1 = NodeMemory.CreateVariable(
+            Variable opl = NodeMemory.CreateVariable(
                 "Output",
                 "",
                 Variable.CreateParams_AllTypes,
@@ -724,6 +727,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 1
             );
+            opl.IsInput = false;
         }
 
         public override string Note
@@ -759,6 +763,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.VariableType.VBT_Pointer,
                 0
             );
+            name.IsInput = false;
 
             Variable ints = NodeMemory.CreateVariable(
                 "Int",
@@ -768,6 +773,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.VariableType.VBT_Pointer,
                 0
             );
+            ints.IsInput = false;
 
             Variable floats = NodeMemory.CreateVariable(
                 "Float",
@@ -777,6 +783,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.VariableType.VBT_Pointer,
                 0
             );
+            floats.IsInput = false;
 
             Variable strings = NodeMemory.CreateVariable(
                 "String",
@@ -786,6 +793,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.VariableType.VBT_Pointer,
                 0
             );
+            strings.IsInput = false;
 
             Variable ulongs = NodeMemory.CreateVariable(
                 "Ulong",
@@ -795,6 +803,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.VariableType.VBT_Pointer,
                 0
             );
+            ulongs.IsInput = false;
 
             Variable bools = NodeMemory.CreateVariable(
                 "Bool",
@@ -804,6 +813,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.VariableType.VBT_Pointer,
                 0
             );
+            bools.IsInput = false;
         }
 
         public override string Note
@@ -1076,7 +1086,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 1
             );
-            NodeMemory.CreateVariable(
+            var v = NodeMemory.CreateVariable(
                 "Current",
                 "",
                 Variable.CreateParams_AllTypes,
@@ -1085,6 +1095,8 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 1
             );
+            v.IsInput = false;
+
             NodeMemory.CreateVariable(
                 "ExitWhenFailure",
                 "F",
@@ -1129,7 +1141,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 1
             );
-            NodeMemory.CreateVariable(
+            var v = NodeMemory.CreateVariable(
                 "Current",
                 "",
                 Variable.CreateParams_Int,
@@ -1138,6 +1150,8 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 1
             );
+            v.IsInput = false;
+
             NodeMemory.CreateVariable(
                 "ExitWhenFailure",
                 "F",
@@ -1203,7 +1217,7 @@ namespace YBehavior.Editor.Core.New
                 1
             );
 
-            NodeMemory.CreateVariable(
+            var v = NodeMemory.CreateVariable(
                 "OutputY",
                 "",
                 Variable.CreateParams_AllNumbers,
@@ -1212,6 +1226,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 1
             );
+            v.IsInput = false;
 
         }
 
@@ -1270,7 +1285,7 @@ namespace YBehavior.Editor.Core.New
                 1
             );
 
-            NodeMemory.CreateVariable(
+            var v = NodeMemory.CreateVariable(
                 "Output",
                 "",
                 Variable.CreateParams_AllTypes,
@@ -1279,6 +1294,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 2
             );
+            v.IsInput = false;
 
             NodeMemory.CreateVariable(
                 "IgnoreInput",
@@ -1357,6 +1373,8 @@ namespace YBehavior.Editor.Core.New
                 Variable.VariableType.VBT_Pointer,
                 Variable.EnableType.ET_FIXED
             );
+            opl.IsInput = false;
+
         }
 
         public override string Note
@@ -1436,6 +1454,8 @@ namespace YBehavior.Editor.Core.New
                 Variable.VariableType.VBT_Pointer,
                 Variable.EnableType.ET_FIXED
             );
+            length.IsInput = false;
+
         }
 
         public override string Note
@@ -1473,6 +1493,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 1
             );
+            array.IsInput = false;
 
             Variable element = NodeMemory.CreateVariable(
                 "Element",
@@ -1528,6 +1549,8 @@ namespace YBehavior.Editor.Core.New
                 Variable.VariableType.VBT_Pointer,
                 Variable.EnableType.ET_FIXED
             );
+            output.IsInput = false;
+
         }
 
         public override string Note
@@ -1593,6 +1616,8 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 1
             );
+            output.IsInput = false;
+
         }
 
         public override string Note

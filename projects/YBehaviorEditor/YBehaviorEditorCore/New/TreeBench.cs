@@ -544,92 +544,147 @@ namespace YBehavior.Editor.Core.New
 
         }
 
+        public void Switch(Variable v)
+        {
+            if (m_Tree.SharedData.SwitchVariable(v))
+            {
+                RefreshAfterSwitchVariable(v);
+                LogMgr.Instance.Log("Switch " + v.DisplayName);
+            }
+        }
+
         public bool RefreshAfterSwitchVariable(Variable v)
         {
             if (v == null)
                 return false;
 
-            Func<Variable, string, bool, bool> processor =
-                (Variable target, string name, bool isLocal) =>
+            Action<Variable> processor =
+                (Variable target) =>
                 {
-                    if (target.Name == name && target.IsLocal == !isLocal)
+                    if (target.Value == v.Name && target.IsLocal == !v.IsLocal)
                     {
-                        target.IsLocal = isLocal;
-                        return true;
+                        target.IsLocal = v.IsLocal;
                     }
-
-                    return false;
                 };
 
-            Action<NodeBase, object, object> handler =
-            (NodeBase node, object o0, object o1) =>
+            ProcessAllVariables(processor);
+
+            return true;
+        }
+
+        public void CheckLocal()
+        {
+            Dictionary<VariableHolder, List<bool>> res = new Dictionary<VariableHolder, List<bool>>();
+            Action<Variable> processor = (Variable v) =>
+            {
+                if (v.vbType == Variable.VariableType.VBT_Const)
+                    return;
+
+                if (v.IsLocal)
+                    return;
+
+                if (!v.CheckValid())
+                    return;
+
+                VariableHolder vh = m_Tree.TreeMemory.GetVariableHolder(v.Value, v.IsLocal);
+                if (vh != null)
+                {
+                    if (!res.TryGetValue(vh, out var list))
+                    {
+                        list = new List<bool>();
+                        res.Add(vh, list);
+                    }
+
+                    list.Add(v.IsInput);
+                }
+            };
+
+            ProcessAllVariables(processor);
+
+            foreach (var pair in res)
+            {
+                var list = pair.Value;
+                /// Only Input or Output;
+                /// When only input, the data may be from code
+                /// When only output, it may be used in SubTree
+                if (list.Count < 2)
+                    continue;
+
+                /// We only check the first and the last
+                /// If first output and last input, it has high chance of being local 
+                if (!list[0] && list[list.Count - 1])
+                {
+                    Switch(pair.Key.Variable);
+                }
+            }
+        }
+
+        public void ProcessAllVariables(Action<Variable> action)
+        {
+            Action<NodeBase> handler =
+            (NodeBase node) =>
             {
                 if (node is TreeNode)
                 {
                     if (node is RootTreeNode)
                         return;
 
-                    string name = o0 as string;
-                    bool isLocal = (bool)o1;
+                    TreeMemory treeMemory = m_Tree.TreeMemory;
 
                     TreeNode treeNode = node as TreeNode;
-                    foreach (var vh in treeNode.NodeMemory.Datas)
+                    foreach (var v in treeNode.NodeMemory.Datas)
                     {
-                        processor(vh.Variable, name, isLocal);
-                        if (vh.Variable.IsElement)
+                        action(v.Variable);
+                        if (v.Variable.IsElement)
                         {
-                            processor(vh.Variable.VectorIndex, name, isLocal);
+                            action(v.Variable.VectorIndex);
                         }
                     }
 
                     if (treeNode is SubTreeNode)
                     {
-                        foreach (var vh in (treeNode as SubTreeNode).InOutMemory.InputMemory.Datas)
+                        foreach (var v in (treeNode as SubTreeNode).InOutMemory.InputMemory.Datas)
                         {
-                            processor(vh.Variable, name, isLocal);
-                            if (vh.Variable.IsElement)
+                            action(v.Variable);
+                            if (v.Variable.IsElement)
                             {
-                                processor(vh.Variable.VectorIndex, name, isLocal);
+                                action(v.Variable.VectorIndex);
                             }
                         }
-                        foreach (var vh in (treeNode as SubTreeNode).InOutMemory.OutputMemory.Datas)
+                        foreach (var v in (treeNode as SubTreeNode).InOutMemory.OutputMemory.Datas)
                         {
-                            processor(vh.Variable, name, isLocal);
-                            if (vh.Variable.IsElement)
+                            action(v.Variable);
+                            if (v.Variable.IsElement)
                             {
-                                processor(vh.Variable.VectorIndex, name, isLocal);
+                                action(v.Variable.VectorIndex);
                             }
                         }
                     }
                 }
             };
 
-            Utility.OperateNode(m_Tree.Root, v.Name, v.IsLocal, true, handler);
+            Utility.OperateNode(m_Tree.Root, true, handler);
             foreach (var tree in m_Forest)
             {
-                Utility.OperateNode(tree, v.Name, v.IsLocal, true, handler);
+                Utility.OperateNode(tree, true, handler);
             }
 
-            foreach (var vh in m_Tree.InOutMemory.InputMemory.Datas)
+            foreach (var v in m_Tree.InOutMemory.InputMemory.Datas)
             {
-                processor(vh.Variable, v.Name, v.IsLocal);
-                if (vh.Variable.IsElement)
+                action(v.Variable);
+                if (v.Variable.IsElement)
                 {
-                    processor(vh.Variable.VectorIndex, v.Name, v.IsLocal);
+                    action(v.Variable.VectorIndex);
                 }
             }
-            foreach (var vh in m_Tree.InOutMemory.OutputMemory.Datas)
+            foreach (var v in m_Tree.InOutMemory.OutputMemory.Datas)
             {
-                processor(vh.Variable, v.Name, v.IsLocal);
-                if (vh.Variable.IsElement)
+                action(v.Variable);
+                if (v.Variable.IsElement)
                 {
-                    processor(vh.Variable.VectorIndex, v.Name, v.IsLocal);
+                    action(v.Variable.VectorIndex);
                 }
             }
-
-
-            return true;
         }
-
     }
 }

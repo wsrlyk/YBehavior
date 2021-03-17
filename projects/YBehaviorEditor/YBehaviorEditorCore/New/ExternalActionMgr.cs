@@ -158,6 +158,14 @@ namespace YBehavior.Editor.Core.New
                 eType = b ? Variable.EnableType.ET_Enable : Variable.EnableType.ET_Disable;
             }
 
+            bool bIsInput = true;
+            attr = xml.Attributes["IsInput"];
+            if (attr != null)
+            {
+                bool b = attr.Value == "True";
+                bIsInput = b;
+            }
+
             string value = string.Empty;
             attr = xml.Attributes["Value"];
             if (attr != null)
@@ -197,6 +205,7 @@ namespace YBehavior.Editor.Core.New
                 param
             );
             v.IsLocal = bIsLocal;
+            v.IsInput = bIsInput;
             return true;
         }
 

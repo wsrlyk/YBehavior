@@ -139,10 +139,9 @@ namespace YBehavior.Editor
             MessageBoxResult dr = MessageBox.Show("Switch variable " + v.Name + "?", "Switch Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (dr == MessageBoxResult.Yes)
             {
-                bool b = v.SharedDataSource.SharedData.SwitchVariable(v);
-                if (b && WorkBenchMgr.Instance.ActiveWorkBench is TreeBench)
+                if (WorkBenchMgr.Instance.ActiveWorkBench is TreeBench)
                 {
-                    (WorkBenchMgr.Instance.ActiveWorkBench as TreeBench).RefreshAfterSwitchVariable(v);
+                    (WorkBenchMgr.Instance.ActiveWorkBench as TreeBench).Switch(v);
                 }
             }
         }

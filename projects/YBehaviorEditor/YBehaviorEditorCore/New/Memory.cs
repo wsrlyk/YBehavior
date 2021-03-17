@@ -253,8 +253,6 @@ namespace YBehavior.Editor.Core.New
         {
 
         }
-
-        public bool IsInput { get; set; }
     }
     public class InOutMemory
     {

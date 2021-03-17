@@ -310,6 +310,7 @@ namespace YBehavior.Editor.Core.New
                 }
             }
         }
+        public bool IsInput { get; set; } = true;
 
         /// <summary>
         /// To tell if it's local or not. Local: aaa'      Shared: aaa
@@ -917,6 +918,7 @@ namespace YBehavior.Editor.Core.New
             v.m_bInited = m_bInited;
             v.m_Params = m_Params;
             v.Description = Description;
+            v.IsInput = IsInput;
             if (m_VectorIndex != null && m_bVectorIndexEnabled)
             {
                 v.m_VectorIndex = m_VectorIndex.Clone(newDataSource);

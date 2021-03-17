@@ -3,6 +3,9 @@
   <Node Class="Root" Pos="297,61">
     <Shared a="_IC 11" />
     <Local a="_Ic 1" e="_Ac " />
-    <Node Class="GetTargetNameAction" Pos="260,200" Target="_ApD e" />
+    <Node Class="Sequence" Pos="210,160">
+      <Node Class="SelectTargetAction" Pos="100,290" Target="_Ap e" />
+      <Node Class="GetTargetNameAction" Pos="300,310" Target="_ApE e" />
+    </Node>
   </Node>
 </A>
