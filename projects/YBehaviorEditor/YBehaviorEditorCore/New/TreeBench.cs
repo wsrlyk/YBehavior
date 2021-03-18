@@ -637,8 +637,8 @@ namespace YBehavior.Editor.Core.New
 
         public void CheckLocal()
         {
-            Dictionary<VariableHolder, List<Tuple<bool, int>>> res = new Dictionary<VariableHolder, List<Tuple<bool, int>>>();
-            Action<Variable, int, bool> processor = (Variable v, int uid, bool isInput) =>
+            Dictionary<VariableHolder, List<Tuple<bool, int, int>>> res = new Dictionary<VariableHolder, List<Tuple<bool, int, int>>>();
+            Action<Variable, int, int, bool> processor = (Variable v, int uid, int parentuid, bool isInput) =>
             {
                 if (v.vbType == Variable.VariableType.VBT_Const)
                     return;
@@ -654,11 +654,11 @@ namespace YBehavior.Editor.Core.New
                 {
                     if (!res.TryGetValue(vh, out var list))
                     {
-                        list = new List<Tuple<bool, int>>();
+                        list = new List<Tuple<bool, int, int>>();
                         res.Add(vh, list);
                     }
 
-                    list.Add(new Tuple<bool, int>(isInput, uid));
+                    list.Add(new Tuple<bool, int, int>(isInput, uid, parentuid));
                 }
             };
 
@@ -675,10 +675,10 @@ namespace YBehavior.Editor.Core.New
                     TreeNode treeNode = node as TreeNode;
                     foreach (var v in treeNode.NodeMemory.Datas)
                     {
-                        processor(v.Variable, (int)node.UID, v.Variable.IsInput);
+                        processor(v.Variable, (int)node.UID, (int)treeNode.Parent.UID, v.Variable.IsInput);
                         if (v.Variable.IsElement)
                         {
-                            processor(v.Variable.VectorIndex, (int)node.UID, true);
+                            processor(v.Variable.VectorIndex, (int)node.UID, (int)treeNode.Parent.UID, true);
                         }
                     }
 
@@ -686,18 +686,18 @@ namespace YBehavior.Editor.Core.New
                     {
                         foreach (var v in (treeNode as SubTreeNode).InOutMemory.InputMemory.Datas)
                         {
-                            processor(v.Variable, (int)node.UID, true);
+                            processor(v.Variable, (int)node.UID, (int)treeNode.Parent.UID, true);
                             if (v.Variable.IsElement)
                             {
-                                processor(v.Variable.VectorIndex, (int)node.UID, true);
+                                processor(v.Variable.VectorIndex, (int)node.UID, (int)treeNode.Parent.UID, true);
                             }
                         }
                         foreach (var v in (treeNode as SubTreeNode).InOutMemory.OutputMemory.Datas)
                         {
-                            processor(v.Variable, (int)node.UID, false);
+                            processor(v.Variable, (int)node.UID, (int)treeNode.Parent.UID, false);
                             if (v.Variable.IsElement)
                             {
-                                processor(v.Variable.VectorIndex, (int)node.UID, true);
+                                processor(v.Variable.VectorIndex, (int)node.UID, (int)treeNode.Parent.UID, true);
                             }
                         }
                     }
@@ -711,25 +711,25 @@ namespace YBehavior.Editor.Core.New
                 Utility.OperateNode(tree, true, handler);
             }
 
-            ///> Check the meaning of IsInput of Variable
-            foreach (var v in m_Tree.InOutMemory.InputMemory.Datas)
-            {
-                processor(v.Variable, -1, false);
-                if (v.Variable.IsElement)
-                {
-                    processor(v.Variable.VectorIndex, -1, true);
-                }
-            }
+            ///////> Check the meaning of IsInput of Variable
+            ////foreach (var v in m_Tree.InOutMemory.InputMemory.Datas)
+            ////{
+            ////    processor(v.Variable, -1, false);
+            ////    if (v.Variable.IsElement)
+            ////    {
+            ////        processor(v.Variable.VectorIndex, -1, true);
+            ////    }
+            ////}
 
-            ///> Check the meaning of IsInput of Variable
-            foreach (var v in m_Tree.InOutMemory.OutputMemory.Datas)
-            {
-                processor(v.Variable, 9999999, true);
-                if (v.Variable.IsElement)
-                {
-                    processor(v.Variable.VectorIndex, 9999999, true);
-                }
-            }
+            ///////> Check the meaning of IsInput of Variable
+            ////foreach (var v in m_Tree.InOutMemory.OutputMemory.Datas)
+            ////{
+            ////    processor(v.Variable, 9999999, true);
+            ////    if (v.Variable.IsElement)
+            ////    {
+            ////        processor(v.Variable.VectorIndex, 9999999, true);
+            ////    }
+            ////}
 
             foreach (var pair in res)
             {
@@ -740,8 +740,27 @@ namespace YBehavior.Editor.Core.New
                 if (list.Count < 2)
                     continue;
 
+                ///> It's very difficult to tell if the variable should be local when it's used
+                ///  under different branch nodes.
+                ///  We only check the variables used under the same Sequence/Selector/...
+                int commonparent = -1;
+                bool iscommon = true;
+                foreach (var t in list)
+                {
+                    if (commonparent == -1)
+                        commonparent = t.Item3;
+                    else if (commonparent != t.Item3)
+                    {
+                        iscommon = false;
+                        break;
+                    }
+                }
+
+                if (!iscommon)
+                    continue;
+
                 list.Sort(
-                    (Tuple<bool, int> a, Tuple<bool, int> b) => 
+                    (Tuple<bool, int, int> a, Tuple<bool, int, int> b) => 
                 {
                     if (a.Item2 == b.Item2)
                         return -a.Item1.CompareTo(b.Item1);

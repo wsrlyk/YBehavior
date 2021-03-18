@@ -2,13 +2,12 @@
 <A>
   <Node Class="Root">
     <Shared a="_IC 11" e="_AC " />
-    <Local />
     <Node Class="Sequence">
       <Node Class="SelectTargetAction" Target="_AP e" />
       <Node Class="GetTargetNameAction" Target="_APE e" />
-      <Node Class="SubTree" Tree="_SC SubTree" Identification="_SC ">
-        <Input Input="_IP a" />
-        <Output Output="_IP a" />
+      <Node Class="SetData" Target="_IP a" Source="_IC 0" />
+      <Node Class="Sequence">
+        <Node Class="Comparer" Return="Success" Operator="_EC ==" Opl="_IP a" Opr="_IC 0" />
       </Node>
     </Node>
   </Node>

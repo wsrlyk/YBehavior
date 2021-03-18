@@ -227,6 +227,25 @@ namespace YBehavior.Editor
         }
     }
 
+    [ValueConversion(typeof(string), typeof(bool))]
+    public class ReturnTypeVisibilityConvertor : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string s = value as string;
+            if (string.IsNullOrEmpty(s))
+                return false;
+            if (s == "Default" || s == "Normal")
+                return false;
+            return true;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+    }
+
 
     [ValueConversion(typeof(System.Windows.Vector), typeof(System.Windows.Vector))]
     public class FSMUIConnectionOffsetConverter : IMultiValueConverter

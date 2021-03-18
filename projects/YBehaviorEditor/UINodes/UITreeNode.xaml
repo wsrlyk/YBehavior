@@ -15,6 +15,11 @@
     </UserControl.Style>
     <UserControl.Resources>
         <local:ReturnTypeConvertor x:Key="returnTypeConvertor"/>
+        <local:ValueConverterGroup x:Key="returnTypeVisibilityConvertor">
+            <local:ReturnTypeVisibilityConvertor/>
+            <BooleanToVisibilityConverter/>
+        </local:ValueConverterGroup>
+
     </UserControl.Resources>
     <DockPanel>
         <Border Name="leftConnectors" DockPanel.Dock="Left" Height="10" HorizontalAlignment="Left" Visibility="{Binding EnableCondition, Converter={StaticResource visibilityConvertor}}"/>
@@ -28,7 +33,8 @@
             <Border Margin="3,3,-3,-3" BorderThickness="0" Background="#BF323232" MinWidth="80" CornerRadius="3" />
             <Border Name="border" BorderThickness="2" BorderBrush="#FFC1C7CD" Background="#FFB4B7B9" MinWidth="80" CornerRadius="3">
                 <Grid>
-                    <Border Margin="0, -18, 0, 0" Background="#FFC1C7CD" Width="10" HorizontalAlignment="Left" VerticalAlignment="Top" Height="15" CornerRadius="3,3,0,0">
+                    <Border Margin="0, -18, 0, 0" Background="#FFC1C7CD" Width="10" HorizontalAlignment="Left" VerticalAlignment="Top" Height="15" CornerRadius="3,3,0,0"
+                            Visibility="{Binding Path=ReturnType, Converter={StaticResource returnTypeVisibilityConvertor}}">
                         <TextBlock Name="Return" HorizontalAlignment="Center" Text="{Binding Path=ReturnType, Converter={StaticResource returnTypeConvertor}}"/>
                     </Border>
                     <Border Name="disableCover" BorderThickness="0" Background="#FF4B4B4B" Visibility="{Binding Disabled, Converter={StaticResource visibilityConvertor}}" CornerRadius="3"/>
