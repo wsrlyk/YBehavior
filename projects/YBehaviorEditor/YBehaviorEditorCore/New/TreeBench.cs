@@ -673,12 +673,13 @@ namespace YBehavior.Editor.Core.New
                     TreeMemory treeMemory = m_Tree.TreeMemory;
 
                     TreeNode treeNode = node as TreeNode;
+                    int parentUID = treeNode.Parent == null ? -2 : (int)treeNode.Parent.UID;
                     foreach (var v in treeNode.NodeMemory.Datas)
                     {
-                        processor(v.Variable, (int)node.UID, (int)treeNode.Parent.UID, v.Variable.IsInput);
+                        processor(v.Variable, (int)node.UID, parentUID, v.Variable.IsInput);
                         if (v.Variable.IsElement)
                         {
-                            processor(v.Variable.VectorIndex, (int)node.UID, (int)treeNode.Parent.UID, true);
+                            processor(v.Variable.VectorIndex, (int)node.UID, parentUID, true);
                         }
                     }
 
@@ -686,18 +687,18 @@ namespace YBehavior.Editor.Core.New
                     {
                         foreach (var v in (treeNode as SubTreeNode).InOutMemory.InputMemory.Datas)
                         {
-                            processor(v.Variable, (int)node.UID, (int)treeNode.Parent.UID, true);
+                            processor(v.Variable, (int)node.UID, parentUID, true);
                             if (v.Variable.IsElement)
                             {
-                                processor(v.Variable.VectorIndex, (int)node.UID, (int)treeNode.Parent.UID, true);
+                                processor(v.Variable.VectorIndex, (int)node.UID, parentUID, true);
                             }
                         }
                         foreach (var v in (treeNode as SubTreeNode).InOutMemory.OutputMemory.Datas)
                         {
-                            processor(v.Variable, (int)node.UID, (int)treeNode.Parent.UID, false);
+                            processor(v.Variable, (int)node.UID, parentUID, false);
                             if (v.Variable.IsElement)
                             {
-                                processor(v.Variable.VectorIndex, (int)node.UID, (int)treeNode.Parent.UID, true);
+                                processor(v.Variable.VectorIndex, (int)node.UID, parentUID, true);
                             }
                         }
                     }
