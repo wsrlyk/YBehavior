@@ -1,11 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <A>
   <Node Class="Root">
-    <Shared />
-    <Local e="_Ac " />
+    <Shared a="_IC 11" e="_AC " />
+    <Local />
     <Node Class="Sequence">
-      <Node Class="SelectTargetAction" Target="_Ap e" />
-      <Node Class="GetTargetNameAction" Target="_ApE e" />
+      <Node Class="SelectTargetAction" Target="_AP e" />
+      <Node Class="GetTargetNameAction" Target="_APE e" />
+      <Node Class="SubTree" Tree="_SC SubTree" Identification="_SC ">
+        <Input Input="_IP a" />
+        <Output Output="_IP a" />
+      </Node>
     </Node>
   </Node>
 </A>

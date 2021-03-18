@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <SubTree>
   <Node Class="Root">
-    <Local a="_Ic 0" b="_Ic 0" s="_Sc " />
-    <Input Input="_Ip b" />
-    <Output Output="_Ip b" />
-    <Node Class="SubTree" Tree="_SC Test" Identification="_SC Sub1" />
+    <Shared b="_IC 0" />
+    <Local />
+    <Input Input="_IP b" />
+    <Output Output="_IP b" />
   </Node>
 </SubTree>

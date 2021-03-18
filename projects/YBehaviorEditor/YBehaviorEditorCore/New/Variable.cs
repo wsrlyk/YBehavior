@@ -310,6 +310,11 @@ namespace YBehavior.Editor.Core.New
                 }
             }
         }
+        /// <summary>
+        /// The meaning of IsInput is different between the node variables and inout variables
+        /// In node variables, input means reading the data from the tree memory.
+        /// While in tree inout variables, input means reading the data from outside and write it to the tree memory.
+        /// </summary>
         public bool IsInput { get; set; } = true;
 
         /// <summary>

@@ -553,29 +553,92 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        public bool RefreshAfterSwitchVariable(Variable v)
+        public bool RefreshAfterSwitchVariable(Variable variable)
         {
-            if (v == null)
+            if (variable == null)
                 return false;
 
             Action<Variable> processor =
                 (Variable target) =>
                 {
-                    if (target.Value == v.Name && target.IsLocal == !v.IsLocal)
+                    if (target.Value == variable.Name && target.IsLocal == !variable.IsLocal)
                     {
-                        target.IsLocal = v.IsLocal;
+                        target.IsLocal = variable.IsLocal;
                     }
                 };
 
-            ProcessAllVariables(processor);
+            Action<NodeBase> handler =
+            (NodeBase node) =>
+            {
+                if (node is TreeNode)
+                {
+                    if (node is RootTreeNode)
+                        return;
+
+                    TreeMemory treeMemory = m_Tree.TreeMemory;
+
+                    TreeNode treeNode = node as TreeNode;
+                    foreach (var v in treeNode.NodeMemory.Datas)
+                    {
+                        processor(v.Variable);
+                        if (v.Variable.IsElement)
+                        {
+                            processor(v.Variable.VectorIndex);
+                        }
+                    }
+
+                    if (treeNode is SubTreeNode)
+                    {
+                        foreach (var v in (treeNode as SubTreeNode).InOutMemory.InputMemory.Datas)
+                        {
+                            processor(v.Variable);
+                            if (v.Variable.IsElement)
+                            {
+                                processor(v.Variable.VectorIndex);
+                            }
+                        }
+                        foreach (var v in (treeNode as SubTreeNode).InOutMemory.OutputMemory.Datas)
+                        {
+                            processor(v.Variable);
+                            if (v.Variable.IsElement)
+                            {
+                                processor(v.Variable.VectorIndex);
+                            }
+                        }
+                    }
+                }
+            };
+
+            Utility.OperateNode(m_Tree.Root, true, handler);
+            foreach (var tree in m_Forest)
+            {
+                Utility.OperateNode(tree, true, handler);
+            }
+
+            foreach (var v in m_Tree.InOutMemory.InputMemory.Datas)
+            {
+                processor(v.Variable);
+                if (v.Variable.IsElement)
+                {
+                    processor(v.Variable.VectorIndex);
+                }
+            }
+            foreach (var v in m_Tree.InOutMemory.OutputMemory.Datas)
+            {
+                processor(v.Variable);
+                if (v.Variable.IsElement)
+                {
+                    processor(v.Variable.VectorIndex);
+                }
+            }
 
             return true;
         }
 
         public void CheckLocal()
         {
-            Dictionary<VariableHolder, List<bool>> res = new Dictionary<VariableHolder, List<bool>>();
-            Action<Variable> processor = (Variable v) =>
+            Dictionary<VariableHolder, List<Tuple<bool, int>>> res = new Dictionary<VariableHolder, List<Tuple<bool, int>>>();
+            Action<Variable, int, bool> processor = (Variable v, int uid, bool isInput) =>
             {
                 if (v.vbType == Variable.VariableType.VBT_Const)
                     return;
@@ -591,36 +654,14 @@ namespace YBehavior.Editor.Core.New
                 {
                     if (!res.TryGetValue(vh, out var list))
                     {
-                        list = new List<bool>();
+                        list = new List<Tuple<bool, int>>();
                         res.Add(vh, list);
                     }
 
-                    list.Add(v.IsInput);
+                    list.Add(new Tuple<bool, int>(isInput, uid));
                 }
             };
 
-            ProcessAllVariables(processor);
-
-            foreach (var pair in res)
-            {
-                var list = pair.Value;
-                /// Only Input or Output;
-                /// When only input, the data may be from code
-                /// When only output, it may be used in SubTree
-                if (list.Count < 2)
-                    continue;
-
-                /// We only check the first and the last
-                /// If first output and last input, it has high chance of being local 
-                if (!list[0] && list[list.Count - 1])
-                {
-                    Switch(pair.Key.Variable);
-                }
-            }
-        }
-
-        public void ProcessAllVariables(Action<Variable> action)
-        {
             Action<NodeBase> handler =
             (NodeBase node) =>
             {
@@ -634,10 +675,10 @@ namespace YBehavior.Editor.Core.New
                     TreeNode treeNode = node as TreeNode;
                     foreach (var v in treeNode.NodeMemory.Datas)
                     {
-                        action(v.Variable);
+                        processor(v.Variable, (int)node.UID, v.Variable.IsInput);
                         if (v.Variable.IsElement)
                         {
-                            action(v.Variable.VectorIndex);
+                            processor(v.Variable.VectorIndex, (int)node.UID, true);
                         }
                     }
 
@@ -645,23 +686,24 @@ namespace YBehavior.Editor.Core.New
                     {
                         foreach (var v in (treeNode as SubTreeNode).InOutMemory.InputMemory.Datas)
                         {
-                            action(v.Variable);
+                            processor(v.Variable, (int)node.UID, true);
                             if (v.Variable.IsElement)
                             {
-                                action(v.Variable.VectorIndex);
+                                processor(v.Variable.VectorIndex, (int)node.UID, true);
                             }
                         }
                         foreach (var v in (treeNode as SubTreeNode).InOutMemory.OutputMemory.Datas)
                         {
-                            action(v.Variable);
+                            processor(v.Variable, (int)node.UID, false);
                             if (v.Variable.IsElement)
                             {
-                                action(v.Variable.VectorIndex);
+                                processor(v.Variable.VectorIndex, (int)node.UID, true);
                             }
                         }
                     }
                 }
             };
+
 
             Utility.OperateNode(m_Tree.Root, true, handler);
             foreach (var tree in m_Forest)
@@ -669,20 +711,48 @@ namespace YBehavior.Editor.Core.New
                 Utility.OperateNode(tree, true, handler);
             }
 
+            ///> Check the meaning of IsInput of Variable
             foreach (var v in m_Tree.InOutMemory.InputMemory.Datas)
             {
-                action(v.Variable);
+                processor(v.Variable, -1, false);
                 if (v.Variable.IsElement)
                 {
-                    action(v.Variable.VectorIndex);
+                    processor(v.Variable.VectorIndex, -1, true);
                 }
             }
+
+            ///> Check the meaning of IsInput of Variable
             foreach (var v in m_Tree.InOutMemory.OutputMemory.Datas)
             {
-                action(v.Variable);
+                processor(v.Variable, 9999999, true);
                 if (v.Variable.IsElement)
                 {
-                    action(v.Variable.VectorIndex);
+                    processor(v.Variable.VectorIndex, 9999999, true);
+                }
+            }
+
+            foreach (var pair in res)
+            {
+                var list = pair.Value;
+                /// Only Input or Output;
+                /// When only input, the data may be from code
+                /// When only output, it may be used in SubTree
+                if (list.Count < 2)
+                    continue;
+
+                list.Sort(
+                    (Tuple<bool, int> a, Tuple<bool, int> b) => 
+                {
+                    if (a.Item2 == b.Item2)
+                        return -a.Item1.CompareTo(b.Item1);
+                    return a.Item2.CompareTo(b.Item2);
+                }
+                );
+                /// We only check the first and the last
+                /// If first output and last input, it has high chance of being local 
+                if (!list[0].Item1 && list[list.Count - 1].Item1)
+                {
+                    Switch(pair.Key.Variable);
                 }
             }
         }

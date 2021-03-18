@@ -79,6 +79,8 @@ namespace YBehavior.Editor
             WorkBench oldActiveBench = WorkBenchMgr.Instance.ActiveWorkBench;
             foreach (var treename in FileMgr.Instance.TreeList)
             {
+                if (string.IsNullOrEmpty(treename))
+                    continue;
                 var fileinfo = FileMgr.Instance.GetFileInfo(treename);
                 if (fileinfo == null)
                 {
@@ -106,6 +108,8 @@ namespace YBehavior.Editor
             WorkBench oldActiveBench = WorkBenchMgr.Instance.ActiveWorkBench;
             foreach (var treename in FileMgr.Instance.TreeList)
             {
+                if (string.IsNullOrEmpty(treename))
+                    continue;
                 var fileinfo = FileMgr.Instance.GetFileInfo(treename);
                 if (fileinfo == null)
                 {
