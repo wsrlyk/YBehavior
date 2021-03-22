@@ -75,7 +75,7 @@ namespace YBehavior
 		}
 	}
 
-	void BehaviorProcessHelper::Load(const StdVector<STRING>& fsmNames, const StdVector<STRING>& treeNames)
+	void BehaviorProcessHelper::Load(const std::set<STRING>& fsmNames, const std::set<STRING>& treeNames)
 	{
 		std::list<STRING> toLoadTrees;
 		for (const auto& s : fsmNames)
