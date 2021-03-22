@@ -26,7 +26,10 @@ namespace YBehavior
 	public:
 		TreeMgr() {}
 		~TreeMgr();
+		///> AutoLoad and Get a tree for an agent. This will inc the ref count.
 		BehaviorTree * GetTree(const STRING& name);
+		///> Just load a tree. Not inc the ref count.
+		bool LoadTree(const STRING& name, const TreeMap*& pOutputTreeMap);
 		///> Mark this tree dirty to reload it when GetTree
 		void ReloadTree(const STRING& name);
 		void ReloadAll();

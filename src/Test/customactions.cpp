@@ -114,7 +114,7 @@ YBehavior::NodeState GetTargetNameAction::Update(YBehavior::AgentPtr pAgent)
 	const YBehavior::EntityWrapper* currentTarget = m_Target->GetCastedValue(pAgent->GetMemory());
 	if (currentTarget && currentTarget->IsValid())
 	{
-		LOG_BEGIN << ((XAgent*)currentTarget->Get())->GetEntity()->ToString() << LOG_END;
+		LOG_BEGIN << ((XEntity*)currentTarget->Get())->ToString() << LOG_END;
 	}
 	else
 	{

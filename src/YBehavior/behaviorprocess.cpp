@@ -61,4 +61,60 @@ namespace YBehavior
 		Mgrs::Instance()->GetBehaviorMgr()->ReloadAll();
 	}
 
+	void _GetToLoadTrees(const TreeMap* treemap, std::list<STRING>& toLoadTrees)
+	{
+		for (auto it : treemap->Node2Trees)
+		{
+			if (!it.second.empty())
+				toLoadTrees.push_back(it.second);
+		}
+		for (auto it : treemap->Name2Trees)
+		{
+			if (!it.second.empty())
+				toLoadTrees.push_back(it.second);
+		}
+	}
+
+	void BehaviorProcessHelper::Load(const StdVector<STRING>& fsmNames, const StdVector<STRING>& treeNames)
+	{
+		std::list<STRING> toLoadTrees;
+		for (const auto& s : fsmNames)
+		{
+			const TreeMap* treeMap = nullptr;
+			if (!Mgrs::Instance()->GetMachineMgr()->LoadFSM(s, treeMap))
+			{
+				ERROR_BEGIN << "Cant Load FSM " << s << ERROR_END;
+				return;
+			}
+			_GetToLoadTrees(treeMap, toLoadTrees);
+		}
+
+		for (const auto& s : treeNames)
+		{
+			toLoadTrees.push_back(s);
+		}
+
+		std::unordered_set<STRING> loadedTrees;
+
+		while (!toLoadTrees.empty())
+		{
+			auto& treename = toLoadTrees.front();
+			bool visited = !loadedTrees.insert(treename).second;
+
+			if (!visited)
+			{
+				const TreeMap* treeMap = nullptr;
+				if (!Mgrs::Instance()->GetTreeMgr()->LoadTree(treename, treeMap))
+				{
+					ERROR_BEGIN << "Cant Load Tree " << treename << ERROR_END;
+					return;
+				}
+
+				_GetToLoadTrees(treeMap, toLoadTrees);
+			}
+
+			toLoadTrees.pop_front();
+		}
+	}
+
 }

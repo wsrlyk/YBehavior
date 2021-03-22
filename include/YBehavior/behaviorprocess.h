@@ -64,6 +64,8 @@ namespace YBehavior
 		static void ReloadTree(const STRING& name);
 		static void ReloadMachine(const STRING& name);
 		static void ReloadAll();
+
+		static void Load(const StdVector<STRING>& fsmNames, const StdVector<STRING>& treeNames);
 	};
 }
 

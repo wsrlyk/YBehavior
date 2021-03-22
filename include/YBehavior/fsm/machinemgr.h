@@ -35,7 +35,10 @@ namespace YBehavior
 	public:
 		~MachineMgr();
 
+		///> AutoLoad and Get a FSM for an agent. This will inc the ref count.
 		FSM* GetFSM(const STRING& key);
+		///> Just load a FSM. Not inc the ref count.
+		bool LoadFSM(const STRING& key, const TreeMap*& pOutputTreeMap);
 		void SetWorkingDir(const STRING& dir);
 		void ReturnFSM(FSM* pFSM);
 		void ReloadMachine(const STRING& name);

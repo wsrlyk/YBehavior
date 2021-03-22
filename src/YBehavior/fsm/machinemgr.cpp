@@ -57,6 +57,23 @@ namespace YBehavior
 		return pFSM;
 	}
 
+	bool MachineMgr::LoadFSM(const STRING& name, const TreeMap*& pOutputTreeMap)
+	{
+		FSM *pFSM;
+		MachineInfoType* info;
+		if (!m_VersionMgr.GetData(name, pFSM, info))
+		{
+			pFSM = _LoadFSM(name);
+			if (!pFSM)
+				return false;
+			info->SetLatest(pFSM);
+			_BuildStateTreeMapping(pFSM);
+		}
+
+		pOutputTreeMap = &pFSM->GetTreeMap();
+		return true;
+	}
+
 #ifdef SHARP
 #define FSM_EXT TOSTRING(.bytes)
 #else

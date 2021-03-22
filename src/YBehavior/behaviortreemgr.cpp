@@ -129,6 +129,23 @@ namespace YBehavior
 		return tree;
 	}
 
+	bool TreeMgr::LoadTree(const STRING& name, const TreeMap*& pOutputTreeMap)
+	{
+		BehaviorTree *tree;
+		TreeInfoType* info;
+		if (!m_VersionMgr.GetData(name, tree, info))
+		{
+			tree = _LoadTree(name);
+			if (!tree)
+				return false;
+
+			info->SetLatest(tree);
+		}
+
+		pOutputTreeMap = &tree->GetTreeMap();
+		return true;
+	}
+
 	void TreeMgr::ReloadTree(const STRING& name)
 	{
 		m_VersionMgr.Reload(name);

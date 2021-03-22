@@ -24,8 +24,10 @@ int main(int argc, char** argv)
 
 	XAgent::InitData();
 
+	BehaviorProcessHelper::Load({ "EmptyFSM" }, { "SubTree" });
+
 	STRING s;
-	XEntity* pEntity = new XEntity("Hehe", "StateMachine/SimpleFSM", nullptr, nullptr);
+	XEntity* pEntity = new XEntity("Hehe", "EmptyFSM", nullptr, nullptr);
 
 	//pMain->OnEnter(pEntity->GetAgent());
 	while (true)

@@ -143,7 +143,7 @@ namespace YBehavior
 		{
 			KEY key = curActiveNameKeyInfo.mKeyCounter++;
 #ifdef PRINT_INTERMEDIATE_INFO
-			LOG_BEGIN << "ADD node: " << name << "key: " << key << LOG_END;
+			LOG_BEGIN << "ADD key: " << name << " ID: " << key << LOG_END;
 #endif
 			curActiveNameKeyInfo.mNameHash[name] = key;
 
