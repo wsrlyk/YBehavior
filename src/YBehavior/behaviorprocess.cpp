@@ -30,7 +30,7 @@ namespace YBehavior
 
 			Mgrs::Instance()->GetBehaviorMgr()->ReturnBehavior(behaviorProcess.pBehavior);
 			behaviorProcess.machineContext.Reset();
-
+			behaviorProcess.pBehavior = nullptr;
 		}
 	}
 
