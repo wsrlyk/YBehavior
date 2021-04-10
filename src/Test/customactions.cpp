@@ -115,13 +115,13 @@ YBehavior::NodeState GetTargetNameAction::Update(YBehavior::AgentPtr pAgent)
 	if (currentTarget && currentTarget->IsValid())
 	{
 		LOG_BEGIN << ((XEntity*)currentTarget->Get())->ToString() << LOG_END;
+		return YBehavior::NS_SUCCESS;
 	}
 	else
 	{
 		LOG_BEGIN << "No Target" << LOG_END;
+		return YBehavior::NS_FAILURE;
 	}
-
-	return YBehavior::NS_SUCCESS;
 }
 
 bool GetTargetNameAction::OnLoaded(const pugi::xml_node& data)

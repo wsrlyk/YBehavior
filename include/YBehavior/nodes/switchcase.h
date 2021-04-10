@@ -19,7 +19,7 @@ namespace YBehavior
 		}
 	};
 
-	class SwitchCase : public CompositeNode
+	class SwitchCase : public CompositeNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "SwitchCase"; }

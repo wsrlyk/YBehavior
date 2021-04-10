@@ -5,7 +5,7 @@
 
 namespace YBehavior
 {
-	class GetArrayLength : public LeafNode
+	class GetArrayLength : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "GetArrayLength"; }
@@ -18,7 +18,7 @@ namespace YBehavior
 		SharedVariableEx<INT>* m_Length;
 	};
 
-	class ClearArray : public LeafNode
+	class ClearArray : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "ClearArray"; }
@@ -30,7 +30,7 @@ namespace YBehavior
 		ISharedVariableEx* m_Array;
 	};
 
-	class ArrayPushElement : public LeafNode
+	class ArrayPushElement : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "ArrayPushElement"; }
@@ -43,7 +43,7 @@ namespace YBehavior
 		ISharedVariableEx* m_Element;
 	};
 
-	class IsArrayEmpty : public LeafNode
+	class IsArrayEmpty : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "IsArrayEmpty"; }
@@ -55,7 +55,7 @@ namespace YBehavior
 		ISharedVariableEx* m_Array;
 	};
 
-	class GenIndexArray : public LeafNode
+	class GenIndexArray : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "GenIndexArray"; }

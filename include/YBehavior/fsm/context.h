@@ -6,6 +6,7 @@
 #include <list>
 #include "transition.h"
 #include "machinestate.h"
+#include <stack>
 
 namespace YBehavior
 {
@@ -59,6 +60,18 @@ namespace YBehavior
 		inline std::list<TransQueueData>& GetTransQueue() { return m_pTransQueue; }
 
 		void Reset();
+	};
+
+	class TreeNodeContext;
+	class TreeContext
+	{
+	protected:
+		std::stack<TreeNodeContext*> m_CallStack;
+	public:
+		void PushCallStack(TreeNodeContext* context) { m_CallStack.push(context); }
+		TreeNodeContext* GetCallStackTop() { if (m_CallStack.empty()) return nullptr; return m_CallStack.top(); }
+		void PopCallStack() { if (!m_CallStack.empty()) m_CallStack.pop(); }
+		bool IsCallStackEmpty() { return m_CallStack.empty(); }
 	};
 }
 

@@ -5,7 +5,7 @@
 
 namespace YBehavior
 {
-	class SubTree : public LeafNode
+	class SubTree : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "SubTree"; }

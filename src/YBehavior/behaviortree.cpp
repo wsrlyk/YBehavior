@@ -18,435 +18,40 @@
 
 namespace YBehavior
 {
-#ifdef YDEBUGGER
-#define DEBUG_RETURN(helper, rawres, finalres)\
-	{\
-		helper.SetResult(rawres, finalres);\
-		return (finalres);\
-	}
-#else
-#define DEBUG_RETURN(helper, rawres, finalres)\
-	return (finalres)
-#endif
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	//Bimap<NodeState, STRING, EnumClassHash> s_NodeStateMap = {
-	//	{ NS_SUCCESS, "SUCCESS" },{ NS_FAILURE, "FAILURE" },{ NS_RUNNING, "RUNNING" },{ NS_BREAK, "BREAK" },{ NS_INVALID, "INVALID" }
-	//};
-
-	BehaviorNode::BehaviorNode()
+	YBehavior::NodeState BehaviorTreeContext::_Update(AgentPtr pAgent, NodeState lastState)
 	{
-		m_Parent = nullptr;
-		m_Condition = nullptr;
-		m_RunningContext = nullptr;
-		m_ContextCreator = nullptr;
-		m_Root = nullptr;
-		m_ReturnType = RT_DEFAULT;
-	}
-
-
-	BehaviorNode::~BehaviorNode()
-	{
-		if (m_Condition != nullptr)
-			delete m_Condition;
-
-		for (auto it = m_Variables.begin(); it != m_Variables.end(); ++it)
+		BehaviorTree* pTree = (BehaviorTree*)m_pNode;
+		if (m_Stage == 0)
 		{
-			delete *it;
+			pAgent->GetMemory()->Push(pTree);
+
+			if (m_pLocalMemoryInOut)
+				m_pLocalMemoryInOut->OnInput(&pTree->m_Inputs);
 		}
-		m_Variables.clear();
-		_TryDeleteRC();
-	}
+//#ifdef YPROFILER
+//		profiler.Pause();
+//#endif
+		NodeState res = SingleChildNodeContext::_Update(pAgent, lastState);
 
-	std::unordered_set<STRING> BehaviorNode::KEY_WORDS = { "Class", "Pos", "NickName" };
+//#ifdef YPROFILER
+//		profiler.Resume();
+//#endif
 
-#ifdef YDEBUGGER
-	bool BehaviorNode::HasLogPoint()
-	{
-		return m_pDebugHelper && m_pDebugHelper->HasDebugPoint();
-	}
-
-	void BehaviorNode::LogSharedData(ISharedVariableEx* pVariable, bool bIsBefore)
-	{
-		m_pDebugHelper->LogSharedData(pVariable, bIsBefore);
-	}
-#endif
-	BehaviorNode* BehaviorNode::CreateNodeByName(const STRING& name)
-	{
-		return NodeFactory::Instance()->Get(name);
-	}
-
-	YBehavior::NodeState BehaviorNode::Execute(AgentPtr pAgent, NodeState parentState)
-	{
-#ifdef YPROFILER
-		Profiler::TreeNodeProfileHelper pfHelper(this);
-		m_pProfileHelper = &pfHelper;
-#endif
-#ifdef YDEBUGGER
-		DebugTreeHelper dbgHelper(pAgent, this);
-		m_pDebugHelper = &dbgHelper;
-#endif
-		NodeState state = NS_INVALID;
-		do
+		if (m_Stage == 2)
 		{
-
-			if (parentState == NS_RUNNING)
-				m_RunningContext = pAgent->PopRC();
-			else
-				m_RunningContext = nullptr;
-			///> check condition
-			if (m_Condition != nullptr)
-			{
-				bool bBreak = false;
-				PROFILER_PAUSE;
-				state = m_Condition->Execute(pAgent, m_RunningContext && m_RunningContext->IsRunningInCondition() ? NS_RUNNING : NS_INVALID);
-				PROFILER_RESUME;
-
-				switch (state)
-				{
-				case YBehavior::NS_FAILURE:
-					_TryDeleteRC();
-					//DEBUG_RETURN(dbgHelper, res);
-					bBreak = true;
-					break;
-				case YBehavior::NS_RUNNING:
-					TryCreateRC();
-					m_RunningContext->SetRunningInCondition(true);
-					_TryPushRC(pAgent);
-					//DEBUG_RETURN(dbgHelper, res);
-					bBreak = true;
-					break;
-				default:
-					break;
-				}
-				if (m_RunningContext)
-					m_RunningContext->SetRunningInCondition(false);
-
-				if (bBreak)
-					break;
-			}
-
-			///> check breakpoint
-#ifdef YDEBUGGER
-			dbgHelper.TryBreaking();
-#endif
-
-			//////////////////////////////////////////////////////////////////////////
-
-
-			state = this->Update(pAgent);
-			///> If not resume in the Update, resume here
-			PROFILER_RESUME;
-
-			switch (state)
-			{
-			case YBehavior::NS_RUNNING:
-				TryCreateRC();
-				m_RunningContext->SetRunningInCondition(false);
-				_TryPushRC(pAgent);
-				break;
-			default:
-				_TryDeleteRC();
-				break;
-			}
-
-			///> postprocessing
-#ifdef YDEBUGGER
-			dbgHelper.TryPause();
-			m_pDebugHelper = nullptr;
-#endif
-		} while (false);
-
-#ifdef YPROFILER
-		m_pProfileHelper = nullptr;
-#endif
-
-		NodeState finalState = state;
-
-		if (state != NS_RUNNING && state != NS_BREAK)
-		{
-			switch (m_ReturnType)
-			{
-			case YBehavior::RT_INVERT:
-				if (state == NS_SUCCESS)
-					finalState = NS_FAILURE;
-				else if (state == NS_FAILURE)
-					finalState = NS_SUCCESS;
-				break;
-			case YBehavior::RT_SUCCESS:
-				finalState = NS_SUCCESS;
-				break;
-			case YBehavior::RT_FAILURE:
-				finalState = NS_FAILURE;
-				break;
-			default:
-				break;
-			}
+			if (m_pLocalMemoryInOut)
+				m_pLocalMemoryInOut->OnOutput(&pTree->m_Outputs);
+			///> Pop the local data
+			pAgent->GetMemory()->Pop();
 		}
-		DEBUG_RETURN(dbgHelper, state, finalState);
+		return res;
 	}
-
-	bool BehaviorNode::Load(const pugi::xml_node& data)
-	{
-		auto returnType = data.attribute("Return");
-		if (!returnType.empty())
-		{
-			STRING s(returnType.value());
-			if (s == "Invert")
-				m_ReturnType = RT_INVERT;
-			else if (s == "Success")
-				m_ReturnType = RT_SUCCESS;
-			else if (s == "Failure")
-				m_ReturnType = RT_FAILURE;
-			else
-				m_ReturnType = RT_DEFAULT;
-		}
-
-		return OnLoaded(data);
-	}
-
-	bool BehaviorNode::LoadChild(const pugi::xml_node& data)
-	{
-		return OnLoadChild(data);
-	}
-
-	void BehaviorNode::LoadFinish()
-	{
-		OnLoadFinish();
-	}
-
-	bool BehaviorNode::AddChild(BehaviorNode* child, const STRING& connection)
-	{
-		if (connection == "condition")
-		{
-			if (m_Condition == nullptr)
-			{
-				m_Condition = child;
-				child->SetParent(this);
-				return true;
-			}
-
-			ERROR_BEGIN_NODE_HEAD << "Too many Condition Node" << ERROR_END;
-			return false;
-		}
-		else
-		{
-			return _AddChild(child, connection);
-		}
-	}
-
-	bool BehaviorNode::_AddChild(BehaviorNode* child, const STRING& connection)
-	{
-		ERROR_BEGIN_NODE_HEAD << "Cant add child to this node" << ERROR_END;
-		return false;
-	}
-
-	bool BehaviorNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, char variableType)
-	{
-		auto tempChar = attri.value();
-		///> split all spaces
-		Utility::SplitString(tempChar, buffer, Utility::SpaceSpliter);
-		if (buffer.size() == 0 || buffer[0].length() < 3)
-		{
-			ERROR_BEGIN_NODE_HEAD << "Format Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
-			return false;
-		}
-
-		if (single != ST_NONE)
-		{
-			if (!((single == ST_SINGLE) ^ (buffer[0][0] == buffer[0][1])))
-			{
-				ERROR_BEGIN_NODE_HEAD << "Single or Vector Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
-				return false;
-			}
-		}
-
-		if (variableType != 0)
-		{
-			if (Utility::ToLower(buffer[0][2]) != Utility::ToLower(variableType))
-			{
-				ERROR_BEGIN_NODE_HEAD << "VariableType Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
-				return false;
-			}
-		}
-
-		if (buffer.size() == 1)
-			buffer.push_back("");
-
-		return true;
-	}
-
-	YBehavior::RunningContext* BehaviorNode::_CreateRC() const
-	{
-		RunningContext* pRC;
-		if (m_ContextCreator)
-			pRC = m_ContextCreator->NewRC();
-		else
-			pRC = ObjectPoolStatic<RunningContext>::Get();
-		pRC->Reset();
-		return pRC;
-	}
-
-	void BehaviorNode::TryCreateRC()
-	{
-		if (!m_RunningContext)
-		{
-			m_RunningContext = _CreateRC();
-			m_RunningContext->SetUID(m_UID);
-		}
-	}
-
-	void BehaviorNode::_TryDeleteRC()
-	{
-		if (m_RunningContext)
-		{
-			if (m_ContextCreator)
-				m_ContextCreator->ReleaseRC(m_RunningContext);
-			else
-				ObjectPoolStatic<RunningContext>::Recycle(m_RunningContext);
-			m_RunningContext = nullptr;
-		}
-	}
-
-	void BehaviorNode::_TryPushRC(AgentPtr agent)
-	{
-		if (m_RunningContext && agent)
-		{
-			agent->PushRC(m_RunningContext);
-			m_RunningContext = nullptr;
-		}
-	}
-
-	void BehaviorNode::_TryPopRC(AgentPtr agent)
-	{
-		_TryDeleteRC();
-		if (agent)
-		{
-			m_RunningContext = agent->PopRC();
-		}
-	}
-
-	STRING BehaviorNode::GetValue(const STRING& attriName, const pugi::xml_node& data)
-	{
-		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
-
-		if (attrOptr.empty())
-		{
-			ERROR_BEGIN_NODE_HEAD << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
-			return "";
-		}
-		StdVector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, ST_SINGLE, Utility::CONST_CHAR))
-			return "";
-
-		return buffer[1];
-	}
-
-	bool BehaviorNode::TryGetValue(const STRING & attriName, const pugi::xml_node & data, STRING& output)
-	{
-		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
-
-		if (attrOptr.empty())
-			return false;
-		StdVector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, ST_SINGLE, Utility::CONST_CHAR))
-			return false;
-
-		output = buffer[1];
-		return true;
-	}
-
-	TYPEID BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType, const STRING& defaultCreateStr)
-	{
-		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
-		op = nullptr;
-		if (attrOptr.empty())
-		{
-			if (variableType != Utility::POINTER_CHAR && defaultCreateStr.length() > 0)
-			{
-				const ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(defaultCreateStr);
-				if (helper != nullptr)
-				{
-					op = helper->CreateVariable();
-					m_Variables.push_back(op);
-
-#ifdef YDEBUGGER
-					op->SetName(attriName, this->GetClassName());
-#endif
-
-					return op->TypeID();
-				}
-				else
-				{
-					ERROR_BEGIN_NODE_HEAD << "DefaultCreateStr " << defaultCreateStr << " ERROR for attribute" << attriName << " in " << data.name() << ERROR_END;
-					return -1;
-				}
-			}
-			ERROR_BEGIN_NODE_HEAD << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
-			return -1;
-		}
-		return _CreateVariable(op, attrOptr, data, variableType);
-	}
-
-	YBehavior::TYPEID BehaviorNode::CreateVariableIfExist(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType /*= 0*/)
-	{
-		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
-		op = nullptr;
-		if (attrOptr.empty())
-			return -1;
-		return _CreateVariable(op, attrOptr, data, variableType);
-	}
-
-	TYPEID BehaviorNode::_CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, char variableType)
-	{
-		StdVector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, ST_NONE, variableType))
-			return -1;
-
-		const ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
-		if (helper != nullptr)
-		{
-			op = helper->CreateVariable();
-			m_Variables.push_back(op);
-
-			///> Vector Index
-			if (buffer.size() >= 5 && buffer[2] == "VI")
-			{
-				op->SetVectorIndex(buffer[3], buffer[4]);
-			}
-
-			if (Utility::ToUpper(buffer[0][2]) == Utility::POINTER_CHAR)
-			{
-				op->SetKeyFromString(buffer[1]);
-				op->SetIsLocal(Utility::IsLower(buffer[0][2]));
-			}
-			else
-				op->SetValueFromString(buffer[1]);
-
-#ifdef YDEBUGGER
-			op->SetName(attrOptr.name(), this->GetClassName());
-#endif
-
-			return op->TypeID();
-		}
-		else
-		{
-			ERROR_BEGIN_NODE_HEAD << "Get VariableCreateHelper Failed: " << buffer[0].substr(0, 2) << ERROR_END;
-			return -1;
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-
 
 	BehaviorTree::BehaviorTree(const STRING& name)
 	{
 		m_TreeNameWithPath = name;
 		m_TreeName = Utility::GetNameFromPath(m_TreeNameWithPath);
-		
+
 		m_SharedData = new SharedDataEx();
 		m_LocalData = nullptr;
 		//m_NameKeyMgr = new NameKeyMgr();
@@ -502,7 +107,7 @@ namespace YBehavior
 				}
 				if (container.count(it->name()) > 0)
 				{
-					ERROR_BEGIN_NODE_HEAD << "Duplicate "<< data.name() << " Variable: " << it->name() << ERROR_END;
+					ERROR_BEGIN_NODE_HEAD << "Duplicate " << data.name() << " Variable: " << it->name() << ERROR_END;
 					return false;
 				}
 				container[it->name()] = pVariable;
@@ -557,6 +162,17 @@ namespace YBehavior
 		return res;
 	}
 
+	YBehavior::TreeNodeContext* BehaviorTree::CreateRootContext(LocalMemoryInOut* pTunnel /*= nullptr*/)
+	{
+		NodeContextType* pContext = (NodeContextType*)CreateContext();
+		pContext->Init(pTunnel);
+		return pContext;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+
+
 	LocalMemoryInOut::LocalMemoryInOut(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo)
 		: m_pAgent(pAgent)
 		, m_pInputsFrom(pInputsFrom)
@@ -607,81 +223,4 @@ namespace YBehavior
 			}
 		}
 	}
-
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-
-	SingleChildNode::SingleChildNode()
-		: m_Child(nullptr)
-	{
-
-	}
-
-	void SingleChildNode::OnAddChild(BehaviorNode* child, const STRING& connection)
-	{
-		if (m_Child == nullptr)
-			m_Child = child;
-		else
-		{
-			ERROR_BEGIN_NODE_HEAD << "There're more than 1 children" << ERROR_END;
-			return;
-		}
-	}
-
-	YBehavior::NodeState SingleChildNode::Update(AgentPtr pAgent)
-	{
-		if (m_Child)
-			return m_Child->Execute(pAgent, m_RunningContext ? NS_RUNNING : NS_INVALID);
-
-		return NS_FAILURE;
-	}
-
-
-	BranchNode::BranchNode()
-	{
-		m_Childs = nullptr;
-	}
-
-	BranchNode::~BranchNode()
-	{
-		_DestroyChilds();
-	}
-
-	BehaviorNodePtr BranchNode::GetChild(UINT index)
-	{
-		if (m_Childs && index < m_Childs->size())
-			return (*m_Childs)[index];
-
-		return nullptr;
-	}
-
-
-	bool BranchNode::_AddChild(BehaviorNode* child, const STRING& connection)
-	{
-		if (child == nullptr)
-			return false;
-
-		if (!m_Childs)
-			m_Childs = new StdVector<BehaviorNodePtr>();
-
-		m_Childs->push_back(child);
-		child->SetParent(this);
-
-		OnAddChild(child, connection);
-
-		return true;
-	}
-
-	void BranchNode::_DestroyChilds()
-	{
-		if (m_Childs)
-		{
-			for(auto it = m_Childs->begin(); it != m_Childs->end(); ++it)
-			{
-				delete (*it);
-			}
-			delete m_Childs;
-		}
-	}
-
 }

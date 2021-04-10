@@ -7,7 +7,7 @@
 
 namespace YBehavior
 {
-	class Comparer : public LeafNode
+	class Comparer : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "Comparer"; }

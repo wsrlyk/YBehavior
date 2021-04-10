@@ -7,7 +7,7 @@
 
 namespace YBehavior
 {
-	class Selector : public CompositeNode
+	class Selector : public CompositeNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "Selector"; }
@@ -21,7 +21,7 @@ namespace YBehavior
 		ContextContainer<VectorTraversalContext> m_RCContainer;
 	};
 
-	class RandomSelector : public CompositeNode
+	class RandomSelector : public CompositeNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "RandomSelector"; }

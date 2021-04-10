@@ -5,7 +5,7 @@
 
 namespace YBehavior
 {
-	class Action : public LeafNode
+	class Action : public LeafNode<>
 	{
 	public:
 		Action();

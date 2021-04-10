@@ -5,7 +5,7 @@
 
 namespace YBehavior
 {
-	class FSMSetCondition : public LeafNode
+	class FSMSetCondition : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "FSMSetCondition"; }
@@ -18,7 +18,7 @@ namespace YBehavior
 		bool m_IsOn;
 	};
 
-	class FSMClearConditions : public LeafNode
+	class FSMClearConditions : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "FSMClearConditions"; }

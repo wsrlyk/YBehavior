@@ -6,7 +6,7 @@
 
 namespace YBehavior
 {
-	class Random : public LeafNode
+	class Random : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "Random"; }
@@ -22,7 +22,7 @@ namespace YBehavior
 		TYPEID m_DataType;
 	};
 
-	class RandomSelect : public LeafNode
+	class RandomSelect : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "RandomSelect"; }
@@ -37,7 +37,7 @@ namespace YBehavior
 		TYPEID m_DataType;
 	};
 
-	class Shuffle : public LeafNode
+	class Shuffle : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "Shuffle"; }

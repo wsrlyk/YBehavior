@@ -6,7 +6,7 @@
 
 namespace YBehavior
 {
-	class PiecewiseFunction : public LeafNode
+	class PiecewiseFunction : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "PiecewiseFunction"; }

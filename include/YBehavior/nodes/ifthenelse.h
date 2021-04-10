@@ -25,7 +25,7 @@ namespace YBehavior
 		}
 	};
 
-	class IfThenElse : public BranchNode
+	class IfThenElse : public CompositeNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "IfThenElse"; }

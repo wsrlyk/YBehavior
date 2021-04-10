@@ -6,7 +6,7 @@
 
 namespace YBehavior
 {
-	class Calculator : public LeafNode
+	class Calculator : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "Calculator"; }

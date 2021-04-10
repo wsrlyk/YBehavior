@@ -6,7 +6,7 @@
 
 namespace YBehavior
 {
-	class ReadRegister : public LeafNode
+	class ReadRegister : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "ReadRegister"; }
@@ -23,7 +23,7 @@ namespace YBehavior
 		SharedVariableEx<VecString>* m_String;
 	};
 
-	class WriteRegister : public LeafNode
+	class WriteRegister : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "WriteRegister"; }

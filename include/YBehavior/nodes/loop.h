@@ -30,7 +30,7 @@ namespace YBehavior
 		}
 	};
 
-	class For : public CompositeNode
+	class For : public CompositeNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "For"; }
@@ -53,7 +53,7 @@ namespace YBehavior
 		ContextContainer<ForContext> m_RCContainer;
 	};
 
-	class ForEach : public SingleChildNode
+	class ForEach : public SingleChildNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "ForEach"; }
@@ -71,7 +71,7 @@ namespace YBehavior
 		ContextContainer<VectorTraversalContext> m_RCContainer;
 	};
 
-	class Loop : public SingleChildNode
+	class Loop : public SingleChildNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "Loop"; }

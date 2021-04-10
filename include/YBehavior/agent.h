@@ -46,6 +46,7 @@ namespace YBehavior
 		inline Behavior* GetBehavior() { return m_Process.pBehavior; }
 		inline Memory* GetMemory() { return &m_Process.memory; }
 		inline MachineContext* GetMachineContext() { return &m_Process.machineContext; }
+		inline TreeContext* GetTreeContext() { return &m_Process.treeContext; }
 		//inline SharedDataEx* GetSharedData() { return m_SharedData; }
 		//inline BehaviorTree* GetTree() { return m_Tree; }
 		inline BehaviorTree* GetRunningTree() { return m_Process.machineContext.GetCurRunningTree(); }
@@ -65,6 +66,7 @@ namespace YBehavior
 		void PushRC(RunningContext* context);
 		void ClearRC();
 		bool IsRCEmpty() { return m_RunningContexts.empty(); }
+
 	protected:
 		virtual void _OnProcessRegister() {}
 	};

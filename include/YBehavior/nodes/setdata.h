@@ -5,7 +5,7 @@
 
 namespace YBehavior
 {
-	class SetData : public LeafNode
+	class SetData : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "SetData"; }

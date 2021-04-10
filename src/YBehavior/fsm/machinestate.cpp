@@ -8,6 +8,7 @@
 #ifdef YDEBUGGER
 #include "YBehavior/debugger.h"
 #endif
+#include "YBehavior/runningcontext.h"
 
 namespace YBehavior
 {
@@ -87,8 +88,42 @@ namespace YBehavior
 		if (pTree)
 		{
 			pAgent->GetMachineContext()->SetCurRunning(pTree);
-			NodeState ns = pTree->RootExecute(pAgent, pAgent->IsRCEmpty() ? NS_INVALID : NS_RUNNING);
-			switch (ns)
+
+			auto treeContext = pAgent->GetTreeContext();
+			NodeState lastState = NS_INVALID;
+			if (treeContext->IsCallStackEmpty())
+			{
+				treeContext->PushCallStack(pTree->CreateRootContext());
+				lastState = NS_RUNNING;
+			}
+
+			while (!treeContext->IsCallStackEmpty())
+			{
+				auto pContext = treeContext->GetCallStackTop();
+				NodeState ns = pContext->Execute(pAgent, lastState);
+				if (ns == NS_BREAK)
+				{
+					lastState = ns;
+					break;
+				}
+				if (ns == NS_RUNNING)
+				{
+					if (treeContext->GetCallStackTop() == pContext)
+					{
+						lastState = ns;
+						break;
+					}
+				}
+				else if (ns != NS_INVALID)
+				{
+					treeContext->PopCallStack();
+					pContext->GetTreeNode()->DestroyContext(pContext);
+				}
+				lastState = ns;
+			}
+
+			////////NodeState ns = pTree->RootExecute(pAgent, pAgent->IsRCEmpty() ? NS_INVALID : NS_RUNNING);
+			switch (lastState)
 			{
 			case YBehavior::NS_BREAK:
 				return MRR_Break;

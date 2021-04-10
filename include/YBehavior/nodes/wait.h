@@ -16,7 +16,7 @@ namespace YBehavior
 			Current = 0;
 		}
 	};
-	class Wait : public LeafNode
+	class Wait : public LeafNode<>
 	{
 	public:
 		STRING GetClassName() const override { return "Wait"; }

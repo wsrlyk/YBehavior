@@ -1,4 +1,5 @@
 #include "YBehavior/runningcontext.h"
+#include "YBehavior/agent.h"
 
 void YBehavior::RunningContext::Reset()
 {
@@ -18,3 +19,4 @@ void YBehavior::RandomVectorTraversalContext::_OnReset()
 	VectorTraversalContext::_OnReset();
 	IndexList.clear();
 }
+

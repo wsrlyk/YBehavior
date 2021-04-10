@@ -7,8 +7,17 @@
 
 namespace YBehavior
 {
-	class Sequence : public CompositeNode
+	class SequenceNodeContext : public CompositeNodeContext
 	{
+	protected:
+		void _OnInit() override;
+		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
+		IndexIterator m_Iterator;
+	};
+
+	class Sequence : public CompositeNode<SequenceNodeContext>
+	{
+		friend SequenceNodeContext;
 	public:
 		STRING GetClassName() const override { return "Sequence"; }
 		Sequence()
@@ -20,8 +29,14 @@ namespace YBehavior
 		IndexIterator m_Iterator;
 		ContextContainer<VectorTraversalContext> m_RCContainer;
 	};
+	class RandomSequenceNodeContext : public SequenceNodeContext
+	{
+	protected:
+		void _OnInit() override;
+		RandomIndex m_RandomIndex;
+	};
 
-	class RandomSequence : public CompositeNode
+	class RandomSequence : public CompositeNode<RandomSequenceNodeContext>
 	{
 	public:
 		STRING GetClassName() const override { return "RandomSequence"; }

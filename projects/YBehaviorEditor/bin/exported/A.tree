@@ -1,14 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <A>
   <Node Class="Root">
-    <Shared a="_IC 11" e="_AC " />
+    <Shared e="_AC " />
+    <Local a="_Ic 11" />
     <Node Class="Sequence">
       <Node Class="SelectTargetAction" Target="_AP e" />
       <Node Class="GetTargetNameAction" Target="_APE e" />
-      <Node Class="SetData" Target="_IP a" Source="_IC 0" />
-      <Node Class="Sequence">
-        <Node Class="Comparer" Return="Success" Operator="_EC ==" Opl="_IP a" Opr="_IC 0" />
-      </Node>
+      <Node Class="SetData" Target="_Ip a" Source="_IC 0" />
     </Node>
   </Node>
 </A>
