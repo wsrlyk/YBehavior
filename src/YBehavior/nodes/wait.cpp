@@ -20,20 +20,21 @@ namespace YBehavior
 		return true;
 	}
 
-	YBehavior::NodeState Wait::Update(AgentPtr pAgent)
+	void WaitNodeContext::_OnInit()
 	{
-		IF_HAS_LOG_POINT
-		{
-			LOG_SHARED_DATA(m_TickCount, true);
-		}
+		TreeNodeContext::_OnInit();
+		m_Count = 0;
+	}
 
+	NodeState WaitNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
+	{
+		Wait* pNode = (Wait*)m_pNode;
 		INT tickCount = 0;
-		m_TickCount->GetCastedValue(pAgent->GetMemory(), tickCount);
-		m_RCContainer.CreateRC(this);
-
-		if (++m_RCContainer.GetRC()->Current >= tickCount)
+		pNode->m_TickCount->GetCastedValue(pAgent->GetMemory(), tickCount);
+		if (++m_Count >= tickCount)
 			return NS_SUCCESS;
-		DEBUG_LOG_INFO("Tick " << m_RCContainer.GetRC()->Current << "; ");
+		
 		return NS_RUNNING;
 	}
+
 }

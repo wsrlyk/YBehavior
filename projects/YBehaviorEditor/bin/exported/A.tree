@@ -2,11 +2,30 @@
 <A>
   <Node Class="Root">
     <Shared e="_AC " />
-    <Local a="_Ic 11" />
+    <Local a="_Ic 11" b="_Ic 0" aa="IIc 1|2|3" />
     <Node Class="Sequence">
       <Node Class="SelectTargetAction" Target="_AP e" />
       <Node Class="GetTargetNameAction" Target="_APE e" />
       <Node Class="SetData" Target="_Ip a" Source="_IC 0" />
+      <Node Class="Loop" Count="_IC 3" Current="_Ip b" ExitWhenFailure="_BC F">
+        <Node Class="Calculator" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_IC 1" />
+      </Node>
+      <Node Class="For" ExitWhenFailure="_BC F">
+        <Node Class="SetData" Connection="init" Target="_Ip b" Source="_IC 0" />
+        <Node Class="Comparer" Connection="cond" Operator="_EC &lt;" Opl="_Ip b" Opr="_IC 3" />
+        <Node Class="Calculator" Connection="inc" Operator="_EC +" Opl="_Ip b" Opr1="_Ip b" Opr2="_IC 1" />
+        <Node Class="Calculator" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_IC 1" />
+      </Node>
+      <Node Class="ForEach" Collection="IIp aa" Current="_Ip b" ExitWhenFailure="_BC F">
+        <Node Class="Calculator" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_Ip b" />
+      </Node>
+      <Node Class="SwitchCase" Switch="_Ip b" Cases="IIp aa">
+        <Node Class="Calculator" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_Ic 100" />
+        <Node Class="Calculator" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_Ic 200" />
+        <Node Class="Calculator" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_Ic 300" />
+        <Node Class="Calculator" Connection="default" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_Ic 400" />
+      </Node>
+      <Node Class="SubTree" Tree="_SC AA" Identification="_SC " />
     </Node>
   </Node>
 </A>

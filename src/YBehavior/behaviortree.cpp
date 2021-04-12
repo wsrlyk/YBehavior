@@ -174,13 +174,18 @@ namespace YBehavior
 
 
 	LocalMemoryInOut::LocalMemoryInOut(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo)
-		: m_pAgent(pAgent)
-		, m_pInputsFrom(pInputsFrom)
-		, m_pOutputsTo(pOutputsTo)
-		, m_TempMemory(pAgent->GetMemory()->GetMainData(), pAgent->GetMemory()->GetStackTop())
 	{
+		Set(pAgent, pInputsFrom, pOutputsTo);
 	}
 
+
+	void LocalMemoryInOut::Set(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo)
+	{
+		m_pAgent = pAgent;
+		m_pInputsFrom = pInputsFrom;
+		m_pOutputsTo = pOutputsTo;
+		m_TempMemory.Set(pAgent->GetMemory()->GetMainData(), pAgent->GetMemory()->GetStackTop());
+	}
 
 	void LocalMemoryInOut::OnInput(std::unordered_map<STRING, ISharedVariableEx*>* pInputsTo)
 	{

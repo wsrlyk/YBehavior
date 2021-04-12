@@ -20,91 +20,6 @@ namespace YBehavior
 		GetTypeID<VecUint64>(),
 	};
 
-	NodeState SwitchCase::Update(AgentPtr pAgent)
-	{
-		IF_HAS_LOG_POINT
-		{
-			LOG_SHARED_DATA(m_Switch, true);
-			LOG_SHARED_DATA(m_Cases, true);
-		}
-
-		if ((INT)m_CasesChilds.size() != m_Cases->VectorSize(pAgent->GetMemory()))
-		{
-			ERROR_BEGIN_NODE_HEAD << "Cases size not match" << ERROR_END;
-			return NS_FAILURE;
-		}
-
-		NodeState ns = NS_FAILURE;
-		int current = -2;
-		m_RCContainer.ConvertRC(this);
-
-		if (m_RCContainer.GetRC())
-		{
-			ns = NS_RUNNING;
-			current = m_RCContainer.GetRC()->Current;
-		}
-
-		INT size = (INT)m_CasesChilds.size();
-		BehaviorNodePtr targetNode = nullptr;
-		switch (current)
-		{
-		case -2:
-		{
-			IVariableOperationHelper* pHelper = m_Switch->GetOperation();
-
-			for (INT i = 0; i < size; ++i)
-			{
-				const void* onecase = m_Cases->GetElement(pAgent->GetMemory(), i);
-				if (onecase == nullptr)
-					continue;
-
-				if (pHelper->Compare(m_Switch->GetValue(pAgent->GetMemory()), onecase, OT_EQUAL))
-				{
-					DEBUG_LOG_INFO("Switch to case " << Utility::ToString(m_CasesChilds[i]->GetUID()) << "; ");
-					targetNode = m_CasesChilds[i];
-					current = i;
-					break;
-				}
-			}
-			if (targetNode == nullptr)
-			{
-				targetNode = m_DefaultChild;
-				current = -1;
-			}
-			break;
-		}
-		case -1:
-		{
-			DEBUG_LOG_INFO("Switch to default; ");
-			targetNode = m_DefaultChild;
-			break;
-		}
-		default:
-		{
-			if (0 <= current && current < size)
-			{
-				DEBUG_LOG_INFO("Switch to case " << Utility::ToString(m_CasesChilds[current]->GetUID()) << "; ");
-				targetNode = m_CasesChilds[current];
-			}
-			break;
-		}
-		}
-
-		if (targetNode)
-		{
-			PROFILER_PAUSE;
-			ns = targetNode->Execute(pAgent, ns);
-			PROFILER_RESUME;
-			if (ns == NS_RUNNING)
-			{
-				m_RCContainer.CreateRC(this);
-				m_RCContainer.GetRC()->Current = current;
-			}
-			return ns;
-		}
-		return NS_FAILURE;
-	}
-
 	bool SwitchCase::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID switchType = CreateVariable(m_Switch, "Switch", data);
@@ -145,6 +60,50 @@ namespace YBehavior
 		else
 		{
 			m_CasesChilds.push_back(child);
+		}
+	}
+
+	YBehavior::NodeState SwitchCaseNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
+	{
+		SwitchCase* pNode = (SwitchCase*)m_pNode;
+		if (m_Stage == 0)
+		{
+			++m_Stage;
+			if ((INT)pNode->m_CasesChilds.size() != pNode->m_Cases->VectorSize(pAgent->GetMemory()))
+			{
+				return NS_FAILURE;
+			}
+
+			INT size = (INT)pNode->m_CasesChilds.size();
+			BehaviorNodePtr targetNode = nullptr;
+			IVariableOperationHelper* pHelper = pNode->m_Switch->GetOperation();
+
+			for (INT i = 0; i < size; ++i)
+			{
+				const void* onecase = pNode->m_Cases->GetElement(pAgent->GetMemory(), i);
+				if (onecase == nullptr)
+					continue;
+
+				if (pHelper->Compare(pNode->m_Switch->GetValue(pAgent->GetMemory()), onecase, OT_EQUAL))
+				{
+					targetNode = pNode->m_CasesChilds[i];
+					break;
+				}
+			}
+			if (targetNode == nullptr)
+			{
+				targetNode = pNode->m_DefaultChild;
+			}
+
+			if (targetNode == nullptr)
+				return NS_FAILURE;
+
+			pAgent->GetTreeContext()->PushCallStack(targetNode->CreateContext());
+			return NS_RUNNING;
+		}
+		else
+		{
+			return lastState;
 		}
 	}
 

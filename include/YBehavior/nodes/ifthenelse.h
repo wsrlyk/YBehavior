@@ -6,41 +6,30 @@
 
 namespace YBehavior
 {
-	enum IfThenElsePhase
+	enum struct IfThenElsePhase
 	{
-		ITE_Normal,
-		ITE_If,
-		ITE_Then,
-		ITE_Else,
+		None,
+		If,
+		ThenElse,
 	};
 
-	class IfThenElseContext : public RunningContext
+	class IfThenElseNodeContext : public CompositeNodeContext
 	{
-	public:
-		IfThenElsePhase Current = ITE_Normal;
 	protected:
-		void _OnReset() override
-		{
-			Current = ITE_Normal;
-		}
+		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
 	};
 
-	class IfThenElse : public CompositeNode<>
+	class IfThenElse : public CompositeNode<IfThenElseNodeContext>
 	{
+		friend IfThenElseNodeContext;
 	public:
 		STRING GetClassName() const override { return "IfThenElse"; }
-	public:
-		IfThenElse();
-		~IfThenElse();
 	protected:
-		NodeState Update(AgentPtr pAgent) override;
 		void OnAddChild(BehaviorNode* child, const STRING& connection) override;
-		bool _CheckRunningNodeState(IfThenElsePhase current, NodeState ns);
 
-		BehaviorNode* m_If;
-		BehaviorNode* m_Then;
-		BehaviorNode* m_Else;
-		ContextContainer<IfThenElseContext> m_RCContainer;
+		BehaviorNode* m_If{};
+		BehaviorNode* m_Then{};
+		BehaviorNode* m_Else{};
 	};
 }
 

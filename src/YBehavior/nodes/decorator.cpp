@@ -3,31 +3,19 @@
 
 namespace YBehavior
 {
-	NodeState AlwaysSuccess::Update(AgentPtr pAgent)
+	YBehavior::NodeState AlwaysSuccessNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
 	{
-		PROFILER_PAUSE;
-		NodeState ns = SingleChildNode::Update(pAgent);
-		PROFILER_RESUME;
-		return ns == NS_RUNNING ? NS_RUNNING : NS_SUCCESS;
-	}
-	NodeState AlwaysFailure::Update(AgentPtr pAgent)
-	{
-		PROFILER_PAUSE;
-		NodeState ns = SingleChildNode::Update(pAgent);
-		PROFILER_RESUME;
-		return ns == NS_RUNNING ? NS_RUNNING : NS_FAILURE;
-	}
-
-	YBehavior::NodeState Invertor::Update(AgentPtr pAgent)
-	{
-		PROFILER_PAUSE;
-		NodeState ns = SingleChildNode::Update(pAgent);
-		PROFILER_RESUME;
-		if (ns == NS_RUNNING)
-			return NS_RUNNING;
-		if (ns == NS_SUCCESS)
-			return NS_FAILURE;
+		NodeState ns = SingleChildNodeContext::_Update(pAgent, lastState);
+		if (ns == NS_RUNNING || ns == NS_BREAK)
+			return ns;
 		return NS_SUCCESS;
 	}
 
+	YBehavior::NodeState AlwaysFailureNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
+	{
+		NodeState ns = SingleChildNodeContext::_Update(pAgent, lastState);
+		if (ns == NS_RUNNING || ns == NS_BREAK)
+			return ns;
+		return NS_FAILURE;
+	}
 }

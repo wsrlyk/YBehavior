@@ -44,12 +44,14 @@ namespace YBehavior
 	class TempMemory : public IMemory
 	{
 	public:
+		TempMemory() {}
 		TempMemory(SharedDataEx* pMain, SharedDataEx* pLocal);
+		void Set(SharedDataEx* pMain, SharedDataEx* pLocal);
 		SharedDataEx* GetMainData() override { return m_pMainData; }
 		SharedDataEx* GetStackTop() override { return m_pLocalData; }
 	private:
-		SharedDataEx* m_pMainData;
-		SharedDataEx* m_pLocalData;
+		SharedDataEx* m_pMainData{};
+		SharedDataEx* m_pLocalData{};
 	};
 }
 

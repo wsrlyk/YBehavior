@@ -502,16 +502,16 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    class InvertorTreeNode : SingleChildNode
-    {
-        public override string Icon => "!";
+    //class InvertorTreeNode : SingleChildNode
+    //{
+    //    public override string Icon => "!";
 
-        public InvertorTreeNode()
-        {
-            m_Name = "Invertor";
-            Type = TreeNodeType.TNT_Default;
-        }
-    }
+    //    public InvertorTreeNode()
+    //    {
+    //        m_Name = "Invertor";
+    //        Type = TreeNodeType.TNT_Default;
+    //    }
+    //}
 
     class ComparerTreeNode : LeafNode
     {

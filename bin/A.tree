@@ -1,12 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <A>
   <Node Class="Root" Pos="297,61">
-    <Shared e="_AC " />
-    <Local a="_Ic 11" />
+    <Shared e="_AC " ee="_IC 0" />
+    <Local a="_Ic 11" b="_Ic 0" aa="IIc 1|2|3" />
     <Node Class="Sequence" Pos="270,170">
       <Node Class="SelectTargetAction" Pos="100,290" Target="_AP e" />
       <Node Class="GetTargetNameAction" Pos="240,310" Target="_APE e" />
       <Node Class="SetData" Pos="450,310" Target="_Ip a" Source="_IC 0" />
+      <Node Class="Loop" Pos="580,310" Count="_IC 3" Current="_Ip b" ExitWhenFailure="_BC F">
+        <Node Class="Calculator" Pos="580,440" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_IC 1" />
+      </Node>
+      <Node Class="For" Pos="710,300" ExitWhenFailure="_BC F">
+        <Node Class="SetData" Connection="init" Pos="680,400" Target="_Ip b" Source="_IC 0" />
+        <Node Class="Comparer" Connection="cond" Pos="700,490" Operator="_EC &lt;" Opl="_Ip b" Opr="_IC 3" />
+        <Node Class="Calculator" Connection="inc" Pos="740,590" Operator="_EC +" Opl="_Ip b" Opr1="_Ip b" Opr2="_IC 1" />
+        <Node Class="Calculator" Pos="800,420" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_IC 1" />
+      </Node>
+      <Node Class="ForEach" Pos="890,320" Collection="IIp aa" Current="_Ip b" ExitWhenFailure="_BC F">
+        <Node Class="Calculator" Pos="890,410" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_Ip b" />
+      </Node>
+      <Node Class="SwitchCase" Pos="1000,320" Switch="_Ip b" Cases="IIp aa">
+        <Node Class="Calculator" Pos="870,560" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_Ic 100" />
+        <Node Class="Calculator" Pos="960,560" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_Ic 200" />
+        <Node Class="Calculator" Pos="1050,560" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_Ic 300" />
+        <Node Class="Calculator" Connection="default" Pos="1150,560" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_Ic 400" />
+      </Node>
+      <Node Class="SubTree" Pos="1140,340" Tree="_SC AA" Identification="_SC " />
     </Node>
   </Node>
 </A>

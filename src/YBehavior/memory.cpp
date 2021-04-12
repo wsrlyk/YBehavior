@@ -128,10 +128,14 @@ namespace YBehavior
 	}
 
 	TempMemory::TempMemory(SharedDataEx* pMain, SharedDataEx* pLocal)
-		: m_pMainData(pMain)
-		, m_pLocalData(pLocal)
 	{
+		Set(pMain, pLocal);
+	}
 
+	void TempMemory::Set(SharedDataEx* pMain, SharedDataEx* pLocal)
+	{
+		m_pMainData = pMain;
+		m_pLocalData = pLocal;
 	}
 
 }

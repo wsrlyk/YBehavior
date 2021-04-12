@@ -104,27 +104,49 @@ namespace YBehavior
 		return true;
 	}
 
-	YBehavior::NodeState SubTree::Update(AgentPtr pAgent)
+	void SubTreeNodeContext::_OnInit()
 	{
-		auto tree = pAgent->GetBehavior()->GetMappedTree(this);
-		if (tree != nullptr)
+		TreeNodeContext::_OnInit();
+		m_Stage = 0;
+		m_pInOut = nullptr;
+	}
+
+	void SubTreeNodeContext::_OnDestroy()
+	{
+		if (m_pInOut)
 		{
-			if (m_Inputs.size() > 0 || m_Outputs.size() > 0)
+			ObjectPoolStatic<LocalMemoryInOut>::Recycle(m_pInOut);
+			m_pInOut = nullptr;
+		}
+	}
+
+	NodeState SubTreeNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
+	{
+		if (m_Stage == 0)
+		{
+			++m_Stage;
+			auto tree = pAgent->GetBehavior()->GetMappedTree(m_pNode);
+			if (tree != nullptr)
 			{
-				LocalMemoryInOut inout(pAgent, m_Inputs.size() > 0 ? &m_Inputs : nullptr, m_Outputs.size() > 0 ? &m_Outputs : nullptr);
-				PROFILER_PAUSE;
-				auto res = tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID, &inout);
-				PROFILER_RESUME;
-				return res;
+				SubTree* pNode = (SubTree*)m_pNode;
+				if (pNode->m_Inputs.size() > 0 || pNode->m_Outputs.size() > 0)
+				{
+					m_pInOut = ObjectPoolStatic<LocalMemoryInOut>::Get();
+					m_pInOut->Set(pAgent, pNode->m_Inputs.size() > 0 ? &pNode->m_Inputs : nullptr, pNode->m_Outputs.size() > 0 ? &pNode->m_Outputs : nullptr);
+					pAgent->GetTreeContext()->PushCallStack(tree->CreateRootContext(m_pInOut));
+					return NS_RUNNING;
+				}
+				else
+				{
+					pAgent->GetTreeContext()->PushCallStack(tree->CreateRootContext(nullptr));
+					return NS_RUNNING;
+				}
 			}
 			else
-			{
-				PROFILER_PAUSE;
-				auto res = tree->RootExecute(pAgent, m_RunningContext != nullptr ? NS_RUNNING : NS_INVALID);
-				PROFILER_RESUME;
-				return res;
-			}
+				return NS_FAILURE;
 		}
-		return NS_FAILURE;
+		else
+			return lastState;
 	}
+
 }

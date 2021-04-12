@@ -279,11 +279,13 @@ namespace YBehavior
 
 	public:
 		void Init(BehaviorNodePtr pNode) { m_pNode = pNode; m_RootStage = RootStage::None; _OnInit(); }
+		void Destroy() { _OnDestroy(); }
 		inline BehaviorNodePtr GetTreeNode() { return m_pNode; }
 		NodeState Execute(AgentPtr pAgent, NodeState lastState);
 	protected:
 		virtual NodeState _Update(AgentPtr pAgent, NodeState lastState) { return m_pNode->Execute(pAgent, lastState); }
 		virtual void _OnInit() {};
+		virtual void _OnDestroy() {};
 	};
 
 	//////////////////////////////////////////////////////////////////////////

@@ -5,27 +5,38 @@
 
 namespace YBehavior
 {
-	class AlwaysSuccess : public SingleChildNode<>
+	class AlwaysSuccessNodeContext : public SingleChildNodeContext
+	{
+	protected:
+		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
+	};
+	class AlwaysSuccess : public SingleChildNode<AlwaysSuccessNodeContext>
 	{
 	public:
 		STRING GetClassName() const override { return "AlwaysSuccess"; }
 	protected:
-		NodeState Update(AgentPtr pAgent) override;
 	};
-	class AlwaysFailure : public SingleChildNode<>
+	//////////////////////////////////////////////////////////////////////////
+	class AlwaysFailureNodeContext : public SingleChildNodeContext
+	{
+	protected:
+		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
+	};
+	class AlwaysFailure : public SingleChildNode<AlwaysFailureNodeContext>
 	{
 	public:
 		STRING GetClassName() const override { return "AlwaysFailure"; }
 	protected:
-		NodeState Update(AgentPtr pAgent) override;
 	};
-	class Invertor : public SingleChildNode<>
-	{
-	public:
-		STRING GetClassName() const override { return "Invertor"; }
-	protected:
-		NodeState Update(AgentPtr pAgent) override;
-	};
+
+	///> Never need anymore
+	//class Invertor : public SingleChildNode<>
+	//{
+	//public:
+	//	STRING GetClassName() const override { return "Invertor"; }
+	//protected:
+	//	NodeState Update(AgentPtr pAgent) override;
+	//};
 }
 
 #endif

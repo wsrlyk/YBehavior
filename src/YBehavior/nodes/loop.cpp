@@ -5,98 +5,6 @@
 
 namespace YBehavior
 {
-	NodeState For::Update(AgentPtr pAgent)
-	{
-		NodeState ns = NS_INVALID;
-		NodeState res = NS_SUCCESS;
-		ForPhase fp = FP_Normal;
-		int loopTimes = 0;
-
-		m_RCContainer.ConvertRC(this);
-
-		if (m_RCContainer.GetRC())
-		{
-			ns = NS_RUNNING;
-			loopTimes = m_RCContainer.GetRC()->LoopTimes;
-			fp = m_RCContainer.GetRC()->Current;
-		}
-
-		if (m_InitChild != nullptr && (fp == FP_Normal || fp == FP_Init))
-		{
-			PROFILER_PAUSE;
-			ns = m_InitChild->Execute(pAgent, ns);
-			PROFILER_RESUME;
-			if (_CheckRunningNodeState(FP_Init, ns, loopTimes))
-				return ns;
-			fp = FP_Normal;
-		}
-
-		while (true)
-		{
-			if (m_CondChild != nullptr && (fp == FP_Normal || fp == FP_Cond))
-			{
-				PROFILER_PAUSE;
-				ns = m_CondChild->Execute(pAgent, ns);
-				PROFILER_RESUME;
-				if (_CheckRunningNodeState(FP_Cond, ns, loopTimes))
-					return ns;
-				fp = FP_Normal;
-
-				if (ns == NS_FAILURE)
-				{
-					DEBUG_LOG_INFO("End For at " << loopTimes << " times; ");
-					break;
-				}
-			}
-
-			++loopTimes;
-
-			if (m_MainChild != nullptr && (fp == FP_Normal || fp == FP_Main))
-			{
-				PROFILER_PAUSE;
-				ns = m_MainChild->Execute(pAgent, ns);
-				PROFILER_RESUME;
-				if (_CheckRunningNodeState(FP_Cond, ns, loopTimes))
-					return ns;
-				fp = FP_Normal;
-				if (ns == NS_FAILURE)
-				{
-					BOOL bExit = Utility::FALSE_VALUE;
-					m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
-					if (bExit)
-					{
-						DEBUG_LOG_INFO("ExitWhenFailure at " << loopTimes << " times; ");
-						res = NS_FAILURE;
-						break;
-					}
-				}
-			}
-
-			if (m_IncChild != nullptr && (fp == FP_Normal || fp == FP_Inc))
-			{
-				PROFILER_PAUSE;
-				ns = m_IncChild->Execute(pAgent, ns);
-				PROFILER_RESUME;
-				if (_CheckRunningNodeState(FP_Cond, ns, loopTimes))
-					return ns;
-				fp = FP_Normal;
-			}
-		}
-
-		return res;
-	}
-
-	bool For::_CheckRunningNodeState(ForPhase current, NodeState ns, int looptimes)
-	{
-		if (ns != NS_RUNNING)
-			return false;
-
-		m_RCContainer.CreateRC(this);
-		m_RCContainer.GetRC()->Current = current;
-		m_RCContainer.GetRC()->LoopTimes = looptimes;
-		return true;
-	}
-
 	bool For::OnLoaded(const pugi::xml_node& data)
 	{
 		CreateVariable(m_ExitWhenFailure, "ExitWhenFailure", data);
@@ -160,60 +68,6 @@ namespace YBehavior
 	/////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////
 
-	NodeState ForEach::Update(AgentPtr pAgent)
-	{
-		INT size = m_Collection->VectorSize(pAgent->GetMemory());
-		INT start = 0;
-		NodeState ns = NS_INVALID;
-
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Collection, true);
-
-		m_RCContainer.ConvertRC(this);
-
-		if (m_RCContainer.GetRC())
-		{
-			start = m_RCContainer.GetRC()->Current;
-			ns = NS_RUNNING;
-		}
-
-		for (INT i = start; i < size; ++i)
-		{
-			const void* element = m_Collection->GetElement(pAgent->GetMemory(), i);
-			if (element == nullptr)
-				continue;
-
-			m_Current->SetValue(pAgent->GetMemory(), element);
-
-			if (m_Child != nullptr)
-			{
-				PROFILER_PAUSE;
-				ns = m_Child->Execute(pAgent, ns);
-				PROFILER_RESUME;
-				switch (ns)
-				{
-				case YBehavior::NS_FAILURE:
-				{
-					BOOL bExit = Utility::FALSE_VALUE;
-					m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
-					if (bExit)
-					{
-						DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetMemory()) << "; ");
-						return NS_FAILURE;
-					}
-					break;
-				}
-				case YBehavior::NS_RUNNING:
-					m_RCContainer.CreateRC(this);
-					m_RCContainer.GetRC()->Current = i;
-					return ns;
-				default:
-					break;
-				}
-			}
-		}
-
-		return NS_SUCCESS;
-	}
 
 	bool ForEach::OnLoaded(const pugi::xml_node& data)
 	{
@@ -260,56 +114,145 @@ namespace YBehavior
 		return true;
 	}
 
-	YBehavior::NodeState Loop::Update(AgentPtr pAgent)
+	void ForNodeContext::_OnInit()
 	{
-		INT size = 0;
-		m_Count->GetCastedValue(pAgent->GetMemory(), size);
+		CompositeNodeContext::_OnInit();
+		m_LoopTimes = 0;
+	}
 
-		INT start = 0;
-		NodeState ns = NS_INVALID;
-
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Count, true);
-
-		m_RCContainer.ConvertRC(this);
-
-		if (m_RCContainer.GetRC())
+	NodeState ForNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
+	{
+		For* pNode = (For*)m_pNode;
+		ForPhase phase = (ForPhase)m_Stage;
+		if (phase == ForPhase::None)
 		{
-			start = m_RCContainer.GetRC()->Current;
-			ns = NS_RUNNING;
-		}
-
-		for (INT i = start; i < size; ++i)
-		{
-			m_Current->SetCastedValue(pAgent->GetMemory(), &i);
-
-			if (m_Child != nullptr)
+			m_Stage = (int)ForPhase::Init;
+			if (pNode->m_InitChild)
 			{
-				PROFILER_PAUSE;
-				ns = m_Child->Execute(pAgent, ns);
-				PROFILER_RESUME;
-				switch (ns)
+				pAgent->GetTreeContext()->PushCallStack(pNode->m_InitChild->CreateContext());
+				return NS_RUNNING;
+			}
+		}
+		if (phase == ForPhase::Init || phase == ForPhase::Inc)
+		{
+			m_Stage = (int)ForPhase::Cond;
+			if (pNode->m_CondChild)
+			{
+				pAgent->GetTreeContext()->PushCallStack(pNode->m_CondChild->CreateContext());
+				return NS_RUNNING;
+			}
+		}
+		if (phase == ForPhase::Cond)
+		{
+			if (pNode->m_CondChild && lastState == NS_FAILURE)
+			{
+				return NS_SUCCESS;
+			}
+			m_Stage = (int)ForPhase::Main;
+			if (pNode->m_MainChild)
+			{
+				pAgent->GetTreeContext()->PushCallStack(pNode->m_MainChild->CreateContext());
+				return NS_RUNNING;
+			}
+		}
+		if (phase == ForPhase::Main)
+		{
+			++m_LoopTimes;
+			if (pNode->m_MainChild && lastState == NS_FAILURE)
+			{
+				BOOL bExit = Utility::FALSE_VALUE;
+				pNode->m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
+				if (bExit)
 				{
-				case YBehavior::NS_FAILURE:
-				{
-					BOOL bExit = Utility::FALSE_VALUE;
-					m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
-					if (bExit)
-					{
-						DEBUG_LOG_INFO("ExitWhenFailure at " << m_Current->GetValueToSTRING(pAgent->GetMemory()) << "; ");
-						return NS_FAILURE;
-					}
-					break;
+					return NS_FAILURE;
 				}
-				case YBehavior::NS_RUNNING:
-					m_RCContainer.CreateRC(this);
-					m_RCContainer.GetRC()->Current = i;
-					return ns;
-				default:
-					break;
-				}
+			}
+			m_Stage = (int)ForPhase::Inc;
+			if (pNode->m_IncChild)
+			{
+				pAgent->GetTreeContext()->PushCallStack(pNode->m_IncChild->CreateContext());
+				return NS_RUNNING;
 			}
 		}
 
-		return NS_SUCCESS;
+		///> If runs here, it means this node has no children.
+		return NS_FAILURE;
 	}
+
+	NodeState ForEachNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
+	{
+		ForEach* pNode = (ForEach*)m_pNode;
+		INT size = pNode->m_Collection->VectorSize(pAgent->GetMemory());
+		if (m_Stage > 0)
+		{
+			if (lastState == NS_FAILURE)
+			{
+				BOOL bExit = Utility::FALSE_VALUE;
+				pNode->m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
+				if (bExit)
+				{
+					return NS_FAILURE;
+				}
+			}
+		}
+		if (m_Stage < size)
+		{
+			const void* element = pNode->m_Collection->GetElement(pAgent->GetMemory(), m_Stage);
+			if (element != nullptr)
+			{
+				pNode->m_Current->SetValue(pAgent->GetMemory(), element);
+			}
+			++m_Stage;
+			if (pNode->m_Child)
+			{
+				pAgent->GetTreeContext()->PushCallStack(pNode->m_Child->CreateContext());
+				return NS_RUNNING;
+			}
+		}
+		else
+		{
+			return NS_SUCCESS;
+		}
+
+		///> If runs here, it means this node has no children.
+		return NS_FAILURE;
+	}
+
+	NodeState LoopNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
+	{
+		Loop* pNode = (Loop*)m_pNode;
+		INT size = 0;
+		pNode->m_Count->GetCastedValue(pAgent->GetMemory(), size);
+		if (m_Stage > 0)
+		{
+			if (lastState == NS_FAILURE)
+			{
+				BOOL bExit = Utility::FALSE_VALUE;
+				pNode->m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
+				if (bExit)
+				{
+					return NS_FAILURE;
+				}
+			}
+		}
+		if (m_Stage < size)
+		{
+			pNode->m_Current->SetCastedValue(pAgent->GetMemory(), &m_Stage);
+
+			++m_Stage;
+			if (pNode->m_Child)
+			{
+				pAgent->GetTreeContext()->PushCallStack(pNode->m_Child->CreateContext());
+				return NS_RUNNING;
+			}
+		}
+		else
+		{
+			return NS_SUCCESS;
+		}
+
+		///> If runs here, it means this node has no children.
+		return NS_FAILURE;
+	}
+
 }

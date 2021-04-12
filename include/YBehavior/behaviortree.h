@@ -14,13 +14,15 @@ namespace YBehavior
 	class LocalMemoryInOut
 	{
 	public:
+		LocalMemoryInOut() {};
 		LocalMemoryInOut(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo);
+		void Set(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo);
 		void OnInput(std::unordered_map<STRING, ISharedVariableEx*>* pInputsTo);
 		void OnOutput(std::unordered_map<STRING, ISharedVariableEx*>* pOutputsFrom);
 	private:
-		AgentPtr m_pAgent;
-		std::vector<ISharedVariableEx* >* m_pInputsFrom;
-		std::vector<ISharedVariableEx* >* m_pOutputsTo;
+		AgentPtr m_pAgent{};
+		std::vector<ISharedVariableEx* >* m_pInputsFrom{};
+		std::vector<ISharedVariableEx* >* m_pOutputsTo{};
 		TempMemory m_TempMemory;
 	};
 

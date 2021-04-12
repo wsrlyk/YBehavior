@@ -343,6 +343,7 @@ namespace YBehavior
 
 	void BehaviorNode::DestroyContext(TreeNodeContext* pContext)
 	{
+		pContext->Destroy();
 		_DestroyContext(pContext);
 	}
 

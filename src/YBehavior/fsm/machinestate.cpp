@@ -84,6 +84,8 @@ namespace YBehavior
 
 	MachineRunRes MachineState::_RunTree(AgentPtr pAgent)
 	{
+		LOG_BEGIN << "-------------------------------------" << LOG_END;
+
 		BehaviorTree* pTree = pAgent->GetBehavior()->GetMappedTree(this);
 		if (pTree)
 		{
@@ -100,6 +102,7 @@ namespace YBehavior
 			while (!treeContext->IsCallStackEmpty())
 			{
 				auto pContext = treeContext->GetCallStackTop();
+				LOG_BEGIN << pContext->GetTreeNode()->GetClassName() << LOG_END;
 				NodeState ns = pContext->Execute(pAgent, lastState);
 				if (ns == NS_BREAK)
 				{

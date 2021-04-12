@@ -7,34 +7,29 @@
 
 namespace YBehavior
 {
-	class Selector : public CompositeNode<>
+	class SelectorNodeContext : public CompositeNodeContext
+	{
+	protected:
+		void _OnInit() override;
+		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
+		IndexIterator m_Iterator;
+	};
+	class Selector : public CompositeNode<SelectorNodeContext>
 	{
 	public:
 		STRING GetClassName() const override { return "Selector"; }
-		Selector()
-		{
-			SetRCCreator(&m_RCContainer);
-		}
-	protected:
-		NodeState Update(AgentPtr pAgent) override;
-		IndexIterator m_Iterator;
-		ContextContainer<VectorTraversalContext> m_RCContainer;
 	};
 
-	class RandomSelector : public CompositeNode<>
+	class RandomSelectorNodeContext : public SelectorNodeContext
+	{
+	protected:
+		void _OnInit() override;
+		RandomIndex m_RandomIndex;
+	};
+	class RandomSelector : public CompositeNode<RandomSelectorNodeContext>
 	{
 	public:
 		STRING GetClassName() const override { return "RandomSelector"; }
-		RandomSelector()
-		{
-			SetRCCreator(&m_RCContainer);
-		}
-	protected:
-		NodeState Update(AgentPtr pAgent) override;
-		void OnAddChild(BehaviorNode* child, const STRING& connection) override;
-		IndexIterator m_Iterator;
-		RandomIndex m_RandomIndex;
-		ContextContainer<RandomVectorTraversalContext> m_RCContainer;
 	};
 }
 
