@@ -1,4 +1,4 @@
-#ifdef SHARP
+#ifdef YSHARP
 #ifndef _SHARPLAUNCH_H_
 #define _SHARPLAUNCH_H_
 

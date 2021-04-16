@@ -12,7 +12,6 @@
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/agent.h"
 #include <string.h>
-#include "YBehavior/runningcontext.h"
 #include "YBehavior/profile/profileheader.h"
 
 

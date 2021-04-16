@@ -53,8 +53,6 @@ namespace YBehavior
 	}
 #endif
 	class BehaviorTree;
-	class RunningContext;
-	class IContextCreator;
 	class BehaviorNode;
 	class TreeNodeContext;
 	typedef BehaviorNode* BehaviorNodePtr;
@@ -62,6 +60,7 @@ namespace YBehavior
 #define ERROR_BEGIN_NODE_HEAD ERROR_BEGIN << m_UID << "." << GetClassName() << " "
 #define LOG_BEGIN_NODE_HEAD LOG_BEGIN << m_UID << "." << GetClassName() << " "
 
+#define TREENODE_DEFINE(classname) classname() { m_ClassName = #classname; }
 	class BehaviorNode
 	{
 	protected:
@@ -71,37 +70,12 @@ namespace YBehavior
 		StdVector<ISharedVariableEx*> m_Variables;	///> Just for destructions of variables
 		static std::unordered_set<STRING> KEY_WORDS;
 		BehaviorTree* m_Root;
-		RunningContext* m_RunningContext;
-		IContextCreator* m_ContextCreator;
 		ReturnType m_ReturnType;
+		STRING m_ClassName;
+
 #ifdef YDEBUGGER
-	public:
-		bool HasLogPoint();
-		void LogSharedData(ISharedVariableEx* pVariable, bool bIsBefore);
-		void LogDebugInfo(const STRING& str) { m_DebugLogInfo << str; }
-	protected:
-		std::stringstream m_DebugLogInfo;
 		DebugTreeHelper* m_pDebugHelper{};
-#define IF_HAS_LOG_POINT if (HasLogPoint())
-#define DEBUG_LOG_INFO(info)\
-	{\
-		IF_HAS_LOG_POINT\
-			m_DebugLogInfo << info;\
-	}
-#define LOG_SHARED_DATA(variable, isbefore) LogSharedData(variable, isbefore);
-#define LOG_SHARED_DATA_IF_HAS_LOG_POINT(variable, isbefore) \
-	{\
-		IF_HAS_LOG_POINT\
-			LOG_SHARED_DATA(variable, isbefore);\
-	}
-	public:
-		std::stringstream& GetDebugLogInfo() { return m_DebugLogInfo; }
-#else
-#define DEBUG_LOG_INFO(info);
-#define IF_HAS_LOG_POINT
-#define LOG_SHARED_DATA(variable, isbefore)
-#define LOG_SHARED_DATA_IF_HAS_LOG_POINT(variable, isbefore)
-#endif 
+#endif
 
 #ifdef YPROFILER
 	protected:
@@ -122,7 +96,7 @@ namespace YBehavior
 		inline BehaviorNodePtr GetCondition() const { return m_Condition; }
 		inline ReturnType GetReturnType() const { return m_ReturnType; }
 
-		virtual STRING GetClassName() const = 0;
+		const STRING& GetClassName() const { return m_ClassName; }
 
 		bool Load(const pugi::xml_node& data);
 		bool LoadChild(const pugi::xml_node& data);
@@ -131,10 +105,6 @@ namespace YBehavior
 
 		static BehaviorNode* CreateNodeByName(const STRING& name);
 		bool AddChild(BehaviorNode* child, const STRING& connection);
-
-		void TryCreateRC();
-		RunningContext* GetRC() { return m_RunningContext; }
-		void SetRCCreator(IContextCreator* rcc) { m_ContextCreator = rcc; }
 
 		TreeNodeContext* CreateContext();
 		void DestroyContext(TreeNodeContext*);
@@ -150,6 +120,10 @@ namespace YBehavior
 		///> If no config, variable will NOT be created
 		template <typename T>
 		TYPEID CreateVariableIfExist(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0);
+#ifdef YDEBUGGER
+		void SetDebugHelper(DebugTreeHelper* pDebugHelper) { m_pDebugHelper = pDebugHelper; };
+		inline DebugTreeHelper* GetDebugHelper() const { return m_pDebugHelper; }
+#endif
 	protected:
 		virtual bool _AddChild(BehaviorNode* child, const STRING& connection);
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
@@ -172,10 +146,6 @@ namespace YBehavior
 		///>
 		/// single: 1, single; 0, vector; -1, dont care
 		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, char variableType = 0);
-		RunningContext* _CreateRC() const;
-		void _TryDeleteRC();
-		void _TryPushRC(AgentPtr agent);
-		void _TryPopRC(AgentPtr agent);
 	};
 
 	template<typename T>
@@ -278,15 +248,68 @@ namespace YBehavior
 		RootStage m_RootStage{ RootStage::None };
 
 	public:
-		void Init(BehaviorNodePtr pNode) { m_pNode = pNode; m_RootStage = RootStage::None; _OnInit(); }
-		void Destroy() { _OnDestroy(); }
+		TreeNodeContext();
+		~TreeNodeContext();
+		void Init(BehaviorNodePtr pNode);
+		void Destroy();
 		inline BehaviorNodePtr GetTreeNode() { return m_pNode; }
 		NodeState Execute(AgentPtr pAgent, NodeState lastState);
 	protected:
 		virtual NodeState _Update(AgentPtr pAgent, NodeState lastState) { return m_pNode->Execute(pAgent, lastState); }
 		virtual void _OnInit() {};
 		virtual void _OnDestroy() {};
+
+#ifdef YDEBUGGER
+	public:
+		static bool HasDebugPoint(DebugTreeHelper* pDebugHelper);
+		static std::stringstream& GetLogInfo(DebugTreeHelper* pDebugHelper);
+		static void LogVariable(DebugTreeHelper* pDebugHelper, ISharedVariableEx* pVariable, bool bBefore);
+	protected:
+		DebugTreeHelper* m_pDebugHelper{};
+#endif
 	};
+
+#ifdef YDEBUGGER
+#define YB_IF_HAS_DEBUG_POINT if (YBehavior::TreeNodeContext::HasDebugPoint(m_pDebugHelper))
+#define YB_LOG_INFO(info)\
+	{\
+		YB_IF_HAS_DEBUG_POINT\
+			YBehavior::TreeNodeContext::GetLogInfo(m_pDebugHelper) << info;\
+	}
+#define YB_LOG_INFO_WITH_END(info)\
+	{\
+		YB_IF_HAS_DEBUG_POINT\
+			YBehavior::TreeNodeContext::GetLogInfo(m_pDebugHelper) << info << "; ";\
+	}
+#define YB_LOG_VARIABLE(variable, isbefore)\
+		YBehavior::TreeNodeContext::LogVariable(m_pDebugHelper, variable, isbefore);
+
+#define YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(variable, isbefore) \
+	{\
+		YB_IF_HAS_DEBUG_POINT\
+			YB_LOG_VARIABLE(variable, isbefore);\
+	}
+
+#define YB_LOG_VARIABLE_BEFORE(variable)\
+	YB_LOG_VARIABLE(variable, true)
+#define YB_LOG_VARIABLE_AFTER(variable)\
+	YB_LOG_VARIABLE(variable, false)
+#define YB_LOG_VARIABLE_BEFORE_IF_HAS_DEBUG_POINT(variable)\
+	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(variable, true)
+#define YB_LOG_VARIABLE_AFTER_IF_HAS_DEBUG_POINT(variable)\
+	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(variable, false)
+
+#else
+#define YB_LOG_INFO(info);
+#define YB_LOG_INFO_WITH_END(info);
+#define YB_IF_HAS_DEBUG_POINT
+#define YB_LOG_VARIABLE(variable, isbefore)
+#define YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(variable, isbefore)
+#define YB_LOG_VARIABLE_BEFORE(variable)
+#define YB_LOG_VARIABLE_AFTER(variable)
+#define YB_LOG_VARIABLE_BEFORE_IF_HAS_DEBUG_POINT(variable)
+#define YB_LOG_VARIABLE_AFTER_IF_HAS_DEBUG_POINT(variable)
+#endif 
 
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////

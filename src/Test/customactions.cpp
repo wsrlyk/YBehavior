@@ -78,7 +78,7 @@ YBehavior::STRING XEntity::ToString() const
 
 YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 {
-	LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Target, true);
+	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Target, true);
 
 	YBehavior::EntityWrapper currentTarget;
 	m_Target->GetCastedValue(pAgent->GetMemory(), currentTarget);
@@ -93,7 +93,7 @@ YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 		m_Target->SetCastedValue(pAgent->GetMemory(), &wrapper);
 	}
 
-	LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Target, false);
+	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Target, false);
 
 	return YBehavior::NS_SUCCESS;
 }

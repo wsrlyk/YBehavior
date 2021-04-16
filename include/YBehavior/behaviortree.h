@@ -38,7 +38,7 @@ namespace YBehavior
 	{
 		friend BehaviorTreeContext;
 	public:
-		STRING GetClassName() const override { return "Tree"; }
+		TREENODE_DEFINE(BehaviorTree)
 		inline void SetVersion(void* v) { m_Version = v; }
 		inline void* GetVersion() const { return m_Version; }
 #ifdef YDEBUGGER

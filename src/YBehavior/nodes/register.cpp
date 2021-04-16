@@ -54,7 +54,7 @@ namespace YBehavior
 		RegisterData* pRegister = pAgent->GetRegister();
 		if (!pRegister->IsDirty())
 		{
-			DEBUG_LOG_INFO("No Event.");
+			YB_LOG_INFO("No Event.");
 			return NS_FAILURE;
 		}
 		m_Event->SetValue(pAgent->GetMemory(), pRegister->GetReceiveData().pEvent);
@@ -66,14 +66,14 @@ namespace YBehavior
 
 		pRegister->Clear();
 
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_Event, false);
-			LOG_SHARED_DATA(m_Int, false);
-			LOG_SHARED_DATA(m_Float, false);
-			LOG_SHARED_DATA(m_String, false);
-			LOG_SHARED_DATA(m_Bool, false);
-			LOG_SHARED_DATA(m_Ulong, false);
+			YB_LOG_VARIABLE(m_Event, false);
+			YB_LOG_VARIABLE(m_Int, false);
+			YB_LOG_VARIABLE(m_Float, false);
+			YB_LOG_VARIABLE(m_String, false);
+			YB_LOG_VARIABLE(m_Bool, false);
+			YB_LOG_VARIABLE(m_Ulong, false);
 		}
 
 		return NS_SUCCESS;
@@ -138,14 +138,14 @@ namespace YBehavior
 		pRegister->GetSendData().pVecUlong = m_Ulong->GetCastedValue(pAgent->GetMemory());
 		pRegister->GetSendData().pVecString = m_String->GetCastedValue(pAgent->GetMemory());
 
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_Event, true);
-			LOG_SHARED_DATA(m_Int, true);
-			LOG_SHARED_DATA(m_Float, true);
-			LOG_SHARED_DATA(m_String, true);
-			LOG_SHARED_DATA(m_Bool, true);
-			LOG_SHARED_DATA(m_Ulong, true);
+			YB_LOG_VARIABLE(m_Event, true);
+			YB_LOG_VARIABLE(m_Int, true);
+			YB_LOG_VARIABLE(m_Float, true);
+			YB_LOG_VARIABLE(m_String, true);
+			YB_LOG_VARIABLE(m_Bool, true);
+			YB_LOG_VARIABLE(m_Ulong, true);
 		};
 
 		m_Int->SetCastedValue(pAgent->GetMemory(), &Utility::VecIntEmpty);

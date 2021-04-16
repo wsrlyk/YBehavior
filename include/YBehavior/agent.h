@@ -11,7 +11,6 @@ namespace YBehavior
 	class BehaviorTree;
 	class SharedDataEx;
 	class RegisterData;
-	class RunningContext;
 	class Memory;
 	class MachineContext;
 
@@ -39,7 +38,6 @@ namespace YBehavior
 		RegisterData* m_RegisterData;
 		Entity* m_Entity;
 
-		std::stack<RunningContext*> m_RunningContexts;
 	public:
 		Agent(Entity* entity);
 		virtual ~Agent();
@@ -62,10 +60,6 @@ namespace YBehavior
 		void ProcessRegister();
 		inline UINT64 GetUID() { return m_UID; }
 		virtual UINT64 GetDebugUID() { return GetUID(); }
-		RunningContext* PopRC();
-		void PushRC(RunningContext* context);
-		void ClearRC();
-		bool IsRCEmpty() { return m_RunningContexts.empty(); }
 
 	protected:
 		virtual void _OnProcessRegister() {}

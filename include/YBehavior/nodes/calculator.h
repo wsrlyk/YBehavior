@@ -9,7 +9,7 @@ namespace YBehavior
 	class Calculator : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "Calculator"; }
+		TREENODE_DEFINE(Calculator)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		NodeState Update(AgentPtr pAgent) override;

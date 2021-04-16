@@ -9,7 +9,7 @@ namespace YBehavior
 	class PiecewiseFunction : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "PiecewiseFunction"; }
+		TREENODE_DEFINE(PiecewiseFunction)
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;

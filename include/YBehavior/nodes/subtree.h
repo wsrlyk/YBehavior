@@ -19,7 +19,7 @@ namespace YBehavior
 	{
 		friend SubTreeNodeContext;
 	public:
-		STRING GetClassName() const override { return "SubTree"; }
+		TREENODE_DEFINE(SubTree)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		bool OnLoadChild(const pugi::xml_node& data) override;

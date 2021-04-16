@@ -76,7 +76,6 @@
     <ClInclude Include="..\include\YBehavior\profile\profileprocessor.h" />
     <ClInclude Include="..\include\YBehavior\profile\profiler.h" />
     <ClInclude Include="..\include\YBehavior\registerdata.h" />
-    <ClInclude Include="..\include\YBehavior\runningcontext.h" />
     <ClInclude Include="..\include\YBehavior\shareddataex.h" />
     <ClInclude Include="..\include\YBehavior\sharedvariablecreatehelper.h" />
     <ClInclude Include="..\include\YBehavior\sharedvariableex.h" />
@@ -147,7 +146,6 @@
     <ClCompile Include="..\src\YBehavior\profile\profileprocessor.cpp" />
     <ClCompile Include="..\src\YBehavior\profile\profiler.cpp" />
     <ClCompile Include="..\src\YBehavior\registerdata.cpp" />
-    <ClCompile Include="..\src\YBehavior\runningcontext.cpp" />
     <ClCompile Include="..\src\YBehavior\shareddataex.cpp" />
     <ClCompile Include="..\src\YBehavior\SharedVariableCreateHelper.cpp" />
     <ClCompile Include="..\src\YBehavior\sharp\sharpentry.cpp" />

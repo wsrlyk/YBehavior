@@ -8,7 +8,6 @@
 #ifdef YDEBUGGER
 #include "YBehavior/debugger.h"
 #endif
-#include "YBehavior/runningcontext.h"
 
 namespace YBehavior
 {
@@ -66,7 +65,7 @@ namespace YBehavior
 
 		///> postprocessing
 #ifdef YDEBUGGER
-			//DEBUG_LOG_INFO(" Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
+			//YB_LOG_INFO(" Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 
 		dbgHelper.TryPause();
 		m_pDebugHelper = nullptr;

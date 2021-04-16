@@ -8,7 +8,7 @@ namespace YBehavior
 	class SetData : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "SetData"; }
+		TREENODE_DEFINE(SetData)
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;

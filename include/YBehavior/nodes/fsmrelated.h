@@ -8,7 +8,7 @@ namespace YBehavior
 	class FSMSetCondition : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "FSMSetCondition"; }
+		TREENODE_DEFINE(FSMSetCondition)
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;
@@ -21,7 +21,7 @@ namespace YBehavior
 	class FSMClearConditions : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "FSMClearConditions"; }
+		TREENODE_DEFINE(FSMClearConditions)
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 	};

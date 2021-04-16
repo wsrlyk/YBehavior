@@ -3,7 +3,6 @@
 
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/sharedvariableex.h"
-#include "YBehavior/runningcontext.h"
 
 namespace YBehavior
 {
@@ -28,7 +27,7 @@ namespace YBehavior
 	{
 		friend ForNodeContext;
 	public:
-		STRING GetClassName() const override { return "For"; }
+		TREENODE_DEFINE(For)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		void OnAddChild(BehaviorNode * child, const STRING & connection) override;
@@ -51,7 +50,7 @@ namespace YBehavior
 	{
 		friend ForEachNodeContext;
 	public:
-		STRING GetClassName() const override { return "ForEach"; }
+		TREENODE_DEFINE(ForEach)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 
@@ -72,7 +71,7 @@ namespace YBehavior
 	{
 		friend LoopNodeContext;
 	public:
-		STRING GetClassName() const override { return "Loop"; }
+		TREENODE_DEFINE(Loop)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 

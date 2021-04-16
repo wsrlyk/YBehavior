@@ -2,7 +2,6 @@
 #define _YBEHAVIOR_WAIT_H_
 
 #include "YBehavior/behaviortree.h"
-#include "YBehavior/runningcontext.h"
 
 namespace YBehavior
 {
@@ -18,7 +17,7 @@ namespace YBehavior
 	{
 		friend WaitNodeContext;
 	public:
-		STRING GetClassName() const override { return "Wait"; }
+		TREENODE_DEFINE(Wait)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 

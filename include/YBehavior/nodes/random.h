@@ -9,7 +9,7 @@ namespace YBehavior
 	class Random : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "Random"; }
+		TREENODE_DEFINE(Random)
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;
@@ -25,7 +25,7 @@ namespace YBehavior
 	class RandomSelect : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "RandomSelect"; }
+		TREENODE_DEFINE(RandomSelect)
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;
@@ -40,7 +40,7 @@ namespace YBehavior
 	class Shuffle : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "Shuffle"; }
+		TREENODE_DEFINE(Shuffle)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		NodeState Update(AgentPtr pAgent) override;

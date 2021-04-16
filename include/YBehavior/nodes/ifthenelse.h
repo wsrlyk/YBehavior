@@ -2,7 +2,6 @@
 #define _YBEHAVIOR_IFTHENELSE_H_
 
 #include "YBehavior/behaviortree.h"
-#include "YBehavior/runningcontext.h"
 
 namespace YBehavior
 {
@@ -23,7 +22,7 @@ namespace YBehavior
 	{
 		friend IfThenElseNodeContext;
 	public:
-		STRING GetClassName() const override { return "IfThenElse"; }
+		TREENODE_DEFINE(IfThenElse)
 	protected:
 		void OnAddChild(BehaviorNode* child, const STRING& connection) override;
 

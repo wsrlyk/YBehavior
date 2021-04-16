@@ -3,7 +3,6 @@
 
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/tools/common.h"
-#include "YBehavior/runningcontext.h"
 
 namespace YBehavior
 {
@@ -19,7 +18,7 @@ namespace YBehavior
 	{
 		friend SequenceNodeContext;
 	public:
-		STRING GetClassName() const override { return "Sequence"; }
+		TREENODE_DEFINE(Sequence)
 	protected:
 	};
 	class RandomSequenceNodeContext : public SequenceNodeContext
@@ -32,7 +31,7 @@ namespace YBehavior
 	class RandomSequence : public CompositeNode<RandomSequenceNodeContext>
 	{
 	public:
-		STRING GetClassName() const override { return "RandomSequence"; }
+		TREENODE_DEFINE(RandomSequence)
 	protected:
 	};
 

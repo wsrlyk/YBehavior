@@ -23,16 +23,16 @@ namespace YBehavior
 
 	YBehavior::NodeState GetArrayLength::Update(AgentPtr pAgent)
 	{
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_Array, true);
+			YB_LOG_VARIABLE(m_Array, true);
 		}
 		INT size = m_Array->VectorSize(pAgent->GetMemory());
 		m_Length->SetCastedValue(pAgent->GetMemory(), &size);
 
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_Length, false);
+			YB_LOG_VARIABLE(m_Length, false);
 		}
 
 		return NS_SUCCESS;
@@ -73,15 +73,15 @@ namespace YBehavior
 
 	YBehavior::NodeState ArrayPushElement::Update(AgentPtr pAgent)
 	{
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_Element, true);
+			YB_LOG_VARIABLE(m_Element, true);
 		}
 		m_Array->PushBackElement(pAgent->GetMemory(), m_Element->GetValue(pAgent->GetMemory()));
 
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_Array, false);
+			YB_LOG_VARIABLE(m_Array, false);
 		}
 
 		return NS_SUCCESS;
@@ -99,9 +99,9 @@ namespace YBehavior
 
 	YBehavior::NodeState IsArrayEmpty::Update(AgentPtr pAgent)
 	{
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_Array, true);
+			YB_LOG_VARIABLE(m_Array, true);
 		}
 		INT size = m_Array->VectorSize(pAgent->GetMemory());
 		if (size != 0)
@@ -132,7 +132,7 @@ namespace YBehavior
 
 	YBehavior::NodeState GenIndexArray::Update(AgentPtr pAgent)
 	{
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Input, true);
+		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Input, true);
 		INT size = 0;
 		if (m_Input->IsThisVector())
 		{
@@ -147,7 +147,7 @@ namespace YBehavior
 			}
 			else
 			{
-				DEBUG_LOG_INFO("Cant get value from Input; ");
+				YB_LOG_INFO("Cant get value from Input; ");
 				return NS_FAILURE;
 			}
 		}
@@ -158,7 +158,7 @@ namespace YBehavior
 			o.push_back(i);
 		}
 		m_Output->SetCastedValue(pAgent->GetMemory(), o);
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Output, false);
+		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Output, false);
 		return NS_SUCCESS;
 	}
 

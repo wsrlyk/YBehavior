@@ -13,7 +13,7 @@ namespace YBehavior
 	class AlwaysSuccess : public SingleChildNode<AlwaysSuccessNodeContext>
 	{
 	public:
-		STRING GetClassName() const override { return "AlwaysSuccess"; }
+		TREENODE_DEFINE(AlwaysSuccess)
 	protected:
 	};
 	//////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ namespace YBehavior
 	class AlwaysFailure : public SingleChildNode<AlwaysFailureNodeContext>
 	{
 	public:
-		STRING GetClassName() const override { return "AlwaysFailure"; }
+		TREENODE_DEFINE(AlwaysFailure)
 	protected:
 	};
 

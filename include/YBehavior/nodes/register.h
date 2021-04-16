@@ -9,7 +9,7 @@ namespace YBehavior
 	class ReadRegister : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "ReadRegister"; }
+		TREENODE_DEFINE(ReadRegister)
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;
@@ -26,7 +26,7 @@ namespace YBehavior
 	class WriteRegister : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "WriteRegister"; }
+		TREENODE_DEFINE(WriteRegister)
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;

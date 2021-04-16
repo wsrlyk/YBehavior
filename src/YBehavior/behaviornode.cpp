@@ -12,7 +12,6 @@
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/agent.h"
 #include <string.h>
-#include "YBehavior/runningcontext.h"
 #include "YBehavior/profile/profileheader.h"
 
 
@@ -39,8 +38,6 @@ namespace YBehavior
 	{
 		m_Parent = nullptr;
 		m_Condition = nullptr;
-		m_RunningContext = nullptr;
-		m_ContextCreator = nullptr;
 		m_Root = nullptr;
 		m_ReturnType = RT_DEFAULT;
 	}
@@ -56,22 +53,10 @@ namespace YBehavior
 			delete *it;
 		}
 		m_Variables.clear();
-		_TryDeleteRC();
 	}
 
 	std::unordered_set<STRING> BehaviorNode::KEY_WORDS = { "Class", "Pos", "NickName" };
 
-#ifdef YDEBUGGER
-	bool BehaviorNode::HasLogPoint()
-	{
-		return m_pDebugHelper && m_pDebugHelper->HasDebugPoint();
-	}
-
-	void BehaviorNode::LogSharedData(ISharedVariableEx* pVariable, bool bIsBefore)
-	{
-		m_pDebugHelper->LogSharedData(pVariable, bIsBefore);
-	}
-#endif
 	BehaviorNode* BehaviorNode::CreateNodeByName(const STRING& name)
 	{
 		return NodeFactory::Instance()->Get(name);
@@ -282,56 +267,6 @@ namespace YBehavior
 		return true;
 	}
 
-	YBehavior::RunningContext* BehaviorNode::_CreateRC() const
-	{
-		RunningContext* pRC;
-		if (m_ContextCreator)
-			pRC = m_ContextCreator->NewRC();
-		else
-			pRC = ObjectPoolStatic<RunningContext>::Get();
-		pRC->Reset();
-		return pRC;
-	}
-
-	void BehaviorNode::TryCreateRC()
-	{
-		if (!m_RunningContext)
-		{
-			m_RunningContext = _CreateRC();
-			m_RunningContext->SetUID(m_UID);
-		}
-	}
-
-	void BehaviorNode::_TryDeleteRC()
-	{
-		if (m_RunningContext)
-		{
-			if (m_ContextCreator)
-				m_ContextCreator->ReleaseRC(m_RunningContext);
-			else
-				ObjectPoolStatic<RunningContext>::Recycle(m_RunningContext);
-			m_RunningContext = nullptr;
-		}
-	}
-
-	void BehaviorNode::_TryPushRC(AgentPtr agent)
-	{
-		if (m_RunningContext && agent)
-		{
-			agent->PushRC(m_RunningContext);
-			m_RunningContext = nullptr;
-		}
-	}
-
-	void BehaviorNode::_TryPopRC(AgentPtr agent)
-	{
-		_TryDeleteRC();
-		if (agent)
-		{
-			m_RunningContext = agent->PopRC();
-		}
-	}
-
 	TreeNodeContext* BehaviorNode::CreateContext()
 	{
 		TreeNodeContext* pContext = _CreateContext();
@@ -461,7 +396,36 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 
+	TreeNodeContext::TreeNodeContext()
+	{
+#ifdef YDEBUGGER
+		m_pDebugHelper = new DebugTreeHelper(this);
+#endif
+	}
 
+	TreeNodeContext::~TreeNodeContext()
+	{
+#ifdef YDEBUGGER
+		delete m_pDebugHelper;
+#endif
+	}
+
+
+	void TreeNodeContext::Init(BehaviorNodePtr pNode)
+	{
+		m_pNode = pNode; 
+		m_RootStage = RootStage::None;
+
+		_OnInit();
+	}
+
+	void TreeNodeContext::Destroy()
+	{
+#ifdef YDEBUGGER
+		m_pDebugHelper->Dispose();
+#endif
+		_OnDestroy();
+	}
 
 	NodeState TreeNodeContext::Execute(AgentPtr pAgent, NodeState lastState)
 	{
@@ -469,6 +433,9 @@ namespace YBehavior
 		switch (m_RootStage)
 		{
 		case RootStage::None:
+#ifdef YDEBUGGER
+			m_pDebugHelper->Init(pAgent);
+#endif
 			if (m_pNode->GetCondition())
 			{
 				pAgent->GetTreeContext()->PushCallStack(m_pNode->GetCondition()->CreateContext());
@@ -478,7 +445,6 @@ namespace YBehavior
 			else
 			{
 				m_RootStage = RootStage::Main;
-				state = _Update(pAgent, lastState);
 			}
 			break;
 		case RootStage::Condition:
@@ -487,14 +453,23 @@ namespace YBehavior
 			else
 			{
 				m_RootStage = RootStage::Main;
-				state = _Update(pAgent, lastState);
 			}
 			break;
 		case RootStage::Main:
-			state = _Update(pAgent, lastState);
-			break;
 		default:
 			break;
+		}
+
+		if (m_RootStage == RootStage::Main)
+		{
+#ifdef YDEBUGGER
+			m_pDebugHelper->TryBreaking();
+			m_pNode->SetDebugHelper(m_pDebugHelper);
+#endif
+			state = _Update(pAgent, lastState);
+#ifdef YDEBUGGER
+			m_pDebugHelper->TryPause();
+#endif
 		}
 
 		if (state == NS_INVALID || state == NS_BREAK || state == NS_RUNNING)
@@ -519,9 +494,25 @@ namespace YBehavior
 			break;
 		}
 
-		return finalState;
+		DEBUG_RETURN((*m_pDebugHelper), state, finalState);
+	}
+#ifdef YDEBUGGER
+	bool TreeNodeContext::HasDebugPoint(DebugTreeHelper* pDebugHelper)
+	{
+		return pDebugHelper && pDebugHelper->HasDebugPoint();
 	}
 
+	std::stringstream& TreeNodeContext::GetLogInfo(DebugTreeHelper* pDebugHelper)
+	{
+		return pDebugHelper->GetDebugLogInfo();
+	}
+
+	void TreeNodeContext::LogVariable(DebugTreeHelper* pDebugHelper, ISharedVariableEx* pVariable, bool bBefore)
+	{
+		pDebugHelper->LogSharedData(pVariable, bBefore);
+	}
+
+#endif
 	NodeState SingleChildNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
 	{
 		switch (m_Stage)

@@ -3,7 +3,6 @@
 
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/tools/common.h"
-#include "YBehavior/runningcontext.h"
 
 namespace YBehavior
 {
@@ -17,7 +16,7 @@ namespace YBehavior
 	class Selector : public CompositeNode<SelectorNodeContext>
 	{
 	public:
-		STRING GetClassName() const override { return "Selector"; }
+		TREENODE_DEFINE(Selector)
 	};
 
 	class RandomSelectorNodeContext : public SelectorNodeContext
@@ -29,7 +28,7 @@ namespace YBehavior
 	class RandomSelector : public CompositeNode<RandomSelectorNodeContext>
 	{
 	public:
-		STRING GetClassName() const override { return "RandomSelector"; }
+		TREENODE_DEFINE(RandomSelector)
 	};
 }
 

@@ -3,7 +3,6 @@
 
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/tools/common.h"
-#include "YBehavior/runningcontext.h"
 
 namespace YBehavior
 {
@@ -18,7 +17,7 @@ namespace YBehavior
 	{
 		friend SwitchCaseNodeContext;
 	public:
-		STRING GetClassName() const override { return "SwitchCase"; }
+		TREENODE_DEFINE(SwitchCase)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		void OnAddChild(BehaviorNode * child, const STRING & connection) override;

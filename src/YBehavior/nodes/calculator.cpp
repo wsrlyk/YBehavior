@@ -51,19 +51,19 @@ namespace YBehavior
 
 	YBehavior::NodeState Calculator::Update(AgentPtr pAgent)
 	{
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_Opl, true);
-			LOG_SHARED_DATA(m_Opr1, true);
-			LOG_SHARED_DATA(m_Opr2, true);
+			YB_LOG_VARIABLE(m_Opl, true);
+			YB_LOG_VARIABLE(m_Opr1, true);
+			YB_LOG_VARIABLE(m_Opr2, true);
 		}
 
 		IVariableOperationHelper* pHelper = m_Opl->GetOperation();
 		pHelper->Calculate(pAgent->GetMemory(), m_Opl, m_Opr1, m_Opr2, m_Operator);
 
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_Opl, false);
+			YB_LOG_VARIABLE(m_Opl, false);
 		}
 
 		return NS_SUCCESS;

@@ -1,14 +1,14 @@
 #ifndef _YBEHAVIOR_ARRAY_H_
 #define _YBEHAVIOR_ARRAY_H_
 
-#include "YBehavior/behaviortree.h"
+#include "YBehavior/behaviornode.h"
 
 namespace YBehavior
 {
 	class GetArrayLength : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "GetArrayLength"; }
+		TREENODE_DEFINE(GetArrayLength)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		NodeState Update(AgentPtr pAgent) override;
@@ -21,7 +21,7 @@ namespace YBehavior
 	class ClearArray : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "ClearArray"; }
+		TREENODE_DEFINE(ClearArray)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		NodeState Update(AgentPtr pAgent) override;
@@ -33,7 +33,7 @@ namespace YBehavior
 	class ArrayPushElement : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "ArrayPushElement"; }
+		TREENODE_DEFINE(ArrayPushElement)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		NodeState Update(AgentPtr pAgent) override;
@@ -46,7 +46,7 @@ namespace YBehavior
 	class IsArrayEmpty : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "IsArrayEmpty"; }
+		TREENODE_DEFINE(IsArrayEmpty)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		NodeState Update(AgentPtr pAgent) override;
@@ -58,7 +58,7 @@ namespace YBehavior
 	class GenIndexArray : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "GenIndexArray"; }
+		TREENODE_DEFINE(GenIndexArray)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		NodeState Update(AgentPtr pAgent) override;

@@ -34,7 +34,7 @@ namespace YBehavior
 
 	YBehavior::NodeState FSMSetCondition::Update(AgentPtr pAgent)
 	{
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Conditions, true);
+		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Conditions, true);
 
 
 		if (m_Conditions->IsThisVector())

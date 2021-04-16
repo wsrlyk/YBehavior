@@ -19,29 +19,29 @@ namespace YBehavior
 	{
 		NodeState ns = NS_FAILURE;
 
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_KeyPointX, true);
-			LOG_SHARED_DATA(m_KeyPointY, true);
-			LOG_SHARED_DATA(m_InputX, true);
-			LOG_SHARED_DATA(m_OutputY, true);
+			YB_LOG_VARIABLE(m_KeyPointX, true);
+			YB_LOG_VARIABLE(m_KeyPointY, true);
+			YB_LOG_VARIABLE(m_InputX, true);
+			YB_LOG_VARIABLE(m_OutputY, true);
 		}
 
 		INT sizeX = m_KeyPointX->VectorSize(pAgent->GetMemory());
 		INT sizeY = m_KeyPointY->VectorSize(pAgent->GetMemory());
 		if (sizeX != sizeY)
 		{
-			DEBUG_LOG_INFO("Different length of X and Y; ");
+			YB_LOG_INFO("Different length of X and Y; ");
 			return NS_FAILURE;
 		}
 		if (sizeX == 0)
 		{
-			DEBUG_LOG_INFO("No key points; ");
+			YB_LOG_INFO("No key points; ");
 			return NS_FAILURE;
 		}
 		else if (sizeX == 1)
 		{
-			DEBUG_LOG_INFO("Only one key point, return it; ");
+			YB_LOG_INFO("Only one key point, return it; ");
 			m_OutputY->SetValue(pAgent->GetMemory(), m_KeyPointY->GetValue(pAgent->GetMemory()));
 			return NS_SUCCESS;
 		}
@@ -74,7 +74,7 @@ namespace YBehavior
 
 			if (x0 == nullptr || x1 == nullptr || y0 == nullptr || y1 == nullptr)
 			{
-				DEBUG_LOG_INFO("Null value at keypoint index " << i <<"; ");
+				YB_LOG_INFO("Null value at keypoint index " << i <<"; ");
 				continue;
 			}
 
@@ -93,7 +93,7 @@ namespace YBehavior
 
 			//if (pHelper->Compare(pAgent->GetSharedData(), m_Switch->GetValue(pAgent->GetSharedData()), onecase, OT_EQUAL))
 			//{
-			//	DEBUG_LOG_INFO("Switch to case " << Utility::ToString(m_CasesChilds[i]->GetUID()) << "; ");
+			//	YB_LOG_INFO("Switch to case " << Utility::ToString(m_CasesChilds[i]->GetUID()) << "; ");
 
 			//	ns = m_CasesChilds[i]->Execute(pAgent);
 			//	return ns;
@@ -102,11 +102,11 @@ namespace YBehavior
 
 		//if (m_DefaultChild != nullptr)
 		//{
-		//	DEBUG_LOG_INFO("Switch to default; ");
+		//	YB_LOG_INFO("Switch to default; ");
 		//	ns = m_DefaultChild->Execute(pAgent);
 		//}
 
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_OutputY, false);
+		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_OutputY, false);
 
 		return ns;
 	}
