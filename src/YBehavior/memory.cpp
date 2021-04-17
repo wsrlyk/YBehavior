@@ -86,11 +86,7 @@ namespace YBehavior
 
 	Memory::~Memory()
 	{
-		if (!m_pMainData)
-		{
-			delete m_pMainData;
-			m_pMainData = nullptr;
-		}
+		delete m_pMainData;
 
 		m_Stack.clear();
 	}
