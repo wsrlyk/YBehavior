@@ -42,12 +42,6 @@ namespace YBehavior
 		return m_IndexList[index];
 	}
 
-	void IndexIterator::Init(int start)
-	{
-		m_Start = start;
-		m_IndexList.clear();
-	}
-
 	void IndexIterator::Init(int length, int start)
 	{
 		m_Length = length;

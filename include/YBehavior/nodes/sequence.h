@@ -13,21 +13,18 @@ namespace YBehavior
 		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
 		IndexIterator m_Iterator;
 	};
-
 	class Sequence : public CompositeNode<SequenceNodeContext>
 	{
-		friend SequenceNodeContext;
 	public:
 		TREENODE_DEFINE(Sequence)
-	protected:
 	};
+
 	class RandomSequenceNodeContext : public SequenceNodeContext
 	{
 	protected:
 		void _OnInit() override;
 		RandomIndex m_RandomIndex;
 	};
-
 	class RandomSequence : public CompositeNode<RandomSequenceNodeContext>
 	{
 	public:
