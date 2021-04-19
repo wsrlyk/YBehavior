@@ -430,7 +430,8 @@ namespace YBehavior
 	NodeState TreeNodeContext::Execute(AgentPtr pAgent, NodeState lastState)
 	{
 		NodeState state = NS_INVALID;
-		switch (m_RootStage)
+		auto oldStage = m_RootStage;
+		switch (oldStage)
 		{
 		case RootStage::None:
 #ifdef YDEBUGGER
@@ -463,17 +464,22 @@ namespace YBehavior
 		if (m_RootStage == RootStage::Main)
 		{
 #ifdef YDEBUGGER
-			m_pDebugHelper->TryBreaking();
+			///> Only the first run here will trigger the breaking
+			if (oldStage != RootStage::Main)
+				m_pDebugHelper->TryBreaking();
 			m_pNode->SetDebugHelper(m_pDebugHelper);
 #endif
 			state = _Update(pAgent, lastState);
-#ifdef YDEBUGGER
-			m_pDebugHelper->TryPause();
-#endif
 		}
 
 		if (state == NS_INVALID || state == NS_BREAK || state == NS_RUNNING)
 			return state;
+
+#ifdef YDEBUGGER
+		///> Only the last run here will trigger the pause
+		m_pDebugHelper->TryPause();
+#endif
+
 		NodeState finalState = state;
 
 		switch (m_pNode->GetReturnType())
