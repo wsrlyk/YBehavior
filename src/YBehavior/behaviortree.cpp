@@ -53,6 +53,7 @@ namespace YBehavior
 
 		m_SharedData = new SharedDataEx();
 		m_LocalData = nullptr;
+		m_ClassName = "Root";
 		//m_NameKeyMgr = new NameKeyMgr();
 	}
 
