@@ -67,11 +67,13 @@ namespace YBehavior
 	{
 	protected:
 		std::stack<TreeNodeContext*> m_CallStack;
+		bool m_bDirty{ false };
 	public:
-		void PushCallStack(TreeNodeContext* context) { m_CallStack.push(context); }
-		TreeNodeContext* GetCallStackTop() { if (m_CallStack.empty()) return nullptr; return m_CallStack.top(); }
-		void PopCallStack() { if (!m_CallStack.empty()) m_CallStack.pop(); }
-		bool IsCallStackEmpty() { return m_CallStack.empty(); }
+		inline void PushCallStack(TreeNodeContext* context) { m_CallStack.push(context); m_bDirty = true; }
+		inline TreeNodeContext* GetCallStackTop() { m_bDirty = false; return m_CallStack.top(); }
+		inline void PopCallStack() { m_CallStack.pop(); }
+		inline bool IsCallStackEmpty() const { return m_CallStack.empty(); }
+		inline bool HasNewCall() const { return m_bDirty; }
 	};
 }
 

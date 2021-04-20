@@ -441,7 +441,7 @@ namespace YBehavior
 			{
 				pAgent->GetTreeContext()->PushCallStack(m_pNode->GetCondition()->CreateContext());
 				m_RootStage = RootStage::Condition;
-				return NS_INVALID;
+				return NS_RUNNING;
 			}
 			else
 			{
@@ -476,7 +476,10 @@ namespace YBehavior
 			return state;
 
 #ifdef YDEBUGGER
-		///> Only the last run here will trigger the pause
+		///> Only the last run here will trigger the pause.
+		///> This is only used for the parent nodes. 
+		///  When child finishes executing, the debugger should pause at the parent, 
+		///  OR the debugger may go directly to the root
 		m_pDebugHelper->TryPause();
 #endif
 

@@ -102,26 +102,24 @@ namespace YBehavior
 			{
 				auto pContext = treeContext->GetCallStackTop();
 				////LOG_BEGIN << pContext->GetTreeNode()->GetClassName() << LOG_END;
-				NodeState ns = pContext->Execute(pAgent, lastState);
-				if (ns == NS_BREAK)
+				lastState = pContext->Execute(pAgent, lastState);
+				if (lastState == NS_BREAK)
 				{
-					lastState = ns;
 					break;
 				}
-				if (ns == NS_RUNNING)
+				if (lastState == NS_RUNNING)
 				{
-					if (treeContext->GetCallStackTop() == pContext)
+					///> leaf node
+					if (!treeContext->HasNewCall())
 					{
-						lastState = ns;
 						break;
 					}
 				}
-				else if (ns != NS_INVALID)
+				else if (lastState != NS_INVALID)
 				{
 					treeContext->PopCallStack();
 					pContext->GetTreeNode()->DestroyContext(pContext);
 				}
-				lastState = ns;
 			}
 
 			////////NodeState ns = pTree->RootExecute(pAgent, pAgent->IsRCEmpty() ? NS_INVALID : NS_RUNNING);
