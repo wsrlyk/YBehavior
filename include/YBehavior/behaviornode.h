@@ -57,8 +57,8 @@ namespace YBehavior
 	class TreeNodeContext;
 	typedef BehaviorNode* BehaviorNodePtr;
 
-#define ERROR_BEGIN_NODE_HEAD ERROR_BEGIN << m_UID << "." << GetClassName() << " "
-#define LOG_BEGIN_NODE_HEAD LOG_BEGIN << m_UID << "." << GetClassName() << " "
+#define ERROR_BEGIN_NODE_HEAD ERROR_BEGIN << this->m_UID << "." << this->GetClassName() << " "
+#define LOG_BEGIN_NODE_HEAD LOG_BEGIN << this->m_UID << "." << this->GetClassName() << " "
 
 #define TREENODE_DEFINE(classname) classname() { m_ClassName = #classname; }
 	class BehaviorNode
@@ -249,7 +249,7 @@ namespace YBehavior
 
 	public:
 		TreeNodeContext();
-		~TreeNodeContext();
+		virtual ~TreeNodeContext();
 		void Init(BehaviorNodePtr pNode);
 		void Destroy();
 		inline BehaviorNodePtr GetTreeNode() { return m_pNode; }
@@ -400,7 +400,7 @@ namespace YBehavior
 		m_Children->push_back(child);
 		child->SetParent(this);
 
-		OnAddChild(child, connection);
+		this->OnAddChild(child, connection);
 
 		return true;
 	}
@@ -465,7 +465,7 @@ namespace YBehavior
 
 		child->SetParent(this);
 
-		OnAddChild(child, connection);
+		this->OnAddChild(child, connection);
 
 		return true;
 	}
