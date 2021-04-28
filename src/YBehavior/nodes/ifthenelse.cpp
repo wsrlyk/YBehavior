@@ -59,6 +59,7 @@ namespace YBehavior
 				pAgent->GetTreeContext()->PushCallStack(pNode->m_Else->CreateContext());
 			}
 			++m_Stage;
+			break;
 		case IfThenElsePhase::ThenElse:
 			return lastState;
 		default:
