@@ -22,8 +22,9 @@ namespace YBehavior
 		else
 		{
 			///> A child has run. The state must be checked
-			if (lastState != NS_SUCCESS)
+			if (lastState != NS_FAILURE)
 			{
+				YB_LOG_INFO_WITH_END("Break at UID  " << (*m_pChildren)[m_Iterator.Current()]->GetUID());
 				++m_Stage;
 				return NS_FAILURE;
 			}
