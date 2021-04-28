@@ -22,11 +22,11 @@ namespace YBehavior
 		else
 		{
 			///> A child has run. The state must be checked
-			if (lastState != NS_FAILURE)
+			if (lastState == NS_SUCCESS)
 			{
 				YB_LOG_INFO_WITH_END("Break at UID  " << (*m_pChildren)[m_Iterator.Current()]->GetUID());
 				++m_Stage;
-				return NS_FAILURE;
+				return NS_SUCCESS;
 			}
 		}
 
@@ -37,7 +37,7 @@ namespace YBehavior
 			return NS_RUNNING;
 		}
 		++m_Stage;
-		return NS_SUCCESS;
+		return NS_FAILURE;
 	}
 
 	void RandomSelectorNodeContext::_OnInit()
