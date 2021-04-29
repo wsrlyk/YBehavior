@@ -410,6 +410,10 @@ namespace YBehavior
 			op = helper->CreateVariable();
 			m_Variables.push_back(op);
 
+#ifdef YDEBUGGER
+			op->SetName(attrOptr.name(), this->GetClassName());
+#endif
+			
 			///> Vector Index
 			if (buffer.size() >= 5 && buffer[2] == "VI")
 			{
@@ -423,10 +427,6 @@ namespace YBehavior
 			}
 			else
 				op->SetValueFromString(buffer[1]);
-
-#ifdef YDEBUGGER
-			op->SetName(attrOptr.name(), this->GetClassName());
-#endif
 
 			return op->TypeID();
 		}

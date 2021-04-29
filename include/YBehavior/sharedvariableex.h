@@ -306,7 +306,7 @@ namespace YBehavior
 
 			if (key == Utility::INVALID_KEY)
 			{
-				ERROR_BEGIN << "Cant Get Key for " << s << " with typeid = " << GetTypeID<T>() << " at " << this->GetLogName() << ERROR_END;
+				ERROR_BEGIN << "Cant Get Key for \"" << s << "\" with typeid = " << GetTypeID<T>() << " at " << this->GetLogName() << ERROR_END;
 			}
 			m_ReferenceName = s;
 			SetKey(key);
