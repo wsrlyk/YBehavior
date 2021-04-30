@@ -33,8 +33,8 @@ namespace YBehavior
 	{
 		if (m_Pool.empty())
 			return new T();
-		T* t = m_Pool.front();
-		m_Pool.pop_front();
+		T* t = m_Pool.back();
+		m_Pool.pop_back();
 		Utility::SetDefault<T>(*t);
 		return t;
 	}
