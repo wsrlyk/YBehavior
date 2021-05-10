@@ -501,37 +501,36 @@ namespace YBehavior
 	}
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
-	DebugTreeHelper::DebugTreeHelper(Agent* pAgent, BehaviorNode* pNode)
-		: IDebugHelper(pAgent)
-		, m_pLogInfo(nullptr)
+	void DebugTreeHelper::Init(Agent* pAgent)
 	{
-		if (pAgent == nullptr || !DebugMgr::Instance()->IsValidTarget(pAgent, pNode->GetRoot()))
+		m_Target = pAgent;
+		m_pLogInfo = nullptr;
+		if (pAgent == nullptr || !DebugMgr::Instance()->IsValidTarget(pAgent, m_pContext->GetTreeNode()->GetRoot()))
 		{
 			m_Target = nullptr;
 			return;
 		}
 
-		m_pNode = pNode;
 		m_Type = DebugTargetType::TREE;
 
-		CreateRunInfo(pNode);
-		m_pRunInfo->nodeUID = pNode->GetUID();
+		CreateRunInfo(m_pContext->GetTreeNode());
+		m_pRunInfo->nodeUID = m_pContext->GetTreeNode()->GetUID();
 		m_pRunInfo->rawRunState = NS_RUNNING;
 		m_pRunInfo->finalRunState = NS_RUNNING;
 		m_pRunInfo->type = DebugTargetType::TREE;
-		m_pRunInfo->pNode = pNode->GetRoot();
+		m_pRunInfo->pNode = m_pContext->GetTreeNode()->GetRoot();
 
-		if (DebugMgr::Instance()->HasDebugPoint({ DebugTargetType::TREE, pNode->GetRoot()->GetTreeName() }, pNode->GetUID()))
+		if (DebugMgr::Instance()->HasDebugPoint({ DebugTargetType::TREE, m_pContext->GetTreeNode()->GetRoot()->GetTreeName() }, m_pContext->GetTreeNode()->GetUID()))
 		{
 			m_pLogInfo = ObjectPoolStatic<NodeLogInfo>::Get();
 			m_pLogInfo->Reset();
-			pNode->GetDebugLogInfo().str("");
+			m_DebugLogInfo.str("");
 		}
 
 		m_Token = ++s_Token;
 	}
 
-	DebugTreeHelper::~DebugTreeHelper()
+	void DebugTreeHelper::Dispose()
 	{
 		if (IsValid())
 		{
@@ -550,7 +549,7 @@ namespace YBehavior
 
 	const YBehavior::STRING& DebugTreeHelper::GetRootName()
 	{
-		return m_pNode->GetRoot()->GetTreeName();
+		return m_pContext->GetTreeNode()->GetRoot()->GetTreeName();
 	}
 
 	void DebugTreeHelper::_SendLogPoint()
@@ -558,16 +557,16 @@ namespace YBehavior
 		if (m_pLogInfo == nullptr)
 			return;
 
-		m_pLogInfo->otherInfo = m_pNode->GetDebugLogInfo().str();
-		m_pNode->GetDebugLogInfo().str("");
+		m_pLogInfo->otherInfo = m_DebugLogInfo.str();
+		m_DebugLogInfo.str("");
 
 		DebugMgr::Instance()->AppendSendContent("[LogPoint]");
 		DebugMgr::Instance()->AppendSendContent(s_HeadSpliter);
-		DebugMgr::Instance()->AppendSendContent(((BehaviorTree*)m_pNode->GetRoot())->GetTreeName());
+		DebugMgr::Instance()->AppendSendContent(((BehaviorTree*)m_pContext->GetTreeNode()->GetRoot())->GetTreeName());
 		DebugMgr::Instance()->AppendSendContent(" ");
-		DebugMgr::Instance()->AppendSendContent(Utility::ToString(m_pNode->GetUID()));
+		DebugMgr::Instance()->AppendSendContent(Utility::ToString(m_pContext->GetTreeNode()->GetUID()));
 		DebugMgr::Instance()->AppendSendContent(".");
-		DebugMgr::Instance()->AppendSendContent(m_pNode->GetClassName());
+		DebugMgr::Instance()->AppendSendContent(m_pContext->GetTreeNode()->GetClassName());
 		DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
 		DebugMgr::Instance()->AppendSendContent(Utility::ToString<INT>((INT)m_pRunInfo->rawRunState));
 		DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);

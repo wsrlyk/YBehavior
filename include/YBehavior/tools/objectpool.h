@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_OBJECTPOOL_H_
 #define _YBEHAVIOR_OBJECTPOOL_H_
 #include "YBehavior/types.h"
-#include <list>
+#include <deque>
 #include "YBehavior/utility.h"
 
 namespace YBehavior
@@ -9,7 +9,7 @@ namespace YBehavior
 	template <typename T>
 	class ObjectPool
 	{
-		std::list<T*> m_Pool;
+		std::deque<T*> m_Pool;
 
 	public:
 		~ObjectPool();
@@ -33,8 +33,8 @@ namespace YBehavior
 	{
 		if (m_Pool.empty())
 			return new T();
-		T* t = m_Pool.front();
-		m_Pool.pop_front();
+		T* t = m_Pool.back();
+		m_Pool.pop_back();
 		Utility::SetDefault<T>(*t);
 		return t;
 	}

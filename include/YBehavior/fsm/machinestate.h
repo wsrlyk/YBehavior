@@ -51,7 +51,7 @@ namespace YBehavior
 		DebugFSMHelper* m_pDebugHelper;
 /*		bool _HasLogPoint();
 #define IF_FSM_HAS_LOG_POINT if (_HasLogPoint())
-#define FSM_DEBUG_LOG_INFO(info)\
+#define FSM_YB_LOG_INFO(info)\
 	{\
 		IF_FSM_HAS_LOG_POINT\
 			m_DebugLogInfo << info;\
@@ -59,7 +59,7 @@ namespace YBehavior
 	public:
 		std::stringstream& GetDebugLogInfo() { return m_DebugLogInfo; }
 #else
-//#define FSM_DEBUG_LOG_INFO(info);
+//#define FSM_YB_LOG_INFO(info);
 //#define IF_FSM_HAS_LOG_POINT
 #endif 
 	public:

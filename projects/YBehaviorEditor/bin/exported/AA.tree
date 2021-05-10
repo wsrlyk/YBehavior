@@ -1,9 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <AA>
   <Node Class="Root">
-    <Local d="_Ic 0" a="IIc " />
-    <Node Class="Sequence">
-      <Node Class="SubTree" Tree="_SC " Identification="_SC " />
-    </Node>
+    <Shared ee="_IC 0" />
+    <Local />
+    <Node Class="Calculator" Operator="_EC +" Opl="_IP ee" Opr1="_IP ee" Opr2="_IC 0" />
   </Node>
 </AA>

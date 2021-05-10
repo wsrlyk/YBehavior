@@ -42,10 +42,17 @@ namespace YBehavior
 		return m_IndexList[index];
 	}
 
-	void IndexIterator::Init(int start)
+	void IndexIterator::Init(int length, int start)
 	{
-		m_Start = start;
+		m_Length = length;
+		m_Current = start - 1;
 		m_IndexList.clear();
+	}
+
+	bool IndexIterator::MoveNext()
+	{
+		++m_Current;
+		return 0 <= m_Current && m_Current < m_Length;
 	}
 
 	int IndexIterator::GetIndex(int input) const

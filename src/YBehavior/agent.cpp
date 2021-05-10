@@ -4,7 +4,6 @@
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/registerdata.h"
 #include "YBehavior/nodefactory.h"
-#include "YBehavior/runningcontext.h"
 #include "YBehavior/memory.h"
 #include "YBehavior/fsm/statemachine.h"
 #include "YBehavior/mgrs.h"
@@ -57,7 +56,6 @@ bool YBehavior::Agent::SetBehavior(const BehaviorKey& key)
 
 void YBehavior::Agent::UnloadBehavior()
 {
-	ClearRC();
 	BehaviorProcessHelper::Release(m_Process);
 }
 
@@ -77,32 +75,6 @@ void YBehavior::Agent::ProcessRegister()
 {
 	_OnProcessRegister();
 	m_RegisterData->GetSendData().Clear();
-}
-
-YBehavior::RunningContext* YBehavior::Agent::PopRC()
-{
-	RunningContext* context = nullptr;
-	if (!m_RunningContexts.empty())
-	{
-		context = m_RunningContexts.top();
-		m_RunningContexts.pop();
-	}
-	return context;
-}
-
-void YBehavior::Agent::PushRC(RunningContext* context)
-{
-	m_RunningContexts.push(context);
-}
-
-void YBehavior::Agent::ClearRC()
-{
-	while (!m_RunningContexts.empty())
-	{
-		RunningContext* context = m_RunningContexts.top();
-		m_RunningContexts.pop();
-		delete context;
-	}
 }
 
 YBehavior::Agent::Agent(Entity* entity)
@@ -126,7 +98,6 @@ YBehavior::Agent::~Agent()
 	//delete m_Memory;
 	//delete m_pMachineContext;
 	//delete m_SharedData;
-	ClearRC();
 }
 
 YBehavior::Entity::Entity()

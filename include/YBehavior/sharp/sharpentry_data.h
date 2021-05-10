@@ -1,4 +1,4 @@
-#ifdef SHARP
+#ifdef YSHARP
 #pragma once
 #include "YBehavior/types.h"
 #include "YBehavior/interface.h"

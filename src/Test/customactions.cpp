@@ -13,7 +13,7 @@ YBehavior::NodeState GetNameAction::Update(YBehavior::AgentPtr pAgent)
 {
 	YBehavior::NodeState ns = YBehavior::NS_SUCCESS;
 	
-	LOG_BEGIN << ((XAgent*)pAgent)->GetEntity()->ToString() << LOG_END;
+	////LOG_BEGIN << ((XAgent*)pAgent)->GetEntity()->ToString() << LOG_END;
 
 
 	return ns;
@@ -78,7 +78,7 @@ YBehavior::STRING XEntity::ToString() const
 
 YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 {
-	LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Target, true);
+	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Target, true);
 
 	YBehavior::EntityWrapper currentTarget;
 	m_Target->GetCastedValue(pAgent->GetMemory(), currentTarget);
@@ -93,7 +93,7 @@ YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 		m_Target->SetCastedValue(pAgent->GetMemory(), &wrapper);
 	}
 
-	LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Target, false);
+	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Target, false);
 
 	return YBehavior::NS_SUCCESS;
 }
@@ -114,14 +114,14 @@ YBehavior::NodeState GetTargetNameAction::Update(YBehavior::AgentPtr pAgent)
 	const YBehavior::EntityWrapper* currentTarget = m_Target->GetCastedValue(pAgent->GetMemory());
 	if (currentTarget && currentTarget->IsValid())
 	{
-		LOG_BEGIN << ((XEntity*)currentTarget->Get())->ToString() << LOG_END;
+		////LOG_BEGIN << ((XEntity*)currentTarget->Get())->ToString() << LOG_END;
+		return YBehavior::NS_SUCCESS;
 	}
 	else
 	{
-		LOG_BEGIN << "No Target" << LOG_END;
+		////LOG_BEGIN << "No Target" << LOG_END;
+		return YBehavior::NS_FAILURE;
 	}
-
-	return YBehavior::NS_SUCCESS;
 }
 
 bool GetTargetNameAction::OnLoaded(const pugi::xml_node& data)

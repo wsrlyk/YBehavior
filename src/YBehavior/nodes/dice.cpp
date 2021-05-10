@@ -19,25 +19,25 @@ namespace YBehavior
 	{
 		NodeState ns = NS_FAILURE;
 
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_Distribution, true);
-			LOG_SHARED_DATA(m_Values, true);
-			LOG_SHARED_DATA(m_Input, true);
-			LOG_SHARED_DATA(m_Output, true);
-			LOG_SHARED_DATA(m_IgnoreInput, true);
+			YB_LOG_VARIABLE(m_Distribution, true);
+			YB_LOG_VARIABLE(m_Values, true);
+			YB_LOG_VARIABLE(m_Input, true);
+			YB_LOG_VARIABLE(m_Output, true);
+			YB_LOG_VARIABLE(m_IgnoreInput, true);
 		}
 
 		INT sizeX = m_Distribution->VectorSize(pAgent->GetMemory());
 		INT sizeY = m_Values->VectorSize(pAgent->GetMemory());
 		if (sizeX != sizeY)
 		{
-			DEBUG_LOG_INFO("Different length of X and Y; ");
+			YB_LOG_INFO("Different length of X and Y; ");
 			return NS_FAILURE;
 		}
 		if (sizeX == 0)
 		{
-			DEBUG_LOG_INFO("No key points; ");
+			YB_LOG_INFO("No key points; ");
 			return NS_FAILURE;
 		}
 
@@ -69,7 +69,7 @@ namespace YBehavior
 
 		if (pHelper->Compare(input, zero.pData, OT_LESS))
 		{
-			DEBUG_LOG_INFO("Input below zero; ");
+			YB_LOG_INFO("Input below zero; ");
 			return NS_FAILURE;
 		}
 
@@ -91,15 +91,15 @@ namespace YBehavior
 
 		if (ns == NS_FAILURE)
 		{
-			DEBUG_LOG_INFO("Input above max; ");
+			YB_LOG_INFO("Input above max; ");
 		}
 		//if (m_DefaultChild != nullptr)
 		//{
-		//	DEBUG_LOG_INFO("Switch to default; ");
+		//	YB_LOG_INFO("Switch to default; ");
 		//	ns = m_DefaultChild->Execute(pAgent);
 		//}
 
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Output, false);
+		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Output, false);
 
 		return ns;
 	}

@@ -180,11 +180,12 @@ namespace YBehavior
 	protected:
 		static unsigned s_Token;
 
-		NodeRunInfo* m_pRunInfo;
+		NodeRunInfo* m_pRunInfo{};
 		unsigned m_Token;
-		Agent* m_Target;
+		Agent* m_Target{};
 		DebugTargetType m_Type;
 	public:
+		IDebugHelper() {};
 		IDebugHelper(Agent* pAgent) : m_Target(pAgent){}
 		virtual ~IDebugHelper() {}
 		inline bool IsValid() { return m_Target != nullptr; }
@@ -210,19 +211,28 @@ namespace YBehavior
 	};
 
 	class Agent;
+	class TreeNodeContext;
+
+	///> For now, tree node is different from machine state
+	///  TreeNodeContext is managed by pool, and each TreeNodeContext will keep a DebugTreeHelper,
+	///  So it means a DebugTreeHelper may never be deleted until the app ends.
+	///  As a result, m_DebugLogInfo can be managed by the DebugTreeHelper 
+	///  and you don't need worrying about allocating a large stringstream for storing the logs
 	class DebugTreeHelper : public IDebugHelper
 	{
-		BehaviorNode* m_pNode;
+		TreeNodeContext* m_pContext;
 		NodeLogInfo* m_pLogInfo;
+		std::stringstream m_DebugLogInfo;
 
 		void _SendLogPoint();
 	public:
-		DebugTreeHelper(Agent* pAgent, BehaviorNode* pNode);
-		~DebugTreeHelper();
+		DebugTreeHelper(TreeNodeContext* pContext) : m_pContext(pContext) {}
+		void Init(Agent* pAgent);
+		void Dispose();
 		const STRING& GetRootName() override;
 	public:
 		void LogSharedData(ISharedVariableEx* pVariable, bool bBefore);
-		
+		inline std::stringstream& GetDebugLogInfo() { return m_DebugLogInfo; }
 	};
 
 	class DebugFSMHelper : public IDebugHelper

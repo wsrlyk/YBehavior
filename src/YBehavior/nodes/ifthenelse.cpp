@@ -1,77 +1,10 @@
 #include "YBehavior/nodes/ifthenelse.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/profile/profileheader.h"
+#include "YBehavior/agent.h"
 
 namespace YBehavior
 {
-	IfThenElse::IfThenElse()
-		: m_If(nullptr)
-		, m_Then(nullptr)
-		, m_Else(nullptr)
-	{
-		SetRCCreator(&m_RCContainer);
-	}
-
-
-	IfThenElse::~IfThenElse()
-	{
-	}
-
-	NodeState IfThenElse::Update(AgentPtr pAgent)
-	{
-		if (m_If == nullptr)
-			return NS_FAILURE;
-
-		NodeState ns = NS_INVALID;
-		IfThenElsePhase itep = ITE_Normal;
-
-		m_RCContainer.ConvertRC(this);
-
-		if (m_RCContainer.GetRC())
-		{
-			ns = NS_RUNNING;
-			itep = m_RCContainer.GetRC()->Current;
-		}
-
-		if (itep == ITE_Normal || itep == ITE_If)
-		{
-			PROFILER_PAUSE;
-			ns = m_If->Execute(pAgent, ns);
-			PROFILER_RESUME;
-			if (_CheckRunningNodeState(ITE_If, ns))
-				return ns;
-			itep = ITE_Normal;
-		}
-
-		if (ns == NS_SUCCESS || itep == ITE_Then)
-		{
-			if (m_Then)
-			{
-				DEBUG_LOG_INFO("Run [THEN]; ");
-				PROFILER_PAUSE;
-				ns = m_Then->Execute(pAgent, ns);
-				PROFILER_RESUME;
-				_CheckRunningNodeState(ITE_Then, ns);
-				return ns;
-			}
-			return NS_FAILURE;
-		}
-		else if (ns == NS_FAILURE || itep == ITE_Else)
-		{
-			if (m_Else)
-			{
-				DEBUG_LOG_INFO("Run [ELSE]; ");
-				PROFILER_PAUSE;
-				ns = m_Else->Execute(pAgent, ns);
-				PROFILER_RESUME;
-				_CheckRunningNodeState(ITE_Else, ns);
-				return ns;
-			}
-			return NS_FAILURE;
-		}
-		return NS_FAILURE;
-	}
-
 	void IfThenElse::OnAddChild(BehaviorNode * child, const STRING & connection)
 	{
 		if (connection == "if")
@@ -101,14 +34,38 @@ namespace YBehavior
 		}
 	}
 
-	bool IfThenElse::_CheckRunningNodeState(IfThenElsePhase current, NodeState ns)
+	NodeState IfThenElseNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
 	{
-		if (ns != NS_RUNNING)
-			return false;
+		IfThenElse* pNode = (IfThenElse*)m_pNode;
+		switch ((IfThenElsePhase)m_Stage)
+		{
+		case IfThenElsePhase::None:
+			if (!pNode->m_If)
+				return NS_FAILURE;
+			pAgent->GetTreeContext()->PushCallStack(pNode->m_If->CreateContext());
+			++m_Stage;
+			break;
+		case IfThenElsePhase::If:
+			if (lastState == NS_SUCCESS)
+			{
+				if (!pNode->m_Then)
+					return NS_FAILURE;
+				pAgent->GetTreeContext()->PushCallStack(pNode->m_Then->CreateContext());
+			}
+			else
+			{
+				if (!pNode->m_Else)
+					return NS_FAILURE;
+				pAgent->GetTreeContext()->PushCallStack(pNode->m_Else->CreateContext());
+			}
+			++m_Stage;
+			break;
+		case IfThenElsePhase::ThenElse:
+			return lastState;
+		default:
+			break;
+		}
 
-		m_RCContainer.CreateRC(this);
-		m_RCContainer.GetRC()->Current = current;
-		return true;
+		return NS_RUNNING;
 	}
-
 }

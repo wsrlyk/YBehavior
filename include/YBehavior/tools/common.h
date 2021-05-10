@@ -24,14 +24,16 @@ namespace YBehavior
 	{
 	private:
 		int m_Length;
-		int m_Start;
+		int m_Current;
 		StdVector<int> m_IndexList;
 	public:
-		void Init(int start);
-		inline int GetStart() const { return m_Start; }
+		void Init(int length, int start);
+		int Current() const { return GetIndex(m_Current); }
+		bool MoveNext();
 		int GetIndex(int input) const;
 		void SetIndexList(const StdVector<int>& indexlist) { m_IndexList = indexlist; }
 	};
+
 	struct xml_string_writer : pugi::xml_writer
 	{
 		std::string result;

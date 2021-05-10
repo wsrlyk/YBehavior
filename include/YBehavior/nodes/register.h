@@ -6,10 +6,10 @@
 
 namespace YBehavior
 {
-	class ReadRegister : public LeafNode
+	class ReadRegister : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "ReadRegister"; }
+		TREENODE_DEFINE(ReadRegister)
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;
@@ -23,10 +23,10 @@ namespace YBehavior
 		SharedVariableEx<VecString>* m_String;
 	};
 
-	class WriteRegister : public LeafNode
+	class WriteRegister : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "WriteRegister"; }
+		TREENODE_DEFINE(WriteRegister)
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;

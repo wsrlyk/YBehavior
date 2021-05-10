@@ -1,4 +1,4 @@
-#ifdef SHARP
+#ifdef YSHARP
 #pragma once
 #include "YBehavior/agent.h"
 #include "YBehavior/sharp/sharpnode.h"
@@ -124,10 +124,10 @@ extern "C" YBEHAVIOR_API YBehavior::ISharedVariableEx* CreateVariable(
 
 extern "C" YBEHAVIOR_API void SetSharedDataByString(YBehavior::Agent* pAgent, YBehavior::CSTRING name, YBehavior::CSTRING value, YBehavior::CHAR separator)
 {
-	auto& maps = YBehavior::SharedVariableCreateHelperMgr::GetAllHelpers();
-	for (auto it = maps.begin(); it != maps.end(); ++it)
+	auto maps = YBehavior::SharedVariableCreateHelperMgr::GetAllHelpers();
+	for (int i = 0; i < MAX_TYPE_KEY; ++i)
 	{
-		if (it->second->TrySetSharedData(pAgent->GetMemory()->GetMainData(), name, value, separator))
+		if (maps[i]->TrySetSharedData(pAgent->GetMemory()->GetMainData(), name, value, separator))
 		{
 			break;
 		}
@@ -137,8 +137,8 @@ extern "C" YBEHAVIOR_API void SetSharedDataByString(YBehavior::Agent* pAgent, YB
 extern "C" YBEHAVIOR_API void LogSharedData(YBehavior::BehaviorNode* pNode, YBehavior::ISharedVariableEx* pVariable, bool before)
 {
 #ifdef YDEBUGGER
-	if (pNode->HasLogPoint())
-		pNode->LogSharedData(pVariable, before);
+	if (YB::TreeNodeContext::HasDebugPoint(pNode->GetDebugHelper()))
+		YB::TreeNodeContext::LogVariable(pNode->GetDebugHelper(), pVariable, before);
 #else
 #endif
 }
@@ -147,7 +147,7 @@ extern "C" YBEHAVIOR_API void LogSharedData(YBehavior::BehaviorNode* pNode, YBeh
 extern "C" YBEHAVIOR_API bool HasLogPoint(YBehavior::BehaviorNode* pNode)
 {
 #ifdef YDEBUGGER
-	return pNode->HasLogPoint();
+	return YB::TreeNodeContext::HasDebugPoint(pNode->GetDebugHelper());
 #else
 	return false;
 #endif
@@ -155,8 +155,8 @@ extern "C" YBEHAVIOR_API bool HasLogPoint(YBehavior::BehaviorNode* pNode)
 extern "C" YBEHAVIOR_API void LogDebugInfo(YBehavior::BehaviorNode* pNode, YBehavior::CSTRING_CONST str)
 {
 #ifdef YDEBUGGER
-	if (pNode->HasLogPoint())
-		pNode->LogDebugInfo(str);
+	if (YB::TreeNodeContext::HasDebugPoint(pNode->GetDebugHelper()))
+		YB::TreeNodeContext::GetLogInfo(pNode->GetDebugHelper()) << str;
 #else
 	
 #endif

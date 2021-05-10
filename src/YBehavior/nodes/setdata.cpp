@@ -33,7 +33,7 @@ namespace YBehavior
 	{
 		m_Opl->SetValue(pAgent->GetMemory(), m_Opr->GetValue(pAgent->GetMemory()));
 
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Opl, false);
+		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Opl, false);
 
 		return NS_SUCCESS;
 	}

@@ -2,8 +2,7 @@
 #define _YBEHAVIOR_MEMORY_H_
 
 #include "YBehavior/shareddataex.h"
-#include <stack>
-#include <list>
+#include <vector>
 
 namespace YBehavior
 {
@@ -22,7 +21,11 @@ namespace YBehavior
 		ObjectPool<SharedDataEx> *m_DataPool;
 	};
 
-	typedef std::list<StackInfo> MemoryStack;
+	///> Deque has poor performance at traversing;
+	///> List will new/delete nodes when push/pop;
+	///> Stack cant traverse.
+	///> So we choose vector. 
+	typedef std::vector<StackInfo> MemoryStack;
 	class Memory : public IMemory
 	{
 	public:
@@ -44,12 +47,14 @@ namespace YBehavior
 	class TempMemory : public IMemory
 	{
 	public:
+		TempMemory() {}
 		TempMemory(SharedDataEx* pMain, SharedDataEx* pLocal);
+		void Set(SharedDataEx* pMain, SharedDataEx* pLocal);
 		SharedDataEx* GetMainData() override { return m_pMainData; }
 		SharedDataEx* GetStackTop() override { return m_pLocalData; }
 	private:
-		SharedDataEx* m_pMainData;
-		SharedDataEx* m_pLocalData;
+		SharedDataEx* m_pMainData{};
+		SharedDataEx* m_pLocalData{};
 	};
 }
 

@@ -46,10 +46,10 @@ namespace YBehavior
 
 	YBehavior::NodeState Comparer::Update(AgentPtr pAgent)
 	{
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_Opl, true);
-			LOG_SHARED_DATA(m_Opr, true);
+			YB_LOG_VARIABLE(m_Opl, true);
+			YB_LOG_VARIABLE(m_Opr, true);
 		}
 
 		IVariableOperationHelper* pHelper = m_Opl->GetOperation();

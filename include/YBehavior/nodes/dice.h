@@ -6,10 +6,10 @@
 
 namespace YBehavior
 {
-	class Dice : public LeafNode
+	class Dice : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "Dice"; }
+		TREENODE_DEFINE(Dice)
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;

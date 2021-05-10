@@ -71,7 +71,7 @@ public:
 class GetNameAction : public YBehavior::Action
 {
 public:
-	YBehavior::STRING GetClassName() const override { return "GetNameAction"; }
+	TREENODE_DEFINE(GetNameAction)
 protected:
 	virtual YBehavior::NodeState Update(YBehavior::AgentPtr pAgent);
 };
@@ -79,7 +79,7 @@ protected:
 class GetTargetNameAction : public YBehavior::Action
 {
 public:
-	YBehavior::STRING GetClassName() const override { return "GetTargetNameAction"; }
+	TREENODE_DEFINE(GetTargetNameAction)
 protected:
 	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;
 	bool OnLoaded(const pugi::xml_node& data) override;
@@ -90,7 +90,7 @@ protected:
 class SelectTargetAction : public YBehavior::Action
 {
 public:
-	YBehavior::STRING GetClassName() const override { return "SelectTargetAction"; }
+	TREENODE_DEFINE(SelectTargetAction)
 
 protected:
 	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;

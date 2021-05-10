@@ -5,12 +5,22 @@
 
 namespace YBehavior
 {
-	class SubTree : public LeafNode
+	class LocalMemoryInOut;
+	class SubTreeNodeContext : public TreeNodeContext
 	{
-	public:
-		STRING GetClassName() const override { return "SubTree"; }
 	protected:
-		NodeState Update(AgentPtr pAgent) override;
+		void _OnInit() override;
+		void _OnDestroy() override;
+		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
+		int m_Stage;
+		LocalMemoryInOut* m_pInOut{};
+	};
+	class SubTree : public LeafNode<SubTreeNodeContext>
+	{
+		friend SubTreeNodeContext;
+	public:
+		TREENODE_DEFINE(SubTree)
+	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		bool OnLoadChild(const pugi::xml_node& data) override;
 		bool _TryCreateFromTo(const pugi::xml_node& data, std::vector<ISharedVariableEx*>& container);
@@ -20,8 +30,6 @@ namespace YBehavior
 
 		std::vector<ISharedVariableEx* > m_Inputs;
 		std::vector<ISharedVariableEx* > m_Outputs;
-
-		STRING m_FinalTreeName;
 	};
 }
 

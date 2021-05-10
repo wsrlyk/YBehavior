@@ -5,13 +5,13 @@
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/logger.h"
 
-#ifdef SHARP
+#ifdef YSHARP
 #include "YBehavior/sharp/sharpnode.h"
 #endif
 
 namespace YBehavior
 {
-#ifdef SHARP
+#ifdef YSHARP
 	struct SharpCallbacks
 	{
 		SharpCallbacks()
@@ -29,11 +29,11 @@ namespace YBehavior
 	protected:
 		static NodeFactory* s_NodeFactory;
 
-#ifdef SHARP
+#ifdef YSHARP
 		std::unordered_map<STRING, SharpCallbacks> m_SharpCallbacks;
 #endif
 	public:
-#ifdef SHARP
+#ifdef YSHARP
 		BehaviorNode* Get(const STRING& name) override;
 		void SetSharpCallback(const STRING& name, OnSharpNodeLoadedDelegate onload, OnSharpNodeUpdateDelegate onupdate);
 #endif // SHARP

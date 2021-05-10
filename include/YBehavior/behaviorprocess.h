@@ -51,6 +51,7 @@ namespace YBehavior
 	struct BehaviorProcess
 	{
 		MachineContext machineContext;
+		TreeContext treeContext;
 		Memory memory;
 		Behavior* pBehavior{};
 	};

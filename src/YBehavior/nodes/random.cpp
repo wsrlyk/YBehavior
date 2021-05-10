@@ -43,19 +43,19 @@ namespace YBehavior
 
 	YBehavior::NodeState Random::Update(AgentPtr pAgent)
 	{
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_Opr1, true);
-			LOG_SHARED_DATA(m_Opr2, true);
-			LOG_SHARED_DATA(m_Opl, true);
+			YB_LOG_VARIABLE(m_Opr1, true);
+			YB_LOG_VARIABLE(m_Opr2, true);
+			YB_LOG_VARIABLE(m_Opl, true);
 		}
 
 		IVariableOperationHelper* pHelper = m_Opl->GetOperation();
 		pHelper->Random(pAgent->GetMemory(), m_Opl, m_Opr1, m_Opr2);
 
-		IF_HAS_LOG_POINT
+		YB_IF_HAS_DEBUG_POINT
 		{
-			LOG_SHARED_DATA(m_Opl, false);
+			YB_LOG_VARIABLE(m_Opl, false);
 		}
 
 		return NS_SUCCESS;
@@ -80,7 +80,7 @@ namespace YBehavior
 
 	YBehavior::NodeState RandomSelect::Update(AgentPtr pAgent)
 	{
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Input, true);
+		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Input, true);
 
 		INT size = m_Input->VectorSize(pAgent->GetMemory());
 		if (size == 0)
@@ -91,7 +91,7 @@ namespace YBehavior
 
 		m_Output->SetValue(pAgent->GetMemory(), m_Input->GetElement(pAgent->GetMemory(), idx));
 
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Output, false);
+		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Output, false);
 		return NS_SUCCESS;
 	}
 
@@ -116,7 +116,7 @@ namespace YBehavior
 
 	YBehavior::NodeState Shuffle::Update(AgentPtr pAgent)
 	{
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Input, true);
+		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Input, true);
 
 		int length = m_Input->VectorSize(pAgent->GetMemory());
 		if (length == 0)
@@ -155,7 +155,7 @@ namespace YBehavior
 			pHelper->Set(const_cast<void*>(pTargetVariable->GetElement(pAgent->GetMemory(), i)), temp.pData);
 		}
 
-		LOG_SHARED_DATA_IF_HAS_LOG_POINT(m_Output, false);
+		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Output, false);
 
 		return NS_SUCCESS;
 	}

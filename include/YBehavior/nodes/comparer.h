@@ -7,10 +7,10 @@
 
 namespace YBehavior
 {
-	class Comparer : public LeafNode
+	class Comparer : public LeafNode<>
 	{
 	public:
-		STRING GetClassName() const override { return "Comparer"; }
+		TREENODE_DEFINE(Comparer)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		NodeState Update(AgentPtr pAgent) override;

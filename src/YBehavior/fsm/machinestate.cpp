@@ -65,7 +65,7 @@ namespace YBehavior
 
 		///> postprocessing
 #ifdef YDEBUGGER
-			//DEBUG_LOG_INFO(" Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
+			//YB_LOG_INFO(" Return " << s_NodeStateMap.GetValue(state, Utility::StringEmpty));
 
 		dbgHelper.TryPause();
 		m_pDebugHelper = nullptr;
@@ -83,12 +83,47 @@ namespace YBehavior
 
 	MachineRunRes MachineState::_RunTree(AgentPtr pAgent)
 	{
+		////LOG_BEGIN << "-------------------------------------" << LOG_END;
+
 		BehaviorTree* pTree = pAgent->GetBehavior()->GetMappedTree(this);
 		if (pTree)
 		{
 			pAgent->GetMachineContext()->SetCurRunning(pTree);
-			NodeState ns = pTree->RootExecute(pAgent, pAgent->IsRCEmpty() ? NS_INVALID : NS_RUNNING);
-			switch (ns)
+
+			auto treeContext = pAgent->GetTreeContext();
+			NodeState lastState = NS_INVALID;
+			if (treeContext->IsCallStackEmpty())
+			{
+				treeContext->PushCallStack(pTree->CreateRootContext());
+				lastState = NS_RUNNING;
+			}
+
+			while (!treeContext->IsCallStackEmpty())
+			{
+				auto pContext = treeContext->GetCallStackTop();
+				////LOG_BEGIN << pContext->GetTreeNode()->GetClassName() << LOG_END;
+				lastState = pContext->Execute(pAgent, lastState);
+				if (lastState == NS_BREAK)
+				{
+					break;
+				}
+				if (lastState == NS_RUNNING)
+				{
+					///> leaf node
+					if (!treeContext->HasNewCall())
+					{
+						break;
+					}
+				}
+				else if (lastState != NS_INVALID)
+				{
+					treeContext->PopCallStack();
+					pContext->GetTreeNode()->DestroyContext(pContext);
+				}
+			}
+
+			////////NodeState ns = pTree->RootExecute(pAgent, pAgent->IsRCEmpty() ? NS_INVALID : NS_RUNNING);
+			switch (lastState)
 			{
 			case YBehavior::NS_BREAK:
 				return MRR_Break;

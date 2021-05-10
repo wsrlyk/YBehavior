@@ -2,35 +2,27 @@
 #define _YBEHAVIOR_WAIT_H_
 
 #include "YBehavior/behaviortree.h"
-#include "YBehavior/runningcontext.h"
 
 namespace YBehavior
 {
-	class WaitContext : public RunningContext
+	class WaitNodeContext : public TreeNodeContext
 	{
-	public:
-		int Current = 0;
 	protected:
-		void _OnReset() override
-		{
-			Current = 0;
-		}
+		void _OnInit() override;
+		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
+		int m_Count;
+
 	};
-	class Wait : public LeafNode
+	class Wait : public LeafNode<WaitNodeContext>
 	{
+		friend WaitNodeContext;
 	public:
-		STRING GetClassName() const override { return "Wait"; }
-		Wait()
-		{
-			SetRCCreator(&m_RCContainer);
-		}
+		TREENODE_DEFINE(Wait)
 	protected:
-		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;
 
 	private:
 		SharedVariableEx<INT>* m_TickCount;
-		ContextContainer<WaitContext> m_RCContainer;
 	};
 }
 
