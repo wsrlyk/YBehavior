@@ -53,7 +53,6 @@
     <ClInclude Include="..\include\YBehavior\network\messageprocessor.h" />
     <ClInclude Include="..\include\YBehavior\network\network.h" />
     <ClInclude Include="..\include\YBehavior\nodefactory.h" />
-    <ClInclude Include="..\include\YBehavior\nodes\action.h" />
     <ClInclude Include="..\include\YBehavior\nodes\array.h" />
     <ClInclude Include="..\include\YBehavior\nodes\calculator.h" />
     <ClInclude Include="..\include\YBehavior\nodes\comparer.h" />
@@ -124,7 +123,6 @@
     <ClCompile Include="..\src\YBehavior\network\network.cpp" />
     <ClCompile Include="..\src\YBehavior\network\network_msvc.cpp" />
     <ClCompile Include="..\src\YBehavior\nodefactory.cpp" />
-    <ClCompile Include="..\src\YBehavior\nodes\action.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\array.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\calculator.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\comparer.cpp" />

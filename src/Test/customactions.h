@@ -1,6 +1,5 @@
 #pragma once
 #include "YBehavior/launcher.h"
-#include "YBehavior/nodes/action.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/shareddataex.h"
 
@@ -67,8 +66,12 @@ public:
 	YBehavior::STRING ToString() const override;
 };
 
+class Action : public YBehavior::LeafNode<>
+{
 
-class GetNameAction : public YBehavior::Action
+};
+
+class GetNameAction : public Action
 {
 public:
 	TREENODE_DEFINE(GetNameAction)
@@ -76,7 +79,7 @@ protected:
 	virtual YBehavior::NodeState Update(YBehavior::AgentPtr pAgent);
 };
 
-class GetTargetNameAction : public YBehavior::Action
+class GetTargetNameAction : public Action
 {
 public:
 	TREENODE_DEFINE(GetTargetNameAction)
@@ -87,7 +90,7 @@ protected:
 	YBehavior::SharedVariableEx<YBehavior::EntityWrapper>* m_Target;
 };
 
-class SelectTargetAction : public YBehavior::Action
+class SelectTargetAction : public Action
 {
 public:
 	TREENODE_DEFINE(SelectTargetAction)
