@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_SETDATA_H_
 #define _YBEHAVIOR_SETDATA_H_
 
-#include "YBehavior/behaviortree.h"
+#include "YBehavior/treenode.h"
 
 namespace YBehavior
 {

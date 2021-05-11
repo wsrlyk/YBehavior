@@ -44,7 +44,7 @@ namespace YBehavior
 		return true;
 	}
 
-	void SwitchCase::OnAddChild(BehaviorNode * child, const STRING & connection)
+	void SwitchCase::OnAddChild(TreeNode * child, const STRING & connection)
 	{
 		if (connection == "default")
 		{
@@ -75,7 +75,7 @@ namespace YBehavior
 			}
 
 			INT size = (INT)pNode->m_CasesChilds.size();
-			BehaviorNodePtr targetNode = nullptr;
+			TreeNodePtr targetNode = nullptr;
 			IVariableOperationHelper* pHelper = pNode->m_Switch->GetOperation();
 
 			for (INT i = 0; i < size; ++i)

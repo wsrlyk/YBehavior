@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_FSMRELATED_H_
 #define _YBEHAVIOR_FSMRELATED_H_
 
-#include "YBehavior/behaviortree.h"
+#include "YBehavior/treenode.h"
 
 namespace YBehavior
 {

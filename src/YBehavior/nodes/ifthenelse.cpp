@@ -5,7 +5,7 @@
 
 namespace YBehavior
 {
-	void IfThenElse::OnAddChild(BehaviorNode * child, const STRING & connection)
+	void IfThenElse::OnAddChild(TreeNode * child, const STRING & connection)
 	{
 		if (connection == "if")
 		{

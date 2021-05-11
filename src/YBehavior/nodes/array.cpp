@@ -13,7 +13,7 @@ namespace YBehavior
 			return false;
 		}
 
-		CreateVariable(m_Length, "Length", data, Utility::POINTER_CHAR);
+		CreateVariable(m_Length, "Length", data, true);
 		if (!m_Length)
 		{
 			return false;
@@ -40,7 +40,7 @@ namespace YBehavior
 
 	bool ClearArray::OnLoaded(const pugi::xml_node& data)
 	{
-		CreateVariable(m_Array, "Array", data, Utility::POINTER_CHAR);
+		CreateVariable(m_Array, "Array", data, true);
 		if (m_Array == nullptr)
 		{
 			return false;
@@ -56,7 +56,7 @@ namespace YBehavior
 
 	bool ArrayPushElement::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeIDArray = CreateVariable(m_Array, "Array", data, Utility::POINTER_CHAR);
+		TYPEID typeIDArray = CreateVariable(m_Array, "Array", data, true);
 		if (m_Array == nullptr)
 		{
 			return false;
@@ -116,7 +116,7 @@ namespace YBehavior
 		{
 			return false;
 		}
-		CreateVariable(m_Output, "Output", data, Utility::POINTER_CHAR);
+		CreateVariable(m_Output, "Output", data, true);
 		if (m_Output == nullptr)
 		{
 			return false;

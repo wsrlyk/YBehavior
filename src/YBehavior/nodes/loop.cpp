@@ -16,7 +16,7 @@ namespace YBehavior
 		return true;
 	}
 
-	void For::OnAddChild(BehaviorNode * child, const STRING & connection)
+	void For::OnAddChild(TreeNode * child, const STRING & connection)
 	{
 		if (connection == "init")
 		{

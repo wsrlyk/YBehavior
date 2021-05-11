@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_PIECEWISEFUNCTION_H_
 #define _YBEHAVIOR_PIECEWISEFUNCTION_H_
 
-#include "YBehavior/behaviortree.h"
+#include "YBehavior/treenode.h"
 #include "YBehavior/tools/common.h"
 
 namespace YBehavior

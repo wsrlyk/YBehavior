@@ -56,7 +56,7 @@ namespace YBehavior
 		return tree;
 	}
 
-	bool TreeMgr::_LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID, BehaviorTree* root)
+	bool TreeMgr::_LoadOneNode(TreeNode* node, const pugi::xml_node& data, UINT& parentUID, BehaviorTree* root)
 	{
 		if (node == nullptr)
 		{
@@ -80,7 +80,7 @@ namespace YBehavior
 					ERROR_BEGIN << "Cant Find Class Name in: " << data.name() << ERROR_END;
 					return false;
 				}
-				BehaviorNode* childNode = BehaviorNode::CreateNodeByName(className.value());
+				TreeNode* childNode = TreeNode::CreateNodeByName(className.value());
 				if (childNode == nullptr)
 				{
 					ERROR_BEGIN << "Cant create node " << className.value() << " cause its not registered;" << ERROR_END;

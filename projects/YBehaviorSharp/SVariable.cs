@@ -11,9 +11,9 @@ namespace YBehaviorSharp
 
     public class SVariableHelper
     {
-        public static SVariable CreateVariable(IntPtr pNode, string attrName, IntPtr data, char variableType = '\0')
+        public static SVariable CreateVariable(IntPtr pNode, string attrName, IntPtr data, bool noConst = false)
         {
-            IntPtr v = SharpHelper.CreateVariable(pNode, attrName, data, variableType);
+            IntPtr v = SharpHelper.CreateVariable(pNode, attrName, data, noConst);
             if (v == IntPtr.Zero)
                 return null;
             return GetVaraible(v);

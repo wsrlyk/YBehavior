@@ -56,7 +56,7 @@
     <Compile Include="SVariable.cs" />
     <Compile Include="SUtility.cs" />
     <Compile Include="SharpHelper.cs" />
-    <Compile Include="SBehaviorNode.cs" />
+    <Compile Include="STreeNode.cs" />
     <Compile Include="SAgent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -90,7 +90,7 @@ namespace YBehavior
 			}
 		}
 
-		TreeNodeProfileHelper::TreeNodeProfileHelper(BehaviorNode* pNode)
+		TreeNodeProfileHelper::TreeNodeProfileHelper(TreeNode* pNode)
 		{
 			IS_PROFILING
 			{

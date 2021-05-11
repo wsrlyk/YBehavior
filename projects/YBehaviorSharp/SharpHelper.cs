@@ -101,7 +101,7 @@ namespace YBehaviorSharp
         public static LogCallback OnThreadLogCallback { get; set; }
         public static LogCallback OnThreadErrorCallback { get; set; }
 
-        static List<SBehaviorNode> s_NodeList = new List<SBehaviorNode>();
+        static List<STreeNode> s_NodeList = new List<STreeNode>();
         public static void Init()
         {
             InitSharp(444);
@@ -116,20 +116,20 @@ namespace YBehaviorSharp
                 OnThreadErrorCallback);
 
             var subTypeQuery = from t in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
-                               where SUtility.IsSubClassOf(t, typeof(SBehaviorNode))
+                               where SUtility.IsSubClassOf(t, typeof(STreeNode))
                                select t;
 
             foreach (var type in subTypeQuery)
             {
-                SBehaviorNode node = Activator.CreateInstance(type) as SBehaviorNode;
+                STreeNode node = Activator.CreateInstance(type) as STreeNode;
                 node.Register();
                 s_NodeList.Add(node);
             }
         }
 
-        public static void Register<T>() where T : SBehaviorNode
+        public static void Register<T>() where T : STreeNode
         {
-            SBehaviorNode node = Activator.CreateInstance<T>();
+            STreeNode node = Activator.CreateInstance<T>();
             node.Register();
             s_NodeList.Add(node);
         }
@@ -182,7 +182,7 @@ namespace YBehaviorSharp
             IntPtr pNode,
             string attrName,
             IntPtr data,
-            char variableType);
+            bool noConst);
 
         [DllImport(VERSION.dll)]
         static public extern IntPtr SetSharedDataByString(
@@ -194,11 +194,11 @@ namespace YBehaviorSharp
 
         #region DEBUGGER
         [DllImport(VERSION.dll)]
-        static public extern void LogSharedData(IntPtr pNode, IntPtr pVariable, bool before);
+        static public extern void LogVariable(IntPtr pNode, IntPtr pVariable, bool before);
         [DllImport(VERSION.dll)]
-        static public extern bool HasLogPoint(IntPtr pNode);
+        static public extern bool HasDebugPoint(IntPtr pNode);
         [DllImport(VERSION.dll)]
-        static public extern void LogDebugInfo(IntPtr pNode, string info);
+        static public extern void LogInfo(IntPtr pNode, string info);
         #endregion
 
         [DllImport(VERSION.dll)]

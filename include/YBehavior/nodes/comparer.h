@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_COMPARER_H_
 #define _YBEHAVIOR_COMPARER_H_
 
-#include "YBehavior/behaviortree.h"
+#include "YBehavior/treenode.h"
 #include <unordered_set>
 #include "YBehavior/variableoperation.h"
 

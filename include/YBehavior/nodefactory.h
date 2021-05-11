@@ -24,7 +24,7 @@ namespace YBehavior
 	};
 #endif
 
-	class NodeFactory: public Factory<BehaviorNode>
+	class NodeFactory: public Factory<TreeNode>
 	{
 	protected:
 		static NodeFactory* s_NodeFactory;
@@ -34,7 +34,7 @@ namespace YBehavior
 #endif
 	public:
 #ifdef YSHARP
-		BehaviorNode* Get(const STRING& name) override;
+		TreeNode* Get(const STRING& name) override;
 		void SetSharpCallback(const STRING& name, OnSharpNodeLoadedDelegate onload, OnSharpNodeUpdateDelegate onupdate);
 #endif // SHARP
 

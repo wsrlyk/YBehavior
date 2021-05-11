@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_ARRAY_H_
 #define _YBEHAVIOR_ARRAY_H_
 
-#include "YBehavior/behaviornode.h"
+#include "YBehavior/treenode.h"
 
 namespace YBehavior
 {

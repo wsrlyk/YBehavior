@@ -25,7 +25,7 @@ namespace YBehavior
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = CreateVariable(m_Opl, "Opl", data, Utility::POINTER_CHAR);
+		m_DataType = CreateVariable(m_Opl, "Opl", data, true);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in calculator: " << m_DataType << ERROR_END;

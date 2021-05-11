@@ -32,7 +32,7 @@ namespace YBehavior
 
 		if (m_Iterator.MoveNext())
 		{
-			BehaviorNodePtr node = (*m_pChildren)[m_Iterator.Current()];
+			TreeNodePtr node = (*m_pChildren)[m_Iterator.Current()];
 			pAgent->GetTreeContext()->PushCallStack(node->CreateContext());
 			return NS_RUNNING;
 		}

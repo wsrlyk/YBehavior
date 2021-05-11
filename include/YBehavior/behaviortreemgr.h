@@ -43,7 +43,7 @@ namespace YBehavior
 	protected:
 		bool _GetTree(const STRING& name, BehaviorTree * &tree, bool bToAgent);
 		BehaviorTree * _LoadTree(const STRING& name);
-		bool _LoadOneNode(BehaviorNode* node, const pugi::xml_node& data, UINT& parentUID, BehaviorTree* root);
+		bool _LoadOneNode(TreeNode* node, const pugi::xml_node& data, UINT& parentUID, BehaviorTree* root);
 	private:
 		//static TreeMgr* s_Instance;
 

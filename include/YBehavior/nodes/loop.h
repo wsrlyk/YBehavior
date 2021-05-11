@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_LOOP_H_
 #define _YBEHAVIOR_LOOP_H_
 
-#include "YBehavior/behaviortree.h"
+#include "YBehavior/treenode.h"
 #include "YBehavior/sharedvariableex.h"
 
 namespace YBehavior
@@ -30,13 +30,13 @@ namespace YBehavior
 		TREENODE_DEFINE(For)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
-		void OnAddChild(BehaviorNode * child, const STRING & connection) override;
+		void OnAddChild(TreeNode * child, const STRING & connection) override;
 
 		SharedVariableEx<BOOL>* m_ExitWhenFailure = nullptr;
-		BehaviorNodePtr m_InitChild = nullptr;
-		BehaviorNodePtr m_CondChild = nullptr;
-		BehaviorNodePtr m_IncChild = nullptr;
-		BehaviorNodePtr m_MainChild = nullptr;
+		TreeNodePtr m_InitChild = nullptr;
+		TreeNodePtr m_CondChild = nullptr;
+		TreeNodePtr m_IncChild = nullptr;
+		TreeNodePtr m_MainChild = nullptr;
 	};
 
 	//////////////////////////////////////////////////////////////////////////

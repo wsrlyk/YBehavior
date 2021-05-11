@@ -10,37 +10,37 @@ namespace YBehavior
 {
 	bool ReadRegister::OnLoaded(const pugi::xml_node& data)
 	{
-		CreateVariable(m_Event, "Event", data, Utility::POINTER_CHAR);
+		CreateVariable(m_Event, "Event", data, true);
 		if (!m_Event)
 		{
 			return false;
 		}
 
-		CreateVariable(m_Int, "Int", data, Utility::POINTER_CHAR);
+		CreateVariable(m_Int, "Int", data, true);
 		if (!m_Int)
 		{
 			return false;
 		}
 
-		CreateVariable(m_Float, "Float", data, Utility::POINTER_CHAR);
+		CreateVariable(m_Float, "Float", data, true);
 		if (!m_Float)
 		{
 			return false;
 		}
 
-		CreateVariable(m_Bool, "Bool", data, Utility::POINTER_CHAR);
+		CreateVariable(m_Bool, "Bool", data, true);
 		if (!m_Bool)
 		{
 			return false;
 		}
 
-		CreateVariable(m_Ulong, "Ulong", data, Utility::POINTER_CHAR);
+		CreateVariable(m_Ulong, "Ulong", data, true);
 		if (!m_Ulong)
 		{
 			return false;
 		}
 
-		CreateVariable(m_String, "String", data, Utility::POINTER_CHAR);
+		CreateVariable(m_String, "String", data, true);
 		if (!m_String)
 		{
 			return false;

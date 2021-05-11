@@ -108,15 +108,15 @@ extern "C" YBEHAVIOR_API void Tick(YBehavior::Agent* pAgent)
 }
 
 extern "C" YBEHAVIOR_API YBehavior::ISharedVariableEx* CreateVariable(
-	YBehavior::BehaviorNode* pNode,
+	YBehavior::TreeNode* pNode,
 	YBehavior::CSTRING_CONST attrName,
 	const pugi::xml_node* data,
-	char variableType)
+	bool noConst)
 {
 	if (pNode != nullptr)
 	{
 		YBehavior::ISharedVariableEx* v;
-		YBehavior::TYPEID res = pNode->CreateVariable(v, attrName, *data, variableType);
+		YBehavior::TYPEID res = pNode->CreateVariable(v, attrName, *data, noConst);
 		return v;
 	}
 	return nullptr;
@@ -134,7 +134,7 @@ extern "C" YBEHAVIOR_API void SetSharedDataByString(YBehavior::Agent* pAgent, YB
 	}
 }
 
-extern "C" YBEHAVIOR_API void LogSharedData(YBehavior::BehaviorNode* pNode, YBehavior::ISharedVariableEx* pVariable, bool before)
+extern "C" YBEHAVIOR_API void LogVariable(YBehavior::TreeNode* pNode, YBehavior::ISharedVariableEx* pVariable, bool before)
 {
 #ifdef YDEBUGGER
 	if (YB::TreeNodeContext::HasDebugPoint(pNode->GetDebugHelper()))
@@ -144,7 +144,7 @@ extern "C" YBEHAVIOR_API void LogSharedData(YBehavior::BehaviorNode* pNode, YBeh
 }
 
 
-extern "C" YBEHAVIOR_API bool HasLogPoint(YBehavior::BehaviorNode* pNode)
+extern "C" YBEHAVIOR_API bool HasDebugPoint(YBehavior::TreeNode* pNode)
 {
 #ifdef YDEBUGGER
 	return YB::TreeNodeContext::HasDebugPoint(pNode->GetDebugHelper());
@@ -152,7 +152,7 @@ extern "C" YBEHAVIOR_API bool HasLogPoint(YBehavior::BehaviorNode* pNode)
 	return false;
 #endif
 }
-extern "C" YBEHAVIOR_API void LogDebugInfo(YBehavior::BehaviorNode* pNode, YBehavior::CSTRING_CONST str)
+extern "C" YBEHAVIOR_API void LogInfo(YBehavior::TreeNode* pNode, YBehavior::CSTRING_CONST str)
 {
 #ifdef YDEBUGGER
 	if (YB::TreeNodeContext::HasDebugPoint(pNode->GetDebugHelper()))

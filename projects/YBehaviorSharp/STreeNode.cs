@@ -5,7 +5,7 @@ using System.Text;
 
 namespace YBehaviorSharp
 {
-    public abstract class SBehaviorNode
+    public abstract class STreeNode
     {
         public void Register()
         {
@@ -18,7 +18,7 @@ namespace YBehaviorSharp
 
         static List<OnNodeLoaded> s_OnLoadCallback = new List<OnNodeLoaded>();
         static List<OnNodeUpdate> s_OnUpdateCallback = new List<OnNodeUpdate>();
-        public SBehaviorNode()
+        public STreeNode()
         {
         }
 
@@ -32,19 +32,19 @@ namespace YBehaviorSharp
             return OnNodeUpdate(pNode, pAgent);
         }
 
-        protected bool HasLogPoint()
+        protected bool HasDebugPoint()
         {
-            return SharpHelper.HasLogPoint(m_pNode);
+            return SharpHelper.HasDebugPoint(m_pNode);
         }
 
-        protected void LogSharedData(SVariable v, bool before)
+        protected void LogVariable(SVariable v, bool before)
         {
-            SharpHelper.LogSharedData(m_pNode, v.Core, before);
+            SharpHelper.LogVariable(m_pNode, v.Core, before);
         }
 
-        protected void LogDebugInfo(string s)
+        protected void LogInfo(string s)
         {
-            SharpHelper.LogDebugInfo(m_pNode, s);
+            SharpHelper.LogInfo(m_pNode, s);
         }
 
         abstract protected bool OnNodeLoaded(IntPtr pNode, IntPtr pData);
@@ -55,7 +55,7 @@ namespace YBehaviorSharp
         protected IntPtr m_pNode;
     }
 
-    public class SelectTargetAction : SBehaviorNode
+    public class SelectTargetAction : STreeNode
     {
         SVariableEntity m_Target;
 
@@ -66,7 +66,7 @@ namespace YBehaviorSharp
 
         protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
-            m_Target = new SVariableEntity(YBehaviorSharp.SharpHelper.CreateVariable(pNode, "Target", pData, YBehaviorSharp.SUtility.POINTER_CHAR));
+            m_Target = new SVariableEntity(YBehaviorSharp.SharpHelper.CreateVariable(pNode, "Target", pData, true));
             if (!m_Target.IsValid)
             {
                 return false;
@@ -83,7 +83,7 @@ namespace YBehaviorSharp
         }
     }
 
-    public class GetTargetNameAction : SBehaviorNode
+    public class GetTargetNameAction : STreeNode
     {
         public GetTargetNameAction()
         {
@@ -102,7 +102,7 @@ namespace YBehaviorSharp
         }
     }
 
-    public class SetVector3Action : SBehaviorNode
+    public class SetVector3Action : STreeNode
     {
         SVariable m_Src;
         SVariable m_Des;
@@ -114,8 +114,8 @@ namespace YBehaviorSharp
 
         protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
-            m_Src = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Src", pData, YBehaviorSharp.SUtility.POINTER_CHAR);
-            m_Des = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Des", pData, YBehaviorSharp.SUtility.POINTER_CHAR);
+            m_Src = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Src", pData, true);
+            m_Des = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Des", pData, true);
 
             return true;
         }

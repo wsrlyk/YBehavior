@@ -17,7 +17,7 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = CreateVariable(m_Opl, "Target", data, Utility::POINTER_CHAR);
+		m_DataType = CreateVariable(m_Opl, "Target", data, true);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
@@ -103,7 +103,7 @@ namespace YBehavior
 			return false;
 		}
 
-		TYPEID typeIDOutput = CreateVariable(m_Output, "Output", data, Utility::POINTER_CHAR);
+		TYPEID typeIDOutput = CreateVariable(m_Output, "Output", data, true);
 		if (typeIDOutput != typeIDInput)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Permulation types not match " << typeIDOutput << " and " << typeIDInput << ERROR_END;

@@ -6,8 +6,8 @@
 
 namespace YBehavior
 {
-	typedef bool(STDCALL *OnSharpNodeLoadedDelegate)(BehaviorNode* pNode, const pugi::xml_node* data);
-	typedef NodeState(STDCALL *OnSharpNodeUpdateDelegate)(BehaviorNode* pNode, AgentPtr pAgent);
+	typedef bool(STDCALL *OnSharpNodeLoadedDelegate)(TreeNode* pNode, const pugi::xml_node* data);
+	typedef NodeState(STDCALL *OnSharpNodeUpdateDelegate)(TreeNode* pNode, AgentPtr pAgent);
 
 	class SharpNode : public LeafNode<>
 	{

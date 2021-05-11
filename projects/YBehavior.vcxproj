@@ -30,7 +30,7 @@
     <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugiconfig.hpp" />
     <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugixml.hpp" />
     <ClInclude Include="..\include\YBehavior\agent.h" />
-    <ClInclude Include="..\include\YBehavior\behaviornode.h" />
+    <ClInclude Include="..\include\YBehavior\treenode.h" />
     <ClInclude Include="..\include\YBehavior\behaviorprocess.h" />
     <ClInclude Include="..\include\YBehavior\behaviortree.h" />
     <ClInclude Include="..\include\YBehavior\behaviortreemgr.h" />
@@ -102,7 +102,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\3rd\pugixml\pugixml.cpp" />
     <ClCompile Include="..\src\YBehavior\agent.cpp" />
-    <ClCompile Include="..\src\YBehavior\behaviornode.cpp" />
+    <ClCompile Include="..\src\YBehavior\treenode.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviorprocess.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviortree.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviortreemgr.cpp" />

@@ -21,13 +21,13 @@ namespace YBehavior
 			return false;
 		}
 
-		CreateVariable(m_Identification, "Identification", data, Utility::CONST_CHAR);
+		CreateVariable(m_Identification, "Identification", data, false);
 		if (!m_Identification)
 		{
 			return false;
 		}
 		
-		CreateVariable(m_TreeName, "Tree", data, Utility::CONST_CHAR);
+		CreateVariable(m_TreeName, "Tree", data, false);
 		if (!m_TreeName)
 		{
 			return false;

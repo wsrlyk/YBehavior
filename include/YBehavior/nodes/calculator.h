@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_CALCULATOR_H_
 #define _YBEHAVIOR_CALCULATOR_H_
 
-#include "YBehavior/behaviortree.h"
+#include "YBehavior/treenode.h"
 #include "YBehavior/variableoperation.h"
 
 namespace YBehavior

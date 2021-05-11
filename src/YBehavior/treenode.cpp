@@ -1,4 +1,4 @@
-#include "YBehavior/behaviornode.h"
+#include "YBehavior/treenode.h"
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
@@ -34,7 +34,7 @@ namespace YBehavior
 	//	{ NS_SUCCESS, "SUCCESS" },{ NS_FAILURE, "FAILURE" },{ NS_RUNNING, "RUNNING" },{ NS_BREAK, "BREAK" },{ NS_INVALID, "INVALID" }
 	//};
 
-	BehaviorNode::BehaviorNode()
+	TreeNode::TreeNode()
 	{
 		m_Parent = nullptr;
 		m_Condition = nullptr;
@@ -43,7 +43,7 @@ namespace YBehavior
 	}
 
 
-	BehaviorNode::~BehaviorNode()
+	TreeNode::~TreeNode()
 	{
 		if (m_Condition != nullptr)
 			delete m_Condition;
@@ -55,129 +55,19 @@ namespace YBehavior
 		m_Variables.clear();
 	}
 
-	std::unordered_set<STRING> BehaviorNode::KEY_WORDS = { "Class", "Pos", "NickName" };
+	std::unordered_set<STRING> TreeNode::KEY_WORDS = { "Class", "Pos", "NickName" };
 
-	BehaviorNode* BehaviorNode::CreateNodeByName(const STRING& name)
+	TreeNode* TreeNode::CreateNodeByName(const STRING& name)
 	{
 		return NodeFactory::Instance()->Get(name);
 	}
 
-//	YBehavior::NodeState BehaviorNode::Execute(AgentPtr pAgent, NodeState parentState)
-//	{
-//#ifdef YPROFILER
-//		Profiler::TreeNodeProfileHelper pfHelper(this);
-//		m_pProfileHelper = &pfHelper;
-//#endif
-//#ifdef YDEBUGGER
-//		DebugTreeHelper dbgHelper(pAgent, this);
-//		m_pDebugHelper = &dbgHelper;
-//#endif
-//		NodeState state = NS_INVALID;
-//		do
-//		{
-//
-//			if (parentState == NS_RUNNING)
-//				m_RunningContext = pAgent->PopRC();
-//			else
-//				m_RunningContext = nullptr;
-//			///> check condition
-//			if (m_Condition != nullptr)
-//			{
-//				bool bBreak = false;
-//				PROFILER_PAUSE;
-//				state = m_Condition->Execute(pAgent, m_RunningContext && m_RunningContext->IsRunningInCondition() ? NS_RUNNING : NS_INVALID);
-//				PROFILER_RESUME;
-//
-//				switch (state)
-//				{
-//				case YBehavior::NS_FAILURE:
-//					_TryDeleteRC();
-//					//DEBUG_RETURN(dbgHelper, res);
-//					bBreak = true;
-//					break;
-//				case YBehavior::NS_RUNNING:
-//					TryCreateRC();
-//					m_RunningContext->SetRunningInCondition(true);
-//					_TryPushRC(pAgent);
-//					//DEBUG_RETURN(dbgHelper, res);
-//					bBreak = true;
-//					break;
-//				default:
-//					break;
-//				}
-//				if (m_RunningContext)
-//					m_RunningContext->SetRunningInCondition(false);
-//
-//				if (bBreak)
-//					break;
-//			}
-//
-//			///> check breakpoint
-//#ifdef YDEBUGGER
-//			dbgHelper.TryBreaking();
-//#endif
-//
-//			//////////////////////////////////////////////////////////////////////////
-//
-//
-//			state = this->Update(pAgent);
-//			///> If not resume in the Update, resume here
-//			PROFILER_RESUME;
-//
-//			switch (state)
-//			{
-//			case YBehavior::NS_RUNNING:
-//				TryCreateRC();
-//				m_RunningContext->SetRunningInCondition(false);
-//				_TryPushRC(pAgent);
-//				break;
-//			default:
-//				_TryDeleteRC();
-//				break;
-//			}
-//
-//			///> postprocessing
-//#ifdef YDEBUGGER
-//			dbgHelper.TryPause();
-//			m_pDebugHelper = nullptr;
-//#endif
-//		} while (false);
-//
-//#ifdef YPROFILER
-//		m_pProfileHelper = nullptr;
-//#endif
-//
-//		NodeState finalState = state;
-//
-//		if (state != NS_RUNNING && state != NS_BREAK)
-//		{
-//			switch (m_ReturnType)
-//			{
-//			case YBehavior::RT_INVERT:
-//				if (state == NS_SUCCESS)
-//					finalState = NS_FAILURE;
-//				else if (state == NS_FAILURE)
-//					finalState = NS_SUCCESS;
-//				break;
-//			case YBehavior::RT_SUCCESS:
-//				finalState = NS_SUCCESS;
-//				break;
-//			case YBehavior::RT_FAILURE:
-//				finalState = NS_FAILURE;
-//				break;
-//			default:
-//				break;
-//			}
-//		}
-//		DEBUG_RETURN(dbgHelper, state, finalState);
-//	}
-
-	YBehavior::NodeState BehaviorNode::Execute(AgentPtr pAgent, NodeState parentState)
+	YBehavior::NodeState TreeNode::Execute(AgentPtr pAgent, NodeState parentState)
 	{
 		return Update(pAgent);
 	}
 
-	bool BehaviorNode::Load(const pugi::xml_node& data)
+	bool TreeNode::Load(const pugi::xml_node& data)
 	{
 		auto returnType = data.attribute("Return");
 		if (!returnType.empty())
@@ -196,17 +86,17 @@ namespace YBehavior
 		return OnLoaded(data);
 	}
 
-	bool BehaviorNode::LoadChild(const pugi::xml_node& data)
+	bool TreeNode::LoadChild(const pugi::xml_node& data)
 	{
 		return OnLoadChild(data);
 	}
 
-	void BehaviorNode::LoadFinish()
+	void TreeNode::LoadFinish()
 	{
 		OnLoadFinish();
 	}
 
-	bool BehaviorNode::AddChild(BehaviorNode* child, const STRING& connection)
+	bool TreeNode::AddChild(TreeNode* child, const STRING& connection)
 	{
 		if (connection == "condition")
 		{
@@ -226,13 +116,13 @@ namespace YBehavior
 		}
 	}
 
-	bool BehaviorNode::_AddChild(BehaviorNode* child, const STRING& connection)
+	bool TreeNode::_AddChild(TreeNode* child, const STRING& connection)
 	{
 		ERROR_BEGIN_NODE_HEAD << "Cant add child to this node" << ERROR_END;
 		return false;
 	}
 
-	bool BehaviorNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, char variableType)
+	bool TreeNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, bool noConst)
 	{
 		auto tempChar = attri.value();
 		///> split all spaces
@@ -252,11 +142,12 @@ namespace YBehavior
 			}
 		}
 
-		if (variableType != 0)
+		if (noConst)
 		{
-			if (Utility::ToLower(buffer[0][2]) != Utility::ToLower(variableType))
+			//if (Utility::ToLower(buffer[0][2]) != Utility::ToLower(variableType))
+			if (Utility::ToUpper(buffer[0][2]) != Utility::POINTER_CHAR)
 			{
-				ERROR_BEGIN_NODE_HEAD << "VariableType Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Cant be a const variable, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
 				return false;
 			}
 		}
@@ -267,7 +158,7 @@ namespace YBehavior
 		return true;
 	}
 
-	TreeNodeContext* BehaviorNode::CreateContext()
+	TreeNodeContext* TreeNode::CreateContext()
 	{
 		TreeNodeContext* pContext = _CreateContext();
 		_InitContext(pContext);
@@ -276,13 +167,13 @@ namespace YBehavior
 	}
 
 
-	void BehaviorNode::DestroyContext(TreeNodeContext* pContext)
+	void TreeNode::DestroyContext(TreeNodeContext* pContext)
 	{
 		pContext->Destroy();
 		_DestroyContext(pContext);
 	}
 
-	STRING BehaviorNode::GetValue(const STRING& attriName, const pugi::xml_node& data)
+	STRING TreeNode::GetValue(const STRING& attriName, const pugi::xml_node& data)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 
@@ -292,33 +183,33 @@ namespace YBehavior
 			return "";
 		}
 		StdVector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, ST_SINGLE, Utility::CONST_CHAR))
+		if (!ParseVariable(attrOptr, data, buffer, ST_SINGLE, false))
 			return "";
 
 		return buffer[1];
 	}
 
-	bool BehaviorNode::TryGetValue(const STRING & attriName, const pugi::xml_node & data, STRING& output)
+	bool TreeNode::TryGetValue(const STRING & attriName, const pugi::xml_node & data, STRING& output)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 
 		if (attrOptr.empty())
 			return false;
 		StdVector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, ST_SINGLE, Utility::CONST_CHAR))
+		if (!ParseVariable(attrOptr, data, buffer, ST_SINGLE, false))
 			return false;
 
 		output = buffer[1];
 		return true;
 	}
 
-	TYPEID BehaviorNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType, const STRING& defaultCreateStr)
+	TYPEID TreeNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst, const STRING& defaultCreateStr)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
 		if (attrOptr.empty())
 		{
-			if (variableType != Utility::POINTER_CHAR && defaultCreateStr.length() > 0)
+			if (!noConst && defaultCreateStr.length() > 0)
 			{
 				const ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(defaultCreateStr);
 				if (helper != nullptr)
@@ -341,22 +232,22 @@ namespace YBehavior
 			ERROR_BEGIN_NODE_HEAD << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
 			return -1;
 		}
-		return _CreateVariable(op, attrOptr, data, variableType);
+		return _CreateVariable(op, attrOptr, data, noConst);
 	}
 
-	YBehavior::TYPEID BehaviorNode::CreateVariableIfExist(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType /*= 0*/)
+	YBehavior::TYPEID TreeNode::CreateVariableIfExist(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
 		if (attrOptr.empty())
 			return -1;
-		return _CreateVariable(op, attrOptr, data, variableType);
+		return _CreateVariable(op, attrOptr, data, noConst);
 	}
 
-	TYPEID BehaviorNode::_CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, char variableType)
+	TYPEID TreeNode::_CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, bool noConst)
 	{
 		StdVector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, ST_NONE, variableType))
+		if (!ParseVariable(attrOptr, data, buffer, ST_NONE, noConst))
 			return -1;
 
 		const ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
@@ -410,7 +301,7 @@ namespace YBehavior
 	}
 
 
-	void TreeNodeContext::Init(BehaviorNodePtr pNode)
+	void TreeNodeContext::Init(TreeNodePtr pNode)
 	{
 		m_pNode = pNode; 
 		m_RootStage = RootStage::None;

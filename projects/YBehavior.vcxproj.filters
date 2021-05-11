@@ -273,7 +273,7 @@
     <ClInclude Include="..\include\YBehavior\sharp\sharplaunch.h">
       <Filter>头文件\sharp</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\YBehavior\behaviornode.h">
+    <ClInclude Include="..\include\YBehavior\treenode.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -443,7 +443,7 @@
     <ClCompile Include="..\src\YBehavior\sharp\sharpentry_buffer.cpp">
       <Filter>源文件\sharp</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\YBehavior\behaviornode.cpp">
+    <ClCompile Include="..\src\YBehavior\treenode.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

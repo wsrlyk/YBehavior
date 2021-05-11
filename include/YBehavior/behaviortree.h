@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_BEHAVIORTREE_H_
 #define _YBEHAVIOR_BEHAVIORTREE_H_
 
-#include "behaviornode.h"
+#include "treenode.h"
 
 //namespace pugi
 //{

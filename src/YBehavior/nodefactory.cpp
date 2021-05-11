@@ -58,7 +58,7 @@ namespace YBehavior
 	}
 
 #ifdef SHARP
-	BehaviorNode* NodeFactory::Get(const STRING& name)
+	TreeNode* NodeFactory::Get(const STRING& name)
 	{
 		auto it = m_SharpCallbacks.find(name);
 		if (it != m_SharpCallbacks.end())
@@ -70,7 +70,7 @@ namespace YBehavior
 			return pSharpNode;
 		}
 
-		return Factory<BehaviorNode>::Get(name);
+		return Factory<TreeNode>::Get(name);
 	}
 
 	void NodeFactory::SetSharpCallback(const STRING& name, OnSharpNodeLoadedDelegate onload, OnSharpNodeUpdateDelegate onupdate)

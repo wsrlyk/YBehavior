@@ -1,5 +1,5 @@
-#ifndef _YBEHAVIOR_BEHAVIORNODE_H_
-#define _YBEHAVIOR_BEHAVIORNODE_H_
+#ifndef _YBEHAVIOR_TREENODE_H_
+#define _YBEHAVIOR_TREENODE_H_
 
 #include "YBehavior/define.h"
 #include "YBehavior/types.h"
@@ -53,19 +53,19 @@ namespace YBehavior
 	}
 #endif
 	class BehaviorTree;
-	class BehaviorNode;
+	class TreeNode;
 	class TreeNodeContext;
-	typedef BehaviorNode* BehaviorNodePtr;
+	typedef TreeNode* TreeNodePtr;
 
 #define ERROR_BEGIN_NODE_HEAD ERROR_BEGIN << this->m_UID << "." << this->GetClassName() << " "
 #define LOG_BEGIN_NODE_HEAD LOG_BEGIN << this->m_UID << "." << this->GetClassName() << " "
 
 #define TREENODE_DEFINE(classname) classname() { m_ClassName = #classname; }
-	class BehaviorNode
+	class TreeNode
 	{
 	protected:
-		BehaviorNodePtr m_Parent;
-		BehaviorNodePtr m_Condition;
+		TreeNodePtr m_Parent;
+		TreeNodePtr m_Condition;
 		UINT m_UID;	// Unique in a tree
 		StdVector<ISharedVariableEx*> m_Variables;	///> Just for destructions of variables
 		static std::unordered_set<STRING> KEY_WORDS;
@@ -83,17 +83,17 @@ namespace YBehavior
 #endif
 
 	public:
-		BehaviorNode();
-		virtual ~BehaviorNode();
+		TreeNode();
+		virtual ~TreeNode();
 
-		inline BehaviorNodePtr GetParent() { return m_Parent;}
-		inline void SetParent(BehaviorNodePtr parent) { m_Parent = parent;}
+		inline TreeNodePtr GetParent() { return m_Parent;}
+		inline void SetParent(TreeNodePtr parent) { m_Parent = parent;}
 
 		inline UINT GetUID() const { return m_UID; }
 		inline void SetUID(UINT uid) { m_UID = uid; }
 		inline BehaviorTree* GetRoot() const { return m_Root; }
 		inline void SetRoot(BehaviorTree* root) { m_Root = root; }
-		inline BehaviorNodePtr GetCondition() const { return m_Condition; }
+		inline TreeNodePtr GetCondition() const { return m_Condition; }
 		inline ReturnType GetReturnType() const { return m_ReturnType; }
 
 		const STRING& GetClassName() const { return m_ClassName; }
@@ -103,34 +103,34 @@ namespace YBehavior
 		void LoadFinish();
 		NodeState Execute(AgentPtr pAgent, NodeState parentState);
 
-		static BehaviorNode* CreateNodeByName(const STRING& name);
-		bool AddChild(BehaviorNode* child, const STRING& connection);
+		static TreeNode* CreateNodeByName(const STRING& name);
+		bool AddChild(TreeNode* child, const STRING& connection);
 
 		TreeNodeContext* CreateContext();
 		void DestroyContext(TreeNodeContext*);
 
 		///> If no config, a default CONST variable will be created
-		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0, const STRING& defaultCreateStr = Utility::StringEmpty);
+		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false, const STRING& defaultCreateStr = Utility::StringEmpty);
 		///> If no config, a default CONST variable will be created
 		template <typename T>
-		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0);
+		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
 		
 		///> If no config, variable will NOT be created
-		TYPEID CreateVariableIfExist(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0);
+		TYPEID CreateVariableIfExist(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
 		///> If no config, variable will NOT be created
 		template <typename T>
-		TYPEID CreateVariableIfExist(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType = 0);
+		TYPEID CreateVariableIfExist(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
 #ifdef YDEBUGGER
 		void SetDebugHelper(DebugTreeHelper* pDebugHelper) { m_pDebugHelper = pDebugHelper; };
 		inline DebugTreeHelper* GetDebugHelper() const { return m_pDebugHelper; }
 #endif
 	protected:
-		virtual bool _AddChild(BehaviorNode* child, const STRING& connection);
+		virtual bool _AddChild(TreeNode* child, const STRING& connection);
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
 		virtual bool OnLoaded(const pugi::xml_node& data) { return true; }
 		virtual bool OnLoadChild(const pugi::xml_node& data) { return true; }
 		virtual void OnLoadFinish() {}
-		virtual void OnAddChild(BehaviorNode* child, const STRING& connection) {}
+		virtual void OnAddChild(TreeNode* child, const STRING& connection) {}
 		virtual TreeNodeContext* _CreateContext() { return nullptr; } //TODO: =0 }
 		virtual void _DestroyContext(TreeNodeContext* pContext) { }//TODO: =0 }
 		virtual void _InitContext(TreeNodeContext* pContext) {}
@@ -142,14 +142,14 @@ namespace YBehavior
 		template<typename T>
 		bool GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T& outValue);
 
-		TYPEID _CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, char variableType);
+		TYPEID _CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, bool noConst);
 		///>
 		/// single: 1, single; 0, vector; -1, dont care
-		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, char variableType = 0);
+		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, bool noConst = false);
 	};
 
 	template<typename T>
-	bool BehaviorNode::GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T& outValue)
+	bool TreeNode::GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T& outValue)
 	{
 		STRING s(GetValue(attriName, data));
 		if (strMap.TryGetKey(s, outValue))
@@ -160,7 +160,7 @@ namespace YBehavior
 	}
 
 	template<typename T>
-	bool BehaviorNode::GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T defaultValue, T& outValue)
+	bool TreeNode::GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T defaultValue, T& outValue)
 	{
 		STRING s;
 		if (!TryGetValue(attriName, data, s))
@@ -177,13 +177,13 @@ namespace YBehavior
 	}
 
 	template <typename T>
-	TYPEID BehaviorNode::CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType)
+	TYPEID TreeNode::CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
 		if (attrOptr.empty())
 		{
-			if (variableType != Utility::POINTER_CHAR)
+			if (!noConst)
 			{
 				op = new SharedVariableEx<T>();
 				m_Variables.push_back(op);
@@ -198,7 +198,7 @@ namespace YBehavior
 		}
 
 		ISharedVariableEx* pTemp = nullptr;
-		TYPEID typeID = _CreateVariable(pTemp, attrOptr, data, variableType);
+		TYPEID typeID = _CreateVariable(pTemp, attrOptr, data, noConst);
 		if (typeID == GetTypeID<T>())
 		{
 			op = (SharedVariableEx<T>*)pTemp;
@@ -212,7 +212,7 @@ namespace YBehavior
 	}
 
 	template <typename T>
-	TYPEID BehaviorNode::CreateVariableIfExist(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, char variableType /*= 0*/)
+	TYPEID TreeNode::CreateVariableIfExist(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
@@ -220,7 +220,7 @@ namespace YBehavior
 			return -1;
 
 		ISharedVariableEx* pTemp = nullptr;
-		TYPEID typeID = _CreateVariable(pTemp, attrOptr, data, variableType);
+		TYPEID typeID = _CreateVariable(pTemp, attrOptr, data, noConst);
 		if (typeID == GetTypeID<T>())
 		{
 			op = (SharedVariableEx<T>*)pTemp;
@@ -244,15 +244,15 @@ namespace YBehavior
 			Condition,
 			Main,
 		};
-		BehaviorNodePtr m_pNode{};
+		TreeNodePtr m_pNode{};
 		RootStage m_RootStage{ RootStage::None };
 
 	public:
 		TreeNodeContext();
 		virtual ~TreeNodeContext();
-		void Init(BehaviorNodePtr pNode);
+		void Init(TreeNodePtr pNode);
 		void Destroy();
-		inline BehaviorNodePtr GetTreeNode() { return m_pNode; }
+		inline TreeNodePtr GetTreeNode() { return m_pNode; }
 		NodeState Execute(AgentPtr pAgent, NodeState lastState);
 	protected:
 		virtual NodeState _Update(AgentPtr pAgent, NodeState lastState) { return m_pNode->Execute(pAgent, lastState); }
@@ -314,7 +314,7 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	template<typename ContextType = TreeNodeContext>
-	class BehaviorContextNode : public BehaviorNode
+	class BehaviorContextNode : public TreeNode
 	{
 	protected:
 		using NodeContextType = ContextType;
@@ -341,12 +341,12 @@ namespace YBehavior
 	class CompositeNodeContext : public TreeNodeContext
 	{
 	protected:
-		StdVector<BehaviorNodePtr>* m_pChildren{};
+		StdVector<TreeNodePtr>* m_pChildren{};
 		int m_Stage{};
 	protected:
 		void _OnInit() { TreeNodeContext::_OnInit(); m_Stage = 0; }
 	public:
-		void SetChildren(StdVector<BehaviorNodePtr>* pChildren) { m_pChildren = pChildren; }
+		void SetChildren(StdVector<TreeNodePtr>* pChildren) { m_pChildren = pChildren; }
 	};
 
 	template<typename ContextType = CompositeNodeContext>
@@ -364,12 +364,12 @@ namespace YBehavior
 				delete m_Children;
 			}
 		}
-		BehaviorNodePtr GetChild(UINT index);
+		TreeNodePtr GetChild(UINT index);
 	protected:
-		StdVector<BehaviorNodePtr>* m_Children{};
-		StdVector<BehaviorNodePtr>* m_Childs{};
+		StdVector<TreeNodePtr>* m_Children{};
+		StdVector<TreeNodePtr>* m_Childs{};
 
-		bool _AddChild(BehaviorNode* child, const STRING& connection) override;
+		bool _AddChild(TreeNode* child, const STRING& connection) override;
 		void _InitContext(TreeNodeContext* pContext) override;
 	};
 
@@ -380,7 +380,7 @@ namespace YBehavior
 	}
 
 	template<typename ContextType /*= TreeNodeContext*/>
-	BehaviorNodePtr YBehavior::CompositeNode<ContextType>::GetChild(UINT index)
+	TreeNodePtr YBehavior::CompositeNode<ContextType>::GetChild(UINT index)
 	{
 		if (m_Children && index < m_Children->size())
 			return (*m_Children)[index];
@@ -389,13 +389,13 @@ namespace YBehavior
 	}
 
 	template<typename ContextType /*= TreeNodeContext*/>
-	bool YBehavior::CompositeNode<ContextType>::_AddChild(BehaviorNode* child, const STRING& connection)
+	bool YBehavior::CompositeNode<ContextType>::_AddChild(TreeNode* child, const STRING& connection)
 	{
 		if (child == nullptr)
 			return false;
 
 		if (!m_Children)
-			m_Children = new StdVector<BehaviorNodePtr>();
+			m_Children = new StdVector<TreeNodePtr>();
 
 		m_Children->push_back(child);
 		child->SetParent(this);
@@ -418,13 +418,13 @@ namespace YBehavior
 	class SingleChildNodeContext : public TreeNodeContext
 	{
 	protected:
-		BehaviorNode* m_pChild{};
+		TreeNode* m_pChild{};
 		int m_Stage{};
 	protected:
 		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
 		void _OnInit() { TreeNodeContext::_OnInit(); m_Stage = 0; }
 	public:
-		void SetChild(BehaviorNode* pChild) { m_pChild = pChild; }
+		void SetChild(TreeNode* pChild) { m_pChild = pChild; }
 	};
 	template<typename ContextType = SingleChildNodeContext>
 	class SingleChildNode : public BehaviorContextNode<ContextType>
@@ -438,13 +438,13 @@ namespace YBehavior
 			m_Child = nullptr;
 		}
 	protected:
-		BehaviorNode* m_Child{};
-		bool _AddChild(BehaviorNode* child, const STRING& connection) override;
+		TreeNode* m_Child{};
+		bool _AddChild(TreeNode* child, const STRING& connection) override;
 		void _InitContext(TreeNodeContext* pContext) override;
 	};
 
 	template<typename ContextType /*= SingleChildNodeContext*/>
-	bool YBehavior::SingleChildNode<ContextType>::_AddChild(BehaviorNode* child, const STRING& connection)
+	bool YBehavior::SingleChildNode<ContextType>::_AddChild(TreeNode* child, const STRING& connection)
 	{
 		if (child == nullptr)
 			return false;

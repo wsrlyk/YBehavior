@@ -8,7 +8,7 @@
 namespace YBehavior
 {
 	class BehaviorTree;
-	class BehaviorNode;
+	class TreeNode;
 
 	namespace Profiler
 	{
@@ -47,7 +47,7 @@ namespace YBehavior
 		class TreeNodeProfileHelper : public ProfileHelper
 		{
 		public:
-			TreeNodeProfileHelper(BehaviorNode* pNode);
+			TreeNodeProfileHelper(TreeNode* pNode);
 			~TreeNodeProfileHelper();
 		protected:
 			const void* m_Tree;

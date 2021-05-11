@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_IFTHENELSE_H_
 #define _YBEHAVIOR_IFTHENELSE_H_
 
-#include "YBehavior/behaviortree.h"
+#include "YBehavior/treenode.h"
 
 namespace YBehavior
 {
@@ -24,11 +24,11 @@ namespace YBehavior
 	public:
 		TREENODE_DEFINE(IfThenElse)
 	protected:
-		void OnAddChild(BehaviorNode* child, const STRING& connection) override;
+		void OnAddChild(TreeNode* child, const STRING& connection) override;
 
-		BehaviorNode* m_If{};
-		BehaviorNode* m_Then{};
-		BehaviorNode* m_Else{};
+		TreeNode* m_If{};
+		TreeNode* m_Then{};
+		TreeNode* m_Else{};
 	};
 }
 

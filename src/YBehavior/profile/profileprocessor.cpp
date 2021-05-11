@@ -62,7 +62,7 @@ namespace YBehavior
 
 				for (auto it2 = data.nodes.begin(); it2 != data.nodes.end(); ++it2)
 				{
-					const BehaviorNode* pNode = (const BehaviorNode*)it2->first;
+					const TreeNode* pNode = (const TreeNode*)it2->first;
 					auto& nodeData = it2->second;
 					TreeNodeData& treeNodeData = treeData.nodes[pNode];
 					treeNodeData.nodeName = pNode->GetClassName();

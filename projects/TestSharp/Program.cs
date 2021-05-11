@@ -117,7 +117,7 @@ namespace TestSharp
         }
     }
 
-    public class XCustomAction : SBehaviorNode
+    public class XCustomAction : STreeNode
     {
         SVariableString m_String0;
         SVariableString m_String1;
@@ -155,9 +155,9 @@ namespace TestSharp
             Console.WriteLine();
             Console.WriteLine("XCustomAction Update");
 
-            this.LogSharedData(m_String0, true);
-            this.LogSharedData(m_Entity0, true);
-            this.LogSharedData(m_Array0, true);
+            this.LogVariable(m_String0, true);
+            this.LogVariable(m_Entity0, true);
+            this.LogVariable(m_Array0, true);
             XSAgent agent = YBehaviorSharp.SPtrMgr.Instance.Get(pAgent) as XSAgent;
             if (agent == null)
                 return NodeState.NS_FAILURE;
@@ -185,7 +185,7 @@ namespace TestSharp
 
             Console.WriteLine(string.Format("0: {0}, 1: {1}", name0, name1));
 
-            this.LogDebugInfo(string.Format("0: {0}, 1: {1}", name0, name1));
+            this.LogInfo(string.Format("0: {0}, 1: {1}", name0, name1));
             ////////////////////////////////////////////////////////////////////////////
 
             XSEntity entity = m_Entity0.Get(pAgent) as XSEntity;
@@ -225,9 +225,9 @@ namespace TestSharp
                 }
             }
 
-            this.LogSharedData(m_String0, false);
-            this.LogSharedData(m_Entity0, false);
-            this.LogSharedData(m_Array0, false);
+            this.LogVariable(m_String0, false);
+            this.LogVariable(m_Entity0, false);
+            this.LogVariable(m_Array0, false);
 
             return NodeState.NS_SUCCESS;
         }
