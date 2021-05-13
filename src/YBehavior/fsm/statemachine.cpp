@@ -343,16 +343,18 @@ namespace YBehavior
 			if (context.LastRunRes == MRR_Running || context.LastRunRes == MRR_Break)
 				return;
 		}
-		context.GetTransition().ResetTransCount();
-		if (context.GetTransQueue().size() == 0)
+		else if (context.GetTransQueue().size() == 0)
 		{
 			///> No Trans, Just Update Current
 			if (!_Trans(pAgent))
 			{
 				context.LastRunRes = context.GetCurState()->Execute(pAgent, context.LastRunRes);
+				if (context.LastRunRes == MRR_Running || context.LastRunRes == MRR_Break)
+					return;
 			}
 
 		}
+		context.GetTransition().ResetTransCount();
 		while (context.GetTransQueue().size() > 0)
 		{
 			while (context.GetTransQueue().size() > 0)

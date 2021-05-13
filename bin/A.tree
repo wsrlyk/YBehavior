@@ -1,12 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <A>
   <Node Class="Root" Pos="297,61">
-    <Shared e="_AC " ee="_IC 0" />
+    <Shared e="_AC " ee="_IC 5" />
     <Local a="_Ic 11" b="_Ic 0" aa="IIc 1|2|3" />
     <Node Class="Sequence" Pos="270,170">
-      <Node Class="SelectTargetAction" Pos="100,290" Target="_AP e" />
-      <Node Class="GetTargetNameAction" Pos="240,310" Target="_APE e" />
-      <Node Class="SetData" Pos="450,310" Target="_Ip a" Source="_IC 0" />
+      <Node Class="SetData" Pos="-10,530" Target="_IP ee" Source="_IC 5" />
+      <Node Class="SelectTargetAction" Pos="100,290" Disabled="true" Target="_AP e" />
+      <Node Class="GetTargetNameAction" Pos="240,310" Disabled="true" Target="_APE e" />
+      <Node Class="Wait" Pos="380,420" TickCount="_IC 3">
+        <Node Class="Sequence" Connection="condition" Pos="290,530">
+          <Node Class="Calculator" Pos="210,660" Operator="_EC -" Opl="_IP ee" Opr1="_IP ee" Opr2="_IC 1" />
+          <Node Class="Comparer" Pos="320,660" Operator="_EC &gt;" Opl="_IP ee" Opr="_IC 0" />
+        </Node>
+      </Node>
+      <Node Class="SetData" Pos="480,310" Target="_Ip a" Source="_IC 0" />
       <Node Class="Loop" Pos="580,310" Count="_IC 3" Current="_Ip b" ExitWhenFailure="_BC F">
         <Node Class="Calculator" Pos="580,440" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_IC 1" />
       </Node>

@@ -227,6 +227,7 @@ namespace YBehavior.Editor.Core.New
             get { return m_TickResultToken; }
         }
 
+        DiffMatchPatch.diff_match_patch dmp = new DiffMatchPatch.diff_match_patch();
         void _CompareTickResult(string ss)
         {
             if (m_PreviousTickResultData == null)
@@ -236,7 +237,6 @@ namespace YBehavior.Editor.Core.New
                 return;
             }
 
-            DiffMatchPatch.diff_match_patch dmp = new DiffMatchPatch.diff_match_patch();
             List<DiffMatchPatch.Diff> diffs = dmp.diff_main(m_PreviousTickResultData, ss);
 
             float diff = 0.0f;
@@ -248,7 +248,12 @@ namespace YBehavior.Editor.Core.New
             }
 
             float avgDiff = (diff + m_PreviousDiffScore) * 0.5f;
-            if(m_DiffScore <= avgDiff)
+            if (m_DiffScore == 0.0f)
+            {
+                m_DiffScore = avgDiff;
+                m_KeyFrameTickResultData = ss;
+            }
+            else if(m_DiffScore <= avgDiff)
             {
                 m_DiffScore = avgDiff;
                 m_KeyFrameTickResultData = m_PreviousTickResultData;

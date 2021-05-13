@@ -263,6 +263,7 @@ namespace YBehavior
 			
 		ScopedLock lock(m_Mutex);
 		NodeRunInfo* pInfo = ObjectPoolStatic<NodeRunInfo>::Get();
+		pInfo->pNode = pNode;
 		m_RunInfos[pNode] = pInfo;
 		return pInfo;
 	}
@@ -272,6 +273,8 @@ namespace YBehavior
 		ScopedLock lock(m_Mutex);
 		for (auto it = m_RunInfos.begin(); it != m_RunInfos.end(); ++it)
 		{
+			///> Null the pNode to make it invalid
+			it->second->pNode = nullptr;
 			ObjectPoolStatic<NodeRunInfo>::Recycle(it->second);
 		}
 		m_RunInfos.clear();
@@ -366,7 +369,7 @@ namespace YBehavior
 				if (pInfo->type == DebugTargetType::FSM)
 					buf = &fsmBuffer;
 				else
-					buf = &(treeBuffer[(BehaviorTree*)pInfo->pNode].second);
+					buf = &(treeBuffer[(BehaviorTree*)pInfo->pRootNode].second);
 				if (buf->length() > 0)
 					*buf += IDebugHelper::s_ListSpliter;
 				*buf += pInfo->ToString();
@@ -513,12 +516,7 @@ namespace YBehavior
 
 		m_Type = DebugTargetType::TREE;
 
-		CreateRunInfo(m_pContext->GetTreeNode());
-		m_pRunInfo->nodeUID = m_pContext->GetTreeNode()->GetUID();
-		m_pRunInfo->rawRunState = NS_RUNNING;
-		m_pRunInfo->finalRunState = NS_RUNNING;
-		m_pRunInfo->type = DebugTargetType::TREE;
-		m_pRunInfo->pNode = m_pContext->GetTreeNode()->GetRoot();
+		_CreateTreeRunInfo();
 
 		if (DebugMgr::Instance()->HasDebugPoint({ DebugTargetType::TREE, m_pContext->GetTreeNode()->GetRoot()->GetTreeName() }, m_pContext->GetTreeNode()->GetUID()))
 		{
@@ -550,6 +548,30 @@ namespace YBehavior
 	const YBehavior::STRING& DebugTreeHelper::GetRootName()
 	{
 		return m_pContext->GetTreeNode()->GetRoot()->GetTreeName();
+	}
+
+	void DebugTreeHelper::TryCreateRunInfo()
+	{
+		///> It means the runinfo has been cleared by DebugMgr.
+		///> This usually happens in nodes like Wait. Their DebugTreeHelper will survive two
+		///   or more ticks, while all the RunInfos will be cleared by DebugMgr every tick
+		if (IsValid())
+		{
+			if (m_pRunInfo == nullptr || m_pRunInfo->pNode != m_pContext->GetTreeNode())
+			{
+				_CreateTreeRunInfo();
+			}
+		}
+	}
+
+	void DebugTreeHelper::_CreateTreeRunInfo()
+	{
+		CreateRunInfo(m_pContext->GetTreeNode());
+		m_pRunInfo->nodeUID = m_pContext->GetTreeNode()->GetUID();
+		m_pRunInfo->rawRunState = NS_RUNNING;
+		m_pRunInfo->finalRunState = NS_RUNNING;
+		m_pRunInfo->type = DebugTargetType::TREE;
+		m_pRunInfo->pRootNode = m_pContext->GetTreeNode()->GetRoot();
 	}
 
 	void DebugTreeHelper::_SendLogPoint()
@@ -669,7 +691,7 @@ namespace YBehavior
 		m_pRunInfo->rawRunState = NS_RUNNING;
 		m_pRunInfo->finalRunState = NS_RUNNING;
 		m_pRunInfo->type = DebugTargetType::FSM;
-		m_pRunInfo->pNode = pNode->GetParentMachine()->GetRootMachine()->GetFSM();
+		m_pRunInfo->pRootNode = pNode->GetParentMachine()->GetRootMachine()->GetFSM();
 
 		if (DebugMgr::Instance()->HasDebugPoint({ DebugTargetType::FSM, pNode->GetParentMachine()->GetRootMachine()->GetFSM()->GetName() }, pNode->GetUID()))
 		{

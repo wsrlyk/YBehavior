@@ -331,7 +331,7 @@ namespace YBehavior
 			{
 				pAgent->GetTreeContext()->PushCallStack(m_pNode->GetCondition()->CreateContext());
 				m_RootStage = RootStage::Condition;
-				return NS_RUNNING;
+				DEBUG_RETURN((*m_pDebugHelper), NS_RUNNING, NS_RUNNING);
 			}
 			else
 			{
@@ -339,6 +339,10 @@ namespace YBehavior
 			}
 			break;
 		case RootStage::Condition:
+#ifdef YDEBUGGER
+			///> Run info may be cleared by DebugMgr, so make sure it's created.
+			m_pDebugHelper->TryCreateRunInfo();
+#endif
 			if (lastState == NS_FAILURE)
 				state = NS_FAILURE;
 			else
@@ -347,6 +351,21 @@ namespace YBehavior
 			}
 			break;
 		case RootStage::Main:
+#ifdef YDEBUGGER
+			///> Run info may be cleared by DebugMgr, so make sure it's created.
+			m_pDebugHelper->TryCreateRunInfo();
+#endif
+			///> Nodes like Wait, each run should check the condition
+			if (lastState == NS_RUNNING)
+			{
+				if (m_pNode->GetCondition())
+				{
+					pAgent->GetTreeContext()->PushCallStack(m_pNode->GetCondition()->CreateContext());
+					m_RootStage = RootStage::Condition;
+					DEBUG_RETURN((*m_pDebugHelper), NS_RUNNING, NS_RUNNING);
+				}
+			}
+			break;
 		default:
 			break;
 		}
@@ -363,7 +382,7 @@ namespace YBehavior
 		}
 
 		if (state == NS_INVALID || state == NS_BREAK || state == NS_RUNNING)
-			return state;
+			DEBUG_RETURN((*m_pDebugHelper), state, state);
 
 #ifdef YDEBUGGER
 		///> Only the last run here will trigger the pause.

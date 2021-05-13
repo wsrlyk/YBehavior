@@ -91,11 +91,11 @@ namespace YBehavior
 			pAgent->GetMachineContext()->SetCurRunning(pTree);
 
 			auto treeContext = pAgent->GetTreeContext();
-			NodeState lastState = NS_INVALID;
+			NodeState lastState = NS_RUNNING;
 			if (treeContext->IsCallStackEmpty())
 			{
 				treeContext->PushCallStack(pTree->CreateRootContext());
-				lastState = NS_RUNNING;
+				lastState = NS_INVALID;
 			}
 
 			while (!treeContext->IsCallStackEmpty())

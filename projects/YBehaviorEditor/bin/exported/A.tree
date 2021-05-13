@@ -1,11 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <A>
   <Node Class="Root">
-    <Shared e="_AC " />
+    <Shared ee="_IC 5" />
     <Local a="_Ic 11" b="_Ic 0" aa="IIc 1|2|3" />
     <Node Class="Sequence">
-      <Node Class="SelectTargetAction" Target="_AP e" />
-      <Node Class="GetTargetNameAction" Target="_APE e" />
+      <Node Class="SetData" Target="_IP ee" Source="_IC 5" />
+      <Node Class="Wait" TickCount="_IC 3">
+        <Node Class="Sequence" Connection="condition">
+          <Node Class="Calculator" Operator="_EC -" Opl="_IP ee" Opr1="_IP ee" Opr2="_IC 1" />
+          <Node Class="Comparer" Operator="_EC &gt;" Opl="_IP ee" Opr="_IC 0" />
+        </Node>
+      </Node>
       <Node Class="SetData" Target="_Ip a" Source="_IC 0" />
       <Node Class="Loop" Count="_IC 3" Current="_Ip b" ExitWhenFailure="_BC F">
         <Node Class="Calculator" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_IC 1" />

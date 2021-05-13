@@ -21,6 +21,7 @@ namespace YBehavior
 		UINT nodeUID;
 		int rawRunState;
 		int finalRunState;
+		const void* pRootNode;
 		const void* pNode;
 		DebugTargetType type;
 		const STRING ToString() const;
@@ -230,9 +231,12 @@ namespace YBehavior
 		void Init(Agent* pAgent);
 		void Dispose();
 		const STRING& GetRootName() override;
+		void TryCreateRunInfo();
 	public:
 		void LogSharedData(ISharedVariableEx* pVariable, bool bBefore);
 		inline std::stringstream& GetDebugLogInfo() { return m_DebugLogInfo; }
+	private:
+		void _CreateTreeRunInfo();
 	};
 
 	class DebugFSMHelper : public IDebugHelper
