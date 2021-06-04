@@ -31,10 +31,21 @@ namespace YBehavior.Editor.Core.New
         public FSMStateNode FromState;
         public FSMStateNode ToState;
     }
-    class Utility
+    public class Utility
     {
         public static readonly HashSet<string> ReservedAttributes = new HashSet<string>(new string[] { "Class", "Connection" });
         public static readonly HashSet<string> ReservedAttributesAll = new HashSet<string>(new string[] { "Class", "Pos", "NickName", "Connection", "DebugPoint", "Comment" });
+
+        static Random m_Random = new Random((int)DateTime.Now.ToBinary());
+
+        public static int Rand()
+        {
+            return m_Random.Next();
+        }
+        public static int Rand(int min, int max)
+        {
+            return m_Random.Next(min, max);
+        }
 
         public static NodeBase CloneNode(NodeBase template, bool bIncludeChildren)
         {

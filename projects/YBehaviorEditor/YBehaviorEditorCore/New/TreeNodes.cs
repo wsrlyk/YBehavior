@@ -13,6 +13,7 @@ namespace YBehavior.Editor.Core.New
         {
             m_Name = "Root";
             Type = TreeNodeType.TNT_Root;
+            Geo.Pos = new Point(300, 100);
         }
 
         protected override void _OnLoadChild(XmlNode data)

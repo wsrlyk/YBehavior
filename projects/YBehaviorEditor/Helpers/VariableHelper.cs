@@ -333,6 +333,27 @@ namespace YBehavior.Editor
         }
     }
 
+    [ValueConversion(typeof(object), typeof(System.Windows.FrameworkElement))]
+    public class MidValueConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values == null || values.Length < 2)
+            {
+                throw new ArgumentException("Pos and Width/Height are required");
+            }
+
+            double pos = (double)values[0];
+            double widthheight = (double)values[1];
+
+            return pos - widthheight * 0.5;
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
     [ValueConversion(typeof(int), typeof(bool))]
     public class IsTwoOrMoreConverter : IValueConverter
     {

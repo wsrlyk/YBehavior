@@ -70,12 +70,25 @@
                     </ItemsControl.ItemTemplateSelector>
                     <ItemsControl.ItemContainerStyle>
                         <Style>
-                            <Setter Property="Canvas.Left" Value="{Binding Owner.Geo.Pos.X}" />
-                            <Setter Property="Canvas.Top" Value="{Binding Owner.Geo.Pos.Y}" />
+                            <Setter Property="Canvas.Left">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource midValueConverter}">
+                                        <Binding Path="Owner.Geo.Pos.X"/>
+                                        <Binding RelativeSource="{RelativeSource Self}" Path ="ActualWidth"/>
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Canvas.Top">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource midValueConverter}">
+                                        <Binding Path="Owner.Geo.Pos.Y"/>
+                                        <Binding RelativeSource="{RelativeSource Self}" Path ="ActualHeight"/>
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                 </ItemsControl>
-                <Canvas Focusable="True" Name="nodeLayer_old"/>
             </Canvas>
         </Grid>
     </Grid>
