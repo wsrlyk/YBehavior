@@ -80,6 +80,7 @@
     <Compile Include="FSMStateFrame.xaml.cs">
       <DependentUpon>FSMStateFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\SizeObserver.cs" />
     <Compile Include="SearchFrame.xaml.cs">
       <DependentUpon>SearchFrame.xaml</DependentUpon>
     </Compile>

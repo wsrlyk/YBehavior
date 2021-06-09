@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d"
-             MinWidth="60" MinHeight="80" HorizontalAlignment="Center">
+             MinWidth="60" MinHeight="80" HorizontalAlignment="Center"
+         >
     <UserControl.Style>
         <Style>
             <!--<Setter Property="local:UITreeNode.DebugTrigger" Value="{Binding Path=DebugTrigger}" />-->
@@ -31,7 +32,11 @@
         <StackPanel DockPanel.Dock="Bottom" Height="15" Name="bottomConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
         <Grid>
             <Border Margin="3,3,-3,-3" BorderThickness="0" Background="#BF323232" MinWidth="80" CornerRadius="3" />
-            <Border Name="border" BorderThickness="2" BorderBrush="#FFC1C7CD" Background="#FFB4B7B9" MinWidth="80" CornerRadius="3">
+            <Border Name="border" BorderThickness="2" BorderBrush="#FFC1C7CD" Background="#FFB4B7B9" MinWidth="80" CornerRadius="3"
+                local:SizeObserver.Observe="True"
+                local:SizeObserver.ObservedWidth="{Binding ActualNodeWidth, Mode=OneWayToSource}"
+                local:SizeObserver.ObservedHeight="{Binding ActualNodeHeight, Mode=OneWayToSource}"
+                >
                 <Grid>
                     <Border Margin="0, -18, 0, 0" Background="#FFC1C7CD" Width="10" HorizontalAlignment="Left" VerticalAlignment="Top" Height="15" CornerRadius="3,3,0,0"
                             Visibility="{Binding Path=ReturnType, Converter={StaticResource returnTypeVisibilityConvertor}}">

@@ -74,7 +74,7 @@
                                 <Setter.Value>
                                     <MultiBinding Converter="{StaticResource midValueConverter}">
                                         <Binding Path="Owner.Geo.Pos.X"/>
-                                        <Binding RelativeSource="{RelativeSource Self}" Path ="ActualWidth"/>
+                                        <Binding Path="ActualNodeWidth"/>
                                     </MultiBinding>
                                 </Setter.Value>
                             </Setter>
@@ -82,7 +82,7 @@
                                 <Setter.Value>
                                     <MultiBinding Converter="{StaticResource midValueConverter}">
                                         <Binding Path="Owner.Geo.Pos.Y"/>
-                                        <Binding RelativeSource="{RelativeSource Self}" Path ="ActualHeight"/>
+                                        <Binding Path="ActualNodeHeight"/>
                                     </MultiBinding>
                                 </Setter.Value>
                             </Setter>

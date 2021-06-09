@@ -344,7 +344,7 @@ namespace YBehavior.Editor
             }
 
             double pos = (double)values[0];
-            double widthheight = (double)values[1];
+            double widthheight = (values[1] is double) ? (double)values[1] : 0.0;
 
             return pos - widthheight * 0.5;
         }

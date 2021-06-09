@@ -289,7 +289,7 @@ namespace YBehavior.Editor.Core.New
         {
             Point finalPos = new Point((int)(Owner.Geo.Pos.X / 10) * 10, (int)(Owner.Geo.Pos.Y / 10) * 10);
             Vector delta2 = finalPos - Owner.Geo.Pos;
-            _Move(delta2, 0);
+            _Move(delta2, m_DragParam);
 
             if (m_Owner.Conns.ParentConnector != null)
             {
@@ -460,6 +460,29 @@ namespace YBehavior.Editor.Core.New
                 }
                 TreeOwner.EnableCondition = value;
                 OnPropertyChanged("EnableCondition");
+            }
+        }
+
+        double m_ActualNodeWidth = 0.0;
+        public double ActualNodeWidth
+        {
+            get { return m_ActualNodeWidth; }
+            set
+            {
+                m_ActualNodeWidth = value;
+
+                OnPropertyChanged("ActualNodeWidth");
+            }
+        }
+        double m_ActualNodeHeight = 0.0;
+        public double ActualNodeHeight
+        {
+            get { return m_ActualNodeHeight; }
+            set
+            {
+                m_ActualNodeHeight = value;
+
+                OnPropertyChanged("ActualNodeHeight");
             }
         }
     }
