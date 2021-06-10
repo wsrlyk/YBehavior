@@ -275,6 +275,29 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        double m_ActualNodeWidth = 0.0;
+        public double ActualNodeWidth
+        {
+            get { return m_ActualNodeWidth; }
+            set
+            {
+                m_ActualNodeWidth = value;
+
+                OnPropertyChanged("ActualNodeWidth");
+            }
+        }
+        double m_ActualNodeHeight = 0.0;
+        public double ActualNodeHeight
+        {
+            get { return m_ActualNodeHeight; }
+            set
+            {
+                m_ActualNodeHeight = value;
+
+                OnPropertyChanged("ActualNodeHeight");
+            }
+        }
+
         public NodeState RunState { get { return DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(m_Owner.UID, true) : NodeState.NS_INVALID; } }
 
         int m_DragParam = -1;
@@ -460,29 +483,6 @@ namespace YBehavior.Editor.Core.New
                 }
                 TreeOwner.EnableCondition = value;
                 OnPropertyChanged("EnableCondition");
-            }
-        }
-
-        double m_ActualNodeWidth = 0.0;
-        public double ActualNodeWidth
-        {
-            get { return m_ActualNodeWidth; }
-            set
-            {
-                m_ActualNodeWidth = value;
-
-                OnPropertyChanged("ActualNodeWidth");
-            }
-        }
-        double m_ActualNodeHeight = 0.0;
-        public double ActualNodeHeight
-        {
-            get { return m_ActualNodeHeight; }
-            set
-            {
-                m_ActualNodeHeight = value;
-
-                OnPropertyChanged("ActualNodeHeight");
             }
         }
     }

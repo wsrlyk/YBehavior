@@ -84,8 +84,22 @@
                     </ItemsControl.ItemTemplate>-->
                     <ItemsControl.ItemContainerStyle>
                         <Style>
-                            <Setter Property="Canvas.Left" Value="{Binding Owner.Geo.Pos.X}" />
-                            <Setter Property="Canvas.Top" Value="{Binding Owner.Geo.Pos.Y}" />
+                            <Setter Property="Canvas.Left">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource midValueConverter}">
+                                        <Binding Path="Owner.Geo.Pos.X"/>
+                                        <Binding Path="ActualNodeWidth"/>
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Canvas.Top">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource midValueConverter}">
+                                        <Binding Path="Owner.Geo.Pos.Y"/>
+                                        <Binding Path="ActualNodeHeight"/>
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemTemplateSelector>
