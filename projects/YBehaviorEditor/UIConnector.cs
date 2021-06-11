@@ -65,7 +65,7 @@ namespace YBehavior.Editor
 
         public abstract Border Main { get; }
 
-        //Vector m_RelativePos = new Vector(double.MaxValue, double.MaxValue);
+        Vector m_RelativePos = new Vector(double.MaxValue, double.MaxValue);
 
         public UIConnector()
         {
@@ -91,14 +91,14 @@ namespace YBehavior.Editor
         {
             if (OwnerNode != null)
             {
-                //if (m_RelativePos.X == double.MaxValue && m_RelativePos.Y == double.MaxValue)
-                //{
-                //    m_RelativePos = TransformToAncestor(OwnerNode).Transform(new Point(ActualWidth / 2, ActualHeight / 2)) - new Point();
-                //}
+                if (m_RelativePos.X == double.MaxValue && m_RelativePos.Y == double.MaxValue)
+                {
+                    m_RelativePos = TransformToAncestor(OwnerNode).Transform(new Point(ActualWidth / 2, ActualHeight / 2)) - new Point(OwnerNode.ActualWidth / 2, OwnerNode.ActualHeight / 2 - ActualHeight);
+                }
 
                 if (OwnerNode.DataContext is NodeBaseRenderer)
                 {
-                    Point pos = (OwnerNode.DataContext as NodeBaseRenderer).Owner.Geo.Pos/* + m_RelativePos*/;
+                    Point pos = (OwnerNode.DataContext as NodeBaseRenderer).Owner.Geo.Pos + m_RelativePos;
                     //Hotspot = pos;
                     (this.DataContext as ConnectorGeometry).Pos = pos;
                 }

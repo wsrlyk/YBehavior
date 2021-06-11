@@ -310,7 +310,7 @@ namespace YBehavior.Editor.Core.New
 
         public void FinishDrag(Vector delta, Point pos)
         {
-            Point finalPos = new Point((int)(Owner.Geo.Pos.X / 10) * 10, (int)(Owner.Geo.Pos.Y / 10) * 10);
+            Point finalPos = new Point(Math.Round(Owner.Geo.Pos.X / 10) * 10, Math.Round(Owner.Geo.Pos.Y / 10) * 10);
             Vector delta2 = finalPos - Owner.Geo.Pos;
             _Move(delta2, m_DragParam);
 
