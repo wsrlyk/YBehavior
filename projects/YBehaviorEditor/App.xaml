@@ -20,6 +20,7 @@
                 <BooleanToVisibilityConverter/>
             </local:ValueConverterGroup>
             <local:MidValueConverter x:Key="midValueConverter"/>
+            <local:OffsetConverter x:Key="offsetConverter"/>
             <Storyboard x:Key="InstantShowAnim" FillBehavior="Stop">
                 <!--            <DoubleAnimation Storyboard.TargetProperty="Opacity"
                              From="0.0" To="1.0" Duration="0:0:0.1"/>   -->

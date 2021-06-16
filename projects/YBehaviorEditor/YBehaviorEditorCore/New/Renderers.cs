@@ -275,26 +275,26 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        double m_ActualNodeWidth = 0.0;
-        public double ActualNodeWidth
+        double m_CenterOffsetX = 0.0;
+        public double CenterOffsetX
         {
-            get { return m_ActualNodeWidth; }
+            get { return m_CenterOffsetX; }
             set
             {
-                m_ActualNodeWidth = value;
+                m_CenterOffsetX = value;
 
-                OnPropertyChanged("ActualNodeWidth");
+                OnPropertyChanged("CenterOffsetX");
             }
         }
-        double m_ActualNodeHeight = 0.0;
-        public double ActualNodeHeight
+        double m_CenterOffsetY = 0.0;
+        public double CenterOffsetY
         {
-            get { return m_ActualNodeHeight; }
+            get { return m_CenterOffsetY; }
             set
             {
-                m_ActualNodeHeight = value;
+                m_CenterOffsetY = value;
 
-                OnPropertyChanged("ActualNodeHeight");
+                OnPropertyChanged("CenterOffsetY");
             }
         }
 

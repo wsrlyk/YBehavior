@@ -25,6 +25,39 @@ namespace YBehavior.Editor
 
     public partial class UITreeNode : UITreeNodeBase
     {
+        public static readonly DependencyProperty CenterOffsetXProperty = DependencyProperty.RegisterAttached(
+            "CenterOffsetX",
+            typeof(double),
+            typeof(UITreeNode));
+        public static readonly DependencyProperty CenterOffsetYProperty = DependencyProperty.RegisterAttached(
+            "CenterOffsetY",
+            typeof(double),
+            typeof(UITreeNode));
+
+        public double CenterOffsetX
+        {
+            get
+            {
+                return (double)GetValue(CenterOffsetXProperty);
+            }
+            set
+            {
+                SetValue(CenterOffsetXProperty, value);
+            }
+        }
+
+        public double CenterOffsetY
+        {
+            get
+            {
+                return (double)GetValue(CenterOffsetYProperty);
+            }
+            set
+            {
+                SetValue(CenterOffsetYProperty, value);
+            }
+        }
+
         public override FrameworkElement SelectCoverUI { get { return this.selectCover; } }
         public override Brush OutlookBrush
         {
@@ -49,6 +82,25 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             _Init();
+
+            this.SizeChanged += OnSizeChanged;
+            _UpdateCenterPos();
+        }
+
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            _UpdateCenterPos();
+        }
+
+        void _UpdateCenterPos()
+        {
+            if (!this.IsAncestorOf(this.border))
+                return;
+            var p = this.border.TransformToAncestor(this).
+                Transform(new Point(this.border.ActualWidth * 0.5f, this.border.ActualHeight * 0.5f));
+
+            CenterOffsetX = p.X;
+            CenterOffsetY = p.Y;
         }
 
         protected override void _OnDataContextChanged()

@@ -72,17 +72,17 @@
                         <Style>
                             <Setter Property="Canvas.Left">
                                 <Setter.Value>
-                                    <MultiBinding Converter="{StaticResource midValueConverter}">
+                                    <MultiBinding Converter="{StaticResource offsetConverter}">
                                         <Binding Path="Owner.Geo.Pos.X"/>
-                                        <Binding Path="ActualNodeWidth"/>
+                                        <Binding Path="CenterOffsetX"/>
                                     </MultiBinding>
                                 </Setter.Value>
                             </Setter>
                             <Setter Property="Canvas.Top">
                                 <Setter.Value>
-                                    <MultiBinding Converter="{StaticResource midValueConverter}">
+                                    <MultiBinding Converter="{StaticResource offsetConverter}">
                                         <Binding Path="Owner.Geo.Pos.Y"/>
-                                        <Binding Path="ActualNodeHeight"/>
+                                        <Binding Path="CenterOffsetY"/>
                                     </MultiBinding>
                                 </Setter.Value>
                             </Setter>

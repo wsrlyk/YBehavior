@@ -354,6 +354,28 @@ namespace YBehavior.Editor
         }
     }
 
+    [ValueConversion(typeof(object), typeof(System.Windows.FrameworkElement))]
+    public class OffsetConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values == null || values.Length < 2)
+            {
+                throw new ArgumentException("Pos and Offset are required");
+            }
+
+            double pos = (double)values[0];
+            double offset = (values[1] is double) ? (double)values[1] : 0.0;
+
+            return pos - offset;
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
+
     [ValueConversion(typeof(int), typeof(bool))]
     public class IsTwoOrMoreConverter : IValueConverter
     {
