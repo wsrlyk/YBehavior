@@ -1,23 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Monster_BlackCrystal3>
-  <Node Class="Root" Target="_AC " f="_FC 1" ff="FFC 1|2|4" f0="_FC 0" i="_IC 0">
+  <Node Class="Root">
     <Node Class="Sequence">
       <Node Class="SelectTargetAction" Target="_AP Target" />
-      <Node Class="GetTargetNameAction" Target="_AP Target" />
+      <Node Class="GetTargetNameAction" Target="_APE Target" />
       <Node Class="SwitchCase" Switch="_FP f" Cases="FFP ff">
         <Node Class="SetData" Target="_FP f" Source="_FC 4" />
         <Node Class="SetData" Target="_FP f" Source="_FC 5" />
         <Node Class="SetData" Target="_FP f" Source="_FC 2" />
         <Node Class="SetData" Connection="default" Target="_FP f" Source="_FC 1" />
       </Node>
-      <Node Class="For" ExitWhenFailure="_BC false">
+      <Node Class="For">
         <Node Class="SetData" Connection="init" Target="_FP f0" Source="_FC 0" />
         <Node Class="Comparer" Connection="cond" Operator="_EC &lt;=" Opl="_FP f0" Opr="_FP f" />
         <Node Class="Calculator" Connection="inc" Operator="_EC ADD" Opl="_FP f0" Opr1="_FP f0" Opr2="_FC 1" />
-        <Node Class="GetTargetNameAction" Target="_AP Target" />
+        <Node Class="GetTargetNameAction" Target="_APE Target" />
       </Node>
-      <Node Class="ForEach" Collection="FFP ff" Current="_FP f" ExitWhenFailure="_BC false">
-        <Node Class="GetTargetNameAction" Target="_AP Target" />
+      <Node Class="ForEach" Collection="FFP ff" Current="_FP f">
+        <Node Class="GetTargetNameAction" Target="_APE Target" />
       </Node>
       <Node Class="PiecewiseFunction" KeyPointX="IIC 1|2|2|4|6" KeyPointY="IIC 1|4|8|16|16" InputX="_IC 2000" OutputY="_IP i" />
       <Node Class="Dice" Distribution="IIC 3|1|9|4" Values="FFC 0.1|0.2|0.3|0.4" Input="_IC 0" Output="_FP f" IgnoreInput="_BC true" />

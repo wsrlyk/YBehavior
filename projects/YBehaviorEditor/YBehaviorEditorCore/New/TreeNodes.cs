@@ -1056,12 +1056,12 @@ namespace YBehavior.Editor.Core.New
         public override void CreateVariables()
         {
             NodeMemory.CreateVariable(
-                "ExitWhenFailure",
+                "ExitValue",
                 "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
-                Variable.EnableType.ET_FIXED
+                Variable.EnableType.ET_Disable
             );
         }
     }
@@ -1099,12 +1099,12 @@ namespace YBehavior.Editor.Core.New
             v.IsInput = false;
 
             NodeMemory.CreateVariable(
-                "ExitWhenFailure",
+                "ExitValue",
                 "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
-                Variable.EnableType.ET_FIXED
+                Variable.EnableType.ET_Disable
             );
         }
 
@@ -1154,12 +1154,12 @@ namespace YBehavior.Editor.Core.New
             v.IsInput = false;
 
             NodeMemory.CreateVariable(
-                "ExitWhenFailure",
+                "ExitValue",
                 "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
-                Variable.EnableType.ET_FIXED
+                Variable.EnableType.ET_Disable
             );
         }
 

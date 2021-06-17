@@ -5,7 +5,7 @@
     <Local localarray="IIc " v="_Ic 0" />
     <Node Class="Sequence">
       <Node Class="SubTree" Tree="_SC BenchMarkTree1" Identification="_SC " />
-      <Node Class="ForEach" Collection="IIP sharedarray" Current="_Ip v" ExitWhenFailure="_BC F">
+      <Node Class="ForEach" Collection="IIP sharedarray" Current="_Ip v">
         <Node Class="ArrayPushElement" Array="IIp localarray" Element="_Ip v" />
       </Node>
     </Node>

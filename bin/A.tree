@@ -14,16 +14,16 @@
         </Node>
       </Node>
       <Node Class="SetData" Pos="480,310" Target="_Ip a" Source="_IC 0" />
-      <Node Class="Loop" Pos="580,310" Count="_IC 3" Current="_Ip b" ExitWhenFailure="_BC F">
+      <Node Class="Loop" Pos="580,310" Count="_IC 3" Current="_Ip b" ExitValue="_BCD F">
         <Node Class="Calculator" Pos="580,440" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_IC 1" />
       </Node>
-      <Node Class="For" Pos="710,300" Comment="testtesttesttest" ExitWhenFailure="_BC F">
+      <Node Class="For" Pos="710,300" Comment="testtesttesttest" ExitValue="_BCD F">
         <Node Class="SetData" Connection="init" Pos="680,400" Target="_Ip b" Source="_IC 0" />
         <Node Class="Comparer" Connection="cond" Pos="700,490" Operator="_EC &lt;" Opl="_Ip b" Opr="_IC 3" />
         <Node Class="Calculator" Connection="inc" Pos="740,590" Operator="_EC +" Opl="_Ip b" Opr1="_Ip b" Opr2="_IC 1" />
         <Node Class="Calculator" Pos="800,420" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_IC 1" />
       </Node>
-      <Node Class="ForEach" Pos="890,320" Collection="IIp aa" Current="_Ip b" ExitWhenFailure="_BC F">
+      <Node Class="ForEach" Pos="890,320" Collection="IIp aa" Current="_Ip b" ExitValue="_BCD F">
         <Node Class="Calculator" Pos="890,410" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_Ip b" />
       </Node>
       <Node Class="SwitchCase" Pos="1000,320" Switch="_Ip b" Cases="IIp aa">

@@ -34,23 +34,23 @@
 			ReturnSuccess="有节点返回成功"
 			ReturnFailure="无子节点 或 所有节点返回失败"/>
                 <For Content="循环运行Children节点，注意不要死循环。&#xD;Init，整个循环刚开始时的初始化节点。&#xD;Cond，每次循环前的判断节点，如失败则结束循环。&#xD;Inc，每次循环后的操作节点"
-			ReturnSuccess="Cond不满足时结束循环"
-			ReturnFailure="ExitWhenFailure触发提前退出 或 Cond和Children节点均没有（无法结束循环。此时For的任何子节点都不会跑）">
-                        <ExitWhenFailure Content="子节点返回失败时，是否提前退出遍历"/>
+			ReturnSuccess="无ExitValue正常结束循环 或 ExitValue生效"
+			ReturnFailure="ExitValue未生效 或 Cond和Children节点均没有（无法结束循环。此时For的任何子节点都不会跑）">
+                        <ExitValue Content="子节点返回此值时，提前退出遍历"/>
 		</For>
                 <ForEach Content="遍历数组，每取出一个值，调用一次子节点。"
-          		ReturnSuccess="正常的结束循环"
-			ReturnFailure="ExitWhenFailure触发提前退出 或 无子节点">
+			ReturnSuccess="无ExitValue正常结束循环 或 ExitValue生效"
+			ReturnFailure="ExitValue未生效 或 无子节点">
 			<Collection Content="数组"/>
                         <Current Content="当前遍历取出的值"/>
-                        <ExitWhenFailure Content="子节点返回失败时，是否提前退出遍历"/>
+                        <ExitValue Content="子节点返回此值时，提前退出遍历"/>
                 </ForEach>
                 <Loop Content="运行子节点若干次。For的简化版"          		
-			ReturnSuccess="正常的结束循环"
-			ReturnFailure="ExitWhenFailure触发提前退出 或 无子节点">
+			ReturnSuccess="无ExitValue正常结束循环 或 ExitValue生效"
+			ReturnFailure="ExitValue未生效 或 无子节点">
                         <Count Content="次数"/>
                         <Current Content="当前次数，从0开始"/>
-                        <ExitWhenFailure Content="子节点返回失败时，是否提前退出遍历"/>
+                        <ExitValue Content="子节点返回此值时，提前退出遍历"/>
                 </Loop>
                 <Calculator Content="计算器"
 			ReturnSuccess="始终成功">
