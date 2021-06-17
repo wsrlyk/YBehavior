@@ -32,12 +32,12 @@ namespace YBehavior
 		INT sizeY = m_Values->VectorSize(pAgent->GetMemory());
 		if (sizeX != sizeY)
 		{
-			YB_LOG_INFO("Different length of X and Y; ");
+			YB_LOG_INFO("Different length of Distribution and Values; ");
 			return NS_FAILURE;
 		}
 		if (sizeX == 0)
 		{
-			YB_LOG_INFO("No key points; ");
+			YB_LOG_INFO("No Distribution; ");
 			return NS_FAILURE;
 		}
 

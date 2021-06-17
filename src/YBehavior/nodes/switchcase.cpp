@@ -69,8 +69,10 @@ namespace YBehavior
 		if (m_Stage == 0)
 		{
 			++m_Stage;
+			YB_LOG_VARIABLE_BEFORE(pNode->m_Cases);
 			if ((INT)pNode->m_CasesChilds.size() != pNode->m_Cases->VectorSize(pAgent->GetMemory()))
 			{
+				YB_LOG_INFO_WITH_END("Cases size != Children size");
 				return NS_FAILURE;
 			}
 

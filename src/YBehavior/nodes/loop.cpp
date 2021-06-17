@@ -123,65 +123,77 @@ namespace YBehavior
 	NodeState ForNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
 	{
 		For* pNode = (For*)m_pNode;
-		ForPhase phase = (ForPhase)m_Stage;
-		if (phase == ForPhase::None)
+		while (true)
 		{
-			m_Stage = (int)ForPhase::Init;
-			if (pNode->m_InitChild)
+			if ((ForPhase)m_Stage == ForPhase::None)
 			{
-				pAgent->GetTreeContext()->PushCallStack(pNode->m_InitChild->CreateContext());
-				return NS_RUNNING;
-			}
-		}
-		if (phase == ForPhase::Init || phase == ForPhase::Inc)
-		{
-			m_Stage = (int)ForPhase::Cond;
-			if (pNode->m_CondChild)
-			{
-				pAgent->GetTreeContext()->PushCallStack(pNode->m_CondChild->CreateContext());
-				return NS_RUNNING;
-			}
-		}
-		if (phase == ForPhase::Cond)
-		{
-			if (pNode->m_CondChild && lastState == NS_FAILURE)
-			{
-				return NS_SUCCESS;
-			}
-			m_Stage = (int)ForPhase::Main;
-			if (pNode->m_MainChild)
-			{
-				pAgent->GetTreeContext()->PushCallStack(pNode->m_MainChild->CreateContext());
-				return NS_RUNNING;
-			}
-		}
-		if (phase == ForPhase::Main)
-		{
-			++m_LoopTimes;
-			if (pNode->m_MainChild && lastState == NS_FAILURE)
-			{
-				BOOL bExit = Utility::FALSE_VALUE;
-				pNode->m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
-				if (bExit)
+				if (pNode->m_CondChild == nullptr && pNode->m_MainChild == nullptr)
 				{
+					YB_LOG_INFO_WITH_END("At least one of Cond and Main Child must be configured.")
 					return NS_FAILURE;
 				}
+				m_Stage = (int)ForPhase::Init;
+				if (pNode->m_InitChild)
+				{
+					pAgent->GetTreeContext()->PushCallStack(pNode->m_InitChild->CreateContext());
+					return NS_RUNNING;
+				}
 			}
-			m_Stage = (int)ForPhase::Inc;
-			if (pNode->m_IncChild)
+			if ((ForPhase)m_Stage == ForPhase::Init || (ForPhase)m_Stage == ForPhase::Inc)
 			{
-				pAgent->GetTreeContext()->PushCallStack(pNode->m_IncChild->CreateContext());
-				return NS_RUNNING;
+				m_Stage = (int)ForPhase::Cond;
+				if (pNode->m_CondChild)
+				{
+					pAgent->GetTreeContext()->PushCallStack(pNode->m_CondChild->CreateContext());
+					return NS_RUNNING;
+				}
+			}
+			if ((ForPhase)m_Stage == ForPhase::Cond)
+			{
+				if (pNode->m_CondChild && lastState == NS_FAILURE)
+				{
+					return NS_SUCCESS;
+				}
+				m_Stage = (int)ForPhase::Main;
+				if (pNode->m_MainChild)
+				{
+					pAgent->GetTreeContext()->PushCallStack(pNode->m_MainChild->CreateContext());
+					return NS_RUNNING;
+				}
+			}
+			if ((ForPhase)m_Stage == ForPhase::Main)
+			{
+				++m_LoopTimes;
+				if (pNode->m_MainChild && lastState == NS_FAILURE)
+				{
+					BOOL bExit = Utility::FALSE_VALUE;
+					pNode->m_ExitWhenFailure->GetCastedValue(pAgent->GetMemory(), bExit);
+					if (bExit)
+					{
+						return NS_FAILURE;
+					}
+				}
+				m_Stage = (int)ForPhase::Inc;
+				if (pNode->m_IncChild)
+				{
+					pAgent->GetTreeContext()->PushCallStack(pNode->m_IncChild->CreateContext());
+					return NS_RUNNING;
+				}
 			}
 		}
 
-		///> If runs here, it means this node has no children.
 		return NS_FAILURE;
 	}
 
 	NodeState ForEachNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
 	{
 		ForEach* pNode = (ForEach*)m_pNode;
+		if (!pNode->m_Child)
+		{
+			YB_LOG_INFO_WITH_END("No Child.");
+			return NS_FAILURE;
+		}
+
 		INT size = pNode->m_Collection->VectorSize(pAgent->GetMemory());
 		if (m_Stage > 0)
 		{
@@ -203,7 +215,7 @@ namespace YBehavior
 				pNode->m_Current->SetValue(pAgent->GetMemory(), element);
 			}
 			++m_Stage;
-			if (pNode->m_Child)
+			//if (pNode->m_Child)
 			{
 				pAgent->GetTreeContext()->PushCallStack(pNode->m_Child->CreateContext());
 				return NS_RUNNING;
@@ -214,13 +226,17 @@ namespace YBehavior
 			return NS_SUCCESS;
 		}
 
-		///> If runs here, it means this node has no children.
 		return NS_FAILURE;
 	}
 
 	NodeState LoopNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
 	{
 		Loop* pNode = (Loop*)m_pNode;
+		if (!pNode->m_Child)
+		{
+			YB_LOG_INFO_WITH_END("No Child.");
+			return NS_FAILURE;
+		}
 		INT size = 0;
 		pNode->m_Count->GetCastedValue(pAgent->GetMemory(), size);
 		if (m_Stage > 0)
@@ -240,7 +256,7 @@ namespace YBehavior
 			pNode->m_Current->SetCastedValue(pAgent->GetMemory(), &m_Stage);
 
 			++m_Stage;
-			if (pNode->m_Child)
+			//if (pNode->m_Child)
 			{
 				pAgent->GetTreeContext()->PushCallStack(pNode->m_Child->CreateContext());
 				return NS_RUNNING;
@@ -251,7 +267,6 @@ namespace YBehavior
 			return NS_SUCCESS;
 		}
 
-		///> If runs here, it means this node has no children.
 		return NS_FAILURE;
 	}
 

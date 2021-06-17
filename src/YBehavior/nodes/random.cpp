@@ -17,21 +17,21 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = CreateVariable(m_Opl, "Target", data, true);
+		m_DataType = CreateVariable(m_Target, "Target", data, true);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Target in Comparer: " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right1
-		TYPEID dataType = CreateVariable(m_Opr1, "Bound1", data);
+		TYPEID dataType = CreateVariable(m_Bound1, "Bound1", data);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right2
-		dataType = CreateVariable(m_Opr2, "Bound2", data);
+		dataType = CreateVariable(m_Bound2, "Bound2", data);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
@@ -45,17 +45,17 @@ namespace YBehavior
 	{
 		YB_IF_HAS_DEBUG_POINT
 		{
-			YB_LOG_VARIABLE(m_Opr1, true);
-			YB_LOG_VARIABLE(m_Opr2, true);
-			YB_LOG_VARIABLE(m_Opl, true);
+			YB_LOG_VARIABLE(m_Bound1, true);
+			YB_LOG_VARIABLE(m_Bound2, true);
+			YB_LOG_VARIABLE(m_Target, true);
 		}
 
-		IVariableOperationHelper* pHelper = m_Opl->GetOperation();
-		pHelper->Random(pAgent->GetMemory(), m_Opl, m_Opr1, m_Opr2);
+		IVariableOperationHelper* pHelper = m_Target->GetOperation();
+		pHelper->Random(pAgent->GetMemory(), m_Target, m_Bound1, m_Bound2);
 
 		YB_IF_HAS_DEBUG_POINT
 		{
-			YB_LOG_VARIABLE(m_Opl, false);
+			YB_LOG_VARIABLE(m_Target, false);
 		}
 
 		return NS_SUCCESS;

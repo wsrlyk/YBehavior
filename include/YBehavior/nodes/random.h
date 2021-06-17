@@ -15,9 +15,9 @@ namespace YBehavior
 		bool OnLoaded(const pugi::xml_node& data) override;
 
 	private:
-		ISharedVariableEx* m_Opr1;
-		ISharedVariableEx* m_Opr2;
-		ISharedVariableEx* m_Opl;
+		ISharedVariableEx* m_Bound1;
+		ISharedVariableEx* m_Bound2;
+		ISharedVariableEx* m_Target;
 
 		TYPEID m_DataType;
 	};
