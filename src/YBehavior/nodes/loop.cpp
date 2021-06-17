@@ -218,7 +218,14 @@ namespace YBehavior
 		}
 		else
 		{
-			return NS_SUCCESS;
+			if (pNode->m_ExitValue)
+			{
+				return NS_FAILURE;
+			}
+			else
+			{
+				return NS_SUCCESS;
+			}
 		}
 
 		return NS_FAILURE;
@@ -259,7 +266,14 @@ namespace YBehavior
 		}
 		else
 		{
-			return NS_SUCCESS;
+			if (pNode->m_ExitValue)
+			{
+				return NS_FAILURE;
+			}
+			else
+			{
+				return NS_SUCCESS;
+			}
 		}
 
 		return NS_FAILURE;
