@@ -126,7 +126,7 @@ namespace YBehavior.Editor
                 }
                 if (childControl is TreeViewItem item && item.DataContext is FileInfo info)
                 {
-                    if (item.IsExpanded)
+                    if (item.IsExpanded && info.Source == null)
                     {
                         expandedItems.Add(info.Name);
                     }

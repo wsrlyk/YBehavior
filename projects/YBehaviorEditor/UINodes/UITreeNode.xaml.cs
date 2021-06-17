@@ -107,6 +107,15 @@ namespace YBehavior.Editor
         {
             _CreateConnectors();
             _SetCommentPos();
+
+            if (Config.Instance.NodeTooltipDelayTime > 0)
+            {
+                this.border.SetBinding(FrameworkElement.ToolTipProperty, new Binding()
+                {
+                    Path = new PropertyPath("Owner.Description"),
+                });
+                ToolTipService.SetInitialShowDelay(this.border, Config.Instance.NodeTooltipDelayTime);
+            }
         }
 
         private void _CreateConnectors()

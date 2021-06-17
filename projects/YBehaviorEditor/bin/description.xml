@@ -2,7 +2,7 @@
 <Description>
 	<Languages>
 		<ReturnSuccess>返回成功</ReturnSuccess>
-		<ReturnFailure>返回成功</ReturnFailure>
+		<ReturnFailure>返回失败</ReturnFailure>
 	</Languages>
         <Nodes>
                 <ReadRegister Content="读取寄存器，并保存到变量中。如无数据，返回失败；否则返回成功，并清空寄存器">

@@ -16,6 +16,7 @@ namespace YBehavior.Editor.Core.New
         public string ExportingDir { get; set; }
 
         public bool PrintIntermediateInfo { get; set; }
+        public int NodeTooltipDelayTime { get; set; }
 
         private string m_DebugIP;
         public string DebugIP
@@ -103,6 +104,12 @@ namespace YBehavior.Editor.Core.New
 
             m_ExpandedFolders = configFile.ReadString("Editor", "ExpandedFolders", "");
 
+            NodeTooltipDelayTime = configFile.ReadInt("Editor", "NodeTooltipDelayTime", -1);
+            if (NodeTooltipDelayTime < 0)
+            {
+                NodeTooltipDelayTime = 800;
+                configFile.WriteInt("Editor", "NodeTooltipDelayTime", 800);
+            }
             ////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
 
