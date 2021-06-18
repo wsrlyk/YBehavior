@@ -19,8 +19,6 @@ namespace YBehavior
 
 		ISharedVariableEx* m_Input;
 		ISharedVariableEx* m_Output;
-
-		SharedVariableEx<BOOL>* m_IgnoreInput;
 	};
 }
 

@@ -7,7 +7,7 @@ namespace YBehavior
 {
 	bool For::OnLoaded(const pugi::xml_node& data)
 	{
-		CreateVariableIfExist(m_ExitValue, "ExitValue", data);
+		CreateVariableIfExist(m_BreakValue, "BreakValue", data);
 
 		return true;
 	}
@@ -75,7 +75,7 @@ namespace YBehavior
 			return false;
 		}
 
-		CreateVariableIfExist(m_ExitValue, "ExitValue", data);
+		CreateVariableIfExist(m_BreakValue, "BreakValue", data);
 
 		return true;
 	}
@@ -97,7 +97,7 @@ namespace YBehavior
 			return false;
 		}
 
-		CreateVariableIfExist(m_ExitValue, "ExitValue", data);
+		CreateVariableIfExist(m_BreakValue, "BreakValue", data);
 
 		return true;
 	}
@@ -140,7 +140,7 @@ namespace YBehavior
 			{
 				if (pNode->m_CondChild && lastState == NS_FAILURE)
 				{
-					if (pNode->m_ExitValue)
+					if (pNode->m_BreakValue)
 					{
 						return NS_FAILURE;
 					}
@@ -159,13 +159,13 @@ namespace YBehavior
 			if ((ForPhase)m_Stage == ForPhase::Main)
 			{
 				++m_LoopTimes;
-				if (pNode->m_MainChild && pNode->m_ExitValue)
+				if (pNode->m_MainChild && pNode->m_BreakValue)
 				{
-					BOOL bExit = Utility::FALSE_VALUE;
-					pNode->m_ExitValue->GetCastedValue(pAgent->GetMemory(), bExit);
+					BOOL bBreak = Utility::FALSE_VALUE;
+					pNode->m_BreakValue->GetCastedValue(pAgent->GetMemory(), bBreak);
 
-					if ((bExit && lastState == NS_SUCCESS)
-						||(!bExit && lastState == NS_FAILURE))
+					if ((bBreak && lastState == NS_SUCCESS)
+						||(!bBreak && lastState == NS_FAILURE))
 					return NS_SUCCESS;
 				}
 				m_Stage = (int)ForPhase::Inc;
@@ -192,13 +192,13 @@ namespace YBehavior
 		INT size = pNode->m_Collection->VectorSize(pAgent->GetMemory());
 		if (m_Stage > 0)
 		{
-			if (pNode->m_ExitValue)
+			if (pNode->m_BreakValue)
 			{
-				BOOL bExit = Utility::FALSE_VALUE;
-				pNode->m_ExitValue->GetCastedValue(pAgent->GetMemory(), bExit);
+				BOOL bBreak = Utility::FALSE_VALUE;
+				pNode->m_BreakValue->GetCastedValue(pAgent->GetMemory(), bBreak);
 
-				if ((bExit && lastState == NS_SUCCESS)
-					|| (!bExit && lastState == NS_FAILURE))
+				if ((bBreak && lastState == NS_SUCCESS)
+					|| (!bBreak && lastState == NS_FAILURE))
 					return NS_SUCCESS;
 			}
 		}
@@ -218,7 +218,7 @@ namespace YBehavior
 		}
 		else
 		{
-			if (pNode->m_ExitValue)
+			if (pNode->m_BreakValue)
 			{
 				return NS_FAILURE;
 			}
@@ -243,13 +243,13 @@ namespace YBehavior
 		pNode->m_Count->GetCastedValue(pAgent->GetMemory(), size);
 		if (m_Stage > 0)
 		{
-			if (pNode->m_ExitValue)
+			if (pNode->m_BreakValue)
 			{
-				BOOL bExit = Utility::FALSE_VALUE;
-				pNode->m_ExitValue->GetCastedValue(pAgent->GetMemory(), bExit);
+				BOOL bBreak = Utility::FALSE_VALUE;
+				pNode->m_BreakValue->GetCastedValue(pAgent->GetMemory(), bBreak);
 
-				if ((bExit && lastState == NS_SUCCESS)
-					|| (!bExit && lastState == NS_FAILURE))
+				if ((bBreak && lastState == NS_SUCCESS)
+					|| (!bBreak && lastState == NS_FAILURE))
 					return NS_SUCCESS;
 			}
 		}
@@ -266,7 +266,7 @@ namespace YBehavior
 		}
 		else
 		{
-			if (pNode->m_ExitValue)
+			if (pNode->m_BreakValue)
 			{
 				return NS_FAILURE;
 			}

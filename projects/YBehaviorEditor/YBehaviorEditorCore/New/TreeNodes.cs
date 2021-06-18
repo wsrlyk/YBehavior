@@ -1056,7 +1056,7 @@ namespace YBehavior.Editor.Core.New
         public override void CreateVariables()
         {
             NodeMemory.CreateVariable(
-                "ExitValue",
+                "BreakValue",
                 "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
@@ -1099,7 +1099,7 @@ namespace YBehavior.Editor.Core.New
             v.IsInput = false;
 
             NodeMemory.CreateVariable(
-                "ExitValue",
+                "BreakValue",
                 "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
@@ -1154,7 +1154,7 @@ namespace YBehavior.Editor.Core.New
             v.IsInput = false;
 
             NodeMemory.CreateVariable(
-                "ExitValue",
+                "BreakValue",
                 "F",
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_SINGLE,
@@ -1282,7 +1282,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllNumbers,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
-                Variable.EnableType.ET_FIXED,
+                Variable.EnableType.ET_Disable,
                 1
             );
 
@@ -1296,16 +1296,6 @@ namespace YBehavior.Editor.Core.New
                 2
             );
             v.IsInput = false;
-
-            NodeMemory.CreateVariable(
-                "IgnoreInput",
-                "T",
-                Variable.CreateParams_Bool,
-                Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_NONE,
-                Variable.EnableType.ET_FIXED,
-                0
-            );
 
         }
 

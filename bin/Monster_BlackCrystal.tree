@@ -12,7 +12,7 @@
         </Node>
       </Node>
       <Node Class="RandomSelect" Pos="478,346" Input="IIP iitest" Output="_IP add1" />
-      <Node Class="Loop" Pos="856,475" Count="_IC 3" Current="_IP iitest" ExitValue="_BCD F">
+      <Node Class="Loop" Pos="856,475" Count="_IC 3" Current="_IP iitest" BreakValue="_BCD F">
         <Node Class="Calculator" Pos="857,734" Operator="_EC ADD" Opl="_IP iitest VI P add0" Opr1="_IP iitest VI P add0" Opr2="_IP add1">
           <Node Class="Wait" Connection="condition" Pos="749,682" Disabled="true" TickCount="_IC 3">
             <Node Class="Sequence" Connection="condition" Pos="718,766">

@@ -11,6 +11,7 @@
           <Node Class="Comparer" Operator="_EC &gt;" Opl="_IP ee" Opr="_IC 0" />
         </Node>
       </Node>
+      <Node Class="Dice" Distribution="IIC 1|2|3" Values="IIC 1|2|3" Output="_Ip a" />
       <Node Class="SetData" Target="_Ip a" Source="_IC 0" />
       <Node Class="Loop" Count="_IC 3" Current="_Ip b">
         <Node Class="Calculator" Operator="_EC +" Opl="_Ip a" Opr1="_Ip a" Opr2="_IC 1" />

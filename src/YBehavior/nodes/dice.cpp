@@ -25,7 +25,6 @@ namespace YBehavior
 			YB_LOG_VARIABLE(m_Values, true);
 			YB_LOG_VARIABLE(m_Input, true);
 			YB_LOG_VARIABLE(m_Output, true);
-			YB_LOG_VARIABLE(m_IgnoreInput, true);
 		}
 
 		INT sizeX = m_Distribution->VectorSize(pAgent->GetMemory());
@@ -41,16 +40,14 @@ namespace YBehavior
 			return NS_FAILURE;
 		}
 
-		IVariableOperationHelper* pHelper = m_Input->GetOperation();
+		IVariableOperationHelper* pHelper = m_Output->GetElementOperation();
 
 		auto zero = pHelper->AllocTempData();
 
 		const void* input;
 		auto res = pHelper->AllocTempData();
 
-		BOOL bIgnoreInput = Utility::FALSE_VALUE;
-		m_IgnoreInput->GetCastedValue(pAgent->GetMemory(), bIgnoreInput);
-		if (bIgnoreInput)
+		if (!m_Input)
 		{
 			auto sum = pHelper->AllocTempData();
 
@@ -123,8 +120,8 @@ namespace YBehavior
 		//	return false;
 		//}
 
-		TYPEID xType = CreateVariable(m_Input, "Input", data);
-		if (s_ValidTypes.find(xType) == s_ValidTypes.end())
+		TYPEID xType = CreateVariableIfExist(m_Input, "Input", data);
+		if (m_Input && s_ValidTypes.find(xType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Input in Dice: " << xType << ERROR_END;
 			return false;
@@ -140,7 +137,7 @@ namespace YBehavior
 		//	return false;
 		//}
 
-		if (!Utility::IsElement(xType, xVecType))
+		if (m_Input && !Utility::IsElement(xType, xVecType))
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types in Dice:  " << xType << " and " << xVecType << ERROR_END;
 			return false;
@@ -149,12 +146,6 @@ namespace YBehavior
 		if (!Utility::IsElement(yType, yVecType))
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types in Dice:  " << yType << " and " << yVecType << ERROR_END;
-			return false;
-		}
-
-		CreateVariable(m_IgnoreInput, "IgnoreInput", data);
-		if (!m_IgnoreInput)
-		{
 			return false;
 		}
 
