@@ -40,7 +40,7 @@ namespace YBehavior
 			return NS_FAILURE;
 		}
 
-		IVariableOperationHelper* pHelper = m_Output->GetElementOperation();
+		IVariableOperationHelper* pHelper = m_Distribution->GetElementOperation();
 
 		auto zero = pHelper->AllocTempData();
 
