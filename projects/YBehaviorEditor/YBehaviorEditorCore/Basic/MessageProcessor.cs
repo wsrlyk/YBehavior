@@ -550,6 +550,7 @@ namespace YBehavior.Editor.Core.New
                     }
                     else
                     {
+                        bool notmatch = false;
                         for (int i = 0; i < res.Count; i++)
                         {
                             if (res[i].ExportFileHash != hashes[i])
@@ -560,6 +561,13 @@ namespace YBehavior.Editor.Core.New
                                     TipType = ShowSystemTipsArg.TipsType.TT_Error,
                                 };
                                 EventMgr.Instance.Send(arg);
+                                notmatch = true;
+
+                                System.Windows.MessageBoxResult dr = System.Windows.MessageBox.Show(res[i].DisplayName + ": version is different from RunTime.", "Continue Or Not", System.Windows.MessageBoxButton.OKCancel, System.Windows.MessageBoxImage.Question);
+                                if (dr == System.Windows.MessageBoxResult.Cancel)
+                                {
+                                    return;
+                                }
                                 break;
                             }
                         }
@@ -567,6 +575,7 @@ namespace YBehavior.Editor.Core.New
                         DebugMgr.Instance.BuildRunInfo(res);
                         _DoDebugBegin(res);
 
+                        if (!notmatch)
                         {
                             ShowSystemTipsArg arg = new ShowSystemTipsArg
                             {

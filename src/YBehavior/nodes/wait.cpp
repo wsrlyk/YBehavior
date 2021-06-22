@@ -31,6 +31,7 @@ namespace YBehavior
 		Wait* pNode = (Wait*)m_pNode;
 		INT tickCount = 0;
 		pNode->m_TickCount->GetCastedValue(pAgent->GetMemory(), tickCount);
+		YB_LOG_INFO(".." << m_Count);
 		if (++m_Count >= tickCount)
 			return NS_SUCCESS;
 		

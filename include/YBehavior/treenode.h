@@ -264,6 +264,7 @@ namespace YBehavior
 		static bool HasDebugPoint(DebugTreeHelper* pDebugHelper);
 		static std::stringstream& GetLogInfo(DebugTreeHelper* pDebugHelper);
 		static void LogVariable(DebugTreeHelper* pDebugHelper, ISharedVariableEx* pVariable, bool bBefore);
+		void SendLog();
 	protected:
 		DebugTreeHelper* m_pDebugHelper{};
 #endif

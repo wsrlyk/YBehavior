@@ -112,6 +112,7 @@ namespace YBehavior
 					///> leaf node
 					if (!treeContext->HasNewCall())
 					{
+						pContext->SendLog();
 						break;
 					}
 				}

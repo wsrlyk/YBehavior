@@ -430,6 +430,11 @@ namespace YBehavior
 		pDebugHelper->LogSharedData(pVariable, bBefore);
 	}
 
+	void TreeNodeContext::SendLog()
+	{
+		m_pDebugHelper->Dispose();
+	}
+
 #endif
 	NodeState SingleChildNodeContext::_Update(AgentPtr pAgent, NodeState lastState)
 	{
