@@ -532,7 +532,7 @@ namespace YBehavior
 	{
 		if (IsValid())
 		{
-			_SendLogPoint();
+			SendLogPoint();
 
 			if (this == DebugMgr::Instance()->GetStepOverHelper())
 			{
@@ -542,7 +542,10 @@ namespace YBehavior
 		}
 
 		if (m_pLogInfo)
+		{
 			ObjectPoolStatic<NodeLogInfo>::Recycle(m_pLogInfo);
+			m_pLogInfo = nullptr;
+		}
 	}
 
 	const YBehavior::STRING& DebugTreeHelper::GetRootName()
@@ -574,7 +577,7 @@ namespace YBehavior
 		m_pRunInfo->pRootNode = m_pContext->GetTreeNode()->GetRoot();
 	}
 
-	void DebugTreeHelper::_SendLogPoint()
+	void DebugTreeHelper::SendLogPoint()
 	{
 		if (m_pLogInfo == nullptr)
 			return;
@@ -607,6 +610,7 @@ namespace YBehavior
 				DebugMgr::Instance()->AppendSendContent(*it);
 				DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
 			}
+			m_pLogInfo->beforeInfo.clear();
 		}
 
 		if (m_pLogInfo->afterInfo.size() > 0)
@@ -621,10 +625,14 @@ namespace YBehavior
 				DebugMgr::Instance()->AppendSendContent(*it);
 				DebugMgr::Instance()->AppendSendContent(s_ContentSpliter);
 			}
+			m_pLogInfo->afterInfo.clear();
 		}
 
 		if (m_pLogInfo->otherInfo.size() > 0)
+		{
 			DebugMgr::Instance()->AppendSendContent(m_pLogInfo->otherInfo);
+			m_pLogInfo->otherInfo = Utility::StringEmpty;
+		}
 
 		DebugMgr::Instance()->Send(false);
 	}

@@ -225,13 +225,13 @@ namespace YBehavior
 		NodeLogInfo* m_pLogInfo;
 		std::stringstream m_DebugLogInfo;
 
-		void _SendLogPoint();
 	public:
 		DebugTreeHelper(TreeNodeContext* pContext) : m_pContext(pContext) {}
 		void Init(Agent* pAgent);
 		void Dispose();
 		const STRING& GetRootName() override;
 		void TryCreateRunInfo();
+		void SendLogPoint();
 	public:
 		void LogSharedData(ISharedVariableEx* pVariable, bool bBefore);
 		inline std::stringstream& GetDebugLogInfo() { return m_DebugLogInfo; }

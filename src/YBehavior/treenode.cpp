@@ -167,7 +167,7 @@ namespace YBehavior
 	}
 
 
-	void TreeNode::DestroyContext(TreeNodeContext* pContext)
+	void TreeNode::DestroyContext(TreeNodeContext*& pContext)
 	{
 		pContext->Destroy();
 		_DestroyContext(pContext);
@@ -432,7 +432,8 @@ namespace YBehavior
 
 	void TreeNodeContext::SendLog()
 	{
-		m_pDebugHelper->Dispose();
+		if (m_pDebugHelper->IsValid())
+			m_pDebugHelper->SendLogPoint();
 	}
 
 #endif

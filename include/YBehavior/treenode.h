@@ -107,7 +107,7 @@ namespace YBehavior
 		bool AddChild(TreeNode* child, const STRING& connection);
 
 		TreeNodeContext* CreateContext();
-		void DestroyContext(TreeNodeContext*);
+		void DestroyContext(TreeNodeContext*&);
 
 		///> If no config, a default CONST variable will be created
 		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false, const STRING& defaultCreateStr = Utility::StringEmpty);
@@ -132,7 +132,7 @@ namespace YBehavior
 		virtual void OnLoadFinish() {}
 		virtual void OnAddChild(TreeNode* child, const STRING& connection) {}
 		virtual TreeNodeContext* _CreateContext() { return nullptr; } //TODO: =0 }
-		virtual void _DestroyContext(TreeNodeContext* pContext) { }//TODO: =0 }
+		virtual void _DestroyContext(TreeNodeContext*& pContext) { }//TODO: =0 }
 		virtual void _InitContext(TreeNodeContext* pContext) {}
 
 		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
@@ -320,7 +320,7 @@ namespace YBehavior
 	protected:
 		using NodeContextType = ContextType;
 		TreeNodeContext* _CreateContext() override;
-		void _DestroyContext(TreeNodeContext* pContext) override;
+		void _DestroyContext(TreeNodeContext*& pContext) override;
 	
 	};
 
@@ -331,9 +331,10 @@ namespace YBehavior
 	}
 
 	template<typename ContextType /*= TreeNodeContext*/>
-	void YBehavior::BehaviorContextNode<ContextType>::_DestroyContext(TreeNodeContext* pContext)
+	void YBehavior::BehaviorContextNode<ContextType>::_DestroyContext(TreeNodeContext*& pContext)
 	{
 		ObjectPoolStatic<ContextType>::Recycle(static_cast<ContextType*>(pContext));
+		pContext = nullptr;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
