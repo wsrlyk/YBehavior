@@ -146,7 +146,7 @@ namespace YBehavior
 		{
 			if (i != 0)
 				ss << '|';
-			ss << std::boolalpha << (t[i] > 0);
+			ss << ToString(t[i]);
 		}
 		ss >> str;
 		return str;
