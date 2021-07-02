@@ -54,8 +54,15 @@ namespace YBehavior.Editor
                 Path = new PropertyPath("DebugTrigger"),
                 Mode = BindingMode.OneWay,
             });
+
+            this.IsVisibleChanged += _OnVisibleChanged;
         }
 
+        void _OnVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (IsVisible && Node != null)
+                SetDebug(Node.Renderer.RunState);
+        }
         //protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         //{
         //    base.OnRenderSizeChanged(sizeInfo);

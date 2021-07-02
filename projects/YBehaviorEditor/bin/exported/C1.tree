@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<C1>
+  <Node Class="Root">
+    <Shared a="_IC 0" />
+    <Node Class="Calculator" Operator="_EC +" Opl="_IP a" Opr1="_IP a" Opr2="_IC 1" />
+  </Node>
+</C1>
