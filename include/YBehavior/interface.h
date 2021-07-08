@@ -24,20 +24,21 @@ namespace YBehavior
 		inline bool IsLocal() { return m_IsLocal; }
 		virtual bool IsConst() = 0;
 
-		void SetName(const STRING& name, const STRING& nodeName)
+		void SetName(const STRING& name, UINT nodeUID, const STRING& nodeName, const STRING& treeName)
 		{
 			m_Name = name;
-			m_LogName = nodeName + "." + name;
+			std::stringstream ss;
+			ss << treeName << "." << nodeUID << "." << nodeName << "." << name;
 			if (m_ReferenceName.size() > 0)
 			{
-				m_LogName += " (";
-				m_LogName += m_ReferenceName;
+				ss << " (" << m_ReferenceName;
 				if (IsLocal())
 				{
-					m_LogName += "'";
+					ss << "'";
 				}
-				m_LogName += ")";
+				ss << ")";
 			}
+			m_LogName = ss.str();
 		}
 		inline const STRING& GetName() { return m_Name; }
 		inline const STRING& GetLogName() { return m_LogName; }

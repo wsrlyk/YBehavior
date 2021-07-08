@@ -137,7 +137,7 @@ namespace YBehavior
 		{
 			if (!((single == ST_SINGLE) ^ (buffer[0][0] == buffer[0][1])))
 			{
-				ERROR_BEGIN_NODE_HEAD << "Single or Vector Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
+				ERROR_BEGIN_NODE_HEAD << "Single or Array Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
 				return false;
 			}
 		}
@@ -218,7 +218,7 @@ namespace YBehavior
 					m_Variables.push_back(op);
 
 #ifdef YDEBUGGER
-					op->SetName(attriName, this->GetClassName());
+					op->SetName(attriName, this->GetUID(), this->GetClassName(), this->GetRoot()->GetTreeName());
 #endif
 
 					return op->TypeID();
@@ -257,7 +257,9 @@ namespace YBehavior
 			m_Variables.push_back(op);
 
 #ifdef YDEBUGGER
-			op->SetName(attrOptr.name(), this->GetClassName());
+			///> There may be some errors in code below, so we must set some names first
+			///> to make the log readable
+			op->SetName(attrOptr.name(), GetUID(), GetClassName(), GetRoot()->GetTreeName());
 #endif
 			///> Vector Index
 			if (buffer.size() >= 5 && buffer[2] == "VI")
@@ -272,6 +274,11 @@ namespace YBehavior
 			}
 			else
 				op->SetValueFromString(buffer[1]);
+
+#ifdef YDEBUGGER
+			///> Set the final names
+			op->SetName(attrOptr.name(), GetUID(), GetClassName(), GetRoot()->GetTreeName());
+#endif
 
 			return op->TypeID();
 		}

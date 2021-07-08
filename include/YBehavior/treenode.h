@@ -188,7 +188,7 @@ namespace YBehavior
 				op = new SharedVariableEx<T>();
 				m_Variables.push_back(op);
 #ifdef YDEBUGGER
-				op->SetName(attriName, GetClassName());
+				op->SetName(attriName, GetUID(), GetClassName(), GetRoot()->GetTreeName());
 #endif
 				return GetTypeID<T>();
 			}

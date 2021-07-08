@@ -58,7 +58,7 @@ namespace YBehavior
 			m_VectorIndex->GetCastedValue(pMemory, index);
 			if (index < 0)
 			{
-				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << " at " << this->GetLogName() << ERROR_END;
+				ERROR_BEGIN << "Invalid Index of Array: " << index << " at " << this->GetLogName() << ERROR_END;
 				return;
 			}
 			SharedDataEx* pData;
@@ -72,17 +72,21 @@ namespace YBehavior
 			}
 
 			const StdVector<ElementType>* pVector = (const StdVector<ElementType>*)pData->Get<StdVector<ElementType>>(m_Key);
-			if (pVector && (UINT)index < pVector->size())
-				(*const_cast<StdVector<ElementType>*>(pVector))[index] = *src;
+			if (pVector)
+			{
+				if ((UINT)index < pVector->size())
+					(*const_cast<StdVector<ElementType>*>(pVector))[index] = *src;
+				else
+					ERROR_BEGIN << "Index " << index << " out of range, Array Length " << pVector->size() << " at " << this->GetLogName() << ERROR_END;
+			}
 		}
-
 		const ElementType* _GetCastedElement(IMemory* pMemory)
 		{
 			INT index = -1;
 			m_VectorIndex->GetCastedValue(pMemory, index);
 			if (index < 0)
 			{
-				ERROR_BEGIN << "Index of the vector storing the variable out of range: " << index << " at " << this->GetLogName() << ERROR_END;
+				ERROR_BEGIN << "Invalid Index of Array: " << index << " at " << this->GetLogName() << ERROR_END;
 				return nullptr;
 			}
 			SharedDataEx* pData;
@@ -103,7 +107,7 @@ namespace YBehavior
 			}
 			if (pVector)
 			{
-				ERROR_BEGIN << "VectorIndex out of range: " << index << ", Total " << pVector->size() << " at " << this->GetLogName() << ERROR_END;
+				ERROR_BEGIN << "Index " << index << " out of range, Array Length " << pVector->size() << " at " << this->GetLogName() << ERROR_END;
 			}
 			else
 			{
@@ -220,7 +224,7 @@ namespace YBehavior
 			{
 				if ((INT)mValue->size() <= index)
 				{
-					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << " at " << this->GetLogName() << ERROR_END;
+					ERROR_BEGIN << "Index " << index << " out of range, Array Length " << mValue->size() << " at " << this->GetLogName() << ERROR_END;
 					return nullptr;
 				}
 				else
@@ -241,7 +245,7 @@ namespace YBehavior
 			{
 				if ((INT)mValue->size() <= index)
 				{
-					ERROR_BEGIN << "Index " << index << " out of range of Vector with size " << mValue->size() << " at " << this->GetLogName() << ERROR_END;
+					ERROR_BEGIN << "Index " << index << " out of range, Array Length " << mValue->size() << " at " << this->GetLogName() << ERROR_END;
 				}
 				else
 				{
