@@ -1,19 +1,19 @@
 #include "YBehavior/nodes/array.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/behaviortree.h"
+#include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
 
 	bool GetArrayLength::OnLoaded(const pugi::xml_node& data)
 	{
-		CreateVariable(m_Array, "Array", data);
+		VariableCreation::CreateVariable(this, m_Array, "Array", data);
 		if (m_Array == nullptr)
 		{
 			return false;
 		}
 
-		CreateVariable(m_Length, "Length", data, true);
+		VariableCreation::CreateVariable(this, m_Length, "Length", data, true);
 		if (!m_Length)
 		{
 			return false;
@@ -40,7 +40,7 @@ namespace YBehavior
 
 	bool ClearArray::OnLoaded(const pugi::xml_node& data)
 	{
-		CreateVariable(m_Array, "Array", data, true);
+		VariableCreation::CreateVariable(this, m_Array, "Array", data, true);
 		if (m_Array == nullptr)
 		{
 			return false;
@@ -56,13 +56,13 @@ namespace YBehavior
 
 	bool ArrayPushElement::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeIDArray = CreateVariable(m_Array, "Array", data, true);
+		TYPEID typeIDArray = VariableCreation::CreateVariable(this, m_Array, "Array", data, true);
 		if (m_Array == nullptr)
 		{
 			return false;
 		}
 
-		TYPEID typeID = CreateVariable(m_Element, "Element", data);
+		TYPEID typeID = VariableCreation::CreateVariable(this, m_Element, "Element", data);
 		if (!Utility::IsElement(typeID, typeIDArray))
 		{
 			ERROR_BEGIN_NODE_HEAD << "types not match " << typeID << " and " << typeIDArray << ERROR_END;
@@ -89,7 +89,7 @@ namespace YBehavior
 
 	bool IsArrayEmpty::OnLoaded(const pugi::xml_node& data)
 	{
-		CreateVariable(m_Array, "Array", data);
+		VariableCreation::CreateVariable(this, m_Array, "Array", data);
 		if (m_Array == nullptr)
 		{
 			return false;
@@ -111,12 +111,12 @@ namespace YBehavior
 
 	bool GenIndexArray::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID inputType = CreateVariable(m_Input, "Input", data);
+		TYPEID inputType = VariableCreation::CreateVariable(this, m_Input, "Input", data);
 		if (m_Input == nullptr)
 		{
 			return false;
 		}
-		CreateVariable(m_Output, "Output", data, true);
+		VariableCreation::CreateVariable(this, m_Output, "Output", data, true);
 		if (m_Output == nullptr)
 		{
 			return false;

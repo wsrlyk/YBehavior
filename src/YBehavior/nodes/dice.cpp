@@ -1,5 +1,6 @@
 #include "YBehavior/nodes/dice.h"
 #include "YBehavior/agent.h"
+#include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
@@ -103,13 +104,13 @@ namespace YBehavior
 
 	bool Dice::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID xVecType = CreateVariable(m_Distribution, "Distribution", data);
+		TYPEID xVecType = VariableCreation::CreateVariable(this, m_Distribution, "Distribution", data);
 		if (s_ValidVecTypes.find(xVecType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Distribution in Dice: " << xVecType << ERROR_END;
 			return false;
 		}
-		TYPEID yVecType = CreateVariable(m_Values, "Values", data);
+		TYPEID yVecType = VariableCreation::CreateVariable(this, m_Values, "Values", data);
 		if (!m_Values)
 		{
 			return false;
@@ -120,13 +121,13 @@ namespace YBehavior
 		//	return false;
 		//}
 
-		TYPEID xType = CreateVariableIfExist(m_Input, "Input", data);
+		TYPEID xType = VariableCreation::CreateVariableIfExist(this, m_Input, "Input", data);
 		if (m_Input && s_ValidTypes.find(xType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Input in Dice: " << xType << ERROR_END;
 			return false;
 		}
-		TYPEID yType = CreateVariable(m_Output, "Output", data);
+		TYPEID yType = VariableCreation::CreateVariable(this, m_Output, "Output", data);
 		if (!m_Output)
 		{
 			return false;

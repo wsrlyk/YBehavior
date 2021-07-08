@@ -1,6 +1,7 @@
 #include "YBehavior/nodes/switchcase.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/profile/profileheader.h"
+#include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
@@ -22,13 +23,13 @@ namespace YBehavior
 
 	bool SwitchCase::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID switchType = CreateVariable(m_Switch, "Switch", data);
+		TYPEID switchType = VariableCreation::CreateVariable(this, m_Switch, "Switch", data);
 		if (s_ValidTypes.find(switchType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Switch: " << switchType << ERROR_END;
 			return false;
 		}
-		TYPEID casesType = CreateVariable(m_Cases, "Cases", data);
+		TYPEID casesType = VariableCreation::CreateVariable(this, m_Cases, "Cases", data);
 		if (s_ValidVecTypes.find(casesType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Cases: " << casesType << ERROR_END;

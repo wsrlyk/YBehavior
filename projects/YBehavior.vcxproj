@@ -96,6 +96,7 @@
     <ClInclude Include="..\include\YBehavior\treekeymgr.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />
+    <ClInclude Include="..\include\YBehavior\variablecreation.h" />
     <ClInclude Include="..\include\YBehavior\variableoperation.h" />
     <ClInclude Include="..\include\YBehavior\version.h" />
   </ItemGroup>
@@ -155,6 +156,7 @@
     <ClCompile Include="..\src\YBehavior\treekeymgr.cpp" />
     <ClCompile Include="..\src\YBehavior\types.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />
+    <ClCompile Include="..\src\YBehavior\variablecreation.cpp" />
     <ClCompile Include="..\src\YBehavior\variableoperation.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

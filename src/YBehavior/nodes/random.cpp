@@ -4,6 +4,7 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
+#include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
@@ -17,21 +18,21 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = CreateVariable(m_Target, "Target", data, true);
+		m_DataType = VariableCreation::CreateVariable(this, m_Target, "Target", data, true);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Target in Comparer: " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right1
-		TYPEID dataType = CreateVariable(m_Bound1, "Bound1", data);
+		TYPEID dataType = VariableCreation::CreateVariable(this, m_Bound1, "Bound1", data);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right2
-		dataType = CreateVariable(m_Bound2, "Bound2", data);
+		dataType = VariableCreation::CreateVariable(this, m_Bound2, "Bound2", data);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
@@ -63,13 +64,13 @@ namespace YBehavior
 
 	bool RandomSelect::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeIDArray = CreateVariable(m_Input, "Input", data);
+		TYPEID typeIDArray = VariableCreation::CreateVariable(this, m_Input, "Input", data);
 		if (m_Input == nullptr)
 		{
 			return false;
 		}
 
-		TYPEID typeID = CreateVariable(m_Output, "Output", data);
+		TYPEID typeID = VariableCreation::CreateVariable(this, m_Output, "Output", data);
 		if (!Utility::IsElement(typeID, typeIDArray))
 		{
 			ERROR_BEGIN_NODE_HEAD << "RandomSelect types not match " << typeID << " and " << typeIDArray << ERROR_END;
@@ -97,13 +98,13 @@ namespace YBehavior
 
 	bool Shuffle::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeIDInput = CreateVariable(m_Input, "Input", data);
+		TYPEID typeIDInput = VariableCreation::CreateVariable(this, m_Input, "Input", data);
 		if (m_Input == nullptr)
 		{
 			return false;
 		}
 
-		TYPEID typeIDOutput = CreateVariable(m_Output, "Output", data, true);
+		TYPEID typeIDOutput = VariableCreation::CreateVariable(this, m_Output, "Output", data, true);
 		if (typeIDOutput != typeIDInput)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Permulation types not match " << typeIDOutput << " and " << typeIDInput << ERROR_END;

@@ -10,6 +10,7 @@
 #include "YBehavior/mgrs.h"
 #include "YBehavior/fsm/behavior.h"
 #include "YBehavior/profile/profileheader.h"
+#include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
@@ -21,13 +22,13 @@ namespace YBehavior
 			return false;
 		}
 
-		CreateVariable(m_Identification, "Identification", data, false);
+		VariableCreation::CreateVariable(this, m_Identification, "Identification", data, false);
 		if (!m_Identification)
 		{
 			return false;
 		}
 		
-		CreateVariable(m_TreeName, "Tree", data, false);
+		VariableCreation::CreateVariable(this, m_TreeName, "Tree", data, false);
 		if (!m_TreeName)
 		{
 			return false;
@@ -87,7 +88,7 @@ namespace YBehavior
 		{
 			ISharedVariableEx* pVariable = nullptr;
 
-			CreateVariable(pVariable, it->name(), data, ST_NONE);
+			VariableCreation::CreateVariable(this, pVariable, it->name(), data, ST_NONE);
 			if (!pVariable)
 			{
 				ERROR_BEGIN_NODE_HEAD << "Failed to Create " << data.name() << ERROR_END;

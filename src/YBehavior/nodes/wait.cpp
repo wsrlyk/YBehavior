@@ -5,13 +5,14 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
+#include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
 	bool Wait::OnLoaded(const pugi::xml_node& data)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		CreateVariable(m_TickCount, "TickCount", data);
+		VariableCreation::CreateVariable(this, m_TickCount, "TickCount", data);
 		if (!m_TickCount)
 		{
 			return false;

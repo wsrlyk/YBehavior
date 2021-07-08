@@ -2,12 +2,13 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/profile/profileheader.h"
+#include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
 	bool For::OnLoaded(const pugi::xml_node& data)
 	{
-		CreateVariableIfExist(m_BreakValue, "BreakValue", data);
+		VariableCreation::CreateVariableIfExist(this, m_BreakValue, "BreakValue", data);
 
 		return true;
 	}
@@ -67,15 +68,15 @@ namespace YBehavior
 
 	bool ForEach::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID collectionType = CreateVariable(m_Collection, "Collection", data);
-		TYPEID currentType = CreateVariable(m_Current, "Current", data);
+		TYPEID collectionType = VariableCreation::CreateVariable(this, m_Collection, "Collection", data);
+		TYPEID currentType = VariableCreation::CreateVariable(this, m_Current, "Current", data);
 		if (!Utility::IsElement(currentType, collectionType))
 		{
 			ERROR_BEGIN_NODE_HEAD << "Types not match: " << currentType << " and " << collectionType << ERROR_END;
 			return false;
 		}
 
-		CreateVariableIfExist(m_BreakValue, "BreakValue", data);
+		VariableCreation::CreateVariableIfExist(this, m_BreakValue, "BreakValue", data);
 
 		return true;
 	}
@@ -86,18 +87,18 @@ namespace YBehavior
 
 	bool Loop::OnLoaded(const pugi::xml_node& data)
 	{
-		CreateVariable(m_Current, "Current", data);
+		VariableCreation::CreateVariable(this, m_Current, "Current", data);
 		if (!m_Current)
 		{
 			return false;
 		}
-		CreateVariable(m_Count, "Count", data);
+		VariableCreation::CreateVariable(this, m_Count, "Count", data);
 		if (!m_Count)
 		{
 			return false;
 		}
 
-		CreateVariableIfExist(m_BreakValue, "BreakValue", data);
+		VariableCreation::CreateVariableIfExist(this, m_BreakValue, "BreakValue", data);
 
 		return true;
 	}

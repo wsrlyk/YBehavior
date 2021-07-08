@@ -13,6 +13,7 @@
 #include "YBehavior/agent.h"
 #include <string.h>
 #include "YBehavior/profile/profileheader.h"
+#include "YBehavior/variablecreation.h"
 
 
 namespace YBehavior
@@ -65,6 +66,11 @@ namespace YBehavior
 	YBehavior::NodeState TreeNode::Execute(AgentPtr pAgent, NodeState parentState)
 	{
 		return Update(pAgent);
+	}
+
+	const YBehavior::STRING& TreeNode::GetTreeName() const
+	{
+		return GetRoot()->GetTreeName();
 	}
 
 	bool TreeNode::Load(const pugi::xml_node& data)
@@ -122,42 +128,6 @@ namespace YBehavior
 		return false;
 	}
 
-	bool TreeNode::ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, bool noConst)
-	{
-		auto tempChar = attri.value();
-		///> split all spaces
-		Utility::SplitString(tempChar, buffer, Utility::SpaceSpliter);
-		if (buffer.size() == 0 || buffer[0].length() < 3)
-		{
-			ERROR_BEGIN_NODE_HEAD << "Format Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
-			return false;
-		}
-
-		if (single != ST_NONE)
-		{
-			if (!((single == ST_SINGLE) ^ (buffer[0][0] == buffer[0][1])))
-			{
-				ERROR_BEGIN_NODE_HEAD << "Single or Array Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
-				return false;
-			}
-		}
-
-		if (noConst)
-		{
-			//if (Utility::ToLower(buffer[0][2]) != Utility::ToLower(variableType))
-			if (Utility::ToUpper(buffer[0][2]) != Utility::POINTER_CHAR)
-			{
-				ERROR_BEGIN_NODE_HEAD << "Cant be a const variable, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
-				return false;
-			}
-		}
-
-		if (buffer.size() == 1)
-			buffer.push_back("");
-
-		return true;
-	}
-
 	TreeNodeContext* TreeNode::CreateContext()
 	{
 		TreeNodeContext* pContext = _CreateContext();
@@ -173,120 +143,10 @@ namespace YBehavior
 		_DestroyContext(pContext);
 	}
 
-	STRING TreeNode::GetValue(const STRING& attriName, const pugi::xml_node& data)
+	void TreeNode::AddVariable(ISharedVariableEx* pVariable)
 	{
-		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
-
-		if (attrOptr.empty())
-		{
-			ERROR_BEGIN_NODE_HEAD << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
-			return "";
-		}
-		StdVector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, ST_SINGLE, false))
-			return "";
-
-		return buffer[1];
-	}
-
-	bool TreeNode::TryGetValue(const STRING & attriName, const pugi::xml_node & data, STRING& output)
-	{
-		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
-
-		if (attrOptr.empty())
-			return false;
-		StdVector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, ST_SINGLE, false))
-			return false;
-
-		output = buffer[1];
-		return true;
-	}
-
-	TYPEID TreeNode::CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst, const STRING& defaultCreateStr)
-	{
-		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
-		op = nullptr;
-		if (attrOptr.empty())
-		{
-			if (!noConst && defaultCreateStr.length() > 0)
-			{
-				const ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(defaultCreateStr);
-				if (helper != nullptr)
-				{
-					op = helper->CreateVariable();
-					m_Variables.push_back(op);
-
-#ifdef YDEBUGGER
-					op->SetName(attriName, this->GetUID(), this->GetClassName(), this->GetRoot()->GetTreeName());
-#endif
-
-					return op->TypeID();
-				}
-				else
-				{
-					ERROR_BEGIN_NODE_HEAD << "DefaultCreateStr " << defaultCreateStr << " ERROR for attribute" << attriName << " in " << data.name() << ERROR_END;
-					return -1;
-				}
-			}
-			ERROR_BEGIN_NODE_HEAD << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
-			return -1;
-		}
-		return _CreateVariable(op, attrOptr, data, noConst);
-	}
-
-	YBehavior::TYPEID TreeNode::CreateVariableIfExist(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst)
-	{
-		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
-		op = nullptr;
-		if (attrOptr.empty())
-			return -1;
-		return _CreateVariable(op, attrOptr, data, noConst);
-	}
-
-	TYPEID TreeNode::_CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, bool noConst)
-	{
-		StdVector<STRING> buffer;
-		if (!ParseVariable(attrOptr, data, buffer, ST_NONE, noConst))
-			return -1;
-
-		const ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
-		if (helper != nullptr)
-		{
-			op = helper->CreateVariable();
-			m_Variables.push_back(op);
-
-#ifdef YDEBUGGER
-			///> There may be some errors in code below, so we must set some names first
-			///> to make the log readable
-			op->SetName(attrOptr.name(), GetUID(), GetClassName(), GetRoot()->GetTreeName());
-#endif
-			///> Vector Index
-			if (buffer.size() >= 5 && buffer[2] == "VI")
-			{
-				op->SetVectorIndex(buffer[3], buffer[4]);
-			}
-
-			if (Utility::ToUpper(buffer[0][2]) == Utility::POINTER_CHAR)
-			{
-				op->SetKeyFromString(buffer[1]);
-				op->SetIsLocal(Utility::IsLower(buffer[0][2]));
-			}
-			else
-				op->SetValueFromString(buffer[1]);
-
-#ifdef YDEBUGGER
-			///> Set the final names
-			op->SetName(attrOptr.name(), GetUID(), GetClassName(), GetRoot()->GetTreeName());
-#endif
-
-			return op->TypeID();
-		}
-		else
-		{
-			ERROR_BEGIN_NODE_HEAD << "Get VariableCreateHelper Failed: " << buffer[0].substr(0, 2) << ERROR_END;
-			return -1;
-		}
+		if (pVariable)
+			m_Variables.push_back(pVariable);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

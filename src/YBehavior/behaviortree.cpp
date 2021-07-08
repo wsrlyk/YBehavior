@@ -13,6 +13,7 @@
 #include "YBehavior/agent.h"
 #include <string.h>
 #include "YBehavior/profile/profileheader.h"
+#include "YBehavior/variablecreation.h"
 
 
 namespace YBehavior
@@ -79,7 +80,7 @@ namespace YBehavior
 			{
 				if (KEY_WORDS.count(it->name()))
 					continue;
-				if (!ParseVariable(*it, data, buffer, ST_NONE))
+				if (!VariableCreation::ParseVariable(this, *it, data, buffer, ST_NONE))
 					return false;
 				const ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
 				if (helper == nullptr)
@@ -99,7 +100,7 @@ namespace YBehavior
 			{
 				ISharedVariableEx* pVariable = nullptr;
 
-				CreateVariable(pVariable, it->name(), data, ST_NONE);
+				VariableCreation::CreateVariable(this, pVariable, it->name(), data, ST_NONE);
 				if (!pVariable)
 				{
 					ERROR_BEGIN_NODE_HEAD << "Failed to Create " << data.name() << ERROR_END;

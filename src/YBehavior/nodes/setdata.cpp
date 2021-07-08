@@ -5,6 +5,7 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
+#include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
@@ -12,14 +13,14 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		TYPEID leftType = CreateVariable(m_Opl, "Target", data, true);
+		TYPEID leftType = VariableCreation::CreateVariable(this, m_Opl, "Target", data, true);
 		if (leftType == Utility::INVALID_TYPE)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in SetData: " << leftType << ERROR_END;
 			return false;
 		}
 		///> Right
-		TYPEID rightType = CreateVariable(m_Opr, "Source", data);
+		TYPEID rightType = VariableCreation::CreateVariable(this, m_Opr, "Source", data);
 		if (leftType != rightType)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types:  Opl & Opr" << ERROR_END;

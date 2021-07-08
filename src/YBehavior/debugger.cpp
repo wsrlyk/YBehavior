@@ -518,7 +518,7 @@ namespace YBehavior
 
 		_CreateTreeRunInfo();
 
-		if (DebugMgr::Instance()->HasDebugPoint({ DebugTargetType::TREE, m_pContext->GetTreeNode()->GetRoot()->GetTreeName() }, m_pContext->GetTreeNode()->GetUID()))
+		if (DebugMgr::Instance()->HasDebugPoint({ DebugTargetType::TREE, m_pContext->GetTreeNode()->GetTreeName() }, m_pContext->GetTreeNode()->GetUID()))
 		{
 			m_pLogInfo = ObjectPoolStatic<NodeLogInfo>::Get();
 			m_pLogInfo->Reset();
@@ -550,7 +550,7 @@ namespace YBehavior
 
 	const YBehavior::STRING& DebugTreeHelper::GetRootName()
 	{
-		return m_pContext->GetTreeNode()->GetRoot()->GetTreeName();
+		return m_pContext->GetTreeNode()->GetTreeName();
 	}
 
 	void DebugTreeHelper::TryCreateRunInfo()
@@ -587,7 +587,7 @@ namespace YBehavior
 
 		DebugMgr::Instance()->AppendSendContent("[LogPoint]");
 		DebugMgr::Instance()->AppendSendContent(s_HeadSpliter);
-		DebugMgr::Instance()->AppendSendContent(((BehaviorTree*)m_pContext->GetTreeNode()->GetRoot())->GetTreeName());
+		DebugMgr::Instance()->AppendSendContent(m_pContext->GetTreeNode()->GetTreeName());
 		DebugMgr::Instance()->AppendSendContent(" ");
 		DebugMgr::Instance()->AppendSendContent(Utility::ToString(m_pContext->GetTreeNode()->GetUID()));
 		DebugMgr::Instance()->AppendSendContent(".");

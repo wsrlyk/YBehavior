@@ -5,6 +5,7 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
+#include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
@@ -20,26 +21,26 @@ namespace YBehavior
 	bool Calculator::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Operator
-		if (!GetValue("Operator", data, IVariableOperationHelper::s_OperatorMap, m_Operator))
+		if (!VariableCreation::GetValue(this, "Operator", data, IVariableOperationHelper::s_OperatorMap, m_Operator))
 			return false;
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = CreateVariable(m_Opl, "Opl", data, true);
+		m_DataType = VariableCreation::CreateVariable(this, m_Opl, "Opl", data, true);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in calculator: " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right1
-		TYPEID dataType = CreateVariable(m_Opr1, "Opr1", data);
+		TYPEID dataType = VariableCreation::CreateVariable(this, m_Opr1, "Opr1", data);
 		if (dataType != m_DataType)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types:  Opl & Opr1" << ERROR_END;
 			return false;
 		}
 		///> Right2
-		dataType = CreateVariable(m_Opr2, "Opr2", data);
+		dataType = VariableCreation::CreateVariable(this, m_Opr2, "Opr2", data);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types: Opl & Opr2" << ERROR_END;

@@ -59,6 +59,8 @@ namespace YBehavior
 
 #define ERROR_BEGIN_NODE_HEAD ERROR_BEGIN << this->m_UID << "." << this->GetClassName() << " "
 #define LOG_BEGIN_NODE_HEAD LOG_BEGIN << this->m_UID << "." << this->GetClassName() << " "
+#define ERROR_BEGIN_NODE(pTreeNode) ERROR_BEGIN << pTreeNode->GetUID() << "." << pTreeNode->GetClassName() << " "
+#define LOG_BEGIN_NODE(pTreeNode) LOG_BEGIN << pTreeNode->GetUID() << "." << pTreeNode->GetClassName() << " "
 
 #define TREENODE_DEFINE(classname) classname() { m_ClassName = #classname; }
 	class TreeNode
@@ -97,6 +99,7 @@ namespace YBehavior
 		inline ReturnType GetReturnType() const { return m_ReturnType; }
 
 		const STRING& GetClassName() const { return m_ClassName; }
+		const STRING& GetTreeName() const;
 
 		bool Load(const pugi::xml_node& data);
 		bool LoadChild(const pugi::xml_node& data);
@@ -109,17 +112,7 @@ namespace YBehavior
 		TreeNodeContext* CreateContext();
 		void DestroyContext(TreeNodeContext*&);
 
-		///> If no config, a default CONST variable will be created
-		TYPEID CreateVariable(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false, const STRING& defaultCreateStr = Utility::StringEmpty);
-		///> If no config, a default CONST variable will be created
-		template <typename T>
-		TYPEID CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
-		
-		///> If no config, variable will NOT be created
-		TYPEID CreateVariableIfExist(ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
-		///> If no config, variable will NOT be created
-		template <typename T>
-		TYPEID CreateVariableIfExist(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
+		void AddVariable(ISharedVariableEx* pVariable);
 #ifdef YDEBUGGER
 		void SetDebugHelper(DebugTreeHelper* pDebugHelper) { m_pDebugHelper = pDebugHelper; };
 		inline DebugTreeHelper* GetDebugHelper() const { return m_pDebugHelper; }
@@ -135,103 +128,8 @@ namespace YBehavior
 		virtual void _DestroyContext(TreeNodeContext*& pContext) { }//TODO: =0 }
 		virtual void _InitContext(TreeNodeContext* pContext) {}
 
-		STRING GetValue(const STRING & attriName, const pugi::xml_node & data);
-		bool TryGetValue(const STRING & attriName, const pugi::xml_node & data, STRING& output);
-		template<typename T>
-		bool GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T defaultValue, T& outValue);
-		template<typename T>
-		bool GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T& outValue);
-
-		TYPEID _CreateVariable(ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, bool noConst);
-		///>
-		/// single: 1, single; 0, vector; -1, dont care
-		bool ParseVariable(const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, bool noConst = false);
 	};
 
-	template<typename T>
-	bool TreeNode::GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T& outValue)
-	{
-		STRING s(GetValue(attriName, data));
-		if (strMap.TryGetKey(s, outValue))
-			return true;
-
-		ERROR_BEGIN_NODE_HEAD << attriName << " Error: " << s << ERROR_END;
-		return false;
-	}
-
-	template<typename T>
-	bool TreeNode::GetValue(const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T defaultValue, T& outValue)
-	{
-		STRING s;
-		if (!TryGetValue(attriName, data, s))
-		{
-			outValue = defaultValue;
-			return true;
-		}
-
-		if (strMap.TryGetKey(s, outValue))
-			return true;
-
-		ERROR_BEGIN_NODE_HEAD << attriName << " Error: " << s << ERROR_END;
-		return false;
-	}
-
-	template <typename T>
-	TYPEID TreeNode::CreateVariable(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst)
-	{
-		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
-		op = nullptr;
-		if (attrOptr.empty())
-		{
-			if (!noConst)
-			{
-				op = new SharedVariableEx<T>();
-				m_Variables.push_back(op);
-#ifdef YDEBUGGER
-				op->SetName(attriName, GetUID(), GetClassName(), GetRoot()->GetTreeName());
-#endif
-				return GetTypeID<T>();
-			}
-
-			ERROR_BEGIN_NODE_HEAD << "Cant create default variable for " << attriName << " with typeid = " << GetTypeID<T>() << ERROR_END;
-			return -1;
-		}
-
-		ISharedVariableEx* pTemp = nullptr;
-		TYPEID typeID = _CreateVariable(pTemp, attrOptr, data, noConst);
-		if (typeID == GetTypeID<T>())
-		{
-			op = (SharedVariableEx<T>*)pTemp;
-		}
-		else
-		{
-			op = nullptr;
-			ERROR_BEGIN_NODE_HEAD << "Invalid type for " << attriName << " with type " << typeID << ERROR_END;
-		}
-		return typeID;
-	}
-
-	template <typename T>
-	TYPEID TreeNode::CreateVariableIfExist(SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst)
-	{
-		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
-		op = nullptr;
-		if (attrOptr.empty())
-			return -1;
-
-		ISharedVariableEx* pTemp = nullptr;
-		TYPEID typeID = _CreateVariable(pTemp, attrOptr, data, noConst);
-		if (typeID == GetTypeID<T>())
-		{
-			op = (SharedVariableEx<T>*)pTemp;
-		}
-		else
-		{
-			op = nullptr;
-			ERROR_BEGIN_NODE_HEAD << "Invalid type for " << attriName << " with type " << typeID << ERROR_END;
-		}
-		return typeID;
-	}
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 

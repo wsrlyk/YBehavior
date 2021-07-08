@@ -276,6 +276,9 @@
     <ClInclude Include="..\include\YBehavior\treenode.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\variablecreation.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -444,6 +447,9 @@
       <Filter>源文件\sharp</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\treenode.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\variablecreation.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,20 +5,21 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
+#include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
 	bool FSMSetCondition::OnLoaded(const pugi::xml_node& data)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		TYPEID type = CreateVariable(m_Conditions, "Conditions", data);
+		TYPEID type = VariableCreation::CreateVariable(this, m_Conditions, "Conditions", data);
 		if (type == Utility::INVALID_TYPE)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Conditions in FSMSetCondition: " << type << ERROR_END;
 			return false;
 		}
 
-		STRING op(GetValue("Operator", data));
+		STRING op(VariableCreation::GetValue(this, "Operator", data));
 		if (op == "On")
 			m_IsOn = true;
 		else if (op == "Off")

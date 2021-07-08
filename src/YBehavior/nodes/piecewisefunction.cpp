@@ -1,5 +1,6 @@
 #include "YBehavior/nodes/piecewisefunction.h"
 #include "YBehavior/agent.h"
+#include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
@@ -113,26 +114,26 @@ namespace YBehavior
 
 	bool PiecewiseFunction::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID xVecType = CreateVariable(m_KeyPointX, "KeyPointX", data);
+		TYPEID xVecType = VariableCreation::CreateVariable(this, m_KeyPointX, "KeyPointX", data);
 		if (s_ValidVecTypes.find(xVecType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for KeyPointX: " << xVecType << ERROR_END;
 			return false;
 		}
-		TYPEID yVecType = CreateVariable(m_KeyPointY, "KeyPointY", data);
+		TYPEID yVecType = VariableCreation::CreateVariable(this, m_KeyPointY, "KeyPointY", data);
 		if (s_ValidVecTypes.find(yVecType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for KeyPointY: " << yVecType << ERROR_END;
 			return false;
 		}
 
-		TYPEID xType = CreateVariable(m_InputX, "InputX", data);
+		TYPEID xType = VariableCreation::CreateVariable(this, m_InputX, "InputX", data);
 		if (s_ValidTypes.find(xType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for InputX: " << xType << ERROR_END;
 			return false;
 		}
-		TYPEID yType = CreateVariable(m_OutputY, "OutputY", data);
+		TYPEID yType = VariableCreation::CreateVariable(this, m_OutputY, "OutputY", data);
 		if (s_ValidTypes.find(yType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for OutputY: " << yType << ERROR_END;

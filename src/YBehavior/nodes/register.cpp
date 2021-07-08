@@ -5,42 +5,43 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
 #include "YBehavior/registerdata.h"
+#include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
 	bool ReadRegister::OnLoaded(const pugi::xml_node& data)
 	{
-		CreateVariable(m_Event, "Event", data, true);
+		VariableCreation::CreateVariable(this, m_Event, "Event", data, true);
 		if (!m_Event)
 		{
 			return false;
 		}
 
-		CreateVariable(m_Int, "Int", data, true);
+		VariableCreation::CreateVariable(this, m_Int, "Int", data, true);
 		if (!m_Int)
 		{
 			return false;
 		}
 
-		CreateVariable(m_Float, "Float", data, true);
+		VariableCreation::CreateVariable(this, m_Float, "Float", data, true);
 		if (!m_Float)
 		{
 			return false;
 		}
 
-		CreateVariable(m_Bool, "Bool", data, true);
+		VariableCreation::CreateVariable(this, m_Bool, "Bool", data, true);
 		if (!m_Bool)
 		{
 			return false;
 		}
 
-		CreateVariable(m_Ulong, "Ulong", data, true);
+		VariableCreation::CreateVariable(this, m_Ulong, "Ulong", data, true);
 		if (!m_Ulong)
 		{
 			return false;
 		}
 
-		CreateVariable(m_String, "String", data, true);
+		VariableCreation::CreateVariable(this, m_String, "String", data, true);
 		if (!m_String)
 		{
 			return false;
@@ -88,37 +89,37 @@ namespace YBehavior
 
 	bool WriteRegister::OnLoaded(const pugi::xml_node& data)
 	{
-		CreateVariable(m_Event, "Event", data);
+		VariableCreation::CreateVariable(this, m_Event, "Event", data);
 		if (!m_Event)
 		{
 			return false;
 		}
 
-		CreateVariable(m_Int, "Int", data);
+		VariableCreation::CreateVariable(this, m_Int, "Int", data);
 		if (!m_Int)
 		{
 			return false;
 		}
 
-		CreateVariable(m_Float, "Float", data);
+		VariableCreation::CreateVariable(this, m_Float, "Float", data);
 		if (!m_Float)
 		{
 			return false;
 		}
 
-		CreateVariable(m_Bool, "Bool", data);
+		VariableCreation::CreateVariable(this, m_Bool, "Bool", data);
 		if (!m_Bool)
 		{
 			return false;
 		}
 
-		CreateVariable(m_Ulong, "Ulong", data);
+		VariableCreation::CreateVariable(this, m_Ulong, "Ulong", data);
 		if (!m_Ulong)
 		{
 			return false;
 		}
 
-		CreateVariable(m_String, "String", data);
+		VariableCreation::CreateVariable(this, m_String, "String", data);
 		if (!m_String)
 		{
 			return false;

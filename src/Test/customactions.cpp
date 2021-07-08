@@ -1,6 +1,7 @@
 #include "customactions.h"
 #include "YBehavior/registerdata.h"
 #include "YBehavior/behaviortree.h"
+#include "YBehavior/variablecreation.h"
 
 void MyLaunchCore::RegisterActions() const
 {
@@ -100,7 +101,7 @@ YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 
 bool SelectTargetAction::OnLoaded(const pugi::xml_node& data)
 {
-	CreateVariable(m_Target, "Target", data, true);
+	YB::VariableCreation::CreateVariable(this, m_Target, "Target", data, true);
 	if (!m_Target)
 	{
 		return false;
@@ -126,14 +127,14 @@ YBehavior::NodeState GetTargetNameAction::Update(YBehavior::AgentPtr pAgent)
 
 bool GetTargetNameAction::OnLoaded(const pugi::xml_node& data)
 {
-	CreateVariable(m_Target, "Target", data, true);
+	YB::VariableCreation::CreateVariable(this, m_Target, "Target", data, true);
 	if (!m_Target)
 	{
 		return false;
 	}
 	
 	YBehavior::ISharedVariableEx* pTestVariable = nullptr;
-	CreateVariable(pTestVariable, "TestVariable", data, 0, YBehavior::Utility::GetCreateStr<YBehavior::INT>());
+	YB::VariableCreation::CreateVariable(this, pTestVariable, "TestVariable", data, 0, YBehavior::Utility::GetCreateStr<YBehavior::INT>());
 
 	return true;
 }

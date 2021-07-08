@@ -6,6 +6,7 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
 #include "YBehavior/tools/common.h"
+#include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
@@ -22,19 +23,19 @@ namespace YBehavior
 	bool Comparer::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Operator
-		if (!GetValue("Operator", data, IVariableOperationHelper::s_OperatorMap, m_Operator))
+		if (!VariableCreation::GetValue(this, "Operator", data, IVariableOperationHelper::s_OperatorMap, m_Operator))
 			return false;
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = CreateVariable(m_Opl, "Opl", data, true);
+		m_DataType = VariableCreation::CreateVariable(this, m_Opl, "Opl", data, true);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right
-		TYPEID dataType = CreateVariable(m_Opr, "Opr", data);
+		TYPEID dataType = VariableCreation::CreateVariable(this, m_Opr, "Opr", data);
 		if (m_DataType != dataType)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types:  Opl & Opr" << ERROR_END;
