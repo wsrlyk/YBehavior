@@ -185,11 +185,13 @@ namespace YBehavior
 		unsigned m_Token;
 		Agent* m_Target{};
 		DebugTargetType m_Type;
+		bool m_bValid{};
 	public:
 		IDebugHelper() {};
 		IDebugHelper(Agent* pAgent) : m_Target(pAgent){}
 		virtual ~IDebugHelper() {}
-		inline bool IsValid() { return m_Target != nullptr; }
+		inline void SetValid(bool b) { m_bValid = b; }
+		inline bool IsValid() { return m_bValid; }
 		void CreateRunInfo(const void* pNode);
 		void SetResult(int rawState, int finalState);
 		void TryBreaking();
@@ -230,13 +232,18 @@ namespace YBehavior
 		void Init(Agent* pAgent);
 		void Dispose();
 		const STRING& GetRootName() override;
-		void TryCreateRunInfo();
+		///> This func is for checking if the runinfo has been cleared by DebugMgr.
+		///  This usually happens in nodes like Wait. Their DebugTreeHelper will survive two
+		///  or more ticks, while all the RunInfos will be recycled by DebugMgr every tick.
+		///  And this func will fetch a new runinfo, and check if the debug state changes.
+		void TryRefresh();
 		void SendLogPoint();
 	public:
 		void LogSharedData(ISharedVariableEx* pVariable, bool bBefore);
 		inline std::stringstream& GetDebugLogInfo() { return m_DebugLogInfo; }
 	private:
 		void _CreateTreeRunInfo();
+		void _TryCreateLogInfo();
 	};
 
 	class DebugFSMHelper : public IDebugHelper

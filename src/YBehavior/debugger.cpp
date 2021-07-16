@@ -508,24 +508,20 @@ namespace YBehavior
 	{
 		m_Target = pAgent;
 		m_pLogInfo = nullptr;
-		if (pAgent == nullptr || !DebugMgr::Instance()->IsValidTarget(pAgent, m_pContext->GetTreeNode()->GetRoot()))
-		{
-			m_Target = nullptr;
-			return;
-		}
 
 		m_Type = DebugTargetType::TREE;
 
-		_CreateTreeRunInfo();
 
-		if (DebugMgr::Instance()->HasDebugPoint({ DebugTargetType::TREE, m_pContext->GetTreeNode()->GetTreeName() }, m_pContext->GetTreeNode()->GetUID()))
-		{
-			m_pLogInfo = ObjectPoolStatic<NodeLogInfo>::Get();
-			m_pLogInfo->Reset();
-			m_DebugLogInfo.str("");
-		}
 
 		m_Token = ++s_Token;
+
+		if (pAgent == nullptr || !DebugMgr::Instance()->IsValidTarget(pAgent, m_pContext->GetTreeNode()->GetRoot()))
+		{
+			SetValid(false);
+			return;
+		}
+		_CreateTreeRunInfo();
+		_TryCreateLogInfo();
 	}
 
 	void DebugTreeHelper::Dispose()
@@ -553,17 +549,19 @@ namespace YBehavior
 		return m_pContext->GetTreeNode()->GetTreeName();
 	}
 
-	void DebugTreeHelper::TryCreateRunInfo()
+	void DebugTreeHelper::TryRefresh()
 	{
-		///> It means the runinfo has been cleared by DebugMgr.
-		///> This usually happens in nodes like Wait. Their DebugTreeHelper will survive two
-		///   or more ticks, while all the RunInfos will be cleared by DebugMgr every tick
-		if (IsValid())
+		if (m_pRunInfo == nullptr || m_pRunInfo->pNode != m_pContext->GetTreeNode())
 		{
-			if (m_pRunInfo == nullptr || m_pRunInfo->pNode != m_pContext->GetTreeNode())
+			if (!IsValid())
 			{
-				_CreateTreeRunInfo();
+				if (DebugMgr::Instance()->IsValidTarget(m_Target, m_pContext->GetTreeNode()->GetRoot()))
+					SetValid(true);
+				else
+					return;
 			}
+			_CreateTreeRunInfo();
+			_TryCreateLogInfo();
 		}
 	}
 
@@ -575,6 +573,23 @@ namespace YBehavior
 		m_pRunInfo->finalRunState = NS_RUNNING;
 		m_pRunInfo->type = DebugTargetType::TREE;
 		m_pRunInfo->pRootNode = m_pContext->GetTreeNode()->GetRoot();
+	}
+
+	void DebugTreeHelper::_TryCreateLogInfo()
+	{
+		bool hasDebugPoint = DebugMgr::Instance()->HasDebugPoint({ DebugTargetType::TREE, m_pContext->GetTreeNode()->GetTreeName() }, m_pContext->GetTreeNode()->GetUID());
+		if (m_pLogInfo == nullptr && hasDebugPoint)
+		{
+			m_pLogInfo = ObjectPoolStatic<NodeLogInfo>::Get();
+			m_pLogInfo->Reset();
+			m_DebugLogInfo.str("");
+		}
+		else if (m_pLogInfo != nullptr && !hasDebugPoint)
+		{
+			ObjectPoolStatic<NodeLogInfo>::Recycle(m_pLogInfo);
+			m_pLogInfo = nullptr;
+			m_DebugLogInfo.str("");
+		}
 	}
 
 	void DebugTreeHelper::SendLogPoint()

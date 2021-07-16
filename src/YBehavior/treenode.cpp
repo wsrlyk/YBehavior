@@ -208,7 +208,7 @@ namespace YBehavior
 		case RootStage::Condition:
 #ifdef YDEBUGGER
 			///> Run info may be cleared by DebugMgr, so make sure it's created.
-			m_pDebugHelper->TryCreateRunInfo();
+			m_pDebugHelper->TryRefresh();
 #endif
 			if (lastState == NS_FAILURE)
 				state = NS_FAILURE;
@@ -220,7 +220,7 @@ namespace YBehavior
 		case RootStage::Main:
 #ifdef YDEBUGGER
 			///> Run info may be cleared by DebugMgr, so make sure it's created.
-			m_pDebugHelper->TryCreateRunInfo();
+			m_pDebugHelper->TryRefresh();
 #endif
 			///> Nodes like Wait, each run should check the condition
 			if (lastState == NS_RUNNING)
