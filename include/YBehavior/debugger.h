@@ -185,13 +185,11 @@ namespace YBehavior
 		unsigned m_Token;
 		Agent* m_Target{};
 		DebugTargetType m_Type;
-		bool m_bValid{};
 	public:
 		IDebugHelper() {};
 		IDebugHelper(Agent* pAgent) : m_Target(pAgent){}
 		virtual ~IDebugHelper() {}
-		inline void SetValid(bool b) { m_bValid = b; }
-		inline bool IsValid() { return m_bValid; }
+		virtual bool IsValid() = 0;
 		void CreateRunInfo(const void* pNode);
 		void SetResult(int rawState, int finalState);
 		void TryBreaking();
@@ -230,6 +228,7 @@ namespace YBehavior
 	public:
 		DebugTreeHelper(TreeNodeContext* pContext) : m_pContext(pContext) {}
 		void Init(Agent* pAgent);
+		bool IsValid() override;
 		void Dispose();
 		const STRING& GetRootName() override;
 		///> This func is for checking if the runinfo has been cleared by DebugMgr.
@@ -255,8 +254,11 @@ namespace YBehavior
 	public:
 		DebugFSMHelper(Agent* pAgent, MachineState* pNode);
 		~DebugFSMHelper();
+		bool IsValid() override;
 		const STRING& GetRootName() override;
-
+	private:
+		void _CreateFSMRunInfo();
+		void _TryCreateLogInfo();
 	};
 
 }

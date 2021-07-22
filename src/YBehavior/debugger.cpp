@@ -504,6 +504,11 @@ namespace YBehavior
 	}
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
+	bool DebugTreeHelper::IsValid()
+	{
+		return DebugMgr::Instance()->IsValidTarget(m_Target, m_pContext->GetTreeNode()->GetRoot());
+	}
+
 	void DebugTreeHelper::Init(Agent* pAgent)
 	{
 		m_Target = pAgent;
@@ -515,9 +520,8 @@ namespace YBehavior
 
 		m_Token = ++s_Token;
 
-		if (pAgent == nullptr || !DebugMgr::Instance()->IsValidTarget(pAgent, m_pContext->GetTreeNode()->GetRoot()))
+		if (!IsValid())
 		{
-			SetValid(false);
 			return;
 		}
 		_CreateTreeRunInfo();
@@ -555,10 +559,7 @@ namespace YBehavior
 		{
 			if (!IsValid())
 			{
-				if (DebugMgr::Instance()->IsValidTarget(m_Target, m_pContext->GetTreeNode()->GetRoot()))
-					SetValid(true);
-				else
-					return;
+				return;
 			}
 			_CreateTreeRunInfo();
 			_TryCreateLogInfo();
@@ -695,35 +696,26 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 
+	bool DebugFSMHelper::IsValid()
+	{
+		return DebugMgr::Instance()->IsValidTarget(m_Target, m_pNode->GetParentMachine()->GetRootMachine()->GetFSM());
+	}
+
 	DebugFSMHelper::DebugFSMHelper(Agent* pAgent, MachineState* pNode)
 		: IDebugHelper(pAgent)
 		, m_pNode(pNode)
 		, m_pLogInfo(nullptr)
 	{
-		if (pAgent == nullptr || !DebugMgr::Instance()->IsValidTarget(pAgent, pNode->GetParentMachine()->GetRootMachine()->GetFSM()))
-		{
-			m_Target = nullptr;
-			return;
-		}
-
 		m_pNode = pNode;
 		m_Type = DebugTargetType::FSM;
 
-		CreateRunInfo(pNode);
-		m_pRunInfo->nodeUID = pNode->GetUID();
-		m_pRunInfo->rawRunState = NS_RUNNING;
-		m_pRunInfo->finalRunState = NS_RUNNING;
-		m_pRunInfo->type = DebugTargetType::FSM;
-		m_pRunInfo->pRootNode = pNode->GetParentMachine()->GetRootMachine()->GetFSM();
-
-		if (DebugMgr::Instance()->HasDebugPoint({ DebugTargetType::FSM, pNode->GetParentMachine()->GetRootMachine()->GetFSM()->GetName() }, pNode->GetUID()))
-		{
-			m_pLogInfo = ObjectPoolStatic<NodeLogInfo>::Get();
-			m_pLogInfo->Reset();
-			pNode->GetDebugLogInfo().str("");
-		}
-
 		m_Token = ++s_Token;
+
+		if (IsValid())
+		{
+			_CreateFSMRunInfo();
+			_TryCreateLogInfo();
+		}
 	}
 
 	DebugFSMHelper::~DebugFSMHelper()
@@ -775,6 +767,34 @@ namespace YBehavior
 		DebugMgr::Instance()->Send(false);
 	}
 
+	void DebugFSMHelper::_CreateFSMRunInfo()
+	{
+		CreateRunInfo(m_pNode);
+		m_pRunInfo->nodeUID = m_pNode->GetUID();
+		m_pRunInfo->rawRunState = NS_RUNNING;
+		m_pRunInfo->finalRunState = NS_RUNNING;
+		m_pRunInfo->type = DebugTargetType::FSM;
+		m_pRunInfo->pRootNode = m_pNode->GetParentMachine()->GetRootMachine()->GetFSM();
+	}
+
+	void DebugFSMHelper::_TryCreateLogInfo()
+	{
+		bool hasDebugPoint = DebugMgr::Instance()->HasDebugPoint({ DebugTargetType::FSM, m_pNode->GetParentMachine()->GetRootMachine()->GetFSM()->GetName() }, m_pNode->GetUID());
+
+		if (hasDebugPoint && !m_pLogInfo)
+		{
+			m_pLogInfo = ObjectPoolStatic<NodeLogInfo>::Get();
+			m_pLogInfo->Reset();
+			m_pNode->GetDebugLogInfo().str("");
+		}
+		else if (m_pLogInfo != nullptr && !hasDebugPoint)
+		{
+			ObjectPoolStatic<NodeLogInfo>::Recycle(m_pLogInfo);
+			m_pLogInfo = nullptr;
+			m_pNode->GetDebugLogInfo().str("");
+		}
+
+	}
 
 }
 #endif // YDEBUGGER
