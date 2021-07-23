@@ -207,7 +207,7 @@ namespace YBehavior.Editor.Core.New
                 SetValue(null, IsLocal);
                 OnPropertyChanged("vType");
                 _OnConditionChanged();
-
+                _OnVTypeChanged();
                 WorkBenchMgr.Instance.PushCommand(command);
             }
         }
@@ -233,7 +233,7 @@ namespace YBehavior.Editor.Core.New
                 OnPropertyChanged("cType");
                 CandidatesReset = !CandidatesReset;
                 _OnConditionChanged();
-
+                _OnCTypeChanged();
                 WorkBenchMgr.Instance.PushCommand(command);
             }
         }
@@ -517,11 +517,21 @@ namespace YBehavior.Editor.Core.New
             else if (m_Parent != null && m_Parent.Container != null)
                 m_Parent.Container.OnVariableValueChanged(m_Parent);
         }
+
         private void _OnConditionChanged()
         {
             OnPropertyChanged("IsValid");
         }
 
+        void _OnVTypeChanged()
+        {
+            (Container as ISameTypeGroupTypeChanged)?.OnVTypeChanged(this.Name);
+        }
+
+        void _OnCTypeChanged()
+        {
+            (Container as ISameTypeGroupTypeChanged)?.OnCTypeChanged(this.Name);
+        }
         public bool LockVBType { get; set; } = false;
         public bool LockCType { get; set; } = false;
         public bool LockEType { get { return eType == EnableType.ET_FIXED; } }

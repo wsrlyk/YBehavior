@@ -488,7 +488,13 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    public class NodeMemory : VariableCollection, IVariableCollection
+    interface ISameTypeGroupTypeChanged
+    {
+        void OnVTypeChanged(string name);
+        void OnCTypeChanged(string name);
+    }
+
+    public class NodeMemory : VariableCollection, IVariableCollection, ISameTypeGroupTypeChanged
     {
         public SameTypeGroup vTypeGroup { get; set; } = null;
         public SameTypeGroup cTypeGroup { get; set; } = null;
@@ -586,6 +592,88 @@ namespace YBehavior.Editor.Core.New
                 vTypeGroup = other.vTypeGroup.Clone();
             if (other.cTypeGroup != null)
                 cTypeGroup = other.cTypeGroup.Clone();
+        }
+
+        bool m_bProcessingSameTypeGroup = false;
+        public void OnVTypeChanged(string name)
+        {
+            if (m_bProcessingSameTypeGroup)
+                return;
+            m_bProcessingSameTypeGroup = true;
+            if (vTypeGroup != null)
+            {
+                bool bFound = false;
+                foreach (HashSet<string> group in vTypeGroup)
+                {
+                    foreach (string n in group)
+                    {
+                        if (n == name)
+                        {
+                            bFound = true;
+                            break;
+                        }
+                    }
+
+                    if (!bFound)
+                        continue;
+
+                    Variable v = GetVariable(name);
+                    if (v != null)
+                    {
+                        Variable.ValueType targetVType = v.vType;
+                        foreach (string n in group)
+                        {
+                            if (n == name)
+                                continue;
+                            Variable vv = GetVariable(n);
+                            if (vv != null)
+                                vv.vType = targetVType;
+                        }
+                    }
+                    break;
+                }
+            }
+            m_bProcessingSameTypeGroup = false;
+        }
+        public void OnCTypeChanged(string name)
+        {
+            if (m_bProcessingSameTypeGroup)
+                return;
+            m_bProcessingSameTypeGroup = true;
+            if (cTypeGroup != null)
+            {
+                bool bFound = false;
+                foreach (HashSet<string> group in cTypeGroup)
+                {
+                    foreach (string n in group)
+                    {
+                        if (n == name)
+                        {
+                            bFound = true;
+                            break;
+                        }
+                    }
+
+                    if (!bFound)
+                        continue;
+
+                    Variable v = GetVariable(name);
+                    if (v != null)
+                    {
+                        Variable.CountType targetCType = v.cType;
+                        foreach (string n in group)
+                        {
+                            if (n == name)
+                                continue;
+                            Variable vv = GetVariable(n);
+                            if (vv != null)
+                                vv.cType = targetCType;
+                        }
+                    }
+                    break;
+                }
+            }
+            m_bProcessingSameTypeGroup = false;
         }
     }
 }
