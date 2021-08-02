@@ -361,6 +361,7 @@ namespace YBehavior.Editor.Core.New
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.AppendChild(xmlDoc.CreateXmlDeclaration("1.0", "utf-8", null));
             var el = xmlDoc.CreateElement(bench.FileInfo.Name);
+            el.SetAttribute("IsEditor", "");
             xmlDoc.AppendChild(el);
 
             bench.Save(el, xmlDoc);

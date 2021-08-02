@@ -98,6 +98,13 @@ namespace YBehavior
 		if (rootData == nullptr)
 			return nullptr;
 		
+		auto isEditor = rootData.attribute("IsEditor");
+		if (!isEditor.empty())
+		{
+			ERROR_BEGIN << "This fsm is for Editor Only: " << name << ERROR_END;
+			return nullptr;
+		}
+
 		FSM* pFSM = new FSM(name);
 		RootMachine* pMachine = pFSM->CreateMachine();
 		///> at most 8 levels, start from 0

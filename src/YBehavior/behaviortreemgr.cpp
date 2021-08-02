@@ -37,6 +37,12 @@ namespace YBehavior
 		if (rootData == nullptr)
 			return nullptr;
 
+		auto isEditor = rootData.attribute("IsEditor");
+		if (!isEditor.empty())
+		{
+			ERROR_BEGIN << "This tree is for Editor Only: " << name << ERROR_END;
+			return nullptr;
+		}
 		BehaviorTree* tree = new BehaviorTree(name);
 
 		UINT uid = 0;
