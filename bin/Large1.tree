@@ -1,10 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Large IsEditor="">
   <Node Class="Root" Pos="0,0">
-    <Shared a="_IC 0" aa="_IC 0" aaaa="_IC 0"  aaaaa="_IC 0"  aaaaaa="_IC 0"  aaaaaaa="_IC 0"  aaaaaaaa="_IC 0"  aaaaaaaaa="_IC 0"  aaaaaaaaaa="_IC 0"  aaaaaaaaaaa="_IC 0"  aaaaaaaaaaaa="_IC 0"  aa1a="_IC 0"  a2aa="_IC 0"  a3aa="_IC 0"  aa4a="_IC 0"
-a2="_IC 0" aa2="_IC 0" a2aaa="_IC 0"  aaaaa2="_IC 0"  aa2aaaa="_IC 0"  aaa2aaaa="_IC 0"  aaaaaaa2a="_IC 0"  aaaaaa2aaa="_IC 0"  aaaaa2aaaaa="_IC 0"  aaaaa2aaaaaa="_IC 0"  aaaaaa2aaaaaa="_IC 0"  aa12a="_IC 0"  a22aa="_IC 0"  a32aa="_IC 0"  aa24a="_IC 0"
-a23="_IC 0" aa32="_IC 0" a2a3aa="_IC 0"  aaaa3a2="_IC 0"  aa2a3aaa="_IC 0"  aaa32aaaa="_IC 0"  aaa3aaaa2a="_IC 0"  aaaaa3a2aaa="_IC 0"  aaaaa2aa3aaa="_IC 0"  aaaaa2aa3aaaa="_IC 0"  aaaaaa2aaaaa3a="_IC 0"  aa312a="_IC 0"  a22a3a="_IC 0"  a32aa3="_IC 0"  aa234a="_IC 0"
- />
+    <Shared />
     <Node Class="Sequence" Pos="40,60">
       <Node Class="Sequence" Pos="60,90">
         <Node Class="Sequence" Pos="80,120">

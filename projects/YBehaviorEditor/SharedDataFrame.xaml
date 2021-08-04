@@ -26,21 +26,52 @@
                             <TextBox Name="NewSharedVariableName" HorizontalAlignment="Right" Width="80" Margin="0,0,20,0"/>
                             <Button HorizontalAlignment="Right" Width="20" Click="AddSharedVariable_Click" Content="+"/>
                         </Grid>
-                        <ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
+                        <ItemsControl Name="SharedContainer" ItemsSource="{Binding SharedMemory.Datas}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <local:UIVariable DataContext="{Binding Variable}"/>
+                                    <!--TextBlock Text = "{Binding Name}"/-->
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel IsVirtualizing="True"
+                                                            VirtualizationMode="Recycling" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.Template>
+                                <ControlTemplate TargetType="ItemsControl">
+                                    <!--<Border BorderThickness="{TemplateBinding BorderThickness}"
+              BorderBrush="{TemplateBinding BorderBrush}"
+              Background="{TemplateBinding Background}">-->
+                                        <ScrollViewer CanContentScroll="True"
+                                                      Padding="{TemplateBinding Padding}"
+                                                      Focusable="False"
+                                                      VerticalScrollBarVisibility ="Auto" 
+                                                      Background="LightGray">
+                                            <ItemsPresenter />
+                                        </ScrollViewer>
+                                    <!--</Border>-->
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                        </ItemsControl>
+                        <!--<ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
                             <ItemsControl Name="SharedContainer" ItemsSource="{Binding SharedMemory.Datas}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <StackPanel/>
+                                        <VirtualizingStackPanel IsVirtualizing ="True" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <local:UIVariable DataContext="{Binding Variable}"/>
-                                        <!--TextBlock Text = "{Binding Name}"/-->
+                                        --><!--TextBlock Text = "{Binding Name}"/--><!--
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                        </ScrollViewer>
+                        </ScrollViewer>-->
                     </DockPanel>
                     <DockPanel Background="DarkGray" Grid.Row="1">
                         <!--<StackPanel DockPanel.Dock="Top">
@@ -51,7 +82,38 @@
                             <TextBox Name="NewLocalVariableName" HorizontalAlignment="Right" Width="80" Margin="0,0,20,0"/>
                             <Button HorizontalAlignment="Right" Width="20" Click="AddLocalVariable_Click" Content="+"/>
                         </Grid>
-                        <ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
+                        <ItemsControl Name="LocalContainer" ItemsSource="{Binding LocalMemory.Datas}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <local:UIVariable DataContext="{Binding Variable}"/>
+                                    <!--TextBlock Text = "{Binding Name}"/-->
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel IsVirtualizing="True"
+                                                            VirtualizationMode="Recycling" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.Template>
+                                <ControlTemplate TargetType="ItemsControl">
+                                    <!--<Border BorderThickness="{TemplateBinding BorderThickness}"
+              BorderBrush="{TemplateBinding BorderBrush}"
+              Background="{TemplateBinding Background}">-->
+                                    <ScrollViewer CanContentScroll="True"
+                                                      Padding="{TemplateBinding Padding}"
+                                                      Focusable="False"
+                                                      VerticalScrollBarVisibility ="Auto" 
+                                                      Background="LightGray">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                    <!--</Border>-->
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                        </ItemsControl>
+                        <!--<ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
                             <ItemsControl Name="LocalContainer" ItemsSource="{Binding LocalMemory.Datas}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -61,11 +123,13 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <local:UIVariable DataContext="{Binding Variable}"/>
-                                        <!--TextBlock Text = "{Binding Name}"/-->
+                                        -->
+                        <!--TextBlock Text = "{Binding Name}"/-->
+                        <!--
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                        </ScrollViewer>
+                        </ScrollViewer>-->
                     </DockPanel>
                 </Grid>
             </TabItem>
@@ -86,7 +150,38 @@
                                 +
                             </Button>
                         </Grid>
-                        <ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
+                        <ItemsControl Name="InputContainer" ItemsSource="{Binding InputMemory.Datas}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <local:UIVariable DataContext="{Binding Variable}"/>
+                                    <!--TextBlock Text = "{Binding Name}"/-->
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel IsVirtualizing="True"
+                                                            VirtualizationMode="Recycling" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.Template>
+                                <ControlTemplate TargetType="ItemsControl">
+                                    <!--<Border BorderThickness="{TemplateBinding BorderThickness}"
+              BorderBrush="{TemplateBinding BorderBrush}"
+              Background="{TemplateBinding Background}">-->
+                                    <ScrollViewer CanContentScroll="True"
+                                                      Padding="{TemplateBinding Padding}"
+                                                      Focusable="False"
+                                                      VerticalScrollBarVisibility ="Auto" 
+                                                      Background="LightGray">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                    <!--</Border>-->
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                        </ItemsControl>
+                        <!--<ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
                             <ItemsControl Name="InputContainer" ItemsSource="{Binding InputMemory.Datas}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -96,11 +191,11 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <local:UIVariable DataContext="{Binding Variable}"/>
-                                        <!--TextBlock Text = "{Binding Name}"/-->
+                                        --><!--TextBlock Text = "{Binding Name}"/--><!--
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                        </ScrollViewer>
+                        </ScrollViewer>-->
                     </DockPanel>
                     <DockPanel Background="DarkGray" Grid.Row="1">
                         <!--<StackPanel DockPanel.Dock="Top">
@@ -113,7 +208,38 @@
                                 +
                             </Button>
                         </Grid>
-                        <ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
+                        <ItemsControl Name="OutputContainer" ItemsSource="{Binding OutputMemory.Datas}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <local:UIVariable DataContext="{Binding Variable}"/>
+                                    <!--TextBlock Text = "{Binding Name}"/-->
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel IsVirtualizing="True"
+                                                            VirtualizationMode="Recycling" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.Template>
+                                <ControlTemplate TargetType="ItemsControl">
+                                    <!--<Border BorderThickness="{TemplateBinding BorderThickness}"
+              BorderBrush="{TemplateBinding BorderBrush}"
+              Background="{TemplateBinding Background}">-->
+                                    <ScrollViewer CanContentScroll="True"
+                                                      Padding="{TemplateBinding Padding}"
+                                                      Focusable="False"
+                                                      VerticalScrollBarVisibility ="Auto" 
+                                                      Background="LightGray">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                    <!--</Border>-->
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                        </ItemsControl>
+                        <!--<ScrollViewer VerticalScrollBarVisibility ="Auto" Background="LightGray">
                             <ItemsControl Name="OutputContainer" ItemsSource="{Binding OutputMemory.Datas}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -123,11 +249,11 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <local:UIVariable DataContext="{Binding Variable}"/>
-                                        <!--TextBlock Text = "{Binding Name}"/-->
+                                        --><!--TextBlock Text = "{Binding Name}"/--><!--
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                        </ScrollViewer>
+                        </ScrollViewer>-->
                     </DockPanel>
                 </Grid>
             </TabItem>
