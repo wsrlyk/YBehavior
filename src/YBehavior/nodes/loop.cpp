@@ -166,8 +166,10 @@ namespace YBehavior
 					pNode->m_BreakValue->GetCastedValue(pAgent->GetMemory(), bBreak);
 
 					if ((bBreak && lastState == NS_SUCCESS)
-						||(!bBreak && lastState == NS_FAILURE))
-					return NS_SUCCESS;
+						|| (!bBreak && lastState == NS_FAILURE))
+					{
+						return NS_SUCCESS;
+					}
 				}
 				m_Stage = (int)ForPhase::Inc;
 				if (pNode->m_IncChild)
@@ -200,9 +202,17 @@ namespace YBehavior
 
 				if ((bBreak && lastState == NS_SUCCESS)
 					|| (!bBreak && lastState == NS_FAILURE))
+				{
+					YB_LOG_INFO_WITH_END("Break at Index " << m_Stage - 1);
 					return NS_SUCCESS;
+				}
 			}
 		}
+		else
+		{
+			YB_LOG_VARIABLE_BEFORE_IF_HAS_DEBUG_POINT(pNode->m_Collection);
+		}
+
 		if (m_Stage < size)
 		{
 			const void* element = pNode->m_Collection->GetElement(pAgent->GetMemory(), m_Stage);
@@ -251,8 +261,15 @@ namespace YBehavior
 
 				if ((bBreak && lastState == NS_SUCCESS)
 					|| (!bBreak && lastState == NS_FAILURE))
+				{
+					YB_LOG_INFO_WITH_END("Break at Index " << m_Stage - 1);
 					return NS_SUCCESS;
+				}
 			}
+		}
+		else
+		{
+			YB_LOG_VARIABLE_BEFORE_IF_HAS_DEBUG_POINT(pNode->m_Count);
 		}
 		if (m_Stage < size)
 		{
