@@ -26,6 +26,7 @@ namespace YBehavior.Editor.Core.New
         PopMenu,
         SelectSharedDataTab,
         VariableClicked,
+        ShowNodeList,
     }
 
     public class EventMgr : Singleton<EventMgr>
@@ -101,6 +102,7 @@ namespace YBehavior.Editor.Core.New
     {
         public NodeBase Node { get; set; }
         public AddMethod From { get; set; }
+        public System.Windows.Point Pos { get; set; }
         public override EventType Type => EventType.NewNodeAdded;
         public enum AddMethod
         {
@@ -154,6 +156,7 @@ namespace YBehavior.Editor.Core.New
     public class CommentCreatedArg : EventArg
     {
         public Comment Comment { get; set; }
+        public System.Windows.Point Pos { get; set; }
         public override EventType Type => EventType.CommentCreated;
     }
 
@@ -193,4 +196,11 @@ namespace YBehavior.Editor.Core.New
         public override EventType Type => EventType.VariableClicked;
         public Variable v { get; set; }
     }
+
+    public class ShowNodeListArg : EventArg
+    {
+        public System.Windows.Point Pos { get; set; }
+        public override EventType Type => EventType.ShowNodeList;
+    }
+
 }

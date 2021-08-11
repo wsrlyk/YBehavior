@@ -86,14 +86,15 @@ namespace YBehavior.Editor.Core.New
             PushDoneCommand(addCommentCommand);
         }
 
-        public void CreateComment()
+        public void CreateComment(System.Windows.Point viewPos)
         {
             Comment comment = new Comment();
             AddComment(comment);
 
             CommentCreatedArg cArg = new CommentCreatedArg()
             {
-                Comment = comment
+                Comment = comment,
+                Pos = viewPos,
             };
             EventMgr.Instance.Send(cArg);
         }

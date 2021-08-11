@@ -89,7 +89,7 @@ namespace YBehavior.Editor
 
         private void _UpdateHotspot()
         {
-            if (OwnerNode != null && OwnerNode.Ancestor.IsAncestorOf(this))
+            if (OwnerNode != null && OwnerNode.Canvas.IsAncestorOf(this))
             {
                 ////if (m_RelativePos.X == double.MaxValue && m_RelativePos.Y == double.MaxValue)
                 ////{
@@ -102,7 +102,7 @@ namespace YBehavior.Editor
                 ////    //Hotspot = pos;
                 ////    (this.DataContext as ConnectorGeometry).Pos = pos;
                 ////}
-                (this.DataContext as ConnectorGeometry).Pos = TransformToAncestor(OwnerNode.Ancestor).Transform(new Point(ActualWidth / 2, ActualHeight / 2));
+                (this.DataContext as ConnectorGeometry).Pos = TransformToAncestor(OwnerNode.Canvas).Transform(new Point(ActualWidth / 2, ActualHeight / 2));
             }
 
             //Hotspot = GetPos(Ancestor);

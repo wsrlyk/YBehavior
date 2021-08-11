@@ -145,6 +145,7 @@ namespace YBehavior.Editor
             this.Nodes.ItemsSource = m_NodeInfos.Children;
             _FilterNodes(null);
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
+            EventMgr.Instance.Register(EventType.ShowNodeList, _OnShowNodeList);
         }
 
         private void _OnWorkBenchSelected(EventArg arg)
@@ -230,7 +231,8 @@ namespace YBehavior.Editor
                     {
                         string nodeText = item.Name;
 
-                        WorkBenchMgr.Instance.CreateNodeToBench(item.Source);
+                        WorkBenchMgr.Instance.CreateNodeToBench(item.Source, m_ShowPos);
+                        _Hide();
                     }
                     break;
                 }
@@ -244,12 +246,40 @@ namespace YBehavior.Editor
         {
             if (DebugMgr.Instance.IsDebugging())
                 return;
-            WorkBenchMgr.Instance.CreateComment();
+            WorkBenchMgr.Instance.CreateComment(m_ShowPos);
+            _Hide();
         }
 
         private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
         {
             _FilterNodes(this.SearchText.Text);
+        }
+
+        System.Windows.Point m_ShowPos;
+        private void _OnShowNodeList(EventArg arg)
+        {
+            this.Visibility = Visibility.Visible;
+            this.SearchText.SetFocus();
+
+            ShowNodeListArg oArg = arg as ShowNodeListArg;
+            m_ShowPos = oArg.Pos;
+
+            var x = Math.Max(0.0, m_ShowPos.X);
+            x = Math.Min(x, this.ActualWidth - this.MainPanel.Width);
+            var y = Math.Max(0.0, m_ShowPos.Y);
+            y = Math.Min(y, this.ActualHeight - this.MainPanel.Height);
+
+            this.MainPanel.Margin = new Thickness(x, y, 0, 0);
+        }
+
+        private void Border_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            _Hide();
+        }
+
+        void _Hide()
+        {
+            this.Visibility = Visibility.Collapsed;
         }
     }
 

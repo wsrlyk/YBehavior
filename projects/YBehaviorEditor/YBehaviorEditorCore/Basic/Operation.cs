@@ -9,14 +9,14 @@ using System.Windows.Media;
 
 namespace YBehavior.Editor.Core.New
 {
-    public interface IHasAncestor
+    public interface IGetCanvas
     {
-        FrameworkElement Ancestor { get; }
+        FrameworkElement Canvas { get; }
     }
 
     public class Operation
     {
-        public delegate void ClickHandler();
+        public delegate void ClickHandler(Point absPos);
         public delegate void DragHandler(Vector delta, Point absPos);
 
         ClickHandler m_LeftClickHandler;
@@ -37,8 +37,8 @@ namespace YBehavior.Editor.Core.New
         DragHandler m_MiddleStartDragHandler;
         DragHandler m_MiddleFinishDragHandler;
 
-        IHasAncestor m_Target;
-        FrameworkElement RenderCanvas { get { return m_Target != null ? m_Target.Ancestor : null; } }
+        IGetCanvas m_Target;
+        FrameworkElement RenderCanvas { get { return m_Target != null ? m_Target.Canvas : null; } }
 
         int m_ValidButtonMask = 0;
 
@@ -53,7 +53,7 @@ namespace YBehavior.Editor.Core.New
             target.MouseUp -= _MouseUp;
             target.MouseUp += _MouseUp;
 
-            m_Target = target as IHasAncestor;
+            m_Target = target as IGetCanvas;
         }
 
         public void MakeCanvasFocused()
@@ -94,7 +94,7 @@ namespace YBehavior.Editor.Core.New
             {
                 m_Timer = new System.Windows.Threading.DispatcherTimer();
                 m_Timer.Interval = new TimeSpan(0, 0, 0, 0, 80);
-                m_Timer.Tick += (s, e1) => { m_Timer.Stop(); if (m_ClickHandler != null) m_ClickHandler(); };
+                m_Timer.Tick += (s, e1) => { m_Timer.Stop(); if (m_ClickHandler != null) m_ClickHandler(m_Pos); };
             }
         }
 
@@ -268,7 +268,7 @@ namespace YBehavior.Editor.Core.New
                     else
                     {
                         if (m_ClickHandler != null)
-                            m_ClickHandler();
+                            m_ClickHandler(m_Pos);
                     }
                 }
 

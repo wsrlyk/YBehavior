@@ -270,7 +270,7 @@ namespace YBehavior.Editor.Core.New
             other.m_Name = this.m_Name;
             other.m_NickName = this.m_NickName;
             other.Geo.Copy(this.Geo);
-            other.Geo.Pos = other.Geo.Pos + new Vector(15, 15);
+            other.Geo.Pos = other.Geo.Pos;
             other.m_NodeDescripion = this.m_NodeDescripion;
 
             return other;

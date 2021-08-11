@@ -96,7 +96,7 @@ namespace YBehavior.Editor
             _UpdateArrow();
         }
 
-        void _OnClick()
+        void _OnClick(Point pos)
         {
             SelectHandler(this, true);
             m_Operation.MakeCanvasFocused();

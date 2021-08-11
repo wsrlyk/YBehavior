@@ -81,10 +81,10 @@ namespace YBehavior.Editor.Core.New
                 m_ActiveWorkBench.AddComment(comment);
         }
 
-        public void CreateComment()
+        public void CreateComment(Point viewPos)
         {
             if (m_ActiveWorkBench != null)
-                m_ActiveWorkBench.CreateComment();
+                m_ActiveWorkBench.CreateComment(viewPos);
         }
 
         public void RefreshNodeUID()
@@ -394,7 +394,7 @@ namespace YBehavior.Editor.Core.New
             return true;
         }
 
-        public NodeBase CreateNodeToBench(NodeBase template)
+        public NodeBase CreateNodeToBench(NodeBase template, Point viewPos)
         {
             NodeBase node = null;
             using (var locker = this.CommandLocker.StartLock())
@@ -422,6 +422,7 @@ namespace YBehavior.Editor.Core.New
             NewNodeAddedArg arg = new NewNodeAddedArg();
             arg.Node = node;
             arg.From = NewNodeAddedArg.AddMethod.New;
+            arg.Pos = viewPos;
             EventMgr.Instance.Send(arg);
 
             return node;
@@ -447,6 +448,7 @@ namespace YBehavior.Editor.Core.New
             NewNodeAddedArg arg = new NewNodeAddedArg();
             arg.Node = node;
             arg.From = NewNodeAddedArg.AddMethod.Duplicate;
+            arg.Pos = template.Geo.Pos + new System.Windows.Vector(15, 15);
             EventMgr.Instance.Send(arg);
 
             return node;
@@ -482,6 +484,7 @@ namespace YBehavior.Editor.Core.New
             NewNodeAddedArg arg = new NewNodeAddedArg();
             arg.Node = node;
             arg.From = NewNodeAddedArg.AddMethod.Paste;
+            arg.Pos = new Point(60, 60);
             EventMgr.Instance.Send(arg);
 
             return node;

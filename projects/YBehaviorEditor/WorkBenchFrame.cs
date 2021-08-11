@@ -10,19 +10,23 @@ namespace YBehavior.Editor
     /// <summary>
     /// WorkBenchFrame.xaml 的交互逻辑
     /// </summary>
-    public abstract class WorkBenchFrame : UserControl
+    public abstract class WorkBenchFrame : UserControl, IGetCanvas
     {
         public PageData CurPageData { get; } = new PageData();
         public abstract FrameworkElement GetCanvasBoard { get; }
         public abstract FrameworkElement GetCanvas { get; }
+
+        public FrameworkElement Canvas { get { return GetCanvasBoard; } }
+
         Operation m_Operation;
 
         protected void _Init()
         {
 
-            m_Operation = new Operation(this.GetCanvasBoard);
+            m_Operation = new Operation(this);
             m_Operation.RegisterMiddleDrag(_OnDrag, null, null);
             m_Operation.RegisterLeftClick(_OnClick);
+            m_Operation.RegisterRightClick(_OnRightClick);
 
             GetCanvas.RenderTransform = CurPageData.TransGroup;
         }
@@ -69,11 +73,11 @@ namespace YBehavior.Editor
             if (oArg.Node == null)
                 return;
 
-            ///> move the node to the topleft of the canvas
-            if (oArg.From != NewNodeAddedArg.AddMethod.Duplicate)
+            /////> move the node to the topleft of the canvas
+            //if (oArg.From != NewNodeAddedArg.AddMethod.Duplicate)
                 oArg.Node.Renderer.SetPos(new Point(
-                    -CurPageData.TranslateTransform.X / CurPageData.ScaleTransform.ScaleX + 60 + Core.New.Utility.Rand(-10, 10),
-                    -CurPageData.TranslateTransform.Y / CurPageData.ScaleTransform.ScaleY + 60 + Core.New.Utility.Rand(-10, 10)));
+                    -CurPageData.TranslateTransform.X / CurPageData.ScaleTransform.ScaleX + oArg.Pos.X + Core.New.Utility.Rand(-10, 10),
+                    -CurPageData.TranslateTransform.Y / CurPageData.ScaleTransform.ScaleY + oArg.Pos.Y + Core.New.Utility.Rand(-10, 10)));
 
             //_CreateNode(oArg.Node);
             //this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<Node>(_ThreadRefreshConnection), oArg.Node);
@@ -87,8 +91,8 @@ namespace YBehavior.Editor
 
             ///> move the comment to the topleft of the canvas
             oArg.Comment.Geo.Pos = new Point(
-                -CurPageData.TranslateTransform.X / CurPageData.ScaleTransform.ScaleX,
-                -CurPageData.TranslateTransform.Y / CurPageData.ScaleTransform.ScaleY);
+                -CurPageData.TranslateTransform.X / CurPageData.ScaleTransform.ScaleX + oArg.Pos.X,
+                -CurPageData.TranslateTransform.Y / CurPageData.ScaleTransform.ScaleY + oArg.Pos.Y);
             oArg.Comment.OnGeometryChanged();
         }
 
@@ -134,11 +138,19 @@ namespace YBehavior.Editor
             CurPageData.TranslateTransform.X += delta.X;
             CurPageData.TranslateTransform.Y += delta.Y;
         }
-        void _OnClick()
+        void _OnClick(Point pos)
         {
             Focus();
             SelectionMgr.Instance.Clear();
         }
+
+        void _OnRightClick(Point pos)
+        {
+            if (CurPageData == null)
+                return;
+            EventMgr.Instance.Send(new ShowNodeListArg() { Pos = pos });
+        }
+
         public void ResetTransform()
         {
             if (CurPageData == null)

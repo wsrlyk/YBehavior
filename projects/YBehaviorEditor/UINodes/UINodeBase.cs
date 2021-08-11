@@ -136,7 +136,7 @@ namespace YBehavior.Editor
         Storyboard m_InstantAnim;
         public override Storyboard InstantAnim { get { return m_InstantAnim; } }
 
-        void _OnClick()
+        void _OnClick(Point pos)
         {
             m_Operation.MakeCanvasFocused();
 

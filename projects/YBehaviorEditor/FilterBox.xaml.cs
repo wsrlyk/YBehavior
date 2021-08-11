@@ -39,5 +39,10 @@ namespace YBehavior.Editor
         {
             this.SearchText.Text = string.Empty;
         }
+
+        public void SetFocus()
+        {
+            SearchText.Focus();
+        }
     }
 }

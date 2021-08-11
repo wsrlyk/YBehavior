@@ -8,10 +8,10 @@ using System.Windows.Data;
 
 namespace YBehavior.Editor
 {
-    public class YUserControl : UserControl, Core.New.IHasAncestor
+    public class YUserControl : UserControl, Core.New.IGetCanvas
     {
-        public static readonly DependencyProperty AncestorProperty =
-            DependencyProperty.Register("Ancestor",
+        public static readonly DependencyProperty CanvasProperty =
+            DependencyProperty.Register("Canvas",
             typeof(FrameworkElement), typeof(YUserControl), new FrameworkPropertyMetadata(Ancestor_PropertyChanged));
 
         private static void Ancestor_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -20,21 +20,21 @@ namespace YBehavior.Editor
             c._OnAncestorPropertyChanged();
         }
 
-        public FrameworkElement Ancestor
+        public FrameworkElement Canvas
         {
             get
             {
-                return (FrameworkElement)GetValue(AncestorProperty);
+                return (FrameworkElement)GetValue(CanvasProperty);
             }
             set
             {
-                SetValue(AncestorProperty, value);
+                SetValue(CanvasProperty, value);
             }
         }
 
         public YUserControl()
         {
-            this.SetBinding(AncestorProperty, new Binding()
+            this.SetBinding(CanvasProperty, new Binding()
             {
                 RelativeSource = new RelativeSource()
                 {
@@ -49,7 +49,7 @@ namespace YBehavior.Editor
         {
             if (bFindAncestor)
             {
-                this.SetBinding(AncestorProperty, new Binding()
+                this.SetBinding(CanvasProperty, new Binding()
                 {
                     RelativeSource = new RelativeSource()
                     {

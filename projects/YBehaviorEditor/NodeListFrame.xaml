@@ -5,27 +5,30 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <DockPanel>
-        <StackPanel Orientation="Horizontal" Height="30" HorizontalAlignment="Left" Width="200" DockPanel.Dock="Top">
-            <Button Name="AddComment" Click="AddComment_Click">Add Comment</Button>
-        </StackPanel>
-        <local:FilterBox x:Name="SearchText" DockPanel.Dock="Top" 
+             d:DesignHeight="350" d:DesignWidth="300">
+    <Grid Margin="0, 20, 0, 0">
+        <Border Background="#00000000" MouseUp="Border_MouseUp"/>
+        <DockPanel Name="MainPanel" Height="350" Width="250" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" Height="30" HorizontalAlignment="Left" Width="200" DockPanel.Dock="Top">
+                <Button Name="AddComment" Click="AddComment_Click">Add Comment</Button>
+            </StackPanel>
+            <local:FilterBox x:Name="SearchText" DockPanel.Dock="Top" 
                          TextChangedHandler="SearchText_TextChanged"/>
-        <TreeView Name="Nodes" Margin="0,5,0,0" MouseDoubleClick="OnNodesItemDoubleClick" Background="DarkGray" DockPanel.Dock="Bottom">
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="{x:Type TreeViewItem}">
-                    <Setter Property="IsExpanded" Value="{Binding Expanded, Mode=TwoWay}"/>
-                </Style>
-            </TreeView.ItemContainerStyle>
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock FontSize="14" Width="20" Height="20" Text="{Binding Icon}" />
-                        <TextBlock FontSize="14" Text="{Binding Name}" Margin="2,0,0,0" ToolTip="{Binding Description}"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
-    </DockPanel>
+            <TreeView Name="Nodes" MouseDoubleClick="OnNodesItemDoubleClick" Background="DarkGray" DockPanel.Dock="Bottom">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsExpanded" Value="{Binding Expanded, Mode=TwoWay}"/>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="14" Width="20" Height="20" Text="{Binding Icon}" />
+                            <TextBlock FontSize="14" Text="{Binding Name}" Margin="2,0,0,0" ToolTip="{Binding Description}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </DockPanel>
+    </Grid>
 </UserControl>

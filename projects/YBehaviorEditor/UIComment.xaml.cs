@@ -79,7 +79,7 @@ namespace YBehavior.Editor
             data.OnGeometryChanged();
         }
 
-        void _OnClick()
+        void _OnClick(Point pos)
         {
             SelectHandler(this, true);
 

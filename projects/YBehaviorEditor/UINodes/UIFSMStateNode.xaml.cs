@@ -100,7 +100,7 @@ namespace YBehavior.Editor
             m_Operation.RegisterLeftDoubleClick(_OnDoubleClick);
         }
 
-        void _OnDoubleClick()
+        void _OnDoubleClick(Point pos)
         {
             m_Operation.MakeCanvasFocused();
 
