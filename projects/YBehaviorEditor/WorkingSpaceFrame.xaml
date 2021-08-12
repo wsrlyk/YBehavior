@@ -5,33 +5,39 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="200">
-    <DockPanel>
-        <StackPanel Name="FileOperatePanel" Orientation="Horizontal" Height="30" HorizontalAlignment="Left" Width="200"  DockPanel.Dock="Top">
-            <Button Name="btnNewTree" Click="btnNewTree_Click">NewTree</Button>
-            <Button Name="btnNewFSM" Click="btnNewFSM_Click">NewFSM</Button>
-            <Button Name="btnSave" Click="btnSave_Click">Save</Button>
-            <Button Name="btnRefresh" Click="btnRefresh_Click">Refresh</Button>
-        </StackPanel>
-        <local:FilterBox x:Name="SearchText" DockPanel.Dock="Top" 
+             d:DesignHeight="500" d:DesignWidth="500">
+    <Grid Margin="0, 0, 0, 0">
+        <Border MouseUp="Border_MouseUp"  Background="#00000000" />
+        <DockPanel Width="500" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Border DockPanel.Dock="Top" Background="DarkGray">
+                <StackPanel Name="FileOperatePanel" Orientation="Horizontal" Height="30" HorizontalAlignment="Left">
+                    <Button Name="btnNewTree" Click="btnNewTree_Click">NewTree</Button>
+                    <Button Name="btnNewFSM" Click="btnNewFSM_Click">NewFSM</Button>
+                    <Button Name="btnSave" Click="btnSave_Click">Save</Button>
+                    <Button Name="btnSaveAs" Click="btnSaveAs_Click">Save As</Button>
+                    <Button Name="btnRefresh" Click="btnRefresh_Click">Refresh</Button>
+                </StackPanel>
+            </Border>
+            <local:FilterBox x:Name="SearchText" DockPanel.Dock="Top" 
                          TextChangedHandler="SearchText_TextChanged"/>
-        <TreeView Name="Files" MouseDoubleClick="OnFilesItemDoubleClick" Background="DarkGray" LostFocus="Files_LostFocus"
+            <TreeView Name="Files" MouseDoubleClick="OnFilesItemDoubleClick" Background="DarkGray" LostFocus="Files_LostFocus"
                   ScrollViewer.HorizontalScrollBarVisibility="Auto" 
                   ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="{x:Type TreeViewItem}">
-                    <Setter Property="IsExpanded" Value="{Binding Expanded, Mode=TwoWay}"/>
-                </Style>
-            </TreeView.ItemContainerStyle>
-            
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock FontSize="12" Width="14" Height="14" Text="{Binding Icon}" />
-                        <TextBlock FontSize="12" Text="{Binding Name}" Margin="1,0,0,0" ToolTip="{Binding Name}"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
-    </DockPanel>
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsExpanded" Value="{Binding Expanded, Mode=TwoWay}"/>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="12" Width="14" Height="14" Text="{Binding Icon}" />
+                            <TextBlock FontSize="12" Text="{Binding Name}" Margin="1,0,0,0" ToolTip="{Binding Name}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </DockPanel>
+    </Grid>
 </UserControl>

@@ -108,6 +108,7 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.WorkBenchSaved, _OnWorkBenchSaved);
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Register(EventType.ShowWorkingSpace, _OnShow);
 
             _InitWorkingSpace();
 
@@ -177,6 +178,7 @@ namespace YBehavior.Editor
                         WorkBench bench = null;
                         if ((bench = WorkBenchMgr.Instance.OpenWorkBench(item.Source)) != null)
                         {
+                            _Hide();
                             WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
                             arg.Bench = bench;
                             EventMgr.Instance.Send(arg);
@@ -214,10 +216,35 @@ namespace YBehavior.Editor
             );
         }
 
+        private void _OnShow(EventArg arg)
+        {
+            this.Visibility = Visibility.Visible;
+        }
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            /*int res = */
             WorkBenchMgr.Instance.TrySaveAndExport();
+        }
+        private void btnSaveAs_Click(object sender, RoutedEventArgs e)
+        {
+            var bench = WorkBenchMgr.Instance.ActiveWorkBench;
+            var oldName = bench.FilePath;
+            if (!string.IsNullOrEmpty(oldName))
+            {
+                bench.FileInfo = new FileMgr.FileInfo()
+                {
+                    Path = string.Empty,
+                    FileType = bench.FileInfo.FileType,
+                };
+            }
+
+            bench.FilePath = string.Empty;
+            int res = WorkBenchMgr.Instance.TrySaveAndExport();
+            if ((res & WorkBenchMgr.SaveResultFlag_NewFile) != 0)
+                _Hide();
+            else
+            {
+                bench.FilePath = oldName;
+            }
 
             //if (res == 1)
             //    _RefreshWorkingSpace(false);
@@ -231,6 +258,7 @@ namespace YBehavior.Editor
                 WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
                 arg.Bench = bench;
                 EventMgr.Instance.Send(arg);
+                _Hide();
             }
         }
 
@@ -242,6 +270,7 @@ namespace YBehavior.Editor
                 WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
                 arg.Bench = bench;
                 EventMgr.Instance.Send(arg);
+                _Hide();
             }
         }
 
@@ -269,6 +298,16 @@ namespace YBehavior.Editor
         private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
         {
             _RefreshWorkingSpace(false);
+        }
+
+        private void Border_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            _Hide();
+        }
+
+        void _Hide()
+        {
+            this.Visibility = Visibility.Collapsed;
         }
     }
 }

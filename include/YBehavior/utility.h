@@ -169,7 +169,7 @@ namespace YBehavior
 		{
 			if (i != 0)
 				ss << '|';
-			ss << t[i];
+			ss << ToString(t[i]);
 		}
 		ss >> str;
 		return str;
@@ -189,7 +189,7 @@ namespace YBehavior
 		{
 			if (i != 0)
 				ss << '|';
-			ss << t[i];
+			ss << ToString(t[i]);
 		}
 		ss << "}(size=" << t.size() << ")";
 		ss >> str;

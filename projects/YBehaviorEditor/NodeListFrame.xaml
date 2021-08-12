@@ -5,10 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
-             d:DesignHeight="350" d:DesignWidth="300">
+             d:DesignHeight="500" d:DesignWidth="300">
     <Grid Margin="0, 20, 0, 0">
         <Border Background="#00000000" MouseUp="Border_MouseUp"/>
-        <DockPanel Name="MainPanel" Height="350" Width="250" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <DockPanel Name="MainPanel" Height="450" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top">
             <StackPanel Orientation="Horizontal" Height="30" HorizontalAlignment="Left" Width="200" DockPanel.Dock="Top">
                 <Button Name="AddComment" Click="AddComment_Click">Add Comment</Button>
             </StackPanel>

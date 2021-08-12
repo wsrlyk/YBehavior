@@ -7,6 +7,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="50" d:DesignWidth="800">
     <StackPanel Orientation="Horizontal">
+        <Button Name="btnFile" Width="50" Click="btnFile_Click" Content="File&#x0a;Menu" />
+        <Button Name="btnSaveFile" Width="50" Click="btnSaveFile_Click" Content="Save&#x0a;Ctrl-S" />
         <Button Name="btnUndo" Width="50" Click="btnUndo_Click" IsEnabled="{Binding HasDoneCommands}" Content="Undo&#x0a;Ctrl-Z" />
         <Button Name="btnRedo" Width="50" Click="btnRedo_Click" IsEnabled="{Binding HasUndoCommands}" Content="Redo&#x0a;Ctrl-Y" />
         <Button Name="btnDuplicate" Width="60" Click="btnDuplicate_Click" Content="Duplicate&#x0a;Ctrl-D&#x0a;(Shift)"/>

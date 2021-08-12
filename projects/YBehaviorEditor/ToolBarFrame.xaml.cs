@@ -117,5 +117,14 @@ namespace YBehavior.Editor
         {
             MainWindow.ProcessKeyDown(Key.F, ModifierKeys.Control);
         }
+
+        private void btnFile_Click(object sender, RoutedEventArgs e)
+        {
+            EventMgr.Instance.Send(new ShowWorkingSpaceArg() { });
+        }
+        private void btnSaveFile_Click(object sender, RoutedEventArgs e)
+        {
+            WorkBenchMgr.Instance.TrySaveAndExport();
+        }
     }
 }

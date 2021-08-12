@@ -251,7 +251,7 @@ namespace YBehavior.Editor.Core.New
             return workBench;
         }
 
-        public void TrySaveAndExport(WorkBench bench = null)
+        public int TrySaveAndExport(WorkBench bench = null)
         {
             if (NetworkMgr.Instance.IsConnected)
             {
@@ -261,9 +261,10 @@ namespace YBehavior.Editor.Core.New
                     TipType = ShowSystemTipsArg.TipsType.TT_Error,
                 };
                 EventMgr.Instance.Send(arg);
+                return 0;
             }
             else
-                SaveAndExport(bench);
+                return SaveAndExport(bench);
 
         }
 
