@@ -33,7 +33,7 @@ namespace YBehavior
 		INT tickCount = 0;
 		pNode->m_TickCount->GetCastedValue(pAgent->GetMemory(), tickCount);
 		YB_LOG_INFO(".." << m_Count);
-		if (++m_Count >= tickCount)
+		if (++m_Count > tickCount)
 			return NS_SUCCESS;
 		
 		return NS_RUNNING;
