@@ -181,6 +181,7 @@ namespace YBehavior.Editor
             WorkBenchMgr.Instance.Remove(bench);
             TabData tabData = m_TabDataDic[tab];
             m_TabDataDic.Remove(tab);
+            tabData.Frame.Disable();
             BenchContainer.Children.Remove(tabData.Frame);
 
             if (m_TabDataDic.Count == 0)

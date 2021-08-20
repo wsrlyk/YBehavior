@@ -75,9 +75,9 @@ namespace YBehavior.Editor
 
             /////> move the node to the topleft of the canvas
             //if (oArg.From != NewNodeAddedArg.AddMethod.Duplicate)
-                oArg.Node.Renderer.SetPos(new Point(
-                    -CurPageData.TranslateTransform.X / CurPageData.ScaleTransform.ScaleX + oArg.Pos.X + Core.New.Utility.Rand(-10, 10),
-                    -CurPageData.TranslateTransform.Y / CurPageData.ScaleTransform.ScaleY + oArg.Pos.Y + Core.New.Utility.Rand(-10, 10)));
+            oArg.Node.Renderer.SetPos(new Point(
+                (-CurPageData.TranslateTransform.X + oArg.Pos.X + Core.New.Utility.Rand(-10, 10)) / CurPageData.ScaleTransform.ScaleX,
+                (-CurPageData.TranslateTransform.Y + oArg.Pos.Y + Core.New.Utility.Rand(-10, 10)) / CurPageData.ScaleTransform.ScaleY));
 
             //_CreateNode(oArg.Node);
             //this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<Node>(_ThreadRefreshConnection), oArg.Node);
@@ -89,10 +89,9 @@ namespace YBehavior.Editor
             if (oArg.Comment == null)
                 return;
 
-            ///> move the comment to the topleft of the canvas
             oArg.Comment.Geo.Pos = new Point(
-                -CurPageData.TranslateTransform.X / CurPageData.ScaleTransform.ScaleX + oArg.Pos.X,
-                -CurPageData.TranslateTransform.Y / CurPageData.ScaleTransform.ScaleY + oArg.Pos.Y);
+                (-CurPageData.TranslateTransform.X + oArg.Pos.X + Core.New.Utility.Rand(-10, 10)) / CurPageData.ScaleTransform.ScaleX,
+                (-CurPageData.TranslateTransform.Y + oArg.Pos.Y + Core.New.Utility.Rand(-10, 10)) / CurPageData.ScaleTransform.ScaleY);
             oArg.Comment.OnGeometryChanged();
         }
 
