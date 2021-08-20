@@ -17,6 +17,38 @@ namespace YBehavior.Editor
     /// </summary>
     public partial class UIFSMStateNode : UIFSMStateNodeBase
     {
+        public static readonly DependencyProperty CenterOffsetXProperty = DependencyProperty.RegisterAttached(
+            "CenterOffsetX",
+            typeof(double),
+            typeof(UIFSMStateNode));
+        public static readonly DependencyProperty CenterOffsetYProperty = DependencyProperty.RegisterAttached(
+            "CenterOffsetY",
+            typeof(double),
+            typeof(UIFSMStateNode));
+
+        public double CenterOffsetX
+        {
+            get
+            {
+                return (double)GetValue(CenterOffsetXProperty);
+            }
+            set
+            {
+                SetValue(CenterOffsetXProperty, value);
+            }
+        }
+
+        public double CenterOffsetY
+        {
+            get
+            {
+                return (double)GetValue(CenterOffsetYProperty);
+            }
+            set
+            {
+                SetValue(CenterOffsetYProperty, value);
+            }
+        }
         public override FrameworkElement SelectCoverUI { get { return this.selectCover;} }
         public override Brush OutlookBrush 
         {

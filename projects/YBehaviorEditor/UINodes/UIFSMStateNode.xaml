@@ -11,6 +11,8 @@
             <Setter Property="local:UIFSMStateNode.SelectTrigger" Value="{Binding Path=SelectTrigger}" />
             <!--<Setter Property="local:UIFSMStateNode.DebugTrigger" Value="{Binding Path=DebugTrigger}" />-->
             <!--<Setter Property="local:UINode.DebugConstant" Value="{Binding Path=DebugConstant}" />-->
+            <Setter Property="local:UITreeNode.CenterOffsetX" Value="{Binding Path=CenterOffsetX, Mode=OneWayToSource}"/>
+            <Setter Property="local:UITreeNode.CenterOffsetY" Value="{Binding Path=CenterOffsetY, Mode=OneWayToSource}"/>
         </Style>
     </UserControl.Style>
     <UserControl.Resources>
@@ -40,9 +42,6 @@
 
             <Border Name="border" BorderThickness="4"
                 MinWidth="80" CornerRadius="{Binding Converter={StaticResource cornerRadiusConverter}}"
-                local:SizeObserver.Observe="True"
-                local:SizeObserver.ObservedWidth="{Binding ActualNodeWidth, Mode=OneWayToSource}"
-                local:SizeObserver.ObservedHeight="{Binding ActualNodeHeight, Mode=OneWayToSource}"
                 >
                 <Border.Background>
                     <MultiBinding Converter="{StaticResource backgroundConvertor}" Mode="OneWay">
