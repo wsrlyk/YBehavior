@@ -48,23 +48,16 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        private string m_ExpandedFolders;
-        public string ExpandedFolders
+        public HashSet<string> ExpandedFolders
         {
-            get { return m_ExpandedFolders; }
-            set
-            {
-                if (m_ExpandedFolders != value)
-                {
-                    m_ExpandedFolders = value;
-                    IniFile configFile = new IniFile(Environment.CurrentDirectory + "\\user.ini");
-                    configFile.WriteString("Editor", "ExpandedFolders", m_ExpandedFolders);
-                }
-            }
+            get { return m_Suo.ExpandedFolders; }
         }
 
         public Suo Suo { get { return m_Suo; } }
         private Suo m_Suo;
+
+        public KeyBindings KeyBindings { get { return m_KeyBindings; } }
+        private KeyBindings m_KeyBindings;
 
         public Config()
         {
@@ -102,8 +95,6 @@ namespace YBehavior.Editor.Core.New
 
             PrintIntermediateInfo = configFile.ReadInt("Debug", "PrintIntermediateInfo", 0) != 0;
 
-            m_ExpandedFolders = configFile.ReadString("Editor", "ExpandedFolders", "");
-
             NodeTooltipDelayTime = configFile.ReadInt("Editor", "NodeTooltipDelayTime", -1);
             if (NodeTooltipDelayTime < 0)
             {
@@ -115,7 +106,6 @@ namespace YBehavior.Editor.Core.New
 
             try
             {
-                IFormatter formatter = new BinaryFormatter();
                 using (StreamReader stream = new StreamReader(Environment.CurrentDirectory + "\\.suo"))
                 {
                     m_Suo = Newtonsoft.Json.JsonConvert.DeserializeObject<Suo>(stream.ReadToEnd());
@@ -126,6 +116,19 @@ namespace YBehavior.Editor.Core.New
                 //LogMgr.Instance.Log(e.ToString());
                 m_Suo = new Suo();
             }
+
+            try
+            {
+                using (StreamReader stream = new StreamReader(Environment.CurrentDirectory + "\\keybindings.json"))
+                {
+                    m_KeyBindings = Newtonsoft.Json.JsonConvert.DeserializeObject<KeyBindings>(stream.ReadToEnd());
+                }
+            }
+            catch (System.Exception)
+            {
+                m_KeyBindings = new KeyBindings();
+            }
+            m_KeyBindings.Init();
         }
 
         public void Save()
@@ -138,6 +141,16 @@ namespace YBehavior.Editor.Core.New
                 using (StreamWriter stream = new StreamWriter(Environment.CurrentDirectory + "\\.suo"))
                 {
                     stream.Write(json2);
+                }
+            }
+            if (m_KeyBindings.IsDirty)
+            {
+                json2 = Newtonsoft.Json.JsonConvert.SerializeObject(m_KeyBindings, Newtonsoft.Json.Formatting.Indented, jsetting);
+                {
+                    using (StreamWriter stream = new StreamWriter(Environment.CurrentDirectory + "\\keybindings.json"))
+                    {
+                        stream.Write(json2);
+                    }
                 }
             }
         }

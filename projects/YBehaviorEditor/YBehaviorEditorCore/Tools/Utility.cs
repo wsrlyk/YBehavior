@@ -47,6 +47,16 @@ namespace YBehavior.Editor.Core.New
             return m_Random.Next(min, max);
         }
 
+        public static uint Hash(string s)
+        {
+            int len = s.Length;
+            uint hash = 0;
+            for (int i = 0; i < len; ++i)
+            {
+                hash = (hash << 5) + hash + (uint)s[i];
+            }
+            return hash;
+        }
         public static NodeBase CloneNode(NodeBase template, bool bIncludeChildren)
         {
             NodeBase node = template.Clone();

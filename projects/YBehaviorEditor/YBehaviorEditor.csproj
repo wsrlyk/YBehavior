@@ -157,6 +157,8 @@
     <Compile Include="TreeBenchFrame.xaml.cs">
       <DependentUpon>TreeBenchFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\RelayCommand.cs" />
+    <Compile Include="ViewModels\ToolBarViewModel.cs" />
     <Compile Include="WorkBenchFrame.cs" />
     <Compile Include="WorkingSpaceFrame.xaml.cs">
       <DependentUpon>WorkingSpaceFrame.xaml</DependentUpon>

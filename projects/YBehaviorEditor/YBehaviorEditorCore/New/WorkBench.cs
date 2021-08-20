@@ -155,14 +155,7 @@ namespace YBehavior.Editor.Core.New
         }
         public uint GenerateHash(string str)
         {
-            int len = str.Length;
-            uint hash = 0;
-            for (int i = 0; i < len; ++i)
-            {
-                hash = (hash << 5) + hash + (uint)str[i];
-            }
-
-            m_ExportFileHash = hash;
+            m_ExportFileHash = Utility.Hash(str);
 
             return m_ExportFileHash;
         }

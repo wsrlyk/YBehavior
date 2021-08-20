@@ -28,14 +28,20 @@ namespace YBehavior.Editor
             UnityCoroutines.CoroutineManager.Instance.Run();
         }
 
-        public static void ProcessKeyDown(Key key, ModifierKeys modifier)
+        static void _ProcessKeyDown(Key key, ModifierKeys modifier)
         {
-            switch (key)
+            var cmd = Config.Instance.KeyBindings.GetCommand(key, modifier);
+            ProcessCommand(cmd, modifier);
+        }
+
+        public static void ProcessCommand(Command cmd, ModifierKeys modifier = ModifierKeys.None)
+        {
+            switch (cmd)
             {
-                case Key.Delete:
+                case Command.Delete:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
-                    if ((modifier & ModifierKeys.Shift) != ModifierKeys.None)
+                    if (Config.Instance.KeyBindings.IsMulti(modifier))
                     {
                         ///> Duplicate all children
                         SelectionMgr.Instance.TryDeleteSelection(1);
@@ -46,12 +52,11 @@ namespace YBehavior.Editor
                         SelectionMgr.Instance.TryDeleteSelection(0);
                     }
                     break;
-                case Key.D:
+                case Command.Duplicate:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
-                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
                     {
-                        if ((modifier & ModifierKeys.Shift) != ModifierKeys.None)
+                        if (Config.Instance.KeyBindings.IsMulti(modifier))
                         {
                             ///> Duplicate all children
                             SelectionMgr.Instance.TryDuplicateSelection(1);
@@ -63,12 +68,11 @@ namespace YBehavior.Editor
                         }
                     }
                     break;
-                case Key.C:
+                case Command.Copy:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
-                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
                     {
-                        if ((modifier & ModifierKeys.Shift) != ModifierKeys.None)
+                        if (Config.Instance.KeyBindings.IsMulti(modifier))
                         {
                             ///> Duplicate all children
                             SelectionMgr.Instance.TryCopySelection(1);
@@ -80,90 +84,92 @@ namespace YBehavior.Editor
                         }
                     }
                     break;
-                case Key.V:
+                case Command.Paste:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
-                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
                     {
                         WorkBenchMgr.Instance.PasteCopiedToBench();
                     }
                     break;
-                case Key.Z:
+                case Command.Undo:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
-                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
                     {
                         WorkBenchMgr.Instance.Undo();
                     }
                     break;
-                case Key.Y:
+                case Command.Redo:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
-                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
                     {
                         WorkBenchMgr.Instance.Redo();
                     }
                     break;
-                case Key.S:
-                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
+                case Command.Save:
                     {
                         WorkBenchMgr.Instance.TrySaveAndExport();
                     }
                     break;
-                case Key.F:
-                    if ((modifier & ModifierKeys.Control) != ModifierKeys.None)
+                case Command.Open:
+                    EventMgr.Instance.Send(new ShowWorkingSpaceArg() { });
+                    break;
+                case Command.Search:
                     {
                         SearchFrame searchFrame = (App.Current.MainWindow as MainWindow).SearchFrame;
                         searchFrame.Visibility = searchFrame.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
                     }
                     break;
-                case Key.F9:
+                case Command.BreakPoint:
                     SelectionMgr.Instance.TryToggleBreakPoint();
                     break;
-                case Key.F8:
+                case Command.LogPoint:
                     SelectionMgr.Instance.TryToggleLogPoint();
                     break;
-                case Key.F12:
+                case Command.Disable:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
                     SelectionMgr.Instance.TryToggleDisable();
                     break;
-                case Key.F6:
+                case Command.Condition:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
                     SelectionMgr.Instance.TryToggleCondition();
                     break;
-                case Key.F7:
+                case Command.Fold:
                     if (DebugMgr.Instance.IsDebugging())
                         break;
                     SelectionMgr.Instance.TryToggleFold();
+                    break;
+                case Command.Default:
+                    if (DebugMgr.Instance.IsDebugging())
+                        break;
                     SelectionMgr.Instance.TryMakeDefault();
                     break;
-                case Key.F1:
+                case Command.Center:
                     {
                         MakeCenterArg oArg = new MakeCenterArg();
                         EventMgr.Instance.Send(oArg);
                     }
                     break;
-                case Key.F2:
+                case Command.Clear:
                     ///> Test....
                     {
                         Console.Clear();
                     }
                     break;
-                case Key.F5:
+                case Command.DebugContinue:
                     {
                         if (DebugMgr.Instance.IsDebugging())
                             DebugMgr.Instance.Continue();
                     }
                     break;
-                case Key.F10:
+                case Command.DebugStepOver:
                     {
                         if (DebugMgr.Instance.IsDebugging())
                             DebugMgr.Instance.StepOver();
                     }
                     break;
-                case Key.F11:
+                case Command.DebugStepIn:
                     {
                         if (DebugMgr.Instance.IsDebugging())
                             DebugMgr.Instance.StepInto();
@@ -179,7 +185,7 @@ namespace YBehavior.Editor
                 e.Handled = true;
                 key = Key.F10;
             }
-            ProcessKeyDown(key, Keyboard.Modifiers);
+            _ProcessKeyDown(key, Keyboard.Modifiers);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

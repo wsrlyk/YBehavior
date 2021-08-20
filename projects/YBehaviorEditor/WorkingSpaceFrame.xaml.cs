@@ -152,14 +152,14 @@ namespace YBehavior.Editor
 
         private void _InitWorkingSpace()
         {
-            m_ExpandedItems.Clear();
-            string expandedFolders = Config.Instance.ExpandedFolders;
-            string[] folders = expandedFolders.Split(new char[] { '|' });
-            foreach (string s in folders)
-            {
-                m_ExpandedItems.Add(s);
-            }
-
+            ////m_ExpandedItems.Clear();
+            ////string expandedFolders = Config.Instance.ExpandedFolders;
+            ////string[] folders = expandedFolders.Split(new char[] { '|' });
+            ////foreach (string s in folders)
+            ////{
+            ////    m_ExpandedItems.Add(s);
+            ////}
+            m_ExpandedItems = Config.Instance.ExpandedFolders;
             m_FileInfos.Build(FileMgr.Instance.ReloadAndGetAllFiles(), _Filter, m_ExpandedItems);
         }
 
@@ -219,6 +219,7 @@ namespace YBehavior.Editor
         private void _OnShow(EventArg arg)
         {
             this.Visibility = Visibility.Visible;
+            this.SearchText.SetFocus();
         }
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
@@ -283,14 +284,14 @@ namespace YBehavior.Editor
         {
             //m_ExpandedItems.Clear();
             _GetExpandedItems(this.Files, m_ExpandedItems);
-            StringBuilder sb = new StringBuilder();
-            foreach (string s in m_ExpandedItems)
-            {
-                if (sb.Length > 0)
-                    sb.Append('|');
-                sb.Append(s);
-            }
-            Config.Instance.ExpandedFolders = sb.ToString();
+            ////StringBuilder sb = new StringBuilder();
+            ////foreach (string s in m_ExpandedItems)
+            ////{
+            ////    if (sb.Length > 0)
+            ////        sb.Append('|');
+            ////    sb.Append(s);
+            ////}
+            ////Config.Instance.ExpandedFolders = sb.ToString();
         }
 
         private string _Filter { get { return this.SearchText.Text; } }

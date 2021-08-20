@@ -6,7 +6,10 @@
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              d:DesignHeight="50" d:DesignWidth="800">
-    <StackPanel Orientation="Horizontal">
+    <UserControl.DataContext>
+        <local:ToolBarViewModel/>
+    </UserControl.DataContext>
+    <!--<StackPanel Orientation="Horizontal">
         <Button Name="btnFile" Width="50" Click="btnFile_Click" Content="File&#x0a;Menu" />
         <Button Name="btnSaveFile" Width="50" Click="btnSaveFile_Click" Content="Save&#x0a;Ctrl-S" />
         <Button Name="btnUndo" Width="50" Click="btnUndo_Click" IsEnabled="{Binding HasDoneCommands}" Content="Undo&#x0a;Ctrl-Z" />
@@ -32,5 +35,18 @@
         </Button>
         <Button Name="btnDisable" Width="50" Click="btnDisable_Click" Content="Disable&#x0a; F12">
         </Button>
-    </StackPanel>
+    </StackPanel>-->
+    <ItemsControl ItemsSource="{Binding Tools}">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Button Content ="{Binding Content}" Command="{Binding CMD}" MinWidth="45"/>
+                <!--TextBlock Text = "{Binding Name}"/-->
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+    </ItemsControl>
 </UserControl>

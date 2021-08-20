@@ -55,9 +55,13 @@ namespace YBehavior.Editor.Core.New
 
         [JsonProperty(PropertyName = "Suos")]
         Dictionary<string, SuoData> m_Suos = new Dictionary<string, SuoData>();
+        [JsonProperty(PropertyName = "ExpandedFolders")]
+        HashSet<string> m_ExpandedFolders = new HashSet<string> ();
 
         [JsonIgnore]
         public IEnumerable<string> Files { get { return m_Suos.Keys; } }
+        [JsonIgnore]
+        public HashSet<string> ExpandedFolders { get { return m_ExpandedFolders; } }
 
         public SuoData GetDebugPointInfo(string fileName)
         {

@@ -48,6 +48,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Basic\KeyBindings.cs" />
     <Compile Include="Basic\Suo.cs" />
     <Compile Include="Coroutine\Coroutine.cs" />
     <Compile Include="Coroutine\CoroutineManager.cs" />

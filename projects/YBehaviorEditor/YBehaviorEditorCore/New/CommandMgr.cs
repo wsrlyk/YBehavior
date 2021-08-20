@@ -14,6 +14,8 @@ namespace YBehavior.Editor.Core.New
         LinkedList<ICommand> m_DoneCommands = new LinkedList<ICommand>();
         LinkedList<ICommand> m_UndoCommands = new LinkedList<ICommand>();
 
+        public event EventHandler OnCommandUpdate;
+
         public bool HasDoneCommands { get { return m_DoneCommands.Count > 0; } }
         public bool HasUndoCommands { get { return m_UndoCommands.Count > 0; } }
 
@@ -34,8 +36,9 @@ namespace YBehavior.Editor.Core.New
 
             //LogMgr.Instance.Log("Push command: " + command.ToString() + ", Total: " + m_DoneCommands.Count.ToString());
 
-            OnPropertyChanged("HasDoneCommands");
-            OnPropertyChanged("HasUndoCommands");
+            OnCommandUpdate.Invoke(this, null);
+            //OnPropertyChanged("HasDoneCommands");
+            //OnPropertyChanged("HasUndoCommands");
 
             Dirty = true;
         }
@@ -53,8 +56,9 @@ namespace YBehavior.Editor.Core.New
 
                 //LogMgr.Instance.Log("Undo command: " + last.ToString());
 
-                OnPropertyChanged("HasDoneCommands");
-                OnPropertyChanged("HasUndoCommands");
+                OnCommandUpdate.Invoke(this, null);
+                //OnPropertyChanged("HasDoneCommands");
+                //OnPropertyChanged("HasUndoCommands");
             }
         }
 
@@ -71,8 +75,9 @@ namespace YBehavior.Editor.Core.New
 
                 //LogMgr.Instance.Log("Redo command: " + last.ToString());
 
-                OnPropertyChanged("HasDoneCommands");
-                OnPropertyChanged("HasUndoCommands");
+                OnCommandUpdate.Invoke(this, null);
+                //OnPropertyChanged("HasDoneCommands");
+                //OnPropertyChanged("HasUndoCommands");
             }
         }
 
