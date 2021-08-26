@@ -39,7 +39,7 @@
     <ItemsControl ItemsSource="{Binding Tools}">
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <Button Content ="{Binding Content}" Command="{Binding CMD}" MinWidth="45"/>
+                <Button Content ="{Binding Content}" ToolTip="{Binding Tips}" Command="{Binding CMD}" MinWidth="45"/>
                 <!--TextBlock Text = "{Binding Name}"/-->
             </DataTemplate>
         </ItemsControl.ItemTemplate>

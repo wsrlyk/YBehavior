@@ -32,6 +32,18 @@
                             </Setter>
                             <Setter TargetName="tbk" Property="Foreground" Value="Black"></Setter>
                         </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="bdr" Property="Background">
+                                <Setter.Value>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="DarkGray" Offset="0"></GradientStop>
+                                        <GradientStop Color="#FF6A6A6A" Offset="0.07"></GradientStop>
+                                        <GradientStop Color="#FF6A6A6A" Offset="0.93"></GradientStop>
+                                        <GradientStop Color="#FF3E3E3E" Offset="1"></GradientStop>
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

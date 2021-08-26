@@ -89,6 +89,16 @@
                         <TextBlock Text="{Binding Converter={StaticResource valueTypeConvertor}}" FontSize="10" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
+                <ComboBox.Style>
+                    <Style TargetType="ComboBox">
+                        <Setter Property="Foreground" Value="Black" />
+                        <Style.Triggers>
+                            <Trigger Property="IsHitTestVisible" Value="False">
+                                <Setter Property="Foreground" Value="DimGray" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ComboBox.Style>
             </ComboBox>
             <StackPanel Orientation="Horizontal"  DockPanel.Dock="Right">
                 <CheckBox IsEnabled="{Binding IsEditable}" Width="20" Height="20" Name="VBSwitcher" Background="Orange" Foreground="GreenYellow" IsChecked="{Binding vbType, Converter={StaticResource variableTypeConvertor}}" Visibility="{Binding Path = CanSwitchConst, Converter={StaticResource visibilityConvertor}}"/>

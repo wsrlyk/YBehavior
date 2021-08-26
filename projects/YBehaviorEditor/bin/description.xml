@@ -153,6 +153,28 @@
                 <FSMClearConditions Content="清空所有状态机转换条件" 
 			ReturnSuccess="始终成功"/>
         </Nodes>
+	<Commands>
+		<Open Name="打开" Content="打开文件面板"/>
+		<Save Name="保存" Content="保存当前文件"/>
+		<Delete Name="删除" Content="删除" />
+		<Copy Name="复制" Content="复制" />
+		<Paste Name="粘贴" Content="粘贴" />
+		<Duplicate Name="克隆" Content="复制并粘贴到旁边"/>
+		<Undo Name="撤销" Content="撤销" />
+		<Redo Name="重做"  Content="重做"/>
+		<Search Name="搜索" Content="打开搜索面板"/>
+		<BreakPoint Name="断点" Content="打印日志并中断"/>
+		<LogPoint Name="日志点" Content="打印日志，不会中断"/>
+		<Disable Name="禁用" Content="禁用/启用某些模块"/>
+		<Condition Name="条件" Content="打开/关闭条件接口"/>
+		<Fold Name="折叠" Content="折叠/展开树"/>
+		<Default Name="默认" Content="设为默认状态"/>
+		<Center Name="居中" Content="使节点整体回到屏幕中央"/>
+		<Clear Name="清空" Content="清空命令行"/>
+		<DebugContinue Name="Continue" Content="继续执行"/>
+		<DebugStepOver Name="StepOver" Content="执行下个节点（跳过子节点）"/>
+		<DebugStepIn Name="StepIn" Content="执行下个节点（包括子节点）"/>
+	</Commands>
         <Hierachies>
                 <Hierachy Value = "1">Actions</Hierachy>
                 <Hierachy Value = "2">Decorators</Hierachy>

@@ -52,6 +52,14 @@ namespace YBehavior.Editor
                 }
             }
 
+            public string Tips
+            {
+                get
+                {
+                    return DescriptionMgr.Instance.GetCommandDescription(Command.ToString()).tips;
+                }
+            }
+
             public Tool(Command command, Func<bool> canExecute = null, ICanExecuteChanged canExecuteChanged = null)
             {
                 Command = command;

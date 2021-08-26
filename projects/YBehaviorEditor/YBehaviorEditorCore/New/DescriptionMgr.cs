@@ -20,11 +20,18 @@ namespace YBehavior.Editor.Core.New
             return content;
         }
     }
+
+    public struct CommandDescription
+    {
+        public string name;
+        public string tips;
+    }
     public class DescriptionMgr : Singleton<DescriptionMgr>
     {
         Dictionary<string, string> m_LanguagesDic = new Dictionary<string, string>();
         Dictionary<string, NodeDescription> m_DescriptionDic = new Dictionary<string, NodeDescription>();
         Dictionary<int, string> m_HierachyDic = new Dictionary<int, string>();
+        Dictionary<string, CommandDescription> m_CommandDic = new Dictionary<string, CommandDescription>();
 
         public NodeDescription GetNodeDescription(string name)
         {
@@ -33,6 +40,14 @@ namespace YBehavior.Editor.Core.New
                 return desc;
             }
             return null;
+        }
+        public CommandDescription GetCommandDescription(string name)
+        {
+            if (m_CommandDic.TryGetValue(name, out var desc))
+            {
+                return desc;
+            }
+            return new CommandDescription();
         }
 
         public string GetHierachyDescription(int hierachy)
@@ -112,6 +127,21 @@ namespace YBehavior.Editor.Core.New
                         {
                             m_HierachyDic.Add(hierachy, node.InnerText);
                         }
+                    }
+                }
+                else if (rootchild.Name == "Commands")
+                {
+                    m_CommandDic.Clear();
+                    foreach (XmlNode node in rootchild.ChildNodes)
+                    {
+                        var c = new CommandDescription();
+                        var attr = node.Attributes["Name"];
+                        if (attr != null)
+                            c.name = attr.Value;
+                        attr = node.Attributes["Content"];
+                        if (attr != null)
+                            c.tips = attr.Value;
+                        m_CommandDic[node.Name] = c;
                     }
                 }
             }
