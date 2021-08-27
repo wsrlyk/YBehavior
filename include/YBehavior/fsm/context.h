@@ -74,6 +74,7 @@ namespace YBehavior
 		inline void PopCallStack() { m_CallStack.pop(); }
 		inline bool IsCallStackEmpty() const { return m_CallStack.empty(); }
 		inline bool HasNewCall() const { return m_bDirty; }
+		void Reset();
 	};
 }
 

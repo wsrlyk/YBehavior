@@ -5,6 +5,7 @@
 #include "YBehavior/fsm/statemachine.h"
 #include "YBehavior/fsm/transition.h"
 #include "YBehavior/fsm/behavior.h"
+#include "YBehavior/treenode.h"
 
 namespace YBehavior
 {
@@ -48,4 +49,16 @@ namespace YBehavior
 		m_pTransQueue.clear();
 		m_pCurRunningTree = nullptr;
 	}
+
+	void TreeContext::Reset()
+	{
+		while (!m_CallStack.empty())
+		{
+			auto p = m_CallStack.top();
+			TreeNodeContext::Destroy(p);
+			m_CallStack.pop();
+		}
+		m_bDirty = false;
+	}
+
 }

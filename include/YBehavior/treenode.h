@@ -149,7 +149,8 @@ namespace YBehavior
 		TreeNodeContext();
 		virtual ~TreeNodeContext();
 		void Init(TreeNodePtr pNode);
-		void Destroy();
+		static void Destroy(TreeNodeContext*& pContext);
+		void OnDestroy();
 		inline TreeNodePtr GetTreeNode() { return m_pNode; }
 		NodeState Execute(AgentPtr pAgent, NodeState lastState);
 	protected:

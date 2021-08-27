@@ -121,7 +121,7 @@ namespace YBehavior
 				else if (lastState != NS_INVALID)
 				{
 					treeContext->PopCallStack();
-					pContext->GetTreeNode()->DestroyContext(pContext);
+					TreeNodeContext::Destroy(pContext);
 				}
 			}
 

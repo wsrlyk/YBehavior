@@ -139,7 +139,7 @@ namespace YBehavior
 
 	void TreeNode::DestroyContext(TreeNodeContext*& pContext)
 	{
-		pContext->Destroy();
+		pContext->OnDestroy();
 		_DestroyContext(pContext);
 	}
 
@@ -176,7 +176,12 @@ namespace YBehavior
 		_OnInit();
 	}
 
-	void TreeNodeContext::Destroy()
+	void TreeNodeContext::Destroy(TreeNodeContext*& pContext)
+	{
+		pContext->m_pNode->DestroyContext(pContext);
+	}
+
+	void TreeNodeContext::OnDestroy()
 	{
 #ifdef YDEBUGGER
 		m_pDebugHelper->Dispose();
