@@ -27,7 +27,7 @@ namespace YBehavior.Editor.Core.New
         SelectSharedDataTab,
         VariableClicked,
         ShowNodeList,
-        ShowWorkingSpace,
+        ShowWorkSpace,
     }
 
     public class EventMgr : Singleton<EventMgr>
@@ -203,9 +203,9 @@ namespace YBehavior.Editor.Core.New
         public System.Windows.Point Pos { get; set; }
         public override EventType Type => EventType.ShowNodeList;
     }
-    public class ShowWorkingSpaceArg : EventArg
+    public class ShowWorkSpaceArg : EventArg
     {
-        public override EventType Type => EventType.ShowWorkingSpace;
+        public override EventType Type => EventType.ShowWorkSpace;
     }
 
 

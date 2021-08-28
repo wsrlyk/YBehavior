@@ -147,6 +147,8 @@ namespace YBehavior
 
 		bool operator ==(const EntityWrapper& other) const
 		{
+			if (!IsValid() && !other.IsValid())
+				return true;
 			if (!IsValid() || !other.IsValid())
 				return false;
 			return Get() == other.Get();
@@ -154,15 +156,53 @@ namespace YBehavior
 
 		bool operator !=(const EntityWrapper& other) const
 		{
+			if (!IsValid() && !other.IsValid())
+				return false;
 			if (!IsValid() || !other.IsValid())
 				return true;
 			return Get() != other.Get();
 		}
 
-		bool operator >(const EntityWrapper& other) const { return false; }
-		bool operator <(const EntityWrapper& other) const { return false; }
-		bool operator >=(const EntityWrapper& other) const { return false; }
-		bool operator <=(const EntityWrapper& other) const { return false; }
+		bool operator >(const EntityWrapper& other) const
+		{
+			if (!IsValid() && !other.IsValid())
+				return false;
+			if (!IsValid())
+				return false;
+			if (!other.IsValid())
+				return true;
+			return Get() > other.Get();
+		}
+		bool operator <(const EntityWrapper& other) const
+		{
+			if (!IsValid() && !other.IsValid())
+				return false;
+			if (!IsValid())
+				return true;
+			if (!other.IsValid())
+				return false;
+			return Get() < other.Get();
+		}
+		bool operator >=(const EntityWrapper& other) const
+		{
+			if (!IsValid() && !other.IsValid())
+				return true;
+			if (!IsValid())
+				return false;
+			if (!other.IsValid())
+				return true;
+			return Get() >= other.Get();
+		}
+		bool operator <=(const EntityWrapper& other) const
+		{
+			if (!IsValid() && !other.IsValid())
+				return true;
+			if (!IsValid())
+				return true;
+			if (!other.IsValid())
+				return false;
+			return Get() <= other.Get();
+		}
 
 		~EntityWrapper();
 

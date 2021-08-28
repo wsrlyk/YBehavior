@@ -111,7 +111,7 @@ namespace YBehavior.Editor
                     }
                     break;
                 case Command.Open:
-                    EventMgr.Instance.Send(new ShowWorkingSpaceArg() { });
+                    EventMgr.Instance.Send(new ShowWorkSpaceArg() { });
                     break;
                 case Command.Search:
                     {

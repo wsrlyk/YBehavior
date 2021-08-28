@@ -10,9 +10,9 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// WorkingSpaceFrame.xaml 的交互逻辑
+    /// WorkSpaceFrame.xaml 的交互逻辑
     /// </summary>
-    public partial class WorkingSpaceFrame : UserControl
+    public partial class WorkSpaceFrame : UserControl
     {
         FileInfo m_FileInfos = new FileInfo();
 
@@ -102,15 +102,15 @@ namespace YBehavior.Editor
             }
         }
 
-        public WorkingSpaceFrame()
+        public WorkSpaceFrame()
         {
             InitializeComponent();
             EventMgr.Instance.Register(EventType.WorkBenchSaved, _OnWorkBenchSaved);
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
-            EventMgr.Instance.Register(EventType.ShowWorkingSpace, _OnShow);
+            EventMgr.Instance.Register(EventType.ShowWorkSpace, _OnShow);
 
-            _InitWorkingSpace();
+            _InitWorkSpace();
 
             this.Files.ItemsSource = m_FileInfos.Children;
 
@@ -140,7 +140,7 @@ namespace YBehavior.Editor
         }
 
         HashSet<string> m_ExpandedItems = new HashSet<string>();
-        private void _RefreshWorkingSpace(bool bReload)
+        private void _RefreshWorkSpace(bool bReload)
         {
             if (bReload)
                 m_ExpandedItems.Clear();
@@ -150,7 +150,7 @@ namespace YBehavior.Editor
 //            this.Files.ItemsSource = m_FileInfos.Children;
         }
 
-        private void _InitWorkingSpace()
+        private void _InitWorkSpace()
         {
             ////m_ExpandedItems.Clear();
             ////string expandedFolders = Config.Instance.ExpandedFolders;
@@ -201,7 +201,7 @@ namespace YBehavior.Editor
             ///> Rename the tab title, refresh the references to the TreeMgr
             //if (oArg.bCreate)
             {
-                _RefreshWorkingSpace(false);
+                _RefreshWorkSpace(false);
             }
         }
 
@@ -248,7 +248,7 @@ namespace YBehavior.Editor
             }
 
             //if (res == 1)
-            //    _RefreshWorkingSpace(false);
+            //    _RefreshWorkSpace(false);
         }
 
         private void btnNewTree_Click(object sender, RoutedEventArgs e)
@@ -277,7 +277,7 @@ namespace YBehavior.Editor
 
         private void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            _RefreshWorkingSpace(true);
+            _RefreshWorkSpace(true);
         }
 
         private void Files_LostFocus(object sender, RoutedEventArgs e)
@@ -298,7 +298,7 @@ namespace YBehavior.Editor
 
         private void SearchText_TextChanged(object sender, TextChangedEventArgs e)
         {
-            _RefreshWorkingSpace(false);
+            _RefreshWorkSpace(false);
         }
 
         private void Border_MouseUp(object sender, MouseButtonEventArgs e)

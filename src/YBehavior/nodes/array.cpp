@@ -209,7 +209,7 @@ namespace YBehavior
 
 	bool ArrayHasElement::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeIDArray = VariableCreation::CreateVariable(this, m_Array, "Array", data, true);
+		TYPEID typeIDArray = VariableCreation::CreateVariable(this, m_Array, "Array", data);
 		if (m_Array == nullptr)
 		{
 			return false;

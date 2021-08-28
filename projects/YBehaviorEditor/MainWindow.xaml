@@ -34,7 +34,7 @@
             <local:NodeListFrame Grid.Column="0" x:Name="NodeListPanel" Visibility="Hidden"/>
             <local:SearchFrame x:Name="SearchFrame" Visibility="Collapsed" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,30"/>
             <local:PopMenuFrame Grid.Column="0"/>
-            <local:WorkingSpaceFrame Grid.Column="0"/>
+            <local:WorkSpaceFrame Grid.Column="0"/>
             <local:SystemTipsFrame Grid.Column="0"/>
             <DockPanel Grid.Column="1" Name="TreeRightPanel" Visibility="Collapsed">
                 <local:SharedDataFrame DockPanel.Dock="Top" Height="450" Margin="5, 0"/>

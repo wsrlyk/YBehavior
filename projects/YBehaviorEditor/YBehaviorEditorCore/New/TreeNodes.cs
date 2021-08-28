@@ -1584,7 +1584,7 @@ namespace YBehavior.Editor.Core.New
                 "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_Pointer,
+                Variable.VariableType.VBT_NONE,
                 Variable.EnableType.ET_FIXED,
                 1
             );

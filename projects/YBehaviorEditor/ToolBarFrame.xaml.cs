@@ -120,7 +120,7 @@ namespace YBehavior.Editor
 
         //private void btnFile_Click(object sender, RoutedEventArgs e)
         //{
-        //    EventMgr.Instance.Send(new ShowWorkingSpaceArg() { });
+        //    EventMgr.Instance.Send(new ShowWorkSpaceArg() { });
         //}
         //private void btnSaveFile_Click(object sender, RoutedEventArgs e)
         //{
