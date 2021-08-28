@@ -389,7 +389,7 @@
     <ClCompile Include="..\src\YBehavior\tools\objectpool.cpp">
       <Filter>源文件\tools</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\YBehavior\sharedvariablecreatehelper_lowercase.cpp">
+    <ClCompile Include="..\src\YBehavior\sharedvariablecreatehelper.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\fsm\statemachine.cpp">
