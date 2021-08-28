@@ -49,6 +49,8 @@ namespace YBehavior
 		REGISTER_TYPE(factory, GetArrayLength);
 		REGISTER_TYPE(factory, IsArrayEmpty);
 		REGISTER_TYPE(factory, ArrayPushElement);
+		REGISTER_TYPE(factory, ArrayRemoveElement);
+		REGISTER_TYPE(factory, ArrayHasElement);
 		REGISTER_TYPE(factory, GenIndexArray);
 		REGISTER_TYPE(factory, Shuffle);
 		REGISTER_TYPE(factory, FSMSetCondition);

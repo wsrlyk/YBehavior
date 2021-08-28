@@ -146,7 +146,7 @@
     <ClCompile Include="..\src\YBehavior\profile\profiler.cpp" />
     <ClCompile Include="..\src\YBehavior\registerdata.cpp" />
     <ClCompile Include="..\src\YBehavior\shareddataex.cpp" />
-    <ClCompile Include="..\src\YBehavior\SharedVariableCreateHelper.cpp" />
+    <ClCompile Include="..\src\YBehavior\sharedvariablecreatehelper_lowercase.cpp" />
     <ClCompile Include="..\src\YBehavior\sharp\sharpentry.cpp" />
     <ClCompile Include="..\src\YBehavior\sharp\sharpentry_buffer.cpp" />
     <ClCompile Include="..\src\YBehavior\sharp\sharplaunch.cpp" />

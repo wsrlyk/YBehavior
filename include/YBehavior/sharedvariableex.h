@@ -263,6 +263,69 @@ namespace YBehavior
 			}
 		}
 
+		bool RemoveElement(IMemory* pMemory, const void* v, bool isAll) override
+		{
+			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
+
+			if (mValue != nullptr && v != nullptr && !mValue->empty())
+			{
+				if (isAll)
+				{
+					auto end = std::remove(mValue->begin(), mValue->end(), *((const ElementType*)v));
+					if (end != mValue->end())
+					{
+						mValue->erase(end, mValue->end());
+						return true;
+					}
+					return false;
+				}
+				else
+				{
+					auto it = std::find(mValue->begin(), mValue->end(), *((const ElementType*)v));
+					if (it != mValue->end())
+					{
+						mValue->erase(it);
+						return true;
+					}
+					return false;
+				}
+			}
+			return false;
+		}
+
+		bool HasElement(IMemory* pMemory, const void* v) override
+		{
+			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
+
+			if (mValue != nullptr && v != nullptr && !mValue->empty())
+			{
+				auto it = std::find(mValue->begin(), mValue->end(), *((const ElementType*)v));
+				return it != mValue->end();
+			}
+			return false;
+		}
+		INT CountElement(IMemory* pMemory, const void* v) override
+		{
+			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
+
+			if (mValue != nullptr && v != nullptr && !mValue->empty())
+			{
+				INT count = 0;
+				auto it = mValue->begin();
+				const auto& vv = *((const ElementType*)v);
+				do
+				{
+					it = std::find(it, mValue->end(), vv);
+					if (it == mValue->end())
+						break;
+					++count;
+					++it;
+				} while (it != mValue->end());
+				return count;
+			}
+			return 0;
+		}
+
 		const void* GetValue(IMemory* pMemory) override
 		{
 			return GetCastedValue(pMemory);

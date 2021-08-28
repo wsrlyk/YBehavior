@@ -43,6 +43,34 @@ namespace YBehavior
 		ISharedVariableEx* m_Element;
 	};
 
+	class ArrayRemoveElement : public LeafNode<>
+	{
+	public:
+		TREENODE_DEFINE(ArrayRemoveElement)
+	protected:
+		bool OnLoaded(const pugi::xml_node& data) override;
+		NodeState Update(AgentPtr pAgent) override;
+
+	private:
+		ISharedVariableEx* m_Array;
+		ISharedVariableEx* m_Element;
+		SharedVariableEx<BOOL>* m_IsAll;
+	};
+
+	class ArrayHasElement : public LeafNode<>
+	{
+	public:
+		TREENODE_DEFINE(ArrayHasElement)
+	protected:
+		bool OnLoaded(const pugi::xml_node& data) override;
+		NodeState Update(AgentPtr pAgent) override;
+
+	private:
+		ISharedVariableEx* m_Array;
+		ISharedVariableEx* m_Element;
+		SharedVariableEx<INT>* m_Count;
+	};
+
 	class IsArrayEmpty : public LeafNode<>
 	{
 	public:

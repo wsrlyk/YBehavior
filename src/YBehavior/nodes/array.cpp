@@ -162,4 +162,93 @@ namespace YBehavior
 		return NS_SUCCESS;
 	}
 
+	bool ArrayRemoveElement::OnLoaded(const pugi::xml_node& data)
+	{
+		TYPEID typeIDArray = VariableCreation::CreateVariable(this, m_Array, "Array", data, true);
+		if (m_Array == nullptr)
+		{
+			return false;
+		}
+
+		TYPEID typeID = VariableCreation::CreateVariable(this, m_Element, "Element", data);
+		if (!Utility::IsElement(typeID, typeIDArray))
+		{
+			ERROR_BEGIN_NODE_HEAD << "types not match " << typeID << " and " << typeIDArray << ERROR_END;
+			return false;
+		}
+
+		typeID = VariableCreation::CreateVariable(this, m_IsAll, "IsAll", data);
+		if (typeID == -1)
+		{
+			return false;
+		}
+		return true;
+
+	}
+
+	YBehavior::NodeState ArrayRemoveElement::Update(AgentPtr pAgent)
+	{
+		YB_IF_HAS_DEBUG_POINT
+		{
+			YB_LOG_VARIABLE_BEFORE(m_Array);
+			YB_LOG_VARIABLE_BEFORE(m_Element);
+			YB_LOG_VARIABLE_BEFORE(m_IsAll);
+		}
+		BOOL isAll;
+		m_IsAll->GetCastedValue(pAgent->GetMemory(), isAll);
+		m_Array->RemoveElement(pAgent->GetMemory(), m_Element->GetValue(pAgent->GetMemory()), isAll);
+
+		YB_IF_HAS_DEBUG_POINT
+		{
+			YB_LOG_VARIABLE(m_Array, false);
+		}
+
+		return NS_SUCCESS;
+
+	}
+
+	bool ArrayHasElement::OnLoaded(const pugi::xml_node& data)
+	{
+		TYPEID typeIDArray = VariableCreation::CreateVariable(this, m_Array, "Array", data, true);
+		if (m_Array == nullptr)
+		{
+			return false;
+		}
+
+		TYPEID typeID = VariableCreation::CreateVariable(this, m_Element, "Element", data);
+		if (!Utility::IsElement(typeID, typeIDArray))
+		{
+			ERROR_BEGIN_NODE_HEAD << "types not match " << typeID << " and " << typeIDArray << ERROR_END;
+			return false;
+		}
+
+		VariableCreation::CreateVariableIfExist(this, m_Count, "Count", data, true);
+		return true;
+	}
+
+	YBehavior::NodeState ArrayHasElement::Update(AgentPtr pAgent)
+	{
+		YB_IF_HAS_DEBUG_POINT
+		{
+			YB_LOG_VARIABLE_BEFORE(m_Array);
+			YB_LOG_VARIABLE_BEFORE(m_Element);
+		}
+
+		bool res = false;
+		if (m_Count != nullptr)
+		{
+			auto count = m_Array->CountElement(pAgent->GetMemory(), m_Element->GetValue(pAgent->GetMemory()));
+			m_Count->SetCastedValue(pAgent->GetMemory(), count);
+			res = count != 0;
+		}
+		else
+		{
+			res = m_Array->HasElement(pAgent->GetMemory(), m_Element->GetValue(pAgent->GetMemory()));
+		}
+
+		YB_LOG_VARIABLE_AFTER_IF_HAS_DEBUG_POINT(m_Count);
+
+		return res ? NS_SUCCESS : NS_FAILURE;
+	}
+
 }

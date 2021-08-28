@@ -85,7 +85,7 @@ namespace YBehavior
 		return iarray->Set(key, src);
 	}
 
-	bool SharedDataEx::TrySet(KEY key, TYPEID typeKey, void* src)
+	bool SharedDataEx::TrySet(KEY key, TYPEID typeKey, const void* src)
 	{
 		IDataArray* iarray = m_Datas[typeKey];
 		if (!iarray)

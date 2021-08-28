@@ -1488,7 +1488,7 @@ namespace YBehavior.Editor.Core.New
 
             Variable element = NodeMemory.CreateVariable(
                 "Element",
-                "0",
+                "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
@@ -1510,6 +1510,120 @@ namespace YBehavior.Editor.Core.New
             }
         }
     }
+    class ArrayRemoveElementTreeNode : LeafNode
+    {
+        public override string Icon => "[x] rm y";
+
+        public ArrayRemoveElementTreeNode()
+        {
+            m_Name = "ArrayRemoveElement";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable array = NodeMemory.CreateVariable(
+                "Array",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_FIXED,
+                1
+            );
+            array.IsInput = false;
+
+            Variable element = NodeMemory.CreateVariable(
+                "Element",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_FIXED,
+                1
+            );
+
+            Variable isAll = NodeMemory.CreateVariable(
+                "IsAll",
+                "F",
+                Variable.CreateParams_Bool,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_FIXED
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("[{0}] remove {1}",
+                    Variables.GetVariable("Array").NoteValue,
+                    Variables.GetVariable("Element").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
+    class ArrayHasElementTreeNode : LeafNode
+    {
+        public override string Icon => "[x] has y?";
+
+        public ArrayHasElementTreeNode()
+        {
+            m_Name = "ArrayHasElement";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable array = NodeMemory.CreateVariable(
+                "Array",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_FIXED,
+                1
+            );
+            array.IsInput = false;
+
+            Variable element = NodeMemory.CreateVariable(
+                "Element",
+                "",
+                Variable.CreateParams_AllTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_FIXED,
+                1
+            );
+
+            Variable count = NodeMemory.CreateVariable(
+                "Count",
+                "",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_Disable
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("[{0}] has {1}?",
+                    Variables.GetVariable("Array").NoteValue,
+                    Variables.GetVariable("Element").NoteValue
+                    );
+                return sb.ToString();
+            }
+        }
+    }
+
 
     class GenIndexArrayTreeNode : LeafNode
     {

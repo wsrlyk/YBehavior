@@ -262,7 +262,7 @@ namespace YBehavior
 		template<typename T>
 		bool TrySet(KEY key, T&& src);
 
-		bool TrySet(KEY key, TYPEID typeKey, void* src);
+		bool TrySet(KEY key, TYPEID typeKey, const void* src);
 
 		void Clear();
 
