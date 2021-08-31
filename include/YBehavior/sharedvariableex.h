@@ -6,6 +6,7 @@
 #include "YBehavior/interface.h"
 #include "treekeymgr.h"
 #include "memory.h"
+#include <algorithm>
 
 namespace YBehavior
 {
