@@ -1,7 +1,7 @@
 #ifdef YDEBUGGER
 #include "YBehavior/define.h"
 
-#ifdef MSVC
+#ifdef YB_MSVC
 #include "YBehavior/network/network.h"
 
 #include <windows.h>

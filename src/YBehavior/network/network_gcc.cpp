@@ -1,7 +1,7 @@
 #ifdef YDEBUGGER
 #include "YBehavior/define.h"
 
-#ifdef GCC
+#ifdef YB_GCC
 #include <pthread.h>		// beginthreadex
 #include <sys/types.h>
 #include <sys/socket.h>

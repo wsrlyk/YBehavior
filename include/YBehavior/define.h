@@ -10,10 +10,10 @@ namespace YBehavior
 #endif
 
 #ifdef _MSC_VER
-	#define MSVC
+	#define YB_MSVC
 	#define STDCALL _stdcall
 #else
-	#define GCC
+	#define YB_GCC
 	#define STDCALL
 #endif
 //#else

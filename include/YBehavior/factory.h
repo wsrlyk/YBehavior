@@ -5,7 +5,7 @@
 #include "YBehavior/types.h"
 #include <unordered_map>
 #include <algorithm>
-#ifdef GCC
+#ifdef YB_GCC
 #include <cxxabi.h>
 #endif
 
@@ -35,7 +35,7 @@ namespace YBehavior
 		template<typename finalType>
 		void Create()
 		{
-#ifdef MSVC
+#ifdef YB_MSVC
 			std::string name(typeid(finalType).name());
 #else
 int status;

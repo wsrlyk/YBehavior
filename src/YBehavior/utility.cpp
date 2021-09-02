@@ -184,7 +184,7 @@ namespace YBehavior
 	{
 		time_t tNow = time(NULL);
 		struct tm t;
-#ifdef MSVC
+#ifdef YB_MSVC
 		localtime_s(&t, &tNow);
 #else
 		localtime_r(&tNow, &t);

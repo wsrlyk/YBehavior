@@ -3,7 +3,7 @@
 #include "customactions.h"
 #include "YBehavior/shareddataex.h"
 
-#ifdef MSVC
+#ifdef YB_MSVC
 #include <stdio.h>
 #include <windows.h>
 #include <conio.h>
