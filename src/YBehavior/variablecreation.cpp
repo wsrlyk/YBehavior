@@ -18,9 +18,9 @@ namespace YBehavior
 					op = helper->CreateVariable();
 					pTreeNode->AddVariable(op);
 
-#ifdef YDEBUGGER
+//#ifdef YDEBUGGER
 					op->SetName(attriName, pTreeNode->GetUID(), pTreeNode->GetClassName(), pTreeNode->GetTreeName());
-#endif
+//#endif
 
 					return op->TypeID();
 				}
@@ -57,11 +57,11 @@ namespace YBehavior
 			op = helper->CreateVariable();
 			pTreeNode->AddVariable(op);
 
-#ifdef YDEBUGGER
+//#ifdef YDEBUGGER
 			///> There may be some errors in code below, so we must set some names first
 			///> to make the log readable
 			op->SetName(attrOptr.name(), pTreeNode->GetUID(), pTreeNode->GetClassName(), pTreeNode->GetTreeName());
-#endif
+//#endif
 			///> Vector Index
 			if (buffer.size() >= 5 && buffer[2] == "VI")
 			{
@@ -76,10 +76,10 @@ namespace YBehavior
 			else
 				op->SetValueFromString(buffer[1]);
 
-#ifdef YDEBUGGER
+//#ifdef YDEBUGGER
 			///> Set the final names
 			op->SetName(attrOptr.name(), pTreeNode->GetUID(), pTreeNode->GetClassName(), pTreeNode->GetTreeName());
-#endif
+//#endif
 
 			return op->TypeID();
 		}
