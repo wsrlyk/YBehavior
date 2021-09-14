@@ -99,9 +99,9 @@ namespace YBehavior
 			{
 				op = new SharedVariableEx<T>();
 				pTreeNode->AddVariable(op);
-#ifdef YDEBUGGER
+//#ifdef YDEBUGGER
 				op->SetName(attriName, pTreeNode->GetUID(), pTreeNode->GetClassName(), pTreeNode->GetTreeName());
-#endif
+//#endif
 				return GetTypeID<T>();
 			}
 
