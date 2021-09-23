@@ -1,56 +1,35 @@
 #include "YBehavior/treekeymgr.h"
-#include "YBehavior/logger.h"
 namespace YBehavior
 {
-	//void TreeKeyMgr::SetActiveTree(NameKeyMgr* nameKeyMgr, bool bReset)
-	//{
-	//	//LOG_BEGIN << "SetActiveTree: " << tree.c_str() << LOG_END;
 
-	//	if (nameKeyMgr == nullptr)
-	//	{
-	//		mpCurActiveNameKeyInfo = &mCommonNameKeyInfo;
-	//		return;
-	//	}
-	//	else
-	//	{
-	//		mpCurActiveNameKeyInfo = nameKeyMgr;
-	//	}
-
-	//	if (bReset)
-	//	{
-	//		mpCurActiveNameKeyInfo->Reset();
-	//		mpCurActiveNameKeyInfo->AssignKey(mCommonNameKeyInfo);
-	//	}
-	//}
-
-	KEY TreeKeyMgr::GetKeyByName(const STRING& name, TYPEID typeID)
+	KEY TreeKeyMgr::CreateKeyByName(const STRING& name)
 	{
-		NameKeyInfo& info = mCommonNameKeyInfo.Get(typeID);
-		KEY key = info.Get(name);
-		if (key != Utility::INVALID_KEY)
-			return key;
-		if (mpCurActiveNameKeyInfo == NULL)
-			return Utility::INVALID_KEY;
-		info = mpCurActiveNameKeyInfo->Get(typeID);
-		return info.Get(name);
+		auto it = m_Name2Hash.find(name);
+		if (it != m_Name2Hash.end())
+			return it->second;
+		KEY key = (KEY)m_Name2Hash.size() + 1;
+		m_Name2Hash[name] = key;
+#ifdef YDEBUGGER
+		m_Hash2Name[key] = name;
+#endif
+		return key;
+	}
+
+	KEY TreeKeyMgr::GetKeyByName(const STRING& name) const
+	{
+		auto it = m_Name2Hash.find(name);
+		if (it != m_Name2Hash.end())
+			return it->second;
+		return Utility::INVALID_KEY;
 	}
 
 #ifdef YDEBUGGER
-	const STRING& TreeKeyMgr::GetNameByKey(KEY key, TYPEID typeID)
+	const YBehavior::STRING& TreeKeyMgr::GetNameByKey(KEY key) const
 	{
-		NameKeyInfo& info = mCommonNameKeyInfo.Get(typeID);
-		const STRING& name = info.Get(key);
-		if (name != Utility::StringEmpty)
-			return name;
-		if (mpCurActiveNameKeyInfo == NULL)
-			return Utility::StringEmpty;
-		info = mpCurActiveNameKeyInfo->Get(typeID);
-		return info.Get(key);
+		auto it = m_Hash2Name.find(key);
+		if (it != m_Hash2Name.end())
+			return it->second;
+		return Utility::StringEmpty;
 	}
 #endif
-	TreeKeyMgr::TreeKeyMgr()
-	{
-		mCommonNameKeyInfo.Reset();
-		mpCurActiveNameKeyInfo = &mCommonNameKeyInfo;
-	}
 }

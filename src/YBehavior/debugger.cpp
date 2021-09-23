@@ -303,7 +303,7 @@ namespace YBehavior
 				continue;
 			for (IDataArray::Iterator it = iarray->Iter(); !it.IsEnd(); ++it)
 			{
-				const STRING& name = TreeKeyMgr::Instance()->GetNameByKey(it.Value(), iarray->TypeID());
+				const STRING& name = TreeKeyMgr::Instance()->GetNameByKey(it.Value());
 				if (name == Utility::StringEmpty)
 					continue;
 				STRING content(name + IDebugHelper::s_SequenceSpliter + iarray->GetToString(it.Value()));
@@ -667,7 +667,7 @@ namespace YBehavior
 		else
 		{
 			ISharedVariableEx* pVectorIndex = pVariable->GetVectorIndex();
-			const STRING& sharedDataVariableName = TreeKeyMgr::Instance()->GetNameByKey(pVariable->GetKey(), pVariable->GetReferenceSharedDataSelfID());
+			const STRING& sharedDataVariableName = TreeKeyMgr::Instance()->GetNameByKey(pVariable->GetKey());
 			ss << sharedDataVariableName;
 			if (pVariable->IsLocal())
 				ss << "'";

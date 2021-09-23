@@ -8,152 +8,21 @@
 
 namespace YBehavior
 {
-	struct NameKeyInfo
-	{
-		std::unordered_map<STRING, KEY> mNameHash;
-#ifdef YDEBUGGER
-		std::unordered_map<KEY, STRING> mReverseNameHash;
-#endif
-		KEY mKeyCounter;
-
-		NameKeyInfo()
-		{
-			mKeyCounter = 0;
-		}
-
-		void Reset()
-		{
-			mNameHash.clear();
-#ifdef YDEBUGGER
-			mReverseNameHash.clear();
-#endif
-			mKeyCounter = 0;
-		}
-
-		KEY Get(const STRING& s)
-		{
-			auto it = mNameHash.find(s);
-			if (it != mNameHash.end())
-				return it->second;
-			return Utility::INVALID_KEY;
-		}
-#ifdef YDEBUGGER
-		const STRING& Get(const KEY& key)
-		{
-			auto it = mReverseNameHash.find(key);
-			if (it != mReverseNameHash.end())
-				return it->second;
-			return Utility::StringEmpty;
-		}
-#endif
-	};
-
-	struct NameKeyMgr
-	{
-	private:
-		std::unordered_map<TYPEID, NameKeyInfo> m_Infos;
-	public:
-		void Reset()
-		{
-			for (auto it = m_Infos.begin(); it != m_Infos.end(); ++it)
-				it->second.Reset();
-		}
-
-		NameKeyInfo& Get(TYPEID typeID)
-		{
-			return m_Infos[typeID];
-		}
-
-		void AssignKey(const NameKeyMgr& other)
-		{
-			for (auto it = other.m_Infos.begin(); it != other.m_Infos.end(); ++it)
-			{
-				m_Infos[it->first].mKeyCounter = it->second.mKeyCounter;
-			}
-		}
-
-		template<typename T>
-		KEY GetKey(const STRING& name)
-		{
-			TYPEID typeNumberId = GetTypeID<T>();
-			NameKeyInfo& info = Get(typeNumberId);
-			return info.Get(name);
-		}
-
-#ifdef YDEBUGGER
-		template<typename T>
-		const STRING& GetName(const KEY& key)
-		{
-			TYPEID typeNumberId = GetTypeID<T>();
-			NameKeyInfo& info = Get(typeNumberId);
-			return info.Get(key);
-		}
-#endif
-	};
-
-	class TreeKeyMgr: public Singleton<TreeKeyMgr>
+	class TreeKeyMgr : public Singleton<TreeKeyMgr>
 	{
 	public:
-		TreeKeyMgr();
-		///> All infos now are stored in common info, so this function is disabled.
-		//void SetActiveTree(NameKeyMgr* nameKeyMgr, bool bReset);
-		template<typename T>
 		KEY CreateKeyByName(const STRING& name);
-		template<typename T>
-		KEY GetKeyByName(const STRING& name);
-		KEY GetKeyByName(const STRING& name, TYPEID typeID);
+		KEY GetKeyByName(const STRING& name) const;
 
 #ifdef YDEBUGGER
-		template<typename T>
-		const STRING& GetNameByKey(KEY key);
-		const STRING& GetNameByKey(KEY key, TYPEID typeID);
+		const STRING& GetNameByKey(KEY key) const;
 #endif
 	private:
-		NameKeyMgr mCommonNameKeyInfo;
-		NameKeyMgr* mpCurActiveNameKeyInfo;
+		std::unordered_map<STRING, KEY> m_Name2Hash;
+#ifdef YDEBUGGER
+		std::unordered_map<KEY, STRING> m_Hash2Name;
+#endif
 	};
 
-	template<typename T>
-	KEY TreeKeyMgr::GetKeyByName(const STRING& name)
-	{
-		return GetKeyByName(name, GetTypeID<T>());
-	}
-
-#ifdef YDEBUGGER
-	template<typename T>
-	const STRING& TreeKeyMgr::GetNameByKey(KEY key)
-	{
-		return GetNameByKey(key, GetTypeID<T>());
-	}
-#endif
-
-	template<typename T>
-	KEY TreeKeyMgr::CreateKeyByName(const STRING& name)
-	{
-		KEY key = mCommonNameKeyInfo.GetKey<T>(name);
-		if (key != Utility::INVALID_KEY)
-			return key;
-		if (mpCurActiveNameKeyInfo == NULL)
-			return Utility::INVALID_KEY;
-
-		TYPEID typeNumberId = GetTypeID<T>();
-		NameKeyInfo& curActiveNameKeyInfo = mpCurActiveNameKeyInfo->Get(typeNumberId);
-
-		if (mpCurActiveNameKeyInfo == &mCommonNameKeyInfo || curActiveNameKeyInfo.Get(name) == Utility::INVALID_KEY)
-		{
-			KEY key = curActiveNameKeyInfo.mKeyCounter++;
-#ifdef PRINT_INTERMEDIATE_INFO
-			LOG_BEGIN << "ADD key: " << name << " ID: " << key << LOG_END;
-#endif
-			curActiveNameKeyInfo.mNameHash[name] = key;
-
-#ifdef YDEBUGGER
-			curActiveNameKeyInfo.mReverseNameHash[key] = name;
-#endif
-		}
-
-		return curActiveNameKeyInfo.mNameHash[name];
-	}
 }
-
 #endif

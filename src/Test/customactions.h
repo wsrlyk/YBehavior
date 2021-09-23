@@ -21,11 +21,11 @@ public:
 	static void InitData()
 	{
 		//YBehavior::TreeKeyMgr::Instance()->SetActiveTree(nullptr, true);
-		tickCount0 = YBehavior::TreeKeyMgr::Instance()->CreateKeyByName<YBehavior::INT>("tickCount0");
-		tickCount1 = YBehavior::TreeKeyMgr::Instance()->CreateKeyByName<YBehavior::INT>("tickCount1");
-		isfighting = YBehavior::TreeKeyMgr::Instance()->CreateKeyByName<YBehavior::BOOL>("isfighting");
-		heartrate = YBehavior::TreeKeyMgr::Instance()->CreateKeyByName<YBehavior::FLOAT>("heartrate");
-		isdead = YBehavior::TreeKeyMgr::Instance()->CreateKeyByName<YBehavior::BOOL>("isdead");
+		tickCount0 = YBehavior::TreeKeyMgr::Instance()->CreateKeyByName("tickCount0");
+		tickCount1 = YBehavior::TreeKeyMgr::Instance()->CreateKeyByName("tickCount1");
+		isfighting = YBehavior::TreeKeyMgr::Instance()->CreateKeyByName("isfighting");
+		heartrate = YBehavior::TreeKeyMgr::Instance()->CreateKeyByName("heartrate");
+		isdead = YBehavior::TreeKeyMgr::Instance()->CreateKeyByName("isdead");
 	}
 
 	void SetData()
@@ -34,8 +34,8 @@ public:
 		//this->GetSharedData()->Set<YBehavior::BOOL>(isfighting, YBehavior::Utility::FALSE_VALUE);
 		//this->GetSharedData()->Set<YBehavior::FLOAT>(heartrate, 2);
 
-		/*YBehavior::KEY f = */YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::FLOAT>("f");
-		fftest = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::VecFloat>("fftest");
+		/*YBehavior::KEY f = */YBehavior::TreeKeyMgr::Instance()->GetKeyByName("f");
+		fftest = YBehavior::TreeKeyMgr::Instance()->GetKeyByName("fftest");
 	}
 
 	void Update();

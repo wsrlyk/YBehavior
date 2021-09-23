@@ -33,12 +33,12 @@ namespace YBehavior
 		}
 		void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) const override
 		{
-			KEY key = TreeKeyMgr::Instance()->CreateKeyByName<valueType>(name);
+			KEY key = TreeKeyMgr::Instance()->CreateKeyByName(name);
 			pData->Set(key, Utility::ToType<valueType>(str));
 		}
 		bool TrySetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str, CHAR separator = '|') const override
 		{
-			KEY key = TreeKeyMgr::Instance()->GetKeyByName<valueType>(name);
+			KEY key = TreeKeyMgr::Instance()->GetKeyByName(name);
 			if (key == Utility::INVALID_KEY)
 				return false;
 			return pData->TrySet(key, Utility::ToType<valueType>(str));
@@ -59,7 +59,7 @@ namespace YBehavior
 		}
 		void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) const override
 		{
-			KEY key = TreeKeyMgr::Instance()->CreateKeyByName<StdVector<elementType>>(name);
+			KEY key = TreeKeyMgr::Instance()->CreateKeyByName(name);
 			StdVector<STRING> splitRes;
 			StdVector<elementType> res;
 			Utility::SplitString(str, splitRes, '|');
@@ -71,7 +71,7 @@ namespace YBehavior
 		}
 		bool TrySetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str, CHAR separator = '|') const override
 		{
-			KEY key = TreeKeyMgr::Instance()->GetKeyByName<StdVector<elementType>>(name);
+			KEY key = TreeKeyMgr::Instance()->GetKeyByName(name);
 			if (key == Utility::INVALID_KEY)
 				return false;
 			StdVector<STRING> splitRes;

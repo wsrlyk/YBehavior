@@ -362,15 +362,16 @@ namespace YBehavior
 		void SetKeyFromString(const STRING& s) override
 		{
 			KEY key = Utility::INVALID_KEY;
-			///> if T is a single type but has vector index, it means this variable is an element of a vector.
-			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
-			{
-				key = (TreeKeyMgr::Instance()->GetKeyByName<StdVector<T>>(s));
-			}
-			else
-			{
-				key = (TreeKeyMgr::Instance()->GetKeyByName<T>(s));
-			}
+			/////> if T is a single type but has vector index, it means this variable is an element of a vector.
+			//if (!IsVector<T>::Result && m_VectorIndex != nullptr)
+			//{
+			//	key = (TreeKeyMgr::Instance()->GetKeyByName<StdVector<T>>(s));
+			//}
+			//else
+			//{
+			//	key = (TreeKeyMgr::Instance()->GetKeyByName<T>(s));
+			//}
+			key = (TreeKeyMgr::Instance()->GetKeyByName(s));
 
 			if (key == Utility::INVALID_KEY)
 			{
