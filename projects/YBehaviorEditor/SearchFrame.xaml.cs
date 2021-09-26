@@ -248,7 +248,7 @@ namespace YBehavior.Editor
                 {
                     if (r == renderer)
                     {
-                        r.SelectTrigger = !r.SelectTrigger;
+                        r.SetSelect();
                         EventMgr.Instance.Send(new MakeCenterArg()
                         {
                             Target = r

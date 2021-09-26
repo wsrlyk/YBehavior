@@ -10,7 +10,6 @@
     <UserControl.Style>
         <Style>
             <!--<Setter Property="local:UITreeNode.DebugTrigger" Value="{Binding Path=DebugTrigger}" />-->
-            <Setter Property="local:UITreeNode.SelectTrigger" Value="{Binding Path=SelectTrigger}" />
             <!--<Setter Property="local:UINode.DebugConstant" Value="{Binding Path=DebugConstant}" />-->
             <Setter Property="local:UITreeNode.CenterOffsetX" Value="{Binding Path=CenterOffsetX, Mode=OneWayToSource}"/>
             <Setter Property="local:UITreeNode.CenterOffsetY" Value="{Binding Path=CenterOffsetY, Mode=OneWayToSource}"/>

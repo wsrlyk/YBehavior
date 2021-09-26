@@ -231,7 +231,7 @@ namespace YBehavior.Editor.Core.New
                 RefreshCandidates();
                 SetValue(null, IsLocal);
                 OnPropertyChanged("cType");
-                CandidatesReset = !CandidatesReset;
+                CandidatesReset();
                 _OnConditionChanged();
                 _OnCTypeChanged();
                 WorkBenchMgr.Instance.PushCommand(command);
@@ -250,18 +250,11 @@ namespace YBehavior.Editor.Core.New
                 OnPropertyChanged("eType");
             }
         }
-        /// <summary>
-        /// Only a trigger to UI, meaningless
-        /// </summary>
-        private bool m_bCandidatesReset;
-        public bool CandidatesReset
+
+        public event Action CandidatesResetEvent;
+        public void CandidatesReset()
         {
-            get { return m_bCandidatesReset; }
-            set
-            {
-                m_bCandidatesReset = value;
-                OnPropertyChanged("CandidatesReset");
-            }
+            CandidatesResetEvent?.Invoke();
         }
 
         public VariableType vbType
@@ -412,21 +405,28 @@ namespace YBehavior.Editor.Core.New
                 if (value == null)
                 {
                     value = string.Empty;
-                    return;
+                    //return;
                 }
 
                 bool isLocal = IsLocal;
                 if (vbType == VariableType.VBT_Pointer)
                 {
-                    int p = value.IndexOf("'");
-                    if (p >= 0)
+                    if (string.IsNullOrEmpty(value))
                     {
-                        value = value.Substring(0, p);
                         isLocal = true;
                     }
                     else
                     {
-                        isLocal = false;
+                        int p = value.IndexOf("'");
+                        if (p >= 0)
+                        {
+                            value = value.Substring(0, p);
+                            isLocal = true;
+                        }
+                        else
+                        {
+                            isLocal = false;
+                        }
                     }
                 }
                 SetValue(value, isLocal);

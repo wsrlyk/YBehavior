@@ -70,12 +70,6 @@ namespace YBehavior.Editor
             m_Operation = new Operation(this);
             m_Operation.RegisterLeftClick(_OnClick);
             this.DataContextChanged += _DataContextChangedEventHandler;
-
-            this.SetBinding(DebugTriggerProperty, new Binding()
-            {
-                Path = new PropertyPath("DebugTrigger"),
-                Mode = BindingMode.OneWay,
-            });
         }
 
         public UIConnection(bool bHasOperation)
@@ -100,6 +94,7 @@ namespace YBehavior.Editor
         {
             m_Renderer = this.DataContext as ConnectionRenderer;
 
+            m_Renderer.DebugEvent += Renderer_DebugEvent;
             //SetCanvas((renderer.ChildConn.Owner as Node).Renderer.RenderCanvas);
         }
 

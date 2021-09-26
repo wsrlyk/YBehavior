@@ -49,12 +49,6 @@ namespace YBehavior.Editor
 
             this.DataContextChanged += _DataContextChangedEventHandler;
 
-            this.SetBinding(DebugTriggerProperty, new Binding()
-            {
-                Path = new PropertyPath("DebugTrigger"),
-                Mode = BindingMode.OneWay,
-            });
-
             this.IsVisibleChanged += _OnVisibleChanged;
         }
 
@@ -87,6 +81,13 @@ namespace YBehavior.Editor
             else
                 SetDebug(NodeState.NS_INVALID);
 
+            Renderer.SelectEvent += Renderer_SelectEvent;
+            Renderer.DebugEvent += Renderer_DebugEvent;
+        }
+
+        private void Renderer_SelectEvent()
+        {
+            SelectHandler(this, true);
         }
 
         protected virtual void _OnDataContextChanged()
@@ -116,22 +117,6 @@ namespace YBehavior.Editor
                 uiConnector.DataContext = geo;
             }
         }
-
-
-        public static readonly DependencyProperty SelectTriggerProperty =
-            DependencyProperty.Register("SelectTrigger",
-            typeof(bool), typeof(UINodeBase<NodeType, NodeRendererType>), new FrameworkPropertyMetadata(SelectTrigger_PropertyChanged));
-        private static void SelectTrigger_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            UINodeBase<NodeType, NodeRendererType> c = (UINodeBase<NodeType, NodeRendererType>)d;
-            c.SelectHandler(c, true);
-        }
-        public bool SelectTrigger
-        {
-            get { return (bool)GetValue(SelectTriggerProperty); }
-            set { SetValue(SelectTriggerProperty, value); }
-        }
-
 
         Storyboard m_InstantAnim;
         public override Storyboard InstantAnim { get { return m_InstantAnim; } }

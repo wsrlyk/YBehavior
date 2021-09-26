@@ -92,22 +92,13 @@ namespace YBehavior.Editor
             }
         }
 
-        public static readonly DependencyProperty DebugTriggerProperty =
-    DependencyProperty.Register("DebugTrigger",
-    typeof(bool), typeof(T), new FrameworkPropertyMetadata(DebugTrigger_PropertyChanged));
-        private static void DebugTrigger_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            T c = (T)d;
-            if (DebugMgr.Instance.bBreaked)
-                c.SetDebug(c.RunState);
-            else
-                c.SetDebugInstant(c.RunState);
-        }
-        public bool DebugTrigger
-        {
-            get { return (bool)GetValue(DebugTriggerProperty); }
-            set { SetValue(DebugTriggerProperty, value); }
-        }
 
+        protected void Renderer_DebugEvent()
+        {
+            if (DebugMgr.Instance.bBreaked)
+                SetDebug(RunState);
+            else
+                SetDebugInstant(RunState);
+        }
     }
 }

@@ -9,7 +9,6 @@
              d:DesignWidth="400" DataContextChanged="UserControl_DataContextChanged">
     <UserControl.Style>
         <Style>
-            <Setter Property="local:UIVariable.CandidatesReset" Value="{Binding Path=CandidatesReset}" />
             <!--<Setter Property="local:UINode.DebugConstant" Value="{Binding Path=DebugConstant}" />-->
         </Style>
     </UserControl.Style>

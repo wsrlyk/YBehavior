@@ -58,6 +58,13 @@ namespace YBehavior.Editor
                 return;
 
             _RefreshVType(v);
+
+            v.CandidatesResetEvent += V_CandidatesResetEvent;
+        }
+
+        private void V_CandidatesResetEvent()
+        {
+            VPointer.SelectedIndex = -1;
         }
 
         private void VTypes_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -99,21 +106,6 @@ namespace YBehavior.Editor
 
             v.cType = v.cType == Variable.CountType.CT_LIST ? Variable.CountType.CT_SINGLE : Variable.CountType.CT_LIST;
             _RefreshVType(v);
-        }
-
-        public static readonly DependencyProperty CandidatesResetProperty =
-            DependencyProperty.Register("CandidatesReset",
-            typeof(bool), typeof(UIVariable), new FrameworkPropertyMetadata(CandidatesReset_PropertyChanged));
-        private static void CandidatesReset_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            UIVariable v = (UIVariable)d;
-            v.VPointer.SelectedIndex = -1;
-        }
-
-        public bool CandidatesReset
-        {
-            get { return (bool)GetValue(CandidatesResetProperty); }
-            set { SetValue(CandidatesResetProperty, value); }
         }
 
         private void VKey_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

@@ -19,6 +19,14 @@ namespace YBehavior.Editor.Core.New
 
             public int CompareTo(Candidate other)
             {
+                if (variable == null || other.variable == null)
+                {
+                    if (variable == null && other.variable == null)
+                        return 0;
+                    if (variable == null)
+                        return -1;
+                    return 1;
+                }
                 if (variable.IsLocal != other.variable.IsLocal)
                 {
                     return variable.IsLocal ? -1 : 1;
@@ -70,7 +78,7 @@ namespace YBehavior.Editor.Core.New
                 return false;
             foreach(var v in candidates.variables)
             {
-                if (v.variable.DisplayName == displayName)
+                if (v.variable != null && v.variable.DisplayName == displayName)
                 {
                     return v.variable.cType == Variable.CountType.CT_LIST;
                 }
@@ -114,6 +122,7 @@ namespace YBehavior.Editor.Core.New
             {
                 v.StartRefresh();
                 v.variables.Clear();
+                v.Add(null);
             }
 
             foreach (var v in collection.Datas)

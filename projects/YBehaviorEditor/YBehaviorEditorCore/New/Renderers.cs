@@ -83,24 +83,12 @@ namespace YBehavior.Editor.Core.New
 
         public NodeState RunState { get { return DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(Owner.Ctr.To.Owner.UID, false) : NodeState.NS_INVALID; } }
 
+        public event Action DebugEvent;
         public void RefreshDebug()
         {
-            DebugTrigger = !DebugTrigger;
+            DebugEvent?.Invoke();
         }
 
-        /// <summary>
-        /// Only a trigger to UI, meaningless
-        /// </summary>
-        private bool m_bDebugTrigger;
-        public bool DebugTrigger
-        {
-            get { return m_bDebugTrigger; }
-            set
-            {
-                m_bDebugTrigger = value;
-                OnPropertyChanged("DebugTrigger");
-            }
-        }
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         internal protected void OnPropertyChanged(string propertyName)
@@ -241,38 +229,16 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        public event Action DebugEvent;
         public void RefreshDebug()
         {
-            DebugTrigger = !DebugTrigger;
-
-            //foreach (NodeBase child in m_Owner.Conns)
-            //{
-            //    child.Renderer.RefreshDebug();
-            //}
+            DebugEvent?.Invoke();
         }
 
-        /// <summary>
-        /// Only a trigger to UI, meaningless
-        /// </summary>
-        private bool m_bDebugTrigger;
-        public bool DebugTrigger
+        public event Action SelectEvent;
+        public void SetSelect()
         {
-            get { return m_bDebugTrigger; }
-            set
-            {
-                m_bDebugTrigger = value;
-                OnPropertyChanged("DebugTrigger");
-            }
-        }
-        private bool m_bSelectTrigger;
-        public bool SelectTrigger
-        {
-            get { return m_bSelectTrigger; }
-            set
-            {
-                m_bSelectTrigger = value;
-                OnPropertyChanged("SelectTrigger");
-            }
+            SelectEvent?.Invoke();
         }
 
         double m_CenterOffsetX = 0.0;
