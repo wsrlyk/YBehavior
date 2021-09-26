@@ -185,6 +185,12 @@ namespace YBehavior
 				m_Datas[key] = *((T*)src);
 			return true;
 		}
+
+		bool SetDefault(KEY key) override
+		{
+			return Utility::SetDefault<T>(m_Datas[key]);
+		}
+
 		bool TrySet(KEY key, const T& src)
 		{
 			if (m_Datas.find(key) == m_Datas.end())
@@ -255,6 +261,7 @@ namespace YBehavior
 		bool Set(KEY key, T&& src);
 
 		bool Set(KEY key, TYPEID typeID, const void* src);
+		bool SetDefault(KEY key, TYPEID typeID);
 
 		template<typename T>
 		bool TrySet(KEY key, const T* src);

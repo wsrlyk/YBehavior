@@ -113,6 +113,7 @@ namespace YBehavior
 		void DestroyContext(TreeNodeContext*&);
 
 		void AddVariable(ISharedVariableEx* pVariable);
+		ISharedVariableEx* GetVariable(const STRING& name) const;
 #ifdef YDEBUGGER
 		void SetDebugHelper(DebugTreeHelper* pDebugHelper) { m_pDebugHelper = pDebugHelper; };
 		inline DebugTreeHelper* GetDebugHelper() const { return m_pDebugHelper; }

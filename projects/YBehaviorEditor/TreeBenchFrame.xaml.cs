@@ -53,12 +53,15 @@ namespace YBehavior.Editor
                 this.commentLayer.ItemsSource = bench.Comments;
                 this.connectionLayer.ItemsSource = bench.ConnectionList.Collection;
 
+                m_MakingCenterDes = (bench as TreeBench).Tree.Root.Geo.Pos;
+                m_MakingCenterDes = new Point(-m_MakingCenterDes.X, -m_MakingCenterDes.Y);
             }
             else
             {
                 this.nodeLayer.ItemsSource = null;
                 this.commentLayer.ItemsSource = null;
                 this.connectionLayer.ItemsSource = null;
+                m_MakingCenterDes = new Point();
             }
         }
 

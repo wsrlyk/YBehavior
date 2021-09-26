@@ -58,7 +58,8 @@ namespace YBehavior.Editor
                 this.commentLayer.ItemsSource = bench.Comments;
                 this.connectionLayer.ItemsSource = bench.ConnectionList.Collection;
                 this.MachineStack.ItemsSource = (bench as FSMBench).StackMachines;
-
+                m_MakingCenterDes = (bench as FSMBench).CurMachine.EntryState.Geo.Pos;
+                m_MakingCenterDes = new Point(-m_MakingCenterDes.X, -m_MakingCenterDes.Y);
             }
             else
             {
@@ -66,6 +67,7 @@ namespace YBehavior.Editor
                 this.commentLayer.ItemsSource = null;
                 this.connectionLayer.ItemsSource = null;
                 this.MachineStack.ItemsSource = null;
+                m_MakingCenterDes = new Point();
             }
         }
 

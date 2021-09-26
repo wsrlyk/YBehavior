@@ -424,6 +424,7 @@ namespace YBehavior.Editor.Core.New
             arg.Node = node;
             arg.From = NewNodeAddedArg.AddMethod.New;
             arg.Pos = viewPos;
+            arg.PosType = NewNodeAddedArg.PositionType.Final;
             EventMgr.Instance.Send(arg);
 
             return node;
@@ -450,6 +451,7 @@ namespace YBehavior.Editor.Core.New
             arg.Node = node;
             arg.From = NewNodeAddedArg.AddMethod.Duplicate;
             arg.Pos = template.Geo.Pos + new System.Windows.Vector(15, 15);
+            arg.PosType = NewNodeAddedArg.PositionType.Origin;
             EventMgr.Instance.Send(arg);
 
             return node;
@@ -486,6 +488,7 @@ namespace YBehavior.Editor.Core.New
             arg.Node = node;
             arg.From = NewNodeAddedArg.AddMethod.Paste;
             arg.Pos = new Point(60, 60);
+            arg.PosType = NewNodeAddedArg.PositionType.Final;
             EventMgr.Instance.Send(arg);
 
             return node;

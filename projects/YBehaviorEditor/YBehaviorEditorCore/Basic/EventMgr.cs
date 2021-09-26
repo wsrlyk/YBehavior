@@ -104,12 +104,18 @@ namespace YBehavior.Editor.Core.New
         public NodeBase Node { get; set; }
         public AddMethod From { get; set; }
         public System.Windows.Point Pos { get; set; }
+        public PositionType PosType { get; set; }
         public override EventType Type => EventType.NewNodeAdded;
         public enum AddMethod
         {
             New,
             Duplicate,
             Paste,
+        }
+        public enum PositionType
+        {
+            Origin,
+            Final,
         }
     }
 

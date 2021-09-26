@@ -70,8 +70,14 @@ namespace YBehavior
 
 			if (Utility::ToUpper(buffer[0][2]) == Utility::POINTER_CHAR)
 			{
-				op->SetKeyFromString(buffer[1]);
-				op->SetIsLocal(Utility::IsLower(buffer[0][2]));
+				///> If this reference is empty, 
+				///  it means it's connected with other variables.
+				///  If after the process of connection, the Key is still invalid, sth is wrong.
+				if (!buffer[1].empty())
+				{
+					op->SetKeyFromString(buffer[1]);
+					op->SetIsLocal(Utility::IsLower(buffer[0][2]));
+				}
 			}
 			else
 				op->SetValueFromString(buffer[1]);

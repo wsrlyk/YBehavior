@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Test>
+  <Node Class="Root">
+    <Shared a="_IC 0" />
+    <Local />
+    <Node Class="Sequence">
+      <Node Class="Calculator" Operator="_EC +" Opl="_IP a" Opr1="_IP a" Opr2="_IC 1" />
+      <Node Class="Calculator" Operator="_EC +" Opl="_IP a" Opr1="_IP a" Opr2="_IC 1" />
+    </Node>
+  </Node>
+  <DataConnections>
+    <DataConnection FromUID="3" FromName="Opl" ToUID="4" ToName="Opr1"/>
+  </DataConnections>
+</Test>

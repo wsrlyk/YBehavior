@@ -85,6 +85,12 @@ namespace YBehavior
 		return iarray->Set(key, src);
 	}
 
+	bool SharedDataEx::SetDefault(KEY key, TYPEID typeID)
+	{
+		IDataArray* iarray = _ForceGetDataArray(typeID);
+		return iarray->SetDefault(key);
+	}
+
 	bool SharedDataEx::TrySet(KEY key, TYPEID typeKey, const void* src)
 	{
 		IDataArray* iarray = m_Datas[typeKey];

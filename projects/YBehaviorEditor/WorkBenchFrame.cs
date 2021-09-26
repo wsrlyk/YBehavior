@@ -29,6 +29,21 @@ namespace YBehavior.Editor
             m_Operation.RegisterRightClick(_OnRightClick);
 
             GetCanvas.RenderTransform = CurPageData.TransGroup;
+
+            this.Loaded += WorkBenchFrame_Loaded;
+        }
+
+        private void WorkBenchFrame_Loaded(object sender, RoutedEventArgs e)
+        {
+            Vector halfcanvas = new Vector(this.GetCanvasBoard.ActualWidth / 2, this.GetCanvasBoard.ActualHeight / 2);
+            Point curPos = new Point(0, 0) + halfcanvas;
+            double nodesScale = CurPageData.ScaleTransform.ScaleX;
+            Point pos = new Vector(m_MakingCenterDes.X, m_MakingCenterDes.Y) * nodesScale + curPos;
+
+            curPos = new Point(CurPageData.TranslateTransform.X, CurPageData.TranslateTransform.Y);
+            var delta = pos - curPos;
+            CurPageData.TranslateTransform.X += delta.X;
+            CurPageData.TranslateTransform.Y += delta.Y;
         }
 
         public void Enable()
@@ -75,9 +90,13 @@ namespace YBehavior.Editor
 
             /////> move the node to the topleft of the canvas
             //if (oArg.From != NewNodeAddedArg.AddMethod.Duplicate)
-            oArg.Node.Renderer.SetPos(new Point(
-                (-CurPageData.TranslateTransform.X + oArg.Pos.X + Core.New.Utility.Rand(-10, 10)) / CurPageData.ScaleTransform.ScaleX,
-                (-CurPageData.TranslateTransform.Y + oArg.Pos.Y + Core.New.Utility.Rand(-10, 10)) / CurPageData.ScaleTransform.ScaleY));
+            if (oArg.PosType == NewNodeAddedArg.PositionType.Final)
+                oArg.Node.Renderer.SetPos(new Point(
+                    (-CurPageData.TranslateTransform.X + oArg.Pos.X + Core.New.Utility.Rand(-10, 10)) / CurPageData.ScaleTransform.ScaleX,
+                    (-CurPageData.TranslateTransform.Y + oArg.Pos.Y + Core.New.Utility.Rand(-10, 10)) / CurPageData.ScaleTransform.ScaleY));
+            else
+                oArg.Node.Renderer.SetPos(new Point(oArg.Pos.X + Core.New.Utility.Rand(-10, 10),
+                                                    oArg.Pos.Y + Core.New.Utility.Rand(-10, 10)));
 
             //_CreateNode(oArg.Node);
             //this.Canvas.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action<Node>(_ThreadRefreshConnection), oArg.Node);
@@ -187,7 +206,7 @@ namespace YBehavior.Editor
             }
         }
 
-        Point m_MakingCenterDes;
+        protected Point m_MakingCenterDes;
         private void ManualMakingCenter(object sender, EventArgs e)
         {
             if (CurPageData == null)

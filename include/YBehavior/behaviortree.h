@@ -82,6 +82,8 @@ namespace YBehavior
 		TreeNodeContext* CreateRootContext(LocalMemoryInOut* pTunnel = nullptr);
 		///> CAUTION: this function can only be called in garbage collection
 		void ClearSubTree() { m_SubTrees.clear(); }
+
+		bool ProcessDataConnections(const std::vector<TreeNode*>& treeNodeCache, const pugi::xml_node& data);
 	protected:
 		bool OnLoadChild(const pugi::xml_node& data) override;
 	};

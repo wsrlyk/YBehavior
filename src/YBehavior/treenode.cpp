@@ -146,7 +146,20 @@ namespace YBehavior
 	void TreeNode::AddVariable(ISharedVariableEx* pVariable)
 	{
 		if (pVariable)
+		{
+			pVariable->SetIndex(m_Variables.size());
 			m_Variables.push_back(pVariable);
+		}
+	}
+
+	YBehavior::ISharedVariableEx* TreeNode::GetVariable(const STRING& name) const
+	{
+		for (auto it : m_Variables)
+		{
+			if (it->GetName() == name)
+				return it;
+		}
+		return nullptr;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

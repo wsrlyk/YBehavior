@@ -3,6 +3,6 @@
   <Machine Default="Main">
     <State Type="Entry" />
     <State Type="Exit" />
-    <State Name="Main" Tree="P" />
+    <State Name="Main" Tree="Test" />
   </Machine>
 </EmptyFSM>

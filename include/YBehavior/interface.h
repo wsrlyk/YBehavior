@@ -23,6 +23,8 @@ namespace YBehavior
 		inline void SetIsLocal(bool local) { m_IsLocal = local; }
 		inline bool IsLocal() { return m_IsLocal; }
 		virtual bool IsConst() = 0;
+		inline UINT GetIndex() const { return m_Idx; }
+		inline void SetIndex(UINT idx) { m_Idx = idx; }
 
 		void SetName(const STRING& name, UINT nodeUID, const STRING& nodeName, const STRING& treeName)
 		{
@@ -74,6 +76,10 @@ namespace YBehavior
 		STRING m_Name;
 		STRING m_LogName;
 		STRING m_ReferenceName;
+		/// <summary>
+		/// Index in the container
+		/// </summary>
+		UINT m_Idx;
 	};
 
 	class IDataArrayIterator
@@ -131,6 +137,7 @@ namespace YBehavior
 		virtual const void* Get(KEY key) const = 0;
 		virtual const STRING GetToString(KEY key) const = 0;
 		virtual bool Set(KEY key, const void* src) = 0;
+		virtual bool SetDefault(KEY key) = 0;
 		virtual bool TrySet(KEY key, const void* src) = 0;
 		virtual void CloneFrom(const IDataArray*) = 0;
 		virtual IDataArray* Clone() = 0;

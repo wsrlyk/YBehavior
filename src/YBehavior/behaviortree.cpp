@@ -114,6 +114,7 @@ namespace YBehavior
 				container[it->name()] = pVariable;
 			}
 		}
+
 		return true;
 	}
 
@@ -168,6 +169,160 @@ namespace YBehavior
 		NodeContextType* pContext = (NodeContextType*)CreateContext();
 		pContext->Init(pTunnel);
 		return pContext;
+	}
+
+	bool BehaviorTree::ProcessDataConnections(const std::vector<TreeNode*>& treeNodeCache, const pugi::xml_node& data)
+	{
+		if (data.empty())
+			return true;
+
+		static const KEY TEMP_KEY_OFFSET = 1000000;
+		KEY currentKey = TEMP_KEY_OFFSET;
+
+		///> FromUID, FromVariableIndex, ToUID, ToVariableIndex
+		using Range = std::tuple<UINT, UINT, UINT, UINT>;
+		struct Ranges
+		{
+			std::vector<Range> ranges;
+			KEY key;
+		};
+		std::unordered_map<TYPEID, std::vector<Ranges>> usedRanges;
+
+		for (auto it = data.begin(); it != data.end(); ++it)
+		{
+			UINT fromUID = it->attribute("FromUID").as_uint(0);
+			UINT toUID = it->attribute("ToUID").as_uint(0);
+			STRING fromName = it->attribute("FromName").value();
+			STRING toName = it->attribute("ToName").value();
+
+			if (fromUID == 0 || fromUID >= treeNodeCache.size())
+			{
+				ERROR_BEGIN << "DataConnection invalid FromUID " << fromUID << ERROR_END;
+				return false;
+			}
+			if (toUID == 0 || toUID >= treeNodeCache.size())
+			{
+				ERROR_BEGIN << "DataConnection invalid ToUID " << toUID << ERROR_END;
+				return false;
+			}
+
+			if (fromUID >= toUID)
+			{
+				ERROR_BEGIN << "DataConnection FromUID MUST larger than ToUID " << fromName << " & " << toUID << ERROR_END;
+				return false;
+			}
+
+			auto fromNode = treeNodeCache[fromUID];
+			auto fromVariable = fromNode->GetVariable(fromName);
+			if (!fromVariable)
+			{
+				ERROR_BEGIN << "DataConnection invalid FromName " << fromName << ERROR_END;
+				return false;
+			}
+			auto toNode = treeNodeCache[toUID];
+			auto toVariable = toNode->GetVariable(toName);
+			if (!toVariable)
+			{
+				ERROR_BEGIN << "DataConnection invalid ToName " << toName << ERROR_END;
+				return false;
+			}
+
+			TYPEID typeID = fromVariable->TypeID();
+			if (toVariable->TypeID() != typeID)
+			{
+				ERROR_BEGIN << "DataConnection Different types: " << fromName << " & " << toName << ERROR_END;
+				return false;
+			}
+			
+			auto setCurrentKey = [&fromVariable, &toVariable, this](KEY key)
+			{
+				fromVariable->SetIsLocal(true);
+				fromVariable->SetKey(key);
+				toVariable->SetIsLocal(true);
+				toVariable->SetKey(key);
+				GetLocalData()->SetDefault(key, fromVariable->TypeID());
+			};
+
+			auto it2 = usedRanges.find(typeID);
+			///> It's the first data in this type
+			if (it2 == usedRanges.end())
+			{
+				std::vector<Ranges> rangesList;
+				Ranges ranges;
+				ranges.key = ++currentKey;
+				ranges.ranges.emplace_back(fromUID, fromVariable->GetIndex(), toUID, toVariable->GetIndex());
+				rangesList.emplace_back(ranges);
+				usedRanges[typeID] = rangesList;
+
+				setCurrentKey(currentKey);
+				continue;
+			}
+			{
+				/// We assume that these ranges are feeded in order
+				/// So current FromUID can only be equal or larger than the previous FromUIDs
+				/// And previous ranges cant make holes
+
+				bool finish = false;
+				std::vector<Ranges>& rangesList = it2->second;
+				for (auto it3 = rangesList.begin(); it3 != rangesList.end(); ++it3)
+				{
+					for (auto it4 = it3->ranges.begin(); it4 != it3->ranges.end(); ++it4)
+					{
+						Range& range = *it4;
+						///> Totally not in this range
+						if (fromUID > std::get<2>(range))
+						{
+							continue;
+						}
+
+						///> Merge
+						if (fromUID == std::get<2>(range))
+						{
+							std::get<2>(range) = toUID;
+							std::get<3>(range) = toVariable->GetIndex();
+							setCurrentKey(it3->key);
+							finish = true;
+							break;
+						}
+
+						if (fromUID == std::get<0>(range))
+						{
+							///> A variable is connected with two more nodes, merge them
+							if (std::get<1>(range) == fromVariable->GetIndex())
+							{
+								///> Use the larger range
+								if (toUID > std::get<2>(range))
+								{
+									std::get<2>(range) = toUID;
+									std::get<3>(range) = toVariable->GetIndex();
+								}
+								setCurrentKey(it3->key);
+								finish = true;
+							}
+							break;
+						}
+
+						///> All other cases are invalid
+						break;
+					}
+
+					if (finish)
+						break;
+				}
+				///> Need a new KEY for this range
+				if (!finish)
+				{
+					Ranges ranges;
+					ranges.key = ++currentKey;
+					ranges.ranges.emplace_back(fromUID, fromVariable->GetIndex(), toUID, toVariable->GetIndex());
+					rangesList.emplace_back(ranges);
+
+					setCurrentKey(currentKey);
+				}
+			}
+		}
+
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
