@@ -809,8 +809,8 @@ namespace YBehavior.Editor.Core.New
         public FSMUserStateNode()
         {
             Type = FSMStateType.Invalid;
-            Conns.Add(Connector.IdentifierParent, true).ConnectionCreator = _CreateConnection;
-            Conns.Add(Connector.IdentifierChildren, true).ConnectionCreator = _CreateConnection;
+            Conns.Add(Connector.IdentifierParent, true, Connector.PosType.PARENT).ConnectionCreator = _CreateConnection;
+            Conns.Add(Connector.IdentifierChildren, true, Connector.PosType.CHILDREN).ConnectionCreator = _CreateConnection;
         }
         public override bool CheckValid()
         {
@@ -874,7 +874,7 @@ namespace YBehavior.Editor.Core.New
             Type = FSMStateType.Special;
             SortIndex = -4;
 
-            Conns.Add(Connector.IdentifierChildren, true).ConnectionCreator = _CreateConnection;
+            Conns.Add(Connector.IdentifierChildren, true, Connector.PosType.CHILDREN).ConnectionCreator = _CreateConnection;
             Geo.Pos = new Point(100, 100);
         }
     }
@@ -887,7 +887,7 @@ namespace YBehavior.Editor.Core.New
             Type = FSMStateType.Special;
             SortIndex = -3;
 
-            Conns.Add(Connector.IdentifierParent, true).ConnectionCreator = _CreateConnection;
+            Conns.Add(Connector.IdentifierParent, true, Connector.PosType.PARENT).ConnectionCreator = _CreateConnection;
             Geo.Pos = new Point(400, 400);
         }
     }
@@ -900,7 +900,7 @@ namespace YBehavior.Editor.Core.New
             Type = FSMStateType.Special;
             SortIndex = -2;
 
-            Conns.Add(Connector.IdentifierChildren, true).ConnectionCreator = _CreateConnection;
+            Conns.Add(Connector.IdentifierChildren, true, Connector.PosType.CHILDREN).ConnectionCreator = _CreateConnection;
             Geo.Pos = new Point(250, 250);
         }
     }
@@ -913,8 +913,8 @@ namespace YBehavior.Editor.Core.New
             Type = FSMStateType.Special;
             SortIndex = -1;
 
-            Conns.Add(Connector.IdentifierParent, true).ConnectionCreator = _CreateConnection;
-            Conns.Add(Connector.IdentifierChildren, true).ConnectionCreator = _CreateConnection;
+            Conns.Add(Connector.IdentifierParent, true, Connector.PosType.PARENT).ConnectionCreator = _CreateConnection;
+            Conns.Add(Connector.IdentifierChildren, true, Connector.PosType.CHILDREN).ConnectionCreator = _CreateConnection;
             Geo.Pos = new Point(400, 100);
         }
     }

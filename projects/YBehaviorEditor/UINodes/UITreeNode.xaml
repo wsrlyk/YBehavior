@@ -46,6 +46,10 @@
                     <StackPanel Name="mainPanel" Margin="3">
                         <TextBlock Name="name" Text="{Binding UITitle}"/>
                         <TextBlock Name="note" Text="{Binding Note}"/>
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Left" Name="inputConnectors" HorizontalAlignment="Left" Orientation="Vertical"/>
+                            <StackPanel DockPanel.Dock="Right" Name="outputConnectors" HorizontalAlignment="Right" Orientation="Vertical"/>
+                        </DockPanel>
                     </StackPanel>
                     <Ellipse Name="breakPoint" HorizontalAlignment="Right" Width="11" Height="11" VerticalAlignment="Top" Visibility="{Binding Path=DebugPointInfo.HasBreakPoint, Converter={StaticResource visibilityConvertor}}" >
                         <Ellipse.Fill>

@@ -45,15 +45,15 @@ namespace YBehavior.Editor.Core.New
             Ctr = ctr;
 
             //Graph = graph;
-            Renderer = _CreateRenderer();
+            Renderer = _CreateRenderer(from.IsVertical);
             Renderer.Owner = this;
             Renderer.ParentConnectorGeo = from.Geo;
             Renderer.ChildConnectorGeo = to.Geo;
         }
         
-        protected virtual ConnectionRenderer _CreateRenderer()
+        protected virtual ConnectionRenderer _CreateRenderer(bool isVertical)
         {
-            return new ConnectionRenderer();
+            return new ConnectionRenderer(isVertical);
         }
     }
 
@@ -70,8 +70,7 @@ namespace YBehavior.Editor.Core.New
                     return;
                 m_Pos = value;
 
-                if (onPosChanged != null)
-                    onPosChanged();
+                onPosChanged?.Invoke();
             }
         }
 
@@ -85,12 +84,11 @@ namespace YBehavior.Editor.Core.New
                     return;
 
                 m_MidY = value;
-                if (onMidYChanged != null)
-                    onMidYChanged();
+                onMidYChanged?.Invoke();
             }
         }
-        public Action onPosChanged;
-        public Action onMidYChanged;
+        public event Action onPosChanged;
+        public event Action onMidYChanged;
     }
 
     public delegate Connection ConnectionCreateDelegate(Connector from, Connector to);
@@ -106,9 +104,17 @@ namespace YBehavior.Editor.Core.New
             OUT,
         };
 
+        public enum PosType
+        {
+            PARENT,
+            CHILDREN,
+            CONDITION,
+            INPUT,
+            OUTPUT,
+        }
         public static readonly string IdentifierChildren = "children";
         public static readonly string IdentifierParent = "parent";
-        public static readonly string IdentifierCondition = "condition";
+        public static readonly string IdentifierCondition = "cond";
 
         public static readonly string IdentifierDefault = "default";
         public static readonly string IdentifierIncrement = "inc";
@@ -118,9 +124,13 @@ namespace YBehavior.Editor.Core.New
         protected string m_Identifier;
         public string Identifier { get { return m_Identifier; } }
 
+        protected PosType m_PosType;
+        public PosType GetPosType { get { return m_PosType; } }
+
         protected Dir m_Dir = Dir.OUT;
         public Dir GetDir => m_Dir;
 
+        public bool IsVertical { get; private set; }
 
         protected List<Connection> m_Conns = new List<Connection>();
         public List<Connection> Conns { get { return m_Conns; } }
@@ -133,38 +143,46 @@ namespace YBehavior.Editor.Core.New
 
         public ConnectionCreateDelegate ConnectionCreator { get; set; }
 
-        int m_AtBottom = 1;  //> Connections on the top of the nodes = -1;
-        public Connector(NodeBase node, string identifier)
+        int m_AtBottom = -1;  //> Connections on the top of the nodes = -1;
+        public Connector(NodeBase node, string identifier, PosType type)
         {
             if (node == null)
                 return;
             m_Owner = node;
             m_Identifier = identifier;
+            m_PosType = type;
 
             m_Geo = new ConnectorGeometry()
             {
                 Owner = this,
             };
 
-            if (identifier == IdentifierParent)
+            if (type == PosType.PARENT || type == PosType.INPUT)
             {
-                m_Geo.onPosChanged = _OnParentConnectorChanged;
+                m_Geo.onPosChanged += _OnParentConnectorChanged;
                 m_Dir = Dir.IN;
             }
             else
             {
-                m_Geo.onPosChanged = _OnChildConnectorChanged;
+                m_Geo.onPosChanged += _OnChildConnectorChanged;
                 m_Dir = Dir.OUT;
             }
 
-            if (identifier == IdentifierCondition || identifier == IdentifierParent)
+            if (type == PosType.CHILDREN)
             {
-                m_AtBottom = -1;
+                m_AtBottom = 1;
+            }
+            if (type == PosType.INPUT || type == PosType.OUTPUT)
+            {
+                IsVertical = false;
             }
         }
 
         public void RecalcMidY()
         {
+            if (!IsVertical)
+                return;
+
             double childPos = CalcHorizontalPos();
             double parentPos = Geo.Pos.Y;
             double midPos;
@@ -333,6 +351,10 @@ namespace YBehavior.Editor.Core.New
         Connector m_ParentConnector;
         public Connector ParentConnector { get { return m_ParentConnector; } }
 
+        List<Connector> m_InputConnectors = new List<Connector>();
+        public System.Collections.IEnumerable InputConnectors { get { return m_InputConnectors; } }
+
+
         List<NodeBase> m_Nodes = new List<NodeBase>();
         public int NodeCount { get { _ProcessDirty(); return m_Nodes.Count; } }
 
@@ -347,33 +369,46 @@ namespace YBehavior.Editor.Core.New
             m_Owner = owner;
         }
 
-        public Connector Add(string identifier, bool isMultiple)
+        public Connector Add(string identifier, bool isMultiple, Connector.PosType type)
         {
             Connector res;
-            if (identifier == Connector.IdentifierParent)
+            if (type == Connector.PosType.PARENT)
             {
                 if (m_ParentConnector == null)
                 {
                     if (isMultiple)
-                        res = new ConnectorMultiple(m_Owner, identifier);
+                        res = new ConnectorMultiple(m_Owner, identifier, type);
                     else
-                        res = new ConnectorSingle(m_Owner, identifier);
+                        res = new ConnectorSingle(m_Owner, identifier, type);
                     m_ParentConnector = res;
                 }
                 else
                     return null;
             }
-            else
+            else if (type == Connector.PosType.INPUT)
             {
-                foreach (var c in m_Connectors)
+                foreach (var c in m_InputConnectors)
                 {
                     if (c.Identifier == identifier)
                         return null;
                 }
                 if (isMultiple)
-                    res = new ConnectorMultiple(m_Owner, identifier);
+                    res = new ConnectorMultiple(m_Owner, identifier, type);
                 else
-                    res = new ConnectorSingle(m_Owner, identifier);
+                    res = new ConnectorSingle(m_Owner, identifier, type);
+                m_InputConnectors.Add(res);
+            }
+            else
+            {
+                foreach (var c in m_Connectors)
+                {
+                    if (c.Identifier == identifier && c.GetPosType == type)
+                        return null;
+                }
+                if (isMultiple)
+                    res = new ConnectorMultiple(m_Owner, identifier, type);
+                else
+                    res = new ConnectorSingle(m_Owner, identifier, type);
                 m_Connectors.Add(res);
             }
             return res;
@@ -459,8 +494,8 @@ namespace YBehavior.Editor.Core.New
 
     public class ConnectorSingle : Connector
     {
-        public ConnectorSingle(NodeBase node, string identifier)
-            : base(node, identifier)
+        public ConnectorSingle(NodeBase node, string identifier, PosType type)
+            : base(node, identifier, type)
         {
         }
 
@@ -472,8 +507,8 @@ namespace YBehavior.Editor.Core.New
 
     public class ConnectorMultiple : Connector
     {
-        public ConnectorMultiple(NodeBase node, string identifier)
-            : base(node, identifier)
+        public ConnectorMultiple(NodeBase node, string identifier, PosType type)
+            : base(node, identifier, type)
         {
         }
     }

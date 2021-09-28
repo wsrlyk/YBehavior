@@ -84,6 +84,9 @@
     <Compile Include="SearchFrame.xaml.cs">
       <DependentUpon>SearchFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="VariableUIConnector.xaml.cs">
+      <DependentUpon>VariableUIConnector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UINodes\UINodeBase.cs" />
     <Compile Include="UINodes\UIFSMStateNode.xaml.cs">
       <DependentUpon>UIFSMStateNode.xaml</DependentUpon>
@@ -191,6 +194,10 @@
     <Page Include="SearchFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="VariableUIConnector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UINodes\UIFSMStateNode.xaml">
       <Generator>MSBuild:Compile</Generator>

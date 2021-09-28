@@ -17,7 +17,7 @@ namespace YBehavior.Editor.Core.New
             FSMRenderer.FSMOwner = this;
         }
 
-        protected override ConnectionRenderer _CreateRenderer()
+        protected override ConnectionRenderer _CreateRenderer(bool isVertical)
         {
             return new FSMConnectionRenderer();
         }

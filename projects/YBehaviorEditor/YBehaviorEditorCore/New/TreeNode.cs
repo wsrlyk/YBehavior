@@ -47,6 +47,7 @@ namespace YBehavior.Editor.Core.New
                 node.CreateBase();
                 node.CreateVariables();
                 node.LoadDescription();
+                node.PostCreate();
                 m_NodeList.Add(node);
                 m_TypeDic.Add(node.Name, type);
                 Console.WriteLine(type);
@@ -62,6 +63,7 @@ namespace YBehavior.Editor.Core.New
                 node.CreateBase();
                 node.CreateVariables();
                 node.LoadDescription();
+                node.PostCreate();
                 return node;
             }
 
@@ -129,7 +131,7 @@ namespace YBehavior.Editor.Core.New
         {
             base.CreateBase();
             if (Type != TreeNodeType.TNT_Root)
-                Conns.Add(Connector.IdentifierParent, false);
+                Conns.Add(Connector.IdentifierParent, false, Connector.PosType.PARENT);
 
             if (Type == TreeNodeType.TNT_Root)
             {
@@ -140,7 +142,7 @@ namespace YBehavior.Editor.Core.New
                 m_Variables = new NodeMemory(m_Wrapper as TreeNodeWrapper);
                 m_NodeMemory = m_Variables as NodeMemory;
             }
-            m_ConditonConnector = Conns.Add(Connector.IdentifierCondition, false);
+            m_ConditonConnector = Conns.Add(Connector.IdentifierCondition, false, Connector.PosType.CONDITION);
 
             _OnCreateBase();
         }
@@ -184,6 +186,23 @@ namespace YBehavior.Editor.Core.New
 
         }
 
+        public override void PostCreate()
+        {
+            base.PostCreate();
+            CreateVariableConnectors();
+        }
+        public void CreateVariableConnectors()
+        {
+            foreach (var v in m_Variables.Datas)
+            {
+                if (v.Variable.vbType == Variable.VariableType.VBT_Const && v.Variable.LockVBType)
+                    continue;
+                Conns.Add(
+                    v.Variable.Name, 
+                    !v.Variable.IsInput, 
+                    v.Variable.IsInput ? Connector.PosType.INPUT : Connector.PosType.OUTPUT);
+            }
+        }
         public void LoadDescription()
         {
             m_NodeDescripion = DescriptionMgr.Instance.GetNodeDescription(this.Name);

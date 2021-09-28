@@ -130,20 +130,47 @@ namespace YBehavior.Editor
                 //if (ctr is ConnectorNone)
                 //    continue;
 
-                TreeUIConnector uiConnector = new TreeUIConnector
+                UIConnector uiConnector;
+                if (ctr.GetPosType == Connector.PosType.OUTPUT)
+                {
+                    uiConnector = new VariableUIConnector
+                    {
+                        Title = ctr.Identifier,
+                        Ctr = ctr
+                    };
+                    outputConnectors.Children.Add(uiConnector);
+                }
+                else
+                {
+                    uiConnector = new TreeUIConnector
+                    {
+                        Title = ctr.Identifier,
+                        Ctr = ctr
+                    };
+                    if (ctr.GetPosType == Connector.PosType.CONDITION)
+                    {
+                        leftConnectors.Child = uiConnector;
+                    }
+                    else
+                    {
+                        bottomConnectors.Children.Add(uiConnector);
+                    }
+                }
+                m_uiConnectors.Add(ctr, uiConnector);
+            }
+
+            foreach (Connector ctr in Node.Conns.InputConnectors)
+            {
+                UIConnector uiConnector = new VariableUIConnector
                 {
                     Title = ctr.Identifier,
                     Ctr = ctr
                 };
                 //uiConnector.SetCanvas(m_Canvas);
-                if (ctr.Identifier == Connector.IdentifierCondition)
-                {
-                    leftConnectors.Child = uiConnector;
-                }
-                else
-                    bottomConnectors.Children.Add(uiConnector);
 
-                m_uiConnectors.Add(ctr.Identifier, uiConnector);
+                inputConnectors.Children.Add(uiConnector);
+
+                m_uiConnectors.Add(ctr, uiConnector);
             }
 
             if (Node.Conns.ParentConnector != null)
@@ -157,7 +184,7 @@ namespace YBehavior.Editor
                 uiConnector.title.FontSize = 14;
                 topConnectors.Children.Add(uiConnector);
 
-                m_uiConnectors.Add(Connector.IdentifierParent, uiConnector);
+                m_uiConnectors.Add(Node.Conns.ParentConnector, uiConnector);
             }
         }
 

@@ -94,7 +94,7 @@ namespace YBehavior.Editor
 
                 connectors.Children.Add(uiConnector);
 
-                m_uiConnectors.Add(Connector.IdentifierParent, uiConnector);
+                m_uiConnectors.Add(Node.Conns.ParentConnector, uiConnector);
             }
 
             foreach (Connector ctr in Node.Conns.ConnectorsList)
@@ -109,7 +109,7 @@ namespace YBehavior.Editor
 
                 connectors.Children.Add(uiConnector);
 
-                m_uiConnectors.Add(ctr.Identifier, uiConnector);
+                m_uiConnectors.Add(ctr, uiConnector);
             }
         }
     }

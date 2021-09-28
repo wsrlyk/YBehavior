@@ -11,13 +11,36 @@ namespace YBehavior.Editor.Core.New
 {
     public class ConnectionRenderer : System.ComponentModel.INotifyPropertyChanged
     {
+        public ConnectionRenderer()
+        { }
+        public ConnectionRenderer(bool isVertical)
+        {
+            m_bIsVertical = isVertical;
+        }
+        bool m_bIsVertical = true;
         bool m_bIsValid = true;
         public bool IsValid { get { return m_bIsValid; } }
         public Connection Owner { get; set; }
         public Point ParentPos { get { return ParentConnectorGeo.Pos; } }
         public Point ChildPos { get { return ChildConnectorGeo.Pos; } }
-        public Point FirstCorner { get { return new Point(ParentConnectorGeo.Pos.X, m_ParentConnectorGeo.MidY); } }
-        public Point SecondCorner { get { return new Point(ChildConnectorGeo.Pos.X, m_ParentConnectorGeo.MidY); } }
+        public Point FirstCorner 
+        {
+            get
+            {
+                return m_bIsVertical ?
+                    new Point(ParentConnectorGeo.Pos.X, m_ParentConnectorGeo.MidY) :
+                    new Point(ParentConnectorGeo.Pos.X + 20, ParentConnectorGeo.Pos.Y);
+            }
+        }
+        public Point SecondCorner
+        {
+            get
+            {
+                return m_bIsVertical ?
+                    new Point(ChildConnectorGeo.Pos.X, m_ParentConnectorGeo.MidY) :
+                    new Point(ChildConnectorGeo.Pos.X - 20, ChildConnectorGeo.Pos.Y);
+            }
+        }
         public Point NotePos { get { return new Point(SecondCorner.X + 5, SecondCorner.Y - 20); } }
         public string Note { get { return Owner.Note; } }
 

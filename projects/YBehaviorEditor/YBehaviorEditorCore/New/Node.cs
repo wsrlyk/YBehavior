@@ -236,6 +236,11 @@ namespace YBehavior.Editor.Core.New
             _CreateWrapper();
             m_Wrapper.Node = this;
         }
+
+        public virtual void PostCreate()
+        {
+
+        }
         /// <summary>
         /// Parent changed
         /// </summary>

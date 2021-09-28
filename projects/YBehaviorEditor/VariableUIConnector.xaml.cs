@@ -18,7 +18,7 @@ namespace YBehavior.Editor
     /// <summary>
     /// UIConnector.xaml 的交互逻辑
     /// </summary>
-    public partial class TreeUIConnector : UIConnector, IDragable, IDropable
+    public partial class VariableUIConnector : UIConnector, IDragable, IDropable
     {
         Brush normalBorderBrush;
 
@@ -26,7 +26,7 @@ namespace YBehavior.Editor
 
         Vector m_RelativePos = new Vector(double.MaxValue, double.MaxValue);
 
-        public TreeUIConnector()
+        public VariableUIConnector()
         {
             InitializeComponent();
 
@@ -128,11 +128,11 @@ namespace YBehavior.Editor
             if (dragable == null)
                 return;
 
-            TreeUIConnector other = dragable as TreeUIConnector;
+            VariableUIConnector other = dragable as VariableUIConnector;
             if (other == null)
                 return;
 
-            WorkBenchMgr.Instance.ConnectNodes(this.Ctr, other.Ctr);
+            (WorkBenchMgr.Instance.ActiveWorkBench as TreeBench).ConnectVariables(this.Ctr, other.Ctr);
         }
     }
 }

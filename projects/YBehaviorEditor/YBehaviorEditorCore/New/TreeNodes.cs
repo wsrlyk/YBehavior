@@ -145,7 +145,7 @@ namespace YBehavior.Editor.Core.New
     {
         public SingleChildNode()
         {
-            m_Ctr = m_Connections.Add(Connector.IdentifierChildren, false);
+            m_Ctr = m_Connections.Add(Connector.IdentifierChildren, false, Connector.PosType.CHILDREN);
         }
     }
 
@@ -153,7 +153,7 @@ namespace YBehavior.Editor.Core.New
     {
         public CompositeNode()
         {
-            m_Ctr = m_Connections.Add(Connector.IdentifierChildren, true);
+            m_Ctr = m_Connections.Add(Connector.IdentifierChildren, true, Connector.PosType.CHILDREN);
         }
     }
 
@@ -632,9 +632,9 @@ namespace YBehavior.Editor.Core.New
             m_Name = "IfThenElse";
             Type = TreeNodeType.TNT_Default;
 
-            m_Connections.Add("if", false);
-            m_Connections.Add("then", false);
-            m_Connections.Add("else", false);
+            m_Connections.Add("if", false, Connector.PosType.CHILDREN);
+            m_Connections.Add("then", false, Connector.PosType.CHILDREN);
+            m_Connections.Add("else", false, Connector.PosType.CHILDREN);
         }
     }
 
@@ -926,7 +926,7 @@ namespace YBehavior.Editor.Core.New
             m_Name = "SwitchCase";
             Type = TreeNodeType.TNT_Default;
 
-            m_Connections.Add(Connector.IdentifierDefault, false);
+            m_Connections.Add(Connector.IdentifierDefault, false, Connector.PosType.CHILDREN);
         }
 
         public override void CreateVariables()
@@ -1045,12 +1045,12 @@ namespace YBehavior.Editor.Core.New
             m_Name = "For";
             Type = TreeNodeType.TNT_Default;
 
-            m_Connections.Add(Connector.IdentifierInit, false);
-            m_Connections.Add(Connector.IdentifierCond, false);
-            m_Connections.Add(Connector.IdentifierIncrement, false);
+            m_Connections.Add(Connector.IdentifierInit, false, Connector.PosType.CHILDREN);
+            m_Connections.Add(Connector.IdentifierCond, false, Connector.PosType.CHILDREN);
+            m_Connections.Add(Connector.IdentifierIncrement, false, Connector.PosType.CHILDREN);
 
             ///> to make the "chilren" conn the last conn
-            m_Ctr = m_Connections.Add(Connector.IdentifierChildren, false);
+            m_Ctr = m_Connections.Add(Connector.IdentifierChildren, false, Connector.PosType.CHILDREN);
         }
 
         public override void CreateVariables()

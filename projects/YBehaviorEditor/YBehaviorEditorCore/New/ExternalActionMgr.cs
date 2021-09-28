@@ -38,6 +38,7 @@ namespace YBehavior.Editor.Core.New
                     if (_LoadAction(node, chi))
                     {
                         node.LoadDescription();
+                        node.PostCreate();
                         m_ActionDic[node.ClassName] = node;
                         TreeNodeMgr.Instance.NodeList.Add(node);
                     }

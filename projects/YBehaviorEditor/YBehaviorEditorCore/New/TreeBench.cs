@@ -32,6 +32,21 @@ namespace YBehavior.Editor.Core.New
             AddRenderers(m_Tree.Root, true);
         }
 
+        public void ConnectVariables(Connector ctr0, Connector ctr1)
+        {
+            Connector parent;
+            Connector child;
+            Connection conn = null;
+            conn = Connector.TryConnect(ctr0, ctr1, out parent, out child);
+            if (conn != null)
+            {
+                ///> refresh parent connections
+                ConnectionRenderer connRenderer = conn.Renderer;
+                if (connRenderer != null)
+                    ConnectionList.Add(connRenderer);
+            }
+        }
+
         public override void ConnectNodes(Connector ctr0, Connector ctr1)
         {
             Connector parent;

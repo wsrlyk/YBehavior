@@ -29,7 +29,7 @@ namespace YBehavior.Editor
         public override NodeState RunState => Node.Renderer.RunState;
         protected Operation m_Operation;
 
-        protected Dictionary<string, UIConnector> m_uiConnectors = new Dictionary<string, UIConnector>();
+        protected Dictionary<Connector, UIConnector> m_uiConnectors = new Dictionary<Connector, UIConnector>();
 
         public UINodeBase()
         {
@@ -101,19 +101,20 @@ namespace YBehavior.Editor
             {
                 _BuildConnectionBinding(ctr);
             }
+            foreach (Connector ctr in Node.Conns.InputConnectors)
+            {
+                _BuildConnectionBinding(ctr);
+            }
 
             if (Node.Conns.ParentConnector != null)
                 _BuildConnectionBinding(Node.Conns.ParentConnector);
         }
 
-        private void _BuildConnectionBinding(Connector ctr, string identifier = null)
+        private void _BuildConnectionBinding(Connector ctr)
         {
-            if (identifier == null)
-                identifier = ctr.Identifier;
-
-            if (m_uiConnectors.TryGetValue(identifier, out UIConnector uiConnector))
+            if (m_uiConnectors.TryGetValue(ctr, out UIConnector uiConnector))
             {
-                ConnectorGeometry geo = Node.Conns.GetConnector(identifier).Geo;
+                ConnectorGeometry geo = ctr.Geo;
                 uiConnector.DataContext = geo;
             }
         }
