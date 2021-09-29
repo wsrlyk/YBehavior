@@ -363,7 +363,7 @@ namespace YBehavior.Editor.Core.New
                 }
             }
 
-            foreach (Connector ctr in Owner.Conns.ConnectorsList)
+            foreach (Connector ctr in Owner.Conns.MainConnectors)
             {
                 while (ctr.Conns.Count > 0)
                 {

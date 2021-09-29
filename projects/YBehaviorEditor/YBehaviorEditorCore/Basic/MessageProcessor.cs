@@ -650,7 +650,7 @@ namespace YBehavior.Editor.Core.New
                 }
                 else
                 {
-                    Utility.OperateNode((workBench as TreeBench).Tree.Root, true, action);
+                    Utility.OperateNode((workBench as TreeBench).Tree.Root, action);
                 }
             }
 

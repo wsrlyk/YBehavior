@@ -242,7 +242,7 @@ namespace YBehavior.Editor.Core.New
             {
                 Connection.FromTo fromto = new Connection.FromTo
                 {
-                    From = EntryState.Conns.GetConnector(Connector.IdentifierChildren),
+                    From = EntryState.Conns.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN),
                     To = m_Default.Conns.ParentConnector
                 };
 
@@ -283,7 +283,7 @@ namespace YBehavior.Editor.Core.New
                 Connector parent;
                 Connector child;
 
-                FSMConnection conn = Connector.TryConnect(EntryState.Conns.GetConnector(Connector.IdentifierChildren), state.Conns.ParentConnector, out parent, out child) as FSMConnection;
+                FSMConnection conn = Connector.TryConnect(EntryState.Conns.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN), state.Conns.ParentConnector, out parent, out child) as FSMConnection;
                 if (conn != null)
                 {
                     Transition res = new Transition(new TransitionMapKey(EntryState, state));
@@ -318,7 +318,8 @@ namespace YBehavior.Editor.Core.New
             if (target != null)
                 return;
             FSMStateNode state = FSMNodeMgr.Instance.CreateStateByName(name);
-            Utility.OperateNode(state, Graph, false, NodeBase.OnAddToGraph);
+            NodeBase.OnAddToGraph(state, Graph);
+            //Utility.OperateNode(state, Graph, false, NodeBase.OnAddToGraph);
 
             AddState(state);
         }
@@ -458,7 +459,7 @@ namespace YBehavior.Editor.Core.New
                 return;
             Connection.FromTo fromto = new Connection.FromTo
             {
-                From = fromState.Conns.GetConnector(Connector.IdentifierChildren),
+                From = fromState.Conns.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN),
                 To = toState.Conns.ParentConnector
             };
 
@@ -516,7 +517,7 @@ namespace YBehavior.Editor.Core.New
         {
             Connector parent;
             Connector child;
-            FSMConnection conn = Connector.TryConnect(fromState.Conns.GetConnector(Connector.IdentifierChildren), toState.Conns.ParentConnector, out parent, out child) as FSMConnection;
+            FSMConnection conn = Connector.TryConnect(fromState.Conns.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN), toState.Conns.ParentConnector, out parent, out child) as FSMConnection;
             if (conn != null)
                 conn.Trans.Add(t);
         }

@@ -21,7 +21,7 @@ namespace YBehavior.Editor.Core.New
 
         public override void InitEmpty()
         {
-            Utility.OperateNode(m_FSM.RootMachine, m_Graph, false, NodeBase.OnAddToGraph);
+            NodeBase.OnAddToGraph(m_FSM.RootMachine, m_Graph);
             m_FSM.RefreshNodeUID(0);
             AddRenderers(m_FSM.RootMachine, true);
         }
@@ -70,7 +70,8 @@ namespace YBehavior.Editor.Core.New
 
         protected bool _LoadMachine(FSMMachineNode machine, XmlNode data)
         {
-            Utility.OperateNode(machine, m_Graph, false, NodeBase.OnAddToGraph);
+            NodeBase.OnAddToGraph(machine, m_Graph);
+            //Utility.OperateNode(machine, m_Graph, false, NodeBase.OnAddToGraph);
 
             if (!machine.PreLoad())
                 return false;
@@ -144,7 +145,8 @@ namespace YBehavior.Editor.Core.New
 
             if (bNewState)
             {
-                Utility.OperateNode(stateNode, m_Graph, false, NodeBase.OnAddToGraph);
+                NodeBase.OnAddToGraph(stateNode, m_Graph);
+                //Utility.OperateNode(stateNode, m_Graph, false, NodeBase.OnAddToGraph);
 
                 if (!machine.AddState(stateNode))
                 {
@@ -442,7 +444,7 @@ namespace YBehavior.Editor.Core.New
             {
                 _AddStateRenderer(state);
 
-                foreach (Connector ctr in state.Conns.ConnectorsList)
+                foreach (Connector ctr in state.Conns.MainConnectors)
                 {
                     foreach (Connection conn in ctr.Conns)
                     {
@@ -459,7 +461,7 @@ namespace YBehavior.Editor.Core.New
 
         public override void RemoveRenderers(NodeBase node, bool excludeRoot = false)
         {
-            foreach (Connector ctr in node.Conns.ConnectorsList)
+            foreach (Connector ctr in node.Conns.MainConnectors)
             {
                 foreach (Connection conn in ctr.Conns)
                 {
@@ -625,7 +627,7 @@ namespace YBehavior.Editor.Core.New
         {
             FSMStateNode state = node as FSMStateNode;
 
-            Utility.OperateNode(node, m_Graph, true, NodeBase.OnAddToGraph);
+            Utility.OperateNode(node, m_Graph, NodeBase.OnAddToGraph);
 
             if (!CurMachine.AddState(state))
                 return;

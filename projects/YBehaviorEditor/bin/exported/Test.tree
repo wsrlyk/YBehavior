@@ -9,6 +9,7 @@
     </Node>
   </Node>
   <DataConnections>
-    <DataConnection FromUID="3" FromName="Opl" ToUID="4" ToName="Opr1"/>
+    <DataConnection FromUID="3" FromName="Opl" ToUID="4" ToName="Opr2" />
+    <DataConnection FromUID="3" FromName="Opl" ToUID="4" ToName="Opr1" />
   </DataConnections>
 </Test>

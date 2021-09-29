@@ -283,9 +283,9 @@ namespace YBehavior.Editor.Core.New
 
         public virtual bool CheckValid() { return true; }
 
-        public static void OnAddToGraph(NodeBase node, object graph)
+        public static void OnAddToGraph(NodeBase node, Graph graph)
         {
-            node.Graph = graph as Graph;
+            node.Graph = graph;
             node.OnAddToGraph();
         }
     }

@@ -142,7 +142,7 @@ namespace YBehavior.Editor.Core.New
                 m_Variables = new NodeMemory(m_Wrapper as TreeNodeWrapper);
                 m_NodeMemory = m_Variables as NodeMemory;
             }
-            m_ConditonConnector = Conns.Add(Connector.IdentifierCondition, false, Connector.PosType.CONDITION);
+            m_ConditonConnector = Conns.Add(Connector.IdentifierCondition, false, Connector.PosType.CHILDREN);
 
             _OnCreateBase();
         }
@@ -466,9 +466,9 @@ namespace YBehavior.Editor.Core.New
                 m_SelfDisabled = newValue;
                 PropertyChange(RenderProperty.Disabled);
                 if (value)
-                    Utility.OperateNode(this, true, _IncreaseDisable);
+                    Utility.OperateNode(this, _IncreaseDisable);
                 else
-                    Utility.OperateNode(this, true, _DecreaseDisable);
+                    Utility.OperateNode(this, _DecreaseDisable);
 
                 if (Graph != null)
                     Graph.RefreshNodeUID(0);
@@ -499,7 +499,7 @@ namespace YBehavior.Editor.Core.New
             base.OnConnectFromChanged();
             TreeNode parent = Parent;
             if ((parent == null && m_DisableCount - m_SelfDisabled > 0) || (parent != null && parent.Disabled))
-                Utility.OperateNode(this, true, _SetDisableBasedOnParent);
+                Utility.OperateNode(this, _SetDisableBasedOnParent);
 
         }
         static void _SetDisableBasedOnParent(NodeBase node)

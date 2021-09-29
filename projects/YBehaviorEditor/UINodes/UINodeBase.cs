@@ -97,17 +97,10 @@ namespace YBehavior.Editor
 
         private void _BuildConnectionBinding()
         {
-            foreach (Connector ctr in Node.Conns.ConnectorsList)
+            foreach (Connector ctr in Node.Conns.AllConnectors)
             {
                 _BuildConnectionBinding(ctr);
             }
-            foreach (Connector ctr in Node.Conns.InputConnectors)
-            {
-                _BuildConnectionBinding(ctr);
-            }
-
-            if (Node.Conns.ParentConnector != null)
-                _BuildConnectionBinding(Node.Conns.ParentConnector);
         }
 
         private void _BuildConnectionBinding(Connector ctr)

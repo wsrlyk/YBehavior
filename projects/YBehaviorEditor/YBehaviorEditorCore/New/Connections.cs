@@ -108,9 +108,9 @@ namespace YBehavior.Editor.Core.New
         {
             PARENT,
             CHILDREN,
-            CONDITION,
             INPUT,
             OUTPUT,
+            MAX,
         }
         public static readonly string IdentifierChildren = "children";
         public static readonly string IdentifierParent = "parent";
@@ -175,6 +175,10 @@ namespace YBehavior.Editor.Core.New
             if (type == PosType.INPUT || type == PosType.OUTPUT)
             {
                 IsVertical = false;
+            }
+            else
+            {
+                IsVertical = true;
             }
         }
 
@@ -345,14 +349,32 @@ namespace YBehavior.Editor.Core.New
     public class Connections : System.Collections.IEnumerable
     {
         NodeBase m_Owner;
-        List<Connector> m_Connectors = new List<Connector>();
-        public System.Collections.IEnumerable ConnectorsList { get { return m_Connectors; } }
+        List<Connector>[] m_ConnectorsList = new List<Connector>[]
+        {
+            new List<Connector>(),
+            new List<Connector>(),
+            new List<Connector>(),
+            new List<Connector>(),
+            new List<Connector>()
+        };
+        /// <summary>
+        /// For searching
+        /// </summary>
+        public System.Collections.IEnumerable AllConnectors => m_AllConnectorsList;
+        List<Connector> m_AllConnectorsList = new List<Connector>();
+        /// <summary>
+        /// For managing the connections starting from Owner
+        /// </summary>
+        public System.Collections.IEnumerable MainConnectors => m_MainConnectorsList;
+        List<Connector> m_MainConnectorsList = new List<Connector>();
+        public System.Collections.IEnumerable ChildrenConnectorsList => m_ChildrenConnectorsList;
+        List<Connector> m_ChildrenConnectorsList = new List<Connector>();
 
-        Connector m_ParentConnector;
-        public Connector ParentConnector { get { return m_ParentConnector; } }
-
+        public Connector ParentConnector { get; private set; }
+        public System.Collections.IEnumerable InputConnectors => m_InputConnectors;
         List<Connector> m_InputConnectors = new List<Connector>();
-        public System.Collections.IEnumerable InputConnectors { get { return m_InputConnectors; } }
+        public System.Collections.IEnumerable OutputConnectors => m_OutputConnectors;
+        List<Connector> m_OutputConnectors = new List<Connector>();
 
 
         List<NodeBase> m_Nodes = new List<NodeBase>();
@@ -372,45 +394,39 @@ namespace YBehavior.Editor.Core.New
         public Connector Add(string identifier, bool isMultiple, Connector.PosType type)
         {
             Connector res;
+            foreach (Connector c in AllConnectors)
+            {
+                if (c.Identifier == identifier && c.GetPosType == type)
+                    return null;
+            }
+            if (isMultiple)
+                res = new ConnectorMultiple(m_Owner, identifier, type);
+            else
+                res = new ConnectorSingle(m_Owner, identifier, type);
             if (type == Connector.PosType.PARENT)
             {
-                if (m_ParentConnector == null)
+                if (ParentConnector == null)
                 {
-                    if (isMultiple)
-                        res = new ConnectorMultiple(m_Owner, identifier, type);
-                    else
-                        res = new ConnectorSingle(m_Owner, identifier, type);
-                    m_ParentConnector = res;
+                    ParentConnector = res;
                 }
                 else
                     return null;
             }
             else if (type == Connector.PosType.INPUT)
             {
-                foreach (var c in m_InputConnectors)
-                {
-                    if (c.Identifier == identifier)
-                        return null;
-                }
-                if (isMultiple)
-                    res = new ConnectorMultiple(m_Owner, identifier, type);
-                else
-                    res = new ConnectorSingle(m_Owner, identifier, type);
                 m_InputConnectors.Add(res);
+            }
+            else if (type == Connector.PosType.OUTPUT)
+            {
+                m_OutputConnectors.Add(res);
+                m_MainConnectorsList.Add(res);
             }
             else
             {
-                foreach (var c in m_Connectors)
-                {
-                    if (c.Identifier == identifier && c.GetPosType == type)
-                        return null;
-                }
-                if (isMultiple)
-                    res = new ConnectorMultiple(m_Owner, identifier, type);
-                else
-                    res = new ConnectorSingle(m_Owner, identifier, type);
-                m_Connectors.Add(res);
+                m_ChildrenConnectorsList.Add(res);
+                m_MainConnectorsList.Add(res);
             }
+            m_AllConnectorsList.Add(res);
             return res;
         }
 
@@ -420,9 +436,9 @@ namespace YBehavior.Editor.Core.New
             {
                 m_bDirty = false;
                 m_Nodes.Clear();
-                foreach (var ctrs in m_Connectors)
+                foreach (var ctrs in m_ChildrenConnectorsList)
                 {
-                    foreach (var conn in ctrs.Conns)
+                    foreach (Connection conn in ctrs.Conns)
                     {
                         m_Nodes.Add(conn.Ctr.To.Owner);
                     }
@@ -435,19 +451,11 @@ namespace YBehavior.Editor.Core.New
             return m_Nodes.GetEnumerator();
         }
 
-        public Connector GetConnector(string identifier)
+        public Connector GetConnector(string identifier, Connector.PosType posType)
         {
-            if (identifier == Connector.IdentifierParent)
+            foreach (var conn in m_AllConnectorsList)
             {
-                if (m_ParentConnector != null)
-                    return m_ParentConnector;
-                else
-                    return null;
-            }
-
-            foreach (var conn in m_Connectors)
-            {
-                if (conn.Identifier == identifier)
+                if (conn.GetPosType == posType && conn.Identifier == identifier)
                     return conn;
             }
 
@@ -456,27 +464,15 @@ namespace YBehavior.Editor.Core.New
 
         public Connection Connect(NodeBase target, string identifier)
         {
-            if (identifier == null)
-                identifier = Connector.IdentifierChildren;
-            Connector conn = GetConnector(identifier);
+            Connector conn = GetConnector(identifier, Connector.PosType.CHILDREN);
             if (conn == null)
                 return null;
             return conn.Connect(target.Conns.ParentConnector);
         }
 
-        public Connection Connect(Connector target, string identifier)
-        {
-            if (identifier == null)
-                identifier = Connector.IdentifierChildren;
-            Connector conn = GetConnector(identifier);
-            if (conn == null)
-                return null;
-            return conn.Connect(target);
-        }
-
         public void Sort(Comparison<Connection> comparer)
         {
-            foreach (var c in m_Connectors)
+            foreach (var c in m_ChildrenConnectorsList)
             {
                 c.Conns.Sort(comparer);
             }

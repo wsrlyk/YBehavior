@@ -97,7 +97,7 @@ namespace YBehavior.Editor
                 m_uiConnectors.Add(Node.Conns.ParentConnector, uiConnector);
             }
 
-            foreach (Connector ctr in Node.Conns.ConnectorsList)
+            foreach (Connector ctr in Node.Conns.MainConnectors)
             {
                 //if (ctr is ConnectorNone)
                 //    continue;

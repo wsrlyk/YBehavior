@@ -8,4 +8,8 @@
       <Node Class="Calculator" Pos="50,270" Operator="_EC +" Opl="_IP a" Opr1="_IP a" Opr2="_IC 1" />
     </Node>
   </Node>
+  <DataConnections>
+    <DataConnection FromUID="3" FromName="Opl" ToUID="4" ToName="Opr2" />
+    <DataConnection FromUID="3" FromName="Opl" ToUID="4" ToName="Opr1" />
+  </DataConnections>
 </Test>

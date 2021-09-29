@@ -63,7 +63,7 @@ namespace YBehavior.Editor.Core.New
 
             if (bIncludeChildren)
             {
-                foreach (Connector ctr in template.Conns.ConnectorsList)
+                foreach (Connector ctr in template.Conns.MainConnectors)
                 {
                     foreach (Connection conn in ctr.Conns)
                     {
@@ -88,43 +88,52 @@ namespace YBehavior.Editor.Core.New
         //        }
         //    }
         //}
-
-        public static void OperateNode(NodeBase node, bool bIncludeChildren, Action<NodeBase> action)
+        /// <summary>
+        /// If func return true, it means we find the target node and return
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="node"></param>
+        /// <param name="param"></param>
+        /// <param name="func"></param>
+        /// <returns></returns>
+        public static bool OperateNode<T>(NodeBase node, T param, Func<NodeBase, T, bool> func)
+        {
+            if (func(node, param))
+                return true;
+            foreach (NodeBase child in node.Conns)
+            {
+                if (OperateNode(child, param, func))
+                    return true;
+            }
+            return false;
+        }
+        public static void OperateNode(NodeBase node, Action<NodeBase> action)
         {
             action(node);
 
-            if (bIncludeChildren)
+            foreach (NodeBase child in node.Conns)
             {
-                foreach (NodeBase child in node.Conns)
-                {
-                    OperateNode(child, bIncludeChildren, action);
-                }
+                OperateNode(child, action);
             }
         }
 
-        public static void OperateNode(NodeBase node, object param, bool bIncludeChildren, Action<NodeBase, object> action)
+        public static void OperateNode<T>(NodeBase node, T param, Action<NodeBase, T> action)
         {
             action(node, param);
 
-            if (bIncludeChildren)
+            foreach (NodeBase child in node.Conns)
             {
-                foreach (NodeBase child in node.Conns)
-                {
-                    OperateNode(child, param, bIncludeChildren, action);
-                }
+                OperateNode(child, param, action);
             }
         }
 
-        public static void OperateNode(NodeBase node, object param0, object param1, bool bIncludeChildren, Action<NodeBase, object, object> action)
+        public static void OperateNode<T0, T1>(NodeBase node, T0 param0, T1 param1, Action<NodeBase, T0, T1> action)
         {
             action(node, param0, param1);
 
-            if (bIncludeChildren)
+            foreach (NodeBase child in node.Conns)
             {
-                foreach (NodeBase child in node.Conns)
-                {
-                    OperateNode(child, param0, param1, bIncludeChildren, action);
-                }
+                OperateNode(child, param0, param1, action);
             }
         }
 

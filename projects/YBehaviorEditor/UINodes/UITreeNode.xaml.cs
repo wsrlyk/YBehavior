@@ -125,7 +125,7 @@ namespace YBehavior.Editor
             bottomConnectors.Children.Clear();
             leftConnectors.Child = null;
 
-            foreach (Connector ctr in Node.Conns.ConnectorsList)
+            foreach (Connector ctr in Node.Conns.MainConnectors)
             {
                 //if (ctr is ConnectorNone)
                 //    continue;
@@ -147,7 +147,7 @@ namespace YBehavior.Editor
                         Title = ctr.Identifier,
                         Ctr = ctr
                     };
-                    if (ctr.GetPosType == Connector.PosType.CONDITION)
+                    if (ctr.Identifier == Connector.IdentifierCondition)
                     {
                         leftConnectors.Child = uiConnector;
                     }

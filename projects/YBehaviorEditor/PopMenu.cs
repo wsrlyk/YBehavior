@@ -129,7 +129,7 @@ namespace YBehavior.Editor
         {
             return new MenuItemViewModel(() =>
             {
-                WorkBenchMgr.Instance.ConnectNodes(from.Conns.GetConnector(Connector.IdentifierChildren), to.Conns.ParentConnector);
+                WorkBenchMgr.Instance.ConnectNodes(from.Conns.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN), to.Conns.ParentConnector);
             })
             { Text = to.ForceGetRenderer.UITitle };
         }

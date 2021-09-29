@@ -999,7 +999,7 @@ namespace YBehavior.Editor.Core.New
             if (m_Cases.vbType == Variable.VariableType.VBT_Const)
             {
                 string[] ss = m_Cases.Value.Split(Variable.ListSpliter);
-                if (ss.Length != this.m_Connections.GetConnector(Connector.IdentifierChildren).Conns.Count)
+                if (ss.Length != this.m_Connections.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN).Conns.Count)
                 {
                     if (Tree != null && !Tree.IsInState(Graph.FLAG_LOADING))
                         LogMgr.Instance.Error("Cases size not match in " + (this.Renderer == null ? this.NickName : this.Renderer.UITitle));
@@ -1012,7 +1012,7 @@ namespace YBehavior.Editor.Core.New
 
         protected void _RefreshChildrenNotes()
         {
-            var conns = m_Connections.GetConnector(Connector.IdentifierChildren).Conns;
+            var conns = m_Connections.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN).Conns;
             var values = _GetCasesValue();
             if (values != null)
             {
