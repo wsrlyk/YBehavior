@@ -125,66 +125,73 @@ namespace YBehavior.Editor
             bottomConnectors.Children.Clear();
             leftConnectors.Child = null;
 
-            foreach (Connector ctr in Node.Conns.MainConnectors)
+            foreach (Connector ctr in Node.Conns.AllConnectors)
             {
                 //if (ctr is ConnectorNone)
                 //    continue;
 
-                UIConnector uiConnector;
-                if (ctr.GetPosType == Connector.PosType.OUTPUT)
+                UIConnector uiConnector = null;
+                switch (ctr.GetPosType)
                 {
-                    uiConnector = new VariableUIConnector
-                    {
-                        Title = ctr.Identifier,
-                        Ctr = ctr
-                    };
-                    outputConnectors.Children.Add(uiConnector);
+                    case Connector.PosType.OUTPUT:
+                        {
+                            uiConnector = new VariableUIConnector
+                            {
+                                Title = ctr.Identifier,
+                                Ctr = ctr
+                            };
+                            outputConnectors.Children.Add(uiConnector);
+                        }
+                        break;
+                    case Connector.PosType.INPUT:
+                        {
+                            uiConnector = new VariableUIConnector
+                            {
+                                Title = ctr.Identifier,
+                                Ctr = ctr
+                            };
+                            inputConnectors.Children.Add(uiConnector);
+                        }
+                        break;
+                    case Connector.PosType.PARENT:
+                        {
+                            uiConnector = new TreeUIConnector
+                            {
+                                Title = Node.Icon,
+                                Ctr = Node.Conns.ParentConnector
+                            };
+                            (uiConnector as TreeUIConnector).title.FontSize = 14;
+                            topConnectors.Children.Add(uiConnector);
+                        }
+                        break;
+                    case Connector.PosType.CHILDREN:
+                        {
+                            uiConnector = new TreeUIConnector
+                            {
+                                Title = ctr.Identifier,
+                                Ctr = ctr
+                            };
+                            if (ctr.Identifier == Connector.IdentifierCondition)
+                            {
+                                leftConnectors.Child = uiConnector;
+                            }
+                            else
+                            {
+                                bottomConnectors.Children.Add(uiConnector);
+                            }
+                        }
+                        break;
                 }
-                else
+                if (uiConnector != null)
                 {
-                    uiConnector = new TreeUIConnector
+                    m_uiConnectors.Add(ctr, uiConnector);
+                    uiConnector.SetBinding(UIElement.VisibilityProperty, new Binding()
                     {
-                        Title = ctr.Identifier,
-                        Ctr = ctr
-                    };
-                    if (ctr.Identifier == Connector.IdentifierCondition)
-                    {
-                        leftConnectors.Child = uiConnector;
-                    }
-                    else
-                    {
-                        bottomConnectors.Children.Add(uiConnector);
-                    }
+                        Path = new PropertyPath("IsVisible"),
+                        Mode = BindingMode.OneWay,
+                        Converter = Application.Current.Resources["visibilityConvertor"] as System.Windows.Data.IValueConverter,
+                    });
                 }
-                m_uiConnectors.Add(ctr, uiConnector);
-            }
-
-            foreach (Connector ctr in Node.Conns.InputConnectors)
-            {
-                UIConnector uiConnector = new VariableUIConnector
-                {
-                    Title = ctr.Identifier,
-                    Ctr = ctr
-                };
-                //uiConnector.SetCanvas(m_Canvas);
-
-                inputConnectors.Children.Add(uiConnector);
-
-                m_uiConnectors.Add(ctr, uiConnector);
-            }
-
-            if (Node.Conns.ParentConnector != null)
-            {
-                TreeUIConnector uiConnector = new TreeUIConnector
-                {
-                    Title = Node.Icon,
-                    Ctr = Node.Conns.ParentConnector
-                };
-                //uiConnector.SetCanvas(m_Canvas);
-                uiConnector.title.FontSize = 14;
-                topConnectors.Children.Add(uiConnector);
-
-                m_uiConnectors.Add(Node.Conns.ParentConnector, uiConnector);
             }
         }
 

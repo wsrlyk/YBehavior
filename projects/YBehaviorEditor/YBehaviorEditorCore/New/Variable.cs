@@ -275,10 +275,11 @@ namespace YBehavior.Editor.Core.New
                 m_vbType = value;
                 RefreshCandidates();
 
-                SetValue(null, IsLocal);
+                SetValue(null, true);
 
                 OnPropertyChanged("vbType");
                 _OnConditionChanged();
+                _OnVTypeChanged();
 
                 WorkBenchMgr.Instance.PushCommand(command);
             }
@@ -531,6 +532,14 @@ namespace YBehavior.Editor.Core.New
         void _OnCTypeChanged()
         {
             (Container as ISameTypeGroupTypeChanged)?.OnCTypeChanged(this.Name);
+        }
+
+        void _OnVBTypeChanged()
+        {
+            if (Container != null)
+                Container.OnVariableVBTypeChanged(this);
+            else if (m_Parent != null && m_Parent.Container != null)
+                m_Parent.Container.OnVariableVBTypeChanged(m_Parent);
         }
         public bool LockVBType { get; set; } = false;
         public bool LockCType { get; set; } = false;

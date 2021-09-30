@@ -138,10 +138,36 @@ namespace YBehavior.Editor.Core.New
         protected NodeBase m_Owner;
         public NodeBase Owner { get { return m_Owner; } }
 
-        public ConnectorGeometry Geo { get { return m_Geo; } }
+        public ConnectorGeometry Geo => m_Geo;
         ConnectorGeometry m_Geo;
 
+        public ConnectorRenderer Renderer => m_Renderer;
+        ConnectorRenderer m_Renderer;
         public ConnectionCreateDelegate ConnectionCreator { get; set; }
+
+        protected bool m_bIsVisible = true;
+        public bool IsVisible
+        {
+            get { return m_bIsVisible; }
+            set
+            {
+                if (m_bIsVisible != value)
+                {
+                    ///> Disconnect first
+                    if (!value)
+                    {
+                        while (m_Conns.Count > 0)
+                        {
+                            Connection conn = m_Conns[m_Conns.Count - 1];
+                            TryDisconnect(conn.Ctr);
+                        }
+                    }
+                    m_bIsVisible = value;
+                    IsVisibleEvent?.Invoke();
+                }
+            }
+        }
+        public event Action IsVisibleEvent;
 
         int m_AtBottom = -1;  //> Connections on the top of the nodes = -1;
         public Connector(NodeBase node, string identifier, PosType type)
@@ -156,6 +182,8 @@ namespace YBehavior.Editor.Core.New
             {
                 Owner = this,
             };
+
+            m_Renderer = new ConnectorRenderer(this);
 
             if (type == PosType.PARENT || type == PosType.INPUT)
             {
@@ -232,6 +260,9 @@ namespace YBehavior.Editor.Core.New
         public Connection Connect(Connector target)
         {
             if (target == null)
+                return null;
+
+            if (!this.IsVisible || !target.IsVisible)
                 return null;
 
             if (!_CanAdd())
@@ -367,7 +398,7 @@ namespace YBehavior.Editor.Core.New
         /// </summary>
         public System.Collections.IEnumerable MainConnectors => m_MainConnectorsList;
         List<Connector> m_MainConnectorsList = new List<Connector>();
-        public System.Collections.IEnumerable ChildrenConnectorsList => m_ChildrenConnectorsList;
+        public System.Collections.IEnumerable ChildrenConnectors => m_ChildrenConnectorsList;
         List<Connector> m_ChildrenConnectorsList = new List<Connector>();
 
         public Connector ParentConnector { get; private set; }

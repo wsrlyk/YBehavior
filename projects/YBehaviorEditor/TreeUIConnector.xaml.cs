@@ -41,31 +41,6 @@ namespace YBehavior.Editor
             m_Operation.RegisterLeftDrag(_OnDragged, _OnStartDragged, _OnFinishDragged);
         }
 
-        void _OnLayoutUpdated(object sender, EventArgs e)
-        {
-            _UpdateHotspot();
-        }
-
-        private void _UpdateHotspot()
-        {
-            if (OwnerNode != null)
-            {
-                if (m_RelativePos.X == double.MaxValue && m_RelativePos.Y == double.MaxValue)
-                {
-                    m_RelativePos = TransformToAncestor(OwnerNode).Transform(new Point(ActualWidth / 2, ActualHeight / 2)) - new Point();
-                }
-
-                if (OwnerNode.DataContext is NodeBaseRenderer)
-                {
-                    Point pos = (OwnerNode.DataContext as NodeBaseRenderer).Owner.Geo.Pos + m_RelativePos;
-                    //Hotspot = pos;
-                    (this.DataContext as ConnectorGeometry).Pos = pos;
-                }
-            }
-
-            //Hotspot = GetPos(Ancestor);
-        }
-
         public string Title
         {
             get { return title.Text; }

@@ -102,7 +102,7 @@ namespace YBehavior.Editor
                 ////    //Hotspot = pos;
                 ////    (this.DataContext as ConnectorGeometry).Pos = pos;
                 ////}
-                (this.DataContext as ConnectorGeometry).Pos = TransformToAncestor(OwnerNode.Canvas).Transform(new Point(ActualWidth / 2, ActualHeight / 2));
+                (this.DataContext as ConnectorRenderer).Owner.Geo.Pos = TransformToAncestor(OwnerNode.Canvas).Transform(new Point(ActualWidth / 2, ActualHeight / 2));
             }
 
             //Hotspot = GetPos(Ancestor);

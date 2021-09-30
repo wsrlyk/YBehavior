@@ -306,6 +306,7 @@ namespace YBehavior.Editor.Core.New
         }
         protected override void _OnLoaded()
         {
+            base._OnLoaded();
             m_LoadedTree = m_Tree.Value;
         }
 
@@ -436,7 +437,7 @@ namespace YBehavior.Editor.Core.New
 
             Variable opl = NodeMemory.CreateVariable(
                 "Opl",
-                "0",
+                "",
                 Variable.CreateParams_CalculatorTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,

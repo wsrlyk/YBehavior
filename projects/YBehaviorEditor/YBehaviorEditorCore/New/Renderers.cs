@@ -355,22 +355,22 @@ namespace YBehavior.Editor.Core.New
                 return;
 
             ///> Disconnect all the connection
-            if (Owner.Conns.ParentConnector != null)
-            {
-                while(Owner.Conns.ParentConnector.Conns.Count > 0)
-                {
-                    WorkBenchMgr.Instance.DisconnectNodes(Owner.Conns.ParentConnector.Conns[0].Ctr);
-                }
-            }
+            //if (Owner.Conns.ParentConnector != null)
+            //{
+            //    while(Owner.Conns.ParentConnector.Conns.Count > 0)
+            //    {
+            //        WorkBenchMgr.Instance.DisconnectNodes(Owner.Conns.ParentConnector.Conns[0].Ctr);
+            //    }
+            //}
 
-            foreach (Connector ctr in Owner.Conns.MainConnectors)
+            foreach (Connector ctr in Owner.Conns.AllConnectors)
             {
                 while (ctr.Conns.Count > 0)
                 {
                     Connection conn = ctr.Conns[ctr.Conns.Count - 1];
                     WorkBenchMgr.Instance.DisconnectNodes(conn.Ctr);
 
-                    if (param != 0)
+                    if (ctr.GetPosType == Connector.PosType.CHILDREN && param != 0)
                         conn.Ctr.To.Owner.Renderer.Delete(param);
                 }
             }
@@ -474,5 +474,36 @@ namespace YBehavior.Editor.Core.New
                 OnPropertyChanged("EnableCondition");
             }
         }
+    }
+
+    public class ConnectorRenderer : System.ComponentModel.INotifyPropertyChanged
+    {
+        public Connector Owner { get; private set; }
+
+        public string Identifier { get { return Owner.Identifier; } }
+
+        public bool IsVisible => Owner.IsVisible;
+
+        public ConnectorRenderer(Connector owner)
+        {
+            Owner = owner;
+            Owner.IsVisibleEvent += Owner_IsVisibleEvent;
+        }
+
+        private void Owner_IsVisibleEvent()
+        {
+            OnPropertyChanged("IsVisible");
+        }
+
+        #region PropertyChanged
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        internal protected void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
     }
 }

@@ -107,8 +107,7 @@ namespace YBehavior.Editor
         {
             if (m_uiConnectors.TryGetValue(ctr, out UIConnector uiConnector))
             {
-                ConnectorGeometry geo = ctr.Geo;
-                uiConnector.DataContext = geo;
+                uiConnector.DataContext = ctr.Renderer;
             }
         }
 

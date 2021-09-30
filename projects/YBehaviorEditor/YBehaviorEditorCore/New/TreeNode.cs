@@ -17,6 +17,10 @@ namespace YBehavior.Editor.Core.New
         {
             (Node as TreeNode).OnVariableValueChanged(v);
         }
+        public void OnVariableVBTypeChanged(Variable v)
+        {
+            (Node as TreeNode).OnVariableVBTypeChanged(v);
+        }
     }
 
     public enum TreeNodeType
@@ -47,7 +51,6 @@ namespace YBehavior.Editor.Core.New
                 node.CreateBase();
                 node.CreateVariables();
                 node.LoadDescription();
-                node.PostCreate();
                 m_NodeList.Add(node);
                 m_TypeDic.Add(node.Name, type);
                 Console.WriteLine(type);
@@ -63,7 +66,6 @@ namespace YBehavior.Editor.Core.New
                 node.CreateBase();
                 node.CreateVariables();
                 node.LoadDescription();
-                node.PostCreate();
                 return node;
             }
 
@@ -197,10 +199,12 @@ namespace YBehavior.Editor.Core.New
             {
                 if (v.Variable.vbType == Variable.VariableType.VBT_Const && v.Variable.LockVBType)
                     continue;
-                Conns.Add(
+                var ctr = Conns.Add(
                     v.Variable.Name, 
                     !v.Variable.IsInput, 
                     v.Variable.IsInput ? Connector.PosType.INPUT : Connector.PosType.OUTPUT);
+                if (ctr != null)
+                    _SetConnectorVisibility(ctr, v.Variable);
             }
         }
         public void LoadDescription()
@@ -229,7 +233,7 @@ namespace YBehavior.Editor.Core.New
 
         protected virtual void _OnLoaded()
         {
-
+            PostCreate();
         }
 
         public void LoadChild(System.Xml.XmlNode data)
@@ -518,6 +522,11 @@ namespace YBehavior.Editor.Core.New
             Conns.Sort(Connections.SortByPosX);
         }
 
+        public void OnVariableVBTypeChanged(Variable v)
+        {
+            _RefreshConnectorVisibility(v);
+        }
+
         public void OnVariableValueChanged(Variable v)
         {
             if (TypeMap.TryGet(v, out TypeMap.Item item))
@@ -531,7 +540,11 @@ namespace YBehavior.Editor.Core.New
                         des.vType = item.DesVType;
                 }
             }
+
             _OnVariableValueChanged(v);
+
+            _RefreshConnectorVisibility(v);
+
             PropertyChange(RenderProperty.Note);
         }
         protected virtual void _OnVariableValueChanged(Variable v)
@@ -539,6 +552,28 @@ namespace YBehavior.Editor.Core.New
 
         }
 
+        void _RefreshConnectorVisibility(Variable v)
+        {
+            if (v.LockVBType && v.vbType == Variable.VariableType.VBT_Const)
+                return;
+            Connector ctr = null;
+            if (v.IsInput)
+                ctr = this.Conns.GetConnector(v.Name, Connector.PosType.INPUT);
+            else
+                ctr = this.Conns.GetConnector(v.Name, Connector.PosType.OUTPUT);
+
+            if (ctr == null)
+            {
+                LogMgr.Instance.Error("Something wrong, cant find the ctr of variable " + v.Name);
+                return;
+            }
+            _SetConnectorVisibility(ctr, v);
+        }
+        void _SetConnectorVisibility(Connector ctr, Variable v)
+        {
+            ctr.IsVisible = (v.vbType == Variable.VariableType.VBT_Pointer && string.IsNullOrEmpty(v.Value));
+
+        }
         #region CONDITION
         Connector m_ConditonConnector;
         bool m_bEnableConditionConnection = false;

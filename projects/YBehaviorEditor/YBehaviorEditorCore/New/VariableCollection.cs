@@ -61,6 +61,7 @@ namespace YBehavior.Editor.Core.New
     public interface IVariableCollectionOwner : IVariableDataSource
     {
         void OnVariableValueChanged(Variable v);
+        void OnVariableVBTypeChanged(Variable v);
     }
 
     public class VariableCollection: IVariableCollection
@@ -176,6 +177,12 @@ namespace YBehavior.Editor.Core.New
         {
             if (m_Owner != null)
                 m_Owner.OnVariableValueChanged(v);
+        }
+
+        public void OnVariableVBTypeChanged(Variable v)
+        {
+            if (m_Owner != null)
+                m_Owner.OnVariableVBTypeChanged(v);
         }
 
         public void CloneFrom(VariableCollection other)
