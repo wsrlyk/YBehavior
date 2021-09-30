@@ -472,7 +472,7 @@ namespace YBehavior.Editor.Core.New
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} << {1} {2} {3}",
+                sb.AppendFormat("{1} {2} {3} >> {0}",
                     Variables.GetVariable("Opl").NoteValue,
                     Variables.GetVariable("Opr1").NoteValue,
                     Variables.GetVariable("Operator").NoteValue,
@@ -542,7 +542,7 @@ namespace YBehavior.Editor.Core.New
 
             Variable opl = NodeMemory.CreateVariable(
                 "Opl",
-                "0",
+                "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
@@ -552,7 +552,7 @@ namespace YBehavior.Editor.Core.New
 
             Variable opr = NodeMemory.CreateVariable(
                 "Opr",
-                "0",
+                "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
@@ -590,7 +590,7 @@ namespace YBehavior.Editor.Core.New
         {
             Variable opl = NodeMemory.CreateVariable(
                 "Target",
-                "0",
+                "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_NONE,
                 Variable.VariableType.VBT_Pointer,
@@ -601,7 +601,7 @@ namespace YBehavior.Editor.Core.New
 
             Variable opr = NodeMemory.CreateVariable(
                 "Source",
-                "0",
+                "",
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_NONE,
                 Variable.VariableType.VBT_NONE,
@@ -654,7 +654,7 @@ namespace YBehavior.Editor.Core.New
         {
             Variable opl = NodeMemory.CreateVariable(
                 "Target",
-                "0",
+                "",
                 Variable.CreateParams_RandomTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
@@ -665,7 +665,7 @@ namespace YBehavior.Editor.Core.New
 
             Variable opr1 = NodeMemory.CreateVariable(
                 "Bound1",
-                "0",
+                "",
                 Variable.CreateParams_RandomTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
@@ -675,7 +675,7 @@ namespace YBehavior.Editor.Core.New
 
             Variable opr2 = NodeMemory.CreateVariable(
                 "Bound2",
-                "0",
+                "",
                 Variable.CreateParams_RandomTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
@@ -934,7 +934,7 @@ namespace YBehavior.Editor.Core.New
         {
             NodeMemory.CreateVariable(
                 "Switch",
-                "0",
+                "",
                 Variable.CreateParams_SwitchTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
@@ -1440,7 +1440,7 @@ namespace YBehavior.Editor.Core.New
 
             Variable length = NodeMemory.CreateVariable(
                 "Length",
-                "0",
+                "",
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,

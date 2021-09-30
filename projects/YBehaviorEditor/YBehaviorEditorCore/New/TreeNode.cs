@@ -119,6 +119,8 @@ namespace YBehavior.Editor.Core.New
             }
             other.TypeMap.CloneFrom(TypeMap);
 
+            other.CreateVariableConnectors();
+
             other._OnCloned();
             return other;
         }

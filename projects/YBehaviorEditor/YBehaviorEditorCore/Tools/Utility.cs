@@ -57,25 +57,63 @@ namespace YBehavior.Editor.Core.New
             }
             return hash;
         }
+
+        static List<NodeBase> toCloneList = new List<NodeBase>();
         public static NodeBase CloneNode(NodeBase template, bool bIncludeChildren)
         {
-            NodeBase node = template.Clone();
-
+            toCloneList.Clear();
             if (bIncludeChildren)
+                OperateNode(template, (NodeBase node) =>
+                {
+                    toCloneList.Add(node);
+                });
+            else
+                toCloneList.Add(template);
+
+            CloneNode(toCloneList);
+            old2new.TryGetValue(template, out var clonedRoot);
+            return clonedRoot;
+        }
+
+        static Dictionary<NodeBase, NodeBase> old2new = new Dictionary<NodeBase, NodeBase>();
+        public static void CloneNode(List<NodeBase> nodeList)
+        {
+            old2new.Clear();
+            foreach (var template in nodeList)
             {
+                NodeBase node = template.Clone();
+                old2new.Add(template, node);
+            }
+
+            foreach (var template in nodeList)
+            {
+                old2new.TryGetValue(template, out NodeBase fromNode);
+
                 foreach (Connector ctr in template.Conns.MainConnectors)
                 {
                     foreach (Connection conn in ctr.Conns)
                     {
-                        NodeBase child = CloneNode(conn.Ctr.To.Owner, true);
-                        node.Conns.Connect(child, conn.Ctr.From.Identifier);
+                        NodeBase toTemplate = conn.Ctr.To.Owner;
+                        if (old2new.TryGetValue(toTemplate, out NodeBase toNode))
+                        {
+                            if (ctr.GetPosType == Connector.PosType.CHILDREN)
+                            {
+                                fromNode.Conns.Connect(toNode, conn.Ctr.From.Identifier);
+                            }
+                            else
+                            {
+                                Connector fromCtr = fromNode.Conns.GetConnector(conn.Ctr.From.Identifier, conn.Ctr.From.GetPosType);
+                                Connector toCtr = toNode.Conns.GetConnector(conn.Ctr.To.Identifier, conn.Ctr.To.GetPosType);
+                                if (fromCtr != null && toCtr != null)
+                                {
+                                    fromCtr.Connect(toCtr);
+                                }
+                            }
+                        }
                     }
                 }
             }
-
-            return node;
         }
-
         //public static void InitNode(Node node, bool bIncludeChildren)
         //{
         //    node.Init();

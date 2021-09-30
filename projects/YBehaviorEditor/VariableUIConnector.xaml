@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              MinWidth="20" MinHeight="10"
              AllowDrop="True">
-    <Border Name="main" MinWidth="20" MinHeight="10" HorizontalAlignment="Center" BorderBrush="#FFEEEEEE" BorderThickness="1" Background="#FFB2B6B6">
+    <Border Name="main" MinWidth="20" MinHeight="10" HorizontalAlignment="Center" BorderBrush="#33474747" BorderThickness="1" Background="#00000000">
         <TextBlock Name="title" Text="con" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>        
     </Border>
 </local:UIConnector>

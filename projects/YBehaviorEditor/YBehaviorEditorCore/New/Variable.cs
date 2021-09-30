@@ -391,6 +391,8 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
+                if (vbType == VariableType.VBT_Pointer && string.IsNullOrEmpty(Value))
+                    return Name;
                 if (IsElement)
                     return DisplayValue + '[' + m_VectorIndex.DisplayValue + ']';
                 return DisplayValue;
@@ -834,20 +836,20 @@ namespace YBehavior.Editor.Core.New
         public bool SetVariable(char valueType, char countType, char variableType, char enableType, string value, string param = null)
         {
             m_bInited = false;
-            vType = ValueTypeDic.GetKey(valueType, ValueType.VT_NONE);
+            m_vType = ValueTypeDic.GetKey(valueType, ValueType.VT_NONE);
             if (vType == ValueType.VT_NONE)
                 return false;
 
             if (!LockVBType)
             {
-                vbType = GetVariableType(variableType, VariableType.VBT_NONE);
+                m_vbType = GetVariableType(variableType, VariableType.VBT_NONE);
                 if (vbType == VariableType.VBT_NONE)
                     return false;
             }
 
             if (!LockCType)
             {
-                cType = GetCountType(valueType, countType);
+                m_cType = GetCountType(valueType, countType);
                 if (cType == CountType.CT_NONE)
                     return false;
             }
@@ -859,13 +861,13 @@ namespace YBehavior.Editor.Core.New
                     return false;
                 ///> Enable/Disable cant convert to Fixed
                 else if (eType == EnableType.ET_NONE || (e == EnableType.ET_Enable || e == EnableType.ET_Disable))
-                    eType = e;
+                    m_eType = e;
                 ///> Not a default value, Fixed convert to Enable
                 else if (m_Value != value)
-                    eType = EnableType.ET_Enable;
+                    m_eType = EnableType.ET_Enable;
             }
 
-            IsLocal = Char.IsLower(variableType);
+            m_bIsLocal = Char.IsLower(variableType);
 
             m_Value = value;
             _RefreshDisplayValue();
@@ -882,14 +884,14 @@ namespace YBehavior.Editor.Core.New
             if (newName != null)
                 m_Name = newName;
 
-            vType = vtype;
+            m_vType = vtype;
             if (vType == ValueType.VT_NONE)
                 return false;
 
-            cType = ctype;
+            m_cType = ctype;
             if (cType == CountType.CT_NONE)
             {
-                cType = CountType.CT_SINGLE;
+                m_cType = CountType.CT_SINGLE;
                 LockCType = false;
             }
             else
@@ -897,10 +899,10 @@ namespace YBehavior.Editor.Core.New
                 LockCType = true;
             }
 
-            vbType = vbtype;
+            m_vbType = vbtype;
             if (vbType == VariableType.VBT_NONE)
             {
-                vbType = VariableType.VBT_Const;
+                m_vbType = VariableType.VBT_Const;
                 LockVBType = false;
             }
             else
@@ -908,9 +910,9 @@ namespace YBehavior.Editor.Core.New
                 LockVBType = true;
             }
 
-            eType = etype;
+            m_eType = etype;
 
-            IsLocal = isLocal;
+            m_bIsLocal = isLocal;
 
             m_Value = value;
             _RefreshDisplayValue();

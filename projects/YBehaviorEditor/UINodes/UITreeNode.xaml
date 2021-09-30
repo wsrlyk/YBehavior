@@ -24,7 +24,7 @@
 
     </UserControl.Resources>
     <DockPanel>
-        <Border Name="leftConnectors" DockPanel.Dock="Left" Height="10" HorizontalAlignment="Left" Visibility="{Binding EnableCondition, Converter={StaticResource visibilityConvertor}}"/>
+        <Border Name="leftConnectors" DockPanel.Dock="Left" Height="15" HorizontalAlignment="Left" Visibility="{Binding EnableCondition, Converter={StaticResource visibilityConvertor}}"/>
         <Border Name="commentBorder" DockPanel.Dock="Right" Margin="10,5,0,10" BorderThickness="1" BorderBrush="#FFE8D3AF" Background="#FFF1E0C6"
                 Visibility="{Binding Path=Comment, Converter={StaticResource invertStringEmptyAndVisibilityConvertor}}">
             <TextBlock Text="{Binding Comment, Mode=OneWay}" FontSize="10"/>
@@ -46,8 +46,8 @@
                     <StackPanel Name="mainPanel" Margin="3">
                         <TextBlock Name="name" Text="{Binding UITitle}"/>
                         <TextBlock Name="note" Text="{Binding Note}"/>
-                        <DockPanel>
-                            <StackPanel DockPanel.Dock="Left" Name="inputConnectors" HorizontalAlignment="Left" Orientation="Vertical"/>
+                        <DockPanel Margin="0,5,0,0">
+                            <StackPanel Margin="0,0,8,0" DockPanel.Dock="Left" Name="inputConnectors" HorizontalAlignment="Left" Orientation="Vertical"/>
                             <StackPanel DockPanel.Dock="Right" Name="outputConnectors" HorizontalAlignment="Right" Orientation="Vertical"/>
                         </DockPanel>
                     </StackPanel>
