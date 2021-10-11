@@ -32,6 +32,25 @@ namespace YBehavior.Editor
 
     public partial class UIConnection : UIConnectionBase, ISelectable, IDeletable, IDraggingConnection
     {
+        public static readonly DependencyProperty StrokeProperty = DependencyProperty.RegisterAttached(
+            "StrokeProperty",
+            typeof(Brush),
+            typeof(UIConnection));
+
+        public Brush Stroke
+        {
+            get
+            {
+                return (Brush)GetValue(StrokeProperty);
+            }
+            set
+            {
+                SetValue(StrokeProperty, value);
+                normalStrokeBrush = value;
+                this.path.Stroke = value;
+            }
+        }
+
         static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
         //static SelectionStateChangeHandler defaultSelectHandler = new SelectionStateChangeHandler(SelectionMgr.Instance.OnSingleSelectedChange);
 

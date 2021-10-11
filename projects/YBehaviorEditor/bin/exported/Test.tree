@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Test>
   <Node Class="Root">
-    <Shared a="_IC 0" />
+    <Shared a="_IC 0" aa="IIC " />
     <Local />
     <Node Class="Sequence">
       <Node Class="Sequence">
-        <Node Class="Calculator" Operator="_EC +" Opl="_Ip " Opr1="_IP a" Opr2="_IC 1" />
-        <Node Class="Calculator" Operator="_EC +" Opl="_IP a" Opr1="_Ip " Opr2="_Ip " />
+        <Node Class="Calculator" Operator="_EC +" Opl="_Ip " Opr1="_IP a" Opr2="_Ic 0" />
+        <Node Class="Calculator" Operator="_EC +" Opl="_Ip " Opr1="_Ip " Opr2="_Ip " />
       </Node>
-      <Node Class="Calculator" Operator="_EC +" Opl="_IP a" Opr1="_Ip " Opr2="_IC 0" />
+      <Node Class="Calculator" Operator="_EC +" Opl="_IP aa VI P a" Opr1="_Ip " Opr2="_IC 0" />
     </Node>
   </Node>
   <DataConnections>
     <DataConnection FromUID="4" FromName="Opl" ToUID="5" ToName="Opr1" />
     <DataConnection FromUID="4" FromName="Opl" ToUID="5" ToName="Opr2" />
-    <DataConnection FromUID="4" FromName="Opl" ToUID="6" ToName="Opr1" />
+    <DataConnection FromUID="5" FromName="Opl" ToUID="6" ToName="Opr1" />
   </DataConnections>
 </Test>

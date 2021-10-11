@@ -30,7 +30,7 @@
             <TextBlock Text="{Binding Comment, Mode=OneWay}" FontSize="10"/>
         </Border>
         <StackPanel DockPanel.Dock="Top" Height="20"  Name="topConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
-        <StackPanel DockPanel.Dock="Bottom" Height="15" Name="bottomConnectors" Orientation="Horizontal" HorizontalAlignment="Center" />
+        <StackPanel DockPanel.Dock="Bottom" Height="15" Name="bottomConnectors" Orientation="Horizontal" HorizontalAlignment="Center"/>
         <Grid>
             <Border Margin="3,3,-3,-3" BorderThickness="0" Background="#BF323232" MinWidth="80" CornerRadius="3" />
             <Border Name="border" BorderThickness="2" BorderBrush="#FFC1C7CD" Background="#FFB4B7B9" MinWidth="80" CornerRadius="3"
@@ -46,7 +46,7 @@
                     <StackPanel Name="mainPanel" Margin="3">
                         <TextBlock Name="name" Text="{Binding UITitle}"/>
                         <TextBlock Name="note" Text="{Binding Note}"/>
-                        <DockPanel Margin="0,5,0,0">
+                        <DockPanel Margin="0,5,0,0" Background="#99616161">
                             <StackPanel Margin="0,0,8,0" DockPanel.Dock="Left" Name="inputConnectors" HorizontalAlignment="Left" Orientation="Vertical"/>
                             <StackPanel DockPanel.Dock="Right" Name="outputConnectors" HorizontalAlignment="Right" Orientation="Vertical"/>
                         </DockPanel>

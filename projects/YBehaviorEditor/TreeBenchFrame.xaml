@@ -9,11 +9,17 @@
              MouseWheel="_MouseWheel"
              Focusable="True">
     <UserControl.Resources>
-        <DataTemplate x:Key="Normal">
+        <DataTemplate x:Key="NormalTreeNode">
             <local:UINormalTreeNode/>
         </DataTemplate>
-        <DataTemplate x:Key="Root">
+        <DataTemplate x:Key="RootTreeNode">
             <local:UIRootTreeNode/>
+        </DataTemplate>
+        <DataTemplate x:Key="NormalConnection">
+            <local:UIConnection Stroke="#FFDADCE4"/>
+        </DataTemplate>
+        <DataTemplate x:Key="WeakConnection">
+            <local:UIConnection Stroke="#B2373738"/>
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
@@ -51,11 +57,16 @@
                             <Canvas />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
+                    <!--<ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <local:UIConnection/>
                         </DataTemplate>
-                    </ItemsControl.ItemTemplate>
+                    </ItemsControl.ItemTemplate>-->
+                    <ItemsControl.ItemTemplateSelector>
+                        <local:ConnectionTypeTemplateSelector
+                            NormalTemplate="{StaticResource NormalConnection}"
+                            WeakTemplate="{StaticResource WeakConnection}"/>
+                    </ItemsControl.ItemTemplateSelector>
                 </ItemsControl>
                 <ItemsControl Focusable="True" Name="nodeLayer">
                     <ItemsControl.ItemsPanel>
@@ -65,8 +76,8 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplateSelector>
                         <local:TreeNodeTypeTemplateSelector
-                            NormalTemplate="{StaticResource Normal}"
-                            RootTemplate="{StaticResource Root}"/>
+                            NormalTemplate="{StaticResource NormalTreeNode}"
+                            RootTemplate="{StaticResource RootTreeNode}"/>
                     </ItemsControl.ItemTemplateSelector>
                     <ItemsControl.ItemContainerStyle>
                         <Style>

@@ -20,6 +20,19 @@ namespace YBehavior.Editor
             return NormalTemplate;
         }
     }
+    public class ConnectionTypeTemplateSelector : DataTemplateSelector
+    {
+        public DataTemplate NormalTemplate { get; set; }
+        public DataTemplate WeakTemplate { get; set; }
+
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            Connection conn = (item as ConnectionRenderer).Owner;
+            if (conn.Ctr.From.GetPosType == Connector.PosType.OUTPUT)
+                return WeakTemplate;
+            return NormalTemplate;
+        }
+    }
 
     /// <summary>
     /// WorkBenchFrame.xaml 的交互逻辑
