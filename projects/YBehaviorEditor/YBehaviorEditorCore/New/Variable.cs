@@ -443,12 +443,16 @@ namespace YBehavior.Editor.Core.New
         public void SetValue(string value, bool isLocal)
         {
             {
-                if (value == null && vbType == VariableType.VBT_Const)
+                if (value == null)
                 {
-                    if (cType == CountType.CT_LIST)
-                        value = "";
-                    else
+                    if (vbType == VariableType.VBT_Const && cType != CountType.CT_LIST)
+                    {
                         DefaultValueDic.TryGetValue(vType, out value);
+                    }
+                    else
+                    {
+                        value = string.Empty;
+                    }
                 }
 
                 ChangeVariableValueCommand command = new ChangeVariableValueCommand()
@@ -492,7 +496,7 @@ namespace YBehavior.Editor.Core.New
                         {
                             m_VectorIndex = new Variable(SharedDataSource);
                             m_VectorIndex.m_Parent = this;
-                            m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, EnableType.ET_FIXED, true, "0");
+                            m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, EnableType.ET_FIXED, true, "0", null, this.Name + ".Index");
                             OnPropertyChanged("VectorIndex");
                         }
                         m_bVectorIndexEnabled = true;
@@ -551,6 +555,7 @@ namespace YBehavior.Editor.Core.New
         public bool CanSwitchList { get { return !LockCType; } }
         public bool CanSwitchEnable { get { return eType == EnableType.ET_Enable || eType == EnableType.ET_Disable; } }
         public virtual bool CanSwitchContainer { get { return false; } }
+        public bool ShouldHaveConnection { get { return vbType == VariableType.VBT_Pointer && string.IsNullOrEmpty(Value); } }
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
@@ -655,13 +660,10 @@ namespace YBehavior.Editor.Core.New
                 return true;
             if (vbType == VariableType.VBT_Pointer)
             {
-                //if (AlwaysConst)
-                //{
-                //    LogMgr.Instance.Log(string.Format("This variable cant be pointer: {0}.", Name));
-                //    return false;
-                //}
-                if (string.IsNullOrEmpty(Value))
-                    return false;
+                ///> If Value is null, it may have a connection to another variable
+                if (!this.IsIndex && string.IsNullOrEmpty(Value))
+                    return true;
+                
                 Variable other = SharedDataSource.SharedData.GetVariable(Value, IsLocal);
                 if (other == null)
                 {
@@ -669,39 +671,7 @@ namespace YBehavior.Editor.Core.New
                     return false;
                 }
 
-                if (other.vType != vType)
-                {
-                    LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", DisplayName, vType, other.DisplayName, other.vType));
-                    return false;
-                }
-
-                if (other.cType != cType)
-                {
-                    if (m_bVectorIndexEnabled)
-                    {
-                        if (m_VectorIndex == null)
-                        {
-                            LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", DisplayName, cType, other.DisplayName, other.cType));
-                            return false;
-                        }
-                        else if (!m_VectorIndex.CheckValid())
-                        {
-                            LogMgr.Instance.Log(string.Format("VectorIndex invalid: {0}.Index == {1}", DisplayName, m_VectorIndex.DisplayValue));
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", DisplayName, cType, other.DisplayName, other.cType));
-                        return false;
-                    }
-                }
-                else if (other.cType == CountType.CT_SINGLE && m_bVectorIndexEnabled)
-                {
-                    LogMgr.Instance.Log(string.Format("Single Variable with VectorIndex: {0} -> {1}", DisplayName, other.DisplayName));
-                    return false;
-                }
-                return true;
+                return CheckValid(this, other);
             }
 
             if (cType == CountType.CT_LIST)
@@ -720,6 +690,42 @@ namespace YBehavior.Editor.Core.New
             return CheckValidSingle(Value);
         }
 
+        public static bool CheckValid(Variable me, Variable other)
+        {
+            if (other.vType != me.vType)
+            {
+                LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", me.DisplayName, me.vType, other.DisplayName, other.vType));
+                return false;
+            }
+
+            if (other.cType != me.cType)
+            {
+                if (me.m_bVectorIndexEnabled)
+                {
+                    if (me.m_VectorIndex == null)
+                    {
+                        LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", me.DisplayName, me.cType, other.DisplayName, other.cType));
+                        return false;
+                    }
+                    else if (!me.m_VectorIndex.CheckValid())
+                    {
+                        LogMgr.Instance.Log(string.Format("VectorIndex invalid: {0}.Index == {1}", me.DisplayName, me.m_VectorIndex.DisplayValue));
+                        return false;
+                    }
+                }
+                else
+                {
+                    LogMgr.Instance.Log(string.Format("Types dont match: {0}.{1} != {2}.{3}", me.DisplayName, me.cType, other.DisplayName, other.cType));
+                    return false;
+                }
+            }
+            else if (other.cType == CountType.CT_SINGLE && me.m_bVectorIndexEnabled)
+            {
+                LogMgr.Instance.Log(string.Format("Single Variable with VectorIndex: {0} -> {1}", me.DisplayName, other.DisplayName));
+                return false;
+            }
+            return true;
+        }
         private bool CheckValidSingle(string v)
         {
             switch(vType)
@@ -830,7 +836,9 @@ namespace YBehavior.Editor.Core.New
                 GetVariableType(variableType[0],VariableType.VBT_NONE),
                 EnableType.ET_FIXED,
                 GetLocal(variableType[0]), 
-                value);
+                value,
+                null,
+                Name + ".Index");
             return true;
         }
         public bool SetVariable(char valueType, char countType, char variableType, char enableType, string value, string param = null)

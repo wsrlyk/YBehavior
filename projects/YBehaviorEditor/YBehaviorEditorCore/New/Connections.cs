@@ -153,15 +153,6 @@ namespace YBehavior.Editor.Core.New
             {
                 if (m_bIsVisible != value)
                 {
-                    ///> Disconnect first
-                    if (!value)
-                    {
-                        while (m_Conns.Count > 0)
-                        {
-                            Connection conn = m_Conns[m_Conns.Count - 1];
-                            TryDisconnect(conn.Ctr);
-                        }
-                    }
                     m_bIsVisible = value;
                     IsVisibleEvent?.Invoke();
                 }

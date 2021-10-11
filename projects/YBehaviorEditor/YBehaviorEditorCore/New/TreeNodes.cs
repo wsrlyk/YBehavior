@@ -471,13 +471,11 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{1} {2} {3} >> {0}",
+                return string.Format("{1} {2} {3} >> {0}",
                     Variables.GetVariable("Opl").NoteValue,
                     Variables.GetVariable("Opr1").NoteValue,
                     Variables.GetVariable("Operator").NoteValue,
                     Variables.GetVariable("Opr2").NoteValue);
-                return sb.ToString();
             }
         }
     }
@@ -565,13 +563,11 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} {1} {2} ?",
+                return string.Format("{0} {1} {2} ?",
                     Variables.GetVariable("Opl").NoteValue,
                     Variables.GetVariable("Operator").Value,
                     Variables.GetVariable("Opr").NoteValue
                     );
-                return sb.ToString();
             }
         }
     }
@@ -614,12 +610,10 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} << {1}",
+                return string.Format("{0} << {1}",
                     Variables.GetVariable("Target").NoteValue,
                     Variables.GetVariable("Source").NoteValue
                     );
-                return sb.ToString();
             }
         }
     }
@@ -688,12 +682,10 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} << [ {1} ~ {2} )",
+                return string.Format("{0} << [ {1} ~ {2} )",
                     Variables.GetVariable("Target").NoteValue,
                     Variables.GetVariable("Bound1").NoteValue,
                     Variables.GetVariable("Bound2").NoteValue);
-                return sb.ToString();
             }
         }
     }
@@ -736,11 +728,9 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{1} <~= {0}",
+                return string.Format("{1} <~= {0}",
                     Variables.GetVariable("Input").NoteValue,
                     Variables.GetVariable("Output").NoteValue);
-                return sb.ToString();
             }
         }
     }
@@ -822,15 +812,13 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0}\nInt: {1}\nFloat: {2}\nString: {3}\nUlong: {4}\nBool: {5}",
+                return string.Format("{0}\nInt: {1}\nFloat: {2}\nString: {3}\nUlong: {4}\nBool: {5}",
                     Variables.GetVariable("Event").NoteValue,
                     Variables.GetVariable("Int").NoteValue,
                     Variables.GetVariable("Float").NoteValue,
                     Variables.GetVariable("String").NoteValue,
                     Variables.GetVariable("Ulong").NoteValue,
                     Variables.GetVariable("Bool").NoteValue);
-                return sb.ToString();
             }
         }
     }
@@ -905,15 +893,13 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0}\nInt: {1}\nFloat: {2}\nString: {3}\nUlong: {4}\nBool: {5}",
+                return string.Format("{0}\nInt: {1}\nFloat: {2}\nString: {3}\nUlong: {4}\nBool: {5}",
                     Variables.GetVariable("Event").NoteValue,
                     Variables.GetVariable("Int").NoteValue,
                     Variables.GetVariable("Float").NoteValue,
                     Variables.GetVariable("String").NoteValue,
                     Variables.GetVariable("Ulong").NoteValue,
                     Variables.GetVariable("Bool").NoteValue);
-                return sb.ToString();
             }
         }
     }
@@ -964,11 +950,9 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} from {{ {1} }}",
+                return string.Format("{0} from {{ {1} }}",
                     Variables.GetVariable("Switch").NoteValue,
                     Variables.GetVariable("Cases").NoteValue);
-                return sb.ToString();
             }
         }
 
@@ -1113,11 +1097,9 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} << {{ {1} }}",
+                return string.Format("{0} << {{ {1} }}",
                     Variables.GetVariable("Current").NoteValue,
                     Variables.GetVariable("Collection").NoteValue);
-                return sb.ToString();
             }
         }
     }
@@ -1168,11 +1150,9 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} << [0, {1})",
+                return string.Format("{0} << [0, {1})",
                     Variables.GetVariable("Current").NoteValue,
                     Variables.GetVariable("Count").NoteValue);
-                return sb.ToString();
             }
         }
     }
@@ -1236,11 +1216,9 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} << func({1})",
+                return string.Format("{0} << func({1})",
                     Variables.GetVariable("OutputY").NoteValue,
                     Variables.GetVariable("InputX").NoteValue);
-                return sb.ToString();
             }
         }
     }
@@ -1373,11 +1351,9 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0}",
+                return string.Format("{0}",
                     Variables.GetVariable("Array").NoteValue
                     );
-                return sb.ToString();
             }
         }
     }
@@ -1408,11 +1384,9 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0}",
+                return string.Format("{0}",
                     Variables.GetVariable("Array").NoteValue
                     );
-                return sb.ToString();
             }
         }
     }
@@ -1454,12 +1428,10 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("{0} << [{1}].Length",
+                return string.Format("{0} << [{1}].Length",
                     Variables.GetVariable("Length").NoteValue,
                     Variables.GetVariable("Array").NoteValue
                     );
-                return sb.ToString();
             }
         }
     }
@@ -1502,12 +1474,10 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("[{0}] <= {1}",
+                return string.Format("[{0}] <= {1}",
                     Variables.GetVariable("Array").NoteValue,
                     Variables.GetVariable("Element").NoteValue
                     );
-                return sb.ToString();
             }
         }
     }
@@ -1558,12 +1528,10 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("[{0}] remove {1}",
+                return string.Format("[{0}] remove {1}",
                     Variables.GetVariable("Array").NoteValue,
                     Variables.GetVariable("Element").NoteValue
                     );
-                return sb.ToString();
             }
         }
     }
@@ -1615,12 +1583,10 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("[{0}] has {1}?",
+                return string.Format("[{0}] has {1}?",
                     Variables.GetVariable("Array").NoteValue,
                     Variables.GetVariable("Element").NoteValue
                     );
-                return sb.ToString();
             }
         }
     }
@@ -1663,19 +1629,17 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
                 var v = Variables.GetVariable("Input");
                 if (v.cType == Variable.CountType.CT_LIST)
-                    sb.AppendFormat("{0} will have same length with {1}",
+                    return string.Format("{0} will have same length with {1}",
                         Variables.GetVariable("Output").NoteValue,
                         v.NoteValue
                         );
                 else
-                    sb.AppendFormat("{0} will have length of {1}",
+                    return string.Format("{0} will have length of {1}",
                         Variables.GetVariable("Output").NoteValue,
                         v.NoteValue
                         );
-                return sb.ToString();
             }
         }
 
@@ -1730,12 +1694,10 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("[{0}] <??< [{1}]",
+                return string.Format("[{0}] <??< [{1}]",
                     Variables.GetVariable("Output").NoteValue,
                     Variables.GetVariable("Input").NoteValue
                     );
-                return sb.ToString();
             }
         }
     }
@@ -1776,12 +1738,10 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("Set Conditions {0}: {1}",
+                return string.Format("Set Conditions {0}: {1}",
                     Variables.GetVariable("Operator").NoteValue,
                     Variables.GetVariable("Conditions").NoteValue
                     );
-                return sb.ToString();
             }
         }
     }

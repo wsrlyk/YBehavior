@@ -569,11 +569,21 @@ namespace YBehavior.Editor.Core.New
                 LogMgr.Instance.Error("Something wrong, cant find the ctr of variable " + v.Name);
                 return;
             }
+
             _SetConnectorVisibility(ctr, v);
         }
         void _SetConnectorVisibility(Connector ctr, Variable v)
         {
-            ctr.IsVisible = (v.vbType == Variable.VariableType.VBT_Pointer && string.IsNullOrEmpty(v.Value));
+            ///> Disconnect first
+            if (!v.ShouldHaveConnection && ctr.Conns.Count > 0)
+            {
+                while (ctr.Conns.Count > 0)
+                {
+                    WorkBenchMgr.Instance.DisconnectNodes(ctr.Conns[ctr.Conns.Count - 1].Ctr);
+                }
+            }
+
+            ctr.IsVisible = v.ShouldHaveConnection;
 
         }
         #region CONDITION

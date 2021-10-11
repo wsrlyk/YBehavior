@@ -67,10 +67,13 @@ namespace YBehavior.Editor.Core.New
                 if (connRenderer != null)
                     ConnectionList.Add(connRenderer);
 
-                TreeNode childNode = child.Owner as TreeNode;
-                RemoveForestTree(childNode, false);
+                if (ctr1.GetPosType == Connector.PosType.PARENT)
+                {
+                    TreeNode childNode = child.Owner as TreeNode;
+                    RemoveForestTree(childNode, false);
 
-                m_Tree.RefreshNodeUID(0);
+                    m_Tree.RefreshNodeUID(0);
+                }
 
                 ConnectNodeCommand connectNodeCommand = new ConnectNodeCommand
                 {
@@ -93,11 +96,14 @@ namespace YBehavior.Editor.Core.New
                 if (connectionRenderer != null)
                     ConnectionList.Remove(connectionRenderer);
 
-                TreeNode childNode = connection.To.Owner as TreeNode;
-                AddForestTree(childNode, false);
+                if (connection.To.GetPosType == Connector.PosType.PARENT)
+                {
+                    TreeNode childNode = connection.To.Owner as TreeNode;
+                    AddForestTree(childNode, false);
 
-                m_Tree.RefreshNodeUID(0);
-                _RefreshForestUID(childNode);
+                    m_Tree.RefreshNodeUID(0);
+                    _RefreshForestUID(childNode);
+                }
 
                 DisconnectNodeCommand disconnectNodeCommand = new DisconnectNodeCommand
                 {
@@ -588,31 +594,142 @@ namespace YBehavior.Editor.Core.New
 
         public override bool CheckError()
         {
-            return _CheckError(m_Tree.Root);
-        }
-
-        private bool _CheckError(TreeNode node)
-        {
-            bool bRes = true;
-            if (!node.CheckValid())
-                bRes = false;
-            foreach (VariableHolder v in node.Variables.Datas)
-            {
-                if (!v.Variable.CheckValid())
-                {
-                    LogMgr.Instance.Error("CheckError in Node: " + node.Renderer.UITitle + ", Variable: " + v.Variable.Name);
-                    bRes = false;
-                }
-            }
-
-            foreach (TreeNode child in node.Conns)
-            {
-                if (!_CheckError(child))
-                    bRes = false;
-            }
+            bool bRes = _CheckError(m_Tree.Root);
+            bRes &= _CheckVariableConnections(m_Tree.Root);
             return bRes;
         }
 
+        private bool _CheckError(TreeNode root)
+        {
+            bool bRes = true;
+
+            Utility.OperateNode(root, (NodeBase node) =>
+            {
+                if (!node.CheckValid())
+                    bRes = false;
+                foreach (VariableHolder v in (node as TreeNode).Variables.Datas)
+                {
+                    if (!v.Variable.CheckValid())
+                    {
+                        LogMgr.Instance.Error("CheckError in Node: " + node.Renderer.UITitle + ", Variable: " + v.Variable.Name);
+                        bRes = false;
+                    }
+                }
+            }
+            );
+            return bRes;
+        }
+
+        bool _CheckVariableConnections(TreeNode root)
+        {
+            bool bRes = true;
+            Utility.OperateNode(root, (NodeBase node) =>
+            {
+                TreeNode thisNode = node as TreeNode;
+                TreeNode rootNode = thisNode.Root;
+                foreach (Connector ctr in node.Conns.OutputConnectors)
+                {
+                    if (!ctr.IsVisible)
+                    {
+                        if (ctr.Conns.Count > 0)
+                        {
+                            LogMgr.Instance.Error("CheckError in Node: " + node.Renderer.UITitle + ", Connector: " + ctr.Identifier);
+                            bRes = false;
+                        }
+                        continue;
+                    }
+                    Variable fromVariable = thisNode.Variables.GetVariable(ctr.Identifier);
+                    if (fromVariable == null)
+                    {
+                        LogMgr.Instance.Error("CheckError in Node: " + node.Renderer.UITitle + ", Connector: " + ctr.Identifier);
+                        bRes = false;
+                        continue;
+                    }
+                    if (!fromVariable.ShouldHaveConnection)
+                    {
+                        LogMgr.Instance.Error("CheckError in Node: " + node.Renderer.UITitle + ", Connector: " + ctr.Identifier);
+                        bRes = false;
+                        continue;
+                    }
+                    if (ctr.Conns.Count == 0)
+                    {
+                        LogMgr.Instance.Error("CheckError in Node: " + node.Renderer.UITitle + ", Connector: " + ctr.Identifier);
+                        bRes = false;
+                        continue;
+                    }
+
+                    foreach (Connection conn in ctr.Conns)
+                    {
+                        Connector toCtr = conn.Ctr.To;
+                        TreeNode toNode = toCtr.Owner as TreeNode;
+                        if (toNode.Root != rootNode)
+                        {
+                            LogMgr.Instance.Error("CheckError in Node: " + toNode.Renderer.UITitle + ", Not in Same Tree with: " + node.Renderer.UITitle);
+                            bRes = false;
+                            continue;
+                        }
+                        Variable toVariable = toNode.Variables.GetVariable(toCtr.Identifier);
+                        if (toVariable == null)
+                        {
+                            LogMgr.Instance.Error("CheckError in Node: " + toNode.Renderer.UITitle + ", Connector: " + toCtr.Identifier);
+                            bRes = false;
+                            continue;
+                        }
+                        if (!toVariable.ShouldHaveConnection)
+                        {
+                            LogMgr.Instance.Error("CheckError in Node: " + toNode.Renderer.UITitle + ", Connector: " + toCtr.Identifier);
+                            bRes = false;
+                            continue;
+                        }
+                    }
+                }
+                foreach (Connector ctr in node.Conns.InputConnectors)
+                {
+                    if (!ctr.IsVisible)
+                    {
+                        if (ctr.Conns.Count > 0)
+                        {
+                            LogMgr.Instance.Error("CheckError in Node: " + node.Renderer.UITitle + ", Connector: " + ctr.Identifier);
+                            bRes = false;
+                        }
+                        continue;
+                    }
+                    Variable toVariable = thisNode.Variables.GetVariable(ctr.Identifier);
+                    if (toVariable == null)
+                    {
+                        LogMgr.Instance.Error("CheckError in Node: " + node.Renderer.UITitle + ", Connector: " + ctr.Identifier);
+                        bRes = false;
+                        continue;
+                    }
+                    if (!toVariable.ShouldHaveConnection)
+                    {
+                        LogMgr.Instance.Error("CheckError in Node: " + node.Renderer.UITitle + ", Connector: " + ctr.Identifier);
+                        bRes = false;
+                        continue;
+                    }
+                    if (ctr.Conns.Count == 0)
+                    {
+                        LogMgr.Instance.Error("CheckError in Node: " + node.Renderer.UITitle + ", Connector: " + ctr.Identifier);
+                        bRes = false;
+                        continue;
+                    }
+
+                    foreach (Connection conn in ctr.Conns)
+                    {
+                        Connector fromCtr = conn.Ctr.From;
+                        TreeNode fromNode = fromCtr.Owner as TreeNode;
+                        if (fromNode.Root != rootNode)
+                        {
+                            LogMgr.Instance.Error("CheckError in Node: " + fromNode.Renderer.UITitle + ", Not in Same Tree with: " + node.Renderer.UITitle);
+                            bRes = false;
+                            continue;
+                        }
+                    }
+                }
+            }
+            );
+           return bRes;
+        }
 
         public void RefreshReferenceStates()
         {
