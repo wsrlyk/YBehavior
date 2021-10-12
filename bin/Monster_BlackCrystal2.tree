@@ -7,7 +7,7 @@
         <Node Class="WriteRegister" Pos="218,621" Event="_SC aistring" Int="IIC " Float="FFP fftest" String="SSC str|ing" Ulong="UUC " Bool="BBC " />
       </Node>
       <Node Class="SetData" Pos="213,384" Target="_IP add0" Source="_IC 0" />
-      <Node Class="Calculator" Pos="306,377" Operator="_EC ADD" Opl="_IP add0" Opr1="_IP add0" Opr2="_IC 3" />
+      <Node Class="Calculator" Pos="306,377" Operator="_EC ADD" Output="_IP add0" Input1="_IP add0" Input2="_IC 3" />
       <Node Class="Random" Pos="469,356" Target="_BP bbtest VI P add1" Bound1="_BC false" Bound2="_BC true" />
     </Node>
   </Node>

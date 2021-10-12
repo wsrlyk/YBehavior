@@ -436,7 +436,7 @@ namespace YBehavior.Editor.Core.New
             );
 
             Variable opl = NodeMemory.CreateVariable(
-                "Opl",
+                "Output",
                 "",
                 Variable.CreateParams_CalculatorTypes,
                 Variable.CountType.CT_SINGLE,
@@ -447,7 +447,7 @@ namespace YBehavior.Editor.Core.New
             opl.IsInput = false;
 
             Variable opr1 = NodeMemory.CreateVariable(
-                "Opr1",
+                "Input1",
                 "0",
                 Variable.CreateParams_CalculatorTypes,
                 Variable.CountType.CT_SINGLE,
@@ -457,7 +457,7 @@ namespace YBehavior.Editor.Core.New
             );
 
             Variable opr2 = NodeMemory.CreateVariable(
-                "Opr2",
+                "Input2",
                 "0",
                 Variable.CreateParams_CalculatorTypes,
                 Variable.CountType.CT_SINGLE,
@@ -472,10 +472,10 @@ namespace YBehavior.Editor.Core.New
             get
             {
                 return string.Format("{1} {2} {3} >> {0}",
-                    Variables.GetVariable("Opl").NoteValue,
-                    Variables.GetVariable("Opr1").NoteValue,
+                    Variables.GetVariable("Output").NoteValue,
+                    Variables.GetVariable("Input1").NoteValue,
                     Variables.GetVariable("Operator").NoteValue,
-                    Variables.GetVariable("Opr2").NoteValue);
+                    Variables.GetVariable("Input2").NoteValue);
             }
         }
     }

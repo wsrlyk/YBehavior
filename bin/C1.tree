@@ -2,6 +2,6 @@
 <C1>
   <Node Class="Root" Pos="280,80">
     <Shared a="_IC 0" />
-    <Node Class="Calculator" Pos="290,220" Operator="_EC +" Opl="_IP a" Opr1="_IP a" Opr2="_IC 1" />
+    <Node Class="Calculator" Pos="290,220" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 1" />
   </Node>
 </C1>

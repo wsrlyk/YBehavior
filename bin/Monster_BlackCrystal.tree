@@ -4,16 +4,16 @@
     <Node Class="Sequence" Pos="221,151" NickName="Hehequence12345678">
       <Node Class="IfThenElse" Pos="96,300">
         <Node Class="Comparer" Connection="if" Pos="64,526" Operator="_EC &lt;" Opl="_IP iitest VI P add0" Opr="_IC 0" />
-        <Node Class="Calculator" Connection="then" Pos="127,683" Operator="_EC ADD" Opl="_IP add1" Opr1="_IC 0" Opr2="_IC 1" />
+        <Node Class="Calculator" Connection="then" Pos="127,683" Operator="_EC ADD" Output="_IP add1" Input1="_IC 0" Input2="_IC 1" />
         <Node Class="IfThenElse" Connection="else" Pos="364,468">
           <Node Class="Comparer" Connection="if" Pos="302,635" Operator="_EC &gt;" Opl="_IP iitest VI P add0" Opr="_IC 10" />
-          <Node Class="Calculator" Connection="then" Pos="360,735" Operator="_EC SUB" Opl="_IP add1" Opr1="_IC 0" Opr2="_IC 1" />
+          <Node Class="Calculator" Connection="then" Pos="360,735" Operator="_EC SUB" Output="_IP add1" Input1="_IC 0" Input2="_IC 1" />
           <Node Class="AlwaysSuccess" Connection="else" Pos="593,739" />
         </Node>
       </Node>
       <Node Class="RandomSelect" Pos="478,346" Input="IIP iitest" Output="_IP add1" />
       <Node Class="Loop" Pos="856,475" Count="_IC 3" Current="_IP iitest" BreakValue="_BCD F">
-        <Node Class="Calculator" Pos="857,734" Operator="_EC ADD" Opl="_IP iitest VI P add0" Opr1="_IP iitest VI P add0" Opr2="_IP add1">
+        <Node Class="Calculator" Pos="857,734" Operator="_EC ADD" Output="_IP iitest VI P add0" Input1="_IP iitest VI P add0" Input2="_IP add1">
           <Node Class="Wait" Connection="condition" Pos="749,682" Disabled="true" TickCount="_IC 3">
             <Node Class="Sequence" Connection="condition" Pos="718,766">
               <Node Class="Random" Pos="698,879" Target="_IP iitest VI C 2" Bound1="_IC 0" Bound2="_IC 2" />

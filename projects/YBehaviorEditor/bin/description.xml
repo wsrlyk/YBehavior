@@ -54,9 +54,9 @@
                 </Loop>
                 <Calculator Content="计算器"
 			ReturnSuccess="始终成功">
-                        <Opl Content="保存计算结果"/>
-                        <Opr1 Content="左边的操作数"/>
-                        <Opr2 Content="右边的操作数"/>
+                        <Output Content="保存计算结果"/>
+                        <Input1 Content="操作数1"/>
+                        <Input2 Content="操作数2"/>
                         <Operator Content="操作符号"/>
                 </Calculator>
                 <Comparer Content="比较器。返回比较结果一致与否"

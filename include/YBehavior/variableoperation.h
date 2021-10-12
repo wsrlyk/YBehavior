@@ -1,6 +1,8 @@
 #ifndef _YBEHAVIOR_VARIABLEOPERATION_H_
 #define _YBEHAVIOR_VARIABLEOPERATION_H_
 
+#define YB_ABOUT_EQUAL_FLOAT
+
 #include "YBehavior/interface.h"
 #include "YBehavior/tools/bimap.h"
 #include "YBehavior/types.h"
@@ -107,12 +109,12 @@ namespace YBehavior
 	{
 		if (pLeft == nullptr)
 		{
-			ERROR_BEGIN << "pLeft is null in Calculate" << ERROR_END;
+			ERROR_BEGIN << "pLeft is null in Compare" << ERROR_END;
 			return false;
 		}
 		if (pRight == nullptr)
 		{
-			ERROR_BEGIN << "pRight is null in Calculate" << ERROR_END;
+			ERROR_BEGIN << "pRight is null in Compare" << ERROR_END;
 			return false;
 		}
 
@@ -288,6 +290,10 @@ namespace YBehavior
 	template<>
 	void ValueHandler::Calculate<Bool>(void* pLeft, const void* pRight0, const void* pRight1, OperationType op);
 
+#ifdef YB_ABOUT_EQUAL_FLOAT
+	template<>
+	bool ValueHandler::Compare<Float>(const void* pLeft, const void* pRight, OperationType op);
+#endif
 
 	template<>
 	void ValueHandler::Random<Int>(void* pLeft, const void* pRight0, const void* pRight1);

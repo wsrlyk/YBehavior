@@ -13,7 +13,7 @@
       <Node Class="For" Pos="807,460" BreakValue="_BCD F">
         <Node Class="SetData" Connection="init" Pos="729,731" Target="_FP f0" Source="_FC 0" />
         <Node Class="Comparer" Connection="cond" Pos="788,680" Operator="_EC &lt;=" Opl="_FP f0" Opr="_FP f" />
-        <Node Class="Calculator" Connection="inc" Pos="846,742" Operator="_EC ADD" Opl="_FP f0" Opr1="_FP f0" Opr2="_FC 1" />
+        <Node Class="Calculator" Connection="inc" Pos="846,742" Operator="_EC ADD" Output="_FP f0" Input1="_FP f0" Input2="_FC 1" />
         <Node Class="GetTargetNameAction" Pos="877,809" Target="_APE Target" />
       </Node>
       <Node Class="ForEach" Pos="1057,506" Collection="FFP ff" Current="_FP f" BreakValue="_BCD F">

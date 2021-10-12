@@ -284,6 +284,7 @@ namespace YBehavior.Editor.Core.New
             {
                 if (!v.SetVariableInNode(attr.Value))
                     return false;
+                _RefreshConnectorVisibility(v);
                 if (v.CheckValid())
                 {
                     return true;

@@ -26,24 +26,24 @@ namespace YBehavior
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = VariableCreation::CreateVariable(this, m_Opl, "Opl", data, true);
+		m_DataType = VariableCreation::CreateVariable(this, m_Output, "Output", data, true);
 		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in calculator: " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Output in calculator: " << m_DataType << ERROR_END;
 			return false;
 		}
 		///> Right1
-		TYPEID dataType = VariableCreation::CreateVariable(this, m_Opr1, "Opr1", data);
+		TYPEID dataType = VariableCreation::CreateVariable(this, m_Input1, "Input1", data);
 		if (dataType != m_DataType)
 		{
-			ERROR_BEGIN_NODE_HEAD << "Different types:  Opl & Opr1" << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types:  Output & Input1" << ERROR_END;
 			return false;
 		}
 		///> Right2
-		dataType = VariableCreation::CreateVariable(this, m_Opr2, "Opr2", data);
+		dataType = VariableCreation::CreateVariable(this, m_Input2, "Input2", data);
 		if (m_DataType != dataType)
 		{
-			ERROR_BEGIN_NODE_HEAD << "Different types: Opl & Opr2" << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types: Output & Input2" << ERROR_END;
 			return false;
 		}
 
@@ -54,17 +54,16 @@ namespace YBehavior
 	{
 		YB_IF_HAS_DEBUG_POINT
 		{
-			YB_LOG_VARIABLE(m_Opl, true);
-			YB_LOG_VARIABLE(m_Opr1, true);
-			YB_LOG_VARIABLE(m_Opr2, true);
+			YB_LOG_VARIABLE_BEFORE(m_Input1);
+			YB_LOG_VARIABLE_BEFORE(m_Input2);
 		}
 
-		IVariableOperationHelper* pHelper = m_Opl->GetOperation();
-		pHelper->Calculate(pAgent->GetMemory(), m_Opl, m_Opr1, m_Opr2, m_Operator);
+		IVariableOperationHelper* pHelper = m_Output->GetOperation();
+		pHelper->Calculate(pAgent->GetMemory(), m_Output, m_Input1, m_Input2, m_Operator);
 
 		YB_IF_HAS_DEBUG_POINT
 		{
-			YB_LOG_VARIABLE(m_Opl, false);
+			YB_LOG_VARIABLE_AFTER(m_Output);
 		}
 
 		return NS_SUCCESS;

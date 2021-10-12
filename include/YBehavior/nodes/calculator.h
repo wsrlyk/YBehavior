@@ -16,9 +16,9 @@ namespace YBehavior
 
 	private:
 		OperationType m_Operator;
-		ISharedVariableEx* m_Opl;
-		ISharedVariableEx* m_Opr1;
-		ISharedVariableEx* m_Opr2;
+		ISharedVariableEx* m_Output;
+		ISharedVariableEx* m_Input1;
+		ISharedVariableEx* m_Input2;
 
 		TYPEID m_DataType;
 
