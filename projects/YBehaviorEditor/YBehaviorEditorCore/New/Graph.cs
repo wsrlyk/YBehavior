@@ -102,5 +102,9 @@ namespace YBehavior.Editor.Core.New
         {
             ///> Nothing to do
         }
+        public void OnVariableETypeChanged(Variable v)
+        {
+            ///> Nothing to do
+        }
     }
 }

@@ -21,6 +21,10 @@ namespace YBehavior.Editor.Core.New
         {
             (Node as TreeNode).OnVariableVBTypeChanged(v);
         }
+        public void OnVariableETypeChanged(Variable v)
+        {
+            (Node as TreeNode).OnVariableETypeChanged(v);
+        }
     }
 
     public enum TreeNodeType
@@ -65,6 +69,7 @@ namespace YBehavior.Editor.Core.New
                 node = Activator.CreateInstance(type) as TreeNode;
                 node.CreateBase();
                 node.CreateVariables();
+                node.CreateVariableConnectors();
                 node.LoadDescription();
                 return node;
             }
@@ -190,11 +195,6 @@ namespace YBehavior.Editor.Core.New
 
         }
 
-        public override void PostCreate()
-        {
-            base.PostCreate();
-            CreateVariableConnectors();
-        }
         public void CreateVariableConnectors()
         {
             foreach (var v in m_Variables.Datas)
@@ -235,7 +235,6 @@ namespace YBehavior.Editor.Core.New
 
         protected virtual void _OnLoaded()
         {
-            PostCreate();
         }
 
         public void LoadChild(System.Xml.XmlNode data)
@@ -526,6 +525,11 @@ namespace YBehavior.Editor.Core.New
         }
 
         public void OnVariableVBTypeChanged(Variable v)
+        {
+            _RefreshConnectorVisibility(v);
+        }
+
+        public void OnVariableETypeChanged(Variable v)
         {
             _RefreshConnectorVisibility(v);
         }

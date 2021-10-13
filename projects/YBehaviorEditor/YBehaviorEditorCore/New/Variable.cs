@@ -248,6 +248,7 @@ namespace YBehavior.Editor.Core.New
 
                 m_eType = value;
                 OnPropertyChanged("eType");
+                _OnETypeChanged();
             }
         }
 
@@ -520,9 +521,9 @@ namespace YBehavior.Editor.Core.New
             OnPropertyChanged("DisplayValue");
             OnPropertyChanged("IsElement");
             if (Container != null)
-                Container.OnVariableValueChanged(this);
+                Container.OnValueChanged(this);
             else if (m_Parent != null && m_Parent.Container != null)
-                m_Parent.Container.OnVariableValueChanged(m_Parent);
+                m_Parent.Container.OnValueChanged(m_Parent);
         }
 
         private void _OnConditionChanged()
@@ -532,20 +533,27 @@ namespace YBehavior.Editor.Core.New
 
         void _OnVTypeChanged()
         {
-            (Container as ISameTypeGroupTypeChanged)?.OnVTypeChanged(this.Name);
+            Container?.OnVTypeChanged(this);
+            //(Container as ISameTypeGroupTypeChanged)?.OnVTypeChanged(this.Name);
         }
 
         void _OnCTypeChanged()
         {
-            (Container as ISameTypeGroupTypeChanged)?.OnCTypeChanged(this.Name);
+            Container?.OnCTypeChanged(this);
+            //(Container as ISameTypeGroupTypeChanged)?.OnCTypeChanged(this.Name);
+        }
+
+        void _OnETypeChanged()
+        {
+            Container?.OnETypeChanged(this);
         }
 
         void _OnVBTypeChanged()
         {
             if (Container != null)
-                Container.OnVariableVBTypeChanged(this);
+                Container.OnVBTypeChanged(this);
             else if (m_Parent != null && m_Parent.Container != null)
-                m_Parent.Container.OnVariableVBTypeChanged(m_Parent);
+                m_Parent.Container.OnVBTypeChanged(m_Parent);
         }
         public bool LockVBType { get; set; } = false;
         public bool LockCType { get; set; } = false;
@@ -555,7 +563,7 @@ namespace YBehavior.Editor.Core.New
         public bool CanSwitchList { get { return !LockCType; } }
         public bool CanSwitchEnable { get { return eType == EnableType.ET_Enable || eType == EnableType.ET_Disable; } }
         public virtual bool CanSwitchContainer { get { return false; } }
-        public bool ShouldHaveConnection { get { return vbType == VariableType.VBT_Pointer && string.IsNullOrEmpty(Value); } }
+        public bool ShouldHaveConnection { get { return eType != EnableType.ET_Disable && vbType == VariableType.VBT_Pointer && string.IsNullOrEmpty(Value); } }
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 

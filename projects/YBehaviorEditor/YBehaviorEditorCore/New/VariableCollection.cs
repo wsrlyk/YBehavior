@@ -62,10 +62,22 @@ namespace YBehavior.Editor.Core.New
     {
         void OnVariableValueChanged(Variable v);
         void OnVariableVBTypeChanged(Variable v);
+        void OnVariableETypeChanged(Variable v);
     }
 
     public class VariableCollection: IVariableCollection
     {
+        public event Action<Variable> valueChanged;
+        public event Action<Variable> vbTypeChanged;
+        public event Action<Variable> cTypeChanged;
+        public event Action<Variable> vTypeChanged;
+        public event Action<Variable> eTypeChanged;
+        public void OnValueChanged(Variable v) => valueChanged?.Invoke(v);
+        public void OnVBTypeChanged(Variable v) => vbTypeChanged?.Invoke(v);
+        public void OnCTypeChanged(Variable v) => cTypeChanged?.Invoke(v);
+        public void OnVTypeChanged(Variable v) => vTypeChanged?.Invoke(v);
+        public void OnETypeChanged(Variable v) => eTypeChanged?.Invoke(v);
+
         protected Dictionary<string, VariableHolder> m_Variables = new Dictionary<string, VariableHolder>();
         protected DelayableNotificationCollection<VariableHolder> m_VariableList = new DelayableNotificationCollection<VariableHolder>();
         public DelayableNotificationCollection<VariableHolder> Datas { get { return m_VariableList; } }
@@ -75,6 +87,12 @@ namespace YBehavior.Editor.Core.New
         public VariableCollection(IVariableCollectionOwner owner)
         {
             m_Owner = owner;
+            if (owner != null)
+            {
+                valueChanged += owner.OnVariableValueChanged;
+                vbTypeChanged += owner.OnVariableVBTypeChanged;
+                eTypeChanged += owner.OnVariableETypeChanged;
+            }
         }
 
         public static bool IsValidVariableName(string name)
@@ -171,18 +189,6 @@ namespace YBehavior.Editor.Core.New
         public Variable GetVariable(string name)
         {
             return GetVariableHolder(name)?.Variable;
-        }
-
-        public void OnVariableValueChanged(Variable v)
-        {
-            if (m_Owner != null)
-                m_Owner.OnVariableValueChanged(v);
-        }
-
-        public void OnVariableVBTypeChanged(Variable v)
-        {
-            if (m_Owner != null)
-                m_Owner.OnVariableVBTypeChanged(v);
         }
 
         public void CloneFrom(VariableCollection other)

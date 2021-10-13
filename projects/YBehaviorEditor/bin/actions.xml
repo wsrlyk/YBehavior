@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Actions>
 	<Action Class="GetNameAction" Note="{0} has {1} in {2}" Hierachy="21" Icon="🎀">
-		<Variable Name="Var0" ValueType="IF" VariableType="P" Value="1" vTypeGroup="1" cTypeGroup="1" />
+		<Variable Name="Var0" ValueType="IF" VariableType="P" Value="" vTypeGroup="1" cTypeGroup="1" />
 		<Variable Name="Var1" ValueType="E" IsArray="False" Value="" Param="Enum0|Enum1|Enum2"/>
 		<Variable Name="Var2" ValueType="S" IsArray="True" Value="1|2|3|4" />
 		<Variable Name="Var3" ValueType="IF" VariableType="C" Value="" vTypeGroup="1" cTypeGroup="1"/>
@@ -10,10 +10,10 @@
 		<TypeMap SrcVariable="Var1" SrcValue="Enum2" DesVariable="Var0" DesType="FF" />
 	</Action>
 	<Action Class="GetTargetNameAction" Note="{0}" Hierachy="21">
-		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" IsEnable="False" Value="0"/>
+		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" IsEnable="False" Value=""/>
 	</Action>
 	<Action Class="SelectTargetAction" Note="{0}" Hierachy="121">
-		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" IsInput="False" Value="0"/>
+		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" IsInput="False" Value=""/>
 	</Action>
 	<Action Class="SetVector3Action" Note="{0}" Hierachy="121">
 		<Variable Name="Src" ValueType="V" IsArray="False" VariableType="P" Value=""/>

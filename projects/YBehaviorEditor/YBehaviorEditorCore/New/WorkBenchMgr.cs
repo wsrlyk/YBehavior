@@ -415,7 +415,6 @@ namespace YBehavior.Editor.Core.New
                 {
                     node = FSMNodeMgr.Instance.CreateStateByName(template.Name);
                 }
-                node.PostCreate();
                 ///> Init Variables
                 ////Utility.InitNode(node, true);
             }

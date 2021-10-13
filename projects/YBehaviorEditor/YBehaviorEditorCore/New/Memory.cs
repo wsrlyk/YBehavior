@@ -488,20 +488,21 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    interface ISameTypeGroupTypeChanged
-    {
-        void OnVTypeChanged(string name);
-        void OnCTypeChanged(string name);
-    }
+    //interface ISameTypeGroupTypeChanged
+    //{
+    //    void OnVTypeChanged(string name);
+    //    void OnCTypeChanged(string name);
+    //}
 
-    public class NodeMemory : VariableCollection, IVariableCollection, ISameTypeGroupTypeChanged
+    public class NodeMemory : VariableCollection, IVariableCollection/*, ISameTypeGroupTypeChanged*/
     {
         public SameTypeGroup vTypeGroup { get; set; } = null;
         public SameTypeGroup cTypeGroup { get; set; } = null;
 
         public NodeMemory(IVariableCollectionOwner owner) : base(owner)
         {
-
+            vTypeChanged += _OnVTypeChanged;
+            cTypeChanged += _OnCTypeChanged;
         }
 
         public bool CreateVariable(
@@ -595,10 +596,11 @@ namespace YBehavior.Editor.Core.New
         }
 
         bool m_bProcessingSameTypeGroup = false;
-        public void OnVTypeChanged(string name)
+        void _OnVTypeChanged(Variable v)
         {
-            if (m_bProcessingSameTypeGroup)
+            if (m_bProcessingSameTypeGroup || v == null)
                 return;
+            string name = v.Name;
             m_bProcessingSameTypeGroup = true;
             if (vTypeGroup != null)
             {
@@ -617,8 +619,8 @@ namespace YBehavior.Editor.Core.New
                     if (!bFound)
                         continue;
 
-                    Variable v = GetVariable(name);
-                    if (v != null)
+                    //Variable v = GetVariable(name);
+                    //if (v != null)
                     {
                         Variable.ValueType targetVType = v.vType;
                         foreach (string n in group)
@@ -635,10 +637,11 @@ namespace YBehavior.Editor.Core.New
             }
             m_bProcessingSameTypeGroup = false;
         }
-        public void OnCTypeChanged(string name)
+        void _OnCTypeChanged(Variable v)
         {
-            if (m_bProcessingSameTypeGroup)
+            if (m_bProcessingSameTypeGroup || v == null)
                 return;
+            string name = v.Name;
             m_bProcessingSameTypeGroup = true;
             if (cTypeGroup != null)
             {
@@ -657,8 +660,8 @@ namespace YBehavior.Editor.Core.New
                     if (!bFound)
                         continue;
 
-                    Variable v = GetVariable(name);
-                    if (v != null)
+                    //Variable v = GetVariable(name);
+                    //if (v != null)
                     {
                         Variable.CountType targetCType = v.cType;
                         foreach (string n in group)
