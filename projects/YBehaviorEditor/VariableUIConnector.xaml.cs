@@ -72,6 +72,17 @@ namespace YBehavior.Editor
             set { title.Text = value; }
         }
 
+        public bool Left
+        {
+            set
+            {
+                if (value)
+                    main.HorizontalAlignment = HorizontalAlignment.Left;
+                else
+                    main.HorizontalAlignment = HorizontalAlignment.Right;
+            }
+        }
+
         void _OnStartDragged(Vector delta, Point absPos)
         {
             if (DebugMgr.Instance.IsDebugging())

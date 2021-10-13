@@ -138,7 +138,8 @@ namespace YBehavior.Editor
                             uiConnector = new VariableUIConnector
                             {
                                 Title = ctr.Identifier,
-                                Ctr = ctr
+                                Ctr = ctr,
+                                Left = false,
                             };
                             outputConnectors.Children.Add(uiConnector);
                         }
@@ -148,7 +149,8 @@ namespace YBehavior.Editor
                             uiConnector = new VariableUIConnector
                             {
                                 Title = ctr.Identifier,
-                                Ctr = ctr
+                                Ctr = ctr,
+                                Left = true,
                             };
                             inputConnectors.Children.Add(uiConnector);
                         }
