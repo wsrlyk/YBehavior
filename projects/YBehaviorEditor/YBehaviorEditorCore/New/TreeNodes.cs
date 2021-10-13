@@ -191,7 +191,10 @@ namespace YBehavior.Editor.Core.New
                 int i = 0;
                 foreach (var v in m_Variables.Datas)
                 {
-                    values[i++] = v.Variable.NoteValue;
+                    values[i++] = 
+                        v.Variable.eType == Variable.EnableType.ET_Disable ? 
+                        string.Empty : 
+                        v.Variable.NoteValue;
                 }
                 return string.Format(NoteFormat, values);
             }
