@@ -114,7 +114,7 @@ namespace YBehavior.Editor.Core.New
         }
         public static readonly string IdentifierChildren = "children";
         public static readonly string IdentifierParent = "parent";
-        public static readonly string IdentifierCondition = "cond";
+        public static readonly string IdentifierCondition = "condition";
 
         public static readonly string IdentifierDefault = "default";
         public static readonly string IdentifierIncrement = "inc";
