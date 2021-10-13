@@ -579,18 +579,49 @@ namespace YBehavior.Editor.Core.New
         }
         void _SetConnectorVisibility(Connector ctr, Variable v)
         {
-            ///> Disconnect first
-            if (!v.ShouldHaveConnection && ctr.Conns.Count > 0)
+            if (ctr.Conns.Count > 0)
             {
-                while (ctr.Conns.Count > 0)
+                ///> Disconnect first
+                if (!v.ShouldHaveConnection)
                 {
-                    WorkBenchMgr.Instance.DisconnectNodes(ctr.Conns[ctr.Conns.Count - 1].Ctr);
+                    while (ctr.Conns.Count > 0)
+                    {
+                        WorkBenchMgr.Instance.DisconnectNodes(ctr.Conns[ctr.Conns.Count - 1].Ctr);
+                    }
+                }
+                else
+                {
+                    int i = ctr.Conns.Count;
+                    while (--i >= 0)
+                    {
+                        var conn = ctr.Conns[i];
+                        if (!CanConnect(conn.Ctr.From, conn.Ctr.To))
+                        {
+                            WorkBenchMgr.Instance.DisconnectNodes(conn.Ctr);
+                        }
+                    }
                 }
             }
 
             ctr.IsVisible = v.ShouldHaveConnection;
-
         }
+
+        public override bool CanConnect(Connector myCtr, Connector otherCtr)
+        {
+            if (myCtr.GetPosType == Connector.PosType.OUTPUT && otherCtr.GetPosType == Connector.PosType.INPUT)
+            {
+                Variable myVariable = (myCtr.Owner as TreeNode).NodeMemory.GetVariable(myCtr.Identifier);
+                Variable otherVariable = (otherCtr.Owner as TreeNode).NodeMemory.GetVariable(otherCtr.Identifier);
+                if (myVariable == null || otherVariable == null)
+                    return false;
+                if (myVariable.vType != otherVariable.vType || myVariable.cType != otherVariable.cType)
+                    return false;
+                return true;
+            }
+            ///> invalid cases should and must be stopped in previous steps
+            return true;
+        }
+
         #region CONDITION
         Connector m_ConditonConnector;
         bool m_bEnableConditionConnection = false;

@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              >
     <Canvas>
-        <Path Name="path" Stroke="#FFDADCE4" StrokeThickness="5" Fill="#FFE1E3E8">
+        <Path Name="path" Stroke="#B2E4E4E4" StrokeThickness="5">
             <Path.Data>
                 <PathGeometry>
                     <PathFigure IsFilled="False" StartPoint="{Binding ParentPos, Mode=OneWay}"  IsClosed="False">
@@ -18,7 +18,7 @@
                 </PathGeometry>
             </Path.Data>
         </Path>
-        <Path Name="debug" Stroke="#FFDADCE4" StrokeThickness="5" Fill="#FFE1E3E8" Visibility="Collapsed">
+        <Path Name="debug" Stroke="#B2E4E4E4" StrokeThickness="5" Visibility="Collapsed">
             <Path.Data>
                 <PathGeometry>
                     <PathFigure IsFilled="False" StartPoint="{Binding ParentPos, Mode=OneWay}"  IsClosed="False">

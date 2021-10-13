@@ -270,6 +270,9 @@ namespace YBehavior.Editor.Core.New
                 }
             }
 
+            if (!Owner.CanConnect(this, target))
+                return null;
+
             Connection connection = ConnectionCreator == null ? new Connection(this, target) : ConnectionCreator(this, target);
             m_Conns.Add(connection);
             target.Conns.Add(connection);

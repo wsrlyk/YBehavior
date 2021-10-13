@@ -258,6 +258,8 @@ namespace YBehavior.Editor.Core.New
 
         }
 
+        public virtual bool CanConnect(Connector myCtr, Connector otherCtr) => true;
+
         public void PropertyChange(RenderProperty property)
         {
             if (m_Renderer != null)

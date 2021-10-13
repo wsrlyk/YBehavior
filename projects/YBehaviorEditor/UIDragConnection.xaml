@@ -1,0 +1,20 @@
+﻿<local:YUserControl x:Class="YBehavior.Editor.UIDragConnection"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:YBehavior.Editor"
+             mc:Ignorable="d" 
+             >
+    <Canvas>
+        <Path Name="path" Stroke="#FFEEEEEE" StrokeThickness="5">
+            <Path.Data>
+                <PathGeometry>
+                    <PathFigure IsFilled="False" IsClosed="False">
+                        <LineSegment />
+                    </PathFigure>
+                </PathGeometry>
+            </Path.Data>
+        </Path>
+    </Canvas>
+</local:YUserControl>

@@ -81,7 +81,7 @@ namespace YBehavior.Editor
         public override void OnWorkBenchSelected()
         {
             base.OnWorkBenchSelected();
-            DraggingConnection<UIConnection>.Instance.SetCanvas(this.canvas);
+            DraggingConnection<UIDragConnection>.Instance.SetCanvas(this.canvas);
         }
     }
 }
