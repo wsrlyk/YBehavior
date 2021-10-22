@@ -24,6 +24,8 @@ namespace YBehavior.Editor.Core.New
 
         public InOutMemory Reload(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                return null;
             InOutMemory inOutMemory = new InOutMemory(null, false);
             if (!_Load(name, inOutMemory))
                 return null;
