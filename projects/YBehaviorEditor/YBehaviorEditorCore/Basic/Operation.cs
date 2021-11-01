@@ -175,6 +175,9 @@ namespace YBehavior.Editor.Core.New
                 return;
             if (!m_bStartDrag)
                 return;
+            ///> Trigger only once
+            if (!m_bStartClick)
+                return;
             DragHandler dragHandler = null;
             bool bValid = false;
             if (e.LeftButton == MouseButtonState.Pressed && m_PressedButton == MouseButton.Left)
