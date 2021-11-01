@@ -36,7 +36,7 @@ namespace YBehavior.Editor.Core.New
 
             //LogMgr.Instance.Log("Push command: " + command.ToString() + ", Total: " + m_DoneCommands.Count.ToString());
 
-            OnCommandUpdate.Invoke(this, null);
+            OnCommandUpdate?.Invoke(this, null);
             //OnPropertyChanged("HasDoneCommands");
             //OnPropertyChanged("HasUndoCommands");
 
