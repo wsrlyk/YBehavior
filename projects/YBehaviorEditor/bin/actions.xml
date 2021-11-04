@@ -1,28 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Actions>
 	<Action Class="GetNameAction" Note="{0} has {1} in {2}" Hierachy="21" Icon="🎀">
-		<Variable Name="Var0" ValueType="IF" VariableType="P" Value="" vTypeGroup="1" cTypeGroup="1" />
+		<Variable Name="Var0" ValueType="IF" IsConst="False" Value="" vTypeGroup="1" cTypeGroup="1" />
 		<Variable Name="Var1" ValueType="E" IsArray="False" Value="" Param="Enum0|Enum1|Enum2"/>
 		<Variable Name="Var2" ValueType="S" IsArray="True" Value="1|2|3|4" />
-		<Variable Name="Var3" ValueType="IF" VariableType="C" Value="" vTypeGroup="1" cTypeGroup="1"/>
+		<Variable Name="Var3" ValueType="IF" IsConst="True" Value="" vTypeGroup="1" cTypeGroup="1"/>
 		<TypeMap SrcVariable="Var1" SrcValue="Enum0" DesVariable="Var0" DesType="_I" />
 		<TypeMap SrcVariable="Var1" SrcValue="Enum1" DesVariable="Var0" DesType="_F" />
 		<TypeMap SrcVariable="Var1" SrcValue="Enum2" DesVariable="Var0" DesType="FF" />
 	</Action>
 	<Action Class="GetTargetNameAction" Note="{0}" Hierachy="21">
-		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" IsEnable="False" Value=""/>
+		<Variable Name="Target" ValueType="A" IsArray="False" IsConst="False" IsEnable="False" Value=""/>
 	</Action>
 	<Action Class="SelectTargetAction" Note="{0}" Hierachy="121">
-		<Variable Name="Target" ValueType="A" IsArray="False" VariableType="P" IsInput="False" Value=""/>
+		<Variable Name="Target" ValueType="A" IsArray="False" IsConst="False" IsInput="False" Value=""/>
 	</Action>
 	<Action Class="SetVector3Action" Note="{0}" Hierachy="121">
-		<Variable Name="Src" ValueType="V" IsArray="False" VariableType="P" Value=""/>
-		<Variable Name="Des" ValueType="V" IsArray="False" VariableType="P" Value=""/>
+		<Variable Name="Src" ValueType="V" IsArray="False" IsConst="False" Value=""/>
+		<Variable Name="Des" ValueType="V" IsArray="False" IsConst="False" Value=""/>
 	</Action>
 	<Action Class="XCustomAction" Note="{0}" Hierachy="121">
-		<Variable Name="String0" ValueType="S" IsArray="False" VariableType="P" Value=""/>
-		<Variable Name="String1" ValueType="S" IsArray="False" VariableType="P" Value=""/>
-		<Variable Name="Entity0" ValueType="A" IsArray="False" VariableType="P" Value=""/>
-		<Variable Name="Array0" ValueType="I" IsArray="True" VariableType="P" Value=""/>
+		<Variable Name="String0" ValueType="S" IsArray="False" IsConst="False" Value=""/>
+		<Variable Name="String1" ValueType="S" IsArray="False" IsConst="False" Value=""/>
+		<Variable Name="Entity0" ValueType="A" IsArray="False" IsConst="False" Value=""/>
+		<Variable Name="Array0" ValueType="I" IsArray="True" IsConst="False" Value=""/>
 	</Action>
 </Actions>

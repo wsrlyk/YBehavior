@@ -109,7 +109,6 @@ namespace YBehavior.Editor.Core.New
                 valueType[i] = Variable.ValueTypeDic.GetKey(valueTypes[i], Variable.ValueType.VT_NONE);
             }
 
-            bool bIsLocal = false;
             Variable.VariableType vbType = Variable.VariableType.VBT_NONE;
             ///> Is Enum, always const
             if (valueType.Length == 1 && valueType[0] == Variable.ValueType.VT_ENUM)
@@ -118,35 +117,17 @@ namespace YBehavior.Editor.Core.New
             }
             else
             {
-                attr = xml.Attributes["VariableType"];
+                attr = xml.Attributes["IsConst"];
                 if (attr != null)
                 {
-                    string strVariableType = attr.Value;
-                    if (strVariableType.Length == 1)
-                    {
-                        vbType = Variable.GetVariableType(strVariableType[0], Variable.VariableType.VBT_NONE);
-                        if (vbType == Variable.VariableType.VBT_NONE)
-                        {
-                            LogMgr.Instance.Error("VariableType format error: " + strVariableType);
-                            return false;
-                        }
-
-                        bIsLocal = Char.IsLower(strVariableType[0]);
-                    }
-                    else
-                    {
-                        LogMgr.Instance.Error("Too many VariableType: " + strVariableType);
-                        return false;
-                    }
+                    vbType = attr.Value == "True" ? Variable.VariableType.VBT_Const : Variable.VariableType.VBT_Pointer;
                 }
             }
 
-            bool isArray = false;
             Variable.CountType countType = Variable.CountType.CT_NONE;
             attr = xml.Attributes["IsArray"];
             if (attr != null)
             {
-                isArray = attr.Value == "True";
                 countType = attr.Value == "True" ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE;
             }
 
@@ -204,7 +185,7 @@ namespace YBehavior.Editor.Core.New
                 cTypeGroup,
                 param
             );
-            v.IsLocal = bIsLocal;
+            v.IsLocal = false;
             v.IsInput = bIsInput;
             return true;
         }
