@@ -88,6 +88,11 @@
                 </Shuffle>
                 <AlwaysSuccess Content="总是返回成功"/>
                 <AlwaysFailure Content="总是返回失败"/>
+                <ConvertToBool Content="根据子节点的成功失败，设置Output值"
+			ReturnSuccess="子节点返回成功"
+			ReturnFailure="子节点返回失败">
+                        <Output Content="子节点的返回值，成功为True，失败为False"/>
+		</ConvertToBool>
                 <Invertor Content="运行并反转子节点的结果"/>
                 <IfThenElse Content="如果If节点返回成功，则运行并返回Then节点，否则运行并返回Else节点"
 			ReturnSuccess="Then/Else返回成功"

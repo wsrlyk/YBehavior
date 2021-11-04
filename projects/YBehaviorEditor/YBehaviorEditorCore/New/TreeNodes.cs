@@ -505,6 +505,28 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
+    class ConvertToBoolTreeNode : SingleChildNode
+    {
+        public override string Icon => "B";
+
+        public ConvertToBoolTreeNode()
+        {
+            m_Name = "ConvertToBool";
+            Type = TreeNodeType.TNT_Default;
+        }
+        public override void CreateVariables()
+        {
+            var v = NodeMemory.CreateVariable(
+                "Output",
+                "",
+                Variable.CreateParams_Bool,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_FIXED
+            );
+            v.IsInput = false;
+        }
+    }
     //class InvertorTreeNode : SingleChildNode
     //{
     //    public override string Icon => "!";

@@ -28,6 +28,21 @@ namespace YBehavior
 		TREENODE_DEFINE(AlwaysFailure)
 	protected:
 	};
+	//////////////////////////////////////////////////////////////////////////
+	class ConvertToBoolNodeContext : public SingleChildNodeContext
+	{
+	protected:
+		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
+	};
+	class ConvertToBool : public SingleChildNode<ConvertToBoolNodeContext>
+	{
+		friend ConvertToBoolNodeContext;
+	public:
+		TREENODE_DEFINE(ConvertToBool)
+	protected:
+		bool OnLoaded(const pugi::xml_node& data) override;
+		SharedVariableEx<BOOL>* m_Output;
+	};
 
 	///> Never need anymore
 	//class Invertor : public SingleChildNode<>

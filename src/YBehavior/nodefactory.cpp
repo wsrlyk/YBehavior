@@ -31,6 +31,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, IfThenElse);
 		REGISTER_TYPE(factory, AlwaysSuccess);
 		REGISTER_TYPE(factory, AlwaysFailure);
+		REGISTER_TYPE(factory, ConvertToBool);
 		//REGISTER_TYPE(factory, Invertor);
 		REGISTER_TYPE(factory, SetData);
 		REGISTER_TYPE(factory, Random);

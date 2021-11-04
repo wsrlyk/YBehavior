@@ -855,8 +855,8 @@ namespace YBehavior.Editor.Core.New
             m_vType = ValueTypeDic.GetKey(valueType, ValueType.VT_NONE);
             if (vType == ValueType.VT_NONE)
                 return false;
-            m_vTypeSet.Clear();
-            m_vTypeSet.Add(m_vType);
+            if (!m_vTypeSet.Contains(m_vType))
+                m_vTypeSet.Add(m_vType);
 
             if (!LockVBType)
             {
