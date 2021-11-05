@@ -294,14 +294,14 @@ namespace YBehavior.Editor.Core.New
         {
             if (m_DragParam == -1)
                 m_DragParam = param;
-            _Move(delta, m_DragParam);
+            Owner.Move(delta, m_DragParam);
         }
 
         public void FinishDrag(Vector delta, Point pos)
         {
             Point finalPos = new Point(Math.Round(Owner.Geo.Pos.X / 10) * 10, Math.Round(Owner.Geo.Pos.Y / 10) * 10);
             Vector delta2 = finalPos - Owner.Geo.Pos;
-            _Move(delta2, m_DragParam);
+            Owner.Move(delta2, m_DragParam);
 
             if (m_Owner.Conns.ParentConnector != null)
             {
@@ -330,22 +330,12 @@ namespace YBehavior.Editor.Core.New
         }
         public void SetPos(Point pos)
         {
-            _Move(pos - Owner.Geo.Pos, 0);
+            Owner.Move(pos - Owner.Geo.Pos, 0);
         }
 
-        void _Move(Vector delta, int param)
+        public void OnMove()
         {
-            Owner.Geo.Pos = Owner.Geo.Pos + delta;
-
             OnPropertyChanged("Owner");
-
-            if (param == 0)
-            {
-                foreach (NodeBase child in m_Owner.Conns)
-                {
-                    child.Renderer._Move(delta, param);
-                }
-            }
         }
 
         protected virtual bool _BeforeDelete(int param) { return true; }

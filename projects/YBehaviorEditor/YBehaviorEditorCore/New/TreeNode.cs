@@ -118,6 +118,10 @@ namespace YBehavior.Editor.Core.New
             TreeNode other = base.Clone() as TreeNode;
             other.Type = Type;
             other.Hierachy = Hierachy;
+            other.ReturnType = ReturnType;
+            other.Folded = Folded;
+            other.m_SelfDisabled = m_SelfDisabled;
+
             if (Variables is NodeMemory)
             {
                 (other.Variables as NodeMemory).CloneFrom(Variables as NodeMemory);

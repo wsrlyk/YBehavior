@@ -281,6 +281,23 @@ namespace YBehavior.Editor.Core.New
 
         public virtual bool CheckValid() { return true; }
 
+        public void Move(Vector delta, int param)
+        {
+            Geo.Pos = Geo.Pos + delta;
+
+            if (Renderer != null)
+                Renderer.OnMove();
+
+            if (param == 0)
+            {
+                foreach (NodeBase child in Conns)
+                {
+                    child.Move(delta, param);
+                }
+            }
+
+        }
+
         public static void OnAddToGraph(NodeBase node, Graph graph)
         {
             node.Graph = graph;
