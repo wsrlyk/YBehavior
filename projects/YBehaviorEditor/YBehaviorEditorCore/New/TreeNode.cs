@@ -121,6 +121,7 @@ namespace YBehavior.Editor.Core.New
             other.ReturnType = ReturnType;
             other.Folded = Folded;
             other.m_SelfDisabled = m_SelfDisabled;
+            other.m_bEnableConditionConnection = m_bEnableConditionConnection;
 
             if (Variables is NodeMemory)
             {
