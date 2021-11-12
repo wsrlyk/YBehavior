@@ -448,8 +448,16 @@ namespace YBehavior.Editor.Core.New
             }
             else
             {
-                m_ChildrenConnectorsList.Add(res);
-                m_MainConnectorsList.Add(res);
+                if (identifier == Connector.IdentifierCondition)
+                {
+                    m_ChildrenConnectorsList.Insert(0, res);
+                    m_MainConnectorsList.Insert(0, res);
+                }
+                else
+                {
+                    m_ChildrenConnectorsList.Add(res);
+                    m_MainConnectorsList.Add(res);
+                }
             }
             m_AllConnectorsList.Add(res);
             return res;
