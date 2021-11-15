@@ -67,7 +67,7 @@ namespace YBehavior.Editor.Core.New
                 if (connRenderer != null)
                     ConnectionList.Add(connRenderer);
 
-                if (ctr1.GetPosType == Connector.PosType.PARENT)
+                if (child.GetPosType == Connector.PosType.PARENT)
                 {
                     TreeNode childNode = child.Owner as TreeNode;
                     RemoveForestTree(childNode, false);
