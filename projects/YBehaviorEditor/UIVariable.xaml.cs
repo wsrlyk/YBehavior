@@ -137,5 +137,20 @@ namespace YBehavior.Editor
                 }
             }
         }
+
+        private void VKey_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Variable v = DataContext as Variable;
+            if (v == null)
+                return;
+
+            Clipboard.SetText(v.Name);
+            ShowSystemTipsArg arg = new ShowSystemTipsArg()
+            {
+                Content = v.Name + "   ->   Clipboard",
+                TipType = ShowSystemTipsArg.TipsType.TT_Success,
+            };
+            EventMgr.Instance.Send(arg);
+        }
     }
 }

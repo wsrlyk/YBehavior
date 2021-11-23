@@ -30,16 +30,20 @@
             <BooleanToVisibilityConverter/>
         </local:ValueConverterGroup>
         <LinearGradientBrush x:Key="normalBrush"  StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Offset="0.0" Color="#00E0FFFF"/>
-            <GradientStop Offset="0.33" Color="#AAE0FFFF"/>
-            <GradientStop Offset="0.66" Color="#AAADD8E6"/>
-            <GradientStop Offset="1.0" Color="#00ADD8E6"/>
+            <GradientStop Offset="0.1" Color="#00E0FFFF"/>
+            <GradientStop Offset="0.2" Color="#AAE0FFFF"/>
+            <GradientStop Offset="0.45" Color="#AAE0FFFF"/>
+            <GradientStop Offset="0.55" Color="#AAADD8E6"/>
+            <GradientStop Offset="0.8" Color="#AAADD8E6"/>
+            <GradientStop Offset="0.9" Color="#00ADD8E6"/>
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="hormalBrush"  StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Offset="0.0" Color="#00E0FFFF"/>
-            <GradientStop Offset="0.33" Color="#EEE0FFFF"/>
-            <GradientStop Offset="0.66" Color="#EEADD8E6"/>
-            <GradientStop Offset="1.0" Color="#00ADD8E6"/>
+            <GradientStop Offset="0.1" Color="#00E0FFFF"/>
+            <GradientStop Offset="0.2" Color="#EEE0FFFF"/>
+            <GradientStop Offset="0.45" Color="#EEE0FFFF"/>
+            <GradientStop Offset="0.55" Color="#EEADD8E6"/>
+            <GradientStop Offset="0.8" Color="#EEADD8E6"/>
+            <GradientStop Offset="0.9" Color="#00ADD8E6"/>
         </LinearGradientBrush>
 
         <Style x:Key="TransparentHoverStyle" TargetType="{x:Type Button}">
@@ -71,7 +75,7 @@
     <StackPanel Opacity ="{Binding ElementName=ESwitcher, Path=IsChecked, Converter={StaticResource boolOpacityConvertor}, Mode=OneWay}">
         <DockPanel Background="LightBlue" Margin="0,1,0,1">
             <Grid DockPanel.Dock="Left">
-                <TextBlock Name="VKey" Style="{StaticResource QuickToolTipStyle}" Text="{Binding DisplayName}" FontSize="13" Width="150" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}" MouseLeftButtonUp="VKey_MouseLeftButtonUp"/>
+                <TextBlock Name="VKey" Style="{StaticResource QuickToolTipStyle}" Text="{Binding DisplayName}" FontSize="13" Width="150" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}" MouseLeftButtonUp="VKey_MouseLeftButtonUp" MouseRightButtonUp="VKey_MouseRightButtonUp"/>
                 <Button Name="CSwitcher" Style="{StaticResource TransparentHoverStyle}" Click="CSwitcher_Click" IsEnabled="{Binding IsEditable}" Visibility="{Binding Path = CanSwitchList, Converter={StaticResource visibilityConvertor}}" ToolTip="{Binding Description}" Margin="126,0,0,0">
                 </Button>
             </Grid>
