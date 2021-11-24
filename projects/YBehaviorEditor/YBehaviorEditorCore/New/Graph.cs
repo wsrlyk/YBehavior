@@ -15,7 +15,7 @@ namespace YBehavior.Editor.Core.New
     {
         public static readonly int FLAG_LOADING = 1 << 0;
 
-        protected List<NodeBase> m_NodeList = new List<NodeBase>();
+        //protected List<NodeBase> m_NodeList = new List<NodeBase>();
 
         public virtual void RefreshNodeUID(uint startUID) { }
         int m_State = 0;

@@ -128,6 +128,7 @@ namespace YBehavior.Editor.Core.New
     public class NodeBase
     {
         private uint m_UID = 0;
+        private uint m_GUID = 0;
         protected string m_Name = string.Empty;
         protected string m_NickName = string.Empty;
         protected string m_Comment = string.Empty;// "This is a node comment test.";
@@ -165,6 +166,15 @@ namespace YBehavior.Editor.Core.New
             {
                 m_UID = value;
                 PropertyChange(RenderProperty.UID);
+            }
+        }
+        public uint GUID
+        {
+            get { return m_GUID; }
+            set
+            {
+                m_GUID = value;
+                //PropertyChange(RenderProperty.UID);
             }
         }
 

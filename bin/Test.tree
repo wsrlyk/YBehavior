@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Test IsEditor="">
-  <Node Class="Root" Pos="0,0">
+  <Node Class="Root" GUID="1" Pos="0,0">
     <Shared f="_FC 0.0" a="_IC 0" aa="IIC " />
     <Local fds="_Ac " />
-    <Node Class="Sequence" Pos="-40,100">
-      <Node Class="Sequence" Pos="-120,250">
-        <Node Class="Calculator" Pos="-320,380" Operator="_EC +" Output="_Ip " Input1="_IP a" Input2="_Ic 0" />
-        <Node Class="Calculator" Pos="-50,410" Operator="_EC +" Output="_Ip " Input1="_Ip " Input2="_Ip " />
+    <Node Class="Sequence" GUID="2" Pos="-40,100">
+      <Node Class="Sequence" GUID="3" Pos="-120,250">
+        <Node Class="Calculator" GUID="4" Pos="-320,380" Operator="_EC +" Output="_Ip " Input1="_IP a" Input2="_Ic 1" />
+        <Node Class="Calculator" GUID="5" Pos="-50,410" Operator="_EC +" Output="_Ip " Input1="_Ip " Input2="_Ip " />
       </Node>
-      <Node Class="Calculator" Pos="100,250" Operator="_EC +" Output="_IP aa VI P a" Input1="_Ip " Input2="_IC 0" />
+      <Node Class="Calculator" GUID="6" Pos="100,250" Operator="_EC +" Output="_IP a" Input1="_Ip " Input2="_IC 1" />
     </Node>
   </Node>
   <DataConnections>
-    <DataConnection FromUID="4" FromName="Output" ToUID="5" ToName="Input1" />
-    <DataConnection FromUID="4" FromName="Output" ToUID="5" ToName="Input2" />
-    <DataConnection FromUID="5" FromName="Output" ToUID="6" ToName="Input1" />
+    <DataConnection FromGUID="4" FromName="Output" ToGUID="5" ToName="Input1" />
+    <DataConnection FromGUID="4" FromName="Output" ToGUID="5" ToName="Input2" />
+    <DataConnection FromGUID="5" FromName="Output" ToGUID="6" ToName="Input1" />
   </DataConnections>
 </Test>

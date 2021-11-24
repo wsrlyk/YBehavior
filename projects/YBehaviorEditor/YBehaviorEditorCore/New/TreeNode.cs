@@ -270,6 +270,9 @@ namespace YBehavior.Editor.Core.New
                 case "Return":
                     m_ReturnType = attr.Value;
                     break;
+                case "GUID":
+                    GUID = uint.Parse(attr.Value);
+                    break;
                 default:
                     return LoadOtherAttr(attr);
             }
@@ -299,6 +302,9 @@ namespace YBehavior.Editor.Core.New
 
         public void Save(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
         {
+            if (GUID != 0)
+                data.SetAttribute("GUID", GUID.ToString());
+
             if (Conns.ParentConnector != null && Conns.ParentConnector.Conns.Count > 0)
             {
                 if (m_Connections.ParentConnector.Conns[0].Ctr.From.Identifier != Connector.IdentifierChildren)

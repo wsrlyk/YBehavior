@@ -33,6 +33,7 @@ namespace YBehavior.Editor.Core.New
         public override void InitEmpty()
         {
             NodeBase.OnAddToGraph(m_Tree.Root, m_Graph);
+            _SetGUID(m_Tree.Root);
             //Utility.OperateNode(m_Tree.Root, m_Graph, false, NodeBase.OnAddToGraph);
             m_Tree.RefreshNodeUID(0);
             AddRenderers(m_Tree.Root, true);
@@ -131,7 +132,11 @@ namespace YBehavior.Editor.Core.New
 
         public override void AddNode(NodeBase node)
         {
-            Utility.OperateNode(node, m_Graph, NodeBase.OnAddToGraph);
+            Utility.OperateNode(node, m_Graph, (NodeBase n, Graph g) => 
+            {
+                NodeBase.OnAddToGraph(n, g);
+                _SetGUID(n);
+            });
             _RefreshForestUID(node);
             AddForestTree(node as TreeNode, true);
 
@@ -196,7 +201,8 @@ namespace YBehavior.Editor.Core.New
                 }
             }
 
-            RefreshReferenceStates();
+            _RefreshReferenceStates();
+            _RefreshGUID();
             CommandMgr.Blocked = false;
             return true;
         }
@@ -279,30 +285,30 @@ namespace YBehavior.Editor.Core.New
         {
             foreach (XmlNode chi in data.ChildNodes)
             {
-                uint FromUID;
-                uint ToUID;
+                uint FromGUID;
+                uint ToGUID;
                 string FromName;
                 string ToName;
-                var attr = chi.Attributes["FromUID"];
+                var attr = chi.Attributes["FromGUID"];
                 if (attr == null)
                 {
-                    LogMgr.Instance.Error("No FromUID Attribute");
+                    LogMgr.Instance.Error("No FromGUID Attribute");
                     continue;
                 }
-                if (!uint.TryParse(attr.Value, out FromUID))
+                if (!uint.TryParse(attr.Value, out FromGUID))
                 {
                     LogMgr.Instance.Error("Parse FromUID Attribute Error: " + attr.Value);
                     continue;
                 }
-                attr = chi.Attributes["ToUID"];
+                attr = chi.Attributes["ToGUID"];
                 if (attr == null)
                 {
-                    LogMgr.Instance.Error("No ToUID Attribute");
+                    LogMgr.Instance.Error("No ToGUID Attribute");
                     continue;
                 }
-                if (!uint.TryParse(attr.Value, out ToUID))
+                if (!uint.TryParse(attr.Value, out ToGUID))
                 {
-                    LogMgr.Instance.Error("Parse ToUID Attribute Error: " + attr.Value);
+                    LogMgr.Instance.Error("Parse ToGUID Attribute Error: " + attr.Value);
                     continue;
                 }
                 attr = chi.Attributes["FromName"];
@@ -323,9 +329,9 @@ namespace YBehavior.Editor.Core.New
                 NodeBase target = null;
                 TreeNode fromNode = null;
                 TreeNode toNode = null;
-                Func<NodeBase, uint, bool> func = (NodeBase node, uint uid) =>
+                Func<NodeBase, uint, bool> func = (NodeBase node, uint guid) =>
                 {
-                    if (node.UID == uid)
+                    if (node.GUID == guid)
                     {
                         target = node;
                         return true;
@@ -335,7 +341,7 @@ namespace YBehavior.Editor.Core.New
 
                 foreach (TreeNode tree in m_AllTrees)
                 {
-                    if (Utility.OperateNode(tree, FromUID, func))
+                    if (Utility.OperateNode(tree, FromGUID, func))
                     {
                         fromNode = target as TreeNode;
                         break;
@@ -343,12 +349,12 @@ namespace YBehavior.Editor.Core.New
                 }
                 if (fromNode == null)
                 {
-                    LogMgr.Instance.Error("Cant find FromUID " + FromUID);
+                    LogMgr.Instance.Error("Cant find FromGUID " + FromGUID);
                     continue;
                 }
                 foreach (TreeNode tree in m_AllTrees)
                 {
-                    if (Utility.OperateNode(tree, ToUID, func))
+                    if (Utility.OperateNode(tree, ToGUID, func))
                     {
                         toNode = target as TreeNode;
                         break;
@@ -356,7 +362,7 @@ namespace YBehavior.Editor.Core.New
                 }
                 if (toNode == null)
                 {
-                    LogMgr.Instance.Error("Cant find ToUID " + ToUID);
+                    LogMgr.Instance.Error("Cant find ToGUID " + ToGUID);
                     continue;
                 }
 
@@ -417,7 +423,7 @@ namespace YBehavior.Editor.Core.New
                 //_SaveVariableConnections(m_Tree.Root, ref variableRoot, data, xmlDoc);
                 foreach (var tree in m_AllTrees)
                 {
-                    _SaveVariableConnections(tree, ref variableRoot, data, xmlDoc);
+                    _SaveVariableConnections(tree, ref variableRoot, data, xmlDoc, false);
                 }
             }
 
@@ -428,7 +434,7 @@ namespace YBehavior.Editor.Core.New
 
             OnPropertyChanged("DisplayName");
 
-            RefreshReferenceStates();
+            _RefreshReferenceStates();
         }
 
         void _SaveNode(TreeNode node, XmlElement data, XmlDocument xmlDoc)
@@ -445,10 +451,10 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        void _SaveVariableConnections(TreeNode node, ref XmlElement data, XmlElement root, XmlDocument xmlDoc)
+        void _SaveVariableConnections(TreeNode node, ref XmlElement data, XmlElement root, XmlDocument xmlDoc, bool export)
         {
             ///> We get the connection NOT from the InputConnector but the OutputConnector,
-            ///  to make sure that the connections are sorted by FromUID
+            ///  to make sure that the connections are sorted by From's UID
             foreach (Connector c in node.Conns.OutputConnectors)
             {
                 foreach (Connection conn in c.Conns)
@@ -460,23 +466,29 @@ namespace YBehavior.Editor.Core.New
                     }
                     var el = xmlDoc.CreateElement("DataConnection");
                     data.AppendChild(el);
-                    el.SetAttribute("FromUID", conn.Ctr.From.Owner.UID.ToString());
+                    if (export)
+                        el.SetAttribute("FromUID", conn.Ctr.From.Owner.UID.ToString());
+                    else
+                        el.SetAttribute("FromGUID", conn.Ctr.From.Owner.GUID.ToString());
                     el.SetAttribute("FromName", conn.Ctr.From.Identifier);
-                    el.SetAttribute("ToUID", conn.Ctr.To.Owner.UID.ToString());
+                    if (export)
+                        el.SetAttribute("ToUID", conn.Ctr.To.Owner.UID.ToString());
+                    else
+                        el.SetAttribute("ToGUID", conn.Ctr.To.Owner.GUID.ToString());
                     el.SetAttribute("ToName", conn.Ctr.To.Identifier);
                 }
             }
 
             foreach (TreeNode chi in node.Conns)
             {
-                _SaveVariableConnections(chi, ref data, root, xmlDoc);
+                _SaveVariableConnections(chi, ref data, root, xmlDoc, export);
             }
         }
         public override void Export(XmlElement data, XmlDocument xmlDoc)
         {
             _ExportNode(m_Tree.Root, data, xmlDoc);
             XmlElement variableRoot = null;
-            _SaveVariableConnections(m_Tree.Root, ref variableRoot, data, xmlDoc);
+            _SaveVariableConnections(m_Tree.Root, ref variableRoot, data, xmlDoc, true);
 
             m_ExportFileHash = GenerateHash(data.OuterXml.Replace(" ", string.Empty));
         }
@@ -731,7 +743,34 @@ namespace YBehavior.Editor.Core.New
            return bRes;
         }
 
-        public void RefreshReferenceStates()
+        uint m_GUID;
+        void _RefreshGUID()
+        {
+            m_GUID = 0;
+            foreach (var tree in m_AllTrees)
+            {
+                Utility.OperateNode(tree, (NodeBase node) =>
+                { 
+                    if (node.GUID != 0)
+                        m_GUID = Math.Max(m_GUID, node.GUID);
+                });
+            }
+            foreach (var tree in m_AllTrees)
+            {
+                Utility.OperateNode(tree, (NodeBase node) =>
+                {
+                    if (node.GUID == 0)
+                        node.GUID = ++m_GUID;
+                });
+            }
+        }
+
+        void _SetGUID(NodeBase node)
+        {
+            if (node.GUID == 0)
+                node.GUID = ++m_GUID;
+        }
+        void _RefreshReferenceStates()
         {
             foreach (var v in m_Tree.TreeMemory.SharedMemory.Datas)
             {
@@ -829,12 +868,12 @@ namespace YBehavior.Editor.Core.New
         {
             if (m_Tree.SharedData.SwitchVariable(v))
             {
-                RefreshAfterSwitchVariable(v);
+                _RefreshAfterSwitchVariable(v);
                 LogMgr.Instance.Log("Switch " + v.DisplayName);
             }
         }
 
-        public bool RefreshAfterSwitchVariable(Variable variable)
+        bool _RefreshAfterSwitchVariable(Variable variable)
         {
             if (variable == null)
                 return false;
