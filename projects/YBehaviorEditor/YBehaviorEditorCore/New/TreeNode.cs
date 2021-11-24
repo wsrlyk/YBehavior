@@ -468,6 +468,7 @@ namespace YBehavior.Editor.Core.New
             foreach (VariableHolder v in Variables.Datas)
             {
                 v.Variable.RefreshCandidates();
+                v.Variable.ResetInvalidValue();
             }
         }
 

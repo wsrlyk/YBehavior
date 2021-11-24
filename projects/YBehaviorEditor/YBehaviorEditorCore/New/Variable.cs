@@ -349,6 +349,32 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        /// <summary>
+        /// If a variable of a node in TreeA has a pointer, but be pasted to TreeB,
+        /// TreeB may not have that shared/local variable.
+        /// We have to set its value to NULL.
+        /// This function must be called after RefreshCandidates.
+        /// </summary>
+        public void ResetInvalidValue()
+        {
+            if (vbType == VariableType.VBT_Pointer && !string.IsNullOrEmpty(Value))
+            {
+                bool bFound = false;
+                foreach (var c in Candidates.variables)
+                {
+                    if (c.variable == null)
+                        continue;
+                    if (c.variable.IsLocal == IsLocal &&
+                        c.variable.Name == Value)
+                    {
+                        bFound = true;
+                        break;
+                    }
+                }
+                if (!bFound)
+                    SetValue(null, false);
+            }
+        }
 
         public VariableCandidates.Candidates Candidates { get; set; }
 

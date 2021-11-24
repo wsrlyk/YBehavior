@@ -680,6 +680,12 @@ namespace YBehavior.Editor.Core.New
                             bRes = false;
                             continue;
                         }
+                        if (toNode.Disabled)
+                        {
+                            LogMgr.Instance.Error("CheckError in Node: " + toNode.Renderer.UITitle + ", Disabled, Can NOT connect to: " + node.Renderer.UITitle);
+                            bRes = false;
+                            continue;
+                        }
                         Variable toVariable = toNode.Variables.GetVariable(toCtr.Identifier);
                         if (toVariable == null)
                         {
@@ -733,6 +739,12 @@ namespace YBehavior.Editor.Core.New
                         if (fromNode.Root != rootNode)
                         {
                             LogMgr.Instance.Error("CheckError in Node: " + fromNode.Renderer.UITitle + ", Not in Same Tree with: " + node.Renderer.UITitle);
+                            bRes = false;
+                            continue;
+                        }
+                        if (fromNode.Disabled)
+                        {
+                            LogMgr.Instance.Error("CheckError in Node: " + fromNode.Renderer.UITitle + ", Disabled, Can NOT connect to: " + node.Renderer.UITitle);
                             bRes = false;
                             continue;
                         }
