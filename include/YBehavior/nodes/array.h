@@ -69,6 +69,7 @@ namespace YBehavior
 		ISharedVariableEx* m_Array;
 		ISharedVariableEx* m_Element;
 		SharedVariableEx<INT>* m_Count;
+		SharedVariableEx<INT>* m_Index;
 	};
 
 	class IsArrayEmpty : public LeafNode<>

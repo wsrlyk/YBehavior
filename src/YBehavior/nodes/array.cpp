@@ -223,6 +223,7 @@ namespace YBehavior
 		}
 
 		VariableCreation::CreateVariableIfExist(this, m_Count, "Count", data, true);
+		VariableCreation::CreateVariableIfExist(this, m_Index, "Index", data, true);
 		return true;
 	}
 
@@ -235,18 +236,28 @@ namespace YBehavior
 		}
 
 		bool res = false;
+		INT index;
 		if (m_Count != nullptr)
 		{
-			auto count = m_Array->CountElement(pAgent->GetMemory(), m_Element->GetValue(pAgent->GetMemory()));
+			auto count = m_Array->CountElement(pAgent->GetMemory(), m_Element->GetValue(pAgent->GetMemory()), index);
 			m_Count->SetCastedValue(pAgent->GetMemory(), count);
 			res = count != 0;
 		}
 		else
 		{
-			res = m_Array->HasElement(pAgent->GetMemory(), m_Element->GetValue(pAgent->GetMemory()));
+			res = m_Array->HasElement(pAgent->GetMemory(), m_Element->GetValue(pAgent->GetMemory()), index);
 		}
 
-		YB_LOG_VARIABLE_AFTER_IF_HAS_DEBUG_POINT(m_Count);
+		if (res && m_Index)
+		{
+			m_Index->SetCastedValue(pAgent->GetMemory(), index);
+		}
+
+		YB_IF_HAS_DEBUG_POINT
+		{
+			YB_LOG_VARIABLE_AFTER(m_Count);
+			YB_LOG_VARIABLE_AFTER(m_Index);
+		}
 
 		return res ? NS_SUCCESS : NS_FAILURE;
 	}

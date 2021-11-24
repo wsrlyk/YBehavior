@@ -68,8 +68,8 @@ namespace YBehavior
 		virtual void SetElement(IMemory* pMemory, const void* v, INT index) = 0;
 		virtual void PushBackElement(IMemory* pMemory, const void* v) = 0;
 		virtual bool RemoveElement(IMemory* pMemory, const void* v, bool isAll) = 0;
-		virtual bool HasElement(IMemory* pMemory, const void* v) = 0;
-		virtual INT CountElement(IMemory* pMemory, const void* v) = 0;
+		virtual bool HasElement(IMemory* pMemory, const void* v, INT& firstIndex) = 0;
+		virtual INT CountElement(IMemory* pMemory, const void* v, INT& firstIndex) = 0;
 	protected:
 		KEY m_Key;
 		bool m_IsLocal;

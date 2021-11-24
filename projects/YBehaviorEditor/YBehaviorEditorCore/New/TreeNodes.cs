@@ -1602,6 +1602,14 @@ namespace YBehavior.Editor.Core.New
                 Variable.VariableType.VBT_Pointer,
                 Variable.EnableType.ET_Disable
             );
+            Variable index = NodeMemory.CreateVariable(
+                "Index",
+                "",
+                Variable.CreateParams_Int,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_Disable
+            );
         }
 
         public override string Note

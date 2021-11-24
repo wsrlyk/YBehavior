@@ -294,21 +294,23 @@ namespace YBehavior
 			return false;
 		}
 
-		bool HasElement(IMemory* pMemory, const void* v) override
+		bool HasElement(IMemory* pMemory, const void* v, INT& firstIndex) override
 		{
 			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
-
+			firstIndex = -1;
 			if (mValue != nullptr && v != nullptr && !mValue->empty())
 			{
 				auto it = std::find(mValue->begin(), mValue->end(), *((const ElementType*)v));
+				auto idx = it - mValue->begin();
+				firstIndex = (INT)idx;
 				return it != mValue->end();
 			}
 			return false;
 		}
-		INT CountElement(IMemory* pMemory, const void* v) override
+		INT CountElement(IMemory* pMemory, const void* v, INT& firstIndex) override
 		{
 			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
-
+			firstIndex = -1;
 			if (mValue != nullptr && v != nullptr && !mValue->empty())
 			{
 				INT count = 0;
@@ -320,6 +322,12 @@ namespace YBehavior
 					if (it == mValue->end())
 						break;
 					++count;
+					if (firstIndex == -1)
+					{
+						auto idx = it - mValue->begin();
+						firstIndex = (INT)idx;
+					}
+
 					++it;
 				} while (it != mValue->end());
 				return count;
