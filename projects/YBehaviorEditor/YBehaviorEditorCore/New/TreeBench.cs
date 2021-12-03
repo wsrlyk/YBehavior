@@ -638,6 +638,9 @@ namespace YBehavior.Editor.Core.New
             Utility.OperateNode(root, (NodeBase node) =>
             {
                 TreeNode thisNode = node as TreeNode;
+                if (thisNode.Disabled)
+                    return;
+
                 TreeNode rootNode = thisNode.Root;
                 foreach (Connector ctr in node.Conns.OutputConnectors)
                 {
