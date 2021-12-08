@@ -513,7 +513,7 @@ namespace YBehavior.Editor.Core.New
             string[] data = ss.Split(msgListSplitter, StringSplitOptions.RemoveEmptyEntries);
             if (data.Length > 0)
             {
-                List<BenchInfo> names = new List<BenchInfo>();
+                List<string> names = new List<string>();
                 List<uint> hashes = new List<uint>();
 
                 foreach (string s in data)
@@ -532,11 +532,12 @@ namespace YBehavior.Editor.Core.New
 
                     if (uint.TryParse(sub[1], out uint hash))
                     {
-                        ///> The first one is the FSM
-                        if (names.Count == 0)
-                            names.Add(new BenchInfo() { Name = sub[0], Type = GraphType.FSM });
-                        else
-                            names.Add(new BenchInfo() { Name = sub[0], Type = GraphType.TREE });
+                        /////> The first one is the FSM
+                        //if (names.Count == 0)
+                        //    names.Add(new BenchInfo() { Name = sub[0], Type = GraphType.FSM });
+                        //else
+                        //    names.Add(new BenchInfo() { Name = sub[0], Type = GraphType.TREE });
+                        names.Add(sub[0]);
                         hashes.Add(hash);
                     }
                 }

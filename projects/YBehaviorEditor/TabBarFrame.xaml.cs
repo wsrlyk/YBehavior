@@ -42,6 +42,11 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.WorkBenchLoaded, _OnWorkBenchLoaded);
             EventMgr.Instance.Register(EventType.WorkBenchSaved, _OnWorkBenchSaved);
             EventMgr.Instance.Register(EventType.SelectWorkBench, _OnSelectWorkBench);
+
+            foreach (WorkBench openedBench in WorkBenchMgr.Instance.OpenedBenches)
+            {
+                _LoadWorkBench(openedBench);
+            }
         }
 
         private void _OnWorkBenchLoaded(EventArg arg)
@@ -50,12 +55,17 @@ namespace YBehavior.Editor
             if (oArg.Bench == null)
                 return;
 
+            _LoadWorkBench(oArg.Bench);
+        }
+
+        private void _LoadWorkBench(WorkBench bench)
+        { 
             ///> Check if the bench has already been in the tabs
 
             UCTabItemWithClose activeTab = null;
             foreach (UCTabItemWithClose tab in this.TabController.Items)
             {
-                if (tab.Content == oArg.Bench)
+                if (tab.Content == bench)
                 {
                     activeTab = tab;
                     break;
@@ -66,8 +76,8 @@ namespace YBehavior.Editor
             {
                 activeTab = new UCTabItemWithClose();
                 //activeTab.Header = oArg.Bench.FileInfo.DisplayName;
-                activeTab.ToolTip = oArg.Bench.FileInfo.DisplayPath;
-                activeTab.Content = oArg.Bench;
+                activeTab.ToolTip = bench.FileInfo.DisplayPath;
+                activeTab.Content = bench;
                 activeTab.CloseHandler = _TabCloseClicked;
                 this.TabController.Items.Add(activeTab);
                 activeTab.PreviewMouseMove += TabItem_PreviewMouseMove;
@@ -76,7 +86,7 @@ namespace YBehavior.Editor
                 activeTab.AllowDrop = true;
 
                 TabData tabData = new TabData();
-                if (oArg.Bench is TreeBench)
+                if (bench is TreeBench)
                     tabData.Frame = new TreeBenchFrame();
                 else
                     tabData.Frame = new FSMBenchFrame();
@@ -85,9 +95,9 @@ namespace YBehavior.Editor
                 this.BenchContainer.Children.Add(tabData.Frame);
                 tabData.Frame.Visibility = Visibility.Collapsed;
 
-                tabData.Frame.OnWorkBenchLoaded(oArg.Bench);
+                tabData.Frame.OnWorkBenchLoaded(bench);
 
-                activeTab.DataContext = oArg.Bench;
+                activeTab.DataContext = bench;
                 activeTab.SetBinding(UCTabItemWithClose.HeaderProperty, new Binding()
                 {
                     Path = new PropertyPath("DisplayName"),
@@ -95,7 +105,7 @@ namespace YBehavior.Editor
                 });
             }
 
-            activeTab.IsSelected = WorkBenchMgr.Instance.ActiveWorkBench == oArg.Bench;
+            activeTab.IsSelected = WorkBenchMgr.Instance.ActiveWorkBench == bench;
 
             //_RenderActiveWorkBench();
         }

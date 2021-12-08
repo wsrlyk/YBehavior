@@ -57,7 +57,7 @@ namespace YBehavior.Editor.Core.New
                 node.LoadDescription();
                 m_NodeList.Add(node);
                 m_TypeDic.Add(node.Name, type);
-                Console.WriteLine(type);
+                LogMgr.Instance.Log(type.ToString());
             }
         }
 

@@ -555,24 +555,29 @@ namespace YBehavior.Editor.Core.New
             ActiveWorkBench.CommandMgr.Redo();
         }
 
-        public List<WorkBench> OpenAList(IEnumerable<BenchInfo> list)
+        public List<WorkBench> OpenAList(IEnumerable<string> list)
         {
             List<WorkBench> res = new List<WorkBench>();
 
-            foreach (BenchInfo info in list)
+            foreach (var f in list)
             {
-                System.IO.FileInfo file = null;
-                if (info.Type == GraphType.TREE)
-                    file = new System.IO.FileInfo(Config.Instance.WorkingDirWin + info.Name + FileMgr.TreeExtension);
-                else
-                    file = new System.IO.FileInfo(Config.Instance.WorkingDirWin + info.Name + ".fsm");
-                if (!file.Exists)
+                //System.IO.FileInfo file = null;
+                //if (info.Type == GraphType.TREE)
+                //    file = new System.IO.FileInfo(Config.Instance.WorkingDirWin + info.Name + FileMgr.TreeExtension);
+                //else
+                //    file = new System.IO.FileInfo(Config.Instance.WorkingDirWin + info.Name + ".fsm");
+                //if (!file.Exists)
+                //{
+                //    LogMgr.Instance.Error("File not exists: " + file.FullName);
+                //    continue;
+                //}
+
+                FileMgr.FileInfo fileInfo = FileMgr.Instance.GetFileInfo(f);
+                if (fileInfo == null)
                 {
-                    LogMgr.Instance.Error("File not exists: " + file.FullName);
+                    LogMgr.Instance.Error("File not exists: " + f);
                     continue;
                 }
-
-                FileMgr.FileInfo fileInfo = FileMgr.Instance.GetFileInfo(info.Name);
                 WorkBench newBench = OpenWorkBenchInBackGround(fileInfo);
 
                 WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
@@ -595,9 +600,9 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    public struct BenchInfo
-    {
-        public string Name;
-        public GraphType Type;
-    }
+    //public struct BenchInfo
+    //{
+    //    public string Name;
+    //    public GraphType Type;
+    //}
 }

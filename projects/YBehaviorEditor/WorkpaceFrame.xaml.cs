@@ -114,6 +114,8 @@ namespace YBehavior.Editor
 
             this.Files.ItemsSource = m_FileInfos.Children;
 
+            if (WorkBenchMgr.Instance.OpenedBenches.Count > 0)
+                _Hide();
         }
 
         void _GetExpandedItems(ItemsControl items, HashSet<string> expandedItems)
@@ -160,7 +162,7 @@ namespace YBehavior.Editor
             ////    m_ExpandedItems.Add(s);
             ////}
             m_ExpandedItems = Config.Instance.ExpandedFolders;
-            m_FileInfos.Build(FileMgr.Instance.ReloadAndGetAllFiles(), _Filter, m_ExpandedItems);
+            m_FileInfos.Build(FileMgr.Instance.AllFiles, _Filter, m_ExpandedItems);
         }
 
         private void OnFilesItemDoubleClick(object sender, MouseButtonEventArgs e)

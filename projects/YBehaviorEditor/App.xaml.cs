@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
@@ -22,6 +23,44 @@ namespace YBehavior.Editor
 
         }
 
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            FileMgr.Instance.Load();
+
+            if (e.Args != null && e.Args.Length > 0)
+            {
+                int i = 0;
+                string s = e.Args[i];
+                do
+                {
+                    switch (s)
+                    {
+                        case "-f":
+                            {
+                                List<string> list = new List<string>();
+                                while(++i < e.Args.Length)
+                                {
+                                    s = e.Args[i];
+                                    if (s.StartsWith("-"))
+                                        break;
+                                    list.Add(s);
+                                }
+                                if (list.Count > 0)
+                                    WorkBenchMgr.Instance.OpenAList(list);
+                            }
+                            break;
+                        default:
+                            LogMgr.Instance.Error("Invalid arg: " + s);
+                            ++i;
+                            if (i < e.Args.Length)
+                                s = e.Args[i];
+                            break;
+                    }
+                }
+                while (i < e.Args.Length);
+            }
+        }
+
         private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             string exceptionStr = e.ExceptionObject.ToString();
@@ -40,7 +79,7 @@ namespace YBehavior.Editor
                         if (sb.Length > 0)
                         {
                             _ProcessCommand(sb.ToString());
-                            Console.WriteLine();
+                            LogMgr.Instance.LogEnd();
                             sb.Clear();
                         }
                         break;
@@ -84,7 +123,7 @@ namespace YBehavior.Editor
                 var fileinfo = FileMgr.Instance.GetFileInfo(treename);
                 if (fileinfo == null)
                 {
-                    Console.WriteLine("Cant find " + treename);
+                    LogMgr.Instance.Error("Cant find " + treename);
                     continue;
                 }
 
@@ -98,7 +137,7 @@ namespace YBehavior.Editor
                     workbench.FilePath = workbench.FileInfo.RelativeName;
 
                     FileMgr.Instance.Load(relativePath, workbench.FilePath);
-                    Console.WriteLine(treename + " saved and exported.");
+                    LogMgr.Instance.Log(treename + " saved and exported.");
                 }
             }
             WorkBenchMgr.Instance.ActiveWorkBench = oldActiveBench;
@@ -113,7 +152,7 @@ namespace YBehavior.Editor
                 var fileinfo = FileMgr.Instance.GetFileInfo(treename);
                 if (fileinfo == null)
                 {
-                    Console.WriteLine("Cant find " + treename);
+                    LogMgr.Instance.Error("Cant find " + treename);
                     continue;
                 }
 
@@ -129,7 +168,7 @@ namespace YBehavior.Editor
                     workbench.FilePath = workbench.FileInfo.RelativeName;
 
                     FileMgr.Instance.Load(relativePath, workbench.FilePath);
-                    Console.WriteLine(treename + " saved and exported.");
+                    LogMgr.Instance.Log(treename + " saved and exported.");
                 }
             }
             WorkBenchMgr.Instance.ActiveWorkBench = oldActiveBench;
