@@ -66,7 +66,7 @@ namespace YBehavior
 			DataArrayIterator<T>* innerIt = ObjectPoolStatic<DataArrayIterator<T>>::Get();
 			innerIt->Set(itBegin, itEnd);
 			Iterator it(innerIt);
-			return std::move(it);
+			return it;
 		}
 
 		void MergeFrom(const IDataArray* other, bool bOverride) override
