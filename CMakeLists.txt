@@ -2,7 +2,7 @@ PROJECT(YBehavior)
   
 cmake_minimum_required(VERSION 3.3.0)  
   
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++17 -pthread")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++17")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -g -DYDEBUGGER -Werror -Wno-unused-function -Wno-invalid-offsetof -Wno-maybe-uninitialized")
 SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O1 -g -Werror -Wno-unused-function -Wno-invalid-offsetof -Wno-maybe-uninitialized")
 

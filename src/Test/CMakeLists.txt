@@ -10,6 +10,4 @@ SET(EXECUTABLE_OUTPUT_PATH  ../../../bin/)
 
 ADD_EXECUTABLE(${ProjectName} ${DIR_SRCS})
 
-TARGET_LINK_LIBRARIES ( ${ProjectName} pthread)
-TARGET_LINK_LIBRARIES ( ${ProjectName} YBehavior)
-
+TARGET_LINK_LIBRARIES ( ${ProjectName} YBehavior pthread)
