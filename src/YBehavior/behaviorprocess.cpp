@@ -28,9 +28,11 @@ namespace YBehavior
 			behaviorProcess.memory.GetStack().clear();
 			behaviorProcess.memory.GetMainData()->Clear();
 
-			Mgrs::Instance()->GetBehaviorMgr()->ReturnBehavior(behaviorProcess.pBehavior);
-			behaviorProcess.machineContext.Reset();
 			behaviorProcess.treeContext.Reset();
+			behaviorProcess.machineContext.Reset();
+
+			Mgrs::Instance()->GetBehaviorMgr()->ReturnBehavior(behaviorProcess.pBehavior);
+
 			behaviorProcess.pBehavior = nullptr;
 		}
 	}

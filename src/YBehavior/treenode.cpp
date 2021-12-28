@@ -175,6 +175,7 @@ namespace YBehavior
 
 	TreeNodeContext::~TreeNodeContext()
 	{
+		m_pNode = nullptr;
 #ifdef YDEBUGGER
 		delete m_pDebugHelper;
 #endif
