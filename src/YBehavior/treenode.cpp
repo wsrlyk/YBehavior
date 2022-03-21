@@ -147,7 +147,7 @@ namespace YBehavior
 	{
 		if (pVariable)
 		{
-			pVariable->SetIndex(m_Variables.size());
+			pVariable->SetIndex((UINT)m_Variables.size());
 			m_Variables.push_back(pVariable);
 		}
 	}

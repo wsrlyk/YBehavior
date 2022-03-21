@@ -73,7 +73,7 @@ namespace YBehavior
 
 	bool TreeMgr::_LoadOneNode(TreeNode* node, const pugi::xml_node& data, std::vector<TreeNode*>& treeNodesCache, BehaviorTree* root)
 	{
-		UINT uid = treeNodesCache.size();
+		UINT uid = (UINT)treeNodesCache.size();
 		if (node == nullptr)
 		{
 			ERROR_BEGIN << "NULL node when load " << data.name() << ", uid " << (uid) << ERROR_END;

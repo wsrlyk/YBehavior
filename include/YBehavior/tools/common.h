@@ -61,14 +61,25 @@ namespace YBehavior
 		TypeTypeMap(const std::initializer_list<Pair>& list)
 			: m_Datas(list)
 		{
+			for (auto it = list.begin(); it != list.end(); ++it)
+			{
+				m_Keys.insert(it->first);
+			}
 		}
 
-		bool Contains(T1 t1, T2 t2)
+		bool NotMatch(T1 t1, T2 t2)
 		{
-			return m_Datas.count(Pair(t1, t2)) > 0;
+			if (m_Datas.count(Pair(t1, t2)) > 0)
+				return false;
+
+			if (m_Keys.count(t1) > 0)
+				return true;
+
+			return false;
 		}
 	protected:
 		std::set<Pair> m_Datas;
+		std::set<T1> m_Keys;
 	};
 }
 
