@@ -170,7 +170,7 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        public void StartDebugTreeWithAgent(ulong uid)
+        public void StartDebugTreeWithAgent(ulong uid, bool waitforbegin)
         {
             FileMgr.FileInfo fileInfo = null;
             if (WorkBenchMgr.Instance.ActiveWorkBench != null)
@@ -182,7 +182,7 @@ namespace YBehavior.Editor.Core.New
 
             //List<WorkBench> benches = WorkBenchMgr.Instance.OpenAllRelated();
             //BuildRunInfo(benches);
-            NetworkMgr.Instance.MessageProcessor.DebugTreeWithAgent(fileInfo, uid);
+            NetworkMgr.Instance.MessageProcessor.DebugTreeWithAgent(fileInfo, uid, waitforbegin);
         }
 
         public void Continue()

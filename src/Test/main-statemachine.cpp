@@ -29,15 +29,18 @@ int main(int argc, char** argv)
 	STRING s;
 	XEntity* pEntity = new XEntity("Hehe", "EmptyFSM", nullptr, nullptr);
 
+	std::cin >> s;
+
 	//pMain->OnEnter(pEntity->GetAgent());
 	while (true)
 	{
 		//pMain->Update(0, pEntity->GetAgent());
+		std::cout << "tick" << std::endl;
 		pEntity->GetAgent()->Tick();
 		//std::cin >> s;
 		//pEntity->GetAgent()->GetMachineContext()->GetTransition().Set(s);
 #if _MSC_VER
-		Sleep(2000);
+		Sleep(300);
 #else
 		usleep(1000000);
 #endif

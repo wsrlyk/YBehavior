@@ -121,7 +121,7 @@ namespace YBehavior.Editor
             else
             {
                 DebugMgr.Instance.StartDebugTreeWithAgent(
-                uid);
+                uid, this.waitForBegin.IsChecked ?? false);
             }
         }
 

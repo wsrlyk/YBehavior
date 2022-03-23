@@ -117,7 +117,7 @@ namespace YBehavior.Editor.Core.New
         }
         private void _OnDebugTargetChanged(EventArg arg)
         {
-            if (DebugMgr.Instance.IsDebugging() && m_ActiveWorkBench != null)
+            if (/*DebugMgr.Instance.IsDebugging() && */m_ActiveWorkBench != null)
                 m_ActiveWorkBench.RefreshDebug();
         }
 

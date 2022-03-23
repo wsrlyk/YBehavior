@@ -4,16 +4,12 @@
     <Shared a="_IC 0" />
     <Local />
     <Node Class="Sequence">
-      <Node Class="Sequence">
-        <Node Class="Calculator" Operator="_EC +" Output="_Ip " Input1="_IP a" Input2="_Ic 1" />
-        <Node Class="Calculator" Operator="_EC +" Output="_Ip " Input1="_Ip " Input2="_Ip " />
+      <Node Class="IfThenElse">
+        <Node Class="Comparer" Connection="if" Operator="_EC &gt;" Opl="_IP a" Opr="_IC 10" />
+        <Node Class="SetData" Connection="then" Target="_IP a" Source="_IC 0" />
+        <Node Class="Calculator" Connection="else" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_Ic 1" />
       </Node>
-      <Node Class="Calculator" Operator="_EC +" Output="_IP a" Input1="_Ip " Input2="_IC 1" />
+      <Node Class="SubTree" Tree="_SC Test0" Identification="_SC " />
     </Node>
   </Node>
-  <DataConnections>
-    <DataConnection FromUID="4" FromName="Output" ToUID="5" ToName="Input1" />
-    <DataConnection FromUID="4" FromName="Output" ToUID="5" ToName="Input2" />
-    <DataConnection FromUID="5" FromName="Output" ToUID="6" ToName="Input1" />
-  </DataConnections>
 </Test>

@@ -28,22 +28,24 @@ namespace YBehavior
 		Clear();
 	}
 
-	void DebugMgr::SetTarget(const DebugTargetID& target)
+	void DebugMgr::SetTarget(const DebugTargetID& target, bool bWaitForBegin)
 	{
 		m_Target = target;
 		//m_TargetHash = hash;
 		m_TargetAgent = 0;
 		m_bTargetDirty = true;
 		m_TryTarget = 0;
+		m_bWaitForBegin = bWaitForBegin;
 	}
 
-	void DebugMgr::SetTarget(UINT64 target)
+	void DebugMgr::SetTarget(UINT64 target, bool bWaitForBegin)
 	{
 		m_Target.Type = DebugTargetType::INVALID;
 		//m_TargetHash = hash;
 		m_TargetAgent = 0;
 		m_bTargetDirty = true;
 		m_TryTarget = target;
+		m_bWaitForBegin = bWaitForBegin;
 	}
 
 	void DebugMgr::Begin()
@@ -52,11 +54,19 @@ namespace YBehavior
 		{
 			m_TargetAgent = m_TryTarget;
 		}
+
+		if (m_bWaitForBegin)
+			m_bWaitForBegin = false;
+	}
+
+	void DebugMgr::Failed()
+	{
+		ResetTarget();
 	}
 
 	void DebugMgr::ResetTarget()
 	{
-		SetTarget(0);
+		SetTarget(0, false);
 	}
 
 	void DebugMgr::Stop()
@@ -93,6 +103,7 @@ namespace YBehavior
 					m_TryTarget == pAgent->GetDebugUID())
 				{
 					_TryDebug(pAgent);
+					return _TryWaitForBegin();
 				}
 			}
 			else
@@ -122,6 +133,7 @@ namespace YBehavior
 					m_TryTarget == pAgent->GetDebugUID())
 				{
 					_TryDebug(pAgent);
+					return _TryWaitForBegin();
 				}
 			}
 			else
@@ -166,6 +178,17 @@ namespace YBehavior
 
 		m_bTargetDirty = false;
 		m_TryTarget = pAgent->GetDebugUID();
+	}
+
+	bool DebugMgr::_TryWaitForBegin()
+	{
+		if (!m_bWaitForBegin)
+			return false;
+		while (m_bWaitForBegin)
+		{
+			Thread::SleepMilli(100);
+		}
+		return m_TargetAgent != 0;
 	}
 
 	bool DebugMgr::HasBreakPoint(const DebugTargetID& target, UINT nodeUID)
@@ -407,7 +430,7 @@ namespace YBehavior
 
 	void IDebugHelper::SetResult(int rawState, int finalState)
 	{
-		if (IsValid())
+		if (IsValid() && m_pRunInfo)
 		{
 			m_pRunInfo->rawRunState = rawState;
 			m_pRunInfo->finalRunState = finalState;
@@ -480,7 +503,7 @@ namespace YBehavior
 
 	void IDebugHelper::TryBreaking()
 	{
-		if (!IsValid())
+		if (!IsValid() || !m_pRunInfo)
 			return;
 
 		if (DebugMgr::Instance()->IsPaused())
@@ -491,14 +514,14 @@ namespace YBehavior
 
 	bool IDebugHelper::HasLogPoint()
 	{
-		if (!IsValid())
+		if (!IsValid() || !m_pRunInfo)
 			return false;
 		return DebugMgr::Instance()->HasLogPoint({ m_Type, GetRootName() }, m_pRunInfo->nodeUID);
 	}
 
 	bool IDebugHelper::HasDebugPoint()
 	{
-		if (!IsValid())
+		if (!IsValid() || !m_pRunInfo)
 			return false;
 		return DebugMgr::Instance()->HasDebugPoint({ m_Type, GetRootName() }, m_pRunInfo->nodeUID);
 	}
@@ -595,7 +618,7 @@ namespace YBehavior
 
 	void DebugTreeHelper::SendLogPoint()
 	{
-		if (m_pLogInfo == nullptr)
+		if (m_pLogInfo == nullptr || m_pRunInfo == nullptr)
 			return;
 
 		m_pLogInfo->otherInfo = m_DebugLogInfo.str();

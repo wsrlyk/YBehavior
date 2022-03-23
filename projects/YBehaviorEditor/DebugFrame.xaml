@@ -18,8 +18,14 @@
             <Button Name="btnStopDebug" Click="btnStopDebug_Click" Content="Quit" Style="{StaticResource ButtonRed}"/>
             <Border BorderBrush="Blue" BorderThickness="1">
                 <StackPanel Orientation="Horizontal">
-                    <Button Name="btnDebugThisTree" Click="btnDebugThisTree_Click" Content="Start Debug UID :"/>
-                    <TextBox Name="debugAgentUID" Text="" Width="150" MaxLines="1" Margin="0,6"/>
+                    <Button Name="btnDebugThisTree" Click="btnDebugThisTree_Click" Content="Start Debug"/>
+                    <Grid Background="White">
+                        <TextBlock Name="Hint" Text=" UID" Background="Transparent" Foreground="#FFA2A2A2"  Visibility="{Binding ElementName=debugAgentUID, Path=Text,Converter={StaticResource stringEmptyVisibilityConvertor}}" VerticalAlignment="Center"/>
+                        <TextBox Name="debugAgentUID" Text="" Width="100" MaxLines="1" VerticalAlignment="Center" Background="Transparent"/>
+                    </Grid>
+                    <CheckBox Name="waitForBegin" Foreground="White" VerticalAlignment="Center">
+                        WaitForBegin
+                    </CheckBox>
                 </StackPanel>
             </Border>
             <Button Name="btnContinue" Click="btnContinue_Click" Content="Continue&#x0a;  F5"/>

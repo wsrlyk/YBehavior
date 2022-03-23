@@ -4,16 +4,12 @@
     <Shared f="_FC 0.0" a="_IC 0" aa="IIC " />
     <Local fds="_Ac " />
     <Node Class="Sequence" GUID="2" Pos="-40,100">
-      <Node Class="Sequence" GUID="3" Pos="-120,250">
-        <Node Class="Calculator" GUID="4" Pos="-320,380" Operator="_EC +" Output="_Ip " Input1="_IP a" Input2="_Ic 1" />
-        <Node Class="Calculator" GUID="5" Pos="-50,410" Operator="_EC +" Output="_Ip " Input1="_Ip " Input2="_Ip " />
+      <Node Class="IfThenElse" GUID="8" Pos="-180,210">
+        <Node Class="Comparer" GUID="9" Connection="if" Pos="-510,350" Operator="_EC &gt;" Opl="_IP a" Opr="_IC 10" />
+        <Node Class="SetData" GUID="10" Connection="then" Pos="-290,440" Target="_IP a" Source="_IC 0" />
+        <Node Class="Calculator" GUID="4" Connection="else" Pos="20,400" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_Ic 1" />
       </Node>
-      <Node Class="Calculator" GUID="6" Pos="100,250" Operator="_EC +" Output="_IP a" Input1="_Ip " Input2="_IC 1" />
+      <Node Class="SubTree" GUID="11" Pos="101,212" Tree="_SC Test0" Identification="_SC " />
     </Node>
   </Node>
-  <DataConnections>
-    <DataConnection FromGUID="4" FromName="Output" ToGUID="5" ToName="Input1" />
-    <DataConnection FromGUID="4" FromName="Output" ToGUID="5" ToName="Input2" />
-    <DataConnection FromGUID="5" FromName="Output" ToGUID="6" ToName="Input1" />
-  </DataConnections>
 </Test>

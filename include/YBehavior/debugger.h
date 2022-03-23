@@ -120,6 +120,7 @@ namespace YBehavior
 		//UINT m_TargetHash;
 		DebugTargetID m_Target;
 		bool m_bTargetDirty = false;
+		bool m_bWaitForBegin = false;
 
 		Mutex m_Mutex;
 		///> Node(Tree or FSM) => RunInfo, one node has only one info
@@ -137,9 +138,10 @@ namespace YBehavior
 		IDebugHelper* m_StepOverHelper = nullptr;
 	public:
 		~DebugMgr();
-		void SetTarget(const DebugTargetID& target);
-		void SetTarget(UINT64 target);
+		void SetTarget(const DebugTargetID& target, bool bWaitForBegin);
+		void SetTarget(UINT64 target, bool bWaitForBegin);
 		void Begin();
+		void Failed();
 		void ResetTarget();
 		void Stop();
 		bool IsValidTarget(Agent* pAgent, BehaviorTree* pTree);
@@ -174,6 +176,7 @@ namespace YBehavior
 		inline IDebugHelper* GetStepOverHelper() const { return m_StepOverHelper; }
 	private:
 		void _TryDebug(AgentPtr pAgent);
+		bool _TryWaitForBegin();
 	};
 
 	class IDebugHelper

@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Test>
-  <Node Class="Root">
-    <Shared f="_FC 0.0" />
-    <Local fds="_Ac " />
-    <Node Class="GetTargetNameAction" Target="_Ap fds" />
-  </Node>
-</Test>

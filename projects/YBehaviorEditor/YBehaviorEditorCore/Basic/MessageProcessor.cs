@@ -5,6 +5,58 @@ using System.Text;
 
 namespace YBehavior.Editor.Core.New
 {
+    class TickResultData
+    {
+        public string MainData;
+        public string FSMRunData;
+        public Dictionary<string, TreeResult> TreeRunDatas = new Dictionary<string, TreeResult>();
+        public struct TreeResult
+        {
+            public string Name;
+            public string LocalData;
+            public string RunData;
+        }
+
+        public void BuildFromString(string ss)
+        {
+            if (ss == null)
+                return;
+            string[] data = ss.Split(MessageProcessor.msgContentSplitter);
+            int subtreesoffset = 2;
+            if (data.Length >= subtreesoffset)
+            {
+                MainData = data[0];
+                FSMRunData = data[1];
+
+                if ((data.Length - subtreesoffset) % 3 == 0)
+                {
+                    TreeResult treeResult = new TreeResult();
+                    for (int i = subtreesoffset; i < data.Length; ++i)
+                    {
+                        int innerIndex = i - subtreesoffset;
+                        ///> TreeName
+                        if (innerIndex % 3 == 0)
+                        {
+                            treeResult.Name = data[i];
+                            continue;
+                        }
+                        ///> LocalData
+                        ///> Only copied to the specified subtree
+                        if (innerIndex % 3 == 1)
+                        {
+                            treeResult.LocalData = data[i];
+                            continue;
+                        }
+
+                        ///> RunInfo
+                        treeResult.RunData = data[i];
+                        TreeRunDatas[treeResult.Name] = treeResult;
+                    }
+                }
+            }
+
+        }
+    }
     public class MessageProcessor
     {
         object m_Lock = new object();
@@ -18,16 +70,21 @@ namespace YBehavior.Editor.Core.New
         {
             if (bConnected)
             {
+                System.Windows.Media.CompositionTarget.Rendering -= _ProcessMessages;
+                System.Windows.Media.CompositionTarget.Rendering += _ProcessMessages;
+
                 if (m_Timer != null)
                     m_Timer.Stop();
                 m_Timer = new System.Windows.Threading.DispatcherTimer();
-                m_Timer.Tick += new EventHandler(_MessageTimerCallback);
+                m_Timer.Tick += new EventHandler(_ShowTickResultTimerCallback);
                 m_Timer.Interval = new TimeSpan(0, 0, 0, 1, 0);
                 m_Timer.Start();
                 Clear();
             }
             else
             {
+                System.Windows.Media.CompositionTarget.Rendering -= _ProcessMessages;
+
                 if (m_Timer != null)
                     m_Timer.Stop();
                 m_Timer = null;
@@ -35,11 +92,39 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        void _MessageTimerCallback(object state, System.EventArgs arg)
+        void _ShowTickResultTimerCallback(object state, System.EventArgs arg)
         {
-            Update();
+            _FireTickResult();
+
+            m_DiffScore = 0.0f;
+            m_KeyFrameTickResultData = null;
+
+            //LogMgr.Instance.Log("KeyFrameScore: " + m_DiffScore);
         }
 
+        void _ProcessMessages(object state, System.EventArgs arg)
+        {
+            if (m_ReceiveBuffer.Count == 0)
+                return;
+
+            lock (m_Lock)
+            {
+                while (m_ReceiveBuffer.Count > 0)
+                {
+                    m_ProcessingMsgs.Add(m_ReceiveBuffer.Dequeue());
+                }
+            }
+
+            for (int i = 0; i < m_ProcessingMsgs.Count; ++i)
+            {
+                _ProcessMsg(m_ProcessingMsgs[i]);
+            }
+
+            m_ProcessingMsgs.Clear();
+
+            if (DebugMgr.Instance.bBreaked)
+                _FireTickResult();
+        }
         void Clear()
         {
             m_ReceiveBuffer.Clear();
@@ -50,7 +135,7 @@ namespace YBehavior.Editor.Core.New
             m_LastTickResultToken = 0;
             m_TickResultToken = 0;
         }
-        public void DebugTreeWithAgent(FileMgr.FileInfo fileInfo, ulong agentUID)
+        public void DebugTreeWithAgent(FileMgr.FileInfo fileInfo, ulong agentUID, bool waitforbegin)
         {
             StringBuilder sb = new StringBuilder();
             string head;
@@ -68,7 +153,8 @@ namespace YBehavior.Editor.Core.New
                     head = "[DebugFSM]";
                 content = fileInfo.Name;
             }
-            sb.Append(head).Append(msgContentSplitter).Append(content);
+            sb.Append(head).Append(msgContentSplitter).Append(content).Append(msgContentSplitter).Append(waitforbegin ? 1 : 0);
+            // [DebugXXX] name waitforbegin
             NetworkMgr.Instance.SendText(sb.ToString());
             Clear();
         }
@@ -142,42 +228,15 @@ namespace YBehavior.Editor.Core.New
             //NetworkMgr.Instance.SendText("[DebugPoint]" + msgContentSplitter + treename + msgContentSplitter + uid.ToString() + msgContentSplitter + count.ToString());
         }
 
-        public void Update()
-        {
-            if (m_ReceiveBuffer.Count == 0)
-                return;
-
-            lock(m_Lock)
-            {
-                while (m_ReceiveBuffer.Count > 0)
-                {
-                    m_ProcessingMsgs.Add(m_ReceiveBuffer.Dequeue());
-                }
-            }
-
-            m_DiffScore = 0.0f;
-            m_KeyFrameTickResultData = null;
-
-            for (int i = 0; i < m_ProcessingMsgs.Count; ++i)
-            {
-                _ProcessMsg(m_ProcessingMsgs[i]);
-            }
-
-            m_ProcessingMsgs.Clear();
-
-            //LogMgr.Instance.Log("KeyFrameScore: " + m_DiffScore);
-            _FireTickResult();
-        }
-
-        char[] msgHeadSplitter = { (char)(3) };
-        char[] msgContentSplitter = { cContentSplitter };
-        char[] msgSectionSplitter = { cSectionSplitter };
-        char[] msgSequenceSplitter = { cSequenceSplitter };
-        char[] msgListSplitter = { cListSplitter };
-        static readonly char cContentSplitter = (char)4;
-        static readonly char cSectionSplitter = (char)5;
-        static readonly char cSequenceSplitter = (char)6;
-        static readonly char cListSplitter = (char)7;
+        public static readonly char cContentSplitter = (char)4;
+        public static readonly char cSectionSplitter = (char)5;
+        public static readonly char cSequenceSplitter = (char)6;
+        public static readonly char cListSplitter = (char)7;
+        public static readonly char[] msgHeadSplitter = { (char)(3) };
+        public static readonly char[] msgContentSplitter = { cContentSplitter };
+        public static readonly char[] msgSectionSplitter = { cSectionSplitter };
+        public static readonly char[] msgSequenceSplitter = { cSequenceSplitter };
+        public static readonly char[] msgListSplitter = { cListSplitter };
         void _ProcessMsg(string msg)
         {
             string[] words = msg.Split(msgHeadSplitter, StringSplitOptions.RemoveEmptyEntries);
@@ -187,7 +246,8 @@ namespace YBehavior.Editor.Core.New
                 case "[TickResult]":
                     if (words.Length != 2)
                         return;
-                    _CompareTickResult(words[1]);
+                    var data = _PreProcessTickResult(words[1]);
+                    _CompareTickResult(data);
                     //_HandleTickResult(words[1]);
                     break;
                 case "[Paused]":
@@ -215,8 +275,8 @@ namespace YBehavior.Editor.Core.New
         }
 
         ///////////////////////////////////////////////////////////////////////////
-        string m_KeyFrameTickResultData = null;
-        string m_PreviousTickResultData = null;
+        TickResultData m_KeyFrameTickResultData = null;
+        TickResultData m_PreviousTickResultData = null;
         float m_PreviousDiffScore = 0.0f;
         float m_DiffScore = 0.0f;
 
@@ -228,7 +288,13 @@ namespace YBehavior.Editor.Core.New
         }
 
         DiffMatchPatch.diff_match_patch dmp = new DiffMatchPatch.diff_match_patch();
-        void _CompareTickResult(string ss)
+        TickResultData _PreProcessTickResult(string ss)
+        {
+            TickResultData data = new TickResultData();
+            data.BuildFromString(ss);
+            return data;
+        }
+        void _CompareTickResult(TickResultData ss)
         {
             if (m_PreviousTickResultData == null)
             {
@@ -237,15 +303,46 @@ namespace YBehavior.Editor.Core.New
                 return;
             }
 
-            List<DiffMatchPatch.Diff> diffs = dmp.diff_main(m_PreviousTickResultData, ss);
+            var bench = WorkBenchMgr.Instance.ActiveWorkBench;
+            if (bench == null)
+            {
+                return;
+            }
+
+            Func<List<DiffMatchPatch.Diff>, float, float> func = 
+                (List<DiffMatchPatch.Diff> diffList, float w) =>
+            {
+                float d = 0f;
+                for (int i = 0; i < diffList.Count; ++i)
+                {
+                    if (diffList[i].operation == DiffMatchPatch.Operation.EQUAL)
+                        continue;
+                    d += (float)Math.Sqrt(diffList[i].text.Length) * w;
+                }
+                return d;
+            };
 
             float diff = 0.0f;
-            for (int i = 0; i < diffs.Count; ++i)
+            float weight = 0f;
+
+            if (bench is FSMBench)
             {
-                if (diffs[i].operation == DiffMatchPatch.Operation.EQUAL)
-                    continue;
-                diff += (float)Math.Sqrt(diffs[i].text.Length);
+                diff += func(dmp.diff_main(m_PreviousTickResultData.FSMRunData, ss.FSMRunData), 1f);
+                weight += 1f;
             }
+            else
+            {
+                if (m_PreviousTickResultData.TreeRunDatas.TryGetValue(bench.FileInfo.Name, out var prev)
+                    &&
+                    ss.TreeRunDatas.TryGetValue(bench.FileInfo.Name, out var cur))
+                {
+                    diff += func(dmp.diff_main(prev.RunData, cur.RunData), 1f);
+                    diff += func(dmp.diff_main(prev.LocalData, cur.LocalData), 0.2f);
+                    weight += 1.2f;
+                }
+            }
+            diff += func(dmp.diff_main(m_PreviousTickResultData.MainData, ss.MainData), 0.2f);
+            diff /= weight;
 
             float avgDiff = (diff + m_PreviousDiffScore) * 0.5f;
             if (m_DiffScore == 0.0f)
@@ -289,79 +386,56 @@ namespace YBehavior.Editor.Core.New
                 }
             }
         }
-        void _HandleTickResult(string ss)
+        void _HandleTickResult(TickResultData data)
         {
-            if (ss == null)
+            if (data == null)
                 return;
-            string[] data = ss.Split(msgContentSplitter);
-            int subtreesoffset = 2;
-            if (data.Length >= subtreesoffset)
+
+            DebugMgr.Instance.ClearRunState();
+            ///> MainData
+            ///> Copied to each subtrees
+            foreach (var v in DebugMgr.Instance.GetRunInfos.Values)
             {
-                DebugMgr.Instance.ClearRunState();
-                ///> MainData
-                ///> Copied to each subtrees
-                foreach (var v in DebugMgr.Instance.GetRunInfos.Values)
+                if (v.sharedData != null)
+                    _HandleMemory(v.sharedData.SharedMemory, data.MainData);
+            }
+
+            ///> FSM RunInfo
+            {
+                FSMRunInfo runInfo = DebugMgr.Instance.FSMRunInfo;
+                string[] runInfos = data.FSMRunData.Split(msgListSplitter);
+                foreach (string s in runInfos)
                 {
-                    if (v.sharedData != null)
-                        _HandleMemory(v.sharedData.SharedMemory, data[0]);
+                    string[] strR = s.Split(msgSequenceSplitter);
+                    if (strR.Length != 3)
+                        continue;
+
+                    runInfo.info[uint.Parse(strR[0])] = int.Parse(strR[1]);
                 }
 
-                ///> FSM RunInfo
+            }
+
+            ++m_TickResultToken;
+
+            foreach (var d in data.TreeRunDatas.Values)
+            {
+                TreeRunInfo runInfo = DebugMgr.Instance.GetRunInfo(d.Name);
+                runInfo.info.Clear();
+                if (runInfo.sharedData != null)
+                    _HandleMemory(runInfo.sharedData.LocalMemory, d.LocalData);
+                string[] runInfos = d.RunData.Split(msgListSplitter);
+                foreach (string s in runInfos)
                 {
-                    FSMRunInfo runInfo = DebugMgr.Instance.FSMRunInfo;
-                    string[] runInfos = data[1].Split(msgListSplitter);
-                    foreach (string s in runInfos)
+                    string[] strR = s.Split(msgSequenceSplitter);
+                    if (strR.Length != 3)
+                        continue;
+
+                    runInfo.info[uint.Parse(strR[0])] = new TreeRunInfo.ResultState()
                     {
-                        string[] strR = s.Split(msgSequenceSplitter);
-                        if (strR.Length != 3)
-                            continue;
-
-                        runInfo.info[uint.Parse(strR[0])] = int.Parse(strR[1]);
-                    }
-
+                        Self = int.Parse(strR[1]),
+                        Final = int.Parse(strR[2]),
+                    };
                 }
-
-                ++m_TickResultToken;
-
-                if ((data.Length - subtreesoffset) % 3 == 0)
-                {
-                    TreeRunInfo runInfo = null;
-                    for (int i = subtreesoffset; i < data.Length; ++i)
-                    {
-                        int innerIndex = i - subtreesoffset;
-                        ///> TreeName
-                        if (innerIndex % 3 == 0)
-                        {
-                            runInfo = DebugMgr.Instance.GetRunInfo(data[i]);
-                            runInfo.info.Clear();
-                            continue;
-                        }
-                        ///> LocalData
-                        ///> Only copied to the specified subtree
-                        if (innerIndex % 3 == 1)
-                        {
-                            if (runInfo.sharedData != null)
-                                _HandleMemory(runInfo.sharedData.LocalMemory, data[i]);
-                            continue;
-                        }
-
-                        ///> RunInfo
-                        string[] runInfos = data[i].Split(msgListSplitter);
-                        foreach (string s in runInfos)
-                        {
-                            string[] strR = s.Split(msgSequenceSplitter);
-                            if (strR.Length != 3)
-                                continue;
-
-                            runInfo.info[uint.Parse(strR[0])] = new TreeRunInfo.ResultState()
-                            {
-                                Self = int.Parse(strR[1]),
-                                Final = int.Parse(strR[2]),
-                            };
-                        }
-                    }
-                }
-                //EventMgr.Instance.Send(new TickResultArg() { bInstant = !DebugMgr.Instance.bBreaked, Token = m_TickResultToken });
             }
         }
 
@@ -548,6 +622,7 @@ namespace YBehavior.Editor.Core.New
                     if (res.Count != hashes.Count)
                     {
                         LogMgr.Instance.Error("Open some files failed.");
+                        _DoDebugFailed();
                     }
                     else
                     {
@@ -567,6 +642,7 @@ namespace YBehavior.Editor.Core.New
                                 System.Windows.MessageBoxResult dr = System.Windows.MessageBox.Show(res[i].DisplayName + ": version is different from RunTime.", "Continue Or Not", System.Windows.MessageBoxButton.OKCancel, System.Windows.MessageBoxImage.Question);
                                 if (dr == System.Windows.MessageBoxResult.Cancel)
                                 {
+                                    _DoDebugFailed();
                                     return;
                                 }
                                 break;
@@ -658,6 +734,11 @@ namespace YBehavior.Editor.Core.New
 
             NetworkMgr.Instance.SendText(sb.ToString());
 
+        }
+
+        void _DoDebugFailed()
+        {
+            NetworkMgr.Instance.SendText("[DebugFailed]");
         }
     }
 }

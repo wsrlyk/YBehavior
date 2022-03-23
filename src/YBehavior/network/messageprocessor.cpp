@@ -8,17 +8,17 @@ namespace YBehavior
 {
 	void DebugAgent(const StdVector<STRING>& datas)
 	{
-		DebugMgr::Instance()->SetTarget(Utility::ToType<UINT64>(datas[1]));
+		DebugMgr::Instance()->SetTarget(Utility::ToType<UINT64>(datas[1]), Utility::ToType<int>(datas[2]) != 0);
 
 	}
 	void DebugTree(const StdVector<STRING>& datas)
 	{
-		DebugMgr::Instance()->SetTarget({ DebugTargetType::TREE, datas[1] });
+		DebugMgr::Instance()->SetTarget({ DebugTargetType::TREE, datas[1] }, Utility::ToType<int>(datas[2]) != 0);
 
 	}
 	void DebugFSM(const StdVector<STRING>& datas)
 	{
-		DebugMgr::Instance()->SetTarget({ DebugTargetType::FSM, datas[1] });
+		DebugMgr::Instance()->SetTarget({ DebugTargetType::FSM, datas[1] }, Utility::ToType<int>(datas[2]) != 0);
 
 	}
 
@@ -48,6 +48,10 @@ namespace YBehavior
 			DebugMgr::Instance()->AddTreeDebugInfo({ i == 1 ? DebugTargetType::FSM : DebugTargetType::TREE, name }, std::move(info));
 		}
 		DebugMgr::Instance()->Begin();
+	}
+	void DebugFailed()
+	{
+		DebugMgr::Instance()->Failed();
 	}
 	void Continue()
 	{
@@ -118,6 +122,10 @@ namespace YBehavior
 		else if (datas[0] == "[DebugBegin]")
 		{
 			DebugBegin(datas);
+		}
+		else if (datas[0] == "[DebugFailed]")
+		{
+			DebugFailed();
 		}
 	}
 

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Test0>
+  <Node Class="Root">
+    <Shared a="_IC 0" />
+    <Node Class="Sequence">
+      <Node Class="IfThenElse">
+        <Node Class="Comparer" Connection="if" Operator="_EC &gt;=" Opl="_IP a" Opr="_IC 9" />
+        <Node Class="Calculator" Connection="then" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 2" />
+        <Node Class="Calculator" Connection="else" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 1" />
+      </Node>
+    </Node>
+  </Node>
+</Test0>
