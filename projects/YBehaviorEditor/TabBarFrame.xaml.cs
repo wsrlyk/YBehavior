@@ -158,8 +158,8 @@ namespace YBehavior.Editor
             WorkBench bench = tab.Content as WorkBench;
             if (bench != null)
             {
-                if (DebugMgr.Instance.IsDebugging(bench))
-                    return false;
+                //if (DebugMgr.Instance.IsDebugging(bench))
+                //    return false;
 
                 if (bench.CommandMgr.Dirty)
                 // if is dirty
