@@ -20,6 +20,18 @@ namespace YBehavior.Editor.Core.New
         public string FilePath { get; set; }
 
         public string DisplayName { get { return FileInfo.DisplayName + (CommandMgr.Dirty ? " *" : ""); } }
+        public string ShortDisplayName
+        {
+            get 
+            {
+                string name = FileInfo.DisplayName;
+                if (name.Length > 20)
+                {
+                    name = name.Substring(0, 10) + ".." + name.Substring(name.Length - 10);
+                }
+                return name + (CommandMgr.Dirty ? " *" : "");
+            }
+        }
 
         private FileMgr.FileInfo m_UntitledFileInfo = null;
         public FileMgr.FileInfo FileInfo

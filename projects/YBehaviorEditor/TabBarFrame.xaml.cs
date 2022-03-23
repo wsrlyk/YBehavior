@@ -100,7 +100,7 @@ namespace YBehavior.Editor
                 activeTab.DataContext = bench;
                 activeTab.SetBinding(UCTabItemWithClose.HeaderProperty, new Binding()
                 {
-                    Path = new PropertyPath("DisplayName"),
+                    Path = new PropertyPath("ShortDisplayName"),
                     Mode = BindingMode.OneWay
                 });
             }
@@ -279,6 +279,13 @@ namespace YBehavior.Editor
                 m_CurTabData = null;
             }
 
+        }
+
+        private void TabController_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            ScrollViewer scrollViewer = (ScrollViewer)sender;
+            scrollViewer.ScrollToHorizontalOffset(scrollViewer.HorizontalOffset - e.Delta);
+            e.Handled = true;
         }
     }
 }

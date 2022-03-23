@@ -3,16 +3,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:YBehavior.Editor"
              mc:Ignorable="d" 
              d:DesignWidth="400"
              >
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20"/>
+            <RowDefinition Height="25"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <TabControl Name="TabController" Grid.Row="0" Tag="200" SelectionChanged="TabController_SelectionChanged" Background="DarkGray"/>
+        <TabControl Name="TabController" Grid.Row="0" Tag="200" SelectionChanged="TabController_SelectionChanged" Background="DarkGray">
+            <TabControl.Template>
+                <ControlTemplate TargetType="TabControl">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"  PreviewMouseWheel="TabController_PreviewMouseWheel">
+                        <TabPanel x:Name="HeaderPanel"
+                        Panel.ZIndex ="1" 
+                        KeyboardNavigation.TabIndex="1"
+                        Grid.Column="0"
+                        Grid.Row="0"
+                        IsItemsHost="true"/>
+                        <ScrollViewer.Resources>
+                            <sys:Double x:Key="{x:Static SystemParameters.HorizontalScrollBarHeightKey}">8</sys:Double>
+                        </ScrollViewer.Resources>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </TabControl.Template>
+        </TabControl>
         <Grid Name="BenchContainer" Grid.Row="1">
         </Grid>
     </Grid>

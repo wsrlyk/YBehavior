@@ -34,6 +34,7 @@ namespace YBehavior.Editor
         /// 约定的宽度
         /// </summary>
         private double m_ConventionWidth = 100;
+        private double m_MinWidth = 80;
         #endregion
 
         #region 事件
@@ -76,6 +77,7 @@ namespace YBehavior.Editor
             int criticalCount = (int)((m_Parent.ActualWidth - 5) / m_ConventionWidth);
             //平均宽度
             double perWidth = (m_Parent.ActualWidth - 5) / m_Parent.Items.Count;
+            perWidth = Math.Max(m_MinWidth, perWidth);
             foreach (UCTabItemWithClose item in m_Parent.Items)
             {
                 if (m_Parent.Items.Count <= criticalCount)
@@ -110,6 +112,7 @@ namespace YBehavior.Editor
             {
                 //大于临界个数 等于平均宽度
                 double perWidth = (m_Parent.ActualWidth - 5) / m_Parent.Items.Count;
+                perWidth = Math.Max(m_MinWidth, perWidth);
                 this.Width = perWidth;
             }
         }
@@ -125,6 +128,7 @@ namespace YBehavior.Editor
         {
             //约定的宽度
             double.TryParse(m_Parent.Tag.ToString(), out m_ConventionWidth);
+            m_MinWidth = m_ConventionWidth * 0.8f;
             //注册父级TabControl尺寸发生变化事件
             m_Parent.SizeChanged += m_Parent_SizeChanged;
 
@@ -140,6 +144,7 @@ namespace YBehavior.Editor
             {
                 //大于临界个数 每项都设成平均宽度
                 double perWidth = (m_Parent.ActualWidth - 5) / m_Parent.Items.Count;
+                perWidth = Math.Max(m_MinWidth, perWidth);
                 foreach (UCTabItemWithClose item in m_Parent.Items)
                 {
                     item.Width = perWidth;
