@@ -27,6 +27,8 @@ namespace YBehavior.Editor
 
         public void SetDebugInstant(NodeState state = NodeState.NS_INVALID)
         {
+            if (m_Target.DebugUI == null)
+                return;
             m_Target.DebugUI.Visibility = Visibility.Collapsed;
             if (state == NodeState.NS_INVALID)
             {
@@ -61,6 +63,8 @@ namespace YBehavior.Editor
 
         public void SetDebug(NodeState state = NodeState.NS_INVALID)
         {
+            if (m_Target.DebugUI == null)
+                return;
             m_Target.InstantAnim.Remove(m_Target.DebugUI);
             if (state == NodeState.NS_INVALID)
             {
