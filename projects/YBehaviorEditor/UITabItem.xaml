@@ -11,7 +11,7 @@
             <Setter Property="BorderBrush" Value="Black"></Setter>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Background" Value="LightGray"></Setter>
-            <Setter Property="Foreground" Value="#FF7B7B7B"/>
+            <Setter Property="Foreground" Value="#FF464646"/>
             <Setter Property="Padding" Value="5,0,0,0"></Setter>
             <Setter Property="HorizontalAlignment" Value="Left"></Setter>
             <Setter Property="VerticalAlignment" Value="Center"></Setter>

@@ -174,7 +174,7 @@ namespace YBehavior.Editor.Core.New
         public class FileInfo
         {
             public string DisplayName { get { return Name; } }
-            public string DisplayPath { get { return Path ?? "NULL"; } }
+            public string DisplayPath { get { return RelativeName ?? "NULL"; } }
 
             public string Name { get; private set; } = string.Empty;
             public string RelativeName { get; private set; } = string.Empty;
