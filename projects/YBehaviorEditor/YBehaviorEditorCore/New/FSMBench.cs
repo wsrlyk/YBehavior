@@ -292,7 +292,7 @@ namespace YBehavior.Editor.Core.New
             CommandMgr.Dirty = false;
             m_ExportFileHash = 0;
 
-            OnPropertyChanged("DisplayName");
+            OnPropertyChanged("ShortDisplayName");
         }
 
         void _SaveMachine(FSMMachineNode machine, XmlElement data, XmlDocument xmlDoc, bool bExport)

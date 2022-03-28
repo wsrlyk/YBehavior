@@ -71,7 +71,7 @@ namespace YBehavior.Editor.Core.New
             CommandMgr.PushDoneCommand(command);
 
             if (!bOldDirty)
-                OnPropertyChanged("DisplayName");
+                OnPropertyChanged("ShortDisplayName");
         }
 
         public void RemoveComment(Comment comment)

@@ -432,7 +432,7 @@ namespace YBehavior.Editor.Core.New
             CommandMgr.Dirty = false;
             m_ExportFileHash = 0;
 
-            OnPropertyChanged("DisplayName");
+            OnPropertyChanged("ShortDisplayName");
 
             _RefreshReferenceStates();
         }
