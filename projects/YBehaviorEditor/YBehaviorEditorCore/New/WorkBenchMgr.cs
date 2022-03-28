@@ -106,19 +106,24 @@ namespace YBehavior.Editor.Core.New
         }
         private void _OnTickResult(EventArg arg)
         {
-            if (DebugMgr.Instance.IsDebugging() && m_ActiveWorkBench != null)
+            if (DebugMgr.Instance.IsSomeBenchDebugging())
             {
                 TickResultArg oArg = arg as TickResultArg;
                 if (oArg.Token == NetworkMgr.Instance.MessageProcessor.TickResultToken)
                 {
-                    m_ActiveWorkBench.RefreshDebug();
+                    foreach (var bench in m_OpenedWorkBenchs)
+                        bench.RefreshBenchDebug();
+                    if (m_ActiveWorkBench != null)
+                        m_ActiveWorkBench.RefreshContentDebug();
                 }
             }
         }
         private void _OnDebugTargetChanged(EventArg arg)
         {
-            if (/*DebugMgr.Instance.IsDebugging() && */m_ActiveWorkBench != null)
-                m_ActiveWorkBench.RefreshDebug();
+            foreach (var bench in m_OpenedWorkBenchs)
+                bench.RefreshBenchDebug();
+            if (m_ActiveWorkBench != null)
+                m_ActiveWorkBench.RefreshContentDebug();
         }
 
         public bool Switch(WorkBench target)

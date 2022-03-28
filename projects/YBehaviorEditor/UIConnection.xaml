@@ -1,4 +1,4 @@
-﻿<local:UIConnectionBase x:Class="YBehavior.Editor.UIConnection"
+﻿<local:YUserControl x:Class="YBehavior.Editor.UIConnection"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -34,4 +34,4 @@
                    Visibility="{Binding Note, Converter={StaticResource invertStringEmptyAndVisibilityConvertor}}"/>
 
     </Canvas>
-</local:UIConnectionBase>
+</local:YUserControl>

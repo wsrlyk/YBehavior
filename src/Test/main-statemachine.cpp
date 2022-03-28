@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 	STRING s;
 	XEntity* pEntity = new XEntity("Hehe", "EmptyFSM", nullptr, nullptr);
 
-	std::cin >> s;
+	//std::cin >> s;
 
 	//pMain->OnEnter(pEntity->GetAgent());
 	while (true)

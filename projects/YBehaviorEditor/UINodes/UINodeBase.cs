@@ -13,7 +13,7 @@ namespace YBehavior.Editor
     /// BehaviorNode.xaml 的交互逻辑
     /// </summary>
     
-    public abstract class UINodeBase<NodeType, NodeRendererType>: DebugControl<UINodeBase<NodeType, NodeRendererType>> where NodeRendererType: NodeBaseRenderer where NodeType : NodeBase
+    public abstract class UINodeBase<NodeType, NodeRendererType>: YUserControl, IDebugControl where NodeRendererType: NodeBaseRenderer where NodeType : NodeBase
     {
         static protected SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
@@ -25,9 +25,12 @@ namespace YBehavior.Editor
         public abstract FrameworkElement SelectCoverUI { get; }
         public abstract Brush OutlookBrush { get; set; }
         public abstract FrameworkElement CommentUI { get; }
+        public abstract FrameworkElement DebugUI { get; }
+        public abstract Brush DebugBrush { get; set; }
 
-        public override NodeState RunState => Node.Renderer.RunState;
+        public NodeState RunState => Node.Renderer.RunState;
         protected Operation m_Operation;
+        protected DebugControl m_DebugControl;
 
         protected Dictionary<Connector, UIConnector> m_uiConnectors = new Dictionary<Connector, UIConnector>();
 
@@ -46,6 +49,7 @@ namespace YBehavior.Editor
             m_Operation.RegisterLeftDrag(_OnDrag, null, _OnFinishDrag);
 
             m_InstantAnim = Application.Current.Resources["InstantShowAnim"] as Storyboard;
+            m_DebugControl = new DebugControl(this);
 
             this.DataContextChanged += _DataContextChangedEventHandler;
 
@@ -55,7 +59,7 @@ namespace YBehavior.Editor
         void _OnVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (IsVisible && Node != null)
-                SetDebug(Node.Renderer.RunState);
+                m_DebugControl.SetDebug(Node.Renderer.RunState);
         }
         //protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         //{
@@ -77,12 +81,12 @@ namespace YBehavior.Editor
             //SetCanvas(Node.Renderer.RenderCanvas);
             _BuildConnectionBinding();
             if (DebugMgr.Instance.bBreaked)
-                SetDebug(Node.Renderer.RunState);
+                m_DebugControl.SetDebug(Node.Renderer.RunState);
             else
-                SetDebug(NodeState.NS_INVALID);
+                m_DebugControl.SetDebug(NodeState.NS_INVALID);
 
             Renderer.SelectEvent += Renderer_SelectEvent;
-            Renderer.DebugEvent += Renderer_DebugEvent;
+            Renderer.DebugEvent += m_DebugControl.Renderer_DebugEvent;
         }
 
         private void Renderer_SelectEvent()
@@ -112,7 +116,7 @@ namespace YBehavior.Editor
         }
 
         Storyboard m_InstantAnim;
-        public override Storyboard InstantAnim { get { return m_InstantAnim; } }
+        public Storyboard InstantAnim { get { return m_InstantAnim; } }
 
         void _OnClick(Point pos)
         {

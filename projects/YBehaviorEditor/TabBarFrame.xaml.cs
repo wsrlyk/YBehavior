@@ -59,11 +59,11 @@ namespace YBehavior.Editor
         }
 
         private void _LoadWorkBench(WorkBench bench)
-        { 
+        {
             ///> Check if the bench has already been in the tabs
 
-            UCTabItemWithClose activeTab = null;
-            foreach (UCTabItemWithClose tab in this.TabController.Items)
+            UITabItem activeTab = null;
+            foreach (UITabItem tab in this.TabController.Items)
             {
                 if (tab.Content == bench)
                 {
@@ -74,11 +74,11 @@ namespace YBehavior.Editor
             ///> Create new tab
             if (activeTab == null)
             {
-                activeTab = new UCTabItemWithClose();
+                activeTab = new UITabItem();
                 //activeTab.Header = oArg.Bench.FileInfo.DisplayName;
                 activeTab.ToolTip = bench.FileInfo.DisplayPath;
                 activeTab.Content = bench;
-                activeTab.CloseHandler = _TabCloseClicked;
+                activeTab.CloseHandler += _TabCloseClicked;
                 this.TabController.Items.Add(activeTab);
                 activeTab.PreviewMouseMove += TabItem_PreviewMouseMove;
                 activeTab.PreviewMouseLeftButtonDown += TabItem_PreviewMouseLeftButtonDown;
@@ -98,7 +98,7 @@ namespace YBehavior.Editor
                 tabData.Frame.OnWorkBenchLoaded(bench);
 
                 activeTab.DataContext = bench;
-                activeTab.SetBinding(UCTabItemWithClose.HeaderProperty, new Binding()
+                activeTab.SetBinding(UITabItem.HeaderProperty, new Binding()
                 {
                     Path = new PropertyPath("ShortDisplayName"),
                     Mode = BindingMode.OneWay
@@ -119,8 +119,8 @@ namespace YBehavior.Editor
             ///> Rename the tab title
             if (oArg.bCreate)
             {
-                UCTabItemWithClose activeTab = null;
-                foreach (UCTabItemWithClose tab in this.TabController.Items)
+                UITabItem activeTab = null;
+                foreach (UITabItem tab in this.TabController.Items)
                 {
                     if (tab.Content == bench)
                     {
@@ -140,7 +140,7 @@ namespace YBehavior.Editor
         {
             SelectWorkBenchArg oArg = arg as SelectWorkBenchArg;
 
-            foreach (UCTabItemWithClose tab in this.TabController.Items)
+            foreach (UITabItem tab in this.TabController.Items)
             {
                 if (tab.Content == oArg.Bench)
                 {
@@ -150,7 +150,7 @@ namespace YBehavior.Editor
             }
         }
 
-        private bool _TabCloseClicked(UCTabItemWithClose tab)
+        private bool _TabCloseClicked(UITabItem tab)
         {
             if (tab == null)
                 return false;
@@ -215,7 +215,7 @@ namespace YBehavior.Editor
         {
             if (e.LeftButton == MouseButtonState.Pressed/* && !IsDragging*/)
             {
-                var tabItem = e.Source as UCTabItemWithClose;
+                var tabItem = e.Source as UITabItem;
                 if (tabItem == null)
                     return;
 
@@ -233,7 +233,7 @@ namespace YBehavior.Editor
         {
             var tabItemTarget = e.Source as TabItem;
 
-            var tabItemSource = e.Data.GetData(typeof(UCTabItemWithClose)) as UCTabItemWithClose;
+            var tabItemSource = e.Data.GetData(typeof(UITabItem)) as UITabItem;
 
             if (!tabItemTarget.Equals(tabItemSource))
             {

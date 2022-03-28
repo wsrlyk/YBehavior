@@ -87,6 +87,9 @@
     <Compile Include="UIDragConnection.xaml.cs">
       <DependentUpon>UIDragConnection.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UITabItem.xaml.cs">
+      <DependentUpon>UITabItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="VariableUIConnector.xaml.cs">
       <DependentUpon>VariableUIConnector.xaml</DependentUpon>
     </Compile>
@@ -201,6 +204,10 @@
     <Page Include="UIDragConnection.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UITabItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="VariableUIConnector.xaml">
       <Generator>MSBuild:Compile</Generator>

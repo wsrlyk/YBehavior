@@ -19,18 +19,7 @@ namespace YBehavior.Editor
     /// <summary>
     /// UIConnection.xaml 的交互逻辑
     /// </summary>
-
-    public abstract class UIConnectionBase : DebugControl<UIConnectionBase>
-    {
-        public UIConnectionBase()
-        { }
-
-        public UIConnectionBase(bool bHasOperation)
-            :base (bHasOperation)
-        { }
-    }
-
-    public partial class UIConnection : UIConnectionBase, ISelectable, IDeletable, IDraggingConnection
+    public partial class UIConnection : YUserControl, ISelectable, IDeletable, IDraggingConnection, IDebugControl
     {
         public static readonly DependencyProperty StrokeProperty = DependencyProperty.RegisterAttached(
             "StrokeProperty",
@@ -60,8 +49,8 @@ namespace YBehavior.Editor
         SelectionStateChangeHandler SelectHandler { get; set; }
         Operation m_Operation;
 
-        public override FrameworkElement DebugUI { get { return this.debug; } }
-        public override Brush DebugBrush
+        public FrameworkElement DebugUI { get { return this.debug; } }
+        public Brush DebugBrush
         {
             get { return this.debug.Stroke; }
             set
@@ -70,11 +59,12 @@ namespace YBehavior.Editor
             }
         }
         Storyboard m_InstantAnim;
-        public override Storyboard InstantAnim { get { return m_InstantAnim; } }
+        public Storyboard InstantAnim { get { return m_InstantAnim; } }
 
-        public override NodeState RunState => m_Renderer.RunState;
+        public NodeState RunState => m_Renderer.RunState;
         ConnectionRenderer m_Renderer;
 
+        DebugControl m_DebugControl;
         public UIConnection()
         {
             InitializeComponent();
@@ -83,6 +73,7 @@ namespace YBehavior.Editor
             normalStrokeBrush = this.path.Stroke;
 
             m_InstantAnim = Application.Current.Resources["InstantShowAnim"] as Storyboard;
+            m_DebugControl = new DebugControl(this);
 
             SelectHandler = new SelectionStateChangeHandler(defaultSelectHandler);
 
@@ -113,7 +104,8 @@ namespace YBehavior.Editor
         {
             m_Renderer = this.DataContext as ConnectionRenderer;
 
-            m_Renderer.DebugEvent += Renderer_DebugEvent;
+            if (m_DebugControl != null)
+            m_Renderer.DebugEvent += m_DebugControl.Renderer_DebugEvent;
             //SetCanvas((renderer.ChildConn.Owner as Node).Renderer.RenderCanvas);
         }
 

@@ -104,6 +104,40 @@ namespace YBehavior.Editor.Core.New
             return NodeState.NS_INVALID;
         }
 
+        public NodeState GetRunState(WorkBench bench)
+        {
+            if (bench == null)
+                return NodeState.NS_INVALID;
+            if (bench is TreeBench)
+            {
+                if (m_RunInfo.TryGetValue(bench.FileInfo.Name, out TreeRunInfo runInfo))
+                {
+                    NodeState state = NodeState.NS_INVALID;
+                    if (runInfo.info.TryGetValue(1, out var s))
+                        state = (NodeState)s.Final;
+                    if (state == NodeState.NS_RUNNING)
+                    {
+                        foreach (var ss in runInfo.info.Values)
+                        {
+                            NodeState detailState = (NodeState)ss.Final;
+                            if (detailState == NodeState.NS_BREAK)
+                                return NodeState.NS_BREAK;
+                        }
+                    }
+                    return state;
+                }
+            }
+            else
+            {
+                // just pick the first value
+                foreach (var v in FSMRunInfo.info.Values)
+                {
+                    return (NodeState)v;
+                }
+            }
+            return NodeState.NS_INVALID;
+        }
+
         public void ClearRunInfo()
         {
             foreach (var info in m_RunInfo)
@@ -156,6 +190,12 @@ namespace YBehavior.Editor.Core.New
             return FSMRunInfo.fsmName == bench.FileInfo.Name;
         }
 
+        public bool IsSomeBenchDebugging()
+        {
+            if (!NetworkMgr.Instance.IsConnected)
+                return false;
+            return m_RunInfo.Count > 0 || FSMRunInfo.info.Count > 0;
+        }
         public DebugMgr()
         {
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnNetworkConnectionChanged);

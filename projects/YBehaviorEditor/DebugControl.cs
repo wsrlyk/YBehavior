@@ -9,27 +9,28 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
-    public abstract class DebugControl<T> : YUserControl where T : DebugControl<T>
+    public interface IDebugControl
     {
-        public abstract FrameworkElement DebugUI { get; }
-        public abstract Brush DebugBrush { get; set; }
+        FrameworkElement DebugUI { get; }
+        Brush DebugBrush { get; set; }
 
-        public abstract Storyboard InstantAnim { get; }
-        public abstract NodeState RunState { get; }
-
-        public DebugControl()
-        { }
-        public DebugControl(bool bFindAncestor)
-            : base (bFindAncestor)
+        Storyboard InstantAnim { get; }
+        NodeState RunState { get; }
+    }
+    public class DebugControl
+    {
+        IDebugControl m_Target;
+        public DebugControl(IDebugControl target)
         {
-
+            m_Target = target;
         }
+
         public void SetDebugInstant(NodeState state = NodeState.NS_INVALID)
         {
-            this.DebugUI.Visibility = Visibility.Collapsed;
+            m_Target.DebugUI.Visibility = Visibility.Collapsed;
             if (state == NodeState.NS_INVALID)
             {
-                InstantAnim.Remove(DebugUI);
+                m_Target.InstantAnim.Remove(m_Target.DebugUI);
             }
             else
             {
@@ -52,18 +53,18 @@ namespace YBehavior.Editor
                         bgBrush = new SolidColorBrush(Colors.Red);
                         break;
                 }
-                this.DebugBrush = bgBrush;
+                m_Target.DebugBrush = bgBrush;
 
-                InstantAnim.Begin(this.DebugUI, true);
+                m_Target.InstantAnim.Begin(m_Target.DebugUI, true);
             }
         }
 
         public void SetDebug(NodeState state = NodeState.NS_INVALID)
         {
-            InstantAnim.Remove(DebugUI);
+            m_Target.InstantAnim.Remove(m_Target.DebugUI);
             if (state == NodeState.NS_INVALID)
             {
-                this.DebugUI.Visibility = Visibility.Collapsed;
+                m_Target.DebugUI.Visibility = Visibility.Collapsed;
             }
             else
             {
@@ -86,19 +87,18 @@ namespace YBehavior.Editor
                         bgBrush = new SolidColorBrush(Colors.Red);
                         break;
                 }
-                this.DebugBrush = bgBrush;
+                m_Target.DebugBrush = bgBrush;
 
-                this.DebugUI.Visibility = Visibility.Visible;
+                m_Target.DebugUI.Visibility = Visibility.Visible;
             }
         }
 
-
-        protected void Renderer_DebugEvent()
+        public void Renderer_DebugEvent()
         {
             if (DebugMgr.Instance.bBreaked)
-                SetDebug(RunState);
+                SetDebug(m_Target.RunState);
             else
-                SetDebugInstant(RunState);
+                SetDebugInstant(m_Target.RunState);
         }
     }
 }

@@ -172,7 +172,9 @@ namespace YBehavior.Editor.Core.New
             return m_ExportFileHash;
         }
 
-        public void RefreshDebug()
+        public event Action DebugEvent;
+
+        public void RefreshContentDebug()
         {
             foreach (var node in NodeList.Collection)
             {
@@ -183,6 +185,13 @@ namespace YBehavior.Editor.Core.New
                 conn.RefreshDebug();
             }
         }
+
+        public void RefreshBenchDebug()
+        {
+            DebugEvent?.Invoke();
+        }
+
+        public NodeState RunState => DebugMgr.Instance.GetRunState(this);
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         internal protected void OnPropertyChanged(string propertyName)
