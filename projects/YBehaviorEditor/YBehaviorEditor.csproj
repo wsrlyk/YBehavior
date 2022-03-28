@@ -157,9 +157,6 @@
     <Compile Include="StateBarFrame.xaml.cs">
       <DependentUpon>StateBarFrame.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UCTabItemWithClose.xaml.cs">
-      <DependentUpon>UCTabItemWithClose.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UIVariable.xaml.cs">
       <DependentUpon>UIVariable.xaml</DependentUpon>
     </Compile>
@@ -296,10 +293,6 @@
     <Page Include="StateBarFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UCTabItemWithClose.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="UIVariable.xaml">
       <SubType>Designer</SubType>
