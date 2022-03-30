@@ -39,16 +39,16 @@ namespace YBehavior.Editor
             m_DebugUI = (Border)this.Template.FindName("debugUI", this);
         }
 
-        private TabControl _FindParentTabControl(DependencyObject reference)
-        {
-            DependencyObject dObj = VisualTreeHelper.GetParent(reference);
-            if (dObj == null)
-                return null;
-            if (dObj.GetType() == typeof(TabControl))
-                return dObj as TabControl;
-            else
-                return _FindParentTabControl(dObj);
-        }
+        //private TabControl _FindParentTabControl(DependencyObject reference)
+        //{
+        //    DependencyObject dObj = VisualTreeHelper.GetParent(reference);
+        //    if (dObj == null)
+        //        return null;
+        //    if (dObj.GetType() == typeof(TabControl))
+        //        return dObj as TabControl;
+        //    else
+        //        return _FindParentTabControl(dObj);
+        //}
 
         public FrameworkElement DebugUI => m_DebugUI;
 
@@ -85,9 +85,9 @@ namespace YBehavior.Editor
         {
             CloseHandler?.Invoke(this);
 
-            var parent = _FindParentTabControl(this);
-            if (parent != null)
-                parent.Items.Remove(this);
+            //var parent = _FindParentTabControl(this);
+            //if (parent != null)
+            //    parent.Items.Remove(this);
         }
     }
 }

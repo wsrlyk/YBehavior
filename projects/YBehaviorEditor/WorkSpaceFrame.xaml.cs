@@ -213,7 +213,7 @@ namespace YBehavior.Editor
                 (() =>
                 {
                     //this.Files.IsEnabled = !DebugMgr.Instance.IsDebugging();
-                    this.FileOperatePanel.IsEnabled = !DebugMgr.Instance.IsDebugging();
+                    this.FileOperatePanel.IsEnabled = !NetworkMgr.Instance.IsConnected;
                 })
             );
         }

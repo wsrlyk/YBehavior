@@ -39,7 +39,7 @@ namespace YBehavior.Editor
             switch (cmd)
             {
                 case Command.Delete:
-                    if (DebugMgr.Instance.IsDebugging())
+                    if (NetworkMgr.Instance.IsConnected)
                         break;
                     if (Config.Instance.KeyBindings.IsMulti(modifier))
                     {
@@ -53,7 +53,7 @@ namespace YBehavior.Editor
                     }
                     break;
                 case Command.Duplicate:
-                    if (DebugMgr.Instance.IsDebugging())
+                    if (NetworkMgr.Instance.IsConnected)
                         break;
                     {
                         if (Config.Instance.KeyBindings.IsMulti(modifier))
@@ -69,7 +69,7 @@ namespace YBehavior.Editor
                     }
                     break;
                 case Command.Copy:
-                    if (DebugMgr.Instance.IsDebugging())
+                    if (NetworkMgr.Instance.IsConnected)
                         break;
                     {
                         if (Config.Instance.KeyBindings.IsMulti(modifier))
@@ -85,21 +85,21 @@ namespace YBehavior.Editor
                     }
                     break;
                 case Command.Paste:
-                    if (DebugMgr.Instance.IsDebugging())
+                    if (NetworkMgr.Instance.IsConnected)
                         break;
                     {
                         WorkBenchMgr.Instance.PasteCopiedToBench();
                     }
                     break;
                 case Command.Undo:
-                    if (DebugMgr.Instance.IsDebugging())
+                    if (NetworkMgr.Instance.IsConnected)
                         break;
                     {
                         WorkBenchMgr.Instance.Undo();
                     }
                     break;
                 case Command.Redo:
-                    if (DebugMgr.Instance.IsDebugging())
+                    if (NetworkMgr.Instance.IsConnected)
                         break;
                     {
                         WorkBenchMgr.Instance.Redo();
@@ -126,22 +126,22 @@ namespace YBehavior.Editor
                     SelectionMgr.Instance.TryToggleLogPoint();
                     break;
                 case Command.Disable:
-                    if (DebugMgr.Instance.IsDebugging())
+                    if (NetworkMgr.Instance.IsConnected)
                         break;
                     SelectionMgr.Instance.TryToggleDisable();
                     break;
                 case Command.Condition:
-                    if (DebugMgr.Instance.IsDebugging())
+                    if (NetworkMgr.Instance.IsConnected)
                         break;
                     SelectionMgr.Instance.TryToggleCondition();
                     break;
                 case Command.Fold:
-                    if (DebugMgr.Instance.IsDebugging())
-                        break;
+                    //if (NetworkMgr.Instance.IsConnected)
+                    //    break;
                     SelectionMgr.Instance.TryToggleFold();
                     break;
                 case Command.Default:
-                    if (DebugMgr.Instance.IsDebugging())
+                    if (NetworkMgr.Instance.IsConnected)
                         break;
                     SelectionMgr.Instance.TryMakeDefault();
                     break;

@@ -59,7 +59,7 @@ namespace YBehavior.Editor
 
         private void _OnResizeDrag0(Vector delta, Point absPos)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
 
             Comment data = this.DataContext as Comment;
@@ -70,7 +70,7 @@ namespace YBehavior.Editor
 
         private void _OnResizeDrag1(Vector delta, Point absPos)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
 
             Comment data = this.DataContext as Comment;
@@ -88,7 +88,7 @@ namespace YBehavior.Editor
 
         void _OnDrag(Vector delta, Point pos)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
 
             Comment data = this.DataContext as Comment;

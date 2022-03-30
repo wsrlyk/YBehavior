@@ -42,6 +42,7 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.WorkBenchLoaded, _OnWorkBenchLoaded);
             EventMgr.Instance.Register(EventType.WorkBenchSaved, _OnWorkBenchSaved);
             EventMgr.Instance.Register(EventType.SelectWorkBench, _OnSelectWorkBench);
+            EventMgr.Instance.Register(EventType.WorkBenchClosed, _OnWorkBenchClosed);
 
             foreach (WorkBench openedBench in WorkBenchMgr.Instance.OpenedBenches)
             {
@@ -135,7 +136,28 @@ namespace YBehavior.Editor
                 }
             }
         }
+        private void _OnWorkBenchClosed(EventArg arg)
+        {
+            WorkBenchClosedArg oArg = arg as WorkBenchClosedArg;
+            WorkBench bench = oArg.Bench;
+            if (bench == null)
+                return;
 
+            foreach (var pair in m_TabDataDic)
+            {
+                if (pair.Key.Content as WorkBench == bench)
+                {
+                    TabData tabData = pair.Value;
+                    m_TabDataDic.Remove(pair.Key);
+                    tabData.Frame.Disable();
+                    BenchContainer.Children.Remove(tabData.Frame);
+                    this.TabController.Items.Remove(pair.Key);
+
+                    break;
+                }
+            }
+
+        }
         private void _OnSelectWorkBench(EventArg arg)
         {
             SelectWorkBenchArg oArg = arg as SelectWorkBenchArg;
@@ -189,19 +211,6 @@ namespace YBehavior.Editor
             }
 
             WorkBenchMgr.Instance.Remove(bench);
-            TabData tabData = m_TabDataDic[tab];
-            m_TabDataDic.Remove(tab);
-            tabData.Frame.Disable();
-            BenchContainer.Children.Remove(tabData.Frame);
-
-            if (m_TabDataDic.Count == 0)
-            {
-                WorkBenchSelectedArg arg = new WorkBenchSelectedArg()
-                {
-                    Bench = null
-                };
-                EventMgr.Instance.Send(arg);
-            }
             return true;
         }
 

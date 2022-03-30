@@ -85,14 +85,14 @@ namespace YBehavior.Editor
 
         void _OnStartDragged(Vector delta, Point absPos)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
             DragHandler(this, true);
         }
 
         void _OnDragged(Vector delta, Point absPos)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
             IDropable droppable = _HitTesting(absPos);
 
@@ -106,7 +106,7 @@ namespace YBehavior.Editor
         }
         void _OnFinishDragged(Vector delta, Point absPos)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
             IDropable droppable = _HitTesting(absPos);
             DraggingConnection<UIDragConnection>.Instance.FinishDrag();
@@ -133,7 +133,7 @@ namespace YBehavior.Editor
 
         public void OnDropped(IDragable dragable)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
 
             if (dragable == null)

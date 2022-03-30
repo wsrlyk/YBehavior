@@ -64,8 +64,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DebugControl.cs" />
-    <Compile Include="DebugFrame.xaml.cs">
-      <DependentUpon>DebugFrame.xaml</DependentUpon>
+    <Compile Include="DebugToolBarFrame.xaml.cs">
+      <DependentUpon>DebugToolBarFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="DraggingConnection.cs" />
     <Compile Include="FilterBox.xaml.cs">
@@ -166,11 +166,11 @@
     <Compile Include="ViewModels\RelayCommand.cs" />
     <Compile Include="ViewModels\ToolBarViewModel.cs" />
     <Compile Include="WorkBenchFrame.cs" />
-    <Compile Include="WorkpaceFrame.xaml.cs">
-      <DependentUpon>WorkpaceFrame.xaml</DependentUpon>
+    <Compile Include="WorkSpaceFrame.xaml.cs">
+      <DependentUpon>WorkSpaceFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="YUserControl.cs" />
-    <Page Include="DebugFrame.xaml">
+    <Page Include="DebugToolBarFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -302,7 +302,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="WorkpaceFrame.xaml">
+    <Page Include="WorkSpaceFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

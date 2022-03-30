@@ -147,7 +147,7 @@ namespace YBehavior.Editor
 
         public void OnDelete(int param)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
 
             WorkBenchMgr.Instance.DisconnectNodes((this.DataContext as ConnectionRenderer).Owner.Ctr);

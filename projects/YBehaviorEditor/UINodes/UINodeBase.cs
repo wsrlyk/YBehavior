@@ -127,7 +127,7 @@ namespace YBehavior.Editor
 
         void _OnDrag(Vector delta, Point pos)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
             if (Node != null)
             {
@@ -137,7 +137,7 @@ namespace YBehavior.Editor
 
         void _OnFinishDrag(Vector delta, Point pos)
         {
-            if (DebugMgr.Instance.IsDebugging() || Node == null)
+            if (NetworkMgr.Instance.IsConnected || Node == null)
                 return;
 
             Node.Renderer.FinishDrag(delta, pos);

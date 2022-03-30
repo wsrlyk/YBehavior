@@ -27,7 +27,7 @@ namespace YBehavior.Editor
 
         private void Remover_Click(object sender, RoutedEventArgs e)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
 
             Variable v = DataContext as Variable;
@@ -121,7 +121,7 @@ namespace YBehavior.Editor
 
         private void ContainerSwitcher_Click(object sender, RoutedEventArgs e)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
 
             Variable v = DataContext as Variable;

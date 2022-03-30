@@ -48,7 +48,7 @@ namespace YBehavior.Editor
 
         public void OnDropped(IDragable dragable)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
 
             if (dragable == null)

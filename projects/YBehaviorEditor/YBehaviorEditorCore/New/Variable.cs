@@ -623,7 +623,7 @@ namespace YBehavior.Editor.Core.New
 
         public bool IsEditable
         {
-            get { return !DebugMgr.Instance.IsDebugging(); }
+            get { return !NetworkMgr.Instance.IsConnected; }
         }
 
         public void DebugStateChanged()

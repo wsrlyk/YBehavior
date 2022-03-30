@@ -95,8 +95,25 @@ namespace YBehavior.Editor.Core.New
         public void Remove(WorkBench target)
         {
             m_OpenedWorkBenchs.Remove(target);
+
+            {
+                WorkBenchClosedArg arg = new WorkBenchClosedArg()
+                {
+                    Bench = target
+                };
+                EventMgr.Instance.Send(arg);
+            }
+
             if (m_ActiveWorkBench == target)
+            {
                 m_ActiveWorkBench = null;
+                WorkBenchSelectedArg arg = new WorkBenchSelectedArg()
+                {
+                    Bench = null
+                };
+                EventMgr.Instance.Send(arg);
+            }
+
         }
 
         private void _NodeMoved(EventArg arg)

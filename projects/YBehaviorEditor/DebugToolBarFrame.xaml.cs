@@ -10,9 +10,9 @@ namespace YBehavior.Editor
     /// <summary>
     /// DebugFrame.xaml 的交互逻辑
     /// </summary>
-    public partial class DebugFrame : UserControl
+    public partial class DebugToolBarFrame : UserControl
     {
-        public DebugFrame()
+        public DebugToolBarFrame()
         {
             InitializeComponent();
             this.DebuggingFrame.Visibility = Visibility.Collapsed;
@@ -70,17 +70,37 @@ namespace YBehavior.Editor
             //    EventMgr.Instance.Send(arg);
             //    return;
             //}
+            bool closeUnsavedBench = false;
             foreach (WorkBench openedBench in WorkBenchMgr.Instance.OpenedBenches)
             {
                 if (openedBench.CommandMgr.Dirty)
                 {
-                    ShowSystemTipsArg arg = new ShowSystemTipsArg()
+                    MessageBoxResult dr = MessageBox.Show(
+                        "Ignore and Close All Unsaved Files?",
+                        "Unsaved Files",
+                        MessageBoxButton.YesNo, 
+                        MessageBoxImage.Question);
+
+                    if (dr == MessageBoxResult.No)
                     {
-                        Content = "Should Save All Opened Files First.",
-                        TipType = ShowSystemTipsArg.TipsType.TT_Error,
-                    };
-                    EventMgr.Instance.Send(arg);
-                    return;
+                        return;
+                    }
+                    else if (dr == MessageBoxResult.Yes)
+                    {
+                        closeUnsavedBench = true;
+                        break;
+                    }
+                }
+            }
+            if (closeUnsavedBench)
+            {
+                for (int i = WorkBenchMgr.Instance.OpenedBenches.Count - 1; i >= 0; --i)
+                {
+                    WorkBench openedBench = WorkBenchMgr.Instance.OpenedBenches[i];
+                    if (openedBench.CommandMgr.Dirty)
+                    {
+                        WorkBenchMgr.Instance.Remove(openedBench);
+                    }
                 }
             }
             //if (bench.CommandMgr.Dirty)

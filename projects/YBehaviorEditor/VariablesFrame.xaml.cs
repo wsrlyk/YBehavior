@@ -146,7 +146,7 @@ namespace YBehavior.Editor
                         v.Variable.DebugStateChanged();
                     }
 
-                    bool isReadOnly = DebugMgr.Instance.IsDebugging();
+                    bool isReadOnly = NetworkMgr.Instance.IsConnected;
                     this.NickName.IsReadOnly = isReadOnly;
                     this.Comment.IsReadOnly = isReadOnly;
                     this.ReturnType.IsReadOnly = isReadOnly;
@@ -156,7 +156,7 @@ namespace YBehavior.Editor
 
         private void RefreshInOutButton_Click(object sender, RoutedEventArgs e)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
             SubTreeNode node = this.InOutTab.DataContext as SubTreeNode;
             if (node == null)

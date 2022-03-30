@@ -10,6 +10,7 @@ namespace YBehavior.Editor.Core.New
         None,
         WorkBenchLoaded,
         WorkBenchSelected,
+        WorkBenchClosed,
         SelectWorkBench,
         WorkBenchSaved,
         NewNodeAdded,
@@ -84,6 +85,11 @@ namespace YBehavior.Editor.Core.New
     {
         public WorkBench Bench { get; set; }
         public override EventType Type => EventType.WorkBenchSelected;
+    }
+    public class WorkBenchClosedArg : EventArg
+    {
+        public WorkBench Bench { get; set; }
+        public override EventType Type => EventType.WorkBenchClosed;
     }
 
     public class SelectWorkBenchArg : EventArg

@@ -219,7 +219,7 @@ namespace YBehavior.Editor
 
         private void OnNodesItemDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
             DependencyObject obj = (DependencyObject)e.OriginalSource;
             while (obj != null && obj != this.Nodes)
@@ -244,7 +244,7 @@ namespace YBehavior.Editor
 
         private void AddComment_Click(object sender, RoutedEventArgs e)
         {
-            if (DebugMgr.Instance.IsDebugging())
+            if (NetworkMgr.Instance.IsConnected)
                 return;
             WorkBenchMgr.Instance.CreateComment(m_ShowPos);
             _Hide();

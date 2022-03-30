@@ -23,7 +23,7 @@
                 </MenuItem>
             </Menu>-->
             <local:ToolBarFrame DockPanel.Dock="Left"/>
-            <local:DebugFrame DockPanel.Dock="Right"/>
+            <local:DebugToolBarFrame DockPanel.Dock="Right"/>
         </DockPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

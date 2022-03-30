@@ -60,10 +60,7 @@ namespace YBehavior.Editor
                 return;
             this.InOutPanel.DataContext = m_CurTree.InOutMemory;
 
-            if (DebugMgr.Instance.IsDebugging())
-                this.DataContext = DebugMgr.Instance.DebugSharedData;
-            else
-                this.DataContext = m_CurTree.SharedData;
+            _RefreshDataContext();
         }
         private void _OnSelectTab(EventArg arg)
         {
@@ -79,14 +76,7 @@ namespace YBehavior.Editor
                 (
                     (NetworkConnectionChangedArg ooArg) =>
                     {
-                        if (ooArg.bConnected)
-                        {
-                            this.DataContext = DebugMgr.Instance.DebugSharedData;
-                        }
-                        else
-                        {
-                            this.DataContext = m_CurTree == null ? null : m_CurTree.SharedData;
-                        }
+                        _RefreshDataContext();
                     }
                 ),
 
@@ -96,9 +86,16 @@ namespace YBehavior.Editor
 
         private void _OnDebugTargetChanged(EventArg arg)
         {
-            this.DataContext = DebugMgr.Instance.DebugSharedData;
+            _RefreshDataContext();
         }
 
+        void _RefreshDataContext()
+        {
+            if (DebugMgr.Instance.IsDebugging())
+                this.DataContext = DebugMgr.Instance.DebugSharedData;
+            else
+                this.DataContext = m_CurTree?.SharedData;
+        }
         private void _OnSharedVariableChanged(EventArg arg)
         {
             if (m_CurTree != null)
@@ -107,6 +104,8 @@ namespace YBehavior.Editor
 
         private void AddSharedVariable_Click(object sender, RoutedEventArgs e)
         {
+            if (NetworkMgr.Instance.IsConnected)
+                return;
             string name = this.NewSharedVariableName.Text;
             bool res = (m_CurTree.SharedData).TryCreateVariable(
                 name,
@@ -121,6 +120,8 @@ namespace YBehavior.Editor
 
         private void AddLocalVariable_Click(object sender, RoutedEventArgs e)
         {
+            if (NetworkMgr.Instance.IsConnected)
+                return;
             string name = this.NewLocalVariableName.Text;
             bool res = (m_CurTree.SharedData).TryCreateVariable(
                 name,
@@ -135,6 +136,8 @@ namespace YBehavior.Editor
 
         private void AddInput_Click(object sender, RoutedEventArgs e)
         {
+            if (NetworkMgr.Instance.IsConnected)
+                return;
             string name = this.NewInputName.Text;
             bool res = m_CurTree.InOutMemory.TryCreateVariable(
                 name,
@@ -148,6 +151,8 @@ namespace YBehavior.Editor
 
         private void AddOutput_Click(object sender, RoutedEventArgs e)
         {
+            if (NetworkMgr.Instance.IsConnected)
+                return;
             string name = this.NewOutputName.Text;
             bool res = m_CurTree.InOutMemory.TryCreateVariable(
                 name,
