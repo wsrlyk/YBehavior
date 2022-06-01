@@ -84,14 +84,14 @@ namespace YBehavior
 			INT size = (INT)pNode->m_CasesChilds.size();
 			TreeNodePtr targetNode = nullptr;
 			IVariableOperationHelper* pHelper = pNode->m_Switch->GetOperation();
-
+			auto pSwitchValue = pNode->m_Switch->GetValue(pAgent->GetMemory());
 			for (INT i = 0; i < size; ++i)
 			{
 				const void* onecase = pNode->m_Cases->GetElement(pAgent->GetMemory(), i);
 				if (onecase == nullptr)
 					continue;
 
-				if (pHelper->Compare(pNode->m_Switch->GetValue(pAgent->GetMemory()), onecase, OT_EQUAL))
+				if (pHelper->Compare(pSwitchValue, onecase, OT_EQUAL))
 				{
 					targetNode = pNode->m_CasesChilds[i];
 					break;

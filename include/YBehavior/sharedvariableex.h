@@ -141,6 +141,23 @@ namespace YBehavior
 			return (T*)pData->Get<T>(m_Key);
 		}
 
+		StdVector<ElementType>* _Convert2Vector(IMemory* pMemory)
+		{
+			if (IsVector<T>::Result)
+			{
+				///> would have compile error if directly operate the m_Value when T is not a StdVector<XX>
+				StdVector<ElementType>* mValue;
+				if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
+					mValue = (StdVector<ElementType>*)_GetValuePtr();
+				else
+					mValue = (StdVector<ElementType>*)const_cast<void*>(GetValue(pMemory));
+
+				return mValue;
+			}
+			else
+				return nullptr;
+		}
+
 	public:
 		TYPEID TypeID() const override{ return GetTypeID<T>(); }
 		TYPEID ElementTypeID() const override { return GetTypeID<ElementType>(); }
@@ -176,22 +193,11 @@ namespace YBehavior
 			return m_Key == Utility::INVALID_KEY;
 		}
 
-		StdVector<ElementType>* _Convert2Vector(IMemory* pMemory)
+		StdVector<ElementType>* GetCastedVector(IMemory* pMemory)
 		{
-			if (IsVector<T>::Result)
-			{
-				///> would have compile error if directly operate the m_Value when T is not a StdVector<XX>
-				StdVector<ElementType>* mValue;
-				if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
-					mValue = (StdVector<ElementType>*)_GetValuePtr();
-				else
-					mValue = (StdVector<ElementType>*)const_cast<void*>(GetValue(pMemory));
-
-				return mValue;
-			}
-			else
-				return nullptr;
+			return _Convert2Vector(pMemory);
 		}
+
 		INT VectorSize(IMemory* pMemory) override
 		{
 			const StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
