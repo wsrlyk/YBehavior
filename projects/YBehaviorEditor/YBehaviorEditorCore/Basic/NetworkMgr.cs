@@ -176,10 +176,10 @@ namespace YBehavior.Editor.Core.New
 
             System.Threading.Thread.Sleep(200);
 
-            closeSocket();
+            closeSocket(false);
         }
 
-        private void closeSocket()
+        private void closeSocket(bool networkThread)
         {
             try
             {
@@ -196,11 +196,23 @@ namespace YBehavior.Editor.Core.New
 
             m_clientSocket = null;
 
-            NetworkConnectionChangedArg arg = new NetworkConnectionChangedArg()
+            Action action = () =>
             {
-                bConnected = false
+                NetworkConnectionChangedArg arg = new NetworkConnectionChangedArg()
+                {
+                    bConnected = false
+                };
+                EventMgr.Instance.Send(arg);
             };
-            EventMgr.Instance.Send(arg);
+            if (networkThread)
+            {
+                Application.Current.Dispatcher.Invoke(action);
+            }
+            else
+            {
+                action.Invoke();
+            }
+
             MessageProcessor.OnNetworkConnectionChanged(false);
             DebugMgr.Instance.Clear();
         }
@@ -262,7 +274,7 @@ namespace YBehavior.Editor.Core.New
                 if (receivedBytes == 0)
                 {
                     LogMgr.Instance.Error("ConnectError");
-                    closeSocket();
+                    closeSocket(true);
                     return;
                 }
 
@@ -293,7 +305,7 @@ namespace YBehavior.Editor.Core.New
                 MessageBox.Show(exc.Message);
                 LogMgr.Instance.Error("ConnectError: " + exc.Message);
 
-                closeSocket();
+                closeSocket(true);
                 //Invoke(m_delegateOnDisconnect);
 
             }
@@ -316,7 +328,7 @@ namespace YBehavior.Editor.Core.New
                 catch (SocketException e)
                 {
                     LogMgr.Instance.Error("Exception: " + e.Message);
-                    closeSocket();
+                    closeSocket(false);
                 }
                 catch (Exception e)
                 {
