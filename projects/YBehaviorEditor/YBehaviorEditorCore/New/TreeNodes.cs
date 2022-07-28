@@ -688,9 +688,13 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return string.Format("{1} >> {0}",
-                    m_Target.NoteValue,
-                    m_Source.NoteValue
+                var targetType = Variable.ValueTypeDic2.GetValue(m_Target.vType, "");
+                var sourceType = Variable.ValueTypeDic2.GetValue(m_Source.vType, "");
+                return string.Format("({0}){1} >> ({2}){3}",
+                    sourceType,
+                    m_Source.NoteValue,
+                    targetType,
+                    m_Target.NoteValue
                     );
             }
         }
