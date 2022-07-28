@@ -30,6 +30,7 @@
     <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugiconfig.hpp" />
     <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugixml.hpp" />
     <ClInclude Include="..\include\YBehavior\agent.h" />
+    <ClInclude Include="..\include\YBehavior\nodes\convert.h" />
     <ClInclude Include="..\include\YBehavior\treenode.h" />
     <ClInclude Include="..\include\YBehavior\behaviorprocess.h" />
     <ClInclude Include="..\include\YBehavior\behaviortree.h" />
@@ -96,6 +97,7 @@
     <ClInclude Include="..\include\YBehavior\treekeymgr.h" />
     <ClInclude Include="..\include\YBehavior\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />
+    <ClInclude Include="..\include\YBehavior\variableconvert.h" />
     <ClInclude Include="..\include\YBehavior\variablecreation.h" />
     <ClInclude Include="..\include\YBehavior\variableoperation.h" />
     <ClInclude Include="..\include\YBehavior\version.h" />
@@ -103,6 +105,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\3rd\pugixml\pugixml.cpp" />
     <ClCompile Include="..\src\YBehavior\agent.cpp" />
+    <ClCompile Include="..\src\YBehavior\nodes\convert.cpp" />
     <ClCompile Include="..\src\YBehavior\treenode.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviorprocess.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviortree.cpp" />
@@ -156,6 +159,7 @@
     <ClCompile Include="..\src\YBehavior\treekeymgr.cpp" />
     <ClCompile Include="..\src\YBehavior\types.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />
+    <ClCompile Include="..\src\YBehavior\variableconvert.cpp" />
     <ClCompile Include="..\src\YBehavior\variablecreation.cpp" />
     <ClCompile Include="..\src\YBehavior\variableoperation.cpp" />
   </ItemGroup>

@@ -7,6 +7,7 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
+    using ConvertType = KeyValuePair<Variable.ValueType, Variable.ValueType>;
     public class RootTreeNode : SingleChildNode
     {
         public RootTreeNode() : base()
@@ -599,7 +600,7 @@ namespace YBehavior.Editor.Core.New
 
     class SetDataTreeNode : LeafNode
     {
-        public override string Icon => "x<<y";
+        public override string Icon => "y >> x";
 
         public SetDataTreeNode()
         {
@@ -618,7 +619,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 1
             );
-            //opl.IsInput = false;
+            opl.IsInput = false;
 
             Variable opr = NodeMemory.CreateVariable(
                 "Source",
@@ -635,13 +636,89 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return string.Format("{0} << {1}",
+                return string.Format("{1} >> {0}",
                     Variables.GetVariable("Target").NoteValue,
                     Variables.GetVariable("Source").NoteValue
                     );
             }
         }
     }
+    class ConvertTreeNode : LeafNode
+    {
+        public override string Icon => "y >> x";
+
+        Variable m_Target;
+        Variable m_Source;
+        public ConvertTreeNode()
+        {
+            m_Name = "Convert";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            m_Target = NodeMemory.CreateVariable(
+                "Target",
+                "",
+                Variable.CreateParams_ConvertTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_FIXED
+            );
+            m_Target.IsInput = false;
+
+            m_Source = NodeMemory.CreateVariable(
+                "Source",
+                "",
+                Variable.CreateParams_ConvertTypes,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_FIXED
+            );
+        }
+        protected override void _OnCloned()
+        {
+            base._OnCloned();
+            m_Target = NodeMemory.GetVariable("Target");
+            m_Source = NodeMemory.GetVariable("Source");
+        }
+
+
+        public override string Note
+        {
+            get
+            {
+                return string.Format("{1} >> {0}",
+                    m_Target.NoteValue,
+                    m_Source.NoteValue
+                    );
+            }
+        }
+
+        static HashSet<ConvertType> s_SupportedTypes = new HashSet<ConvertType>
+    {
+        new ConvertType(Variable.ValueType.VT_INT, Variable.ValueType.VT_STRING),
+        new ConvertType(Variable.ValueType.VT_FLOAT, Variable.ValueType.VT_STRING),
+        new ConvertType(Variable.ValueType.VT_BOOL, Variable.ValueType.VT_STRING),
+        new ConvertType(Variable.ValueType.VT_INT, Variable.ValueType.VT_BOOL),
+        new ConvertType(Variable.ValueType.VT_INT, Variable.ValueType.VT_FLOAT),
+    };
+        protected override bool _OnCheckValid()
+        {
+            ConvertType type = new ConvertType(m_Source.vType, m_Target.vType);
+            if (s_SupportedTypes.Contains(type))
+                return true;
+
+            type = new ConvertType(m_Target.vType, m_Source.vType);
+            if (s_SupportedTypes.Contains(type))
+                return true;
+
+            LogMgr.Instance.Error(this.Renderer.UITitle + ": This type of convert is not supported.");
+
+            return false;
+        }
+    }
+
 
     class IfThenElseTreeNode : TreeNode
     {

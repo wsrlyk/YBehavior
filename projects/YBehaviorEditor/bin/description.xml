@@ -67,9 +67,14 @@
                 </Comparer>
                 <SetData Content="赋值器"
 			ReturnSuccess="始终成功">
-                        <Target Content="目标变量"/>
-                        <Source Content="源值"/>
+                        <Target Content="目标"/>
+                        <Source Content="源"/>
                 </SetData>
+                <Convert Content="类型转换"
+			ReturnFailure="类型不支持">
+                        <Target Content="目标"/>
+                        <Source Content="源"/>
+                </Convert>
                 <Random Content="随机器"
 			ReturnSuccess="始终成功">
                         <Target Content="保存计算结果"/>

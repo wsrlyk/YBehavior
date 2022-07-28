@@ -17,6 +17,7 @@
 #include "YBehavior/nodes/wait.h"
 #include "YBehavior/nodes/array.h"
 #include "YBehavior/nodes/fsmrelated.h"
+#include "YBehavior/nodes/convert.h"
 namespace YBehavior
 {
 	NodeFactory* CreateNodeFactory()
@@ -32,7 +33,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, AlwaysSuccess);
 		REGISTER_TYPE(factory, AlwaysFailure);
 		REGISTER_TYPE(factory, ConvertToBool);
-		//REGISTER_TYPE(factory, Invertor);
+		REGISTER_TYPE(factory, Convert);
 		REGISTER_TYPE(factory, SetData);
 		REGISTER_TYPE(factory, Random);
 		REGISTER_TYPE(factory, RandomSelect);

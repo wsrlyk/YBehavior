@@ -52,6 +52,7 @@ namespace YBehavior
 	{
 	public:
 		static Bimap<OperationType, STRING, EnumClassHash> s_OperatorMap;
+		virtual ~IVariableOperationHelper() {}
 		virtual bool Compare(const void* pLeft, const void* pRight, OperationType op) = 0;
 		virtual bool Compare(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, OperationType op) = 0;
 		virtual void Calculate(void* pLeft, const void* pRight0, const void* pRight1, OperationType op) = 0;
