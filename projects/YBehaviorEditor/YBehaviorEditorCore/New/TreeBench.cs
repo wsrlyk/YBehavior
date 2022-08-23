@@ -459,6 +459,8 @@ namespace YBehavior.Editor.Core.New
             {
                 foreach (Connection conn in c.Conns)
                 {
+                    if (export && conn.Ctr.From.Owner.Disabled && conn.Ctr.To.Owner.Disabled)
+                        continue;
                     if (data == null)
                     {
                         data = xmlDoc.CreateElement("DataConnections");
