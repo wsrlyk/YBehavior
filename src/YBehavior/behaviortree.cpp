@@ -188,6 +188,9 @@ namespace YBehavior
 		};
 		std::unordered_map<TYPEID, std::vector<Ranges>> usedRanges;
 
+		int lastRangesListIndex = -1;
+		UINT lastFromUID = 0;
+
 		for (auto it = data.begin(); it != data.end(); ++it)
 		{
 			UINT fromUID = it->attribute("FromUID").as_uint(0);
@@ -242,6 +245,11 @@ namespace YBehavior
 				toVariable->SetKey(key);
 				GetLocalData()->SetDefault(key, fromVariable->TypeID());
 			};
+			auto setLastInfos = [&lastFromUID, &lastRangesListIndex, fromUID](int rangesListIndex)
+			{
+				lastFromUID = fromUID;
+				lastRangesListIndex = rangesListIndex;
+			};
 
 			auto it2 = usedRanges.find(typeID);
 			///> It's the first data in this type
@@ -255,23 +263,47 @@ namespace YBehavior
 				usedRanges[typeID] = rangesList;
 
 				setCurrentKey(currentKey);
+				setLastInfos(0);
+
 				continue;
 			}
 			{
-				/// We assume that these ranges are feeded in order
+				/// We assume that these ranges are feeded IN ORDER
 				/// So current FromUID can only be equal or larger than the previous FromUIDs
 				/// And previous ranges cant make holes
+				
+				std::vector<Ranges>& rangesList = it2->second;
+
+				///> In this case, an output is connected to multiple inputs. Just merge them.
+				if (lastFromUID == fromUID)
+				{
+					///> It must be the last range cause of ORDER
+					Ranges& ranges = rangesList[lastRangesListIndex];
+					Range& range = *ranges.ranges.rbegin();
+					///> Use the larger range
+					if (toUID > std::get<2>(range))
+					{
+						std::get<2>(range) = toUID;
+						std::get<3>(range) = toVariable->GetIndex();
+					}
+					setCurrentKey(ranges.key);
+					continue;
+				}
+
+				int validRangesListIndex = -1;
 
 				bool finish = false;
-				std::vector<Ranges>& rangesList = it2->second;
-				for (auto it3 = rangesList.begin(); it3 != rangesList.end(); ++it3)
+				for (int i = 0, imax = rangesList.size(); i < imax; ++i)
 				{
-					for (auto it4 = it3->ranges.begin(); it4 != it3->ranges.end(); ++it4)
+					Ranges& ranges = rangesList[i];
+					for (int j = 0, jmax = ranges.ranges.size(); j < imax; ++j)
 					{
-						Range& range = *it4;
-						///> Totally not in this range
+						Range& range = ranges.ranges[j];
+						///> Totally not in this range.
+						///  It can be appended to this range, if no better ranges exist.
 						if (fromUID > std::get<2>(range))
 						{
+							validRangesListIndex = i;
 							continue;
 						}
 
@@ -280,7 +312,8 @@ namespace YBehavior
 						{
 							std::get<2>(range) = toUID;
 							std::get<3>(range) = toVariable->GetIndex();
-							setCurrentKey(it3->key);
+							setCurrentKey(ranges.key);
+							setLastInfos(i);
 							finish = true;
 							break;
 						}
@@ -296,28 +329,46 @@ namespace YBehavior
 									std::get<2>(range) = toUID;
 									std::get<3>(range) = toVariable->GetIndex();
 								}
-								setCurrentKey(it3->key);
+								setCurrentKey(ranges.key);
+								setLastInfos(i);
 								finish = true;
 							}
 							break;
 						}
 
 						///> All other cases are invalid
+
+						///> This rangesList is not fit for this connect;
+						if (validRangesListIndex == i)
+							validRangesListIndex = -1;
 						break;
 					}
 
 					if (finish)
 						break;
 				}
-				///> Need a new KEY for this range
+
 				if (!finish)
 				{
-					Ranges ranges;
-					ranges.key = ++currentKey;
-					ranges.ranges.emplace_back(fromUID, fromVariable->GetIndex(), toUID, toVariable->GetIndex());
-					rangesList.emplace_back(ranges);
+					///> append to this range
+					if (validRangesListIndex >= 0)
+					{
+						Ranges& ranges = rangesList[validRangesListIndex];
+						ranges.ranges.emplace_back(fromUID, fromVariable->GetIndex(), toUID, toVariable->GetIndex());
+						setCurrentKey(ranges.key);
+						setLastInfos(validRangesListIndex);
+					}
+					///> Need a new KEY for this range
+					else
+					{
+						Ranges ranges;
+						ranges.key = ++currentKey;
+						ranges.ranges.emplace_back(fromUID, fromVariable->GetIndex(), toUID, toVariable->GetIndex());
+						rangesList.emplace_back(ranges);
 
-					setCurrentKey(currentKey);
+						setCurrentKey(currentKey);
+						setLastInfos(rangesList.size() - 1);
+					}
 				}
 			}
 		}
