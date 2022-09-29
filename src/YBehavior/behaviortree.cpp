@@ -293,10 +293,10 @@ namespace YBehavior
 				int validRangesListIndex = -1;
 
 				bool finish = false;
-				for (int i = 0, imax = rangesList.size(); i < imax; ++i)
+				for (int i = 0, imax = (int)rangesList.size(); i < imax; ++i)
 				{
 					Ranges& ranges = rangesList[i];
-					for (int j = 0, jmax = ranges.ranges.size(); j < imax; ++j)
+					for (int j = 0, jmax = (int)ranges.ranges.size(); j < jmax; ++j)
 					{
 						Range& range = ranges.ranges[j];
 						///> Totally not in this range.
@@ -367,7 +367,7 @@ namespace YBehavior
 						rangesList.emplace_back(ranges);
 
 						setCurrentKey(currentKey);
-						setLastInfos(rangesList.size() - 1);
+						setLastInfos((int)rangesList.size() - 1);
 					}
 				}
 			}
