@@ -102,6 +102,35 @@ protected:
 	YBehavior::SharedVariableEx<YBehavior::EntityWrapper>* m_Target;
 };
 
+class ProjectVector3 : public Action
+{
+public:
+	TREENODE_DEFINE(ProjectVector3)
+
+protected:
+	bool OnLoaded(const pugi::xml_node& data) override;
+	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;
+
+	YBehavior::SharedVariableEx<YBehavior::Vector3>* m_Input;
+	YBehavior::SharedVariableEx<YBehavior::Float>* m_X;
+	YBehavior::SharedVariableEx<YBehavior::Float>* m_Y;
+	YBehavior::SharedVariableEx<YBehavior::Float>* m_Z;
+};
+
+class SetVector3 : public Action
+{
+public:
+	TREENODE_DEFINE(SetVector3)
+
+protected:
+	bool OnLoaded(const pugi::xml_node& data) override;
+	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;
+
+	YBehavior::SharedVariableEx<YBehavior::Vector3>* m_Output;
+	YBehavior::SharedVariableEx<YBehavior::Float>* m_X;
+	YBehavior::SharedVariableEx<YBehavior::Float>* m_Y;
+	YBehavior::SharedVariableEx<YBehavior::Float>* m_Z;
+};
 
 class MyLaunchCore : public YBehavior::LaunchCore
 {

@@ -8,6 +8,8 @@ void MyLaunchCore::RegisterActions() const
 	_Register<GetNameAction>();
 	_Register<SelectTargetAction>();
 	_Register<GetTargetNameAction>();
+	_Register<ProjectVector3>();
+	_Register<SetVector3>();
 }
 
 YBehavior::NodeState GetNameAction::Update(YBehavior::AgentPtr pAgent)
@@ -137,4 +139,49 @@ bool GetTargetNameAction::OnLoaded(const pugi::xml_node& data)
 	YB::VariableCreation::CreateVariable(this, pTestVariable, "TestVariable", data, 0, YBehavior::Utility::GetCreateStr<YBehavior::INT>());
 
 	return true;
+}
+
+bool ProjectVector3::OnLoaded(const pugi::xml_node& data)
+{
+	YBehavior::VariableCreation::CreateVariable(this, m_Input, "Input", data, true);
+	YBehavior::VariableCreation::CreateVariableIfExist(this, m_X, "X", data, true);
+	YBehavior::VariableCreation::CreateVariableIfExist(this, m_Y, "Y", data, true);
+	YBehavior::VariableCreation::CreateVariableIfExist(this, m_Z, "Z", data, true);
+
+	return true;
+}
+
+YBehavior::NodeState ProjectVector3::Update(YBehavior::AgentPtr pAgent)
+{
+	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Input, true);
+	YBehavior::Vector3 v;
+	m_Input->GetCastedValue(pAgent->GetMemory(), v);
+	if (m_X)
+		m_X->SetCastedValue(pAgent->GetMemory(), v.x);
+	if (m_Y)
+		m_Y->SetCastedValue(pAgent->GetMemory(), v.y);
+	if (m_Z)
+		m_Z->SetCastedValue(pAgent->GetMemory(), v.z);
+	return YBehavior::NS_SUCCESS;
+}
+
+bool SetVector3::OnLoaded(const pugi::xml_node& data)
+{
+	YBehavior::VariableCreation::CreateVariable(this, m_Output, "Output", data, true);
+	YBehavior::VariableCreation::CreateVariable(this, m_X, "X", data);
+	YBehavior::VariableCreation::CreateVariable(this, m_Y, "Y", data);
+	YBehavior::VariableCreation::CreateVariable(this, m_Z, "Z", data);
+
+	return true;
+}
+
+YBehavior::NodeState SetVector3::Update(YBehavior::AgentPtr pAgent)
+{
+	YBehavior::Vector3 v;
+	m_X->GetCastedValue(pAgent->GetMemory(), v.x);
+	m_Y->GetCastedValue(pAgent->GetMemory(), v.y);
+	m_Z->GetCastedValue(pAgent->GetMemory(), v.z);
+	m_Output->SetCastedValue(pAgent->GetMemory(), v);
+	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Output, false);
+	return YBehavior::NS_SUCCESS;
 }

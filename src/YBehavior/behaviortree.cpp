@@ -190,6 +190,7 @@ namespace YBehavior
 
 		int lastRangesListIndex = -1;
 		UINT lastFromUID = 0;
+		UINT lastFromVariableIndex = 0;
 
 		for (auto it = data.begin(); it != data.end(); ++it)
 		{
@@ -245,9 +246,10 @@ namespace YBehavior
 				toVariable->SetKey(key);
 				GetLocalData()->SetDefault(key, fromVariable->TypeID());
 			};
-			auto setLastInfos = [&lastFromUID, &lastRangesListIndex, fromUID](int rangesListIndex)
+			auto setLastInfos = [&lastFromUID, &lastFromVariableIndex, &lastRangesListIndex, fromUID, fromVariable](int rangesListIndex)
 			{
 				lastFromUID = fromUID;
+				lastFromVariableIndex = fromVariable->GetIndex();
 				lastRangesListIndex = rangesListIndex;
 			};
 
@@ -275,7 +277,7 @@ namespace YBehavior
 				std::vector<Ranges>& rangesList = it2->second;
 
 				///> In this case, an output is connected to multiple inputs. Just merge them.
-				if (lastFromUID == fromUID)
+				if (lastFromUID == fromUID && lastFromVariableIndex == fromVariable->GetIndex())
 				{
 					///> It must be the last range cause of ORDER
 					Ranges& ranges = rangesList[lastRangesListIndex];

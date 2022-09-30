@@ -25,4 +25,17 @@
 		<Variable Name="Entity0" ValueType="A" IsArray="False" IsConst="False" Value=""/>
 		<Variable Name="Array0" ValueType="I" IsArray="True" IsConst="False" Value=""/>
 	</Action>
+	<Action Class="ProjectVector3" Note="Project {0} to {1} {2} {3}" Hierachy="1">
+		<Variable Name="Input" ValueType="V" IsArray="False" IsConst="False"/>
+		<Variable Name="X" ValueType="F" IsArray="False" IsInput="False" IsConst="False" IsEnable="False" />
+		<Variable Name="Y" ValueType="F" IsArray="False" IsInput="False" IsConst="False" IsEnable="False" />
+		<Variable Name="Z" ValueType="F" IsArray="False" IsInput="False" IsConst="False" IsEnable="False" />
+	</Action>
+	<Action Class="SetVector3" Note="Set ({1}, {2}, {3}) to {4}" Hierachy="1">
+		<Variable Name="Input" ValueType="V" IsArray="False" IsEnable="False"/>
+		<Variable Name="X" ValueType="F" IsArray="False" IsEnable="False" />
+		<Variable Name="Y" ValueType="F" IsArray="False" IsEnable="False" />
+		<Variable Name="Z" ValueType="F" IsArray="False" IsEnable="False" />
+		<Variable Name="Output" ValueType="V" IsArray="False" IsInput="False" IsConst="False"/>
+	</Action>
 </Actions>
