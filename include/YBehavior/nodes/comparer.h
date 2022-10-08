@@ -3,7 +3,7 @@
 
 #include "YBehavior/treenode.h"
 #include <unordered_set>
-#include "YBehavior/variableoperation.h"
+#include "YBehavior/variables/variablecompare.h"
 
 namespace YBehavior
 {
@@ -16,11 +16,11 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 
 	private:
-		OperationType m_Operator;
+		CompareType m_Operator;
 		ISharedVariableEx* m_Opl;
 		ISharedVariableEx* m_Opr;
 
-		TYPEID m_DataType;
+		const IVariableCompareHelper* m_pHelper;
 
 	};
 }

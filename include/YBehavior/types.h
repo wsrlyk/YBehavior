@@ -18,6 +18,12 @@ namespace YBehavior
 		float y{};
 		float z{};
 
+		Vector3() = default;
+		Vector3(float _x, float _y, float _z)
+			: x(_x)
+			, y(_y)
+			, z(_z)
+		{}
 		friend std::stringstream & operator<<(std::stringstream &outstream, const Vector3 &obj)
 		{
 			outstream << obj.x << ',' << obj.y << ',' << obj.z;
@@ -56,20 +62,12 @@ namespace YBehavior
 
 		Vector3 operator + (const Vector3& other) const
 		{
-			Vector3 res;
-			res.x = x + other.x;
-			res.y = y + other.y;
-			res.z = z + other.z;
-			return res;
+			return Vector3(x + other.x, y + other.y, z + other.z);
 		}
 
 		Vector3 operator - (const Vector3& other) const
 		{
-			Vector3 res;
-			res.x = x - other.x;
-			res.y = y - other.y;
-			res.z = z - other.z;
-			return res;
+			return Vector3(x - other.x, y - other.y, z - other.z);
 		}
 
 		Vector3 operator * (const Vector3& other) const
@@ -79,6 +77,17 @@ namespace YBehavior
 		Vector3 operator / (const Vector3& other) const
 		{
 			return *this;
+		}
+
+		Vector3 operator * (float v) const
+		{
+			return Vector3(x * v, y * v, z * v);
+		}
+		Vector3 operator / (float v) const
+		{
+			if (v == 0.0f)
+				return *this;
+			return Vector3(x / v, y / v, z / v);
 		}
 
 		bool operator < (const Vector3& other) const
@@ -219,6 +228,14 @@ namespace YBehavior
 		inline bool IsValid() const { return *m_IsValid; }
 		inline void SetValid(bool b) { *m_IsValid = b; }
 	};
+	///> Let the POINTER of the result of calculation returnable
+	template<typename T>
+	class PreservedValue
+	{
+	public:
+		static T Data;
+	};
+	template<typename T> T PreservedValue<T>::Data;
 
 	typedef int					KEY;	///> Key to get value from the shareddata
 	typedef int					SIZE_KEY;

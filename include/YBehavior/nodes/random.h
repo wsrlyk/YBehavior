@@ -6,6 +6,7 @@
 
 namespace YBehavior
 {
+	class IVariableRandomHelper;
 	class Random : public LeafNode<>
 	{
 	public:
@@ -19,7 +20,7 @@ namespace YBehavior
 		ISharedVariableEx* m_Bound2;
 		ISharedVariableEx* m_Target;
 
-		TYPEID m_DataType;
+		const IVariableRandomHelper* m_pHelper;
 	};
 
 	class RandomSelect : public LeafNode<>
@@ -37,6 +38,7 @@ namespace YBehavior
 		TYPEID m_DataType;
 	};
 
+	class IVariableOperationHelper;
 	class Shuffle : public LeafNode<>
 	{
 	public:
@@ -50,6 +52,7 @@ namespace YBehavior
 		ISharedVariableEx* m_Output;
 
 		bool m_bSameArray;
+		const IVariableOperationHelper* m_pHelper;
 	};
 
 }

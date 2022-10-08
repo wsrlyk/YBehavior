@@ -1,15 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Test>
   <Node Class="Root">
-    <Shared a="_IC 0" />
-    <Local />
+    <Shared f="_FC 0.0" v="_VC 1,2,3" v2="VVC 0,0,0" />
+    <Local ff="FFc 0.5" />
     <Node Class="Sequence">
-      <Node Class="IfThenElse">
-        <Node Class="Comparer" Connection="if" Operator="_EC &gt;" Opl="_IP a" Opr="_IC 10" />
-        <Node Class="SetData" Connection="then" Target="_IP a" Source="_IC 0" />
-        <Node Class="Calculator" Connection="else" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_Ic 1" />
-      </Node>
-      <Node Class="SubTree" Tree="_SC Test0" Identification="_SC " />
+      <Node Class="ProjectVector3" Input="_VP v" X="_FPE " Y="_FPE " Z="_FPE " />
+      <Node Class="Calculator" Operator="_EC +" Output="_FP " Input1="_Fp " Input2="_Fp ff VI c 0" />
+      <Node Class="Calculator" Operator="_EC +" Output="_FP " Input1="_Fp " Input2="_FC 0.7" />
+      <Node Class="SetVector3" X="_FpE " Y="_FpE " Z="_FpE " Output="_VP v2 VI c 0" />
+      <Node Class="Calculator" Operator="_EC *" Output="_Fp " Input1="_Fp " Input2="_Fp " />
+      <Node Class="Calculator" Operator="_EC *" Output="_Fp " Input1="_Fp " Input2="_Fp " />
+      <Node Class="Calculator" Operator="_EC +" Output="_FP f" Input1="_Fp " Input2="_Fp " />
     </Node>
   </Node>
+  <DataConnections>
+    <DataConnection FromUID="3" FromName="X" ToUID="4" ToName="Input1" />
+    <DataConnection FromUID="3" FromName="Y" ToUID="6" ToName="Y" />
+    <DataConnection FromUID="3" FromName="Z" ToUID="5" ToName="Input1" />
+    <DataConnection FromUID="4" FromName="Output" ToUID="6" ToName="X" />
+    <DataConnection FromUID="4" FromName="Output" ToUID="7" ToName="Input1" />
+    <DataConnection FromUID="4" FromName="Output" ToUID="7" ToName="Input2" />
+    <DataConnection FromUID="5" FromName="Output" ToUID="6" ToName="Z" />
+    <DataConnection FromUID="5" FromName="Output" ToUID="8" ToName="Input1" />
+    <DataConnection FromUID="5" FromName="Output" ToUID="8" ToName="Input2" />
+    <DataConnection FromUID="7" FromName="Output" ToUID="9" ToName="Input1" />
+    <DataConnection FromUID="8" FromName="Output" ToUID="9" ToName="Input2" />
+  </DataConnections>
 </Test>

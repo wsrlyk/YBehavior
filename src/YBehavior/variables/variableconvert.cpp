@@ -1,4 +1,4 @@
-#include "YBehavior/variableconvert.h"
+#include "YBehavior/variables/variableconvert.h"
 
 namespace YBehavior
 {

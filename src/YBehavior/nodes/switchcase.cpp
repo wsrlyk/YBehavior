@@ -2,6 +2,7 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/profile/profileheader.h"
 #include "YBehavior/variablecreation.h"
+#include "YBehavior/variables/variablecompare.h"
 
 namespace YBehavior
 {
@@ -39,6 +40,12 @@ namespace YBehavior
 		if (!Utility::IsElement(switchType, casesType))
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types: Switch & Cases " << ERROR_END;
+			return false;
+		}
+		
+		m_pHelper = VariableCompareMgr::Instance()->Get(switchType);
+		if (!m_pHelper)
+		{
 			return false;
 		}
 
@@ -83,7 +90,6 @@ namespace YBehavior
 
 			INT size = (INT)pNode->m_CasesChilds.size();
 			TreeNodePtr targetNode = nullptr;
-			IVariableOperationHelper* pHelper = pNode->m_Switch->GetOperation();
 			auto pSwitchValue = pNode->m_Switch->GetValue(pAgent->GetMemory());
 			for (INT i = 0; i < size; ++i)
 			{
@@ -91,7 +97,7 @@ namespace YBehavior
 				if (onecase == nullptr)
 					continue;
 
-				if (pHelper->Compare(pSwitchValue, onecase, OT_EQUAL))
+				if (pNode->m_pHelper->Compare(pSwitchValue, onecase, CompareType::EQUAL))
 				{
 					targetNode = pNode->m_CasesChilds[i];
 					break;

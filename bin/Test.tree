@@ -1,15 +1,40 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Test IsEditor="">
   <Node Class="Root" GUID="1" Pos="0,0">
-    <Shared f="_FC 0.0" a="_IC 0" aa="IIC " />
-    <Local fds="_Ac " />
-    <Node Class="Sequence" GUID="2" Pos="-40,100">
-      <Node Class="IfThenElse" GUID="8" Pos="-180,210">
-        <Node Class="Comparer" GUID="9" Connection="if" Pos="-510,350" Operator="_EC &gt;" Opl="_IP a" Opr="_IC 10" />
-        <Node Class="SetData" GUID="10" Connection="then" Pos="-290,440" Target="_IP a" Source="_IC 0" />
-        <Node Class="Calculator" GUID="4" Connection="else" Pos="20,400" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_Ic 1" />
-      </Node>
-      <Node Class="SubTree" GUID="11" Pos="101,212" Tree="_SC Test0" Identification="_SC " />
+    <Shared f="_FC 0.0" a="_IC 0" aa="IIC " v="_VC 1,2,3" v2="VVC 0,0,0" />
+    <Local fds="_Ac " s="_Sc " b="_Bc F" ff="FFc 0.5" />
+    <Node Class="Sequence" GUID="28" Pos="-70,110">
+      <Node Class="ProjectVector3" GUID="42" Pos="-360,250" Input="_VP v" X="_FPE " Y="_FPE " Z="_FPE " />
+      <Node Class="Calculator" GUID="35" Pos="-100,220" Operator="_EC +" Output="_FP " Input1="_Fp " Input2="_Fp ff VI c 0" />
+      <Node Class="Calculator" GUID="36" Pos="-90,330" Operator="_EC +" Output="_FP " Input1="_Fp " Input2="_FC 0.7" />
+      <Node Class="SetVector3" GUID="43" Pos="90,290" Input="_VCD " X="_FpE " Y="_FpE " Z="_FpE " Output="_VP v2 VI c 0" />
+      <Node Class="Calculator" GUID="38" Pos="330,210" Operator="_EC *" Output="_Fp " Input1="_Fp " Input2="_Fp " />
+      <Node Class="Calculator" GUID="39" Pos="360,360" Operator="_EC *" Output="_Fp " Input1="_Fp " Input2="_Fp " />
+      <Node Class="Calculator" GUID="44" Pos="557,241" Operator="_EC +" Output="_FP f" Input1="_Fp " Input2="_Fp " />
     </Node>
   </Node>
+  <Node Class="Sequence" GUID="21" Pos="300,590">
+    <Node Class="Calculator" GUID="22" Pos="120,689" Operator="_EC +" Output="_IP " Input1="_IC 1" Input2="_IC 2" />
+    <Node Class="Calculator" GUID="23" Pos="175,809" Operator="_EC +" Output="_IP " Input1="_IC 3" Input2="_IC 4" />
+    <Node Class="Calculator" GUID="24" Pos="335,730" Operator="_EC +" Output="_IP " Input1="_Ip " Input2="_Ip " />
+    <Node Class="Comparer" GUID="25" Pos="555,720" Operator="_EC &gt;=" Opl="_IP " Opr="_IC 1" />
+    <Node Class="Comparer" GUID="26" Pos="635,828" Operator="_EC &lt;=" Opl="_IP " Opr="_IC 10" />
+  </Node>
+  <DataConnections>
+    <DataConnection FromGUID="42" FromName="X" ToGUID="35" ToName="Input1" />
+    <DataConnection FromGUID="42" FromName="Y" ToGUID="43" ToName="Y" />
+    <DataConnection FromGUID="42" FromName="Z" ToGUID="36" ToName="Input1" />
+    <DataConnection FromGUID="35" FromName="Output" ToGUID="43" ToName="X" />
+    <DataConnection FromGUID="35" FromName="Output" ToGUID="38" ToName="Input1" />
+    <DataConnection FromGUID="35" FromName="Output" ToGUID="38" ToName="Input2" />
+    <DataConnection FromGUID="36" FromName="Output" ToGUID="43" ToName="Z" />
+    <DataConnection FromGUID="36" FromName="Output" ToGUID="39" ToName="Input1" />
+    <DataConnection FromGUID="36" FromName="Output" ToGUID="39" ToName="Input2" />
+    <DataConnection FromGUID="38" FromName="Output" ToGUID="44" ToName="Input1" />
+    <DataConnection FromGUID="39" FromName="Output" ToGUID="44" ToName="Input2" />
+    <DataConnection FromGUID="22" FromName="Output" ToGUID="24" ToName="Input1" />
+    <DataConnection FromGUID="23" FromName="Output" ToGUID="24" ToName="Input2" />
+    <DataConnection FromGUID="24" FromName="Output" ToGUID="25" ToName="Opl" />
+    <DataConnection FromGUID="24" FromName="Output" ToGUID="26" ToName="Opl" />
+  </DataConnections>
 </Test>

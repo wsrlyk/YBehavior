@@ -1,6 +1,9 @@
 #include "YBehavior/nodes/piecewisefunction.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/variablecreation.h"
+#include "YBehavior/variables/variablecompare.h"
+#include "YBehavior/variables/variablecalculate.h"
+#include "YBehavior/variables/variableoperation.h"
 
 namespace YBehavior
 {
@@ -47,19 +50,17 @@ namespace YBehavior
 			return NS_SUCCESS;
 		}
 
-		IVariableOperationHelper* pHelper = m_InputX->GetOperation();
-
 		///>   y = y0 + (y1 - y0) * (x - x0) / (x1 - x0)
 		///>   y = y0 + pDeltaY * pOffsetX / pDeltaX
 		///>   y = y0 + pDeltaY * pRatio  (Here we wont calc pRatio first, in case that offsetX and DeltaX are intergers, leading to inaccurate division.
 		///>								Instead, we calc pDeltaY * pOffsetX first
 		///>   y = y0 + pOffsetY
 
-		auto deltaX = pHelper->AllocTempData();
-		auto deltaY = pHelper->AllocTempData();
-		auto offsetX = pHelper->AllocTempData();
-		auto deltaYxpOffsetX = pHelper->AllocTempData();
-		auto offsetY = pHelper->AllocTempData();
+		auto deltaX = m_pOperationHelper->AllocTempData();
+		auto deltaY = m_pOperationHelper->AllocTempData();
+		auto offsetX = m_pOperationHelper->AllocTempData();
+		auto deltaYxpOffsetX = m_pOperationHelper->AllocTempData();
+		auto offsetY = m_pOperationHelper->AllocTempData();
 
 		const void* x = m_InputX->GetValue(pAgent->GetMemory());
 		for (INT i = 0; i < sizeX - 1; ++i)
@@ -68,7 +69,7 @@ namespace YBehavior
 			const void* x1 = m_KeyPointX->GetElement(pAgent->GetMemory(), i + 1);
 
 			///> Not in the range of this (x0, x1]
-			if (pHelper->Compare(x, x1, OT_GREATER) && i < sizeX - 2)
+			if (m_pCompareHelper->Compare(x, x1, CompareType::GREATER) && i < sizeX - 2)
 				continue;
 			const void* y0 = m_KeyPointY->GetElement(pAgent->GetMemory(), i);
 			const void* y1 = m_KeyPointY->GetElement(pAgent->GetMemory(), i + 1);
@@ -79,12 +80,12 @@ namespace YBehavior
 				continue;
 			}
 
-			pHelper->Calculate(deltaX.pData, x1, x0, OT_SUB);
-			pHelper->Calculate(offsetX.pData, x, x0, OT_SUB);
-			pHelper->Calculate(deltaY.pData, y1, y0, OT_SUB);
-			pHelper->Calculate(deltaYxpOffsetX.pData, deltaY.pData, offsetX.pData, OT_MUL);
-			pHelper->Calculate(offsetY.pData, deltaYxpOffsetX.pData, deltaX.pData, OT_DIV);
-			const void* res = pHelper->Calculate(y0, offsetY.pData, OT_ADD);
+			m_pCalculateHelper->Calculate(deltaX.pData, x1, x0, CalculateType::SUB);
+			m_pCalculateHelper->Calculate(offsetX.pData, x, x0, CalculateType::SUB);
+			m_pCalculateHelper->Calculate(deltaY.pData, y1, y0, CalculateType::SUB);
+			m_pCalculateHelper->Calculate(deltaYxpOffsetX.pData, deltaY.pData, offsetX.pData, CalculateType::MUL);
+			m_pCalculateHelper->Calculate(offsetY.pData, deltaYxpOffsetX.pData, deltaX.pData, CalculateType::DIV);
+			const void* res = m_pCalculateHelper->Calculate(y0, offsetY.pData, CalculateType::ADD);
 
 			m_OutputY->SetValue(pAgent->GetMemory(), res);
 			ns = NS_SUCCESS;
@@ -152,6 +153,14 @@ namespace YBehavior
 			return false;
 		}
 
+		m_pCalculateHelper = VariableCalculateMgr::Instance()->Get(xType);
+		m_pCompareHelper = VariableCompareMgr::Instance()->Get(xType);
+		m_pOperationHelper = VariableOperationMgr::Instance()->Get(xType);
+		if (!m_pCalculateHelper || !m_pCompareHelper || !m_pOperationHelper)
+		{
+			ERROR_BEGIN_NODE_HEAD << "This type is not supported by PiecewiseNode." << ERROR_END;
+			return false;
+		}
 		return true;
 	}
 }

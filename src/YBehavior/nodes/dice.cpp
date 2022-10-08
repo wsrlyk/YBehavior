@@ -1,6 +1,10 @@
 #include "YBehavior/nodes/dice.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/variablecreation.h"
+#include "YBehavior/variables/variablecompare.h"
+#include "YBehavior/variables/variablecalculate.h"
+#include "YBehavior/variables/variableoperation.h"
+#include "YBehavior/variables/variablerandom.h"
 
 namespace YBehavior
 {
@@ -41,23 +45,21 @@ namespace YBehavior
 			return NS_FAILURE;
 		}
 
-		IVariableOperationHelper* pHelper = m_Distribution->GetElementOperation();
-
-		auto zero = pHelper->AllocTempData();
+		auto zero = m_pOperationHelper->AllocTempData();
 
 		const void* input;
-		auto res = pHelper->AllocTempData();
+		auto res = m_pOperationHelper->AllocTempData();
 
 		if (!m_Input)
 		{
-			auto sum = pHelper->AllocTempData();
+			auto sum = m_pOperationHelper->AllocTempData();
 
 			for (INT i = 0; i < sizeX; ++i)
 			{
 				const void* x1 = m_Distribution->GetElement(pAgent->GetMemory(), i);
-				pHelper->Calculate(sum.pData, sum.pData, x1, OT_ADD);
+				m_pCalculateHelper->Calculate(sum.pData, sum.pData, x1, CalculateType::ADD);
 			}
-			pHelper->Random(res.pData, zero.pData, sum.pData);
+			m_pRandomHelper->Random(res.pData, zero.pData, sum.pData);
 			input = res.pData;
 		}
 		else
@@ -65,21 +67,21 @@ namespace YBehavior
 			input = m_Input->GetValue(pAgent->GetMemory());
 		}
 
-		if (pHelper->Compare(input, zero.pData, OT_LESS))
+		if (m_pCompareHelper->Compare(input, zero.pData, CompareType::LESS))
 		{
 			YB_LOG_INFO("Input below zero; ");
 			return NS_FAILURE;
 		}
 
-		auto current = pHelper->AllocTempData();
+		auto current = m_pOperationHelper->AllocTempData();
 
 		for (INT i = 0; i < sizeX; ++i)
 		{
 			const void* x0 = m_Distribution->GetElement(pAgent->GetMemory(), i);
-			pHelper->Calculate(current.pData, current.pData, x0, OT_ADD);
+			m_pCalculateHelper->Calculate(current.pData, current.pData, x0, CalculateType::ADD);
 
 			///> in the range of this (x0, x1)
-			if (pHelper->Compare(input, current.pData, OT_LESS))
+			if (m_pCompareHelper->Compare(input, current.pData, CompareType::LESS))
 			{
 				ns = NS_SUCCESS;
 				m_Output->SetValue(pAgent->GetMemory(), m_Values->GetElement(pAgent->GetMemory(), i));
@@ -150,6 +152,16 @@ namespace YBehavior
 			return false;
 		}
 
+		auto helperType = m_Distribution->ElementTypeID();
+		m_pCalculateHelper = VariableCalculateMgr::Instance()->Get(helperType);
+		m_pCompareHelper = VariableCompareMgr::Instance()->Get(helperType);
+		m_pOperationHelper = VariableOperationMgr::Instance()->Get(helperType);
+		m_pRandomHelper = VariableRandomMgr::Instance()->Get(helperType);
+		if (!m_pCalculateHelper || !m_pCompareHelper || !m_pOperationHelper || !m_pRandomHelper)
+		{
+			ERROR_BEGIN_NODE_HEAD << "This type is not supported by Dice." << ERROR_END;
+			return false;
+		}
 		return true;
 	}
 }

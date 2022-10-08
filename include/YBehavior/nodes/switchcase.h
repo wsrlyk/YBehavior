@@ -13,6 +13,7 @@ namespace YBehavior
 		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
 	};
 
+	class IVariableCompareHelper;
 	class SwitchCase : public CompositeNode<SwitchCaseNodeContext>
 	{
 		friend SwitchCaseNodeContext;
@@ -27,6 +28,8 @@ namespace YBehavior
 
 		StdVector<TreeNodePtr> m_CasesChilds;
 		TreeNodePtr m_DefaultChild = nullptr;
+
+		const IVariableCompareHelper* m_pHelper;
 	};
 }
 

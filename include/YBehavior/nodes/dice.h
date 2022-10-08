@@ -6,6 +6,10 @@
 
 namespace YBehavior
 {
+	class IVariableCompareHelper;
+	class IVariableCalculateHelper;
+	class IVariableOperationHelper;
+	class IVariableRandomHelper;
 	class Dice : public LeafNode<>
 	{
 	public:
@@ -19,6 +23,11 @@ namespace YBehavior
 
 		ISharedVariableEx* m_Input;
 		ISharedVariableEx* m_Output;
+
+		const IVariableCompareHelper* m_pCompareHelper;
+		const IVariableCalculateHelper* m_pCalculateHelper;
+		const IVariableOperationHelper* m_pOperationHelper;
+		const IVariableRandomHelper* m_pRandomHelper;
 	};
 }
 

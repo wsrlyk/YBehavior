@@ -418,11 +418,29 @@ namespace YBehavior.Editor.Core.New
     class CalculatorTreeNode : LeafNode
     {
         public override string Icon => "+-×÷";
+
         public CalculatorTreeNode()
         {
             m_Name = "Calculator";
             Type = TreeNodeType.TNT_Default;
+        }
 
+        protected override void _OnCreateBase()
+        {
+            base._OnCreateBase();
+            this.NodeMemory.vTypeChanged += _vTypeChanged;
+        }
+        /// <summary>
+        /// Only change all the vtypes to the same when Output changes,
+        /// because vtypes can be different.
+        /// </summary>
+        private void _vTypeChanged(Variable obj)
+        {
+            if (obj == Variables.GetVariable("Output"))
+            {
+                Variables.GetVariable("Input1").vType = obj.vType;
+                Variables.GetVariable("Input2").vType = obj.vType;
+            }
         }
 
         public override void CreateVariables()
@@ -445,8 +463,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_CalculatorTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_Pointer,
-                Variable.EnableType.ET_FIXED,
-                1
+                Variable.EnableType.ET_FIXED
             );
             opl.IsInput = false;
 
@@ -456,18 +473,15 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_CalculatorTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
-                Variable.EnableType.ET_FIXED,
-                1
+                Variable.EnableType.ET_FIXED
             );
-
             Variable opr2 = NodeMemory.CreateVariable(
                 "Input2",
                 "0",
                 Variable.CreateParams_CalculatorTypes,
                 Variable.CountType.CT_SINGLE,
                 Variable.VariableType.VBT_NONE,
-                Variable.EnableType.ET_FIXED,
-                1
+                Variable.EnableType.ET_FIXED
             );
         }
 
@@ -481,6 +495,40 @@ namespace YBehavior.Editor.Core.New
                     Variables.GetVariable("Operator").NoteValue,
                     Variables.GetVariable("Input2").NoteValue);
             }
+        }
+
+        protected override bool _OnCheckValid()
+        {
+            var tOutput = Variables.GetVariable("Output").vType;
+            var tInput1 = Variables.GetVariable("Input1").vType;
+            var tInput2 = Variables.GetVariable("Input2").vType;
+
+            if ((tOutput == Variable.ValueType.VT_INT || tOutput == Variable.ValueType.VT_FLOAT)
+                && tOutput == tInput1 && tOutput == tInput2)
+                return true;
+            var op = Variables.GetVariable("Operator").Value;
+            if (tOutput == Variable.ValueType.VT_VECTOR3)
+            {
+                if (op == "+" || op == "-")
+                {
+                    if (tOutput == tInput1 && tOutput == tInput2)
+                        return true;
+                }
+                else
+                {
+                    if (tInput1 == Variable.ValueType.VT_VECTOR3 && tInput2 == Variable.ValueType.VT_FLOAT)
+                        return true;
+                }
+            }
+            else if (tOutput == Variable.ValueType.VT_STRING)
+            {
+                if (op == "+")
+                    return true;
+            }
+
+            LogMgr.Instance.Error(this.Renderer.UITitle + ": This type of calculate is not supported.");
+
+            return false;
         }
     }
 

@@ -6,6 +6,9 @@
 
 namespace YBehavior
 {
+	class IVariableCompareHelper;
+	class IVariableCalculateHelper;
+	class IVariableOperationHelper;
 	class PiecewiseFunction : public LeafNode<>
 	{
 	public:
@@ -19,6 +22,10 @@ namespace YBehavior
 
 		ISharedVariableEx* m_InputX;
 		ISharedVariableEx* m_OutputY;
+
+		const IVariableCompareHelper* m_pCompareHelper;
+		const IVariableCalculateHelper* m_pCalculateHelper;
+		const IVariableOperationHelper* m_pOperationHelper;
 	};
 }
 

@@ -2,7 +2,7 @@
 #define _YBEHAVIOR_CALCULATOR_H_
 
 #include "YBehavior/treenode.h"
-#include "YBehavior/variableoperation.h"
+#include "YBehavior/variables/variablecalculate.h"
 
 namespace YBehavior
 {
@@ -15,13 +15,12 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 
 	private:
-		OperationType m_Operator;
+		CalculateType m_Operator;
 		ISharedVariableEx* m_Output;
 		ISharedVariableEx* m_Input1;
 		ISharedVariableEx* m_Input2;
 
-		TYPEID m_DataType;
-
+		const IVariableCalculateHelper* m_pHelper{};
 	};
 }
 

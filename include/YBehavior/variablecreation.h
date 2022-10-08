@@ -2,10 +2,9 @@
 #define _YBEHAVIOR_VARIABLECREATION_H_
 
 #include "YBehavior/types.h"
-#include "utility.h"
-#include "3rd/pugixml/pugixml.hpp"
-#include "sharedvariableex.h"
+#include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/treenode.h"
+#include "YBehavior/tools/bimap.h"
 
 namespace YBehavior
 {

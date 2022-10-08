@@ -20,28 +20,43 @@ namespace YBehavior
 		GetTypeID<EntityWrapper>()
 	};
 
+	Bimap<CompareType, STRING, EnumClassHash> OperatorMap = {
+		{ CompareType::EQUAL, "==" },
+		{ CompareType::NOT_EQUAL, "!=" },
+		{ CompareType::GREATER, ">" },
+		{ CompareType::LESS, "<" },
+		{ CompareType::LESS_EQUAL, "<=" },
+		{ CompareType::GREATER_EQUAL, ">=" }
+	};
+
 	bool Comparer::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Operator
-		if (!VariableCreation::GetValue(this, "Operator", data, IVariableOperationHelper::s_OperatorMap, m_Operator))
+		if (!VariableCreation::GetValue(this, "Operator", data, OperatorMap, m_Operator))
 			return false;
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = VariableCreation::CreateVariable(this, m_Opl, "Opl", data, true);
-		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
+		auto dataTypeL = VariableCreation::CreateVariable(this, m_Opl, "Opl", data, true);
+		if (s_ValidTypes.find(dataTypeL) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in Comparer: " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in Comparer: " << dataTypeL << ERROR_END;
 			return false;
 		}
 		///> Right
-		TYPEID dataType = VariableCreation::CreateVariable(this, m_Opr, "Opr", data);
-		if (m_DataType != dataType)
+		auto dataTypeR = VariableCreation::CreateVariable(this, m_Opr, "Opr", data);
+		if (dataTypeL != dataTypeR)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types:  Opl & Opr" << ERROR_END;
 			return false;
 		}
 
+		m_pHelper = VariableCompareMgr::Instance()->Get(dataTypeL);
+		if (!m_pHelper)
+		{
+			ERROR_BEGIN_NODE_HEAD << "This type is not supported by ComparerNode." << ERROR_END;
+			return false;
+		}
 		return true;
 	}
 
@@ -53,8 +68,7 @@ namespace YBehavior
 			YB_LOG_VARIABLE(m_Opr, true);
 		}
 
-		IVariableOperationHelper* pHelper = m_Opl->GetOperation();
-		return pHelper->Compare(pAgent->GetMemory(), m_Opl, m_Opr, m_Operator) ? NS_SUCCESS : NS_FAILURE;
+		return m_pHelper->Compare(pAgent->GetMemory(), m_Opl, m_Opr, m_Operator) ? NS_SUCCESS : NS_FAILURE;
 	}
 
 }

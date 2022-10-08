@@ -5,6 +5,8 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
 #include "YBehavior/variablecreation.h"
+#include "YBehavior/variables/variablerandom.h"
+#include "YBehavior/variables/variableoperation.h"
 
 namespace YBehavior
 {
@@ -18,27 +20,33 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = VariableCreation::CreateVariable(this, m_Target, "Target", data, true);
-		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
+		auto dataTypeL = VariableCreation::CreateVariable(this, m_Target, "Target", data, true);
+		if (s_ValidTypes.find(dataTypeL) == s_ValidTypes.end())
 		{
-			ERROR_BEGIN_NODE_HEAD << "Invalid type for Target in Comparer: " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Invalid type for Target in Random: " << dataTypeL << ERROR_END;
 			return false;
 		}
 		///> Right1
-		TYPEID dataType = VariableCreation::CreateVariable(this, m_Bound1, "Bound1", data);
-		if (m_DataType != dataType)
+		auto dataTypeR = VariableCreation::CreateVariable(this, m_Bound1, "Bound1", data);
+		if (dataTypeL != dataTypeR)
 		{
-			ERROR_BEGIN_NODE_HEAD << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types:  " << dataTypeL << " and " << dataTypeR << ERROR_END;
 			return false;
 		}
 		///> Right2
-		dataType = VariableCreation::CreateVariable(this, m_Bound2, "Bound2", data);
-		if (m_DataType != dataType)
+		dataTypeR = VariableCreation::CreateVariable(this, m_Bound2, "Bound2", data);
+		if (dataTypeL != dataTypeR)
 		{
-			ERROR_BEGIN_NODE_HEAD << "Different types:  " << dataType << " and " << m_DataType << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "Different types:  " << dataTypeL << " and " << dataTypeR << ERROR_END;
 			return false;
 		}
 
+		m_pHelper = VariableRandomMgr::Instance()->Get(dataTypeL);
+		if (!m_pHelper)
+		{
+			ERROR_BEGIN_NODE_HEAD << "This type is not supported by RandomNode." << ERROR_END;
+			return false;
+		}
 		return true;
 	}
 
@@ -51,8 +59,7 @@ namespace YBehavior
 			YB_LOG_VARIABLE(m_Target, true);
 		}
 
-		IVariableOperationHelper* pHelper = m_Target->GetOperation();
-		pHelper->Random(pAgent->GetMemory(), m_Target, m_Bound1, m_Bound2);
+		m_pHelper->Random(pAgent->GetMemory(), m_Target, m_Bound1, m_Bound2);
 
 		YB_IF_HAS_DEBUG_POINT
 		{
@@ -112,6 +119,10 @@ namespace YBehavior
 		}
 
 		m_bSameArray = m_Input->GetKey() == m_Output->GetKey();
+
+		m_pHelper = VariableOperationMgr::Instance()->Get(m_Input->ElementTypeID());
+		if (!m_pHelper)
+			return false;
 		return true;
 	}
 
@@ -138,9 +149,8 @@ namespace YBehavior
 			pTargetVariable = m_Input;
 		}
 
-		IVariableOperationHelper* pHelper = m_Input->GetElementOperation();
 		//if (m_bSameArray)
-		auto temp = pHelper->AllocTempData();
+		auto temp = m_pHelper->AllocTempData();
 
 		for (int i = length - 1; i > 0; --i)
 		{
@@ -151,9 +161,9 @@ namespace YBehavior
 				continue;
 			}
 
-			pHelper->Set(temp.pData, pTargetVariable->GetElement(pAgent->GetMemory(), j));
-			pHelper->Set(const_cast<void*>(pTargetVariable->GetElement(pAgent->GetMemory(), j)), pTargetVariable->GetElement(pAgent->GetMemory(), i));
-			pHelper->Set(const_cast<void*>(pTargetVariable->GetElement(pAgent->GetMemory(), i)), temp.pData);
+			m_pHelper->Set(temp.pData, pTargetVariable->GetElement(pAgent->GetMemory(), j));
+			m_pHelper->Set(const_cast<void*>(pTargetVariable->GetElement(pAgent->GetMemory(), j)), pTargetVariable->GetElement(pAgent->GetMemory(), i));
+			m_pHelper->Set(const_cast<void*>(pTargetVariable->GetElement(pAgent->GetMemory(), i)), temp.pData);
 		}
 
 		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Output, false);

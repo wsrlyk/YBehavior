@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <AA>
   <Node Class="Root">
-    <Shared ee="_IC 0" />
+    <Shared />
     <Local />
-    <Node Class="Calculator" Operator="_EC +" Opl="_IP ee" Opr1="_IP ee" Opr2="_IC 0" />
+    <Node Class="Sequence" />
   </Node>
 </AA>

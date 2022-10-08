@@ -6,7 +6,7 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
 #include "YBehavior/variablecreation.h"
-#include "YBehavior/variableconvert.h"
+#include "YBehavior/variables/variableconvert.h"
 
 namespace YBehavior
 {

@@ -9,44 +9,35 @@
 
 namespace YBehavior
 {
-	///> Too lazy to create a file for just this line. Temporarily put it here
-	Bimap<OperationType, STRING, EnumClassHash> IVariableOperationHelper::s_OperatorMap = {
-		{ OT_ADD, "+" },{ OT_SUB, "-" },{ OT_MUL, "*" },{ OT_DIV, "/" },
-	{ OT_EQUAL, "==" },{ OT_GREATER, ">" },{ OT_LESS, "<" },{ OT_NOT_EQUAL, "!=" },{ OT_LESS_EQUAL, "<=" },{ OT_GREATER_EQUAL, ">=" }
-	};
+	Bimap<CalculateType, STRING, EnumClassHash> OperatorMap = {
+		{ CalculateType::ADD, "+" },
+		{ CalculateType::SUB, "-" },
+		{ CalculateType::MUL, "*" },
+		{ CalculateType::DIV, "/" } };
 
 	//////////////////////////////////////////////////////////////////////////////////////////
-	static std::unordered_set<TYPEID> s_ValidTypes = { GetTypeID<Int>(), GetTypeID<Float>(), GetTypeID<String>()};
-
 	bool Calculator::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Operator
-		if (!VariableCreation::GetValue(this, "Operator", data, IVariableOperationHelper::s_OperatorMap, m_Operator))
+		if (!VariableCreation::GetValue(this, "Operator", data, OperatorMap, m_Operator))
 			return false;
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		m_DataType = VariableCreation::CreateVariable(this, m_Output, "Output", data, true);
-		if (s_ValidTypes.find(m_DataType) == s_ValidTypes.end())
-		{
-			ERROR_BEGIN_NODE_HEAD << "Invalid type for Output in calculator: " << m_DataType << ERROR_END;
-			return false;
-		}
-		///> Right1
-		TYPEID dataType = VariableCreation::CreateVariable(this, m_Input1, "Input1", data);
-		if (dataType != m_DataType)
-		{
-			ERROR_BEGIN_NODE_HEAD << "Different types:  Output & Input1" << ERROR_END;
-			return false;
-		}
-		///> Right2
-		dataType = VariableCreation::CreateVariable(this, m_Input2, "Input2", data);
-		if (m_DataType != dataType)
-		{
-			ERROR_BEGIN_NODE_HEAD << "Different types: Output & Input2" << ERROR_END;
-			return false;
-		}
+		auto outputType = VariableCreation::CreateVariable(this, m_Output, "Output", data, true);
 
+		///> Right1
+		auto inputType1 = VariableCreation::CreateVariable(this, m_Input1, "Input1", data);
+
+		///> Right2
+		auto inputType2 = VariableCreation::CreateVariable(this, m_Input2, "Input2", data);
+
+		m_pHelper = VariableCalculateMgr::Instance()->Get(outputType, inputType1, inputType2);
+		if (!m_pHelper)
+		{
+			ERROR_BEGIN_NODE_HEAD << "These types are not supported by CalculatorNode." << ERROR_END;
+			return false;
+		}
 		return true;
 	}
 
@@ -58,8 +49,7 @@ namespace YBehavior
 			YB_LOG_VARIABLE_BEFORE(m_Input2);
 		}
 
-		IVariableOperationHelper* pHelper = m_Output->GetOperation();
-		pHelper->Calculate(pAgent->GetMemory(), m_Output, m_Input1, m_Input2, m_Operator);
+		m_pHelper->Calculate(pAgent->GetMemory(), m_Output, m_Input1, m_Input2, m_Operator);
 
 		YB_IF_HAS_DEBUG_POINT
 		{

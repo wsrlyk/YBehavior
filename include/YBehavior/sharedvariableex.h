@@ -2,11 +2,11 @@
 #define _YBEHAVIOR_SHAREDVARIABLEEX_H_
 
 #include "YBehavior/shareddataex.h"
-#include "YBehavior/variableoperation.h"
 #include "YBehavior/interface.h"
-#include "treekeymgr.h"
-#include "memory.h"
+#include "YBehavior/treekeymgr.h"
+#include "YBehavior/memory.h"
 #include <algorithm>
+#include "YBehavior/logger.h"
 
 namespace YBehavior
 {
@@ -178,8 +178,6 @@ namespace YBehavior
 		{
 			return IsVector<T>::Result;
 		}
-		IVariableOperationHelper* GetOperation() const override { return VariableOperationHelper<T>::Get(); }
-		IVariableOperationHelper* GetElementOperation() const override { return VariableOperationHelper<ElementType>::Get(); }
 
 		ISharedVariableEx* GetVectorIndex() override
 		{

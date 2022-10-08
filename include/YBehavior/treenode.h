@@ -5,9 +5,9 @@
 #include "YBehavior/types.h"
 #include <unordered_map>
 #include <unordered_set>
-#include "sharedvariableex.h"
-#include "3rd/pugixml/pugixml.hpp"
-
+#include "YBehavior/sharedvariableex.h"
+#include "YBehavior/3rd/pugixml/pugixml.hpp"
+#include "YBehavior/logger.h"
 //namespace pugi
 //{
 //	class xml_node;

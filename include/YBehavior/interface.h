@@ -55,8 +55,6 @@ namespace YBehavior
 		///> if this variable is an INT, and it refers to an element of an INT[], this method will return the type of INT[] instead of INT;   Used in log..
 		virtual TYPEID GetReferenceSharedDataSelfID() = 0;
 
-		virtual IVariableOperationHelper* GetOperation() const = 0;
-		virtual IVariableOperationHelper* GetElementOperation() const = 0;
 		virtual ISharedVariableEx* GetVectorIndex() = 0;
 		virtual STRING GetValueToSTRING(IMemory* pMemory) = 0;
 

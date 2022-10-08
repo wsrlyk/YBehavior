@@ -1,12 +1,10 @@
 #ifndef _YBEHAVIOR_VARIABLECONVERT_H_
 #define _YBEHAVIOR_VARIABLECONVERT_H_
 
-#define YB_ABOUT_EQUAL_FLOAT
-
 #include "YBehavior/interface.h"
 #include "YBehavior/types.h"
-#include "utility.h"
 #include "YBehavior/singleton.h"
+#include "YBehavior/utility.h"
 #include <map>
 
 namespace YBehavior

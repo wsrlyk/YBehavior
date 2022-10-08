@@ -1,8 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<AA>
-  <Node Class="Root" Pos="0,0">
+<AA IsEditor="">
+  <Node Class="Root" GUID="1" Pos="0,0">
     <Shared ee="_IC 0" />
     <Local d="_Ic 0" a="IIc " />
-    <Node Class="Calculator" Pos="10,160" Operator="_EC +" Output="_IP ee" Input1="_IP ee" Input2="_IC 0" />
+    <Node Class="Sequence" GUID="3" Pos="-40,120">
+      <Node Class="Calculator" GUID="2" Pos="-130,250" Disabled="true" Operator="_EC +" Output="_Ip " Input1="_IP ee" Input2="_IC 0" />
+      <Node Class="Comparer" GUID="4" Pos="50,250" Disabled="true" Operator="_EC ==" Opl="_IP " Opr="_IC 0" />
+    </Node>
   </Node>
+  <DataConnections>
+    <DataConnection FromGUID="2" FromName="Output" ToGUID="4" ToName="Opl" />
+  </DataConnections>
 </AA>
