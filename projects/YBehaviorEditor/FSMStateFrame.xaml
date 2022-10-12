@@ -7,6 +7,9 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="250" d:DesignWidth="400">
+    <UserControl.Resources>
+        <CollectionViewSource x:Key="cvs" Source="{Binding TreeList}"/>
+    </UserControl.Resources>
     <StackPanel DataContextChanged="OnDataContextChanged">
         <TextBlock Text="{Binding Type}" Background="DarkGray"/>
         <DockPanel Name="NamePanel">
@@ -15,20 +18,25 @@
         </DockPanel>
         <DockPanel Name="TreePanel">
             <TextBlock Text="Tree" Background="LightBlue" Width="90"/>
-            <ComboBox Name="Tree" ItemsSource="{Binding TreeList}" SelectedItem="{Binding Tree}">
+            <local:FilteredComboBox IsEditable="True" IsEnabled="{Binding IsEditable}" x:Name="Tree" ItemsSource="{Binding Source={StaticResource cvs}}" SelectedItem="{Binding Tree, UpdateSourceTrigger=LostFocus}"
+                                    StaysOpenOnEdit="True" IsTextSearchEnabled="False" >
                 <!--IsEditable="{Binding vTypeSet, Converter={StaticResource typeCountConvertor}}"
                       Focusable="False"
                       -->
-                <ComboBox.Resources>
+                <local:FilteredComboBox.Resources>
                     <sys:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">0</sys:Double>
-                </ComboBox.Resources>
-                <ComboBox.ItemTemplate>
+                </local:FilteredComboBox.Resources>
+                <local:FilteredComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel VirtualizationMode="Recycling" />
+                    </ItemsPanelTemplate>
+                </local:FilteredComboBox.ItemsPanel>
+                <local:FilteredComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding}" FontSize="11" ToolTip="{Binding}" />
                     </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-
+                </local:FilteredComboBox.ItemTemplate>
+            </local:FilteredComboBox>
         </DockPanel>
         <DockPanel Name="CommentPanel">
             <TextBlock Text="Comment" Background="LightBlue" Width="90"/>

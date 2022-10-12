@@ -230,6 +230,11 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        public bool IsEditable
+        {
+            get { return !NetworkMgr.Instance.IsConnected; }
+        }
+
         public string UITitle { get { return Owner.UID.ToString() + "." + FullName; } }
         public DebugPointInfo DebugPointInfo { get { return Owner.DebugPointInfo; } }
         public string Note { get { return Owner.Note; } }
