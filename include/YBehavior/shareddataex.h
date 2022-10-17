@@ -7,22 +7,24 @@
 #include "YBehavior/interface.h"
 #include <unordered_map>
 #include "tools/objectpool.h"
-
+#include "YBehavior/smallmap.h"
 namespace YBehavior
 {
 	template<typename K, typename T>
 	struct DataArrayMapDef
 	{
-		typedef std::unordered_map<K, T> type;
+		using type = small_map<K, T>;
+		using const_iterator = typename type::const_iterator;
+		using iterator = typename type::iterator;
 	};
 
 	template<typename T>
 	class DataArrayIterator : public IDataArrayIterator
 	{
-		typename DataArrayMapDef<KEY, T>::type::const_iterator m_It;
-		typename DataArrayMapDef<KEY, T>::type::const_iterator m_End;
+		typename DataArrayMapDef<KEY, T>::const_iterator m_It;
+		typename DataArrayMapDef<KEY, T>::const_iterator m_End;
 	public:
-		void Set(const typename DataArrayMapDef<KEY, T>::type::const_iterator& begin, const typename DataArrayMapDef<KEY, T>::type::const_iterator& end)
+		void Set(const typename DataArrayMapDef<KEY, T>::const_iterator& begin, const typename DataArrayMapDef<KEY, T>::const_iterator& end)
 		{
 			m_It = begin;
 			m_End = end;
@@ -30,7 +32,7 @@ namespace YBehavior
 
 		bool IsEnd() override { return m_It == m_End; }
 		IDataArrayIterator& operator ++() override { ++m_It; return *this; }
-		const KEY Value() override { return m_It->first; }
+		const KEY Value() override { return m_It->first(); }
 
 		void Recycle() override
 		{
@@ -61,8 +63,8 @@ namespace YBehavior
 
 		Iterator Iter() const override
 		{
-			typename DataArrayMapDef<KEY, T>::type::const_iterator itBegin = m_Datas.begin();
-			typename DataArrayMapDef<KEY, T>::type::const_iterator itEnd = m_Datas.end();
+			auto itBegin = m_Datas.begin();
+			auto itEnd = m_Datas.end();
 			DataArrayIterator<T>* innerIt = ObjectPoolStatic<DataArrayIterator<T>>::Get();
 			innerIt->Set(itBegin, itEnd);
 			Iterator it(innerIt);
@@ -78,10 +80,10 @@ namespace YBehavior
 			for (auto it = otherArray->m_Datas.begin(); it != otherArray->m_Datas.end(); ++it)
 			{
 				if (!bOverride)
-					this->m_Datas[it->first] = it->second;
+					this->m_Datas[it->first()] = it->second();
 				else
 				{
-					m_Datas.insert(std::make_pair(it->first, it->second));
+					m_Datas.insert(it->first(), it->second());
 				}
 			}
 		}
@@ -102,11 +104,11 @@ namespace YBehavior
 			auto it = m_Datas.find(key);
 			if (it == m_Datas.end())
 				return false;
-			res = it->second;
+			res = it->second();
 			return true;
 		}
 
-		virtual const void* Get(KEY key) const override
+		const void* Get(KEY key) const override
 		{
 			//if (key < 0 || key >= (KEY)m_Datas.size())
 			//	return nullptr;
@@ -115,10 +117,10 @@ namespace YBehavior
 			auto it = m_Datas.find(key);
 			if (it == m_Datas.end())
 				return nullptr;
-			return (const void*)&(it->second);
+			return (const void*)&(it->second());
 		}
 
-		virtual const STRING GetToString(KEY key) const override
+		const STRING GetToString(KEY key) const override
 		{
 			//if (key < 0 || key >= (KEY)m_Datas.size())
 			//	return Types::StringEmpty;
@@ -127,7 +129,7 @@ namespace YBehavior
 			auto it = m_Datas.find(key);
 			if (it == m_Datas.end())
 				return Utility::StringEmpty;
-			const T& data = it->second;
+			const T& data = it->second();
 			return Utility::ToString(data);
 		}
 

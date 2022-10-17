@@ -15,10 +15,36 @@
 #include <iostream>
 #include "YBehavior/fsm/transition.h"
 #include "YBehavior/fsm/context.h"
+#include "YBehavior/smallmap.h"
 
 using namespace YBehavior;
 int main(int argc, char** argv)
 {
+	small_map<int, STRING> map{{6,"666"}};
+	map.insert(0, "hehe");
+	map.insert(1, "fuck");
+	map[2] = "truck";
+	auto res = map[3];
+	if (map.find(2) != map.end())
+		map[4] = "444";
+	if (map.find(7) != map.end())
+		map[8] = "888";
+
+	for (auto it = map.begin(); it != map.end(); ++it)
+	{
+		std::cout << (*it).first() << " " << it->second() << " ";
+	}
+	std::cout << std::endl;
+	map.erase(3);
+	map.erase(map.find(2));
+
+	const auto& m = map;
+	for (auto it = m.begin(); it != m.end(); ++it)
+	{
+		std::cout << it->first() << " " << (*it).second() << " ";
+	}
+	std::cout << std::endl;
+
 	MyLaunchCore core;
 	YB::Launcher::Launch(core);
 

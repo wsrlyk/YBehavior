@@ -300,6 +300,9 @@
     <ClInclude Include="..\include\YBehavior\variablecreation.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\smallmap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
