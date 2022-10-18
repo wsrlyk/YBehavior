@@ -49,14 +49,14 @@ namespace YBehavior
 		}
 	}
 
-	void SharedDataEx::MergeFrom(const SharedDataEx& other, bool bOverride)
+	void SharedDataEx::MergeFrom(const SharedDataEx& other, bool useNewValue)
 	{
 		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
 		{
 			if (other.m_Datas[i])
 			{
 				if (m_Datas[i])
-					m_Datas[i]->MergeFrom(other.m_Datas[i], bOverride);
+					m_Datas[i]->MergeFrom(other.m_Datas[i], useNewValue);
 				else
 					m_Datas[i] = other.m_Datas[i]->Clone();
 			}

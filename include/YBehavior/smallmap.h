@@ -71,7 +71,7 @@ namespace YBehavior
 				return *this;
 			}
 			const_iterator operator++(int)
-			{	// postincrement
+			{
 				const_iterator tmp = *this;
 				++* this;
 				return (tmp);

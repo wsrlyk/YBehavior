@@ -1,3 +1,4 @@
+#ifdef STATIC_BUILD_TREES
 #include "YBehavior/types.h"
 #include <list>
 #include "YBehavior/behaviortree.h"
@@ -6,7 +7,7 @@ namespace YBehavior
 {
 	struct MergedTreeNode
 	{
-		std::list<BehaviorTree*> trees;
+		std::vector<BehaviorTree*> trees;
 		StdVector<MergedTreeNode*> children;
 
 		~MergedTreeNode()
@@ -305,7 +306,7 @@ namespace YBehavior
 			commonData = node->CreateMergedSharedData();
 			for (auto it = node->trees.begin(); it != node->trees.end(); ++it)
 			{
-				commonData->MergeFrom(*(*it)->GetSharedData(), false);
+				commonData->MergeFrom(*(*it)->GetSharedData(), true);
 			}
 		}
 		else
@@ -318,7 +319,7 @@ namespace YBehavior
 			for (auto it = node->children.begin(); it != node->children.end(); ++it)
 			{
 				_FinalBuild(*it, buildingInfo);
-				commonData->MergeFrom(*(*it)->GetSharedData(), false);
+				commonData->MergeFrom(*(*it)->GetSharedData(), true);
 			}
 		}
 
@@ -326,7 +327,7 @@ namespace YBehavior
 		{
 			for (auto it = node->trees.begin(); it != node->trees.end(); ++it)
 			{
-				(*it)->GetSharedData()->MergeFrom(*commonData, true);
+				(*it)->GetSharedData()->MergeFrom(*commonData, false);
 			}
 		}
 	}
@@ -335,3 +336,4 @@ namespace YBehavior
 		_FinalBuild(buildingInfo.mergedRoot, buildingInfo);
 	}
 }
+#endif // STATIC_BUILD_TREES

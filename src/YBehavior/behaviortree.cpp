@@ -127,7 +127,7 @@ namespace YBehavior
 
 	void BehaviorTree::MergeDataTo(SharedDataEx& destination)
 	{
-		destination.MergeFrom(*m_SharedData, false);
+		destination.MergeFrom(*m_SharedData, true);
 	}
 
 

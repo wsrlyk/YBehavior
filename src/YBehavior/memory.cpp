@@ -19,7 +19,7 @@ namespace YBehavior
 		{
 			m_DataPool = &pTree->GetLocalDataPool();
 			Data = m_DataPool->Fetch();
-			Data->MergeFrom(*pTree->GetLocalDataIfExists(), false);
+			Data->CloneFrom(*pTree->GetLocalDataIfExists());
 		}
 		else
 		{
@@ -44,7 +44,7 @@ namespace YBehavior
 		{
 			m_DataPool = other.m_DataPool;
 			Data = m_DataPool->Fetch();
-			Data->MergeFrom(*other.Data, false);
+			Data->CloneFrom(*other.Data);
 		}
 		else
 		{
@@ -59,7 +59,7 @@ namespace YBehavior
 		{
 			m_DataPool = other.m_DataPool;
 			Data = m_DataPool->Fetch();
-			Data->MergeFrom(*other.Data, false);
+			Data->CloneFrom(*other.Data);
 		}
 		else
 		{

@@ -71,7 +71,7 @@ namespace YBehavior
 			return it;
 		}
 
-		void MergeFrom(const IDataArray* other, bool bOverride) override
+		void MergeFrom(const IDataArray* other, bool useNewValue) override
 		{
 			if (other == nullptr)
 				return;
@@ -79,7 +79,7 @@ namespace YBehavior
 			const DataArray<T>* otherArray = (const DataArray<T>*) other;
 			for (auto it = otherArray->m_Datas.begin(); it != otherArray->m_Datas.end(); ++it)
 			{
-				if (!bOverride)
+				if (useNewValue)
 					this->m_Datas[it->first()] = it->second();
 				else
 				{
@@ -244,7 +244,7 @@ namespace YBehavior
 
 		void CloneFrom(const SharedDataEx& other);
 
-		void MergeFrom(const SharedDataEx& other, bool bOverride);
+		void MergeFrom(const SharedDataEx& other, bool useNewValue);
 
 		template<typename T>
 		bool Get(KEY key, T& res);
