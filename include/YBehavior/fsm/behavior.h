@@ -1,9 +1,8 @@
 #ifndef _YBEHAVIOR_BEHAVIOR_H_
 #define _YBEHAVIOR_BEHAVIOR_H_
 
-#include "YBehavior/types.h"
-#include "YBehavior/utility.h"
-#include <unordered_map>
+#include "YBehavior/types/types.h"
+#include "YBehavior/types/smallmap.h"
 
 namespace YBehavior
 {
@@ -11,7 +10,7 @@ namespace YBehavior
 	class FSM;
 	class Memory;
 
-	typedef std::unordered_map<NodePtr, BehaviorTree*> Node2TreeMapType;
+	typedef small_map<NodePtr, BehaviorTree*> Node2TreeMapType;
 	class Behavior
 	{
 		void* m_Version;

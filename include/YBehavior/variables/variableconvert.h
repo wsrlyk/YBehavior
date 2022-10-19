@@ -2,10 +2,10 @@
 #define _YBEHAVIOR_VARIABLECONVERT_H_
 
 #include "YBehavior/interface.h"
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 #include "YBehavior/singleton.h"
 #include "YBehavior/utility.h"
-#include <map>
+#include "YBehavior/types/smallmap.h"
 
 namespace YBehavior
 {
@@ -112,7 +112,7 @@ namespace YBehavior
 	/////////////////////////////////////
 	class VariableConvertMgr : public Singleton<VariableConvertMgr>
 	{
-		std::map<std::pair<TYPEID, TYPEID>, const IVariableConvertHelper*> m_Converts;
+		small_map<std::pair<TYPEID, TYPEID>, const IVariableConvertHelper*> m_Converts;
 	public:
 		VariableConvertMgr();
 		~VariableConvertMgr();

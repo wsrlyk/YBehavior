@@ -2,10 +2,10 @@
 #define _YBEHAVIOR_VARIABLECALCULATE_H_
 
 #include "YBehavior/interface.h"
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 #include "YBehavior/singleton.h"
-#include <map>
 #include "YBehavior/logger.h"
+#include "YBehavior/types/smallmap.h"
 
 namespace YBehavior
 {
@@ -173,7 +173,7 @@ namespace YBehavior
 		/// <summary>
 		/// Left, Right0, Right1
 		/// </summary>
-		std::map<std::tuple<TYPEID, TYPEID, TYPEID>, const IVariableCalculateHelper*> m_Calculates;
+		small_map<std::tuple<TYPEID, TYPEID, TYPEID>, const IVariableCalculateHelper*> m_Calculates;
 	public:
 		VariableCalculateMgr();
 		~VariableCalculateMgr();

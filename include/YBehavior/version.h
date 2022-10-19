@@ -2,9 +2,11 @@
 #define _YBEHAVIOR_VERSION_H_
 
 #include "YBehavior/define.h"
-#include "YBehavior/types.h"
-#include <unordered_map>
+#include "YBehavior/types/types.h"
+#include "YBehavior/types/smallmap.h"
 #include <iostream>
+#include <map>
+#include "YBehavior/fsm/behavior.h"
 
 namespace YBehavior
 {
@@ -33,11 +35,11 @@ namespace YBehavior
 		void ChangeReferenceCount(bool bInc, VersionType* version = nullptr);
 		void Print();
 
-		inline std::unordered_map<int, VersionType*>& GetVersions() { return m_Versions; }
+		inline small_map<int, VersionType*>& GetVersions() { return m_Versions; }
 	private:
 		VersionType * m_LatestVersion{ nullptr };
 		VersionType* m_PreviousVersion{ nullptr };
-		std::unordered_map<int, VersionType*> m_Versions;
+		small_map<int, VersionType*> m_Versions;
 	};
 
 	template<typename T>
@@ -45,7 +47,7 @@ namespace YBehavior
 	{
 		for (auto it = m_Versions.begin(); it != m_Versions.end(); ++it)
 		{
-			std::cout << "version " << it->first << ", count " << it->second->referenceCount << std::endl;
+			std::cout << "version " << it->first() << ", count " << it->second()->referenceCount << std::endl;
 		}
 	}
 
@@ -57,7 +59,7 @@ namespace YBehavior
 		else
 		{
 			auto it = m_Versions.find(version->versionID);
-			if (it != m_Versions.end() && it->second != version)
+			if (it != m_Versions.end() && it->second() != version)
 				version = nullptr;
 		}
 
@@ -129,7 +131,7 @@ namespace YBehavior
 	{
 		for (auto it = m_Versions.begin(); it != m_Versions.end(); ++it)
 		{
-			delete it->second->data;
+			delete it->second()->data;
 		}
 		m_Versions.clear();
 	}
@@ -162,7 +164,7 @@ namespace YBehavior
 	{
 	public:
 		typedef Info<DataType> InfoType;
-		typedef std::unordered_map<KeyType, InfoType*> InfoListType;
+		typedef std::map<KeyType, InfoType*> InfoListType;
 		VersionMgr() {}
 		~VersionMgr();
 		bool GetData(const KeyType& key, DataType* &outputData, InfoType* &outputInfo);

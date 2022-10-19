@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_MACHINESTATE_H_
 #define _YBEHAVIOR_MACHINESTATE_H_
 
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 
 namespace YBehavior
 {

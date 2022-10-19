@@ -3,7 +3,6 @@
 
 #include "YBehavior/treenode.h"
 #include "YBehavior/tools/common.h"
-
 namespace YBehavior
 {
 	class SequenceNodeContext : public CompositeNodeContext

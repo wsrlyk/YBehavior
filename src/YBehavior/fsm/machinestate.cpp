@@ -1,10 +1,6 @@
 #include "YBehavior/fsm/machinestate.h"
-#include "YBehavior/logger.h"
-#include "YBehavior/utility.h"
 #include "YBehavior/fsm/behavior.h"
-#include "YBehavior/fsm/statemachine.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/behaviortree.h"
 #ifdef YDEBUGGER
 #include "YBehavior/debugger.h"
 #endif

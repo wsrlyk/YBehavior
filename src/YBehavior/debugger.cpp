@@ -4,12 +4,9 @@
 #include "YBehavior/tools/objectpool.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/interface.h"
-#include "YBehavior/nodefactory.h"
 #include <sstream>
-#include "YBehavior/shareddataex.h"
-#include "YBehavior/memory.h"
 #include "YBehavior/fsm/behavior.h"
-
+#include "YBehavior/treekeymgr.h"
 namespace YBehavior
 {
 	const STRING NodeRunInfo::ToString() const
@@ -160,7 +157,7 @@ namespace YBehavior
 		//bool bFirst = true;
 		for (auto& it : behavior->GetTreeMapping())
 		{
-			BehaviorTree* pCurTree = it.second;
+			BehaviorTree* pCurTree = it.second();
 
 			//if (bFirst)
 			//{

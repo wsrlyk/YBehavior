@@ -23,7 +23,7 @@ namespace YBehavior
 	{
 		for (auto it = m_Operations.begin(); it != m_Operations.end(); ++it)
 		{
-			delete it->second;
+			delete it->second();
 		}
 		m_Operations.clear();
 	}
@@ -31,7 +31,7 @@ namespace YBehavior
 	{
 		auto it = m_Operations.find(t);
 		if (it != m_Operations.end())
-			return it->second;
+			return it->second();
 		return nullptr;
 	}
 

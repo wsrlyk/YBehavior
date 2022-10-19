@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_VARIABLECREATION_H_
 #define _YBEHAVIOR_VARIABLECREATION_H_
 
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/treenode.h"
 #include "YBehavior/tools/bimap.h"
@@ -28,9 +28,9 @@ namespace YBehavior
 		static STRING GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data);
 		static bool TryGetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, STRING& output);
 		template<typename T>
-		static bool GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T defaultValue, T& outValue);
+		static bool GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T defaultValue, T& outValue);
 		template<typename T>
-		static bool GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T& outValue);
+		static bool GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T& outValue);
 		static bool ParseVariable(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, bool noConst = false);
 
 	private:
@@ -38,7 +38,7 @@ namespace YBehavior
 	};
 
 	template<typename T>
-	bool VariableCreation::GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T& outValue)
+	bool VariableCreation::GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T& outValue)
 	{
 		STRING s(GetValue(pTreeNode, attriName, data));
 		if (strMap.TryGetKey(s, outValue))
@@ -49,7 +49,7 @@ namespace YBehavior
 	}
 
 	template<typename T>
-	bool VariableCreation::GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING, EnumClassHash>& strMap, T defaultValue, T& outValue)
+	bool VariableCreation::GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T defaultValue, T& outValue)
 	{
 		STRING s;
 		if (!TryGetValue(pTreeNode, attriName, data, s))

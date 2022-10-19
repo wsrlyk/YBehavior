@@ -1,4 +1,5 @@
 #include "YBehavior/treekeymgr.h"
+#include "YBehavior/utility.h"
 namespace YBehavior
 {
 

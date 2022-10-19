@@ -1,8 +1,7 @@
 #ifndef _YBEHAVIOR_UTILITY_H_
 #define _YBEHAVIOR_UTILITY_H_
 
-#include "YBehavior/types.h"
-#include <vector>
+#include "YBehavior/types/types.h"
 #include <sstream>
 #include <random>
 #include <chrono>

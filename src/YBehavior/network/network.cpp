@@ -2,7 +2,7 @@
 #include "YBehavior/network/network.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/network/messageprocessor.h"
-#include <string.h>
+#include <cstring>
 
 namespace YBehavior
 {

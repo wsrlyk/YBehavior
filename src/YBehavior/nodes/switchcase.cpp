@@ -1,12 +1,12 @@
 #include "YBehavior/nodes/switchcase.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/profile/profileheader.h"
 #include "YBehavior/variablecreation.h"
 #include "YBehavior/variables/variablecompare.h"
+#include <set>
 
 namespace YBehavior
 {
-	static std::unordered_set<TYPEID> s_ValidTypes = {
+	static std::set<TYPEID> s_ValidTypes = {
 		GetTypeID<Int>(),
 		GetTypeID<Float>(),
 		GetTypeID<Bool>(),
@@ -14,7 +14,7 @@ namespace YBehavior
 		GetTypeID<Uint64>(),
 	};
 
-	static std::unordered_set<TYPEID> s_ValidVecTypes = {
+	static std::set<TYPEID> s_ValidVecTypes = {
 		GetTypeID<VecInt>(),
 		GetTypeID<VecFloat>(),
 		GetTypeID<VecBool>(),

@@ -6,8 +6,6 @@
 #include "YBehavior/define.h"
 #include "YBehavior/singleton.h"
 #include "YBehavior/behaviortree.h"
-
-#include <list>
 #include <unordered_map>
 #include "YBehavior/network/network.h"
 #include "YBehavior/fsm/statemachine.h"
@@ -15,7 +13,7 @@
 namespace YBehavior
 {
 	enum struct DebugTargetType;
-	
+
 	struct NodeRunInfo
 	{
 		UINT nodeUID;

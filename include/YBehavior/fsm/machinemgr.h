@@ -1,9 +1,7 @@
 #ifndef _YBEHAVIOR_MACHINEMGR_H_
 #define _YBEHAVIOR_MACHINEMGR_H_
 
-#include "YBehavior/types.h"
-#include "YBehavior/singleton.h"
-#include <unordered_map>
+#include "YBehavior/types/types.h"
 #include "statemachine.h"
 #include "YBehavior/version.h"
 #include "YBehavior/mgrs.h"

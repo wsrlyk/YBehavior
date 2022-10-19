@@ -2,7 +2,7 @@
 #define _YBEHAVIOR_REGISTERDATA_H_
 
 #include "YBehavior/define.h"
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 namespace YBehavior
 {
 #define FOR_EACH_REGISTER_TYPE(func)    \

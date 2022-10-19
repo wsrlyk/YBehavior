@@ -4,11 +4,10 @@
 #define YB_ABOUT_EQUAL_FLOAT
 
 #include "YBehavior/interface.h"
-#include "YBehavior/tools/bimap.h"
-#include "YBehavior/types.h"
-#include "YBehavior/logger.h"
+#include "YBehavior/types/types.h"
 #include "YBehavior/tools/objectpool.h"
-#include <map>
+#include "YBehavior/types/smallmap.h"
+#include "YBehavior/singleton.h"
 namespace YBehavior
 {
 	class IVariableOperationHelper;
@@ -86,7 +85,7 @@ namespace YBehavior
 /////////////////////////////////////
 	class VariableOperationMgr : public Singleton<VariableOperationMgr>
 	{
-		std::map<TYPEID, const IVariableOperationHelper*> m_Operations;
+		small_map<TYPEID, const IVariableOperationHelper*> m_Operations;
 	public:
 		VariableOperationMgr();
 		~VariableOperationMgr();

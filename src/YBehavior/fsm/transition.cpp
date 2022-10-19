@@ -1,7 +1,4 @@
 #include "YBehavior/fsm/transition.h"
-#include "YBehavior/utility.h"
-#include "YBehavior/logger.h"
-#include "YBehavior/agent.h"
 
 namespace YBehavior
 {

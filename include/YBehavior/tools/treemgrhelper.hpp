@@ -1,5 +1,5 @@
 #ifdef STATIC_BUILD_TREES
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 #include <list>
 #include "YBehavior/behaviortree.h"
 

@@ -1,5 +1,4 @@
 #include "YBehavior/nodes/decorator.h"
-#include "YBehavior/profile/profileheader.h"
 #include "YBehavior/variablecreation.h"
 #include "YBehavior/agent.h"
 

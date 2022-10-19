@@ -67,6 +67,12 @@
     <Filter Include="源文件\variables">
       <UniqueIdentifier>{92a88e70-4747-4205-89d6-bc796d9a5432}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\types">
+      <UniqueIdentifier>{40de35e0-902a-47c7-a882-7b0871e59489}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\types">
+      <UniqueIdentifier>{94ad1323-088b-4378-8150-bc14d6d67f17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\YBehavior\agent.h">
@@ -85,9 +91,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\YBehavior\behaviortreemgr.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\YBehavior\types.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\YBehavior\nodes\sequence.h">
@@ -170,9 +173,6 @@
     </ClInclude>
     <ClInclude Include="..\include\YBehavior\registerdata.h">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\YBehavior\tools\linkedlist.h">
-      <Filter>头文件\tools</Filter>
     </ClInclude>
     <ClInclude Include="..\include\YBehavior\nodes\switchcase.h">
       <Filter>头文件\nodes</Filter>
@@ -300,8 +300,14 @@
     <ClInclude Include="..\include\YBehavior\variablecreation.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\YBehavior\smallmap.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="..\include\YBehavior\types\types.h">
+      <Filter>头文件\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\types\smallmap.h">
+      <Filter>头文件\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\types\treemap.h">
+      <Filter>头文件\types</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -372,9 +378,6 @@
       <Filter>源文件\nodes</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\registerdata.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\types.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\nodes\switchcase.cpp">
@@ -490,6 +493,9 @@
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\variablecreation.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\types\types.cpp">
+      <Filter>源文件\types</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

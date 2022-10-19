@@ -5,9 +5,36 @@
 #include "YBehavior/mgrs.h"
 #include "YBehavior/behaviortreemgr.h"
 #include "YBehavior/fsm/machinemgr.h"
-
+#include "YBehavior/fsm/behavior.h"
 namespace YBehavior
 {
+	BehaviorKey::BehaviorKey(const YBehavior::STRING& machinename, const StdVector<STRING>* pStateTrees, const StdVector<STRING>* pSubTrees)
+		: machineName(machinename)
+		, stateTrees(pStateTrees)
+		, subTrees(pSubTrees)
+	{
+		std::stringstream ss;
+		ss << machineName;
+		ss << Utility::ListSpliter;
+		if (stateTrees)
+		{
+			for (auto& it : *stateTrees)
+			{
+				ss << it << Utility::SequenceSpliter;
+			}
+		}
+		ss << Utility::ListSpliter;
+		if (subTrees)
+		{
+			for (auto& it : *subTrees)
+			{
+				ss << it << Utility::SequenceSpliter;
+			}
+		}
+
+		m_hash = Utility::Hash(ss.str());
+	}
+
 	bool BehaviorProcessHelper::GetBehaviorProcess(const BehaviorKey& key, BehaviorProcess& behaviorProcess)
 	{
 		Behavior* pBehavior = Mgrs::Instance()->GetBehaviorMgr()->GetBehavior(key);
@@ -68,13 +95,13 @@ namespace YBehavior
 	{
 		for (auto it : treemap->Node2Trees)
 		{
-			if (!it.second.empty())
-				toLoadTrees.push_back(it.second);
+			if (!it.second().empty())
+				toLoadTrees.push_back(it.second());
 		}
 		for (auto it : treemap->Name2Trees)
 		{
-			if (!it.second.empty())
-				toLoadTrees.push_back(it.second);
+			if (!it.second().empty())
+				toLoadTrees.push_back(it.second());
 		}
 	}
 
@@ -97,7 +124,7 @@ namespace YBehavior
 			toLoadTrees.push_back(s);
 		}
 
-		std::unordered_set<STRING> loadedTrees;
+		std::set<STRING> loadedTrees;
 
 		while (!toLoadTrees.empty())
 		{

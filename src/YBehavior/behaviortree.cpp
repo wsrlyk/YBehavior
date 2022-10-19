@@ -3,7 +3,6 @@
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include <sstream>
-#include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariablecreatehelper.h"
 #include "YBehavior/sharedvariableex.h"
 #ifdef YDEBUGGER
@@ -11,8 +10,10 @@
 #endif
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/agent.h"
-#include <string.h>
+#include <cstring>
+#ifdef YPROFILER
 #include "YBehavior/profile/profileheader.h"
+#endif
 #include "YBehavior/variablecreation.h"
 
 
@@ -69,6 +70,7 @@ namespace YBehavior
 		//delete m_NameKeyMgr;
 	}
 
+	static std::set<STRING> KEY_WORDS{ "Class", "Pos", "NickName" };
 	bool BehaviorTree::OnLoadChild(const pugi::xml_node& data)
 	{
 		///> Shared & Local Variables

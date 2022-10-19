@@ -1,6 +1,6 @@
 #ifdef YSHARP
 #pragma once
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/interface.h"
 #include "sharpentry_buffer.h"

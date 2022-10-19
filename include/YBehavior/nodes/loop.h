@@ -2,7 +2,6 @@
 #define _YBEHAVIOR_LOOP_H_
 
 #include "YBehavior/treenode.h"
-#include "YBehavior/sharedvariableex.h"
 
 namespace YBehavior
 {

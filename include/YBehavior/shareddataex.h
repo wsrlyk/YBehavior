@@ -1,13 +1,12 @@
 #ifndef _YBEHAVIOR_SHAREDDATAEX_H_
 #define _YBEHAVIOR_SHAREDDATAEX_H_
 
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/tools/meta.h"
 #include "YBehavior/interface.h"
-#include <unordered_map>
 #include "tools/objectpool.h"
-#include "YBehavior/smallmap.h"
+#include "YBehavior/types/smallmap.h"
 namespace YBehavior
 {
 	template<typename K, typename T>

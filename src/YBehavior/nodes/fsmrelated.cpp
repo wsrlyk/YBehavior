@@ -3,8 +3,6 @@
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/nodefactory.h"
-#include "YBehavior/sharedvariableex.h"
 #include "YBehavior/variablecreation.h"
 
 namespace YBehavior

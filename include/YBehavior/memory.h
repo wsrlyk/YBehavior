@@ -7,6 +7,7 @@
 namespace YBehavior
 {
 	class BehaviorTree;
+	class SharedDataEx;
 	struct StackInfo
 	{
 		StackInfo();

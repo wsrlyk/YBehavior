@@ -1,10 +1,8 @@
 #ifndef _YBEHAVIOR_TRANSITION_H_
 #define _YBEHAVIOR_TRANSITION_H_
 
-#include "YBehavior/types.h"
-#include <map>
+#include "YBehavior/types/types.h"
 #include <list>
-#include "YBehavior/utility.h"
 #include <unordered_map>
 
 namespace YBehavior

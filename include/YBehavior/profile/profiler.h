@@ -4,7 +4,7 @@
 #ifdef YPROFILER
 
 #include "YBehavior/define.h"
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 #include "YBehavior/singleton.h"
 #include <unordered_map>
 #include "YBehavior/utility.h"

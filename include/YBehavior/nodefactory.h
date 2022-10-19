@@ -3,7 +3,6 @@
 
 #include "YBehavior/factory.h"
 #include "YBehavior/behaviortree.h"
-#include "YBehavior/logger.h"
 
 #ifdef YSHARP
 #include "YBehavior/sharp/sharpnode.h"

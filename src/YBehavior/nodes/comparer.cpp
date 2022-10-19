@@ -1,16 +1,10 @@
 #include "YBehavior/nodes/comparer.h"
-#include "YBehavior/3rd/pugixml/pugixml.hpp"
-#include "YBehavior/logger.h"
-#include "YBehavior/utility.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/nodefactory.h"
-#include "YBehavior/sharedvariableex.h"
-#include "YBehavior/tools/common.h"
 #include "YBehavior/variablecreation.h"
-
+#include <set>
 namespace YBehavior
 {
-	static std::unordered_set<TYPEID> s_ValidTypes = {
+	static std::set<TYPEID> s_ValidTypes = {
 		GetTypeID<Int>(),
 		GetTypeID<Float>(),
 		GetTypeID<Bool>(),
@@ -20,7 +14,7 @@ namespace YBehavior
 		GetTypeID<EntityWrapper>()
 	};
 
-	Bimap<CompareType, STRING, EnumClassHash> OperatorMap = {
+	static Bimap<CompareType, STRING> OperatorMap = {
 		{ CompareType::EQUAL, "==" },
 		{ CompareType::NOT_EQUAL, "!=" },
 		{ CompareType::GREATER, ">" },

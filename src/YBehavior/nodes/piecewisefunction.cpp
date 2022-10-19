@@ -4,16 +4,16 @@
 #include "YBehavior/variables/variablecompare.h"
 #include "YBehavior/variables/variablecalculate.h"
 #include "YBehavior/variables/variableoperation.h"
-
+#include <set>
 namespace YBehavior
 {
-	static std::unordered_set<TYPEID> s_ValidVecTypes = {
+	static std::set<TYPEID> s_ValidVecTypes = {
 		GetTypeID<VecInt>(),
 		GetTypeID<VecFloat>(),
 		GetTypeID<VecUint64>(),
 	};
 
-	static std::unordered_set<TYPEID> s_ValidTypes = {
+	static std::set<TYPEID> s_ValidTypes = {
 		GetTypeID<Int>(),
 		GetTypeID<Float>(),
 		GetTypeID<Uint64>(),

@@ -1,10 +1,7 @@
 #ifndef _YBEHAVIOR_BEHAVIORMGR_H_
 #define _YBEHAVIOR_BEHAVIORMGR_H_
 
-#include "YBehavior/types.h"
-#include "YBehavior/singleton.h"
-#include <unordered_map>
-#include "behavior.h"
+#include "YBehavior/types/types.h"
 #include "YBehavior/version.h"
 
 ///>///////////////////////////////////////////////////////////////////////
@@ -16,6 +13,7 @@
 
 namespace YBehavior
 {
+	class Behavior;
 	typedef VersionMgr<Behavior, UINT> BehaviorVersionMgrType;
 	typedef typename BehaviorVersionMgrType::InfoType BehaviorInfoType;
 	typedef typename BehaviorVersionMgrType::InfoType::VersionType BehaviorVersionType;

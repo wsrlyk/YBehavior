@@ -1,6 +1,6 @@
 #ifndef _YBEHAVIOR_OBJECTPOOL_H_
 #define _YBEHAVIOR_OBJECTPOOL_H_
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 #include <deque>
 #include "YBehavior/utility.h"
 

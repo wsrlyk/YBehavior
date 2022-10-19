@@ -2,7 +2,7 @@
 #define _YBEHAVIOR_MESSAGEPROCESSOR_H_
 
 #ifdef YDEBUGGER
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 #include "YBehavior/singleton.h"
 
 namespace YBehavior

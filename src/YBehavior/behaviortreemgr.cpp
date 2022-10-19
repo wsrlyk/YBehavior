@@ -3,10 +3,9 @@
 #include <iostream>
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/logger.h"
-#include "YBehavior/nodefactory.h"
-#include <string.h>
+#include <cstring>
 #include "YBehavior/tools/common.h"
-//#include "YBehavior/tools/treemgrhelper.hpp"
+#include "YBehavior/utility.h"
 #include "YBehavior/mgrs.h"
 
 namespace YBehavior

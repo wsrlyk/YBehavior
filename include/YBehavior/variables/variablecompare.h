@@ -2,10 +2,10 @@
 #define _YBEHAVIOR_VARIABLECOMPARE_H_
 
 #include "YBehavior/interface.h"
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 #include "YBehavior/singleton.h"
-#include <map>
 #include "YBehavior/logger.h"
+#include "YBehavior/types/smallmap.h"
 
 namespace YBehavior
 {
@@ -109,7 +109,7 @@ namespace YBehavior
 	/////////////////////////////////////
 	class VariableCompareMgr : public Singleton<VariableCompareMgr>
 	{
-		std::map<TYPEID, const IVariableCompareHelper*> m_Compares;
+		small_map<TYPEID, const IVariableCompareHelper*> m_Compares;
 	public:
 		VariableCompareMgr();
 		~VariableCompareMgr();

@@ -1,8 +1,10 @@
 #ifndef _YBEHAVIOR_BEHAVIORTREE_H_
 #define _YBEHAVIOR_BEHAVIORTREE_H_
 
-#include "treenode.h"
-
+#include "YBehavior/treenode.h"
+#include "YBehavior/types/treemap.h"
+#include "YBehavior/memory.h"
+#include <unordered_map>
 //namespace pugi
 //{
 //	class xml_node;

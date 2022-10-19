@@ -2,6 +2,7 @@
 #define _YBEHAVIOR_SMALLMAP_H_
 
 #include <vector>
+#include <algorithm>
 
 namespace YBehavior
 {
@@ -239,7 +240,7 @@ namespace YBehavior
 		{
 			auto res = std::lower_bound(_Keys.begin(), _Keys.end(), k);
 			cur = res - _Keys.begin();
-			return res != _Keys.end() && * res == k;
+			return res != _Keys.end() && *res == k;
 
 
 			//int len = (int)_Keys.size();

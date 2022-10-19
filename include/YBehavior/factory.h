@@ -2,9 +2,8 @@
 #define _YBEHAVIOR_FACTORY_H_
 
 #include "YBehavior/define.h"
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 #include <unordered_map>
-#include <algorithm>
 #ifdef YB_GCC
 #include <cxxabi.h>
 #endif

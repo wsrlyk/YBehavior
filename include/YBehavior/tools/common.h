@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_COMMON_H_
 #define _YBEHAVIOR_COMMON_H_
 
-#include "YBehavior/types.h"
+#include "YBehavior/types/types.h"
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include <set>
 

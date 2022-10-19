@@ -2,11 +2,11 @@
 #define _YBEHAVIOR_VARIABLERANDOM_H_
 
 #include "YBehavior/interface.h"
-#include "YBehavior/types.h"
-#include "YBehavior/utility.h"
+#include "YBehavior/types/types.h"
 #include "YBehavior/singleton.h"
-#include <map>
+#include "YBehavior/types/smallmap.h"
 #include "YBehavior/logger.h"
+#include "YBehavior/utility.h"
 
 namespace YBehavior
 {
@@ -105,7 +105,7 @@ namespace YBehavior
 	/////////////////////////////////////
 	class VariableRandomMgr : public Singleton<VariableRandomMgr>
 	{
-		std::map<TYPEID, const IVariableRandomHelper*> m_Randoms;
+		small_map<TYPEID, const IVariableRandomHelper*> m_Randoms;
 	public:
 		VariableRandomMgr();
 		~VariableRandomMgr();

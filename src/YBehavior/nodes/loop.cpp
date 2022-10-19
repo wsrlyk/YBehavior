@@ -1,7 +1,5 @@
 #include "YBehavior/nodes/loop.h"
-#include "YBehavior/nodefactory.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/profile/profileheader.h"
 #include "YBehavior/variablecreation.h"
 
 namespace YBehavior

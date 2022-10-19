@@ -2,10 +2,10 @@
 #define _YBEHAVIOR_METASTATE_H_
 
 #include "YBehavior/fsm/machinestate.h"
-#include "YBehavior/fsm/statemachine.h"
 
 namespace YBehavior
 {
+	class StateMachine;
 	class MetaState : public MachineState
 	{
 	protected:

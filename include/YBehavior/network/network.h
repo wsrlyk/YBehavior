@@ -2,9 +2,7 @@
 #define _YBEHAVIOR_NETWORK_H_
 
 #ifdef YDEBUGGER
-#include "YBehavior/types.h"
-#include <vector>
-#include <sstream>
+#include "YBehavior/types/types.h"
 #include "YBehavior/singleton.h"
 
 namespace YBehavior

@@ -1,12 +1,7 @@
 #include "YBehavior/fsm/behavior.h"
-#include "YBehavior/utility.h"
-#include "YBehavior/logger.h"
-#include "YBehavior/behaviorprocess.h"
 #include "YBehavior/fsm/machinemgr.h"
 #include "YBehavior/memory.h"
-#include "YBehavior/behaviortree.h"
 #include "YBehavior/behaviortreemgr.h"
-#include "YBehavior/mgrs.h"
 
 namespace YBehavior
 {
@@ -24,7 +19,7 @@ namespace YBehavior
 
 		for (auto it = m_Node2TreeMapping.begin(); it != m_Node2TreeMapping.end(); ++it)
 		{
-			Mgrs::Instance()->GetTreeMgr()->ReturnTree(it->second);
+			Mgrs::Instance()->GetTreeMgr()->ReturnTree(it->second());
 		}
 		m_Node2TreeMapping.clear();
 
@@ -39,7 +34,7 @@ namespace YBehavior
 	{
 		auto it = m_Node2TreeMapping.find(pNode);
 		if (it != m_Node2TreeMapping.end())
-			return it->second;
+			return it->second();
 		return nullptr;
 	}
 }

@@ -1,10 +1,9 @@
 #ifndef _YBEHAVIOR_SHAREDVARIABLECREATEHELPER_H_
 #define _YBEHAVIOR_SHAREDVARIABLECREATEHELPER_H_
 
-#include "types.h"
-#include "nodefactory.h"
+#include "YBehavior/types/types.h"
 #include "shareddataex.h"
-#include <unordered_map>
+#include <map>
 #include "sharedvariableex.h"
 
 namespace YBehavior
@@ -88,7 +87,7 @@ namespace YBehavior
 	class SharedVariableCreateHelperMgr
 	{
 	public:
-		typedef std::unordered_map<STRING, ISharedVariableCreateHelper*> HelperMapType;
+		typedef std::map<STRING, ISharedVariableCreateHelper*> HelperMapType;
 	protected:
 		static HelperMapType _Helpers;
 		static ISharedVariableCreateHelper* _HelperList[MAX_TYPE_KEY];

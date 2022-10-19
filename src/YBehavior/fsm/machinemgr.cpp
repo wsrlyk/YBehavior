@@ -1,7 +1,5 @@
 #include "YBehavior/fsm/machinemgr.h"
 #include "YBehavior/logger.h"
-#include "YBehavior/utility.h"
-#include "YBehavior/behaviorprocess.h"
 #include <iostream>
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/fsm/metastate.h"
@@ -9,6 +7,7 @@
 #include "YBehavior/tools/common.h"
 #include <algorithm>
 #include <cstring>
+#include "YBehavior/utility.h"
 
 namespace YBehavior
 {
@@ -425,7 +424,7 @@ namespace YBehavior
 			else
 			{
 				if (pState->GetType() == MST_Normal)
-					pFSM->GetTreeMap().Name2Trees[{pState, pState->GetName()}] = pState->GetTree();
+					pFSM->GetTreeMap().Name2Trees[std::make_tuple(pState, pState->GetName())] = pState->GetTree();
 			}
 		}
 	}

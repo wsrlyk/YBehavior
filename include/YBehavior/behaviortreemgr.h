@@ -2,13 +2,10 @@
 #define _YBEHAVIOR_BEHAVIORTREEMGR_H_
 
 #include "YBehavior/define.h"
-#include "YBehavior/types.h"
-#include <unordered_map>
-#include <list>
-#include <unordered_set>
-#include "version.h"
-#include "behaviortree.h"
+#include "YBehavior/types/types.h"
+#include "YBehavior/version.h"
 #include "YBehavior/mgrs.h"
+#include "YBehavior/behaviortree.h"
 
 namespace pugi
 {
@@ -17,6 +14,8 @@ namespace pugi
 
 namespace YBehavior
 {
+	struct TreeMap;
+	class TreeNode;
 	typedef VersionMgr<BehaviorTree, STRING> TreeVersionMgrType;
 	typedef typename TreeVersionMgrType::InfoType TreeInfoType;
 	typedef typename TreeVersionMgrType::InfoType::VersionType TreeVersionType;

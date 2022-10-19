@@ -1,6 +1,5 @@
 #ifdef YPROFILER
 #include "YBehavior/profile/profiler.h"
-#include <assert.h>
 #include "YBehavior/agent.h"
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/profile/profileprocessor.h"

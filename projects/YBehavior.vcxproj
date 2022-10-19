@@ -31,7 +31,6 @@
     <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugixml.hpp" />
     <ClInclude Include="..\include\YBehavior\agent.h" />
     <ClInclude Include="..\include\YBehavior\nodes\convert.h" />
-    <ClInclude Include="..\include\YBehavior\smallmap.h" />
     <ClInclude Include="..\include\YBehavior\treenode.h" />
     <ClInclude Include="..\include\YBehavior\behaviorprocess.h" />
     <ClInclude Include="..\include\YBehavior\behaviortree.h" />
@@ -91,12 +90,13 @@
     <ClInclude Include="..\include\YBehavior\singleton.h" />
     <ClInclude Include="..\include\YBehavior\tools\bimap.h" />
     <ClInclude Include="..\include\YBehavior\tools\common.h" />
-    <ClInclude Include="..\include\YBehavior\tools\linkedlist.h" />
     <ClInclude Include="..\include\YBehavior\tools\meta.h" />
     <ClInclude Include="..\include\YBehavior\tools\objectpool.h" />
     <ClInclude Include="..\include\YBehavior\tools\treemgrhelper.hpp" />
     <ClInclude Include="..\include\YBehavior\treekeymgr.h" />
-    <ClInclude Include="..\include\YBehavior\types.h" />
+    <ClInclude Include="..\include\YBehavior\types\smallmap.h" />
+    <ClInclude Include="..\include\YBehavior\types\treemap.h" />
+    <ClInclude Include="..\include\YBehavior\types\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />
     <ClInclude Include="..\include\YBehavior\variablecreation.h" />
     <ClInclude Include="..\include\YBehavior\variables\variablecalculate.h" />
@@ -161,7 +161,7 @@
     <ClCompile Include="..\src\YBehavior\tools\common.cpp" />
     <ClCompile Include="..\src\YBehavior\tools\objectpool.cpp" />
     <ClCompile Include="..\src\YBehavior\treekeymgr.cpp" />
-    <ClCompile Include="..\src\YBehavior\types.cpp" />
+    <ClCompile Include="..\src\YBehavior\types\types.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />
     <ClCompile Include="..\src\YBehavior\variablecreation.cpp" />
     <ClCompile Include="..\src\YBehavior\variables\variablecalculate.cpp" />

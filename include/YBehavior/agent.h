@@ -2,8 +2,7 @@
 #define _YBEHAVIOR_AGENT_H_
 
 #include "YBehavior/define.h"
-#include "YBehavior/types.h"
-#include <stack>
+#include "YBehavior/types/types.h"
 #include "behaviorprocess.h"
 
 namespace YBehavior

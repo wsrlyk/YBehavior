@@ -1,16 +1,15 @@
 #include "YBehavior/nodes/random.h"
-#include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/logger.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
 #include "YBehavior/variablecreation.h"
 #include "YBehavior/variables/variablerandom.h"
 #include "YBehavior/variables/variableoperation.h"
+#include <set>
 
 namespace YBehavior
 {
-	static std::unordered_set<TYPEID> s_ValidTypes = {
+	static std::set<TYPEID> s_ValidTypes = {
 		GetTypeID<Int>(),
 		GetTypeID<Float>(),
 		GetTypeID<Bool>(),

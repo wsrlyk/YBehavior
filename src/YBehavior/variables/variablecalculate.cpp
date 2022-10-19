@@ -59,7 +59,7 @@ namespace YBehavior
 	{
 		for (auto it = m_Calculates.begin(); it != m_Calculates.end(); ++it)
 		{
-			delete it->second;
+			delete it->second();
 		}
 		m_Calculates.clear();
 	}
@@ -67,7 +67,7 @@ namespace YBehavior
 	{
 		auto it = m_Calculates.find(std::make_tuple(tl, tr0, tr1));
 		if (it != m_Calculates.end())
-			return it->second;
+			return it->second();
 		return nullptr;
 	}
 }

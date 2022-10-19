@@ -19,7 +19,7 @@ namespace YBehavior
 	{
 		for (auto it = m_Randoms.begin(); it != m_Randoms.end(); ++it)
 		{
-			delete it->second;
+			delete it->second();
 		}
 		m_Randoms.clear();
 	}
@@ -27,7 +27,7 @@ namespace YBehavior
 	{
 		auto it = m_Randoms.find(t);
 		if (it != m_Randoms.end())
-			return it->second;
+			return it->second();
 		return nullptr;
 	}
 }

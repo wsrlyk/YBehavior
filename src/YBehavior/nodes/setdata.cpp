@@ -1,9 +1,7 @@
 #include "YBehavior/nodes/setdata.h"
-#include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
 #include "YBehavior/variablecreation.h"
 

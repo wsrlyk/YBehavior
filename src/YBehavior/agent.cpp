@@ -1,13 +1,5 @@
 #include "YBehavior/agent.h"
-#include "YBehavior/behaviortreemgr.h"
-#include "YBehavior/behaviortree.h"
-#include "YBehavior/shareddataex.h"
 #include "YBehavior/registerdata.h"
-#include "YBehavior/nodefactory.h"
-#include "YBehavior/memory.h"
-#include "YBehavior/fsm/statemachine.h"
-#include "YBehavior/mgrs.h"
-#include "YBehavior/fsm/behaviormgr.h"
 #ifdef YPROFILER
 #include "YBehavior/profile/profilehelper.h"
 #endif

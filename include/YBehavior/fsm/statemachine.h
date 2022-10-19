@@ -1,18 +1,18 @@
 #ifndef _YBEHAVIOR_STATEMACHINE_H_
 #define _YBEHAVIOR_STATEMACHINE_H_
 
-#include "YBehavior/types.h"
-#include "machinestate.h"
+#include "YBehavior/types/types.h"
 #include <set>
-#include <list>
-#include "YBehavior/utility.h"
-#include <unordered_map>
+#include "YBehavior/types/smallmap.h"
 #include "transition.h"
+#include "YBehavior/types/treemap.h"
 
 namespace YBehavior
 {
 	class RootMachine;
 	class MetaState;
+	class MachineState;
+	class MachineContext;
 	class StateMachine
 	{
 	protected:
@@ -53,8 +53,8 @@ namespace YBehavior
 		std::set<TransitionData> m_FromTransitionMap;
 		std::set<TransitionData> m_AnyTransitionMap;
 
-		std::unordered_map<STRING, MachineState*> m_NamedStatesMap;
-		std::unordered_map<UINT, MachineState*> m_UIDStatesMap;
+		small_map<STRING, MachineState*> m_NamedStatesMap;
+		small_map<UINT, MachineState*> m_UIDStatesMap;
 		std::vector<MachineState*> m_AllStates;
 		FSM* m_pFSM;
 	public:

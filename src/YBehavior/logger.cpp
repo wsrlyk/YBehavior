@@ -1,7 +1,6 @@
 #include "YBehavior/logger.h"
 #include <iostream>
 #include "stdarg.h"
-#include <stdio.h>
 
 namespace YBehavior
 {

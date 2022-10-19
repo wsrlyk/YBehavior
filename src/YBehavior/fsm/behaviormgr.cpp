@@ -1,4 +1,5 @@
 #include "YBehavior/fsm/behaviormgr.h"
+#include "YBehavior/fsm/behavior.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/behaviorprocess.h"
@@ -35,13 +36,13 @@ namespace YBehavior
 	{
 		for (auto it : treemap.Node2Trees)
 		{
-			if (!it.second.empty())
-				toLoadTrees.emplace_back(it.first, it.second);
+			if (!it.second().empty())
+				toLoadTrees.emplace_back(it.first(), it.second());
 		}
 		for (auto it : treemap.Name2Trees)
 		{
-			STRING name(it.second);
-			auto it2 = n2t.find(std::get<1>(it.first));
+			STRING name(it.second());
+			auto it2 = n2t.find(std::get<1>(it.first()));
 			if (it2 != n2t.end())
 				name = it2->second;
 			if (name.empty())
@@ -49,7 +50,7 @@ namespace YBehavior
 				//ERROR_BEGIN << "No tree for node " << std::get<1>(it.first) << ERROR_END;
 				continue;
 			}
-			toLoadTrees.emplace_back(std::get<0>(it.first), name);
+			toLoadTrees.emplace_back(std::get<0>(it.first()), name);
 		}
 	}
 
@@ -92,7 +93,7 @@ namespace YBehavior
 		}
 
 		std::list<std::tuple<NodePtr, STRING>> toLoadTrees;
-		std::unordered_set<STRING> loadedTrees;
+		std::set<STRING> loadedTrees;
 
 		_GetToLoadTrees(pFSM->GetTreeMap(), toLoadTrees, m2t);
 
@@ -123,7 +124,7 @@ namespace YBehavior
 		//////////////////////////////////////////////////////////////////////////
 		for (auto it : behavior->GetTreeMapping())
 		{
-			it.second->MergeDataTo(*behavior->GetMemory()->GetMainData());
+			it.second()->MergeDataTo(*behavior->GetMemory()->GetMainData());
 		}
 		behavior->SetID(key.Hash());
 		behavior->SetFSM(pFSM);
@@ -146,7 +147,7 @@ namespace YBehavior
 
 			for (auto & it2 : b->GetTreeMapping())
 			{
-				if (it2.second->GetKey() == name)
+				if (it2.second()->GetKey() == name)
 				{
 					it.second->IncreaseLatestVesion();
 					break;

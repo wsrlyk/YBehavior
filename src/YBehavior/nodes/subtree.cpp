@@ -1,16 +1,12 @@
 #include "YBehavior/nodes/subtree.h"
-#include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/nodefactory.h"
-#include "YBehavior/sharedvariableex.h"
 #include "YBehavior/behaviortreemgr.h"
-#include <string.h>
 #include "YBehavior/mgrs.h"
 #include "YBehavior/fsm/behavior.h"
-#include "YBehavior/profile/profileheader.h"
 #include "YBehavior/variablecreation.h"
+#include <cstring>
 
 namespace YBehavior
 {
@@ -63,7 +59,7 @@ namespace YBehavior
 		}
 		else
 		{
-			m_Root->GetTreeMap().Name2Trees[{this, id}] = defaultTreeName;
+			m_Root->GetTreeMap().Name2Trees[std::make_tuple(this, id)] = defaultTreeName;
 		}
 
 		return true;

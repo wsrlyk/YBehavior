@@ -1,8 +1,7 @@
 #ifndef _YBEHAVIOR_CONTEXT_H_
 #define _YBEHAVIOR_CONTEXT_H_
 
-#include "YBehavior/types.h"
-#include "YBehavior/utility.h"
+#include "YBehavior/types/types.h"
 #include <list>
 #include "transition.h"
 #include "machinestate.h"

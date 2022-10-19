@@ -2,12 +2,10 @@
 #define _YBEHAVIOR_TREENODE_H_
 
 #include "YBehavior/define.h"
-#include "YBehavior/types.h"
-#include <unordered_map>
-#include <unordered_set>
-#include "YBehavior/sharedvariableex.h"
+#include "YBehavior/types/types.h"
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/logger.h"
+#include "YBehavior/sharedvariableex.h"
 //namespace pugi
 //{
 //	class xml_node;
@@ -40,7 +38,6 @@ namespace YBehavior
 		ST_ARRAY,
 	};
 
-	class ISharedVariableEx;
 	class SharedDataEx;
 	struct NameKeyMgr;
 #ifdef YDEBUGGER
@@ -70,7 +67,6 @@ namespace YBehavior
 		TreeNodePtr m_Condition;
 		UINT m_UID;	// Unique in a tree
 		StdVector<ISharedVariableEx*> m_Variables;	///> Just for destructions of variables
-		static std::unordered_set<STRING> KEY_WORDS;
 		BehaviorTree* m_Root;
 		ReturnType m_ReturnType;
 		STRING m_ClassName;

@@ -1,8 +1,6 @@
 #include "YBehavior/nodes/register.h"
-#include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/logger.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/nodefactory.h"
 #include "YBehavior/sharedvariableex.h"
 #include "YBehavior/registerdata.h"
 #include "YBehavior/variablecreation.h"

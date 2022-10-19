@@ -1,5 +1,4 @@
 #include "YBehavior/nodes/selector.h"
-#include "YBehavior/profile/profileheader.h"
 #include "YBehavior/agent.h"
 
 namespace YBehavior

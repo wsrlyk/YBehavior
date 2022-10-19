@@ -1,15 +1,10 @@
 #include "YBehavior/nodes/calculator.h"
-#include "YBehavior/3rd/pugixml/pugixml.hpp"
-#include "YBehavior/logger.h"
-#include "YBehavior/utility.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/nodefactory.h"
-#include "YBehavior/sharedvariableex.h"
 #include "YBehavior/variablecreation.h"
 
 namespace YBehavior
 {
-	Bimap<CalculateType, STRING, EnumClassHash> OperatorMap = {
+	static Bimap<CalculateType, STRING> OperatorMap = {
 		{ CalculateType::ADD, "+" },
 		{ CalculateType::SUB, "-" },
 		{ CalculateType::MUL, "*" },

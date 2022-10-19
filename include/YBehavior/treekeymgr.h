@@ -1,10 +1,9 @@
 #ifndef _YBEHAVIOR_TREEKEYMGR_H_
 #define _YBEHAVIOR_TREEKEYMGR_H_
 
-#include "YBehavior/types.h"
-#include "utility.h"
+#include "YBehavior/types/types.h"
 #include "singleton.h"
-#include <unordered_map>
+#include <map>
 
 namespace YBehavior
 {
@@ -18,9 +17,9 @@ namespace YBehavior
 		const STRING& GetNameByKey(KEY key) const;
 #endif
 	private:
-		std::unordered_map<STRING, KEY> m_Name2Hash;
+		std::map<STRING, KEY> m_Name2Hash;
 #ifdef YDEBUGGER
-		std::unordered_map<KEY, STRING> m_Hash2Name;
+		std::map<KEY, STRING> m_Hash2Name;
 #endif
 	};
 

@@ -15,7 +15,7 @@
 #include <iostream>
 #include "YBehavior/fsm/transition.h"
 #include "YBehavior/fsm/context.h"
-#include "YBehavior/smallmap.h"
+#include "YBehavior/types/smallmap.h"
 
 using namespace YBehavior;
 int main(int argc, char** argv)

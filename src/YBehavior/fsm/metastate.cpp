@@ -1,7 +1,5 @@
 #include "YBehavior/fsm/metastate.h"
-#include "YBehavior/logger.h"
 #include "YBehavior/fsm/statemachine.h"
-#include "YBehavior/agent.h"
 
 namespace YBehavior
 {

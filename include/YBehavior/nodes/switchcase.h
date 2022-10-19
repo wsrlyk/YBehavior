@@ -2,7 +2,6 @@
 #define _YBEHAVIOR_SWITCHCASE_H_
 
 #include "YBehavior/treenode.h"
-#include "YBehavior/tools/common.h"
 
 namespace YBehavior
 {

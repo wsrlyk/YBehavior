@@ -1,18 +1,14 @@
 #include "YBehavior/treenode.h"
-#include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include <sstream>
 #include "YBehavior/nodefactory.h"
-#include "YBehavior/sharedvariablecreatehelper.h"
 #include "YBehavior/sharedvariableex.h"
 #ifdef YDEBUGGER
 #include "YBehavior/debugger.h"
 #endif
 #include "YBehavior/shareddataex.h"
 #include "YBehavior/agent.h"
-#include <string.h>
-#include "YBehavior/profile/profileheader.h"
 #include "YBehavior/variablecreation.h"
 
 
@@ -55,8 +51,6 @@ namespace YBehavior
 		}
 		m_Variables.clear();
 	}
-
-	std::unordered_set<STRING> TreeNode::KEY_WORDS = { "Class", "Pos", "NickName" };
 
 	TreeNode* TreeNode::CreateNodeByName(const STRING& name)
 	{

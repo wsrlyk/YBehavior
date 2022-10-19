@@ -27,7 +27,7 @@ namespace YBehavior
 	{
 		for (auto it = m_Converts.begin(); it != m_Converts.end(); ++it)
 		{
-			delete it->second;
+			delete it->second();
 		}
 		m_Converts.clear();
 	}
@@ -35,7 +35,7 @@ namespace YBehavior
 	{
 		auto it = m_Converts.find(std::make_pair(from, to));
 		if (it != m_Converts.end())
-			return it->second;
+			return it->second();
 		return nullptr;
 	}
 }
