@@ -194,26 +194,32 @@ namespace YBehavior
 
 		bool TrySet(KEY key, const T& src)
 		{
-			if (m_Datas.find(key) == m_Datas.end())
+			auto it = m_Datas.find(key);
+			if (it == m_Datas.end())
 				return false;
-			m_Datas[key] = src;
+			it->second() = src;
 			return true;
 		}
 
 		bool TrySet(KEY key, T&& src)
 		{
-			if (m_Datas.find(key) == m_Datas.end())
+			auto it = m_Datas.find(key);
+			if (it == m_Datas.end())
 				return false;
-			m_Datas[key] = src;
+			it->second() = std::move(src);
 			return true;
 		}
 
 		bool TrySet(KEY key, const void* src) override
 		{
-			if (m_Datas.find(key) == m_Datas.end())
+			if (src == nullptr)
 				return false;
-			if (src != nullptr)
-				m_Datas[key] = *((T*)src);
+
+			auto it = m_Datas.find(key);
+			if (it == m_Datas.end())
+				return false;
+			
+			it->second() = *((T*)src);
 			return true;
 		}
 

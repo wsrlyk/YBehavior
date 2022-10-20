@@ -97,7 +97,7 @@ namespace YBehavior
 		///> Inputs & Outputs
 		else if (strcmp(data.name(), "Input") == 0 || strcmp(data.name(), "Output") == 0)
 		{
-			std::unordered_map<STRING, ISharedVariableEx*>& container = data.name()[0] == 'I' ? m_Inputs : m_Outputs;
+			auto& container = data.name()[0] == 'I' ? m_Inputs : m_Outputs;
 			for (auto it = data.attributes_begin(); it != data.attributes_end(); ++it)
 			{
 				ISharedVariableEx* pVariable = nullptr;
@@ -108,7 +108,7 @@ namespace YBehavior
 					ERROR_BEGIN_NODE_HEAD << "Failed to Create " << data.name() << ERROR_END;
 					return false;
 				}
-				if (container.count(it->name()) > 0)
+				if (container.find(it->name()) != container.end())
 				{
 					ERROR_BEGIN_NODE_HEAD << "Duplicate " << data.name() << " Variable: " << it->name() << ERROR_END;
 					return false;
@@ -398,7 +398,7 @@ namespace YBehavior
 		m_TempMemory.Set(pAgent->GetMemory()->GetMainData(), pAgent->GetMemory()->GetStackTop());
 	}
 
-	void LocalMemoryInOut::OnInput(std::unordered_map<STRING, ISharedVariableEx*>* pInputsTo)
+	void LocalMemoryInOut::OnInput(small_map<STRING, ISharedVariableEx*>* pInputsTo)
 	{
 		if (m_pInputsFrom && pInputsTo)
 		{
@@ -408,7 +408,7 @@ namespace YBehavior
 				auto it2 = pInputsTo->find(pFrom->GetName());
 				if (it2 == pInputsTo->end())
 					continue;
-				ISharedVariableEx* pTo = it2->second;
+				ISharedVariableEx* pTo = it2->second();
 				if (pFrom->TypeID() != pTo->TypeID())
 				{
 					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetRunningTree()->GetTreeName() << ERROR_END;
@@ -419,7 +419,7 @@ namespace YBehavior
 		}
 	}
 
-	void LocalMemoryInOut::OnOutput(std::unordered_map<STRING, ISharedVariableEx*>* pOutputsFrom)
+	void LocalMemoryInOut::OnOutput(small_map<STRING, ISharedVariableEx*>* pOutputsFrom)
 	{
 		if (m_pOutputsTo && pOutputsFrom)
 		{
@@ -429,7 +429,7 @@ namespace YBehavior
 				auto it2 = pOutputsFrom->find(pTo->GetName());
 				if (it2 == pOutputsFrom->end())
 					continue;
-				ISharedVariableEx* pFrom = it2->second;
+				ISharedVariableEx* pFrom = it2->second();
 				if (pFrom->TypeID() != pTo->TypeID())
 				{
 					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetRunningTree()->GetTreeName() << ERROR_END;

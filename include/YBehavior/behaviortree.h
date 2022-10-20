@@ -4,7 +4,7 @@
 #include "YBehavior/treenode.h"
 #include "YBehavior/types/treemap.h"
 #include "YBehavior/memory.h"
-#include <unordered_map>
+#include "YBehavior/types/smallmap.h"
 //namespace pugi
 //{
 //	class xml_node;
@@ -19,8 +19,8 @@ namespace YBehavior
 		LocalMemoryInOut() {};
 		LocalMemoryInOut(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo);
 		void Set(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo);
-		void OnInput(std::unordered_map<STRING, ISharedVariableEx*>* pInputsTo);
-		void OnOutput(std::unordered_map<STRING, ISharedVariableEx*>* pOutputsFrom);
+		void OnInput(small_map<STRING, ISharedVariableEx*>* pInputsTo);
+		void OnOutput(small_map<STRING, ISharedVariableEx*>* pOutputsFrom);
 	private:
 		AgentPtr m_pAgent{};
 		std::vector<ISharedVariableEx* >* m_pInputsFrom{};
@@ -60,8 +60,8 @@ namespace YBehavior
 #endif
 
 		StdVector<BehaviorTree*> m_SubTrees;
-		std::unordered_map<STRING, ISharedVariableEx*> m_Inputs;
-		std::unordered_map<STRING, ISharedVariableEx*> m_Outputs;
+		small_map<STRING, ISharedVariableEx*> m_Inputs;
+		small_map<STRING, ISharedVariableEx*> m_Outputs;
 	public:
 		BehaviorTree(const STRING& name);
 		~BehaviorTree();

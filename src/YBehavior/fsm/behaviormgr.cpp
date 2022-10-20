@@ -32,7 +32,7 @@ namespace YBehavior
 		return pRes;
 	}
 
-	void _GetToLoadTrees(const TreeMap& treemap, std::list<std::tuple<NodePtr, STRING>>& toLoadTrees, std::unordered_map<STRING, STRING>& n2t)
+	void _GetToLoadTrees(const TreeMap& treemap, std::list<std::tuple<NodePtr, STRING>>& toLoadTrees, small_map<STRING, STRING>& n2t)
 	{
 		for (auto it : treemap.Node2Trees)
 		{
@@ -44,7 +44,7 @@ namespace YBehavior
 			STRING name(it.second());
 			auto it2 = n2t.find(std::get<1>(it.first()));
 			if (it2 != n2t.end())
-				name = it2->second;
+				name = it2->second();
 			if (name.empty())
 			{
 				//ERROR_BEGIN << "No tree for node " << std::get<1>(it.first) << ERROR_END;
@@ -66,8 +66,8 @@ namespace YBehavior
 			ERROR_BEGIN << "Even amount of inputs is required. But now it's " << key.SubTrees()->size() << " When Load Behavior " << key.Name() << ERROR_END;
 			return nullptr;
 		}
-		std::unordered_map<STRING, STRING> m2t;
-		std::unordered_map<STRING, STRING> t2t;
+		small_map<STRING, STRING> m2t;
+		small_map<STRING, STRING> t2t;
 		if (key.StateTrees())
 		{
 			for (UINT i = 0; i < key.StateTrees()->size(); i += 2)

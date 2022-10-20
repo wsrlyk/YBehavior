@@ -6,10 +6,10 @@
 #include "YBehavior/define.h"
 #include "YBehavior/singleton.h"
 #include "YBehavior/behaviortree.h"
-#include <unordered_map>
+#include "YBehavior/types/smallmap.h"
 #include "YBehavior/network/network.h"
 #include "YBehavior/fsm/statemachine.h"
-
+#include <map>
 namespace YBehavior
 {
 	enum struct DebugTargetType;
@@ -61,7 +61,7 @@ namespace YBehavior
 
 	struct GraphDebugInfo
 	{
-		std::unordered_map<UINT, DebugPointInfo> DebugPointInfos;
+		small_map<UINT, DebugPointInfo> DebugPointInfos;
 		UINT Hash;
 
 		void Reset()
@@ -122,10 +122,9 @@ namespace YBehavior
 
 		Mutex m_Mutex;
 		///> Node(Tree or FSM) => RunInfo, one node has only one info
-		std::unordered_map<const void*, NodeRunInfo*> m_RunInfos;
+		std::map<const void*, NodeRunInfo*> m_RunInfos;
 		//std::unordered_map<UINT, DebugPointInfo> m_DebugPointInfos;
-
-		std::unordered_map<STRING, GraphDebugInfo> m_TreeDebugInfo;
+		small_map<STRING, GraphDebugInfo> m_TreeDebugInfo;
 		GraphDebugInfo m_FSMDebugInfo;
 
 		STRING m_SendBuffer;

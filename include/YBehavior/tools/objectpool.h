@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_OBJECTPOOL_H_
 #define _YBEHAVIOR_OBJECTPOOL_H_
 #include "YBehavior/types/types.h"
-#include <deque>
+#include <vector>
 #include "YBehavior/utility.h"
 
 namespace YBehavior
@@ -9,7 +9,7 @@ namespace YBehavior
 	template <typename T>
 	class ObjectPool
 	{
-		std::deque<T*> m_Pool;
+		std::vector<T*> m_Pool;
 
 	public:
 		~ObjectPool();

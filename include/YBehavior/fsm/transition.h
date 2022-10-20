@@ -2,15 +2,14 @@
 #define _YBEHAVIOR_TRANSITION_H_
 
 #include "YBehavior/types/types.h"
+#include "YBehavior/types/smallmap.h"
 #include <list>
-#include <unordered_map>
-
 namespace YBehavior
 {
 	class MachineState;
 	class ConditionMgr
 	{
-		std::unordered_map<STRING, int> m_Map;
+		small_map<STRING, int> m_Map;
 	public:
 		int GetConditionValue(const STRING& cond);
 		bool TryGetConditionValue(const STRING& cond, int& value);
