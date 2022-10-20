@@ -188,7 +188,7 @@ namespace YBehavior
 			std::vector<Range> ranges;
 			KEY key;
 		};
-		std::unordered_map<TYPEID, std::vector<Ranges>> usedRanges;
+		small_map<TYPEID, std::vector<Ranges>> usedRanges;
 
 		int lastRangesListIndex = -1;
 		UINT lastFromUID = 0;
@@ -276,7 +276,7 @@ namespace YBehavior
 				/// So current FromUID can only be equal or larger than the previous FromUIDs
 				/// And previous ranges cant make holes
 				
-				std::vector<Ranges>& rangesList = it2->second;
+				std::vector<Ranges>& rangesList = it2->second();
 
 				///> In this case, an output is connected to multiple inputs. Just merge them.
 				if (lastFromUID == fromUID && lastFromVariableIndex == fromVariable->GetIndex())
