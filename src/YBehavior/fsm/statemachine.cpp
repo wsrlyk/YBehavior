@@ -2,6 +2,7 @@
 #include "YBehavior/fsm/metastate.h"
 #include "YBehavior/agent.h"
 #include <list>
+#include "YBehavior/logger.h"
 #include "YBehavior/fsm/context.h"
 #ifdef YDEBUGGER
 #include "YBehavior/debugger.h"

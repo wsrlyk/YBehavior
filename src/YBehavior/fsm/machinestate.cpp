@@ -4,6 +4,7 @@
 #ifdef YDEBUGGER
 #include "YBehavior/debugger.h"
 #endif
+#include "YBehavior/behaviortree.h"
 
 namespace YBehavior
 {
