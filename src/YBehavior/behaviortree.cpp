@@ -108,12 +108,12 @@ namespace YBehavior
 					ERROR_BEGIN_NODE_HEAD << "Failed to Create " << data.name() << ERROR_END;
 					return false;
 				}
-				if (container.find(it->name()) != container.end())
-				{
-					ERROR_BEGIN_NODE_HEAD << "Duplicate " << data.name() << " Variable: " << it->name() << ERROR_END;
-					return false;
-				}
-				container[it->name()] = pVariable;
+				//if (container.find(it->name()) != container.end())
+				//{
+				//	ERROR_BEGIN_NODE_HEAD << "Duplicate " << data.name() << " Variable: " << it->name() << ERROR_END;
+				//	return false;
+				//}
+				container.emplace_back(pVariable);
 			}
 		}
 
@@ -130,40 +130,6 @@ namespace YBehavior
 	void BehaviorTree::MergeDataTo(SharedDataEx& destination)
 	{
 		destination.MergeFrom(*m_SharedData, true);
-	}
-
-
-	YBehavior::NodeState BehaviorTree::RootExecute(AgentPtr pAgent, NodeState parentState, LocalMemoryInOut* pInOut)
-	{
-#ifdef YPROFILER
-		Profiler::TreeProfileHelper profiler(this);
-#endif
-		///> Push the local data to the stack of the agent memory
-		if (parentState != NS_RUNNING)
-		{
-			pAgent->GetMemory()->Push(this);
-
-			if (pInOut)
-				pInOut->OnInput(&m_Inputs);
-		}
-#ifdef YPROFILER
-		profiler.Pause();
-#endif
-		NodeState res = Execute(pAgent, parentState);
-
-#ifdef YPROFILER
-		profiler.Resume();
-#endif
-
-		if (res != NS_RUNNING)
-		{
-			if (pInOut)
-				pInOut->OnOutput(&m_Outputs);
-			///> Pop the local data
-			pAgent->GetMemory()->Pop();
-		}
-
-		return res;
 	}
 
 	YBehavior::TreeNodeContext* BehaviorTree::CreateRootContext(LocalMemoryInOut* pTunnel /*= nullptr*/)
@@ -398,17 +364,17 @@ namespace YBehavior
 		m_TempMemory.Set(pAgent->GetMemory()->GetMainData(), pAgent->GetMemory()->GetStackTop());
 	}
 
-	void LocalMemoryInOut::OnInput(small_map<STRING, ISharedVariableEx*>* pInputsTo)
+	void LocalMemoryInOut::OnInput(StdVector<ISharedVariableEx*>* pInputsTo)
 	{
-		if (m_pInputsFrom && pInputsTo)
+		if (m_pInputsFrom && pInputsTo && m_pInputsFrom->size() == pInputsTo->size())
 		{
-			for (auto it = m_pInputsFrom->begin(); it != m_pInputsFrom->end(); ++it)
+			auto len = m_pInputsFrom->size();
+			for (size_t i = 0; i < len; ++i)
 			{
-				ISharedVariableEx* pFrom = *it;
-				auto it2 = pInputsTo->find(pFrom->GetName());
-				if (it2 == pInputsTo->end())
+				ISharedVariableEx* pFrom = (*m_pInputsFrom)[i];
+				ISharedVariableEx* pTo = (*pInputsTo)[i];
+				if (!pFrom || !pTo)
 					continue;
-				ISharedVariableEx* pTo = it2->second();
 				if (pFrom->TypeID() != pTo->TypeID())
 				{
 					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetRunningTree()->GetTreeName() << ERROR_END;
@@ -419,17 +385,17 @@ namespace YBehavior
 		}
 	}
 
-	void LocalMemoryInOut::OnOutput(small_map<STRING, ISharedVariableEx*>* pOutputsFrom)
+	void LocalMemoryInOut::OnOutput(StdVector<ISharedVariableEx*>* pOutputsFrom)
 	{
-		if (m_pOutputsTo && pOutputsFrom)
+		if (m_pOutputsTo && pOutputsFrom && m_pOutputsTo->size() == pOutputsFrom->size())
 		{
-			for (auto it = m_pOutputsTo->begin(); it != m_pOutputsTo->end(); ++it)
+			auto len = m_pOutputsTo->size();
+			for (size_t i = 0; i < len; ++i)
 			{
-				ISharedVariableEx* pTo = *it;
-				auto it2 = pOutputsFrom->find(pTo->GetName());
-				if (it2 == pOutputsFrom->end())
+				ISharedVariableEx* pTo = (*m_pOutputsTo)[i];
+				ISharedVariableEx* pFrom = (*pOutputsFrom)[i];
+				if (!pFrom || !pTo)
 					continue;
-				ISharedVariableEx* pFrom = it2->second();
 				if (pFrom->TypeID() != pTo->TypeID())
 				{
 					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetRunningTree()->GetTreeName() << ERROR_END;

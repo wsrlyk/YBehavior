@@ -19,8 +19,8 @@ namespace YBehavior
 		LocalMemoryInOut() {};
 		LocalMemoryInOut(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo);
 		void Set(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo);
-		void OnInput(small_map<STRING, ISharedVariableEx*>* pInputsTo);
-		void OnOutput(small_map<STRING, ISharedVariableEx*>* pOutputsFrom);
+		void OnInput(StdVector<ISharedVariableEx*>* pInputsTo);
+		void OnOutput(StdVector<ISharedVariableEx*>* pOutputsFrom);
 	private:
 		AgentPtr m_pAgent{};
 		std::vector<ISharedVariableEx* >* m_pInputsFrom{};
@@ -59,9 +59,8 @@ namespace YBehavior
 		UINT m_Hash;
 #endif
 
-		StdVector<BehaviorTree*> m_SubTrees;
-		small_map<STRING, ISharedVariableEx*> m_Inputs;
-		small_map<STRING, ISharedVariableEx*> m_Outputs;
+		StdVector<ISharedVariableEx*> m_Inputs;
+		StdVector<ISharedVariableEx*> m_Outputs;
 	public:
 		BehaviorTree(const STRING& name);
 		~BehaviorTree();
@@ -77,13 +76,8 @@ namespace YBehavior
 		//inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }
 
 		void MergeDataTo(SharedDataEx& destination);
-		void AddSubTree(BehaviorTree* sub) { m_SubTrees.push_back(sub); }
-		inline StdVector<BehaviorTree*>& GetSubTrees() { return m_SubTrees; }
-		NodeState RootExecute(AgentPtr pAgent, NodeState parentState, LocalMemoryInOut* pTunnel = nullptr);
 
 		TreeNodeContext* CreateRootContext(LocalMemoryInOut* pTunnel = nullptr);
-		///> CAUTION: this function can only be called in garbage collection
-		void ClearSubTree() { m_SubTrees.clear(); }
 
 		bool ProcessDataConnections(const std::vector<TreeNode*>& treeNodeCache, const pugi::xml_node& data);
 	protected:
