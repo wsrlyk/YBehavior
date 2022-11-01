@@ -1,29 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Test>
   <Node Class="Root">
-    <Shared f="_FC 0.0" v="_VC 1,2,3" v2="VVC 0,0,0" />
-    <Local ff="FFc 0.5" />
+    <Shared a="_IC 0" />
+    <Local s="_Sc " ss="SSc hehe|haha" />
     <Node Class="Sequence">
-      <Node Class="ProjectVector3" Input="_VP v" X="_FPE " Y="_FPE " Z="_FPE " />
-      <Node Class="Calculator" Operator="_EC +" Output="_FP " Input1="_Fp " Input2="_Fp ff VI c 0" />
-      <Node Class="Calculator" Operator="_EC +" Output="_FP " Input1="_Fp " Input2="_FC 0.7" />
-      <Node Class="SetVector3" X="_FpE " Y="_FpE " Z="_FpE " Output="_VP v2 VI c 0" />
-      <Node Class="Calculator" Operator="_EC *" Output="_Fp " Input1="_Fp " Input2="_Fp " />
-      <Node Class="Calculator" Operator="_EC *" Output="_Fp " Input1="_Fp " Input2="_Fp " />
-      <Node Class="Calculator" Operator="_EC +" Output="_FP f" Input1="_Fp " Input2="_Fp " />
+      <Node Class="Calculator" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 1" />
+      <Node Class="SwitchCase" Return="Success" Switch="_IP a" Cases="IIC 1|2|3|4">
+        <Node Class="HandleEvent" Type="_EC Latest" Events="SSC hehe">
+          <Node Class="Sequence" />
+        </Node>
+        <Node Class="HandleEvent" Type="_EC Every" Events="SSC hoho|heihei">
+          <Node Class="Sequence" />
+        </Node>
+        <Node Class="HandleEvent" Type="_EC Latest" Events="SSC hehe|haha">
+          <Node Class="Sequence" />
+          <Node Class="Sequence" />
+        </Node>
+        <Node Class="HandleEvent" Type="_EC Latest" Events="SSp ss" Current="_SpE s">
+          <Node Class="Sequence" />
+        </Node>
+      </Node>
+      <Node Class="Comparer" Operator="_EC &gt;=" Opl="_IP a" Opr="_IC 4" />
+      <Node Class="SetData" Target="_IP a" Source="_IC 0" />
     </Node>
   </Node>
-  <DataConnections>
-    <DataConnection FromUID="3" FromName="X" ToUID="4" ToName="Input1" />
-    <DataConnection FromUID="3" FromName="Y" ToUID="6" ToName="Y" />
-    <DataConnection FromUID="3" FromName="Z" ToUID="5" ToName="Input1" />
-    <DataConnection FromUID="4" FromName="Output" ToUID="6" ToName="X" />
-    <DataConnection FromUID="4" FromName="Output" ToUID="7" ToName="Input1" />
-    <DataConnection FromUID="4" FromName="Output" ToUID="7" ToName="Input2" />
-    <DataConnection FromUID="5" FromName="Output" ToUID="6" ToName="Z" />
-    <DataConnection FromUID="5" FromName="Output" ToUID="8" ToName="Input1" />
-    <DataConnection FromUID="5" FromName="Output" ToUID="8" ToName="Input2" />
-    <DataConnection FromUID="7" FromName="Output" ToUID="9" ToName="Input1" />
-    <DataConnection FromUID="8" FromName="Output" ToUID="9" ToName="Input2" />
-  </DataConnections>
 </Test>

@@ -18,7 +18,7 @@ namespace YBehavior
 		if (pTree && pTree->GetLocalDataIfExists())
 		{
 			m_DataPool = &pTree->GetLocalDataPool();
-			Data = m_DataPool->Fetch();
+			Data = m_DataPool->FetchNotReset();
 			Data->CloneFrom(*pTree->GetLocalDataIfExists());
 		}
 		else
@@ -43,7 +43,7 @@ namespace YBehavior
 		if (other.Data && other.m_DataPool != nullptr)
 		{
 			m_DataPool = other.m_DataPool;
-			Data = m_DataPool->Fetch();
+			Data = m_DataPool->FetchNotReset();
 			Data->CloneFrom(*other.Data);
 		}
 		else
@@ -58,7 +58,7 @@ namespace YBehavior
 		if (other.Data && other.m_DataPool != nullptr)
 		{
 			m_DataPool = other.m_DataPool;
-			Data = m_DataPool->Fetch();
+			Data = m_DataPool->FetchNotReset();
 			Data->CloneFrom(*other.Data);
 		}
 		else

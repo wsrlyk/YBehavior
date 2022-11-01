@@ -14,6 +14,7 @@ namespace YBehavior
 	public:
 		~ObjectPool();
 		T* Fetch();
+		T* FetchNotReset();
 
 		void Return(T* t);
 	};
@@ -35,7 +36,17 @@ namespace YBehavior
 			return new T();
 		T* t = m_Pool.back();
 		m_Pool.pop_back();
-		Utility::SetDefault<T>(*t);
+		Utility::SetDefault(*t);
+		return t;
+	}
+
+	template <typename T>
+	T* ObjectPool<T>::FetchNotReset()
+	{
+		if (m_Pool.empty())
+			return new T();
+		T* t = m_Pool.back();
+		m_Pool.pop_back();
 		return t;
 	}
 

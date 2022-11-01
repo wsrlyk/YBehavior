@@ -9,7 +9,7 @@ namespace YBehavior
 {
 	class BehaviorTree;
 	class SharedDataEx;
-	class RegisterData;
+	class EventQueue;
 	class Memory;
 	class MachineContext;
 
@@ -34,7 +34,7 @@ namespace YBehavior
 		BehaviorProcess m_Process;
 
 		//BehaviorTree* m_Tree;
-		RegisterData* m_RegisterData;
+		EventQueue* m_pEventQueue{};
 		Entity* m_Entity;
 
 	public:
@@ -49,19 +49,16 @@ namespace YBehavior
 		inline BehaviorTree* GetRunningTree() { return m_Process.machineContext.GetCurRunningTree(); }
 		inline Entity* GetEntity() { return m_Entity; }
 		inline void SetEntity(Entity* entity) { m_Entity = entity; }
-		RegisterData* GetRegister();
+		inline EventQueue* GetEventQueue() const { return m_pEventQueue; }
 		//bool SetTree(const STRING& name, const std::vector<STRING>* subs = nullptr);
 		bool SetBehavior(const BehaviorKey& key);
 		//void UnloadTree();
 		void UnloadBehavior();
 		void Tick();
 
-		void ProcessRegister();
 		inline UINT64 GetUID() { return m_UID; }
 		virtual UINT64 GetDebugUID() { return GetUID(); }
 
-	protected:
-		virtual void _OnProcessRegister() {}
 	};
 }
 

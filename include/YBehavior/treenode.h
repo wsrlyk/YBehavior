@@ -99,7 +99,7 @@ namespace YBehavior
 
 		bool Load(const pugi::xml_node& data);
 		bool LoadChild(const pugi::xml_node& data);
-		void LoadFinish();
+		bool LoadFinish();
 		NodeState Execute(AgentPtr pAgent, NodeState parentState);
 
 		static TreeNode* CreateNodeByName(const STRING& name);
@@ -119,7 +119,7 @@ namespace YBehavior
 		virtual NodeState Update(AgentPtr pAgent) { return NS_SUCCESS; }
 		virtual bool OnLoaded(const pugi::xml_node& data) { return true; }
 		virtual bool OnLoadChild(const pugi::xml_node& data) { return true; }
-		virtual void OnLoadFinish() {}
+		virtual bool OnLoadFinish() { return true; }
 		virtual void OnAddChild(TreeNode* child, const STRING& connection) {}
 		virtual TreeNodeContext* _CreateContext() { return nullptr; } //TODO: =0 }
 		virtual void _DestroyContext(TreeNodeContext*& pContext) { }//TODO: =0 }
@@ -242,7 +242,7 @@ namespace YBehavior
 		StdVector<TreeNodePtr>* m_pChildren{};
 		int m_Stage{};
 	protected:
-		void _OnInit() { TreeNodeContext::_OnInit(); m_Stage = 0; }
+		void _OnInit() override { TreeNodeContext::_OnInit(); m_Stage = 0; }
 	public:
 		void SetChildren(StdVector<TreeNodePtr>* pChildren) { m_pChildren = pChildren; }
 	};
@@ -265,7 +265,6 @@ namespace YBehavior
 		TreeNodePtr GetChild(UINT index);
 	protected:
 		StdVector<TreeNodePtr>* m_Children{};
-		StdVector<TreeNodePtr>* m_Childs{};
 
 		bool _AddChild(TreeNode* child, const STRING& connection) override;
 		void _InitContext(TreeNodeContext* pContext) override;
@@ -320,7 +319,7 @@ namespace YBehavior
 		int m_Stage{};
 	protected:
 		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
-		void _OnInit() { TreeNodeContext::_OnInit(); m_Stage = 0; }
+		void _OnInit() override { TreeNodeContext::_OnInit(); m_Stage = 0; }
 	public:
 		void SetChild(TreeNode* pChild) { m_pChild = pChild; }
 	};

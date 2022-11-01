@@ -2,6 +2,7 @@
 #include "YBehavior/fsm/machinemgr.h"
 #include "YBehavior/memory.h"
 #include "YBehavior/behaviortreemgr.h"
+#include "YBehavior/behaviortree.h"
 
 namespace YBehavior
 {
@@ -37,4 +38,24 @@ namespace YBehavior
 			return it->second();
 		return nullptr;
 	}
+
+	void Behavior::Merge(BehaviorTree* pTree)
+	{
+		GetMemory()->GetMainData()->MergeFrom(*pTree->GetSharedData(), true);
+		m_ValidEvents.merge(pTree->GetValidEvents());
+	}
+
+	void Behavior::RegiseterEvent(UINT e, UINT count)
+	{
+		m_ValidEvents.insert(e, count);
+	}
+
+	UINT Behavior::IsValidEvent(UINT hash) const
+	{
+		auto it = m_ValidEvents.find(hash);
+		if (it == m_ValidEvents.end())
+			return 0;
+		return it->second();
+	}
+
 }

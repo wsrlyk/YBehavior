@@ -55,6 +55,8 @@ namespace YBehavior
 		STRING m_TreeName;	///> Only File
 		void* m_Version;
 		TreeMap m_TreeMap;
+
+		small_map<UINT, UINT> m_ValidEvents;
 #ifdef YDEBUGGER
 		UINT m_Hash;
 #endif
@@ -67,7 +69,8 @@ namespace YBehavior
 		inline const STRING& GetKey() const { return m_TreeNameWithPath; }
 		inline const STRING& GetFullName() const { return m_TreeNameWithPath; }
 		inline const STRING& GetTreeName() const { return m_TreeName; }
-		inline SharedDataEx* GetSharedData() { return m_SharedData; }
+		inline const SharedDataEx* GetSharedData() const { return m_SharedData; }
+		inline const auto& GetValidEvents() const { return m_ValidEvents; }
 		SharedDataEx* GetLocalData();
 		inline SharedDataEx* GetLocalDataIfExists() { return m_LocalData; }
 		inline ObjectPool<SharedDataEx>& GetLocalDataPool() { return m_LocalDataPool; }
@@ -75,7 +78,7 @@ namespace YBehavior
 		inline TreeMap& GetTreeMap() { return m_TreeMap; }
 		//inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }
 
-		void MergeDataTo(SharedDataEx& destination);
+		void RegiseterEvent(UINT e, UINT count);
 
 		TreeNodeContext* CreateRootContext(LocalMemoryInOut* pTunnel = nullptr);
 

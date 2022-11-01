@@ -124,7 +124,9 @@ namespace YBehavior
 		//////////////////////////////////////////////////////////////////////////
 		for (auto it : behavior->GetTreeMapping())
 		{
-			it.second()->MergeDataTo(*behavior->GetMemory()->GetMainData());
+			behavior->Merge(it.second());
+			//it.second()->MergeDataTo(*behavior->GetMemory()->GetMainData());
+			//it.second()->MergeEventsTo(behavior->GetValidEvents());
 		}
 		behavior->SetID(key.Hash());
 		behavior->SetFSM(pFSM);

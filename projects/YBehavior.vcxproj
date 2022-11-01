@@ -64,7 +64,7 @@
     <ClInclude Include="..\include\YBehavior\nodes\ifthenelse.h" />
     <ClInclude Include="..\include\YBehavior\nodes\piecewisefunction.h" />
     <ClInclude Include="..\include\YBehavior\nodes\random.h" />
-    <ClInclude Include="..\include\YBehavior\nodes\register.h" />
+    <ClInclude Include="..\include\YBehavior\nodes\handleevent.h" />
     <ClInclude Include="..\include\YBehavior\nodes\selector.h" />
     <ClInclude Include="..\include\YBehavior\nodes\sequence.h" />
     <ClInclude Include="..\include\YBehavior\nodes\setdata.h" />
@@ -75,7 +75,7 @@
     <ClInclude Include="..\include\YBehavior\profile\profilehelper.h" />
     <ClInclude Include="..\include\YBehavior\profile\profileprocessor.h" />
     <ClInclude Include="..\include\YBehavior\profile\profiler.h" />
-    <ClInclude Include="..\include\YBehavior\registerdata.h" />
+    <ClInclude Include="..\include\YBehavior\eventqueue.h" />
     <ClInclude Include="..\include\YBehavior\shareddataex.h" />
     <ClInclude Include="..\include\YBehavior\sharedvariablecreatehelper.h" />
     <ClInclude Include="..\include\YBehavior\sharedvariableex.h" />
@@ -95,6 +95,7 @@
     <ClInclude Include="..\include\YBehavior\tools\treemgrhelper.hpp" />
     <ClInclude Include="..\include\YBehavior\treekeymgr.h" />
     <ClInclude Include="..\include\YBehavior\types\smallmap.h" />
+    <ClInclude Include="..\include\YBehavior\types\smallset.h" />
     <ClInclude Include="..\include\YBehavior\types\treemap.h" />
     <ClInclude Include="..\include\YBehavior\types\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />
@@ -141,7 +142,7 @@
     <ClCompile Include="..\src\YBehavior\nodes\ifthenelse.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\piecewisefunction.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\random.cpp" />
-    <ClCompile Include="..\src\YBehavior\nodes\register.cpp" />
+    <ClCompile Include="..\src\YBehavior\nodes\handleevent.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\selector.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\sequence.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\setdata.cpp" />
@@ -151,7 +152,7 @@
     <ClCompile Include="..\src\YBehavior\profile\profilehelper.cpp" />
     <ClCompile Include="..\src\YBehavior\profile\profileprocessor.cpp" />
     <ClCompile Include="..\src\YBehavior\profile\profiler.cpp" />
-    <ClCompile Include="..\src\YBehavior\registerdata.cpp" />
+    <ClCompile Include="..\src\YBehavior\eventqueue.cpp" />
     <ClCompile Include="..\src\YBehavior\shareddataex.cpp" />
     <ClCompile Include="..\src\YBehavior\sharedvariablecreatehelper.cpp" />
     <ClCompile Include="..\src\YBehavior\sharp\sharpentry.cpp" />
@@ -286,7 +287,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MinSpace</Optimization>
+      <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>YDEBUGGER;PRINT_INTERMEDIATE_INFO;YPROFILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>

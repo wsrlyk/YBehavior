@@ -2,25 +2,49 @@
 <Test IsEditor="">
   <Node Class="Root" GUID="1" Pos="0,0">
     <Shared f="_FC 0.0" a="_IC 0" aa="IIC " v="_VC 1,2,3" v2="VVC 0,0,0" />
-    <Local fds="_Ac " s="_Sc " b="_Bc F" ff="FFc 0.5" />
-    <Node Class="Sequence" GUID="28" Pos="-70,110">
-      <Node Class="ProjectVector3" GUID="42" Pos="-360,250" Input="_VP v" X="_FPE " Y="_FPE " Z="_FPE " />
-      <Node Class="Calculator" GUID="35" Pos="-100,220" Operator="_EC +" Output="_FP " Input1="_Fp " Input2="_Fp ff VI c 0" />
-      <Node Class="Calculator" GUID="36" Pos="-90,330" Operator="_EC +" Output="_FP " Input1="_Fp " Input2="_FC 0.7" />
-      <Node Class="SetVector3" GUID="43" Pos="90,290" Input="_VCD " X="_FpE " Y="_FpE " Z="_FpE " Output="_VP v2 VI c 0" />
-      <Node Class="Calculator" GUID="38" Pos="330,210" Operator="_EC *" Output="_Fp " Input1="_Fp " Input2="_Fp " />
-      <Node Class="Calculator" GUID="39" Pos="360,360" Operator="_EC *" Output="_Fp " Input1="_Fp " Input2="_Fp " />
-      <Node Class="Calculator" GUID="44" Pos="557,241" Operator="_EC +" Output="_FP f" Input1="_Fp " Input2="_Fp " />
+    <Local fds="_Ac " s="_Sc " b="_Bc F" ff="FFc 0.5" ss="SSc hehe|haha" />
+    <Node Class="Sequence" GUID="45" Pos="-70,111">
+      <Node Class="Calculator" GUID="46" Pos="-318,211" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 1" />
+      <Node Class="SwitchCase" GUID="47" Return="Success" Pos="-70,270" Switch="_IP a" Cases="IIC 1|2|3|4">
+        <Node Class="HandleEvent" GUID="61" Pos="-320,470" Type="_EC Latest" Events="SSC hehe" Int="IIPD " Float="FFPD " String="SSPD " Ulong="UUPD " Bool="BBPD " Vector3="VVPD " Entity="AAPD " Current="_SPD ">
+          <Node Class="Sequence" GUID="62" Pos="-290,670" />
+        </Node>
+        <Node Class="HandleEvent" GUID="51" Pos="-160,470" Type="_EC Every" Events="SSC hoho|heihei" Int="IIPD " Float="FFPD " String="SSPD " Ulong="UUPD " Bool="BBPD " Vector3="VVPD " Entity="AAPD " Current="_SPD ">
+          <Node Class="Sequence" GUID="55" Pos="-140,670" />
+        </Node>
+        <Node Class="HandleEvent" GUID="52" Pos="30,480" Type="_EC Latest" Events="SSC hehe|haha" Int="IIPD " Float="FFPD " String="SSPD " Ulong="UUPD " Bool="BBPD " Vector3="VVPD " Entity="AAPD " Current="_SPD ">
+          <Node Class="Sequence" GUID="56" Pos="-30,670" />
+          <Node Class="Sequence" GUID="58" Pos="90,670" />
+        </Node>
+        <Node Class="HandleEvent" GUID="53" Pos="190,500" Type="_EC Latest" Events="SSp ss" Int="IIPD " Float="FFPD " String="SSPD " Ulong="UUPD " Bool="BBPD " Vector3="VVPD " Entity="AAPD " Current="_SpE s">
+          <Node Class="Sequence" GUID="60" Pos="270,650" />
+        </Node>
+      </Node>
+      <Node Class="Comparer" GUID="48" Pos="130,240" Operator="_EC &gt;=" Opl="_IP a" Opr="_IC 4" />
+      <Node Class="SetData" GUID="49" Pos="274,236" Target="_IP a" Source="_IC 0" />
     </Node>
   </Node>
-  <Node Class="Sequence" GUID="21" Pos="300,590">
-    <Node Class="Calculator" GUID="22" Pos="120,689" Operator="_EC +" Output="_IP " Input1="_IC 1" Input2="_IC 2" />
-    <Node Class="Calculator" GUID="23" Pos="175,809" Operator="_EC +" Output="_IP " Input1="_IC 3" Input2="_IC 4" />
-    <Node Class="Calculator" GUID="24" Pos="335,730" Operator="_EC +" Output="_IP " Input1="_Ip " Input2="_Ip " />
-    <Node Class="Comparer" GUID="25" Pos="555,720" Operator="_EC &gt;=" Opl="_IP " Opr="_IC 1" />
-    <Node Class="Comparer" GUID="26" Pos="635,828" Operator="_EC &lt;=" Opl="_IP " Opr="_IC 10" />
+  <Node Class="Sequence" GUID="21" Pos="370,960">
+    <Node Class="Calculator" GUID="22" Pos="190,1059" Operator="_EC +" Output="_IP " Input1="_IC 1" Input2="_IC 2" />
+    <Node Class="Calculator" GUID="23" Pos="245,1179" Operator="_EC +" Output="_IP " Input1="_IC 3" Input2="_IC 4" />
+    <Node Class="Calculator" GUID="24" Pos="405,1100" Operator="_EC +" Output="_IP " Input1="_Ip " Input2="_Ip " />
+    <Node Class="Comparer" GUID="25" Pos="625,1090" Operator="_EC &gt;=" Opl="_IP " Opr="_IC 1" />
+    <Node Class="Comparer" GUID="26" Pos="705,1198" Operator="_EC &lt;=" Opl="_IP " Opr="_IC 10" />
+  </Node>
+  <Node Class="Sequence" GUID="28" Pos="-610,790">
+    <Node Class="ProjectVector3" GUID="42" Pos="-899,930" Input="_VP v" X="_FPE " Y="_FPE " Z="_FPE " />
+    <Node Class="Calculator" GUID="35" Pos="-640,900" Operator="_EC +" Output="_FP " Input1="_Fp " Input2="_Fp ff VI c 0" />
+    <Node Class="Calculator" GUID="36" Pos="-630,1009" Operator="_EC +" Output="_FP " Input1="_Fp " Input2="_FC 0.7" />
+    <Node Class="SetVector3" GUID="43" Pos="-450,969" Input="_VCD " X="_FpE " Y="_FpE " Z="_FpE " Output="_VP v2 VI c 0" />
+    <Node Class="Calculator" GUID="38" Pos="-210,890" Operator="_EC *" Output="_Fp " Input1="_Fp " Input2="_Fp " />
+    <Node Class="Calculator" GUID="39" Pos="-180,1040" Operator="_EC *" Output="_Fp " Input1="_Fp " Input2="_Fp " />
+    <Node Class="Calculator" GUID="44" Pos="17,921" Operator="_EC +" Output="_FP f" Input1="_Fp " Input2="_Fp " />
   </Node>
   <DataConnections>
+    <DataConnection FromGUID="22" FromName="Output" ToGUID="24" ToName="Input1" />
+    <DataConnection FromGUID="23" FromName="Output" ToGUID="24" ToName="Input2" />
+    <DataConnection FromGUID="24" FromName="Output" ToGUID="25" ToName="Opl" />
+    <DataConnection FromGUID="24" FromName="Output" ToGUID="26" ToName="Opl" />
     <DataConnection FromGUID="42" FromName="X" ToGUID="35" ToName="Input1" />
     <DataConnection FromGUID="42" FromName="Y" ToGUID="43" ToName="Y" />
     <DataConnection FromGUID="42" FromName="Z" ToGUID="36" ToName="Input1" />
@@ -32,9 +56,5 @@
     <DataConnection FromGUID="36" FromName="Output" ToGUID="39" ToName="Input2" />
     <DataConnection FromGUID="38" FromName="Output" ToGUID="44" ToName="Input1" />
     <DataConnection FromGUID="39" FromName="Output" ToGUID="44" ToName="Input2" />
-    <DataConnection FromGUID="22" FromName="Output" ToGUID="24" ToName="Input1" />
-    <DataConnection FromGUID="23" FromName="Output" ToGUID="24" ToName="Input2" />
-    <DataConnection FromGUID="24" FromName="Output" ToGUID="25" ToName="Opl" />
-    <DataConnection FromGUID="24" FromName="Output" ToGUID="26" ToName="Opl" />
   </DataConnections>
 </Test>

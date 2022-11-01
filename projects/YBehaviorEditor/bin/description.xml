@@ -5,22 +5,24 @@
 		<ReturnFailure>返回失败</ReturnFailure>
 	</Languages>
         <Nodes>
-                <ReadRegister Content="读取寄存器，并保存到变量中。如无数据，返回失败；否则返回成功，并清空寄存器">
-                        <Event Content="事件名，用于区分寄存器中的值的来源"/>
-                        <Int Content="Int型的数据"/>
-                        <Float Content="Float型的数据"/>
-                        <Bool Content="Bool型的数据"/>
-                        <Ulong Content="Ulong型的数据"/>
-                        <String Content="String型的数据"/>
-                </ReadRegister>
-                <WriteRegister Content="写入寄存器。写完清空输入数组">
-                        <Event Content="事件名，用于区分寄存器中的值的来源"/>
-                        <Int Content="Int型的数据"/>
-                        <Float Content="Float型的数据"/>
-                        <Bool Content="Bool型的数据"/>
-                        <Ulong Content="Ulong型的数据"/>
-                        <String Content="String型的数据"/>
-                </WriteRegister>
+                <HandleEvent Content="事件处理，可一次性处理队列里的所有事件"
+			ReturnSuccess="处理唯一一个事件时，子节点返回成功；可能处理多个事件时，有收到事件"
+			ReturnFailure="无事件；或处理唯一一个事件时，子节点返回失败">
+                        <Type Content="事件类型，
+LATEST 只处理最新的事件，老事件丢弃
+EVERY 依次处理所有事件"/>
+                        <Events Content="事件名，可填多个。
+当Events为常量时，子节点和Events一一对应；或者子节点为一个，通过Current区分当前处理的事件
+当Events为变量时，子节点只能有一个，通过Current区分当前处理的事件"/>
+                        <Int Content="Int型的参数"/>
+                        <Float Content="Float型的参数"/>
+                        <Bool Content="Bool型的参数"/>
+                        <Ulong Content="Ulong型的参数"/>
+                        <String Content="String型的参数"/>
+                        <Vector3 Content="Vector3型的参数"/>
+                        <Entity Content="Entity型的参数"/>
+                        <Current Content="当前正在处理的事件名。子节点和Events一一对应时，一般不需要Current"/>
+                </HandleEvent>
                 <Sequence Content="从左到右运行子节点，一旦有子节点返回失败则终止"
 			ReturnSuccess="所有子节点均返回成功"
 			ReturnFailure="无子节点 或 有节点返回失败"/>

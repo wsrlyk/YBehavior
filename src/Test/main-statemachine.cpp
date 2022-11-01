@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 	{
 		//pMain->Update(0, pEntity->GetAgent());
 		std::cout << "tick" << std::endl;
-		pEntity->GetAgent()->Tick();
+		pEntity->GetAgent()->Update();
 		//std::cin >> s;
 		//pEntity->GetAgent()->GetMachineContext()->GetTransition().Set(s);
 #if _MSC_VER

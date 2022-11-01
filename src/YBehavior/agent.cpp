@@ -1,17 +1,17 @@
 #include "YBehavior/agent.h"
-#include "YBehavior/registerdata.h"
+#include "YBehavior/eventqueue.h"
 #ifdef YPROFILER
 #include "YBehavior/profile/profilehelper.h"
 #endif
 
 YBehavior::UINT64 YBehavior::Agent::s_UID = 0;
 
-YBehavior::RegisterData* YBehavior::Agent::GetRegister()
-{
-	if (m_RegisterData == nullptr)
-		m_RegisterData = new RegisterData();
-	return m_RegisterData;
-}
+//YBehavior::EventQueue* YBehavior::Agent::GetEventQueue()
+//{
+//	if (m_pEventQueue == nullptr)
+//		m_pEventQueue = new EventQueue();
+//	return m_pEventQueue;
+//}
 
 //bool YBehavior::Agent::SetTree(const STRING& name, const std::vector<STRING>* subs)
 //{
@@ -31,6 +31,7 @@ bool YBehavior::Agent::SetBehavior(const BehaviorKey& key)
 	if (!BehaviorProcessHelper::GetBehaviorProcess(key, m_Process))
 		return false;
 
+	m_pEventQueue = new EventQueue(m_Process.pBehavior);
 	return true;
 }
 
@@ -49,6 +50,11 @@ bool YBehavior::Agent::SetBehavior(const BehaviorKey& key)
 void YBehavior::Agent::UnloadBehavior()
 {
 	BehaviorProcessHelper::Release(m_Process);
+	if (m_pEventQueue)
+	{
+		delete m_pEventQueue;
+		m_pEventQueue = nullptr;
+	}
 }
 
 void YBehavior::Agent::Tick()
@@ -63,16 +69,10 @@ void YBehavior::Agent::Tick()
 	BehaviorProcessHelper::Execute(this);
 }
 
-void YBehavior::Agent::ProcessRegister()
-{
-	_OnProcessRegister();
-	m_RegisterData->GetSendData().Clear();
-}
-
 YBehavior::Agent::Agent(Entity* entity)
 	//: m_Tree(nullptr)
-	: m_RegisterData(nullptr)
-	, m_Entity(entity)
+	//: m_pEventQueue(nullptr)
+	: m_Entity(entity)
 {
 	m_UID = ++s_UID;
 
@@ -84,8 +84,6 @@ YBehavior::Agent::~Agent()
 {
 	//UnloadTree();
 	UnloadBehavior();
-	if (m_RegisterData)
-		delete m_RegisterData;
 
 	//delete m_Memory;
 	//delete m_pMachineContext;

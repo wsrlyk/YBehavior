@@ -3,7 +3,6 @@
 
 #include "YBehavior/types/types.h"
 #include "YBehavior/types/smallmap.h"
-
 namespace YBehavior
 {
 	class BehaviorTree;
@@ -20,7 +19,10 @@ namespace YBehavior
 		Node2TreeMapType m_Node2TreeMapping;
 		///> Merged memory for all trees
 		Memory* m_pMemory;
-
+		/// <summary>
+		/// EventNameHash->Count, 1: singleton, 2 or larger: multi events
+		/// </summary>
+		small_map<UINT, UINT> m_ValidEvents;
 	public:
 		Behavior();
 		~Behavior();
@@ -34,6 +36,10 @@ namespace YBehavior
 		inline void SetFSM(FSM* pFSM) { m_pFSM = pFSM; }
 		inline FSM* GetFSM() { return m_pFSM; }
 		inline Memory* GetMemory() { return m_pMemory; }
+		UINT IsValidEvent(UINT hash) const;
+		void RegiseterEvent(UINT e, UINT count);
+
+		void Merge(BehaviorTree* pTree);
 	};
 
 }

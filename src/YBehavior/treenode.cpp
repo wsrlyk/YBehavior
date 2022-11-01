@@ -91,9 +91,9 @@ namespace YBehavior
 		return OnLoadChild(data);
 	}
 
-	void TreeNode::LoadFinish()
+	bool TreeNode::LoadFinish()
 	{
-		OnLoadFinish();
+		return OnLoadFinish();
 	}
 
 	bool TreeNode::AddChild(TreeNode* child, const STRING& connection)

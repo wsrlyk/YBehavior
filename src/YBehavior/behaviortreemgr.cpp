@@ -123,8 +123,7 @@ namespace YBehavior
 				}
 			}
 		}
-		node->LoadFinish();
-		return true;
+		return node->LoadFinish();
 	}
 
 	BehaviorTree * TreeMgr::GetTree(const STRING& name)

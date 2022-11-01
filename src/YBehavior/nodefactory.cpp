@@ -8,7 +8,7 @@
 #include "YBehavior/nodes/selector.h"
 #include "YBehavior/nodes/setdata.h"
 #include "YBehavior/nodes/random.h"
-#include "YBehavior/nodes/register.h"
+#include "YBehavior/nodes/handleevent.h"
 #include "YBehavior/nodes/switchcase.h"
 #include "YBehavior/nodes/loop.h"
 #include "YBehavior/nodes/piecewisefunction.h"
@@ -37,8 +37,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, SetData);
 		REGISTER_TYPE(factory, Random);
 		REGISTER_TYPE(factory, RandomSelect);
-		REGISTER_TYPE(factory, ReadRegister);
-		REGISTER_TYPE(factory, WriteRegister);
+		REGISTER_TYPE(factory, HandleEvent);
 		REGISTER_TYPE(factory, SwitchCase);
 		REGISTER_TYPE(factory, For);
 		REGISTER_TYPE(factory, ForEach);

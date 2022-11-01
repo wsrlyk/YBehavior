@@ -93,10 +93,12 @@ namespace YBehavior
 
 		static UINT Hash(const STRING& str);
 
-		template<typename T>
-		static const T& Default() { return 0; }
+		//template<typename T>
+		//static const T& Default() { return 0; }
 		template<typename T>
 		static bool SetDefault(T& t) { return false; }
+		template<typename T>
+		static bool SetDefault(StdVector<T>& t) { t.clear(); return true; }
 
 		template<typename T>
 		static const STRING& GetCreateStr() { return StringEmpty; }	
@@ -216,11 +218,9 @@ namespace YBehavior
 
 #define DEFAULT_DECLARE(type)\
 	template<>\
-	const type& Utility::Default();\
-	template<>\
 	bool Utility::SetDefault(type& t);
 
-	FOR_EACH_TYPE(DEFAULT_DECLARE);
+	FOR_EACH_SINGLE_NORMAL_TYPE(DEFAULT_DECLARE);
 
 #define TYPES_DECLARE_CREATE_STR_FUNC(type)\
 	template<>\

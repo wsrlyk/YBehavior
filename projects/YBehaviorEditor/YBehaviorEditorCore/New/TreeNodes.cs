@@ -889,27 +889,40 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    class ReadRegisterTreeNode : LeafNode
+    class HandleEventTreeNode : CompositeNode
     {
-        public override string Icon => "[_↓_]";
+        public override string Icon => "[↙↓↘]";
+        Variable m_Events;
 
-        public ReadRegisterTreeNode()
+        public HandleEventTreeNode()
         {
-            m_Name = "ReadRegister";
+            m_Name = "HandleEvent";
             Type = TreeNodeType.TNT_Default;
         }
 
         public override void CreateVariables()
         {
-            Variable name = NodeMemory.CreateVariable(
-                "Event",
+            NodeMemory.CreateVariable(
+                "Type",
+                "Latest",
+                Variable.CreateParams_Enum,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                Variable.EnableType.ET_FIXED,
+                0,
+                0,
+                "Latest|Every"
+            );
+
+            m_Events = NodeMemory.CreateVariable(
+                "Events",
                 "",
                 Variable.CreateParams_String,
-                Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_Pointer,
-                0
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_FIXED
             );
-            name.IsInput = false;
+            m_Events.IsInput = true;
 
             Variable ints = NodeMemory.CreateVariable(
                 "Int",
@@ -917,7 +930,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
-                0
+                Variable.EnableType.ET_Disable
             );
             ints.IsInput = false;
 
@@ -927,7 +940,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_Float,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
-                0
+                Variable.EnableType.ET_Disable
             );
             floats.IsInput = false;
 
@@ -937,7 +950,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_String,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
-                0
+                Variable.EnableType.ET_Disable
             );
             strings.IsInput = false;
 
@@ -947,7 +960,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_Ulong,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
-                0
+                Variable.EnableType.ET_Disable
             );
             ulongs.IsInput = false;
 
@@ -957,105 +970,141 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_Bool,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_Pointer,
-                0
+                Variable.EnableType.ET_Disable
             );
             bools.IsInput = false;
-        }
 
-        public override string Note
-        {
-            get
-            {
-                return string.Format("{0}\nInt: {1}\nFloat: {2}\nString: {3}\nUlong: {4}\nBool: {5}",
-                    Variables.GetVariable("Event").NoteValue,
-                    Variables.GetVariable("Int").NoteValue,
-                    Variables.GetVariable("Float").NoteValue,
-                    Variables.GetVariable("String").NoteValue,
-                    Variables.GetVariable("Ulong").NoteValue,
-                    Variables.GetVariable("Bool").NoteValue);
-            }
-        }
-    }
-    class WriteRegisterTreeNode : LeafNode
-    {
-        public override string Icon => "[_↑_]";
+            Variable vector3 = NodeMemory.CreateVariable(
+                "Vector3",
+                "",
+                Variable.CreateParams_Vector3,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_Disable
+            );
+            vector3.IsInput = false;
 
-        public WriteRegisterTreeNode()
-        {
-            m_Name = "WriteRegister";
-            Type = TreeNodeType.TNT_Default;
-        }
+            Variable entity = NodeMemory.CreateVariable(
+                "Entity",
+                "",
+                Variable.CreateParams_Entity,
+                Variable.CountType.CT_LIST,
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_Disable
+            );
+            entity.IsInput = false;
 
-        public override void CreateVariables()
-        {
-            Variable name = NodeMemory.CreateVariable(
-                "Event",
+            Variable current = NodeMemory.CreateVariable(
+                "Current",
                 "",
                 Variable.CreateParams_String,
                 Variable.CountType.CT_SINGLE,
-                Variable.VariableType.VBT_NONE,
-                0
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_Disable
             );
-
-            Variable ints = NodeMemory.CreateVariable(
-                "Int",
-                "",
-                Variable.CreateParams_Int,
-                Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_NONE,
-                0
-            );
-
-            Variable floats = NodeMemory.CreateVariable(
-                "Float",
-                "",
-                Variable.CreateParams_Float,
-                Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_NONE,
-                0
-            );
-
-            Variable strings = NodeMemory.CreateVariable(
-                "String",
-                "",
-                Variable.CreateParams_String,
-                Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_NONE,
-                0
-            );
-
-            Variable ulongs = NodeMemory.CreateVariable(
-                "Ulong",
-                "",
-                Variable.CreateParams_Ulong,
-                Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_NONE,
-                0
-            );
-
-            Variable bools = NodeMemory.CreateVariable(
-                "Bool",
-                "",
-                Variable.CreateParams_Bool,
-                Variable.CountType.CT_LIST,
-                Variable.VariableType.VBT_NONE,
-                0
-            );
+            current.IsInput = false;
         }
 
         public override string Note
         {
             get
             {
-                return string.Format("{0}\nInt: {1}\nFloat: {2}\nString: {3}\nUlong: {4}\nBool: {5}",
-                    Variables.GetVariable("Event").NoteValue,
-                    Variables.GetVariable("Int").NoteValue,
-                    Variables.GetVariable("Float").NoteValue,
-                    Variables.GetVariable("String").NoteValue,
-                    Variables.GetVariable("Ulong").NoteValue,
-                    Variables.GetVariable("Bool").NoteValue);
+                return string.Format("{0}",
+                    Variables.GetVariable("Events").NoteValue);
             }
         }
+
+        protected override void _OnCloned()
+        {
+            base._OnCloned();
+            m_Events = NodeMemory.GetVariable("Events");
+        }
+
+        protected override bool _OnCheckValid()
+        {
+            if (m_Events.vbType == Variable.VariableType.VBT_Const)
+            {
+                if (_GetCasesValue() == null)
+                {
+                    LogMgr.Instance.Error(this.Renderer.UITitle + ": invalid Events");
+                    return false;
+                }
+            }
+            else
+            {
+                if (this.m_Connections.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN).Conns.Count != 1)
+                {
+                    LogMgr.Instance.Error(this.Renderer.UITitle + ": children count must be one");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        protected override void _OnVariableValueChanged(Variable v)
+        {
+            if (v == m_Events)
+            {
+                _RefreshChildrenNotes();
+            }
+        }
+
+        public override void OnConnectToChanged()
+        {
+            base.OnConnectToChanged();
+            _RefreshChildrenNotes();
+        }
+
+        string[] _GetCasesValue()
+        {
+            if (m_Events.vbType == Variable.VariableType.VBT_Const)
+            {
+                if (string.IsNullOrEmpty(m_Events.Value))
+                {
+                    if (Tree != null && !Tree.IsInState(Graph.FLAG_LOADING))
+                        LogMgr.Instance.Error("Events cant be empty " + (this.Renderer == null ? this.NickName : this.Renderer.UITitle));
+                    return null;
+                }
+                var childCount = this.m_Connections.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN).Conns.Count;
+                if (childCount == 1)
+                    return new string[] { m_Events.Value };
+                string[] ss = m_Events.Value.Split(Variable.ListSpliter);
+                if (ss.Length != childCount)
+                {
+                    if (Tree != null && !Tree.IsInState(Graph.FLAG_LOADING))
+                        LogMgr.Instance.Error("Events size not match in " + (this.Renderer == null ? this.NickName : this.Renderer.UITitle));
+                    return null;
+                }
+                return ss;
+            }
+            return null;
+        }
+
+        protected void _RefreshChildrenNotes()
+        {
+            var conns = m_Connections.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN).Conns;
+            var values = _GetCasesValue();
+            if (values != null)
+            {
+                for (int i = 0; i < conns.Count; ++i)
+                {
+                    conns[i].Note = values[i];
+                }
+            }
+            else
+            {
+                if (conns.Count == 1)
+                    conns[0].Note = string.Empty;
+                else
+                {
+                    for (int i = 0; i < conns.Count; ++i)
+                    {
+                        conns[i].Note = "No." + i;
+                    }
+                }
+            }
+        }
+
     }
 
     class SwitchCaseTreeNode : CompositeNode
@@ -1137,6 +1186,13 @@ namespace YBehavior.Editor.Core.New
         {
             if (m_Cases.vbType == Variable.VariableType.VBT_Const)
             {
+                if (string.IsNullOrEmpty(m_Cases.Value))
+                {
+                    if (Tree != null && !Tree.IsInState(Graph.FLAG_LOADING))
+                        LogMgr.Instance.Error("Cases cant be empty " + (this.Renderer == null ? this.NickName : this.Renderer.UITitle));
+                    return null;
+                }
+
                 string[] ss = m_Cases.Value.Split(Variable.ListSpliter);
                 if (ss.Length != this.m_Connections.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN).Conns.Count)
                 {

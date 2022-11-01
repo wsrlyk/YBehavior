@@ -127,9 +127,9 @@ namespace YBehavior
 		return m_LocalData;
 	}
 
-	void BehaviorTree::MergeDataTo(SharedDataEx& destination)
+	void BehaviorTree::RegiseterEvent(UINT e, UINT count)
 	{
-		destination.MergeFrom(*m_SharedData, true);
+		m_ValidEvents.insert(e, count);
 	}
 
 	YBehavior::TreeNodeContext* BehaviorTree::CreateRootContext(LocalMemoryInOut* pTunnel /*= nullptr*/)

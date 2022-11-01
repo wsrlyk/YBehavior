@@ -1,5 +1,5 @@
 #include "customactions.h"
-#include "YBehavior/registerdata.h"
+#include "YBehavior/eventqueue.h"
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/variablecreation.h"
 
@@ -30,39 +30,51 @@ YBehavior::KEY XAgent::isdead;
 
 void XAgent::Update()
 {
-	YBehavior::RegisterData* pRegister = GetRegister();
+	auto pQueue = this->GetEventQueue();
 
 	static int i = 1;
 	static float f = 0.0f;
-	static YBehavior::BOOL b = YBehavior::Utility::FALSE_VALUE;
+	static bool b = false;
 	
-	pRegister->Clear();
-	pRegister->SetEvent("hehe");
-
 	if (i > 5)
+	{
 		i = 1;
-	for (int k = 0; k < i; ++k)
-	{
-		pRegister->Push(k);
-	}
-	++i;
-
-	if (f > 0.7f)
-		f -= 0.7f;
-	for (float j = 0.1f; j < f; j += 0.11f)
-	{
-		pRegister->Push(j);
-	}
-	f += 0.17f;
-
-	if (b)
-	{
-		pRegister->Push(YBehavior::Utility::FALSE_VALUE);
-		pRegister->Push(YBehavior::Utility::TRUE_VALUE);
+		pQueue->ClearAll();
 	}
 	else
+		pQueue->Clear();
+
+
+	{	
+		auto pData = pQueue->Create("hehe");
+		pData->notClear = b;
+		for (int k = 0; k < i; ++k)
+		{
+			pData->Push(k);
+		}
+		++i;
+
+		if (f > 0.7f)
+			f -= 0.7f;
+		for (float j = 0.1f; j < f; j += 0.11f)
+		{
+			pData->Push(j);
+		}
+		f += 0.17f;
+
+		if (b)
+		{
+			pData->Push(YBehavior::Utility::FALSE_VALUE);
+			pData->Push(YBehavior::Utility::TRUE_VALUE);
+		}
+		else
+		{
+			pData->Push(YBehavior::Utility::TRUE_VALUE);
+		}
+	}
 	{
-		pRegister->Push(YBehavior::Utility::TRUE_VALUE);
+		pQueue->Create("haha");
+		pQueue->Create("hoho");
 	}
 	b = !b;
 

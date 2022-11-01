@@ -60,7 +60,7 @@ namespace YBehavior
 			{
 				_Size = pMap->size();
 			}
-			const_iterator(size_type cur, const small_map* pMap)
+			const_iterator(const small_map* pMap, size_type cur)
 				: _Pair(const_cast<small_map*>(pMap), cur)
 			{
 				_Size = pMap->size();
@@ -110,8 +110,8 @@ namespace YBehavior
 			iterator(small_map* pMap)
 				: const_iterator(pMap)
 			{}
-			iterator(size_type cur, small_map* pMap)
-				: const_iterator(cur, pMap)
+			iterator(small_map* pMap, size_type cur)
+				: const_iterator(pMap, cur)
 			{}
 
 			iterator& operator++()
@@ -156,28 +156,34 @@ namespace YBehavior
 
 		size_type size() const { return _Keys.size(); }
 
-		iterator find(const K& k) {
-			return iterator(_find(k), this);
+		iterator find(const K& k) 
+		{
+			return iterator(this, _find(k));
 		}
 
-		const_iterator find(const K& k) const {
-			return const_iterator(_find(k), this);
+		const_iterator find(const K& k) const
+		{
+			return const_iterator(this, _find(k));
 		}
 
-		iterator begin() {
-			return iterator(0, this);
+		iterator begin()
+		{
+			return iterator(this, 0);
 		}
 
-		const_iterator begin() const {
-			return const_iterator(0, this);
+		const_iterator begin() const
+		{
+			return const_iterator(this, 0);
 		}
 
-		iterator end() {
-			return iterator(size(), this);
+		iterator end()
+		{
+			return iterator(this, size());
 		}
 
-		const_iterator end() const {
-			return const_iterator(size(), this);
+		const_iterator end() const 
+		{
+			return const_iterator(this, size());
 		}
 
 		void clear()
@@ -217,7 +223,7 @@ namespace YBehavior
 			{
 				_Keys.erase(_Keys.begin() + it->idx());
 				_Values.erase(_Values.begin() + it->idx());
-				return iterator(it->idx(), this);
+				return iterator(this, it->idx());
 			}
 			else
 			{
@@ -227,13 +233,30 @@ namespace YBehavior
 
 		size_type erase(const K& k)
 		{
-			auto it = find(k);
-			if (it == end())
-				return 0;
-			erase(it);
-			return 1;
+			size_type cur;
+			if (_find(k, cur))
+			{
+				erase(iterator(this, cur));
+				return 1;
+			}
+			return 0;
 		}
 
+		void merge(const small_map& other)
+		{
+			for (size_type i = 0, len = other.size(); i < len; ++i)
+			{
+				size_type cur;
+				auto k = other._Keys[i];
+				if (!_find(k, cur))
+				{
+					auto v = other._Values[i];
+
+					_Keys.emplace(_Keys.begin() + cur, k);
+					_Values.emplace(_Values.begin() + cur, v);
+				}
+			}
+		}
 
 	protected:
 		bool _find(const K& k, size_type& cur) const
