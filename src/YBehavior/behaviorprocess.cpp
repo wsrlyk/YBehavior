@@ -44,7 +44,7 @@ namespace YBehavior
 		behaviorProcess.machineContext.Init(pBehavior);
 
 		behaviorProcess.memory.GetMainData()->CloneFrom(*pBehavior->GetMemory()->GetMainData());
-
+		behaviorProcess.eventQueue.Init(pBehavior->GetValidEvents());
 		return true;
 	}
 
@@ -52,6 +52,7 @@ namespace YBehavior
 	{
 		if (behaviorProcess.pBehavior)
 		{
+			behaviorProcess.eventQueue.ClearAll();
 			behaviorProcess.memory.GetStack().clear();
 			behaviorProcess.memory.GetMainData()->Clear();
 

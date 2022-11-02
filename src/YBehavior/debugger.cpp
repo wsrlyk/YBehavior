@@ -7,6 +7,7 @@
 #include <sstream>
 #include "YBehavior/fsm/behavior.h"
 #include "YBehavior/treekeymgr.h"
+#include "YBehavior/fsm/machinestate.h"
 namespace YBehavior
 {
 	const STRING NodeRunInfo::ToString() const

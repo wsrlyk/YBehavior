@@ -1,5 +1,6 @@
 #include "YBehavior/nodes/sequence.h"
 #include "YBehavior/agent.h"
+#include "YBehavior/fsm/context.h"
 
 namespace YBehavior
 {

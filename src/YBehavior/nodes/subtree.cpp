@@ -7,6 +7,7 @@
 #include "YBehavior/fsm/behavior.h"
 #include "YBehavior/variablecreation.h"
 #include <cstring>
+#include "YBehavior/fsm/context.h"
 
 namespace YBehavior
 {

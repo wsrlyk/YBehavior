@@ -3,6 +3,7 @@
 #include "YBehavior/variablecreation.h"
 #include "YBehavior/variables/variablecompare.h"
 #include <set>
+#include "YBehavior/fsm/context.h"
 
 namespace YBehavior
 {

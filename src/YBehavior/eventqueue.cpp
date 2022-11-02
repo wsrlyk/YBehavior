@@ -43,15 +43,19 @@ void EventQueue::Event::Assign(const StdVector<TYPE>& data)\
 	FOR_EACH_REGISTER_TYPE(DEFINE_PUSH_FUNCTION);
 
 	////////////////////////////////////////////////////////////////////////
-	EventQueue::EventQueue(const Behavior* pBehavior)
-		: m_pBehavior(pBehavior)
-	{
-
-	}
-
 	EventQueue::~EventQueue()
 	{
 		ClearAll();
+	}
+
+	void EventQueue::Init(const small_map<UINT, UINT>& validEvents)
+	{
+		m_ValidEvents = validEvents;
+	}
+
+	void EventQueue::RegisterEvent(const STRING& e, UINT count)
+	{
+		m_ValidEvents.insert(Utility::Hash(e), count);
 	}
 
 	void EventQueue::Clear(StdVector<STRING>* pClearedEvents)
@@ -102,12 +106,14 @@ void EventQueue::Event::Assign(const StdVector<TYPE>& data)\
 	{
 		auto hash = Utility::Hash(name);
 		UINT count = 0;
-		if (m_pBehavior)
+		auto it = m_ValidEvents.find(hash);
+		if (it != m_ValidEvents.end())
 		{
-			count = m_pBehavior->IsValidEvent(hash);
-			if (count == 0)
-				return nullptr;
+			count = it->second();
 		}
+		if (count == 0)
+			return nullptr;
+
 		EventQueue::Event* pEvent = nullptr;
 		if (count == 1)
 		{

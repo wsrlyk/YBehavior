@@ -1,6 +1,7 @@
 #include "YBehavior/nodes/ifthenelse.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/agent.h"
+#include "YBehavior/fsm/context.h"
 
 namespace YBehavior
 {

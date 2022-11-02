@@ -5,6 +5,7 @@
 #include "YBehavior/variablecreation.h"
 #include "YBehavior/eventqueue.h"
 #include "YBehavior/behaviortree.h"
+#include "YBehavior/fsm/context.h"
 
 namespace YBehavior
 {
@@ -35,7 +36,7 @@ namespace YBehavior
 	{
 		HandleEvent* pNode = static_cast<HandleEvent*>(m_pNode);
 		if (!pAgent->GetEventQueue()->IsDirty())
-			_Return(pNode, lastState);
+			return _Return(pNode, lastState);
 
 		if (m_Stage == 0)
 		{
@@ -113,7 +114,7 @@ namespace YBehavior
 		}
 		else
 		{
-			_Return(pNode, lastState);
+			return _Return(pNode, lastState);
 		}
 		++m_Stage;
 		return NS_RUNNING;

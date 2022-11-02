@@ -4,6 +4,7 @@
 #include "YBehavior/utility.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/variablecreation.h"
+#include "YBehavior/fsm/context.h"
 
 namespace YBehavior
 {

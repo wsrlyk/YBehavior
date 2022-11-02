@@ -5,7 +5,7 @@
 #include "YBehavior/debugger.h"
 #endif
 #include "YBehavior/behaviortree.h"
-
+#include "YBehavior/fsm/context.h"
 namespace YBehavior
 {
 #ifdef YDEBUGGER

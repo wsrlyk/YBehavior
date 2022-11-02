@@ -36,8 +36,7 @@ namespace YBehavior
 		inline void SetFSM(FSM* pFSM) { m_pFSM = pFSM; }
 		inline FSM* GetFSM() { return m_pFSM; }
 		inline Memory* GetMemory() { return m_pMemory; }
-		UINT IsValidEvent(UINT hash) const;
-		void RegiseterEvent(UINT e, UINT count);
+		const small_map<UINT, UINT>& GetValidEvents() const { return m_ValidEvents; }
 
 		void Merge(BehaviorTree* pTree);
 	};

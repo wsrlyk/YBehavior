@@ -2,9 +2,10 @@
 #define _YBEHAVIOR_BEHAVIORPROCESS_H_
 
 #include "YBehavior/types/types.h"
-#include "memory.h"
-#include "fsm/context.h"
+#include "YBehavior/memory.h"
+#include "YBehavior/fsm/context.h"
 #include <set>
+#include "YBehavior/eventqueue.h"
 namespace YBehavior
 {
 	struct BehaviorKey
@@ -28,6 +29,7 @@ namespace YBehavior
 		TreeContext treeContext;
 		Memory memory;
 		Behavior* pBehavior{};
+		EventQueue eventQueue{};
 	};
 
 	class BehaviorProcessHelper

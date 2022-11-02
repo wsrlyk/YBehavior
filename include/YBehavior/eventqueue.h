@@ -3,6 +3,7 @@
 
 #include "YBehavior/define.h"
 #include "YBehavior/types/types.h"
+#include "YBehavior/types/smallmap.h"
 namespace YBehavior
 {
 #define FOR_EACH_REGISTER_TYPE(func)    \
@@ -14,7 +15,6 @@ namespace YBehavior
 		func(EntityWrapper);   \
 		func(Vector3);
 
-	class Behavior;
 	class EventQueue
 	{
 	public:
@@ -38,10 +38,16 @@ namespace YBehavior
 		};
 	private:
 		StdVector<Event*> m_Events;
-		const Behavior* m_pBehavior;
+		//TODO: If in most cases, agents share common lists of valid events, 
+		// which means RegisterEvent is called very few times, 
+		// then there's no need to copy the common lists to here in every Init.
+		small_map<UINT, UINT> m_ValidEvents;
 	public:
-		EventQueue(const Behavior* pBehavior);
 		~EventQueue();
+
+		void Init(const small_map<UINT, UINT>& validEvents);
+		void RegisterEvent(const STRING& e, UINT count);
+
 		void Clear(StdVector<STRING>* pClearedEvents = nullptr);
 		void ClearAll(StdVector<STRING>* pClearedEvents = nullptr);
 		Event* Create(const STRING& name);

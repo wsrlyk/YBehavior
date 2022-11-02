@@ -6,11 +6,6 @@
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/logger.h"
 #include "YBehavior/sharedvariableex.h"
-//namespace pugi
-//{
-//	class xml_node;
-//	class xml_attribute;
-//}
 
 namespace YBehavior
 {
