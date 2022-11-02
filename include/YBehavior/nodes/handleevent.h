@@ -11,11 +11,13 @@ namespace YBehavior
 		EVERY,
 	};
 
+	class HandleEvent;
 	class HandleEventContext : public CompositeNodeContext
 	{
 	protected:
 		void _OnInit() override;
 		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
+		NodeState _Return(HandleEvent* pNode, NodeState lastState);
 	private:
 		StdVector<UINT> m_Hashes;
 		StdVector<UINT>* m_pTargetHashes{};

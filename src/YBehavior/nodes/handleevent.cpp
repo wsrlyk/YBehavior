@@ -15,11 +15,27 @@ namespace YBehavior
 		m_Hashes.clear();
 		m_Idx = 0;
 	}
+
+	NodeState HandleEventContext::_Return(HandleEvent* pNode, NodeState lastState)
+	{
+		///> return failure when there's no event.
+		if (m_Stage == 0)
+			return NS_FAILURE;
+
+		///> only return the child state when everything is single
+		if (pNode->m_Type == HandleEventType::LATEST &&
+			m_pChildren->size() == 1 &&
+			m_pTargetHashes->size() == 1)
+			return lastState;
+
+		///> return success when there has one or more events.
+		return NS_SUCCESS;
+	}
 	NodeState HandleEventContext::_Update(AgentPtr pAgent, NodeState lastState)
 	{
 		HandleEvent* pNode = static_cast<HandleEvent*>(m_pNode);
 		if (!pAgent->GetEventQueue()->IsDirty())
-			return m_Stage == 0 ? NS_FAILURE : m_Stage == 1 ? lastState : NS_SUCCESS;
+			_Return(pNode, lastState);
 
 		if (m_Stage == 0)
 		{
@@ -97,18 +113,7 @@ namespace YBehavior
 		}
 		else
 		{
-			///> return failure when there's no event.
-			if (m_Stage == 0)
-				return NS_FAILURE;
-
-			///> only return the child state when everything is single
-			if (pNode->m_Type == HandleEventType::LATEST &&
-				m_pChildren->size() == 1 &&
-				m_pTargetHashes->size() == 1)
-				return lastState;
-		
-			///> return success when there has one or more events.
-			return NS_SUCCESS;
+			_Return(pNode, lastState);
 		}
 		++m_Stage;
 		return NS_RUNNING;

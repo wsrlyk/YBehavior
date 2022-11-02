@@ -47,6 +47,8 @@ namespace YBehavior
 		Event* Create(const STRING& name);
 		inline bool IsDirty() { return !m_Events.empty(); }
 
+		///> DO NOT recycle Event after using it
+		const Event* TryGetLast() const;
 		///> MUST recycle Event after using it
 		Event* TryGetFirstAndPop(size_t& startIdx, UINT nameHash);
 		///> MUST recycle Event after using it

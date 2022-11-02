@@ -11,6 +11,7 @@ namespace YBehavior
 #define DATA_VARIABLE_CLEAR(TYPE)\
 	if (pVec##TYPE != nullptr)\
 	{\
+		pVec##TYPE->clear();\
 		ObjectPoolStatic<StdVector<TYPE>>::Recycle(pVec##TYPE);\
 		pVec##TYPE = nullptr;\
 	}
@@ -128,6 +129,14 @@ void EventQueue::Event::Assign(const StdVector<TYPE>& data)\
 		m_Events.emplace_back(pEvent);
 		pEvent->name = name;
 		pEvent->nameHash = hash;
+		return pEvent;
+	}
+
+	const EventQueue::Event* EventQueue::TryGetLast() const
+	{
+		if (m_Events.empty())
+			return nullptr;
+		auto pEvent = *m_Events.rbegin();
 		return pEvent;
 	}
 
