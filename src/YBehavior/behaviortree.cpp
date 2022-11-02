@@ -15,7 +15,7 @@
 #include "YBehavior/profile/profileheader.h"
 #endif
 #include "YBehavior/variablecreation.h"
-
+#include <set>
 
 namespace YBehavior
 {
