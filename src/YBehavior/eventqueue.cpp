@@ -61,7 +61,7 @@ void EventQueue::Event::Assign(const StdVector<TYPE>& data)\
 		{
 			StdVector<STRING>* pResults{};
 		public:
-			class RemoveNotNotClear(StdVector<STRING>* results)
+			RemoveNotNotClear(StdVector<STRING>* results)
 				: pResults(results){}
 
 			bool operator()(Event* pData)
