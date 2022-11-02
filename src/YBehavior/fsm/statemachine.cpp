@@ -7,6 +7,7 @@
 #ifdef YDEBUGGER
 #include "YBehavior/debugger.h"
 #endif
+#include "YBehavior/utility.h"
 
 namespace YBehavior
 {
