@@ -6,8 +6,8 @@
 	</Languages>
         <Nodes>
                 <HandleEvent Content="事件处理，可一次性处理队列里的所有事件"
-			ReturnSuccess="处理唯一一个事件时，子节点返回成功；可能处理多个事件时，有收到事件"
-			ReturnFailure="无事件；或处理唯一一个事件时，子节点返回失败">
+			ReturnSuccess="有收到事件"
+			ReturnFailure="无事件">
                         <Type Content="事件类型，
 LATEST 只处理最新的事件，老事件丢弃
 EVERY 依次处理所有事件"/>
