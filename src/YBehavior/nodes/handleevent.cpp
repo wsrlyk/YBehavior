@@ -23,11 +23,11 @@ namespace YBehavior
 		if (m_Stage == 0)
 			return NS_FAILURE;
 
-		///> only return the child state when everything is single
-		if (pNode->m_Type == HandleEventType::LATEST &&
-			m_pChildren->size() == 1 &&
-			m_pTargetHashes->size() == 1)
-			return lastState;
+		/////> only return the child state when everything is single
+		//if (pNode->m_Type == HandleEventType::LATEST &&
+		//	m_pChildren->size() == 1 &&
+		//	m_pTargetHashes->size() == 1)
+		//	return lastState;
 
 		///> return success when there has one or more events.
 		return NS_SUCCESS;
