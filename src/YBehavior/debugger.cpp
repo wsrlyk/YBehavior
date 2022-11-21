@@ -158,7 +158,7 @@ namespace YBehavior
 		//bool bFirst = true;
 		for (auto& it : behavior->GetTreeMapping())
 		{
-			BehaviorTree* pCurTree = it.second();
+			BehaviorTree* pCurTree = it.second;
 
 			//if (bFirst)
 			//{
@@ -198,7 +198,7 @@ namespace YBehavior
 		auto it2 = pGraph->DebugPointInfos.find(nodeUID);
 		if (it2 == pGraph->DebugPointInfos.end())
 			return false;
-		return it2->second().HasBreakPoint();
+		return it2->second.HasBreakPoint();
 	}
 
 	bool DebugMgr::HasLogPoint(const DebugTargetID& target, UINT nodeUID)
@@ -210,7 +210,7 @@ namespace YBehavior
 		auto it2 = pGraph->DebugPointInfos.find(nodeUID);
 		if (it2 == pGraph->DebugPointInfos.end())
 			return false;
-		return it2->second().HasLogPoint();
+		return it2->second.HasLogPoint();
 	}
 
 	bool DebugMgr::HasDebugPoint(const DebugTargetID& target, UINT nodeUID)
@@ -222,7 +222,7 @@ namespace YBehavior
 		auto it2 = pGraph->DebugPointInfos.find(nodeUID);
 		if (it2 == pGraph->DebugPointInfos.end())
 			return false;
-		return !it2->second().NoDebugPoint();
+		return !it2->second.NoDebugPoint();
 	}
 
 	void DebugMgr::AddBreakPoint(const DebugTargetID& target, UINT nodeUID)
@@ -273,7 +273,7 @@ namespace YBehavior
 		auto it = m_TreeDebugInfo.find(target.Name);
 		if (it == m_TreeDebugInfo.end())
 			return nullptr;
-		return &(it->second());
+		return &(it->second);
 	}
 
 	NodeRunInfo* DebugMgr::CreateAndAppendRunInfo(const void* pNode)
@@ -403,11 +403,11 @@ namespace YBehavior
 		for (auto it = treeBuffer.begin(); it != treeBuffer.end(); ++it)
 		{
 			AppendSendContent(IDebugHelper::s_ContentSpliter);
-			AppendSendContent(it->first()->GetTreeName());
+			AppendSendContent(it->first->GetTreeName());
 			AppendSendContent(IDebugHelper::s_ContentSpliter);
-			AppendSendContent(it->second().first);
+			AppendSendContent(it->second.first);
 			AppendSendContent(IDebugHelper::s_ContentSpliter);
-			AppendSendContent(it->second().second);
+			AppendSendContent(it->second.second);
 		}
 
 		//if (IsPaused())

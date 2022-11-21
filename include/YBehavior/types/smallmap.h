@@ -6,6 +6,38 @@
 
 namespace YBehavior
 {
+	template <typename Key, typename Value/*, typename Compare*/>
+	class map_value_compare
+	{
+	public:
+		//Compare c;
+
+		//map_value_compare(const Compare& x)
+		//	: c(x) {}
+
+	public:
+		bool operator()(const Value& a, const Value& b) const
+		{
+			return a.first < b.first;
+		}
+
+		bool operator()(const Value& a, const Key& b) const
+		{
+			return a.first < b;
+		}
+
+		bool operator()(const Key& a, const Value& b) const
+		{
+			return a < b.first;
+		}
+
+		bool operator()(const Key& a, const Key& b) const
+		{
+			return a <= = > b;
+		}
+
+	}; // map_value_compare
+
 	/// <summary>
 	/// More suitable for small amount of elements, like below 100.
 	/// 
@@ -13,285 +45,145 @@ namespace YBehavior
 	/// </summary>
 	/// <typeparam name="K"></typeparam>
 	/// <typeparam name="V"></typeparam>
-	template<typename K, typename V>
-	class small_map
+	template<typename K, typename V,
+	typename random_access_container = std::vector<std::pair<K, V>>>
+	class small_map : public random_access_container
 	{
-		template<typename T>
-		using container_type = std::vector<T>;
-		using size_type = typename container_type<K>::size_type;
-
-	public:
-		class const_iterator;
-		class iterator;
-		class pair
-		{
-			friend const_iterator;
-			friend iterator;
-			small_map* _Map;
-			size_type _Idx;
-		public:
-			pair(small_map* map, size_type idx)
-				: _Map(map)
-				, _Idx(idx)
-			{}
-			bool operator==(const pair& other) const
-			{
-				return _Idx == other._Idx && _Map == other._Map;
-			}
-			bool operator!=(const pair& other) const
-			{
-				return _Idx != other._Idx || _Map != other._Map;
-			}
-
-			const K& first() const { return _Map->keys()[_Idx]; }
-			const V& second() const { return _Map->values()[_Idx]; }
-			size_type idx() const { return _Idx; }
-			V& second() { return _Map->values()[_Idx]; }
-		};
-		class const_iterator
-		{
-		public:
-			const_iterator()
-				: _Pair(nullptr, 0)
-				, _Size(0)
-			{}
-			const_iterator(const small_map* pMap)
-				: _Pair(const_cast<small_map*>(pMap), 0)
-			{
-				_Size = pMap->size();
-			}
-			const_iterator(const small_map* pMap, size_type cur)
-				: _Pair(const_cast<small_map*>(pMap), cur)
-			{
-				_Size = pMap->size();
-			}
-
-			const_iterator& operator++()
-			{
-				++_Pair._Idx;
-				return *this;
-			}
-			const_iterator operator++(int)
-			{
-				const_iterator tmp = *this;
-				++* this;
-				return (tmp);
-			}
-
-			bool operator==(const const_iterator& other) const
-			{
-				return _Pair == other._Pair;
-			}
-			bool operator!=(const const_iterator& other) const
-			{
-				return _Pair != other._Pair;
-			}
-
-			const pair& operator*() const
-			{
-				return _Pair;
-			}
-
-			const pair* operator->() const
-			{
-				return &_Pair;
-			}
-
-
-		protected:
-			pair _Pair;
-			size_type _Size;
-		};
-
-		class iterator : public const_iterator
-		{
-			using base = const_iterator;
-		public:
-			iterator(small_map* pMap)
-				: const_iterator(pMap)
-			{}
-			iterator(small_map* pMap, size_type cur)
-				: const_iterator(pMap, cur)
-			{}
-
-			iterator& operator++()
-			{
-				base::operator++();
-				return *this;
-			}
-			iterator operator++(int)
-			{	// postincrement
-				iterator tmp = *this;
-				base::operator++();
-				return tmp;
-			}
-
-			pair& operator*()
-			{
-				return this->_Pair;
-			}
-
-			pair* operator->()
-			{
-				return &this->_Pair;
-			}
-		};
-
+		using base_type = random_access_container;
+		using size_type = typename base_type::size_type;
+		using value_type = std::pair<K, V>;
+		using key_type = K;
+		using mapped_type = V;
 	protected:
-		container_type<K> _Keys;
-		container_type<V> _Values;
+		map_value_compare<key_type, value_type> value_compare;
+	public:
+		using iterator = typename base_type::iterator;
+		using const_iterator = typename base_type::const_iterator;
 
 	public:
 		small_map(){}
-		small_map(std::initializer_list<std::pair<K, V>> list)
+		small_map(std::initializer_list<value_type> list)
 		{
 			for (auto it = list.begin(); it != list.end(); ++it)
 			{
-				insert(it->first, it->second);
+				insert(*it);
 			}
 		}
-		const container_type<K>& keys() const { return _Keys; }
-		const container_type<V>& values() const { return _Values; }
-		container_type<V>& values() { return _Values; }
 
-		size_type size() const { return _Keys.size(); }
-
-		iterator find(const K& k) 
+		inline iterator lower_bound(const key_type& k)
 		{
-			return iterator(this, _find(k));
+			return std::lower_bound(begin(), end(), k, value_compare);
 		}
 
-		const_iterator find(const K& k) const
+		inline const_iterator lower_bound(const key_type& k) const
 		{
-			return const_iterator(this, _find(k));
+			return std::lower_bound(begin(), end(), k, value_compare);
 		}
 
-		iterator begin()
+		inline std::pair<iterator, iterator> equal_range(const key_type& k)
 		{
-			return iterator(this, 0);
+			// The resulting range will either be empty or have one element,
+			// so instead of doing two tree searches (one for lower_bound and 
+			// one for upper_bound), we do just lower_bound and see if the 
+			// result is a range of size zero or one.
+			const iterator itLower(lower_bound(k));
+
+			if ((itLower == end()) || value_compare(k, (*itLower))) // If at the end or if (k is < itLower)...
+				return std::pair<iterator, iterator>(itLower, itLower);
+
+			iterator itUpper(itLower);
+			return std::pair<iterator, iterator>(itLower, ++itUpper);
 		}
 
-		const_iterator begin() const
+		inline std::pair<const_iterator, const_iterator> equal_range(const key_type& k) const
 		{
-			return const_iterator(this, 0);
+			// The resulting range will either be empty or have one element,
+			// so instead of doing two tree searches (one for lower_bound and 
+			// one for upper_bound), we do just lower_bound and see if the 
+			// result is a range of size zero or one.
+			const const_iterator itLower(lower_bound(k));
+
+			if ((itLower == end()) || value_compare(k, *itLower)) // If at the end or if (k is < itLower)...
+				return std::pair<const_iterator, const_iterator>(itLower, itLower);
+
+			auto itUpper(itLower);
+			return std::pair<const_iterator, const_iterator>(itLower, ++itUpper);
 		}
 
-		iterator end()
+		iterator find(const key_type& k)
 		{
-			return iterator(this, size());
+			const std::pair<iterator, iterator> pairIts(equal_range(k));
+			return (pairIts.first != pairIts.second) ? pairIts.first : end();
+		}
+		const_iterator find(const key_type& k) const
+		{
+			const std::pair<const_iterator, const_iterator> pairIts(equal_range(k));
+			return (pairIts.first != pairIts.second) ? pairIts.first : end();
 		}
 
-		const_iterator end() const 
+		mapped_type& operator[](const key_type& k)
 		{
-			return const_iterator(this, size());
+			iterator itLB(lower_bound(k));
+
+			if ((itLB == end()) || value_compare(k, (*itLB)))
+				itLB = base_type::insert(itLB, value_type(k, mapped_type()));
+			return (*itLB).second;
 		}
 
-		void clear()
+		mapped_type& operator[](key_type&& k)
 		{
-			_Keys.clear();
-			_Values.clear();
-		}
-		template<typename KK>
-		V& operator[](KK&& k)
-		{
-			size_type cur = 0;
-			if (_find(k, cur))
-			{
-				return _Values[cur];
-			}
-			_Keys.emplace(_Keys.begin() + cur, k);
-			_Values.emplace(_Values.begin() + cur);
-			return _Values[cur];
+			iterator itLB(lower_bound(k));
+
+			if ((itLB == end()) || value_compare(k, (*itLB)))
+				itLB = base_type::insert(itLB, value_type(std::move(k), mapped_type()));
+			return (*itLB).second;
 		}
 
-		template<typename KK, typename VV>
-		std::pair<pair, bool> insert(KK&& k, VV&& v)
+		std::pair<iterator, bool> insert(const value_type& value)
 		{
-			size_type cur = 0;
-			if (_find(k, cur))
-			{
-				return std::pair<pair, bool>(pair(this, cur), false);
-			}
-			_Keys.emplace(_Keys.begin() + cur, k);
-			_Values.emplace(_Values.begin() + cur, v);
-			return std::pair<pair, bool>(pair(this, cur), true);
+			const iterator itLB(lower_bound(value.first));
+
+			if ((itLB != end()) && !value_compare(value, *itLB))
+				return std::pair<iterator, bool>(itLB, false);
+
+			return std::pair<iterator, bool>(base_type::insert(itLB, value), true);
 		}
 
-		iterator erase(iterator it)
+		//std::pair<iterator, bool> insert(const key_type& otherValue)
+		//{
+
+		//}
+		//std::pair<iterator, bool> insert(key_type&& otherValue)
+		//{
+
+		//}
+
+		template <typename ...Args>
+		inline std::pair<iterator, bool> emplace(Args&&... args)
 		{
-			if (it->idx() < size())
-			{
-				_Keys.erase(_Keys.begin() + it->idx());
-				_Values.erase(_Values.begin() + it->idx());
-				return iterator(this, it->idx());
-			}
-			else
-			{
-				return it;
-			}
+			return insert(std::forward<Args>(args)...);
 		}
 
 		size_type erase(const K& k)
 		{
-			size_type cur;
-			if (_find(k, cur))
+			auto it(find(k));
+
+			if (it != end()) // If it exists...
 			{
-				erase(iterator(this, cur));
+				base_type::erase(it);
 				return 1;
 			}
 			return 0;
 		}
+		iterator  erase(const_iterator position)
+		{
+			return base_type::erase(position);
+		}
 
 		void merge(const small_map& other)
 		{
-			for (size_type i = 0, len = other.size(); i < len; ++i)
-			{
-				size_type cur;
-				auto k = other._Keys[i];
-				if (!_find(k, cur))
-				{
-					auto v = other._Values[i];
-
-					_Keys.emplace(_Keys.begin() + cur, k);
-					_Values.emplace(_Values.begin() + cur, v);
-				}
-			}
-		}
-
-	protected:
-		bool _find(const K& k, size_type& cur) const
-		{
-			auto res = std::lower_bound(_Keys.begin(), _Keys.end(), k);
-			cur = res - _Keys.begin();
-			return res != _Keys.end() && *res == k;
-
-
-			//int len = (int)_Keys.size();
-			//int start = 0;
-			//int end = len - 1;
-			//while (start <= end)
-			//{
-			//	auto mid = (start + end) >> 1;
-			//	if (k < _Keys[mid])
-			//		end = mid - 1;
-			//	else if (k > _Keys[mid])
-			//		start = mid + 1;
-			//	else
-			//	{
-			//		cur = (size_type)mid;
-			//		return true;
-			//	}
-			//}
-			//cur = (size_type)len;
-			//return false;
-		}
-
-		size_type _find(const K& k) const
-		{
-			size_type cur = 0;
-			if (_find(k, cur))
-				return cur;
-			return _Keys.size();
+			for (auto it = other.begin(); it != other.end(); ++it)
+				insert(*it);
 		}
 	};
 }

@@ -36,21 +36,21 @@ namespace YBehavior
 	{
 		for (auto it : treemap.Node2Trees)
 		{
-			if (!it.second().empty())
-				toLoadTrees.emplace_back(it.first(), it.second());
+			if (!it.second.empty())
+				toLoadTrees.emplace_back(it.first, it.second);
 		}
 		for (auto it : treemap.Name2Trees)
 		{
-			STRING name(it.second());
-			auto it2 = n2t.find(std::get<1>(it.first()));
+			STRING name(it.second);
+			auto it2 = n2t.find(std::get<1>(it.first));
 			if (it2 != n2t.end())
-				name = it2->second();
+				name = it2->second;
 			if (name.empty())
 			{
 				//ERROR_BEGIN << "No tree for node " << std::get<1>(it.first) << ERROR_END;
 				continue;
 			}
-			toLoadTrees.emplace_back(std::get<0>(it.first()), name);
+			toLoadTrees.emplace_back(std::get<0>(it.first), name);
 		}
 	}
 
@@ -124,7 +124,7 @@ namespace YBehavior
 		//////////////////////////////////////////////////////////////////////////
 		for (auto it : behavior->GetTreeMapping())
 		{
-			behavior->Merge(it.second());
+			behavior->Merge(it.second);
 			//it.second()->MergeDataTo(*behavior->GetMemory()->GetMainData());
 			//it.second()->MergeEventsTo(behavior->GetValidEvents());
 		}
@@ -149,7 +149,7 @@ namespace YBehavior
 
 			for (auto & it2 : b->GetTreeMapping())
 			{
-				if (it2.second()->GetKey() == name)
+				if (it2.second->GetKey() == name)
 				{
 					it.second->IncreaseLatestVesion();
 					break;

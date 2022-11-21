@@ -47,7 +47,7 @@ namespace YBehavior
 	{
 		for (auto it = m_Versions.begin(); it != m_Versions.end(); ++it)
 		{
-			std::cout << "version " << it->first() << ", count " << it->second()->referenceCount << std::endl;
+			std::cout << "version " << it->first << ", count " << it->second->referenceCount << std::endl;
 		}
 	}
 
@@ -59,7 +59,7 @@ namespace YBehavior
 		else
 		{
 			auto it = m_Versions.find(version->versionID);
-			if (it != m_Versions.end() && it->second() != version)
+			if (it != m_Versions.end() && it->second != version)
 				version = nullptr;
 		}
 
@@ -131,7 +131,7 @@ namespace YBehavior
 	{
 		for (auto it = m_Versions.begin(); it != m_Versions.end(); ++it)
 		{
-			delete it->second()->data;
+			delete it->second->data;
 		}
 		m_Versions.clear();
 	}

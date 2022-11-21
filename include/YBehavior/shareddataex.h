@@ -31,7 +31,7 @@ namespace YBehavior
 
 		bool IsEnd() override { return m_It == m_End; }
 		IDataArrayIterator& operator ++() override { ++m_It; return *this; }
-		const KEY Value() override { return m_It->first(); }
+		const KEY Value() override { return m_It->first; }
 
 		void Recycle() override
 		{
@@ -79,10 +79,10 @@ namespace YBehavior
 			for (auto it = otherArray->m_Datas.begin(); it != otherArray->m_Datas.end(); ++it)
 			{
 				if (useNewValue)
-					this->m_Datas[it->first()] = it->second();
+					this->m_Datas[it->first] = it->second;
 				else
 				{
-					m_Datas.insert(it->first(), it->second());
+					m_Datas.insert({ it->first, it->second });
 				}
 			}
 		}
@@ -103,7 +103,7 @@ namespace YBehavior
 			auto it = m_Datas.find(key);
 			if (it == m_Datas.end())
 				return false;
-			res = it->second();
+			res = it->second;
 			return true;
 		}
 
@@ -116,7 +116,7 @@ namespace YBehavior
 			auto it = m_Datas.find(key);
 			if (it == m_Datas.end())
 				return nullptr;
-			return (const void*)&(it->second());
+			return (const void*)&(it->second);
 		}
 
 		const STRING GetToString(KEY key) const override
@@ -128,7 +128,7 @@ namespace YBehavior
 			auto it = m_Datas.find(key);
 			if (it == m_Datas.end())
 				return Utility::StringEmpty;
-			const T& data = it->second();
+			const T& data = it->second;
 			return Utility::ToString(data);
 		}
 
@@ -197,7 +197,7 @@ namespace YBehavior
 			auto it = m_Datas.find(key);
 			if (it == m_Datas.end())
 				return false;
-			it->second() = src;
+			it->second = src;
 			return true;
 		}
 
@@ -206,7 +206,7 @@ namespace YBehavior
 			auto it = m_Datas.find(key);
 			if (it == m_Datas.end())
 				return false;
-			it->second() = std::move(src);
+			it->second = std::move(src);
 			return true;
 		}
 
@@ -219,7 +219,7 @@ namespace YBehavior
 			if (it == m_Datas.end())
 				return false;
 			
-			it->second() = *((T*)src);
+			it->second = *((T*)src);
 			return true;
 		}
 

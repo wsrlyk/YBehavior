@@ -129,7 +129,7 @@ namespace YBehavior
 
 	void BehaviorTree::RegiseterEvent(UINT e, UINT count)
 	{
-		m_ValidEvents.insert(e, count);
+		m_ValidEvents.insert({ e, count });
 	}
 
 	YBehavior::TreeNodeContext* BehaviorTree::CreateRootContext(LocalMemoryInOut* pTunnel /*= nullptr*/)
@@ -242,7 +242,7 @@ namespace YBehavior
 				/// So current FromUID can only be equal or larger than the previous FromUIDs
 				/// And previous ranges cant make holes
 				
-				std::vector<Ranges>& rangesList = it2->second();
+				std::vector<Ranges>& rangesList = it2->second;
 
 				///> In this case, an output is connected to multiple inputs. Just merge them.
 				if (lastFromUID == fromUID && lastFromVariableIndex == fromVariable->GetIndex())

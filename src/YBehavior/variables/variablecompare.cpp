@@ -23,7 +23,7 @@ namespace YBehavior
 	{
 		for (auto it = m_Compares.begin(); it != m_Compares.end(); ++it)
 		{
-			delete it->second();
+			delete it->second;
 		}
 		m_Compares.clear();
 	}
@@ -31,7 +31,7 @@ namespace YBehavior
 	{
 		auto it = m_Compares.find(t);
 		if (it != m_Compares.end())
-			return it->second();
+			return it->second;
 		return nullptr;
 	}
 }

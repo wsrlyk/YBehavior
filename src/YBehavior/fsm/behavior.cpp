@@ -20,7 +20,7 @@ namespace YBehavior
 
 		for (auto it = m_Node2TreeMapping.begin(); it != m_Node2TreeMapping.end(); ++it)
 		{
-			Mgrs::Instance()->GetTreeMgr()->ReturnTree(it->second());
+			Mgrs::Instance()->GetTreeMgr()->ReturnTree(it->second);
 		}
 		m_Node2TreeMapping.clear();
 
@@ -35,7 +35,7 @@ namespace YBehavior
 	{
 		auto it = m_Node2TreeMapping.find(pNode);
 		if (it != m_Node2TreeMapping.end())
-			return it->second();
+			return it->second;
 		return nullptr;
 	}
 

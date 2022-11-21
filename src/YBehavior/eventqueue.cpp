@@ -55,7 +55,7 @@ void EventQueue::Event::Assign(const StdVector<TYPE>& data)\
 
 	void EventQueue::RegisterEvent(const STRING& e, UINT count)
 	{
-		m_ValidEvents.insert(Utility::Hash(e), count);
+		m_ValidEvents.insert({ Utility::Hash(e), count });
 	}
 
 	void EventQueue::Clear(StdVector<STRING>* pClearedEvents)
@@ -109,7 +109,7 @@ void EventQueue::Event::Assign(const StdVector<TYPE>& data)\
 		auto it = m_ValidEvents.find(hash);
 		if (it != m_ValidEvents.end())
 		{
-			count = it->second();
+			count = it->second;
 		}
 		if (count == 0)
 			return nullptr;

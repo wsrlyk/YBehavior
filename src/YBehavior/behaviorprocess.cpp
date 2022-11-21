@@ -96,13 +96,13 @@ namespace YBehavior
 	{
 		for (auto it : treemap->Node2Trees)
 		{
-			if (!it.second().empty())
-				toLoadTrees.push_back(it.second());
+			if (!it.second.empty())
+				toLoadTrees.push_back(it.second);
 		}
 		for (auto it : treemap->Name2Trees)
 		{
-			if (!it.second().empty())
-				toLoadTrees.push_back(it.second());
+			if (!it.second.empty())
+				toLoadTrees.push_back(it.second);
 		}
 	}
 

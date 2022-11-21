@@ -171,9 +171,9 @@ namespace YBehavior
 			return false;
 
 		///> Only named states will be inserted into the name map
-		if ((pState->GetName() == Utility::StringEmpty || m_NamedStatesMap.insert(pState->GetName(), pState).second)
+		if ((pState->GetName() == Utility::StringEmpty || m_NamedStatesMap.insert({ pState->GetName(), pState }).second)
 			&&
-			m_UIDStatesMap.insert(pState->GetUID(), pState).second)
+			m_UIDStatesMap.insert({ pState->GetUID(), pState }).second)
 		{
 			m_AllStates.push_back(pState);
 			return true;
@@ -314,7 +314,7 @@ namespace YBehavior
 		auto it = m_NamedStatesMap.find(name);
 		if (it == m_NamedStatesMap.end())
 			return nullptr;
-		return it->second();
+		return it->second;
 	}
 
 	YBehavior::MachineState* RootMachine::FindState(UINT uid)
@@ -322,7 +322,7 @@ namespace YBehavior
 		auto it = m_UIDStatesMap.find(uid);
 		if (it == m_UIDStatesMap.end())
 			return nullptr;
-		return it->second();
+		return it->second;
 	}
 
 	void RootMachine::OnLoadFinish()

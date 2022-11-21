@@ -72,7 +72,7 @@ namespace YBehavior
 			if (it == map0.end())
 				return false;
 
-			t1 = it->second();
+			t1 = it->second;
 			return true;
 		}
 		bool TryGetKey(const T1& t1, T0& t0) const
@@ -81,7 +81,7 @@ namespace YBehavior
 			if (it == map1.end())
 				return false;
 
-			t0 = it->second();
+			t0 = it->second;
 			return true;
 		}
 
@@ -90,7 +90,7 @@ namespace YBehavior
 			auto it = map0.find(t0);
 			if (it == map0.end())
 				return defaultRes;
-			return it->second();
+			return it->second;
 		}
 
 		const T0& GetKey(const T1& t1, const T0& defaultRes) const
@@ -98,7 +98,7 @@ namespace YBehavior
 			auto it = map1.find(t1);
 			if (it == map1.end())
 				return defaultRes;
-			return it->second();
+			return it->second;
 		}
 
 	};

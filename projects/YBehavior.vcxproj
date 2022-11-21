@@ -95,7 +95,6 @@
     <ClInclude Include="..\include\YBehavior\tools\treemgrhelper.hpp" />
     <ClInclude Include="..\include\YBehavior\treekeymgr.h" />
     <ClInclude Include="..\include\YBehavior\types\smallmap.h" />
-    <ClInclude Include="..\include\YBehavior\types\smallset.h" />
     <ClInclude Include="..\include\YBehavior\types\treemap.h" />
     <ClInclude Include="..\include\YBehavior\types\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />

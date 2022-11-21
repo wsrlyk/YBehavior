@@ -11,7 +11,7 @@ namespace YBehavior
 			m_Map[cond] = newValue;
 			return newValue;
 		}
-		return it->second();
+		return it->second;
 	}
 
 	bool ConditionMgr::TryGetConditionValue(const STRING& cond, int& value)
@@ -21,7 +21,7 @@ namespace YBehavior
 		{
 			return false;
 		}
-		value = it->second();
+		value = it->second;
 		return true;
 	}
 

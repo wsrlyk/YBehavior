@@ -21,8 +21,8 @@ using namespace YBehavior;
 int main(int argc, char** argv)
 {
 	small_map<int, STRING> map{{6,"666"}};
-	map.insert(0, "hehe");
-	map.insert(1, "fuck");
+	map.insert({ 0, "hehe" });
+	map.insert({ 1, "fuck" });
 	map[2] = "truck";
 	auto res = map[3];
 	if (map.find(2) != map.end())
@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 
 	for (auto it = map.begin(); it != map.end(); ++it)
 	{
-		std::cout << (*it).first() << " " << it->second() << " ";
+		std::cout << (*it).first << " " << it->second << " ";
 	}
 	std::cout << std::endl;
 	map.erase(3);
@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 	const auto& m = map;
 	for (auto it = m.begin(); it != m.end(); ++it)
 	{
-		std::cout << it->first() << " " << (*it).second() << " ";
+		std::cout << it->first << " " << (*it).second << " ";
 	}
 	std::cout << std::endl;
 
