@@ -33,7 +33,7 @@ namespace YBehavior
 
 		bool operator()(const Key& a, const Key& b) const
 		{
-			return a <= = > b;
+			return a < b;
 		}
 
 	}; // map_value_compare
@@ -72,12 +72,12 @@ namespace YBehavior
 
 		inline iterator lower_bound(const key_type& k)
 		{
-			return std::lower_bound(begin(), end(), k, value_compare);
+			return std::lower_bound(base_type::begin(), base_type::end(), k, value_compare);
 		}
 
 		inline const_iterator lower_bound(const key_type& k) const
 		{
-			return std::lower_bound(begin(), end(), k, value_compare);
+			return std::lower_bound(base_type::begin(), base_type::end(), k, value_compare);
 		}
 
 		inline std::pair<iterator, iterator> equal_range(const key_type& k)
@@ -88,7 +88,7 @@ namespace YBehavior
 			// result is a range of size zero or one.
 			const iterator itLower(lower_bound(k));
 
-			if ((itLower == end()) || value_compare(k, (*itLower))) // If at the end or if (k is < itLower)...
+			if ((itLower == base_type::end()) || value_compare(k, (*itLower))) // If at the end or if (k is < itLower)...
 				return std::pair<iterator, iterator>(itLower, itLower);
 
 			iterator itUpper(itLower);
@@ -103,7 +103,7 @@ namespace YBehavior
 			// result is a range of size zero or one.
 			const const_iterator itLower(lower_bound(k));
 
-			if ((itLower == end()) || value_compare(k, *itLower)) // If at the end or if (k is < itLower)...
+			if ((itLower == base_type::end()) || value_compare(k, *itLower)) // If at the end or if (k is < itLower)...
 				return std::pair<const_iterator, const_iterator>(itLower, itLower);
 
 			auto itUpper(itLower);
@@ -113,19 +113,19 @@ namespace YBehavior
 		iterator find(const key_type& k)
 		{
 			const std::pair<iterator, iterator> pairIts(equal_range(k));
-			return (pairIts.first != pairIts.second) ? pairIts.first : end();
+			return (pairIts.first != pairIts.second) ? pairIts.first : base_type::end();
 		}
 		const_iterator find(const key_type& k) const
 		{
 			const std::pair<const_iterator, const_iterator> pairIts(equal_range(k));
-			return (pairIts.first != pairIts.second) ? pairIts.first : end();
+			return (pairIts.first != pairIts.second) ? pairIts.first : base_type::end();
 		}
 
 		mapped_type& operator[](const key_type& k)
 		{
 			iterator itLB(lower_bound(k));
 
-			if ((itLB == end()) || value_compare(k, (*itLB)))
+			if ((itLB == base_type::end()) || value_compare(k, (*itLB)))
 				itLB = base_type::insert(itLB, value_type(k, mapped_type()));
 			return (*itLB).second;
 		}
@@ -134,7 +134,7 @@ namespace YBehavior
 		{
 			iterator itLB(lower_bound(k));
 
-			if ((itLB == end()) || value_compare(k, (*itLB)))
+			if ((itLB == base_type::end()) || value_compare(k, (*itLB)))
 				itLB = base_type::insert(itLB, value_type(std::move(k), mapped_type()));
 			return (*itLB).second;
 		}
@@ -143,7 +143,7 @@ namespace YBehavior
 		{
 			const iterator itLB(lower_bound(value.first));
 
-			if ((itLB != end()) && !value_compare(value, *itLB))
+			if ((itLB != base_type::end()) && !value_compare(value, *itLB))
 				return std::pair<iterator, bool>(itLB, false);
 
 			return std::pair<iterator, bool>(base_type::insert(itLB, value), true);
@@ -168,7 +168,7 @@ namespace YBehavior
 		{
 			auto it(find(k));
 
-			if (it != end()) // If it exists...
+			if (it != base_type::end()) // If it exists...
 			{
 				base_type::erase(it);
 				return 1;
