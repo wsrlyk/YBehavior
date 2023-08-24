@@ -223,35 +223,6 @@ namespace YBehavior.Editor
             this.Visibility = Visibility.Visible;
             this.SearchText.SetFocus();
         }
-        private void btnSave_Click(object sender, RoutedEventArgs e)
-        {
-            WorkBenchMgr.Instance.TrySaveAndExport();
-        }
-        private void btnSaveAs_Click(object sender, RoutedEventArgs e)
-        {
-            var bench = WorkBenchMgr.Instance.ActiveWorkBench;
-            var oldName = bench.FilePath;
-            if (!string.IsNullOrEmpty(oldName))
-            {
-                bench.FileInfo = new FileMgr.FileInfo()
-                {
-                    Path = string.Empty,
-                    FileType = bench.FileInfo.FileType,
-                };
-            }
-
-            bench.FilePath = string.Empty;
-            int res = WorkBenchMgr.Instance.TrySaveAndExport();
-            if ((res & WorkBenchMgr.SaveResultFlag_NewFile) != 0)
-                _Hide();
-            else
-            {
-                bench.FilePath = oldName;
-            }
-
-            //if (res == 1)
-            //    _RefreshWorkSpace(false);
-        }
 
         private void btnNewTree_Click(object sender, RoutedEventArgs e)
         {

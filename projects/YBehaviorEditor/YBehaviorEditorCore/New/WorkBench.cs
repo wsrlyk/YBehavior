@@ -17,7 +17,23 @@ namespace YBehavior.Editor.Core.New
         public CoroutineCollection<DelayableNotificationCollection<NodeBaseRenderer>, NodeBaseRenderer> NodeList { get; } = new CoroutineCollection<DelayableNotificationCollection<NodeBaseRenderer>, NodeBaseRenderer>();
         public CoroutineCollection<DelayableNotificationCollection<ConnectionRenderer>, ConnectionRenderer> ConnectionList { get; } = new CoroutineCollection<DelayableNotificationCollection<ConnectionRenderer>, ConnectionRenderer>();
 
-        public string FilePath { get; set; }
+        string filePath = string.Empty;
+        public string FilePath
+        {
+            get { return filePath; }
+            set
+            {
+                filePath = value;
+                if (string.IsNullOrEmpty(filePath))
+                {
+                    m_UntitledFileInfo = new FileMgr.FileInfo() { FileType = this.FileType };
+                }
+                else
+                {
+                    m_UntitledFileInfo = null;
+                }
+            }
+        }
 
         public string DisplayName { get { return FileInfo.DisplayName + (CommandMgr.Dirty ? " *" : ""); } }
         public string ShortDisplayName
@@ -40,12 +56,9 @@ namespace YBehavior.Editor.Core.New
             {
                 return string.IsNullOrEmpty(FilePath) ? m_UntitledFileInfo : FileMgr.Instance.GetFileInfo(FilePath);
             }
-            set
-            {
-                m_UntitledFileInfo = value;
-            }
         }
 
+        protected virtual FileType FileType => FileType.TREE;
         public WorkBench()
         {
             //NodeList.Step = 1;

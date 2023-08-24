@@ -13,8 +13,6 @@
                 <StackPanel Name="FileOperatePanel" Orientation="Horizontal" Height="30" HorizontalAlignment="Left">
                     <Button Name="btnNewTree" Click="btnNewTree_Click">NewTree</Button>
                     <Button Name="btnNewFSM" Click="btnNewFSM_Click">NewFSM</Button>
-                    <Button Name="btnSave" Click="btnSave_Click">Save</Button>
-                    <Button Name="btnSaveAs" Click="btnSaveAs_Click">Save As</Button>
                     <Button Name="btnRefresh" Click="btnRefresh_Click">Refresh</Button>
                 </StackPanel>
             </Border>

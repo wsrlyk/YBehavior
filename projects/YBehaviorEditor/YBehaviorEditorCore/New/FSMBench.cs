@@ -13,6 +13,7 @@ namespace YBehavior.Editor.Core.New
         public DelayableNotificationCollection<FSMMachineNode> StackMachines { get; } = new DelayableNotificationCollection<FSMMachineNode>();
         public FSMMachineNode CurMachine { get { return StackMachines.Count > 0 ? StackMachines[0] : null; } }
 
+        protected override FileType FileType => FileType.FSM;
         public FSMBench()
         {
             m_FSM = new FSM();

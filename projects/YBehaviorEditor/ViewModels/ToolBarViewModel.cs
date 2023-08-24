@@ -104,6 +104,7 @@ namespace YBehavior.Editor
                 if (oArg.Bench != null)
                 {
                     Tools.Add(new Tool(Command.Save));
+                    Tools.Add(new Tool(Command.SaveAs));
                     Tools.Add(new Tool(
                         Command.Undo,
                         () => { return oArg.Bench.CommandMgr.HasDoneCommands; },

@@ -18,6 +18,7 @@ namespace YBehavior.Editor.Core.New
         Redo,
         Open,
         Save,
+        SaveAs,
         Search,
         BreakPoint,
         LogPoint,

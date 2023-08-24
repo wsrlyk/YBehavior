@@ -110,6 +110,22 @@ namespace YBehavior.Editor
                         WorkBenchMgr.Instance.TrySaveAndExport();
                     }
                     break;
+                case Command.SaveAs:
+                    {
+                        var bench = WorkBenchMgr.Instance.ActiveWorkBench;
+
+                        var oldFilePath = bench.FilePath;
+                        var oldFileInfo = bench.FileInfo;
+                        bench.FilePath = string.Empty;
+                        bench.FileInfo.Path = oldFileInfo.Path;
+                        int res = WorkBenchMgr.Instance.TrySaveAndExport();
+                        if ((res & WorkBenchMgr.SaveResultFlag_NewFile) == 0)
+                        {
+                            bench.FilePath = oldFilePath;
+                        }
+
+                    }
+                    break;
                 case Command.Open:
                     EventMgr.Instance.Send(new ShowWorkSpaceArg() { });
                     break;

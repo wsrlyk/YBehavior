@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -295,7 +296,7 @@ namespace YBehavior.Editor.Core.New
         public static readonly int SaveResultFlag_NewFile = 1 << 1;
         public static readonly int SaveResultFlag_Saved = 1 << 2;
 
-        public int SaveAndExport(WorkBench bench = null)
+        public int SaveAndExport(WorkBench bench)
         {
             int res = SaveWorkBench(bench);
             if ((res & SaveResultFlag_Saved) != 0)
@@ -304,10 +305,6 @@ namespace YBehavior.Editor.Core.New
 
                 if (bench == null)
                     bench = ActiveWorkBench;
-                var relativePath = bench.FileInfo.RelativePath;
-                bench.FilePath = bench.FileInfo.RelativeName;
-
-                FileMgr.Instance.Load(relativePath, bench.FilePath);
 
                 WorkBenchSavedArg arg = new WorkBenchSavedArg()
                 {
@@ -339,7 +336,7 @@ namespace YBehavior.Editor.Core.New
         /// </summary>
         /// <param name="bench"></param>
         /// <returns> 0: normal; 1: new file created; -1: cancel; -2: error</returns>
-        public int SaveWorkBench(WorkBench bench = null)
+        public int SaveWorkBench(WorkBench bench)
         {
             int res = SaveResultFlag_None;
             if (bench == null)
@@ -366,11 +363,13 @@ namespace YBehavior.Editor.Core.New
             {
                 ///> Pop the save dialog
                 Microsoft.Win32.SaveFileDialog sfd = new Microsoft.Win32.SaveFileDialog();
-                sfd.InitialDirectory = Config.Instance.WorkingDirWin;
+                var index = bench.FileInfo.RelativeName.LastIndexOf(bench.FileInfo.Name);
+                string subdir = bench.FileInfo.RelativeName.Substring(0, index).Replace("/", "\\");
+                sfd.InitialDirectory = Config.Instance.WorkingDirWin + subdir;
+                sfd.FileName = bench.FileInfo.RelativeName.Substring(index);
                 sfd.Filter = bench is TreeBench ? "TREE|*" + FileMgr.TreeExtension : "FSM|*.fsm";
                 if (sfd.ShowDialog() == true)
                 {
-                    string extension = bench is TreeBench ? FileMgr.TreeExtension : ".fsm";
                     bench.FileInfo.Path = sfd.FileName;
 
                     res |= SaveResultFlag_NewFile;
@@ -380,7 +379,7 @@ namespace YBehavior.Editor.Core.New
                     return res;
                 }
             }
-            
+
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.AppendChild(xmlDoc.CreateXmlDeclaration("1.0", "utf-8", null));
             var el = xmlDoc.CreateElement(bench.FileInfo.Name);
@@ -392,6 +391,13 @@ namespace YBehavior.Editor.Core.New
 
             LogMgr.Instance.Log("Saved to " + bench.FileInfo.Path);
             res |= SaveResultFlag_Saved;
+
+            if (string.IsNullOrEmpty(bench.FilePath))
+            {
+                FileMgr.Instance.Load(bench.FileInfo.RelativePath, bench.FileInfo.RelativeName);
+                bench.FilePath = bench.FileInfo.RelativeName;
+            }
+
             return res;
         }
 
@@ -521,26 +527,16 @@ namespace YBehavior.Editor.Core.New
             WorkBench workBench = null;
             if (type == FileType.TREE)
             {
-                workBench = new TreeBench
+                workBench = new TreeBench()
                 {
-                    FilePath = string.Empty,
-                    FileInfo = new FileMgr.FileInfo()
-                    {
-                        Path = string.Empty,
-                        FileType = type,
-                    }
+                    FilePath = string.Empty
                 };
             }
             else if (type == FileType.FSM)
             {
-                workBench = new FSMBench
+                workBench = new FSMBench()
                 {
-                    FilePath = string.Empty,
-                    FileInfo = new FileMgr.FileInfo()
-                    {
-                        Path = string.Empty,
-                        FileType = type,
-                    }
+                    FilePath = string.Empty
                 };
             }
 

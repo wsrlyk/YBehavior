@@ -40,7 +40,6 @@ namespace YBehavior.Editor
         {
             InitializeComponent();
             EventMgr.Instance.Register(EventType.WorkBenchLoaded, _OnWorkBenchLoaded);
-            EventMgr.Instance.Register(EventType.WorkBenchSaved, _OnWorkBenchSaved);
             EventMgr.Instance.Register(EventType.SelectWorkBench, _OnSelectWorkBench);
             EventMgr.Instance.Register(EventType.WorkBenchClosed, _OnWorkBenchClosed);
 
@@ -109,32 +108,6 @@ namespace YBehavior.Editor
             activeTab.IsSelected = WorkBenchMgr.Instance.ActiveWorkBench == bench;
 
             //_RenderActiveWorkBench();
-        }
-
-        private void _OnWorkBenchSaved(EventArg arg)
-        {
-            WorkBenchSavedArg oArg = arg as WorkBenchSavedArg;
-            WorkBench bench = oArg.Bench;
-            if (bench == null)
-                return;
-            ///> Rename the tab title
-            if (oArg.bCreate)
-            {
-                UITabItem activeTab = null;
-                foreach (UITabItem tab in this.TabController.Items)
-                {
-                    if (tab.Content == bench)
-                    {
-                        activeTab = tab;
-                        break;
-                    }
-                }
-                ///> Create new tab
-                if (activeTab != null)
-                {
-                    activeTab.Header = bench.FileInfo.DisplayName;
-                }
-            }
         }
         private void _OnWorkBenchClosed(EventArg arg)
         {

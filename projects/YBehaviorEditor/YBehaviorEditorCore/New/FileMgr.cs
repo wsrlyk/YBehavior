@@ -181,7 +181,7 @@ namespace YBehavior.Editor.Core.New
             public string RelativePath { get; private set; } = string.Empty;
 
             public FileType FileType = FileType.TREE;
-            private string m_Path = null;
+            private string m_Path = string.Empty;
             public string Path
             {
                 get { return m_Path; }

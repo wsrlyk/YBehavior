@@ -133,10 +133,6 @@ namespace YBehavior.Editor
                 {
                     WorkBenchMgr.Instance.ExportWorkBench(workbench);
 
-                    var relativePath = workbench.FileInfo.RelativePath;
-                    workbench.FilePath = workbench.FileInfo.RelativeName;
-
-                    FileMgr.Instance.Load(relativePath, workbench.FilePath);
                     LogMgr.Instance.Log(treename + " saved and exported.");
                 }
             }
@@ -164,10 +160,6 @@ namespace YBehavior.Editor
                 {
                     WorkBenchMgr.Instance.ExportWorkBench(workbench);
 
-                    var relativePath = workbench.FileInfo.RelativePath;
-                    workbench.FilePath = workbench.FileInfo.RelativeName;
-
-                    FileMgr.Instance.Load(relativePath, workbench.FilePath);
                     LogMgr.Instance.Log(treename + " saved and exported.");
                 }
             }
