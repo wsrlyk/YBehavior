@@ -155,7 +155,7 @@ namespace YBehavior
 		{
 			auto v = info->GetLatestVersion();
 			if (v && v->Invalid())
-				return nullptr;
+				return false;
 			
 			tree = _LoadTree(name);
 			info->SetLatest(tree);

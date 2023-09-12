@@ -69,7 +69,7 @@ namespace YBehavior
 		{
 			auto v = info->GetLatestVersion();
 			if (v && v->Invalid())
-				return nullptr;
+				return false;
 			
 			pFSM = _LoadFSM(name);
 			info->SetLatest(pFSM);
