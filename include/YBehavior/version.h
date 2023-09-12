@@ -16,6 +16,10 @@ namespace YBehavior
 		int versionID{ -1 };
 		T* data{ nullptr };
 		int referenceCount{ 0 };
+
+		bool Invalid() const { return !data && referenceCount < 0; }
+		void TrySetInvalid() { if (!data) referenceCount = -1; }
+		void ResetValid() { if (Invalid()) referenceCount = 0; }
 	};
 
 	template<typename T>
@@ -89,13 +93,25 @@ namespace YBehavior
 		if (m_LatestVersion == nullptr)
 			CreateVersion();
 		m_LatestVersion->data = data;
-		data->SetVersion(m_LatestVersion);
+		if (data)
+			data->SetVersion(m_LatestVersion);
+		else
+			m_LatestVersion->TrySetInvalid();
 	}
 
 	template<typename T>
 	void Info<T>::IncreaseLatestVesion()
 	{
-		if (m_LatestVersion == nullptr || m_LatestVersion->data == nullptr)
+		if (m_LatestVersion == nullptr)
+			return;
+		
+		if (m_LatestVersion->Invalid())
+		{
+			m_LatestVersion->ResetValid();
+			return;
+		}
+
+		if (m_LatestVersion->data == nullptr)
 			return;
 
 		CreateVersion();

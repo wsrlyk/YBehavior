@@ -43,11 +43,16 @@ namespace YBehavior
 		MachineInfoType* info;
 		if (!m_VersionMgr.GetData(name, pFSM, info))
 		{
+			auto v = info->GetLatestVersion();
+			if (v && v->Invalid())
+				return nullptr;
+			
 			pFSM = _LoadFSM(name);
+			info->SetLatest(pFSM);
+
 			if (!pFSM)
 				return nullptr;
 
-			info->SetLatest(pFSM);
 			info->ChangeReferenceCount(true);
 			_BuildStateTreeMapping(pFSM);
 
@@ -62,10 +67,15 @@ namespace YBehavior
 		MachineInfoType* info;
 		if (!m_VersionMgr.GetData(name, pFSM, info))
 		{
+			auto v = info->GetLatestVersion();
+			if (v && v->Invalid())
+				return nullptr;
+			
 			pFSM = _LoadFSM(name);
+			info->SetLatest(pFSM);
+
 			if (!pFSM)
 				return false;
-			info->SetLatest(pFSM);
 			_BuildStateTreeMapping(pFSM);
 		}
 

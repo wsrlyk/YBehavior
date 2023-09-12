@@ -20,13 +20,15 @@ namespace YBehavior
 
 		if (!m_VersionMgr.GetData(key.Hash(), pRes, info))
 		{
-			pRes = _LoadNewBehavior(key);
-
-			if (!pRes)
+			auto v = info->GetLatestVersion();
+			if (v && v->Invalid())
 				return nullptr;
 
+			pRes = _LoadNewBehavior(key);
+
 			info->SetLatest(pRes);
-			info->ChangeReferenceCount(true);
+			if (pRes)
+				info->ChangeReferenceCount(true);
 		}
 
 		return pRes;

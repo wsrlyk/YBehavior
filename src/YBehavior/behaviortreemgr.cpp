@@ -132,12 +132,15 @@ namespace YBehavior
 		TreeInfoType* info;
 		if (!m_VersionMgr.GetData(name, tree, info))
 		{
-			tree = _LoadTree(name);
-			if (!tree)
+			auto v = info->GetLatestVersion();
+			if (v && v->Invalid())
 				return nullptr;
 
+			tree = _LoadTree(name);
 			info->SetLatest(tree);
-			info->ChangeReferenceCount(true);
+			
+			if (tree)
+				info->ChangeReferenceCount(true);
 
 		}
 
@@ -150,11 +153,15 @@ namespace YBehavior
 		TreeInfoType* info;
 		if (!m_VersionMgr.GetData(name, tree, info))
 		{
+			auto v = info->GetLatestVersion();
+			if (v && v->Invalid())
+				return nullptr;
+			
 			tree = _LoadTree(name);
+			info->SetLatest(tree);
+
 			if (!tree)
 				return false;
-
-			info->SetLatest(tree);
 		}
 
 		pOutputTreeMap = &tree->GetTreeMap();
