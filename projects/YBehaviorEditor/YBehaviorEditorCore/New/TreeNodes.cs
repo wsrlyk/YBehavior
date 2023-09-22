@@ -667,7 +667,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 1
             );
-            opl.IsInput = false;
+            //opl.IsInput = false;
 
             Variable opr = NodeMemory.CreateVariable(
                 "Source",
@@ -836,7 +836,7 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return string.Format("{0} << [ {1} ~ {2} )",
+                return string.Format("[ {1} ~ {2} ) >> {0}",
                     Variables.GetVariable("Target").NoteValue,
                     Variables.GetVariable("Bound1").NoteValue,
                     Variables.GetVariable("Bound2").NoteValue);
@@ -882,7 +882,7 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return string.Format("{1} <~= {0}",
+                return string.Format("{0} ~=> {1}",
                     Variables.GetVariable("Input").NoteValue,
                     Variables.GetVariable("Output").NoteValue);
             }
@@ -1307,7 +1307,7 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return string.Format("{0} << {{ {1} }}",
+                return string.Format("{{ {1} }} >> {0}",
                     Variables.GetVariable("Current").NoteValue,
                     Variables.GetVariable("Collection").NoteValue);
             }
@@ -1360,7 +1360,7 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return string.Format("{0} << [0, {1})",
+                return string.Format("[0, {1}) >> {0}",
                     Variables.GetVariable("Current").NoteValue,
                     Variables.GetVariable("Count").NoteValue);
             }
@@ -1426,7 +1426,7 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return string.Format("{0} << func({1})",
+                return string.Format("func({1}) >> {0}",
                     Variables.GetVariable("OutputY").NoteValue,
                     Variables.GetVariable("InputX").NoteValue);
             }
@@ -1638,7 +1638,7 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return string.Format("{0} << [{1}].Length",
+                return string.Format("[{1}].Length >> {0}",
                     Variables.GetVariable("Length").NoteValue,
                     Variables.GetVariable("Array").NoteValue
                     );
@@ -1914,7 +1914,7 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return string.Format("[{0}] <??< [{1}]",
+                return string.Format("[{1}] >??> [{0}]",
                     Variables.GetVariable("Output").NoteValue,
                     Variables.GetVariable("Input").NoteValue
                     );
