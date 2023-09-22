@@ -543,6 +543,7 @@ namespace YBehavior.Editor.Core.New
             if (workBench == null)
                 return null;
 
+            workBench.CommandMgr.Dirty = true;
             m_OpenedWorkBenchs.Add(workBench);
             m_ActiveWorkBench = workBench;
 

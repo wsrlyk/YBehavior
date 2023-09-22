@@ -26,7 +26,7 @@ namespace YBehavior.Editor.Core.New
                 filePath = value;
                 if (string.IsNullOrEmpty(filePath))
                 {
-                    m_UntitledFileInfo = new FileMgr.FileInfo() { FileType = this.FileType };
+                    m_UntitledFileInfo = new FileMgr.FileInfo() { FileType = this.FileType, Path = string.Empty };
                 }
                 else
                 {

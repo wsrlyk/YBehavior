@@ -409,9 +409,7 @@ namespace YBehavior.Editor.Core.New
             {
                 return
                     m_bIsLocal &&
-                    //SharedDataSource != null
-                    //&& SharedDataSource is Tree &&
-                    !(this is InOutVariable)
+                    this is TreeVariable
                     ? m_Name + "'" : m_Name;
             }
         }
