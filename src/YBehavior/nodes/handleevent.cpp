@@ -42,7 +42,11 @@ namespace YBehavior
 		{
 			YB_LOG_VARIABLE_BEFORE_IF_HAS_DEBUG_POINT(pNode->m_Events);
 
-			if (!pNode->m_Events->IsConst())
+			if (!pNode->m_Events)
+			{
+				m_pTargetHashes = nullptr;
+			}
+			else if (!pNode->m_Events->IsConst())
 			{
 				pNode->_GetHashes(m_Hashes, pAgent->GetMemory());
 				m_pTargetHashes = &m_Hashes;
@@ -55,8 +59,10 @@ namespace YBehavior
 
 		EventQueue::Event* pEvent;
 		size_t offset;
-		if (m_pTargetHashes->size() == 1)
-			pEvent = pAgent->GetEventQueue()->TryGetFirstAndPop(m_Idx, (* m_pTargetHashes)[0]);
+		if (m_pTargetHashes == nullptr)
+			pEvent = pAgent->GetEventQueue()->TryGetFirstAndPop();
+		else if (m_pTargetHashes->size() == 1)
+			pEvent = pAgent->GetEventQueue()->TryGetFirstAndPop(m_Idx, (*m_pTargetHashes)[0]);
 		else
 			pEvent = pAgent->GetEventQueue()->TryGetAndPop(m_Idx, m_pTargetHashes->begin(), m_pTargetHashes->end(), offset);
 		
@@ -128,9 +134,9 @@ namespace YBehavior
 
 	bool HandleEvent::OnLoaded(const pugi::xml_node& data)
 	{
-		VariableCreation::CreateVariable(this, m_Events, "Events", data);
-		if (!m_Events)
-			return false;
+		VariableCreation::CreateVariableIfExist(this, m_Events, "Events", data);
+		//if (!m_Events)
+		//	return false;
 
 		if (!VariableCreation::GetValue(this, "Type", data, OperatorMap, m_Type))
 			return false;

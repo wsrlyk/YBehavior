@@ -161,6 +161,15 @@ void EventQueue::Event::Assign(const StdVector<TYPE>& data)\
 		return nullptr;
 	}
 
+	YBehavior::EventQueue::Event* EventQueue::TryGetFirstAndPop()
+	{
+		if (m_Events.empty())
+			return nullptr;
+		auto res = *m_Events.begin();
+		m_Events.erase(m_Events.begin());
+		return res;
+	}
+
 	EventQueue::Event* EventQueue::TryGetAndPop(size_t& startIdx,
 		StdVector<UINT>::const_iterator begin,
 		StdVector<UINT>::const_iterator end,

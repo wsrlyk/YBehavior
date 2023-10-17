@@ -920,7 +920,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_String,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_NONE,
-                Variable.EnableType.ET_FIXED
+                Variable.EnableType.ET_Enable
             );
             m_Events.IsInput = true;
 

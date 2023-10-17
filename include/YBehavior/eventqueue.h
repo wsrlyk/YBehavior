@@ -56,6 +56,8 @@ namespace YBehavior
 		///> DO NOT recycle Event after using it
 		const Event* TryGetLast() const;
 		///> MUST recycle Event after using it
+		Event* TryGetFirstAndPop();
+		///> MUST recycle Event after using it
 		Event* TryGetFirstAndPop(size_t& startIdx, UINT nameHash);
 		///> MUST recycle Event after using it
 		Event* TryGetAndPop(size_t& startIdx,
