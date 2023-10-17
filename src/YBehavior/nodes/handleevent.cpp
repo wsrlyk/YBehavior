@@ -158,7 +158,7 @@ namespace YBehavior
 	bool HandleEvent::OnLoadFinish()
 	{
 		size_t eventCount = 0;
-		if (m_Events->IsConst())
+		if (m_Events && m_Events->IsConst())
 			eventCount = m_Events->VectorSize(nullptr);
 		else
 			eventCount = 1;
@@ -176,7 +176,7 @@ namespace YBehavior
 			return false;
 		}
 
-		if (m_Events->IsConst())
+		if (m_Events && m_Events->IsConst())
 		{
 			_GetHashes(m_Hashes, nullptr);
 			if (m_Root)
