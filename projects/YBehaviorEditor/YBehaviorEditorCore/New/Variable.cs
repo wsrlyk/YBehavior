@@ -248,9 +248,18 @@ namespace YBehavior.Editor.Core.New
                 if (m_eType == value)
                     return;
 
+                ChangeVariableETypeCommand command = new ChangeVariableETypeCommand()
+                {
+                    OldType = m_eType,
+                    NewType = value,
+                    Variable = this
+                };
+
+
                 m_eType = value;
                 OnPropertyChanged("eType");
                 _OnETypeChanged();
+                WorkBenchMgr.Instance.PushCommand(command);
             }
         }
 

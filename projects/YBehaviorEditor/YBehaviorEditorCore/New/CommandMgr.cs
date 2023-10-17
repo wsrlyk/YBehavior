@@ -446,6 +446,21 @@ namespace YBehavior.Editor.Core.New
             NodeRenderer.ReturnType = OriginReturnType;
         }
     }
+    public class ChangeVariableETypeCommand : ICommand
+    {
+        public Variable Variable { get; set; }
+        public Variable.EnableType OldType { get; set; }
+        public Variable.EnableType NewType { get; set; }
+
+        public void Redo()
+        {
+            Variable.eType = NewType;
+        }
+        public void Undo()
+        {
+            Variable.eType = OldType;
+        }
+    }
 
     public class RemoveTransCommand : ICommand
     {

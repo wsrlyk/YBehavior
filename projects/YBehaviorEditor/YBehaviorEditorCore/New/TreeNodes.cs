@@ -1009,8 +1009,11 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return string.Format("{0}",
-                    Variables.GetVariable("Events").NoteValue);
+                var v = Variables.GetVariable("Events");
+                if (v.eType == Variable.EnableType.ET_Disable)
+                    return "All Events";
+                else
+                    return v.NoteValue;
             }
         }
 
@@ -1022,7 +1025,7 @@ namespace YBehavior.Editor.Core.New
 
         protected override bool _OnCheckValid()
         {
-            if (m_Events.vbType == Variable.VariableType.VBT_Const)
+            if (m_Events.eType != Variable.EnableType.ET_Disable && m_Events.vbType == Variable.VariableType.VBT_Const)
             {
                 if (_GetCasesValue() == null)
                 {
@@ -1057,6 +1060,8 @@ namespace YBehavior.Editor.Core.New
 
         string[] _GetCasesValue()
         {
+            if (m_Events.eType == Variable.EnableType.ET_Disable)
+                return null;
             if (m_Events.vbType == Variable.VariableType.VBT_Const)
             {
                 if (string.IsNullOrEmpty(m_Events.Value))
