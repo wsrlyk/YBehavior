@@ -27,7 +27,7 @@ namespace YBehavior.Editor.Core.New
                 //node.LoadDescription();
                 m_StateList.Add(node);
                 m_TypeDic.Add(node.Name, type);
-                LogMgr.Instance.Log(type.ToString());
+                //LogMgr.Instance.Log(type.ToString());
             }
         }
 

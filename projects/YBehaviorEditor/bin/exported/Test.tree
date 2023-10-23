@@ -1,27 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Test>
   <Node Class="Root">
-    <Shared a="_IC 0" />
-    <Local s="_Sc " ss="SSc hehe|haha" />
+    <Shared />
+    <Local ff="FFc 0.5|0.1|0.2" fff="FFc 0.1|0.6" />
     <Node Class="Sequence">
-      <Node Class="Calculator" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 1" />
-      <Node Class="SwitchCase" Return="Success" Switch="_IP a" Cases="IIC 1|2|3|4">
-        <Node Class="HandleEvent" Type="_EC Latest" Events="SSC hehe">
-          <Node Class="Sequence" />
-        </Node>
-        <Node Class="HandleEvent" Type="_EC Every" Events="SSC hoho|heihei">
-          <Node Class="Sequence" />
-        </Node>
-        <Node Class="HandleEvent" Type="_EC Latest" Events="SSC hehe|haha">
-          <Node Class="Sequence" />
-          <Node Class="Sequence" />
-        </Node>
-        <Node Class="HandleEvent" Type="_EC Latest" Events="SSp ss" Current="_SpE s">
-          <Node Class="Sequence" />
-        </Node>
-      </Node>
-      <Node Class="Comparer" Operator="_EC &gt;=" Opl="_IP a" Opr="_IC 4" />
-      <Node Class="SetData" Target="_IP a" Source="_IC 0" />
+      <Node Class="SetOperation" Operator="_EC APPEND" Output="FFp fff" Input1="FFp ff" Input2="FFp fff" />
+      <Node Class="SetOperation" Operator="_EC MERGE" Output="FFp ff" Input1="FFp ff" Input2="FFp fff" />
     </Node>
   </Node>
 </Test>

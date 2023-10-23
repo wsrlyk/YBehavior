@@ -18,6 +18,7 @@
 #include "YBehavior/nodes/array.h"
 #include "YBehavior/nodes/fsmrelated.h"
 #include "YBehavior/nodes/convert.h"
+#include "YBehavior/nodes/set.h"
 namespace YBehavior
 {
 	NodeFactory* CreateNodeFactory()
@@ -56,6 +57,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, Shuffle);
 		REGISTER_TYPE(factory, FSMSetCondition);
 		REGISTER_TYPE(factory, FSMClearConditions);
+		REGISTER_TYPE(factory, SetOperation);
 
 		return factory;
 	}

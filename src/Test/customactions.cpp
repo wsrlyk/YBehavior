@@ -45,8 +45,8 @@ void XAgent::Update()
 		pQueue->Clear();
 
 
-	{	
-		auto pData = pQueue->Create("hehe");
+	if (auto pData = pQueue->Create("hehe"))
+	{
 		pData->notClear = b;
 		for (int k = 0; k < i; ++k)
 		{

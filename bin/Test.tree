@@ -1,27 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Test IsEditor="">
-  <Node Class="Root" GUID="1" Pos="0,0">
+  <Node Class="Root" GUID="1" Pos="630,-340">
     <Shared f="_FC 0.0" a="_IC 0" aa="IIC " v="_VC 1,2,3" v2="VVC 0,0,0" />
-    <Local fds="_Ac " s="_Sc " b="_Bc F" ff="FFc 0.5" ss="SSc hehe|haha" />
-    <Node Class="Sequence" GUID="45" Pos="-70,111">
-      <Node Class="Calculator" GUID="46" Pos="-318,211" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 1" />
-      <Node Class="SwitchCase" GUID="47" Return="Success" Pos="-70,270" Switch="_IP a" Cases="IIC 1|2|3|4">
-        <Node Class="HandleEvent" GUID="61" Pos="-320,470" Type="_EC Latest" Events="SSC hehe" Int="IIPD " Float="FFPD " String="SSPD " Ulong="UUPD " Bool="BBPD " Vector3="VVPD " Entity="AAPD " Current="_SPD ">
-          <Node Class="Sequence" GUID="62" Pos="-290,670" />
-        </Node>
-        <Node Class="HandleEvent" GUID="51" Pos="-160,470" Type="_EC Every" Events="SSC hoho|heihei" Int="IIPD " Float="FFPD " String="SSPD " Ulong="UUPD " Bool="BBPD " Vector3="VVPD " Entity="AAPD " Current="_SPD ">
-          <Node Class="Sequence" GUID="55" Pos="-140,670" />
-        </Node>
-        <Node Class="HandleEvent" GUID="52" Pos="30,480" Type="_EC Latest" Events="SSC hehe|haha" Int="IIPD " Float="FFPD " String="SSPD " Ulong="UUPD " Bool="BBPD " Vector3="VVPD " Entity="AAPD " Current="_SPD ">
-          <Node Class="Sequence" GUID="56" Pos="-30,670" />
-          <Node Class="Sequence" GUID="58" Pos="90,670" />
-        </Node>
-        <Node Class="HandleEvent" GUID="53" Pos="190,500" Type="_EC Latest" Events="SSp ss" Int="IIPD " Float="FFPD " String="SSPD " Ulong="UUPD " Bool="BBPD " Vector3="VVPD " Entity="AAPD " Current="_SpE s">
-          <Node Class="Sequence" GUID="60" Pos="270,650" />
-        </Node>
-      </Node>
-      <Node Class="Comparer" GUID="48" Pos="130,240" Operator="_EC &gt;=" Opl="_IP a" Opr="_IC 4" />
-      <Node Class="SetData" GUID="49" Pos="274,236" Target="_IP a" Source="_IC 0" />
+    <Local fds="_Ac " s="_Sc " b="_Bc F" ff="FFc 0.5|0.1|0.2" ss="SSc hehe|haha" fff="FFc 0.1|0.6" ffff="FFc " />
+    <Node Class="Sequence" GUID="64" Pos="625,-243">
+      <Node Class="SetOperation" GUID="63" Pos="510,-100" Operator="_EC APPEND" Output="FFp fff" Input1="FFp ff" Input2="FFp fff" />
+      <Node Class="SetOperation" GUID="65" Pos="770,-90" Operator="_EC MERGE" Output="FFp ff" Input1="FFp ff" Input2="FFp fff" />
     </Node>
   </Node>
   <Node Class="Sequence" GUID="21" Pos="370,960">
@@ -39,6 +23,26 @@
     <Node Class="Calculator" GUID="38" Pos="-210,890" Operator="_EC *" Output="_Fp " Input1="_Fp " Input2="_Fp " />
     <Node Class="Calculator" GUID="39" Pos="-180,1040" Operator="_EC *" Output="_Fp " Input1="_Fp " Input2="_Fp " />
     <Node Class="Calculator" GUID="44" Pos="17,921" Operator="_EC +" Output="_FP f" Input1="_Fp " Input2="_Fp " />
+  </Node>
+  <Node Class="Sequence" GUID="45" Pos="-70,111">
+    <Node Class="Calculator" GUID="46" Pos="-318,211" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 1" />
+    <Node Class="SwitchCase" GUID="47" Return="Success" Pos="-70,270" Switch="_IP a" Cases="IIC 1|2|3|4">
+      <Node Class="HandleEvent" GUID="61" Pos="-320,470" Type="_EC Latest" Events="SSCE hehe" Int="IIPD " Float="FFPD " String="SSPD " Ulong="UUPD " Bool="BBPD " Vector3="VVPD " Entity="AAPD " Current="_SPD ">
+        <Node Class="Sequence" GUID="62" Pos="-290,670" />
+      </Node>
+      <Node Class="HandleEvent" GUID="51" Pos="-160,470" Type="_EC Every" Events="SSCE hoho|heihei" Int="IIPD " Float="FFPD " String="SSPD " Ulong="UUPD " Bool="BBPD " Vector3="VVPD " Entity="AAPD " Current="_SPD ">
+        <Node Class="Sequence" GUID="55" Pos="-140,670" />
+      </Node>
+      <Node Class="HandleEvent" GUID="52" Pos="30,480" Type="_EC Latest" Events="SSCE hehe|haha" Int="IIPD " Float="FFPD " String="SSPD " Ulong="UUPD " Bool="BBPD " Vector3="VVPD " Entity="AAPD " Current="_SPD ">
+        <Node Class="Sequence" GUID="56" Pos="-30,670" />
+        <Node Class="Sequence" GUID="58" Pos="90,670" />
+      </Node>
+      <Node Class="HandleEvent" GUID="53" Pos="190,500" Type="_EC Latest" Events="SSpE ss" Int="IIPD " Float="FFPD " String="SSPD " Ulong="UUPD " Bool="BBPD " Vector3="VVPD " Entity="AAPD " Current="_SpE s">
+        <Node Class="Sequence" GUID="60" Pos="270,650" />
+      </Node>
+    </Node>
+    <Node Class="Comparer" GUID="48" Pos="130,240" Operator="_EC &gt;=" Opl="_IP a" Opr="_IC 4" />
+    <Node Class="SetData" GUID="49" Pos="274,236" Target="_IP a" Source="_IC 0" />
   </Node>
   <DataConnections>
     <DataConnection FromGUID="22" FromName="Output" ToGUID="24" ToName="Input1" />
