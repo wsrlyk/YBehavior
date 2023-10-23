@@ -6,14 +6,16 @@
 	</Languages>
         <Nodes>
                 <HandleEvent Content="事件处理，可一次性处理队列里的所有事件"
-			ReturnSuccess="有收到事件"
-			ReturnFailure="无事件">
+			ReturnSuccess="处理唯一一个事件时，子节点返回成功；可能处理多个事件时，有收到事件"
+			ReturnFailure="无事件；或处理唯一一个事件时，子节点返回失败">
                         <Type Content="事件类型，
 LATEST 只处理最新的事件，老事件丢弃
 EVERY 依次处理所有事件"/>
-                        <Events Content="事件名，可填多个。
-当Events为常量时，子节点和Events一一对应；或者子节点为一个，通过Current区分当前处理的事件
-当Events为变量时，子节点只能有一个，通过Current区分当前处理的事件"/>
+                        <Events Content="本节点能够处理的事件名，可填多个。
+当Events为常量时，子节点和Events一一对应；或者子节点为一个，通过Current区分当前处理的事件；
+当Events为变量时，子节点只能有一个，通过Current区分当前处理的事件；
+
+当Events禁用时，本节点处理所有事件，子节点只能有一个，通过Current区分当前处理的事件；"/>
                         <Int Content="Int型的参数"/>
                         <Float Content="Float型的参数"/>
                         <Bool Content="Bool型的参数"/>
@@ -176,6 +178,14 @@ EVERY 依次处理所有事件"/>
                 </FSMSetCondition>
                 <FSMClearConditions Content="清空所有状态机转换条件" 
 			ReturnSuccess="始终成功"/>
+                <ArrayOperation Content="数组运算操作"
+			ReturnSuccess="始终成功">
+                        <Operator Content="
+APPEND  直接拼接，不改变顺序
+MERGE   按集合的方式合并，每个元素唯一，且排序
+"/>
+                        <Output Content="从0开始，长度等于Input数组长度，或Input"/>
+                </ArrayOperation>
         </Nodes>
 	<Commands>
 		<Open Name="打开" Content="打开文件面板"/>

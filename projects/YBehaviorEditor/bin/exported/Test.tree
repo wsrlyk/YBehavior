@@ -4,8 +4,8 @@
     <Shared />
     <Local ff="FFc 0.5|0.1|0.2" fff="FFc 0.1|0.6" />
     <Node Class="Sequence">
-      <Node Class="SetOperation" Operator="_EC APPEND" Output="FFp fff" Input1="FFp ff" Input2="FFp fff" />
-      <Node Class="SetOperation" Operator="_EC MERGE" Output="FFp ff" Input1="FFp ff" Input2="FFp fff" />
+      <Node Class="ArrayOperation" Operator="_EC APPEND" Output="FFp fff" Input1="FFp ff" Input2="FFp fff" />
+      <Node Class="ArrayOperation" Operator="_EC MERGE" Output="FFp ff" Input1="FFp ff" Input2="FFp fff" />
     </Node>
   </Node>
 </Test>

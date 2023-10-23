@@ -31,7 +31,6 @@
     <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugixml.hpp" />
     <ClInclude Include="..\include\YBehavior\agent.h" />
     <ClInclude Include="..\include\YBehavior\nodes\convert.h" />
-    <ClInclude Include="..\include\YBehavior\nodes\set.h" />
     <ClInclude Include="..\include\YBehavior\treenode.h" />
     <ClInclude Include="..\include\YBehavior\behaviorprocess.h" />
     <ClInclude Include="..\include\YBehavior\behaviortree.h" />
@@ -105,14 +104,13 @@
     <ClInclude Include="..\include\YBehavior\variables\variableconvert.h" />
     <ClInclude Include="..\include\YBehavior\variables\variableoperation.h" />
     <ClInclude Include="..\include\YBehavior\variables\variablerandom.h" />
-    <ClInclude Include="..\include\YBehavior\variables\variablesetoperation.h" />
+    <ClInclude Include="..\include\YBehavior\variables\variablearrayoperation.h" />
     <ClInclude Include="..\include\YBehavior\version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\3rd\pugixml\pugixml.cpp" />
     <ClCompile Include="..\src\YBehavior\agent.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\convert.cpp" />
-    <ClCompile Include="..\src\YBehavior\nodes\set.cpp" />
     <ClCompile Include="..\src\YBehavior\treenode.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviorprocess.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviortree.cpp" />
@@ -172,7 +170,7 @@
     <ClCompile Include="..\src\YBehavior\variables\variableconvert.cpp" />
     <ClCompile Include="..\src\YBehavior\variables\variableoperation.cpp" />
     <ClCompile Include="..\src\YBehavior\variables\variablerandom.cpp" />
-    <ClCompile Include="..\src\YBehavior\variables\variablesetoperation.cpp" />
+    <ClCompile Include="..\src\YBehavior\variables\variablearrayoperation.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C1582006-77B9-497E-A630-43FC48DD4B18}</ProjectGuid>

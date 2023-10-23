@@ -2,6 +2,7 @@
 #define _YBEHAVIOR_ARRAY_H_
 
 #include "YBehavior/treenode.h"
+#include "YBehavior/variables/variablearrayoperation.h"
 
 namespace YBehavior
 {
@@ -95,6 +96,23 @@ namespace YBehavior
 	private:
 		ISharedVariableEx* m_Input;
 		SharedVariableEx<VecInt>* m_Output;
+	};
+
+	class ArrayOperation : public LeafNode<>
+	{
+	public:
+		TREENODE_DEFINE(ArrayOperation)
+	protected:
+		bool OnLoaded(const pugi::xml_node& data) override;
+		NodeState Update(AgentPtr pAgent) override;
+
+	private:
+		ArrayOperationType m_Operator;
+		ISharedVariableEx* m_Output;
+		ISharedVariableEx* m_Input1;
+		ISharedVariableEx* m_Input2;
+
+		const IVariableArrayOperationHelper* m_pHelper{};
 	};
 
 }

@@ -9,35 +9,35 @@
 
 namespace YBehavior
 {
-	enum struct SetOperationType
+	enum struct ArrayOperationType
 	{
 		APPEND,
 		MERGE,
 		EXCLUDE,
 	};
 
-	class IVariableSetOperationHelper
+	class IVariableArrayOperationHelper
 	{
 	public:
-		virtual ~IVariableSetOperationHelper() {}
+		virtual ~IVariableArrayOperationHelper() {}
 	public:
-		virtual void SetOperation(void* pLeft, const void* pRight0, const void* pRight1, SetOperationType op) const = 0;
-		virtual const void* SetOperation(const void* pRight0, const void* pRight1, SetOperationType op) const = 0;
-		virtual void SetOperation(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, SetOperationType op) const = 0;
+		virtual void ArrayOperation(void* pLeft, const void* pRight0, const void* pRight1, ArrayOperationType op) const = 0;
+		virtual const void* ArrayOperation(const void* pRight0, const void* pRight1, ArrayOperationType op) const = 0;
+		virtual void ArrayOperation(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, ArrayOperationType op) const = 0;
 	};
 
-	class ValueSetOperation
+	class ValueArrayOperation
 	{
 	public:
 		template<typename T>
-		static void SetOperation(void* pLeft, const void* pRight0, const void* pRight1, SetOperationType op)
+		static void ArrayOperation(void* pLeft, const void* pRight0, const void* pRight1, ArrayOperationType op)
 		{
-			return _DoSetOperation<T>(pLeft, pRight0, pRight1, op/*, typename CalculateTagDispatchTrait<T>::Tag{}*/);
+			return _DoArrayOperation<T>(pLeft, pRight0, pRight1, op/*, typename CalculateTagDispatchTrait<T>::Tag{}*/);
 		}
 
 	private:
 		template<typename T>
-		static void _DoSetOperation(void* pLeft, const void* pRight0, const void* pRight1, SetOperationType op/*, NormalCalculateTag*/);
+		static void _DoArrayOperation(void* pLeft, const void* pRight0, const void* pRight1, ArrayOperationType op/*, NormalCalculateTag*/);
 
 		template<typename T>
 		static void _Append(const StdVector<T>& left, const StdVector<T>& right, StdVector<T>& output);
@@ -48,7 +48,7 @@ namespace YBehavior
 	};
 
 	template<typename T>
-	void ValueSetOperation::_DoSetOperation(void* pLeft, const void* pRight0, const void* pRight1, SetOperationType op/*, NormalCalculateTag*/)
+	void ValueArrayOperation::_DoArrayOperation(void* pLeft, const void* pRight0, const void* pRight1, ArrayOperationType op/*, NormalCalculateTag*/)
 	{
 		if (pLeft == nullptr)
 		{
@@ -72,13 +72,13 @@ namespace YBehavior
 		T& left = *((T*)pLeft);
 		switch (op)
 		{
-		case YBehavior::SetOperationType::APPEND:
+		case YBehavior::ArrayOperationType::APPEND:
 			_Append(right0, right1, left);
 			break;
-		case YBehavior::SetOperationType::MERGE:
+		case YBehavior::ArrayOperationType::MERGE:
 			_Merge(right0, right1, left);
 			break;
-		case YBehavior::SetOperationType::EXCLUDE:
+		case YBehavior::ArrayOperationType::EXCLUDE:
 			_Exclude(right0, right1, left);
 			break;
 		default:
@@ -87,7 +87,7 @@ namespace YBehavior
 	}
 
 	template<typename T>
-	void ValueSetOperation::_Append(const StdVector<T>& left, const StdVector<T>& right, StdVector<T>& output)
+	void ValueArrayOperation::_Append(const StdVector<T>& left, const StdVector<T>& right, StdVector<T>& output)
 	{
 		if (&output == &left)
 		{
@@ -106,7 +106,7 @@ namespace YBehavior
 	}
 
 	template<typename T>
-	void ValueSetOperation::_Merge(const StdVector<T>& left, const StdVector<T>& right, StdVector<T>& output)
+	void ValueArrayOperation::_Merge(const StdVector<T>& left, const StdVector<T>& right, StdVector<T>& output)
 	{
 		if (&output == &left)
 		{
@@ -129,7 +129,7 @@ namespace YBehavior
 	}
 
 	template<typename T>
-	void ValueSetOperation::_Exclude(const StdVector<T>& left, const StdVector<T>& right, StdVector<T>& output)
+	void ValueArrayOperation::_Exclude(const StdVector<T>& left, const StdVector<T>& right, StdVector<T>& output)
 	{
 	//TODO
 	}
@@ -139,26 +139,26 @@ namespace YBehavior
 	/////////////////////////////////////
 
 	template<typename T>
-	class VariableSetOperationHelper : public IVariableSetOperationHelper
+	class VariableArrayOperationHelper : public IVariableArrayOperationHelper
 	{
-		static VariableSetOperationHelper<T> s_Instance;
+		static VariableArrayOperationHelper<T> s_Instance;
 	public:
-		static IVariableSetOperationHelper* Get() { return &s_Instance; }
+		static IVariableArrayOperationHelper* Get() { return &s_Instance; }
 
-		void SetOperation(void* pLeft, const void* pRight0, const void* pRight1, SetOperationType op) const override
+		void ArrayOperation(void* pLeft, const void* pRight0, const void* pRight1, ArrayOperationType op) const override
 		{
-			ValueSetOperation::SetOperation<T>(pLeft, pRight0, pRight1, op);
+			ValueArrayOperation::ArrayOperation<T>(pLeft, pRight0, pRight1, op);
 		}
-		const void* SetOperation(const void* pRight0, const void* pRight1, SetOperationType op) const override
+		const void* ArrayOperation(const void* pRight0, const void* pRight1, ArrayOperationType op) const override
 		{
 			T& left = PreservedValue<T>::Data;
-			ValueSetOperation::SetOperation<T>(&left, pRight0, pRight1, op);
+			ValueArrayOperation::ArrayOperation<T>(&left, pRight0, pRight1, op);
 			return &left;
 		}
-		void SetOperation(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, SetOperationType op) const override
+		void ArrayOperation(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, ArrayOperationType op) const override
 		{
 			auto left =const_cast<void*>(pLeft->GetValue(pMemory));
-			ValueSetOperation::SetOperation<T>(left, pRight0->GetValue(pMemory), pRight1->GetValue(pMemory), op);
+			ValueArrayOperation::ArrayOperation<T>(left, pRight0->GetValue(pMemory), pRight1->GetValue(pMemory), op);
 			//pLeft->SetValue(pMemory, &left);
 		}
 	};
@@ -167,25 +167,25 @@ namespace YBehavior
 	/////////////////////////////////////
 	/////////////////////////////////////
 	/////////////////////////////////////
-	class VariableSetOperationMgr : public Singleton<VariableSetOperationMgr>
+	class VariableArrayOperationMgr : public Singleton<VariableArrayOperationMgr>
 	{
 		/// <summary>
 		/// Left, Right0, Right1
 		/// </summary>
-		small_map<TYPEID, const IVariableSetOperationHelper*> m_SetOperations;
+		small_map<TYPEID, const IVariableArrayOperationHelper*> m_Operations;
 	public:
-		VariableSetOperationMgr();
-		~VariableSetOperationMgr();
+		VariableArrayOperationMgr();
+		~VariableArrayOperationMgr();
 
-		const IVariableSetOperationHelper* Get(TYPEID t) const;
+		const IVariableArrayOperationHelper* Get(TYPEID t) const;
 
 		template<typename T>
-		const IVariableSetOperationHelper* Get() const
+		const IVariableArrayOperationHelper* Get() const
 		{
 			return Get(GetTypeID<T>());
 		}
 		template<typename TL, typename TR0, typename TR1>
-		const IVariableSetOperationHelper* Get() const
+		const IVariableArrayOperationHelper* Get() const
 		{
 			return Get(GetTypeID<TL>(), GetTypeID<TR0>(), GetTypeID<TR0>());
 		}

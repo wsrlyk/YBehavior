@@ -1980,13 +1980,13 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    class SetOperationTreeNode : LeafNode
+    class ArrayOperationTreeNode : LeafNode
     {
         public override string Icon => "[x]+-*/[y]";
 
-        public SetOperationTreeNode()
+        public ArrayOperationTreeNode()
         {
-            m_Name = "SetOperation";
+            m_Name = "ArrayOperation";
             Type = TreeNodeType.TNT_Default;
         }
 
