@@ -5,6 +5,7 @@
 #include "YBehavior/types/treemap.h"
 #include "YBehavior/memory.h"
 #include "YBehavior/types/smallmap.h"
+#include <unordered_map>
 //namespace pugi
 //{
 //	class xml_node;
@@ -57,6 +58,7 @@ namespace YBehavior
 		TreeMap m_TreeMap;
 
 		small_map<UINT, UINT> m_ValidEvents;
+		std::unordered_map<STRING, UINT> m_TreeNodeCounts;
 #ifdef YDEBUGGER
 		UINT m_Hash;
 #endif
@@ -71,6 +73,7 @@ namespace YBehavior
 		inline const STRING& GetTreeName() const { return m_TreeName; }
 		inline const SharedDataEx* GetSharedData() const { return m_SharedData; }
 		inline const auto& GetValidEvents() const { return m_ValidEvents; }
+		inline const auto& GetTreeNodeCounts() const { return m_TreeNodeCounts; }
 		SharedDataEx* GetLocalData();
 		inline SharedDataEx* GetLocalDataIfExists() { return m_LocalData; }
 		inline ObjectPool<SharedDataEx>& GetLocalDataPool() { return m_LocalDataPool; }
@@ -79,6 +82,7 @@ namespace YBehavior
 		//inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }
 
 		void RegiseterEvent(UINT e, UINT count);
+		void AddTreeNodeCount(const STRING& name);
 
 		TreeNodeContext* CreateRootContext(LocalMemoryInOut* pTunnel = nullptr);
 

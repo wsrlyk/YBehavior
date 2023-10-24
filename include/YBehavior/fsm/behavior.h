@@ -3,6 +3,7 @@
 
 #include "YBehavior/types/types.h"
 #include "YBehavior/types/smallmap.h"
+#include <unordered_map>
 namespace YBehavior
 {
 	class BehaviorTree;
@@ -23,6 +24,7 @@ namespace YBehavior
 		/// EventNameHash->Count, 1: singleton, 2 or larger: multi events
 		/// </summary>
 		small_map<UINT, UINT> m_ValidEvents;
+		std::unordered_map<STRING, UINT> m_TreeNodeCounts;
 	public:
 		Behavior();
 		~Behavior();
@@ -37,7 +39,7 @@ namespace YBehavior
 		inline FSM* GetFSM() { return m_pFSM; }
 		inline Memory* GetMemory() { return m_pMemory; }
 		const small_map<UINT, UINT>& GetValidEvents() const { return m_ValidEvents; }
-
+		UINT GetTreeNodeCount(const STRING& name) const;
 		void Merge(BehaviorTree* pTree);
 	};
 

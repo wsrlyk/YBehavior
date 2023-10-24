@@ -96,13 +96,13 @@ namespace YBehavior
 					ERROR_BEGIN << "Cant Find Class Name in: " << data.name() << ERROR_END;
 					return false;
 				}
-				TreeNode* childNode = TreeNode::CreateNodeByName(className.value());
+				STRING name(className.value());
+				TreeNode* childNode = TreeNode::CreateNodeByName(name);
 				if (childNode == nullptr)
 				{
-					ERROR_BEGIN << "Cant create node " << className.value() << " cause its not registered;" << ERROR_END;
+					ERROR_BEGIN << "Cant create node " << name << " cause its not registered;" << ERROR_END;
 					return false;
 				}
-
 				auto connectionName = it->attribute("Connection");
 				if (!node->AddChild(childNode, connectionName.value()))
 				{
@@ -110,7 +110,7 @@ namespace YBehavior
 					delete childNode;
 					return false;
 				}
-
+				root->AddTreeNodeCount(name);
 				if (!_LoadOneNode(childNode, *it, treeNodesCache, root))
 					return false;
 			}

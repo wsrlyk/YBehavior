@@ -39,9 +39,23 @@ namespace YBehavior
 		return nullptr;
 	}
 
+	UINT Behavior::GetTreeNodeCount(const STRING& name) const
+	{
+		auto it = m_TreeNodeCounts.find(name);
+		if (it != m_TreeNodeCounts.end())
+			return it->second;
+		return 0;
+	}
+
 	void Behavior::Merge(BehaviorTree* pTree)
 	{
 		GetMemory()->GetMainData()->MergeFrom(*pTree->GetSharedData(), true);
 		m_ValidEvents.merge(pTree->GetValidEvents());
+
+		for (const auto& pair : pTree->GetTreeNodeCounts())
+		{
+			auto& count = m_TreeNodeCounts[pair.first];
+			count += pair.second;
+		}
 	}
 }

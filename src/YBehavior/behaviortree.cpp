@@ -132,6 +132,12 @@ namespace YBehavior
 		m_ValidEvents.insert({ e, count });
 	}
 
+	void BehaviorTree::AddTreeNodeCount(const STRING& name)
+	{
+		auto& count = m_TreeNodeCounts[name];
+		++count;
+	}
+
 	YBehavior::TreeNodeContext* BehaviorTree::CreateRootContext(LocalMemoryInOut* pTunnel /*= nullptr*/)
 	{
 		NodeContextType* pContext = (NodeContextType*)CreateContext();
