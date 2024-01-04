@@ -49,6 +49,8 @@ namespace YBehavior.Editor.Core.New
 
             foreach (var type in subTypeQuery)
             {
+                if (type.IsAbstract)
+                    continue;
                 TreeNode node = Activator.CreateInstance(type) as TreeNode;
                 if (node.Type == TreeNodeType.TNT_Invalid)
                     continue;
@@ -490,6 +492,8 @@ namespace YBehavior.Editor.Core.New
 
                 if (Graph != null)
                     Graph.RefreshNodeUID(0);
+                
+                Parent?._OnChildDisableChanged(this);
             }
         }
 
@@ -508,7 +512,10 @@ namespace YBehavior.Editor.Core.New
                 treeNode.PropertyChange(RenderProperty.Disabled);
             }
         }
+        protected virtual void _OnChildDisableChanged(NodeBase node)
+        {
 
+        }
         /// <summary>
         /// When a node is attached to a disabled parent, all children should be set to disabled, and vice versa.
         /// </summary>

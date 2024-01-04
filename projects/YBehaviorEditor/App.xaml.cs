@@ -110,6 +110,9 @@ namespace YBehavior.Editor
                 case "checklocal":
                     _CheckLocal();
                     break;
+                case "clear":
+                    Console.Clear();
+                    break;
             }
         }
 

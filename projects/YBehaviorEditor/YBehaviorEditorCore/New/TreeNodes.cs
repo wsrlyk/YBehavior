@@ -889,7 +889,84 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-    class HandleEventTreeNode : CompositeNode
+    abstract class SwitchLikeTreeNode: CompositeNode
+    {
+        protected string[] _GetCasesValue(Variable v)
+        {
+            if (v.eType == Variable.EnableType.ET_Disable)
+                return null;
+            if (v.vbType == Variable.VariableType.VBT_Const)
+            {
+                if (string.IsNullOrEmpty(v.Value))
+                {
+                    if (Tree != null && !Tree.IsInState(Graph.FLAG_LOADING))
+                        LogMgr.Instance.Error(v.DisplayName + " cant be empty " + (this.Renderer == null ? this.NickName : this.Renderer.UITitle));
+                    return null;
+                }
+                var children = this.m_Connections.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN).Conns;
+
+                foreach (var child in children)
+                {
+                    if (child.Ctr.To.Owner.Disabled)
+                    {
+                        if (Tree != null && !Tree.IsInState(Graph.FLAG_LOADING))
+                            LogMgr.Instance.Error("Disabled children are not supported yet in " + (this.Renderer == null ? this.NickName : this.Renderer.UITitle));
+                        return null;
+                    }
+                }
+                if (children.Count == 1)
+                    return new string[] { v.Value };
+                string[] ss = v.Value.Split(Variable.ListSpliter);
+                if (ss.Length != children.Count)
+                {
+                    if (Tree != null && !Tree.IsInState(Graph.FLAG_LOADING))
+                        LogMgr.Instance.Error(v.DisplayName + " size not match with children count in " + (this.Renderer == null ? this.NickName : this.Renderer.UITitle));
+                    return null;
+                }
+                return ss;
+            }
+            return null;
+        }
+
+        protected void _RefreshChildrenNotes(Variable v)
+        {
+            var conns = m_Connections.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN).Conns;
+            var values = _GetCasesValue(v);
+            if (values != null)
+            {
+                if (values.Length == conns.Count)
+                {
+                    for (int i = 0; i < conns.Count; ++i)
+                    {
+                        conns[i].Note = values[i];
+                    }
+                }
+                else
+                {
+                    for (int i = 0, j = 0; i < conns.Count; ++i)
+                    {
+                        if (conns[i].Ctr.To.Owner.Disabled)
+                            conns[i].Note = string.Empty;
+                        else
+                            conns[i].Note = values[j++];
+                    }
+                }
+            }
+            else
+            {
+                if (conns.Count == 1)
+                    conns[0].Note = string.Empty;
+                else
+                {
+                    for (int i = 0; i < conns.Count; ++i)
+                    {
+                        conns[i].Note = "No." + i;
+                    }
+                }
+            }
+        }
+    }
+    class HandleEventTreeNode : SwitchLikeTreeNode
     {
         public override string Icon => "[↙↓↘]";
         Variable m_Events;
@@ -1027,7 +1104,7 @@ namespace YBehavior.Editor.Core.New
         {
             if (m_Events.eType != Variable.EnableType.ET_Disable && m_Events.vbType == Variable.VariableType.VBT_Const)
             {
-                if (_GetCasesValue() == null)
+                if (_GetCasesValue(m_Events) == null)
                 {
                     LogMgr.Instance.Error(this.Renderer.UITitle + ": invalid Events");
                     return false;
@@ -1048,71 +1125,23 @@ namespace YBehavior.Editor.Core.New
         {
             if (v == m_Events)
             {
-                _RefreshChildrenNotes();
+                _RefreshChildrenNotes(m_Events);
             }
         }
 
         public override void OnConnectToChanged()
         {
             base.OnConnectToChanged();
-            _RefreshChildrenNotes();
+            _RefreshChildrenNotes(m_Events);
         }
-
-        string[] _GetCasesValue()
+        protected override void _OnChildDisableChanged(NodeBase node)
         {
-            if (m_Events.eType == Variable.EnableType.ET_Disable)
-                return null;
-            if (m_Events.vbType == Variable.VariableType.VBT_Const)
-            {
-                if (string.IsNullOrEmpty(m_Events.Value))
-                {
-                    if (Tree != null && !Tree.IsInState(Graph.FLAG_LOADING))
-                        LogMgr.Instance.Error("Events cant be empty " + (this.Renderer == null ? this.NickName : this.Renderer.UITitle));
-                    return null;
-                }
-                var childCount = this.m_Connections.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN).Conns.Count;
-                if (childCount == 1)
-                    return new string[] { m_Events.Value };
-                string[] ss = m_Events.Value.Split(Variable.ListSpliter);
-                if (ss.Length != childCount)
-                {
-                    if (Tree != null && !Tree.IsInState(Graph.FLAG_LOADING))
-                        LogMgr.Instance.Error("Events size not match in " + (this.Renderer == null ? this.NickName : this.Renderer.UITitle));
-                    return null;
-                }
-                return ss;
-            }
-            return null;
+            base._OnChildDisableChanged(node);
+            _RefreshChildrenNotes(m_Events);
         }
-
-        protected void _RefreshChildrenNotes()
-        {
-            var conns = m_Connections.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN).Conns;
-            var values = _GetCasesValue();
-            if (values != null)
-            {
-                for (int i = 0; i < conns.Count; ++i)
-                {
-                    conns[i].Note = values[i];
-                }
-            }
-            else
-            {
-                if (conns.Count == 1)
-                    conns[0].Note = string.Empty;
-                else
-                {
-                    for (int i = 0; i < conns.Count; ++i)
-                    {
-                        conns[i].Note = "No." + i;
-                    }
-                }
-            }
-        }
-
     }
 
-    class SwitchCaseTreeNode : CompositeNode
+    class SwitchCaseTreeNode : SwitchLikeTreeNode
     {
         public override string Icon => "↙↓↘";
         Variable m_Cases;
@@ -1168,7 +1197,7 @@ namespace YBehavior.Editor.Core.New
         {
             if (m_Cases.vbType == Variable.VariableType.VBT_Const)
             {
-                return _GetCasesValue() != null;
+                return _GetCasesValue(m_Cases) != null;
             }
             return true;
         }
@@ -1177,62 +1206,20 @@ namespace YBehavior.Editor.Core.New
         {
             if (v == m_Cases)
             {
-                _RefreshChildrenNotes();
+                _RefreshChildrenNotes(m_Cases);
             }
         }
 
         public override void OnConnectToChanged()
         {
             base.OnConnectToChanged();
-            _RefreshChildrenNotes();
+            _RefreshChildrenNotes(m_Cases);
         }
 
-        string[] _GetCasesValue()
+        protected override void _OnChildDisableChanged(NodeBase node)
         {
-            if (m_Cases.vbType == Variable.VariableType.VBT_Const)
-            {
-                if (string.IsNullOrEmpty(m_Cases.Value))
-                {
-                    if (Tree != null && !Tree.IsInState(Graph.FLAG_LOADING))
-                        LogMgr.Instance.Error("Cases cant be empty " + (this.Renderer == null ? this.NickName : this.Renderer.UITitle));
-                    return null;
-                }
-
-                string[] ss = m_Cases.Value.Split(Variable.ListSpliter);
-                if (ss.Length != this.m_Connections.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN).Conns.Count)
-                {
-                    if (Tree != null && !Tree.IsInState(Graph.FLAG_LOADING))
-                        LogMgr.Instance.Error("Cases size not match in " + (this.Renderer == null ? this.NickName : this.Renderer.UITitle));
-                    return null;
-                }
-                return ss;
-            }
-            return null;
-        }
-
-        protected void _RefreshChildrenNotes()
-        {
-            var conns = m_Connections.GetConnector(Connector.IdentifierChildren, Connector.PosType.CHILDREN).Conns;
-            var values = _GetCasesValue();
-            if (values != null)
-            {
-                for (int i = 0; i < conns.Count; ++i)
-                {
-                    conns[i].Note = values[i];
-                }
-            }
-            else
-            {
-                if (conns.Count == 1)
-                    conns[0].Note = string.Empty;
-                else
-                {
-                    for (int i = 0; i < conns.Count; ++i)
-                    {
-                        conns[i].Note = "No." + i;
-                    }
-                }
-            }
+            base._OnChildDisableChanged(node);
+            _RefreshChildrenNotes(m_Cases);
         }
     }
 
