@@ -18,11 +18,14 @@ namespace YBehavior
 		float z{};
 
 		Vector3() = default;
-		Vector3(float _x, float _y, float _z)
-			: x(_x)
-			, y(_y)
-			, z(_z)
-		{}
+		static Vector3 Create(float _x, float _y, float _z)
+		{
+			Vector3 v3;
+			v3.x = _x;
+			v3.y = _y;
+			v3.z = _z;
+			return v3;
+		}
 		friend std::stringstream & operator<<(std::stringstream &outstream, const Vector3 &obj)
 		{
 			outstream << obj.x << ',' << obj.y << ',' << obj.z;
@@ -61,12 +64,12 @@ namespace YBehavior
 
 		Vector3 operator + (const Vector3& other) const
 		{
-			return Vector3(x + other.x, y + other.y, z + other.z);
+			return Vector3::Create(x + other.x, y + other.y, z + other.z);
 		}
 
 		Vector3 operator - (const Vector3& other) const
 		{
-			return Vector3(x - other.x, y - other.y, z - other.z);
+			return Vector3::Create(x - other.x, y - other.y, z - other.z);
 		}
 
 		Vector3 operator * (const Vector3& other) const
@@ -80,13 +83,13 @@ namespace YBehavior
 
 		Vector3 operator * (float v) const
 		{
-			return Vector3(x * v, y * v, z * v);
+			return Vector3::Create(x * v, y * v, z * v);
 		}
 		Vector3 operator / (float v) const
 		{
 			if (v == 0.0f)
 				return *this;
-			return Vector3(x / v, y / v, z / v);
+			return Vector3::Create(x / v, y / v, z / v);
 		}
 
 		bool operator < (const Vector3& other) const

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Xml.Linq;
 using YBehaviorSharp;
 
 namespace TestSharp
@@ -119,12 +120,12 @@ namespace TestSharp
 
     public class XCustomAction : STreeNode
     {
-        SVariableString m_String0;
-        SVariableString m_String1;
+        //SVariableString m_String0;
+        SVariableInt m_Int0;
 
-        SVariableEntity m_Entity0;
+        //SVariableEntity m_Entity0;
 
-        SVariable m_Array0;
+        //SVariable m_Array0;
 
         public XCustomAction()
         {
@@ -133,20 +134,19 @@ namespace TestSharp
 
         protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
-            m_String0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "String0", pData) as SVariableString;
-            if (m_String0 == null)
-                return false;
-            m_String1 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "String1", pData) as SVariableString;
-            if (m_String1 == null)
-                return false;
+            //m_String0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "String0", pData) as SVariableString;
 
-            m_Entity0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Entity0", pData) as SVariableEntity;
-            if (m_Entity0 == null)
-                return false;
+            m_Int0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Int0", pData) as SVariableInt;
 
-            m_Array0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Array0", pData);
-            if (m_Array0 == null)
-                return false;
+            //m_Entity0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Entity0", pData) as SVariableEntity;
+
+            //m_Array0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Array0", pData);
+
+            if (YBehaviorSharp.SharpHelper.TryGetValue(pNode, "Type", pData))
+            {
+                string s = SharpHelper.GetFromBufferString();
+                Console.WriteLine(string.Format("Type: {0}", s));
+            }
             return true;
         }
 
@@ -155,9 +155,10 @@ namespace TestSharp
             Console.WriteLine();
             Console.WriteLine("XCustomAction Update");
 
-            this.LogVariable(m_String0, true);
-            this.LogVariable(m_Entity0, true);
-            this.LogVariable(m_Array0, true);
+            //this.LogVariable(m_String0, true);
+            this.LogVariable(m_Int0, true);
+            //this.LogVariable(m_Entity0, true);
+            //this.LogVariable(m_Array0, true);
             XSAgent agent = YBehaviorSharp.SPtrMgr.Instance.Get(pAgent) as XSAgent;
             if (agent == null)
                 return NodeState.NS_FAILURE;
@@ -177,24 +178,26 @@ namespace TestSharp
             SharpHelper.SetToBufferString(sharedData1);
             SharpHelper.SetSharedData(pAgent, key1, GetClassType<string>.ID);
 
-            string name0 = m_String0.Get(pAgent);
+            //string name0 = m_String0.Get(pAgent);
             //name = (agent.Entity as XSEntity).GetEntity.Name;
-            string name1 = m_String1.Get(pAgent);
-            m_String0.Set(pAgent, name1);
-            m_String1.Set(pAgent, name0);
+            //string name1 = m_String1.Get(pAgent);
+            int int0 = m_Int0.Get(pAgent);
+            //m_String0.Set(pAgent, name1);
+            //m_String1.Set(pAgent, name0);
+            m_Int0.Set(pAgent, int0 - 2);
 
-            Console.WriteLine(string.Format("0: {0}, 1: {1}", name0, name1));
+            Console.WriteLine(string.Format("int0: {0}", int0));
 
-            this.LogInfo(string.Format("0: {0}, 1: {1}", name0, name1));
+            //this.LogInfo(string.Format("0: {0}, 1: {1}", name0, name1));
             ////////////////////////////////////////////////////////////////////////////
 
-            XSEntity entity = m_Entity0.Get(pAgent) as XSEntity;
-            if (entity != null)
-            {
-                Console.WriteLine(string.Format("entity: {0}", entity.GetEntity.Name));
-            }
-            entity = Scene.Instance.entities[++counter % 2].Entity;
-            m_Entity0.Set(pAgent, entity);
+            //XSEntity entity = m_Entity0.Get(pAgent) as XSEntity;
+            //if (entity != null)
+            //{
+            //    Console.WriteLine(string.Format("entity: {0}", entity.GetEntity.Name));
+            //}
+            //entity = Scene.Instance.entities[++counter % 2].Entity;
+            //m_Entity0.Set(pAgent, entity);
 
             ////////////////////////////////////////////////////////////////////////////
             var keya = SharpHelper.GetTypeKeyByName("II0", GetClassType<int>.VecID);
@@ -205,29 +208,30 @@ namespace TestSharp
             arr.PushBack(100);
             SharpHelper.SetSharedData(pAgent, keya, GetClassType<int>.VecID);
 
-            if (m_Array0 is SArrayVaraible)
-            {
-                SArrayVaraible av = m_Array0 as SArrayVaraible;
-                SArrayInt array = av.Get(pAgent) as SArrayInt;
-                if (array != null)
-                {
-                    if (array.GetLength() > 10)
-                        array.Clear();
-                    array.PushBack(array.GetLength());
+            //if (m_Array0 is SArrayVaraible)
+            //{
+            //    SArrayVaraible av = m_Array0 as SArrayVaraible;
+            //    SArrayInt array = av.Get(pAgent) as SArrayInt;
+            //    if (array != null)
+            //    {
+            //        if (array.GetLength() > 10)
+            //            array.Clear();
+            //        array.PushBack(array.GetLength());
 
-                    string s = array.Get(0).ToString();
-                    for (int i = 1; i < array.GetLength(); ++i)
-                    {
-                        s += "|";
-                        s += array.Get(i);
-                    }
-                    Console.WriteLine(string.Format("Array: {0}", s));
-                }
-            }
+            //        string s = array.Get(0).ToString();
+            //        for (int i = 1; i < array.GetLength(); ++i)
+            //        {
+            //            s += "|";
+            //            s += array.Get(i);
+            //        }
+            //        Console.WriteLine(string.Format("Array: {0}", s));
+            //    }
+            //}
 
-            this.LogVariable(m_String0, false);
-            this.LogVariable(m_Entity0, false);
-            this.LogVariable(m_Array0, false);
+            //this.LogVariable(m_String0, false);
+            this.LogVariable(m_Int0, false);
+            //this.LogVariable(m_Entity0, false);
+            //this.LogVariable(m_Array0, false);
 
             return NodeState.NS_SUCCESS;
         }

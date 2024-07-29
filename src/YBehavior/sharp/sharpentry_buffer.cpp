@@ -1,4 +1,4 @@
-#ifdef SHARP
+#ifdef YSHARP
 #include "YBehavior/sharp/sharpentry_buffer.h"
 
 YBehavior::SharpBuffer YBehavior::SharpBuffer::s_Buffer;

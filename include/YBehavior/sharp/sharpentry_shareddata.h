@@ -22,9 +22,9 @@ extern "C" YBEHAVIOR_API void SetSharedData(YBehavior::Agent* pAgent, YBehavior:
 }
 
 
-extern "C" YBEHAVIOR_API YBehavior::KEY GetTypeKeyByName(YBehavior::CSTRING name, YBehavior::TYPEID type)
+extern "C" YBEHAVIOR_API YBehavior::KEY GetTypeKeyByName(YBehavior::CSTRING name)
 {
-	return YBehavior::TreeKeyMgr::Instance()->GetKeyByName(name, type);
+	return YBehavior::TreeKeyMgr::Instance()->GetKeyByName(name);
 }
 
 #define SHAREDDATA_ALLTYPES_OPERATIONS(TYPE)\

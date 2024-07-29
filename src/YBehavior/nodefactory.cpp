@@ -62,7 +62,7 @@ namespace YBehavior
 		return factory;
 	}
 
-#ifdef SHARP
+#ifdef YSHARP
 	TreeNode* NodeFactory::Get(const STRING& name)
 	{
 		auto it = m_SharpCallbacks.find(name);

@@ -10,6 +10,9 @@
 #include "YBehavior/sharp/sharplaunch.h"
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/sharedvariablecreatehelper.h"
+#include "YBehavior/variablecreation.h"
+#include "YBehavior/behaviorprocess.h"
+#include "YBehavior/sharp/sharpentry_buffer.h"
 
 extern "C" YBEHAVIOR_API YBehavior::Entity* CreateEntity()
 {
@@ -116,11 +119,30 @@ extern "C" YBEHAVIOR_API YBehavior::ISharedVariableEx* CreateVariable(
 	if (pNode != nullptr)
 	{
 		YBehavior::ISharedVariableEx* v;
-		YBehavior::TYPEID res = pNode->CreateVariable(v, attrName, *data, noConst);
+		auto res = YBehavior::VariableCreation::CreateVariableIfExist(pNode, v, attrName, *data, noConst);
 		return v;
 	}
 	return nullptr;
 }
+
+extern "C" YBEHAVIOR_API bool TryGetValue(
+	YBehavior::TreeNode* pNode,
+	YBehavior::CSTRING_CONST attrName,
+	const pugi::xml_node* data)
+{
+	if (pNode != nullptr)
+	{
+		YBehavior::STRING s;
+		if (YBehavior::VariableCreation::TryGetValue(pNode, attrName, *data, s))
+		{
+			YBehavior::SharpBuffer::Set(&s, YBehavior::GetTypeID<YBehavior::STRING>());
+			return true;
+		}
+		return false;
+	}
+	return nullptr;
+}
+
 
 extern "C" YBEHAVIOR_API void SetSharedDataByString(YBehavior::Agent* pAgent, YBehavior::CSTRING name, YBehavior::CSTRING value, YBehavior::CHAR separator)
 {

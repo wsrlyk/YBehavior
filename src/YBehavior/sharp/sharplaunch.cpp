@@ -1,4 +1,4 @@
-#ifdef SHARP
+#ifdef YSHARP
 
 #include "YBehavior/sharp/sharplaunch.h"
 #include "YBehavior/sharp/sharpentry_buffer.h"

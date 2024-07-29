@@ -15,7 +15,7 @@
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SharpDebug|AnyCPU'">
-    <StartWorkingDirectory>F:\Develop\YBehavior\bin\</StartWorkingDirectory>
+    <StartWorkingDirectory>E:\Develop\YBehavior\projects\YBehaviorEditor\bin\exported\</StartWorkingDirectory>
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
   </PropertyGroup>
 </Project>

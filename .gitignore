@@ -35,6 +35,7 @@
 /projects/Release
 /projects/ipch
 /projects/obj
+.vs
 *.opensdf
 *.pdb
 *.ilk

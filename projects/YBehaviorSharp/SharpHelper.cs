@@ -178,6 +178,12 @@ namespace YBehaviorSharp
         static public extern void Tick(IntPtr pAgent);
 
         [DllImport(VERSION.dll)]
+        static public extern bool TryGetValue(
+            IntPtr pNode,
+            string attrName,
+            IntPtr data);
+
+        [DllImport(VERSION.dll)]
         static public extern IntPtr CreateVariable(
             IntPtr pNode,
             string attrName,

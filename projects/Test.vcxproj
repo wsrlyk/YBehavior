@@ -222,6 +222,11 @@
   <ItemGroup>
     <ClInclude Include="..\src\Test\customactions.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="YBehavior.vcxproj">
+      <Project>{c1582006-77b9-497e-a630-43fc48dd4b18}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -1,4 +1,4 @@
-#ifdef SHARP
+#ifdef YSHARP
 
 #include "YBehavior/sharp/sharpnode.h"
 

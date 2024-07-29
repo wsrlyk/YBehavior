@@ -5,10 +5,13 @@
     <Node Class="Sequence" GUID="2" Pos="120,-120">
       <Node Class="IfThenElse" GUID="6" Pos="-74,11">
         <Node Class="Comparer" GUID="7" Connection="if" Pos="-210,120" Operator="_EC &gt;=" Opl="_IP a" Opr="_IC 9" />
-        <Node Class="Calculator" GUID="8" Connection="then" Pos="-94,138" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 2" />
-        <Node Class="Calculator" GUID="9" Connection="else" Pos="86,160" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 1" />
+        <Node Class="Sequence" GUID="10" Connection="then" Pos="-90,140">
+          <Node Class="Calculator" GUID="14" Pos="-190,270" Operator="_EC -" Output="_IP a" Input1="_IP a" Input2="_IC 9" />
+          <Node Class="XCustomAction" GUID="12" Pos="-50,280" Type="_EC Enum2" String0="_SPD " Int0="_IPE a" Entity0="_APD " Array0="IIPD " />
+        </Node>
+        <Node Class="Calculator" GUID="9" Connection="else" Pos="130,160" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 2" />
       </Node>
     </Node>
   </Node>
-  <Node Class="Calculator" GUID="5" Pos="346,-151" Operator="_EC +" Output="_IP " Input1="_IC 0" Input2="_IC 0" />
+  <Node Class="Calculator" GUID="5" Pos="300,30" Operator="_EC +" Output="_IP " Input1="_IC 0" Input2="_IC 0" />
 </Test0>

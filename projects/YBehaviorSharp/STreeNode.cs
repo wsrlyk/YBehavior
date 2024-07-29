@@ -39,6 +39,8 @@ namespace YBehaviorSharp
 
         protected void LogVariable(SVariable v, bool before)
         {
+            if (v == null)
+                return;
             SharpHelper.LogVariable(m_pNode, v.Core, before);
         }
 
