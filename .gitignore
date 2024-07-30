@@ -87,3 +87,4 @@ projects/YBehaviorEditor/bin/user.ini
 /projects/UnityTest/YBTest/Assets/StreamingAssets/Bundles.meta
 projects/YBehaviorEditor/bin/keybindings.json
 bin/Test
+projects/TestSharp/Properties/launchSettings.json

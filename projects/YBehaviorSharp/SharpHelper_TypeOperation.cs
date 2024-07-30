@@ -7,11 +7,11 @@ using System.Linq;
 namespace YBehaviorSharp
 {
     using INT = System.Int32;
-    using BOOL = System.Int16;
+    using BOOL = System.Byte;
     using FLOAT = System.Single;
     using ULONG = System.UInt64;
     using STRING = System.String;
-    using Bool = System.Int16;
+    using Bool = System.Byte;
     using KEY = System.Int32;
 
     public partial class SharpHelper

@@ -253,7 +253,7 @@ namespace YBehavior
 	typedef unsigned long long	ULONG;
 	typedef unsigned char       BYTE;
 	typedef bool				BOOL_REAL;
-	typedef unsigned short		BOOL;	///> WARNING: bool is defined by short. Cause bool in vector is specialized and has quite different behaviors with others.
+	typedef unsigned char		BOOL;	///> WARNING: bool is defined by short. Cause bool in vector is specialized and has quite different behaviors with others.
 	typedef unsigned short		USHORT;
 	typedef float				FLOAT;
 	typedef char				CHAR;

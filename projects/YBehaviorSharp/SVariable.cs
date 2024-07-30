@@ -6,7 +6,7 @@ namespace YBehaviorSharp
 {
     using TYPEID = System.Int32;
     using INT = System.Int32;
-    using BOOL = System.Int16;
+    using BOOL = System.Byte;
 
 
     public class SVariableHelper

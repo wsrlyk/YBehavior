@@ -7,7 +7,7 @@ using System.Linq;
 namespace YBehaviorSharp
 {
     using TYPEID = System.Int32;
-    using BOOL = System.Int16;
+    using BOOL = System.Byte;
 
     public interface ISArray
     {
@@ -40,9 +40,9 @@ namespace YBehaviorSharp
 
     public class SArrayHelper
     {
-        public static ISArray GetArray(IntPtr ptr, TYPEID type)
+        public static ISArray GetArray(IntPtr ptr, TYPEID elementType)
         {
-            var t = s_ArrayTypes[type];
+            var t = s_ArrayTypes[elementType];
             return Activator.CreateInstance(t, ptr) as ISArray;
         }
 

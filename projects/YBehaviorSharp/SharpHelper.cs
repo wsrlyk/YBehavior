@@ -9,11 +9,11 @@ namespace YBehaviorSharp
     using TYPEID = System.Int32;
     using KEY = System.Int32;
     using INT = System.Int32;
-    using BOOL = System.Int16;
+    using BOOL = System.Byte;
     using FLOAT = System.Single;
     using ULONG = System.UInt64;
     using STRING = System.String;
-    using Bool = System.Int16;
+    using Bool = System.Byte;
 
     public delegate bool OnNodeLoaded(IntPtr pNode, IntPtr pData);
     public delegate NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent);

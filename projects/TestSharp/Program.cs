@@ -125,7 +125,7 @@ namespace TestSharp
 
         //SVariableEntity m_Entity0;
 
-        //SVariable m_Array0;
+        SVariable m_Array0;
 
         public XCustomAction()
         {
@@ -140,7 +140,7 @@ namespace TestSharp
 
             //m_Entity0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Entity0", pData) as SVariableEntity;
 
-            //m_Array0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Array0", pData);
+            m_Array0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Array0", pData);
 
             if (YBehaviorSharp.SharpHelper.TryGetValue(pNode, "Type", pData))
             {
@@ -169,14 +169,14 @@ namespace TestSharp
             SharpHelper.GetSharedData(pAgent, key0, GetClassType<string>.ID);
             string sharedData0 = SharpHelper.GetFromBufferString();
             //sharedData0 = sharedData0 + "0";
-            SharpHelper.SetToBufferString(sharedData0);
-            SharpHelper.SetSharedData(pAgent, key0, GetClassType<string>.ID);
+            //SharpHelper.SetToBufferString(sharedData0);
+            SSharedData.SetSharedString(pAgent, key0, sharedData0);
 
             SharpHelper.GetSharedData(pAgent, key1, GetClassType<string>.ID);
             string sharedData1 = SharpHelper.GetFromBufferString();
             //sharedData1 = sharedData1 + "1";
             SharpHelper.SetToBufferString(sharedData1);
-            SharpHelper.SetSharedData(pAgent, key1, GetClassType<string>.ID);
+            //SharpHelper.SetSharedData(pAgent, key1, GetClassType<string>.ID);
 
             //string name0 = m_String0.Get(pAgent);
             //name = (agent.Entity as XSEntity).GetEntity.Name;
@@ -203,35 +203,35 @@ namespace TestSharp
             var keya = SharpHelper.GetTypeKeyByName("II0", GetClassType<int>.VecID);
 
             SharpHelper.GetSharedData(pAgent, keya, GetClassType<int>.VecID);
-            SArrayInt arr = SArrayHelper.GetArray(SharpHelper.GetFromBufferVector(GetClassType<int>.VecID), GetClassType<int>.ID) as SArrayInt;
+            SArrayInt arr = SSharedData.GetSharedArray<int>(pAgent, keya) as SArrayInt;
             //arr.Clear();
             arr.PushBack(100);
             SharpHelper.SetSharedData(pAgent, keya, GetClassType<int>.VecID);
 
-            //if (m_Array0 is SArrayVaraible)
-            //{
-            //    SArrayVaraible av = m_Array0 as SArrayVaraible;
-            //    SArrayInt array = av.Get(pAgent) as SArrayInt;
-            //    if (array != null)
-            //    {
-            //        if (array.GetLength() > 10)
-            //            array.Clear();
-            //        array.PushBack(array.GetLength());
+            if (m_Array0 is SArrayVaraible)
+            {
+                SArrayVaraible av = m_Array0 as SArrayVaraible;
+                SArrayInt array = av.Get(pAgent) as SArrayInt;
+                if (array != null)
+                {
+                    if (array.GetLength() > 10)
+                        array.Clear();
+                    array.PushBack(array.GetLength());
 
-            //        string s = array.Get(0).ToString();
-            //        for (int i = 1; i < array.GetLength(); ++i)
-            //        {
-            //            s += "|";
-            //            s += array.Get(i);
-            //        }
-            //        Console.WriteLine(string.Format("Array: {0}", s));
-            //    }
-            //}
+                    string s = array.Get(0).ToString();
+                    for (int i = 1; i < array.GetLength(); ++i)
+                    {
+                        s += "|";
+                        s += array.Get(i);
+                    }
+                    Console.WriteLine(string.Format("Array: {0}", s));
+                }
+            }
 
             //this.LogVariable(m_String0, false);
             this.LogVariable(m_Int0, false);
             //this.LogVariable(m_Entity0, false);
-            //this.LogVariable(m_Array0, false);
+            this.LogVariable(m_Array0, false);
 
             return NodeState.NS_SUCCESS;
         }
