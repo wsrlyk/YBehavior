@@ -10,8 +10,6 @@ namespace YBehavior
 	YBehavior::SharpLogDelegate SharpLaunchCore::s_ThreadLogCallback{};
 	YBehavior::SharpLogDelegate SharpLaunchCore::s_ThreadErrorCallback{};
 
-	STRING SharpLaunchCore::m_WorkingDir;
-
 	SharpLaunchCore::SharpLaunchCore(int debugport)
 		: m_Port(debugport)
 	{
@@ -28,13 +26,13 @@ namespace YBehavior
 
 	void SharpLaunchCore::GetLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const
 	{
-		pLog = s_ProcessLog;
-		pError = s_ProcessError;
+		pLog = ProcessLog;
+		pError = ProcessError;
 	}
 	void SharpLaunchCore::GetThreadLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const
 	{
-		pLog = s_ProcessThreadLog;
-		pError = s_ProcessThreadError;
+		pLog = ProcessThreadLog;
+		pError = ProcessThreadError;
 
 	}
 
@@ -50,33 +48,28 @@ namespace YBehavior
 		s_ThreadErrorCallback = threaderror;
 	}
 
-	void SharpLaunchCore::SetWorkingDir(CSTRING_CONST path)
-	{
-		m_WorkingDir = path;
-	}
-
-	void SharpLaunchCore::s_ProcessLog(const STRING& str)
+	void SharpLaunchCore::ProcessLog(const STRING& str)
 	{
 		SharpBuffer::s_Buffer.m_String = str;
 		if (s_LogCallback)
 			s_LogCallback();
 	}
 
-	void SharpLaunchCore::s_ProcessError(const STRING& str)
+	void SharpLaunchCore::ProcessError(const STRING& str)
 	{
 		SharpBuffer::s_Buffer.m_String = str;
 		if (s_ErrorCallback)
 			s_ErrorCallback();
 	}
 
-	void SharpLaunchCore::s_ProcessThreadLog(const STRING& str)
+	void SharpLaunchCore::ProcessThreadLog(const STRING& str)
 	{
 		SharpBuffer::s_Buffer.m_String = str;
 		if (s_ThreadLogCallback)
 			s_ThreadLogCallback();
 	}
 
-	void SharpLaunchCore::s_ProcessThreadError(const STRING& str)
+	void SharpLaunchCore::ProcessThreadError(const STRING& str)
 	{
 		SharpBuffer::s_Buffer.m_String = str;
 		if (s_ThreadErrorCallback)

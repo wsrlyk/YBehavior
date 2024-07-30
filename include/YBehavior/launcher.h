@@ -9,7 +9,9 @@ namespace YBehavior
 	public:
 		virtual void RegisterActions() const;
 		virtual int StartWithDebugListeningPort() const { return 0; }
+#ifndef YSHARP
 		virtual STRING WorkingDir() const { return ""; }
+#endif
 		virtual void GetLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const { return; }
 		virtual void GetThreadLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const { return; }
 	protected:

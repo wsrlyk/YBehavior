@@ -28,8 +28,9 @@ namespace YBehavior
 	{
 		MachineVersionMgrType m_VersionMgr;
 
+#ifndef YSHARP
 		STRING m_WorkingDir;
-
+#endif
 	public:
 		~MachineMgr();
 
@@ -37,7 +38,9 @@ namespace YBehavior
 		FSM* GetFSM(const STRING& key);
 		///> Just load a FSM. Not inc the ref count.
 		bool LoadFSM(const STRING& key, const TreeMap*& pOutputTreeMap);
+#ifndef YSHARP
 		void SetWorkingDir(const STRING& dir);
+#endif
 		void ReturnFSM(FSM* pFSM);
 		void ReloadMachine(const STRING& name);
 		void ReloadAll();

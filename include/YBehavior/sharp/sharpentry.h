@@ -13,6 +13,7 @@
 #include "YBehavior/variablecreation.h"
 #include "YBehavior/behaviorprocess.h"
 #include "YBehavior/sharp/sharpentry_buffer.h"
+#include "YBehavior/sharp/sharputility.h"
 
 extern "C" YBEHAVIOR_API YBehavior::Entity* CreateEntity()
 {
@@ -56,9 +57,9 @@ extern "C" YBEHAVIOR_API void RegisterSharpNode(
 	YBehavior::NodeFactory::Instance()->SetSharpCallback(name, onload, onupdate);
 }
 
-extern "C" YBEHAVIOR_API void RegisterWorkingDir(YBehavior::CSTRING_CONST path)
+extern "C" YBEHAVIOR_API void RegisterGetFilePathCallback(YBehavior::SharpGetFilePathDelegate callback)
 {
-	YBehavior::SharpLaunchCore::SetWorkingDir(path);
+	YBehavior::SharpUtility::SetGetFilePathCallback(callback);
 }
 
 extern "C" YBEHAVIOR_API void RegisterLogCallback(

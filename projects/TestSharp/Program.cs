@@ -17,7 +17,8 @@ namespace TestSharp
             YBehaviorSharp.SharpHelper.OnErrorCallback = ShowLog;
             YBehaviorSharp.SharpHelper.OnThreadLogCallback = ShowLog;
             YBehaviorSharp.SharpHelper.OnThreadErrorCallback = ShowLog;
-            YBehaviorSharp.SharpHelper.Init("E:\\Develop\\YBehavior\\projects\\YBehaviorEditor\\bin\\exported");
+            SharpHelper.OnGetFilePathCallback = GetFilePath;
+            YBehaviorSharp.SharpHelper.Init();
             SharpHelper.Register<XCustomAction>();
 
             XEntity entity0 = new XEntity("Hehe");
@@ -42,21 +43,17 @@ namespace TestSharp
             Console.Read();
         }
 
-        static string LoadData(string treename)
-        {
-            FileStream fileStream = new FileStream(treename, FileMode.Open, FileAccess.Read, FileShare.Read);
-            byte[] bytes = new byte[fileStream.Length];
-            fileStream.Read(bytes, 0, bytes.Length);
-            fileStream.Close();
-
-            string str = System.Text.Encoding.UTF8.GetString(bytes);
-            return str;
-        }
-
         static void ShowLog()
         {
             string data = YBehaviorSharp.SharpHelper.GetFromBufferString();
             Console.WriteLine(data);
+        }
+
+        static void GetFilePath()
+        {
+            string filename = YBehaviorSharp.SharpHelper.GetFromBufferString();
+            filename = "E:\\Develop\\YBehavior\\projects\\YBehaviorEditor\\bin\\exported\\" + filename;
+            SharpHelper.SetToBufferString(filename);
         }
     }
 

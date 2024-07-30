@@ -23,8 +23,10 @@ namespace YBehavior
 
 
 		core.RegisterActions();
+#ifndef YSHARP
 		Mgrs::Instance()->GetTreeMgr()->SetWorkingDir(core.WorkingDir());
 		Mgrs::Instance()->GetMachineMgr()->SetWorkingDir(core.WorkingDir());
+#endif
 #ifdef YDEBUGGER
 		if (core.StartWithDebugListeningPort())
 			Network::Instance()->InitAndCreateThread(core.StartWithDebugListeningPort());

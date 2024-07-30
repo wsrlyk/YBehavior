@@ -8,6 +8,9 @@
 #include <algorithm>
 #include <cstring>
 #include "YBehavior/utility.h"
+#ifdef YSHARP
+#include "YBehavior/sharp/sharputility.h"
+#endif
 
 namespace YBehavior
 {
@@ -15,6 +18,7 @@ namespace YBehavior
 	{
 	}
 
+#ifndef YSHARP
 	void MachineMgr::SetWorkingDir(const STRING& dir)
 	{
 		m_WorkingDir = dir;
@@ -28,7 +32,7 @@ namespace YBehavior
 			m_WorkingDir.append(1, '/');
 		}
 	}
-
+#endif
 
 	void MachineMgr::ReturnFSM(FSM* pFSM)
 	{
@@ -91,7 +95,11 @@ namespace YBehavior
 	FSM * MachineMgr::_LoadFSM(const STRING& name)
 	{
 		pugi::xml_document doc;
+#ifdef YSHARP
+		pugi::xml_parse_result result = doc.load_file(SharpUtility::GetFilePath(name + FSM_EXT).c_str());
+#else
 		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + FSM_EXT).c_str());
+#endif
 		LOG_BEGIN << "Loading: " << name << FSM_EXT << LOG_END;
 		if (result.status)
 		{

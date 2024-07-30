@@ -7,6 +7,9 @@
 #include "YBehavior/tools/common.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/mgrs.h"
+#ifdef YSHARP
+#include "YBehavior/sharp/sharputility.h"
+#endif
 
 namespace YBehavior
 {
@@ -19,7 +22,11 @@ namespace YBehavior
 	{
 		pugi::xml_document doc;
 
+#ifdef YSHARP
+		pugi::xml_parse_result result = doc.load_file(SharpUtility::GetFilePath(name + TREE_EXT).c_str());
+#else
 		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + TREE_EXT).c_str());
+#endif
 		if (result.status)
 		{
 			ERROR_BEGIN << "Loading " << name << TREE_EXT ": " << result.description() << ERROR_END;
@@ -196,6 +203,7 @@ namespace YBehavior
 		std::cout << "Print all trees end." << std::endl;
 	}
 
+#ifndef YSHARP
 	void TreeMgr::SetWorkingDir(const STRING& dir)
 	{
 		m_WorkingDir = dir;
@@ -209,7 +217,7 @@ namespace YBehavior
 			m_WorkingDir.append(1, '/');
 		}
 	}
-
+#endif
 	void TreeMgr::Clear()
 	{
 		m_VersionMgr.Clear();

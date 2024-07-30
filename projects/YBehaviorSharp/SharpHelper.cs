@@ -19,6 +19,7 @@ namespace YBehaviorSharp
     public delegate NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent);
     public delegate string LoadDataCallback(string treeName);
     public delegate void LogCallback();
+    public delegate void GetFilePathCallback();
 
     public enum NodeState
     {
@@ -98,11 +99,11 @@ namespace YBehaviorSharp
         public static LogCallback OnErrorCallback { get; set; }
         public static LogCallback OnThreadLogCallback { get; set; }
         public static LogCallback OnThreadErrorCallback { get; set; }
+        public static GetFilePathCallback OnGetFilePathCallback { get; set; }
 
         static List<STreeNode> s_NodeList = new List<STreeNode>();
-        public static void Init(string workingDir)
+        public static void Init()
         {
-            RegisterWorkingDir(workingDir);
             InitSharp(444);
 
             RegisterLogCallback(
@@ -110,6 +111,7 @@ namespace YBehaviorSharp
                 OnErrorCallback,
                 OnThreadLogCallback,
                 OnThreadErrorCallback);
+            RegisterGetFilePathCallback(OnGetFilePathCallback);
 
             var subTypeQuery = from t in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
                                where SUtility.IsSubClassOf(t, typeof(STreeNode))
@@ -135,7 +137,7 @@ namespace YBehaviorSharp
         static public extern void InitSharp(int debugPort);
 
         [DllImport(VERSION.dll)]
-        static public extern void RegisterWorkingDir(string path);
+        static public extern void RegisterGetFilePathCallback(GetFilePathCallback callback);
 
         [DllImport(VERSION.dll, CallingConvention = CallingConvention.StdCall)]
         static public extern void RegisterLogCallback(

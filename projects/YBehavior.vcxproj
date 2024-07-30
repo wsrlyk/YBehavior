@@ -31,6 +31,7 @@
     <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugixml.hpp" />
     <ClInclude Include="..\include\YBehavior\agent.h" />
     <ClInclude Include="..\include\YBehavior\nodes\convert.h" />
+    <ClInclude Include="..\include\YBehavior\sharp\sharputility.h" />
     <ClInclude Include="..\include\YBehavior\treenode.h" />
     <ClInclude Include="..\include\YBehavior\behaviorprocess.h" />
     <ClInclude Include="..\include\YBehavior\behaviortree.h" />
@@ -111,6 +112,7 @@
     <ClCompile Include="..\src\YBehavior\3rd\pugixml\pugixml.cpp" />
     <ClCompile Include="..\src\YBehavior\agent.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\convert.cpp" />
+    <ClCompile Include="..\src\YBehavior\sharp\sharputility.cpp" />
     <ClCompile Include="..\src\YBehavior\treenode.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviorprocess.cpp" />
     <ClCompile Include="..\src\YBehavior\behaviortree.cpp" />
