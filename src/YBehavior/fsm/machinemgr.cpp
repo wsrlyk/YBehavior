@@ -83,19 +83,15 @@ namespace YBehavior
 		return true;
 	}
 
-#ifdef SHARP
-#define FSM_EXT TOSTRING(.bytes)
+#ifdef YSHARP
+#define FSM_EXT TOSTRING(.fsm)
 #else
 #define FSM_EXT TOSTRING(.fsm)
 #endif
 	FSM * MachineMgr::_LoadFSM(const STRING& name)
 	{
 		pugi::xml_document doc;
-		pugi::xml_parse_result result;
-		if (m_LoadDataCallback != nullptr)
-			result = doc.load_string(m_LoadDataCallback((m_WorkingDir + name + FSM_EXT).c_str()));
-		else
-			result = doc.load_file((m_WorkingDir + name + FSM_EXT).c_str());
+		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + FSM_EXT).c_str());
 		LOG_BEGIN << "Loading: " << name << FSM_EXT << LOG_END;
 		if (result.status)
 		{

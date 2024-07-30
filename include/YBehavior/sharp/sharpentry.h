@@ -56,11 +56,9 @@ extern "C" YBEHAVIOR_API void RegisterSharpNode(
 	YBehavior::NodeFactory::Instance()->SetSharpCallback(name, onload, onupdate);
 }
 
-extern "C" YBEHAVIOR_API void RegisterLoadData(YBehavior::LoadDataDelegate loaddata)
+extern "C" YBEHAVIOR_API void RegisterWorkingDir(YBehavior::CSTRING_CONST path)
 {
-	YBehavior::Mgrs::Instance()->GetTreeMgr()->SetLoadDataCallback(loaddata);
-	YBehavior::Mgrs::Instance()->GetMachineMgr()->SetLoadDataCallback(loaddata);
-	//YBehavior::TreeMgr::Instance()->SetLoadDataCallback(loaddata);
+	YBehavior::SharpLaunchCore::SetWorkingDir(path);
 }
 
 extern "C" YBEHAVIOR_API void RegisterLogCallback(

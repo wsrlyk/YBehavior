@@ -10,6 +10,8 @@ namespace YBehavior
 	YBehavior::SharpLogDelegate SharpLaunchCore::s_ThreadLogCallback{};
 	YBehavior::SharpLogDelegate SharpLaunchCore::s_ThreadErrorCallback{};
 
+	STRING SharpLaunchCore::m_WorkingDir;
+
 	SharpLaunchCore::SharpLaunchCore(int debugport)
 		: m_Port(debugport)
 	{
@@ -46,6 +48,11 @@ namespace YBehavior
 		s_ErrorCallback = error;
 		s_ThreadLogCallback = threadlog;
 		s_ThreadErrorCallback = threaderror;
+	}
+
+	void SharpLaunchCore::SetWorkingDir(CSTRING_CONST path)
+	{
+		m_WorkingDir = path;
 	}
 
 	void SharpLaunchCore::s_ProcessLog(const STRING& str)

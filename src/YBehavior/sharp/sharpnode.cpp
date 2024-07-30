@@ -8,7 +8,7 @@ namespace YBehavior
 	{
 		if (_OnUpdateCallback)
 		{
-			LOG_BEGIN << "SharpNode Update" << LOG_END;
+			//LOG_BEGIN << "SharpNode Update" << LOG_END;
 			return _OnUpdateCallback(this, pAgent);
 		}
 		return NS_SUCCESS;
@@ -19,7 +19,7 @@ namespace YBehavior
 	{
 		if (_OnLoadCallback)
 		{
-			LOG_BEGIN << "SharpNode OnLoaded" << LOG_END;
+			//LOG_BEGIN << "SharpNode OnLoaded" << LOG_END;
 			return _OnLoadCallback(this, &data);
 		}
 		return true;

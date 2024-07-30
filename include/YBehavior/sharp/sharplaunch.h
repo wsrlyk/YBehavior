@@ -12,9 +12,11 @@ namespace YBehavior
 	{
 	private:
 		int m_Port{};
+		static STRING m_WorkingDir;
 	public:
 		SharpLaunchCore(int debugport);
 		int StartWithDebugListeningPort() const override;
+		STRING WorkingDir() const override { return m_WorkingDir; }
 
 		void GetLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const override;
 		void GetThreadLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const override;
@@ -24,6 +26,7 @@ namespace YBehavior
 			SharpLogDelegate error, 
 			SharpLogDelegate threadlog, 
 			SharpLogDelegate threaderror);
+		static void SetWorkingDir(CSTRING_CONST path);
 	private:
 		static void s_ProcessLog(const STRING& str);
 		static void s_ProcessError(const STRING& str);

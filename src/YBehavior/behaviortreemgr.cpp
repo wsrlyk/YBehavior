@@ -10,8 +10,8 @@
 
 namespace YBehavior
 {
-#ifdef SHARP
-#define TREE_EXT TOSTRING(.bytes)
+#ifdef YSHARP
+#define TREE_EXT TOSTRING(.tree)
 #else
 #define TREE_EXT TOSTRING(.tree)
 #endif
@@ -19,11 +19,7 @@ namespace YBehavior
 	{
 		pugi::xml_document doc;
 
-		pugi::xml_parse_result result;
-		if (m_LoadDataCallback != nullptr)
-			result = doc.load_string(m_LoadDataCallback((m_WorkingDir + name + TREE_EXT ).c_str()));
-		else
-			result = doc.load_file((m_WorkingDir + name + TREE_EXT).c_str());
+		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + TREE_EXT).c_str());
 		if (result.status)
 		{
 			ERROR_BEGIN << "Loading " << name << TREE_EXT ": " << result.description() << ERROR_END;

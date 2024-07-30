@@ -94,20 +94,16 @@ namespace YBehaviorSharp
 
     public partial class SharpHelper
     {
-        public static LoadDataCallback LoadDataCallback { get; set; }
-
         public static LogCallback OnLogCallback { get; set; }
         public static LogCallback OnErrorCallback { get; set; }
         public static LogCallback OnThreadLogCallback { get; set; }
         public static LogCallback OnThreadErrorCallback { get; set; }
 
         static List<STreeNode> s_NodeList = new List<STreeNode>();
-        public static void Init()
+        public static void Init(string workingDir)
         {
+            RegisterWorkingDir(workingDir);
             InitSharp(444);
-
-            if (LoadDataCallback != null)
-                RegisterLoadData(LoadDataCallback);
 
             RegisterLogCallback(
                 OnLogCallback,
@@ -138,6 +134,9 @@ namespace YBehaviorSharp
         [DllImport(VERSION.dll)]
         static public extern void InitSharp(int debugPort);
 
+        [DllImport(VERSION.dll)]
+        static public extern void RegisterWorkingDir(string path);
+
         [DllImport(VERSION.dll, CallingConvention = CallingConvention.StdCall)]
         static public extern void RegisterLogCallback(
             LogCallback log,
@@ -163,9 +162,6 @@ namespace YBehaviorSharp
             string name,
             OnNodeLoaded onload,
             OnNodeUpdate onupdate);
-
-        [DllImport(VERSION.dll, CallingConvention = CallingConvention.StdCall)]
-        static public extern void RegisterLoadData(LoadDataCallback loaddata);
 
         [DllImport(VERSION.dll)]
         static public extern bool SetBehavior(

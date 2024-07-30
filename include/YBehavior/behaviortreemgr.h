@@ -36,7 +36,6 @@ namespace YBehavior
 		//static TreeMgr* Instance();
 		void Print();
 		void SetWorkingDir(const STRING& dir);
-		void SetLoadDataCallback(LoadDataDelegate callback) { m_LoadDataCallback = callback; }
 	
 		void Clear();
 	protected:
@@ -48,8 +47,6 @@ namespace YBehavior
 
 		VersionMgr<BehaviorTree, STRING> m_VersionMgr;
 		STRING m_WorkingDir;
-
-		LoadDataDelegate m_LoadDataCallback = nullptr;
 	};
 }
 

@@ -274,7 +274,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>YBEHAVIOR_EXPORTS;YDEBUGGER;PRINT_INTERMEDIATE_INFO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>YBEHAVIOR_EXPORTS;YDEBUGGER;YSHARP;NO_PRINT_INTERMEDIATE_INFO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -303,8 +303,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='SharpDebug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MinSpace</Optimization>
-      <PreprocessorDefinitions>YDEBUGGER;PRINT_INTERMEDIATE_INFO;YPROFILER;YSHARP;YBEHAVIOR_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>YDEBUGGER;NO_PRINT_INTERMEDIATE_INFO;YSHARP;YBEHAVIOR_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -314,6 +314,10 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)TestSharp\bin\SharpDebug\net6.0\$(ProjectName).dll"
+copy "$(TargetDir)$(ProjectName).pdb" "$(SolutionDir)TestSharp\bin\SharpDebug\net6.0\$(ProjectName).pdb"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

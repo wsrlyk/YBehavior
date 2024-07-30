@@ -42,15 +42,12 @@ namespace YBehavior
 		void ReloadMachine(const STRING& name);
 		void ReloadAll();
 		void Print();
-		void SetLoadDataCallback(LoadDataDelegate callback) { m_LoadDataCallback = callback; }
 	
 		void Clear();
 	protected:
 		FSM * _LoadFSM(const STRING& name);
 		bool _CreateSpecialStates(StateMachine* pMachine, UINT uid);
 		bool _LoadMachine(StateMachine* pMachine, const pugi::xml_node& data, UINT& uid);
-
-		LoadDataDelegate m_LoadDataCallback = nullptr;
 	};
 }
 
