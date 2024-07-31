@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Test0>
   <Node Class="Root">
-    <Shared II0="IIC 0|1" a="_IC 0" />
+    <Shared S0="_SC string0" II0="IIC 0|1" a="_IC 0" />
     <Node Class="Sequence">
       <Node Class="IfThenElse">
         <Node Class="Comparer" Connection="if" Operator="_EC &gt;=" Opl="_IP a" Opr="_IC 9" />
         <Node Class="Sequence" Connection="then">
           <Node Class="Calculator" Operator="_EC -" Output="_IP a" Input1="_IP a" Input2="_IC 9" />
-          <Node Class="XCustomAction" Type="_EC Enum2" Int0="_IPE a" Array0="IIPE II0" />
+          <Node Class="XCustomAction" Type="_EC Enum2" String0="_SPE S0" Int0="_IPE a" Array0="IIPE II0" />
         </Node>
         <Node Class="Calculator" Connection="else" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 2" />
       </Node>

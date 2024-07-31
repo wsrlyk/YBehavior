@@ -62,16 +62,19 @@ namespace YBehaviorSharp
     public class SArrayVaraible : SVariable
     {
         protected TYPEID m_ElementTypeID;
+        protected ISArray m_Array;
 
         public SArrayVaraible(IntPtr core) : base(core)
         {
             m_ElementTypeID = SharpHelper.GetVariableElementTypeID(core);
+            m_Array = SArrayHelper.GetArray(IntPtr.Zero, m_ElementTypeID);
         }
 
         public ISArray Get(IntPtr pAgent)
         {
             IntPtr ptr = SharpHelper.GetVariableValuePtr(pAgent, m_Core);
-            return SArrayHelper.GetArray(ptr, m_ElementTypeID);
+            m_Array.Init(ptr);
+            return m_Array;
         }
 
         ///> No Set. Just Get and operate it.
@@ -230,7 +233,7 @@ namespace YBehaviorSharp
         {
             if (SharpHelper.GetVariableValue(pAgent, m_Core))
             {
-                return SharpHelper.GetFromBufferString();
+                return SUtility.GetFromBufferString();
             }
             return string.Empty;
         }

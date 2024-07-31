@@ -86,7 +86,7 @@ extern "C" YBEHAVIOR_API void SetToBufferVector3(YBehavior::Vector3 data);
 extern "C" YBEHAVIOR_API YBehavior::BOOL GetFromBufferBool();
 extern "C" YBEHAVIOR_API void SetToBufferBool(YBehavior::BOOL data);
 
-extern "C" YBEHAVIOR_API void GetFromBufferString(char* output, int len);
+extern "C" YBEHAVIOR_API void GetFromBufferString(unsigned char* output, int len);
 extern "C" YBEHAVIOR_API void SetToBufferString(char* data);
 
 extern "C" YBEHAVIOR_API YBehavior::Entity* GetFromBufferEntity();
@@ -94,5 +94,5 @@ extern "C" YBEHAVIOR_API void SetToBufferEntity(YBehavior::Entity* data);
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-extern "C" YBEHAVIOR_API void* GetFromBufferVector(YBehavior::TYPEID type);
+extern "C" YBEHAVIOR_API void* GetFromBufferArray(YBehavior::TYPEID type);
 #endif

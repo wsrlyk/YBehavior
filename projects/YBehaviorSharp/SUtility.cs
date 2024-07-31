@@ -26,5 +26,31 @@ namespace YBehaviorSharp
         public static char CONST_CHAR = 'C';
         public static char ZERO_CHAR = '\0';
 
+        private static int MaxStringBufferLen = 1024 * 256;
+
+        public static string StringBuffer = new string((char)0, MaxStringBufferLen);
+        public static byte[] CharBuffer = new byte[MaxStringBufferLen];
+
+        public static unsafe string GetFromBufferString()
+        {
+            SharpHelper.GetFromBufferString(CharBuffer, CharBuffer.Length);
+            return BuildStringFromCharBuffer();
+        }
+        public static unsafe string BuildStringFromCharBuffer()
+        {
+            fixed (char* ptr = StringBuffer)
+            {
+                for (int i = 0, len = CharBuffer.Length; i < len; ++i)
+                {
+                    ptr[i] = (char)CharBuffer[i];
+                    if (ptr[i] == 0)
+                    {
+                        *((int*)ptr - 1) = i;
+                        break;
+                    }
+                }
+            }
+            return StringBuffer;
+        }
     }
 }

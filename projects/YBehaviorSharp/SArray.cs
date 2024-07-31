@@ -11,8 +11,10 @@ namespace YBehaviorSharp
 
     public interface ISArray
     {
-
-    }
+        void Init(IntPtr core);
+        void Clear();
+        int GetLength();
+  }
     abstract public class SArray<T> : ISArray
     {
         protected IntPtr m_Core;
@@ -22,15 +24,18 @@ namespace YBehaviorSharp
             m_Core = core;
             m_TypeID = type;
         }
-
+        public void Init(IntPtr core)
+        {
+            m_Core = core;
+        }
         public void Clear()
         {
-            SharpHelper.VectorClear(m_Core, m_TypeID);
+            SharpHelper.ArrayClear(m_Core, m_TypeID);
         }
 
         public int GetLength()
         {
-            return (int)SharpHelper.VectorGetSize(m_Core, m_TypeID);
+            return (int)SharpHelper.ArrayGetSize(m_Core, m_TypeID);
         }
 
         abstract public void PushBack(T data);
@@ -66,18 +71,18 @@ namespace YBehaviorSharp
         public override void PushBack(int data)
         {
             SharpHelper.SetToBufferInt(data);
-            SharpHelper.VectorPushBack(m_Core, m_TypeID);
+            SharpHelper.ArrayPushBack(m_Core, m_TypeID);
         }
 
         public override void Set(int data, int idx)
         {
             SharpHelper.SetToBufferInt(data);
-            SharpHelper.VectorSet(m_Core, idx, m_TypeID);
+            SharpHelper.ArraySet(m_Core, idx, m_TypeID);
         }
 
         public override int Get(int idx)
         {
-            SharpHelper.VectorGet(m_Core, idx, m_TypeID);
+            SharpHelper.ArrayGet(m_Core, idx, m_TypeID);
             return SharpHelper.GetFromBufferInt();
         }
     }
@@ -88,18 +93,18 @@ namespace YBehaviorSharp
         public override void PushBack(float data)
         {
             SharpHelper.SetToBufferFloat(data);
-            SharpHelper.VectorPushBack(m_Core, m_TypeID);
+            SharpHelper.ArrayPushBack(m_Core, m_TypeID);
         }
 
         public override void Set(float data, int idx)
         {
             SharpHelper.SetToBufferFloat(data);
-            SharpHelper.VectorSet(m_Core, idx, m_TypeID);
+            SharpHelper.ArraySet(m_Core, idx, m_TypeID);
         }
 
         public override float Get(int idx)
         {
-            SharpHelper.VectorGet(m_Core, idx, m_TypeID);
+            SharpHelper.ArrayGet(m_Core, idx, m_TypeID);
             return SharpHelper.GetFromBufferFloat();
         }
     }
@@ -110,18 +115,18 @@ namespace YBehaviorSharp
         public override void PushBack(ulong data)
         {
             SharpHelper.SetToBufferUlong(data);
-            SharpHelper.VectorPushBack(m_Core, m_TypeID);
+            SharpHelper.ArrayPushBack(m_Core, m_TypeID);
         }
 
         public override void Set(ulong data, int idx)
         {
             SharpHelper.SetToBufferUlong(data);
-            SharpHelper.VectorSet(m_Core, idx, m_TypeID);
+            SharpHelper.ArraySet(m_Core, idx, m_TypeID);
         }
 
         public override ulong Get(int idx)
         {
-            SharpHelper.VectorGet(m_Core, idx, m_TypeID);
+            SharpHelper.ArrayGet(m_Core, idx, m_TypeID);
             return SharpHelper.GetFromBufferUlong();
         }
     }
@@ -132,18 +137,18 @@ namespace YBehaviorSharp
         public override void PushBack(bool data)
         {
             SharpHelper.SetToBufferBool(SharpHelper.ConvertBool(data));
-            SharpHelper.VectorPushBack(m_Core, m_TypeID);
+            SharpHelper.ArrayPushBack(m_Core, m_TypeID);
         }
 
         public override void Set(bool data, int idx)
         {
             SharpHelper.SetToBufferBool(SharpHelper.ConvertBool(data));
-            SharpHelper.VectorSet(m_Core, idx, m_TypeID);
+            SharpHelper.ArraySet(m_Core, idx, m_TypeID);
         }
 
         public override bool Get(int idx)
         {
-            SharpHelper.VectorGet(m_Core, idx, m_TypeID);
+            SharpHelper.ArrayGet(m_Core, idx, m_TypeID);
             return SharpHelper.ConvertBool(SharpHelper.GetFromBufferBool());
         }
     }
@@ -154,18 +159,18 @@ namespace YBehaviorSharp
         public override void PushBack(Vector3 data)
         {
             SharpHelper.SetToBufferVector3(data);
-            SharpHelper.VectorPushBack(m_Core, m_TypeID);
+            SharpHelper.ArrayPushBack(m_Core, m_TypeID);
         }
 
         public override void Set(Vector3 data, int idx)
         {
             SharpHelper.SetToBufferVector3(data);
-            SharpHelper.VectorSet(m_Core, idx, m_TypeID);
+            SharpHelper.ArraySet(m_Core, idx, m_TypeID);
         }
 
         public override Vector3 Get(int idx)
         {
-            SharpHelper.VectorGet(m_Core, idx, m_TypeID);
+            SharpHelper.ArrayGet(m_Core, idx, m_TypeID);
             return SharpHelper.GetFromBufferVector3();
         }
     }
@@ -176,18 +181,18 @@ namespace YBehaviorSharp
         public override void PushBack(SEntity data)
         {
             SharpHelper.SetToBufferEntity(data.Core);
-            SharpHelper.VectorPushBack(m_Core, m_TypeID);
+            SharpHelper.ArrayPushBack(m_Core, m_TypeID);
         }
 
         public override void Set(SEntity data, int idx)
         {
             SharpHelper.SetToBufferEntity(data.Core);
-            SharpHelper.VectorSet(m_Core, idx, m_TypeID);
+            SharpHelper.ArraySet(m_Core, idx, m_TypeID);
         }
 
         public override SEntity Get(int idx)
         {
-            SharpHelper.VectorGet(m_Core, idx, m_TypeID);
+            SharpHelper.ArrayGet(m_Core, idx, m_TypeID);
             return SPtrMgr.Instance.Get(SharpHelper.GetFromBufferEntity()) as SEntity;
         }
     }
@@ -198,19 +203,20 @@ namespace YBehaviorSharp
         public override void PushBack(string data)
         {
             SharpHelper.SetToBufferString(data);
-            SharpHelper.VectorPushBack(m_Core, m_TypeID);
+            SharpHelper.ArrayPushBack(m_Core, m_TypeID);
         }
 
         public override void Set(string data, int idx)
         {
             SharpHelper.SetToBufferString(data);
-            SharpHelper.VectorSet(m_Core, idx, m_TypeID);
+            SharpHelper.ArraySet(m_Core, idx, m_TypeID);
         }
 
         public override string Get(int idx)
         {
-            SharpHelper.VectorGet(m_Core, idx, m_TypeID);
-            return SharpHelper.GetFromBufferString();
+            SharpHelper.ArrayGet(m_Core, idx, m_TypeID);
+            SharpHelper.GetFromBufferString(SUtility.CharBuffer, SUtility.CharBuffer.Length);
+            return SUtility.BuildStringFromCharBuffer();
         }
     }
 }

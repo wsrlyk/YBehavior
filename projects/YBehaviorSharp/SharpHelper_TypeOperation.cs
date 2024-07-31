@@ -50,19 +50,13 @@ namespace YBehaviorSharp
         static public extern void SetToBufferEntity(IntPtr data);
 
         [DllImport(VERSION.dll)]
-        static private extern void GetFromBufferString(StringBuilder sb, int len);
-        static StringBuilder sb = new StringBuilder(100);
-        static public string GetFromBufferString()
-        {
-            sb.Length = 0;
-            GetFromBufferString(sb, sb.Capacity);
-            return sb.ToString();
-        }
+        static public extern void GetFromBufferString(byte[] s, int len);
+
         [DllImport(VERSION.dll)]
         static public extern void SetToBufferString(string data);
 
         [DllImport(VERSION.dll)]
-        static public extern IntPtr GetFromBufferVector(int type);
+        static public extern IntPtr GetFromBufferArray(int type);
 
         ///////////////////////////////////////////////////////////////
 
@@ -86,15 +80,15 @@ namespace YBehaviorSharp
         ///////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////
         [DllImport(VERSION.dll)]
-        static public extern uint VectorGetSize(IntPtr pVector, int type);
+        static public extern uint ArrayGetSize(IntPtr pVector, int type);
         [DllImport(VERSION.dll)]
-        static public extern void VectorClear(IntPtr pVector, int type);
+        static public extern void ArrayClear(IntPtr pVector, int type);
         [DllImport(VERSION.dll)]
-        static public extern void VectorPushBack(IntPtr pVector, int type);
+        static public extern void ArrayPushBack(IntPtr pVector, int type);
         [DllImport(VERSION.dll)]
-        static public extern bool VectorSet(IntPtr pVector, int index, int type);
+        static public extern bool ArraySet(IntPtr pVector, int index, int type);
         [DllImport(VERSION.dll)]
-        static public extern bool VectorGet(IntPtr pVector, int index, int type);
+        static public extern bool ArrayGet(IntPtr pVector, int index, int type);
 
         ///////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////
@@ -111,14 +105,7 @@ namespace YBehaviorSharp
         [DllImport(VERSION.dll)]
         static public extern IntPtr ToEntity(IntPtr ptr);
         [DllImport(VERSION.dll)]
-        static private extern bool ToString(IntPtr ptr, StringBuilder sb, int len);
-        static public string ToString(IntPtr ptr)
-        {
-            sb.Length = 0;
-            if (ToString(ptr, sb, sb.Capacity))
-                return sb.ToString();
-            return string.Empty;
-        }
+        static public extern bool ToString(IntPtr ptr, char[] s, int len);
 
     }
 }

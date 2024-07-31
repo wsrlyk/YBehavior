@@ -32,7 +32,8 @@ namespace YBehaviorSharp
         public static string GetSharedString(IntPtr pAgent, int key)
         {
             SharpHelper.GetSharedData(pAgent, key, GetClassType<string>.ID);
-            return SharpHelper.GetFromBufferString();
+            SharpHelper.GetFromBufferString(SUtility.CharBuffer, SUtility.CharBuffer.Length);
+            return SUtility.BuildStringFromCharBuffer();
         }
         public static IntPtr GetSharedEntity(IntPtr pAgent, int key)
         {
@@ -83,7 +84,7 @@ namespace YBehaviorSharp
         public static ISArray GetSharedArray<T>(IntPtr pAgent, int key)
         {
             SharpHelper.GetSharedData(pAgent, key, GetClassType<T>.VecID);
-            return SArrayHelper.GetArray(SharpHelper.GetFromBufferVector(GetClassType<T>.VecID), GetClassType<T>.ID);
+            return SArrayHelper.GetArray(SharpHelper.GetFromBufferArray(GetClassType<T>.VecID), GetClassType<T>.ID);
 
         }
 

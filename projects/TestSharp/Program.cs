@@ -45,13 +45,13 @@ namespace TestSharp
 
         static void ShowLog()
         {
-            string data = YBehaviorSharp.SharpHelper.GetFromBufferString();
+            string data = YBehaviorSharp.SUtility.GetFromBufferString();
             Console.WriteLine(data);
         }
 
         static void GetFilePath()
         {
-            string filename = YBehaviorSharp.SharpHelper.GetFromBufferString();
+            string filename = YBehaviorSharp.SUtility.GetFromBufferString();
             filename = "E:\\Develop\\YBehavior\\projects\\YBehaviorEditor\\bin\\exported\\" + filename;
             SharpHelper.SetToBufferString(filename);
         }
@@ -139,7 +139,7 @@ namespace TestSharp
 
             if (YBehaviorSharp.SharpHelper.TryGetValue(pNode, "Type", pData))
             {
-                string s = SharpHelper.GetFromBufferString();
+                string s = SUtility.GetFromBufferString();
                 Console.WriteLine(string.Format("Type: {0}", s));
             }
             return true;
@@ -161,14 +161,12 @@ namespace TestSharp
             var key0 = SharpHelper.GetTypeKeyByName("S0", GetClassType<string>.ID);
             var key1 = SharpHelper.GetTypeKeyByName("S1", GetClassType<string>.ID);
 
-            SharpHelper.GetSharedData(pAgent, key0, GetClassType<string>.ID);
-            string sharedData0 = SharpHelper.GetFromBufferString();
-            //sharedData0 = sharedData0 + "0";
-            //SharpHelper.SetToBufferString(sharedData0);
+            string sharedData0 = SSharedData.GetSharedString(pAgent, key0);
+            sharedData0 = sharedData0 + "0";
             SSharedData.SetSharedString(pAgent, key0, sharedData0);
 
             SharpHelper.GetSharedData(pAgent, key1, GetClassType<string>.ID);
-            string sharedData1 = SharpHelper.GetFromBufferString();
+            string sharedData1 = SUtility.GetFromBufferString();
             //sharedData1 = sharedData1 + "1";
             SharpHelper.SetToBufferString(sharedData1);
             //SharpHelper.SetSharedData(pAgent, key1, GetClassType<string>.ID);

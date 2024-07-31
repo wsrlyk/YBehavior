@@ -53,9 +53,9 @@ extern "C" YBEHAVIOR_API void SetToBufferBool(YBehavior::BOOL data)
 	YBehavior::SharpBuffer::s_Buffer.m_Bool = data;
 }
 
-extern "C" YBEHAVIOR_API void GetFromBufferString(char* output, int len)
+extern "C" YBEHAVIOR_API void GetFromBufferString(unsigned char* output, int len)
 {
-	snprintf(output, (size_t)len, "%s", YBehavior::SharpBuffer::s_Buffer.m_String.c_str());
+	snprintf((char*)output, (size_t)len, "%s", YBehavior::SharpBuffer::s_Buffer.m_String.c_str());
 }
 
 extern "C" YBEHAVIOR_API void SetToBufferString(char* data)
@@ -81,7 +81,7 @@ extern "C" YBEHAVIOR_API void SetToBufferEntity(YBehavior::Entity* data)
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-extern "C" YBEHAVIOR_API void* GetFromBufferVector(YBehavior::TYPEID type)
+extern "C" YBEHAVIOR_API void* GetFromBufferArray(YBehavior::TYPEID type)
 {
 	return YBehavior::SharpBuffer::Get(type);
 }
