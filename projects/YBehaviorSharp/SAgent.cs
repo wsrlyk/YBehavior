@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace YBehaviorSharp
 {
@@ -20,6 +21,18 @@ namespace YBehaviorSharp
 
     public partial class SharpHelper
     {
+        [DllImport(VERSION.dll)]
+        static extern IntPtr CreateEntity();
+
+        [DllImport(VERSION.dll)]
+        static extern void DeleteEntity(IntPtr pEntity);
+
+        [DllImport(VERSION.dll)]
+        static extern IntPtr CreateAgent(IntPtr pEntity);
+
+        [DllImport(VERSION.dll)]
+        static extern void DeleteAgent(IntPtr pAgent);
+
         public static void CreateEntity(IEntity entity)
         {
             if (entity != null && entity.Ptr == IntPtr.Zero)
@@ -63,8 +76,7 @@ namespace YBehaviorSharp
 
     public class SPtrMgr
     {
-        static SPtrMgr s_Mgr = new SPtrMgr();
-        public static SPtrMgr Instance { get { return s_Mgr; } }
+        public static SPtrMgr Instance { get; private set; } = new SPtrMgr();
 
         Dictionary<IntPtr, IPtr> m_Dic = new Dictionary<IntPtr, IPtr>();
 

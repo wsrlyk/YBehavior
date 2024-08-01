@@ -14,7 +14,7 @@
 #include "YBehavior/behaviorprocess.h"
 #include "YBehavior/sharp/sharpentry_buffer.h"
 #include "YBehavior/sharp/sharputility.h"
-
+#include "YBehavior/sharp/sharpnode.h"
 extern "C" YBEHAVIOR_API YBehavior::Entity* CreateEntity()
 {
 	return new YBehavior::Entity();
@@ -52,9 +52,17 @@ extern "C" YBEHAVIOR_API void InitSharp(int debugPort)
 extern "C" YBEHAVIOR_API void RegisterSharpNode(
 	YBehavior::CSTRING_CONST name,
 	YBehavior::OnSharpNodeLoadedDelegate onload,
-	YBehavior::OnSharpNodeUpdateDelegate onupdate)
+	YBehavior::OnSharpNodeUpdateDelegate onupdate,
+	int index)
 {
-	YBehavior::NodeFactory::Instance()->SetSharpCallback(name, onload, onupdate);
+	YBehavior::NodeFactory::Instance()->RegisterSharpNode(name, index);
+}
+extern "C" YBEHAVIOR_API void RegisterSharpNodeCallback(
+	YBehavior::OnSharpNodeLoadedDelegate onload,
+	YBehavior::OnSharpNodeUpdateDelegate onupdate
+	)
+{
+	YBehavior::SharpNode::SetCallback(onload, onupdate);
 }
 
 extern "C" YBEHAVIOR_API void RegisterGetFilePathCallback(YBehavior::SharpGetFilePathDelegate callback)

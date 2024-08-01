@@ -30,7 +30,7 @@ namespace TestSharp
         {
             SharpLauncher launcher = new SharpLauncher();
             YBehaviorSharp.SharpHelper.Init(launcher);
-            SharpHelper.Register<XCustomAction>();
+            SharpHelper.RegisterTreeNode(new XCustomAction());
 
             XEntity entity0 = new XEntity("Hehe");
             XEntity entity1 = new XEntity("Haha");
@@ -114,16 +114,13 @@ namespace TestSharp
             SharpHelper.DestroyAgent(this);
         }
     }
-    public class SelectTargetAction : STreeNode
+    public class SelectTargetAction : ITreeNode
     {
         SVariableEntity m_Target;
 
-        public SelectTargetAction()
-        {
-            m_Name = "SelectTargetAction";
-        }
+        public string NodeName => "SelectTargetAction";
 
-        protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
+        public bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
             m_Target = new SVariableEntity(YBehaviorSharp.SharpHelper.CreateVariable(pNode, "Target", pData, true));
             if (!m_Target.IsValid)
@@ -134,7 +131,7 @@ namespace TestSharp
             return true;
         }
 
-        protected override NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        public NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
         {
             Console.WriteLine("SelectTargetAction Update");
             IEntity entity = m_Target.Get(pAgent);
@@ -142,36 +139,25 @@ namespace TestSharp
         }
     }
 
-    public class GetTargetNameAction : STreeNode
+    public class GetTargetNameAction : IStaticTreeNode
     {
-        public GetTargetNameAction()
-        {
-            m_Name = "GetTargetNameAction";
-        }
+        public string NodeName => "GetTargetNameAction";
 
-        protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
-        {
-            return true;
-        }
-
-        protected override NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        public NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
         {
             Console.WriteLine("GetTargetNameAction Update");
             return NodeState.NS_SUCCESS;
         }
     }
 
-    public class SetVector3Action : STreeNode
+    public class SetVector3Action : ITreeNode
     {
         SVariable m_Src;
         SVariable m_Des;
 
-        public SetVector3Action()
-        {
-            m_Name = "SetVector3Action";
-        }
+        public string NodeName => "SetVector3Action";
 
-        protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
+        public bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
             m_Src = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Src", pData, true);
             m_Des = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Des", pData, true);
@@ -179,7 +165,7 @@ namespace TestSharp
             return true;
         }
 
-        protected override NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        public NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
         {
             Console.WriteLine("SetVector3Action Update");
 
@@ -191,7 +177,7 @@ namespace TestSharp
         }
     }
 
-    public class XCustomAction : STreeNode
+    public class XCustomAction : ITreeNode
     {
         //SVariableString m_String0;
         SVariableInt m_Int0;
@@ -200,12 +186,9 @@ namespace TestSharp
 
         SVariable m_Array0;
 
-        public XCustomAction()
-        {
-            m_Name = "XCustomAction";
-        }
+        public string NodeName => "XCustomAction";
 
-        protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
+        public bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
             //m_String0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "String0", pData) as SVariableString;
 
@@ -223,13 +206,13 @@ namespace TestSharp
             return true;
         }
 
-        protected override NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        public NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
         {
             Console.WriteLine();
             Console.WriteLine("XCustomAction Update");
 
             //this.LogVariable(m_String0, true);
-            this.LogVariable(m_Int0, true);
+            SharpHelper.LogVariable(pNode, m_Int0.Ptr, true);
             //this.LogVariable(m_Entity0, true);
             //this.LogVariable(m_Array0, true);
             XSAgent agent = YBehaviorSharp.SPtrMgr.Instance.Get(pAgent) as XSAgent;
@@ -300,9 +283,9 @@ namespace TestSharp
             }
 
             //this.LogVariable(m_String0, false);
-            this.LogVariable(m_Int0, false);
+            SharpHelper.LogVariable(pNode, m_Int0.Ptr, false);
             //this.LogVariable(m_Entity0, false);
-            this.LogVariable(m_Array0, false);
+            SharpHelper.LogVariable(pNode, m_Array0.Ptr, false);
 
             return NodeState.NS_SUCCESS;
         }

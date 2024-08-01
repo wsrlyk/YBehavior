@@ -65,33 +65,29 @@ namespace YBehavior
 #ifdef YSHARP
 	TreeNode* NodeFactory::Get(const STRING& name)
 	{
-		auto it = m_SharpCallbacks.find(name);
-		if (it != m_SharpCallbacks.end())
+		auto it = m_SharpNodeDatas.find(name);
+		if (it != m_SharpNodeDatas.end())
 		{
 			SharpNode* pSharpNode = new SharpNode();
 			pSharpNode->SetName(name);
-			pSharpNode->SetOnLoadCallback(it->second.onload);
-			pSharpNode->SetOnUpdateCallback(it->second.onupdate);
 			return pSharpNode;
 		}
 
 		return Factory<TreeNode>::Get(name);
 	}
 
-	void NodeFactory::SetSharpCallback(const STRING& name, OnSharpNodeLoadedDelegate onload, OnSharpNodeUpdateDelegate onupdate)
+	void NodeFactory::RegisterSharpNode(const STRING& name, int indexInSharp)
 	{
-		auto it = m_SharpCallbacks.find(name);
-		if (it != m_SharpCallbacks.end())
+		auto it = m_SharpNodeDatas.find(name);
+		if (it != m_SharpNodeDatas.end())
 		{
-			it->second.onload = onload;
-			it->second.onupdate = onupdate;
+			it->second.indexInSharp = indexInSharp;
 		}
 		else
 		{
-			SharpCallbacks callbacks;
-			callbacks.onload = onload;
-			callbacks.onupdate = onupdate;
-			m_SharpCallbacks[name] = callbacks;
+			SharpNodeData data;
+			data.indexInSharp = indexInSharp;
+			m_SharpNodeDatas[name] = data;
 		}
 	}
 

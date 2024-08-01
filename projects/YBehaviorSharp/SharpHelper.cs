@@ -15,8 +15,8 @@ namespace YBehaviorSharp
     using STRING = System.String;
     using Bool = System.Byte;
 
-    public delegate bool OnNodeLoaded(IntPtr pNode, IntPtr pData);
-    public delegate NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent);
+    public delegate bool OnNodeLoaded(IntPtr pNode, IntPtr pData, int index);
+    public delegate NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int index);
     public delegate string LoadDataCallback(string treeName);
     public delegate void LogCallback();
     public delegate void GetFilePathCallback();
@@ -103,8 +103,6 @@ namespace YBehaviorSharp
 
     public partial class SharpHelper
     {
-
-        static List<STreeNode> s_NodeList = new List<STreeNode>();
         public static void Init(ISharpLauncher launcher)
         {
             InitSharp(launcher.DebugPort);
@@ -116,23 +114,16 @@ namespace YBehaviorSharp
                 launcher.OnError);
             RegisterGetFilePathCallback(launcher.OnGetFilePath);
 
-            var subTypeQuery = from t in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
-                               where SUtility.IsSubClassOf(t, typeof(STreeNode))
-                               select t;
+            //var subTypeQuery = from t in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
+            //                   where SUtility.IsSubClassOf(t, typeof(STreeNode))
+            //                   select t;
 
-            foreach (var type in subTypeQuery)
-            {
-                STreeNode node = Activator.CreateInstance(type) as STreeNode;
-                node.Register();
-                s_NodeList.Add(node);
-            }
-        }
-
-        public static void Register<T>() where T : STreeNode
-        {
-            STreeNode node = Activator.CreateInstance<T>();
-            node.Register();
-            s_NodeList.Add(node);
+            //foreach (var type in subTypeQuery)
+            //{
+            //    STreeNode node = Activator.CreateInstance(type) as STreeNode;
+            //    node.Register();
+            //    s_NodeList.Add(node);
+            //}
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,24 +140,6 @@ namespace YBehaviorSharp
             LogCallback threadlog,
             LogCallback threaderror
             );
-
-        [DllImport(VERSION.dll)]
-        static extern IntPtr CreateEntity();
-
-        [DllImport(VERSION.dll)]
-        static extern void DeleteEntity(IntPtr pEntity);
-
-        [DllImport(VERSION.dll)]
-        static extern IntPtr CreateAgent(IntPtr pEntity);
-
-        [DllImport(VERSION.dll)]
-        static extern void DeleteAgent(IntPtr pAgent);
-
-        [DllImport(VERSION.dll, CallingConvention = CallingConvention.StdCall)]
-        static public extern void RegisterSharpNode(
-            string name,
-            OnNodeLoaded onload,
-            OnNodeUpdate onupdate);
 
         [DllImport(VERSION.dll)]
         static public extern bool SetBehavior(

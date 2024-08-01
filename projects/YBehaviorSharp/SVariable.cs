@@ -45,17 +45,16 @@ namespace YBehaviorSharp
 
     public class SVariable
     {
-        protected IntPtr m_Core;
-        public IntPtr Core { get { return m_Core; } }
+        public IntPtr Ptr { get; protected set; } = IntPtr.Zero;
 
         protected TYPEID m_TypeID;
 
-        public bool IsValid { get { return m_Core != IntPtr.Zero; } }
+        public bool IsValid { get { return Ptr != IntPtr.Zero; } }
 
-        public SVariable(IntPtr core)
+        public SVariable(IntPtr ptr)
         {
-            m_Core = core;
-            m_TypeID = SharpHelper.GetVariableTypeID(core);
+            Ptr = ptr;
+            m_TypeID = SharpHelper.GetVariableTypeID(ptr);
         }
     }
 
@@ -72,7 +71,7 @@ namespace YBehaviorSharp
 
         public ISArray Get(IntPtr pAgent)
         {
-            IntPtr ptr = SharpHelper.GetVariableValuePtr(pAgent, m_Core);
+            IntPtr ptr = SharpHelper.GetVariableValuePtr(pAgent, Ptr);
             m_Array.Init(ptr);
             return m_Array;
         }
@@ -89,13 +88,9 @@ namespace YBehaviorSharp
         public SVariable(IntPtr core)
             : base(core)
         {
-            if (core != IntPtr.Zero && GetClassType<T>.ID == m_TypeID)
+            if (core != IntPtr.Zero && GetClassType<T>.ID != m_TypeID)
             {
-                m_Core = core;
-            }
-            else
-            {
-                m_Core = IntPtr.Zero;
+                Ptr = IntPtr.Zero;
             }
         }
 
@@ -111,7 +106,7 @@ namespace YBehaviorSharp
 
         public override IEntity Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, m_Core))
+            if (SharpHelper.GetVariableValue(pAgent, Ptr))
             {
                 return SPtrMgr.Instance.Get(SharpHelper.GetFromBufferEntity()) as IEntity;
             }
@@ -121,7 +116,7 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, IEntity data)
         {
             SharpHelper.SetToBufferEntity(data.Ptr);
-            SharpHelper.SetVariableValue(pAgent, m_Core);
+            SharpHelper.SetVariableValue(pAgent, Ptr);
         }
     }
 
@@ -131,7 +126,7 @@ namespace YBehaviorSharp
 
         public override int Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, m_Core))
+            if (SharpHelper.GetVariableValue(pAgent, Ptr))
             {
                 return SharpHelper.GetFromBufferInt();
             }
@@ -141,7 +136,7 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, int data)
         {
             SharpHelper.SetToBufferInt(data);
-            SharpHelper.SetVariableValue(pAgent, m_Core);
+            SharpHelper.SetVariableValue(pAgent, Ptr);
         }
     }
 
@@ -151,7 +146,7 @@ namespace YBehaviorSharp
 
         public override float Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, m_Core))
+            if (SharpHelper.GetVariableValue(pAgent, Ptr))
             {
                 return SharpHelper.GetFromBufferFloat();
             }
@@ -161,7 +156,7 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, float data)
         {
             SharpHelper.SetToBufferFloat(data);
-            SharpHelper.SetVariableValue(pAgent, m_Core);
+            SharpHelper.SetVariableValue(pAgent, Ptr);
         }
     }
 
@@ -171,7 +166,7 @@ namespace YBehaviorSharp
 
         public override ulong Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, m_Core))
+            if (SharpHelper.GetVariableValue(pAgent, Ptr))
             {
                 return SharpHelper.GetFromBufferUlong();
             }
@@ -181,7 +176,7 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, ulong data)
         {
             SharpHelper.SetToBufferUlong(data);
-            SharpHelper.SetVariableValue(pAgent, m_Core);
+            SharpHelper.SetVariableValue(pAgent, Ptr);
         }
     }
 
@@ -191,7 +186,7 @@ namespace YBehaviorSharp
 
         public override bool Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, m_Core))
+            if (SharpHelper.GetVariableValue(pAgent, Ptr))
             {
                 return SharpHelper.ConvertBool(SharpHelper.GetFromBufferBool());
             }
@@ -201,7 +196,7 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, bool data)
         {
             SharpHelper.SetToBufferBool(SharpHelper.ConvertBool(data));
-            SharpHelper.SetVariableValue(pAgent, m_Core);
+            SharpHelper.SetVariableValue(pAgent, Ptr);
         }
     }
 
@@ -211,7 +206,7 @@ namespace YBehaviorSharp
 
         public override Vector3 Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, m_Core))
+            if (SharpHelper.GetVariableValue(pAgent, Ptr))
             {
                 return SharpHelper.GetFromBufferVector3();
             }
@@ -221,7 +216,7 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, Vector3 data)
         {
             SharpHelper.SetToBufferVector3(data);
-            SharpHelper.SetVariableValue(pAgent, m_Core);
+            SharpHelper.SetVariableValue(pAgent, Ptr);
         }
     }
 
@@ -231,7 +226,7 @@ namespace YBehaviorSharp
 
         public override string Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, m_Core))
+            if (SharpHelper.GetVariableValue(pAgent, Ptr))
             {
                 return SharpHelper.GetFromBufferString();
             }
@@ -241,7 +236,7 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, string data)
         {
             SharpHelper.SetToBufferString(data);
-            SharpHelper.SetVariableValue(pAgent, m_Core);
+            SharpHelper.SetVariableValue(pAgent, Ptr);
         }
     }
 }

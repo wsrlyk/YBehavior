@@ -6,10 +6,10 @@ namespace YBehavior
 {
 	NodeState SharpNode::Update(AgentPtr pAgent)
 	{
-		if (_OnUpdateCallback)
+		if (s_OnUpdateCallback)
 		{
 			//LOG_BEGIN << "SharpNode Update" << LOG_END;
-			return _OnUpdateCallback(this, pAgent);
+			return s_OnUpdateCallback(this, pAgent, m_IndexInSharp);
 		}
 		return NS_SUCCESS;
 	}
@@ -17,13 +17,17 @@ namespace YBehavior
 
 	bool SharpNode::OnLoaded(const pugi::xml_node& data)
 	{
-		if (_OnLoadCallback)
+		if (s_OnLoadCallback)
 		{
 			//LOG_BEGIN << "SharpNode OnLoaded" << LOG_END;
-			return _OnLoadCallback(this, &data);
+			return s_OnLoadCallback(this, &data, m_IndexInSharp);
 		}
 		return true;
 	}
+
+	YBehavior::OnSharpNodeLoadedDelegate SharpNode::s_OnLoadCallback;
+	YBehavior::OnSharpNodeUpdateDelegate SharpNode::s_OnUpdateCallback;
+
 }
 
 #endif

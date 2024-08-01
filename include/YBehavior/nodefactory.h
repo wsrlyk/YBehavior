@@ -11,15 +11,13 @@
 namespace YBehavior
 {
 #ifdef YSHARP
-	struct SharpCallbacks
+	struct SharpNodeData
 	{
-		SharpCallbacks()
+		SharpNodeData()
 		{
-			onload = nullptr;
-			onupdate = nullptr;
+			indexInSharp = -1;
 		}
-		OnSharpNodeLoadedDelegate onload;
-		OnSharpNodeUpdateDelegate onupdate;
+		int indexInSharp;
 	};
 #endif
 
@@ -29,12 +27,12 @@ namespace YBehavior
 		static NodeFactory* s_NodeFactory;
 
 #ifdef YSHARP
-		std::unordered_map<STRING, SharpCallbacks> m_SharpCallbacks;
+		std::unordered_map<STRING, SharpNodeData> m_SharpNodeDatas;
 #endif
 	public:
 #ifdef YSHARP
 		TreeNode* Get(const STRING& name) override;
-		void SetSharpCallback(const STRING& name, OnSharpNodeLoadedDelegate onload, OnSharpNodeUpdateDelegate onupdate);
+		void RegisterSharpNode(const STRING& name, int index);
 #endif // SHARP
 
 		static NodeFactory* Instance();

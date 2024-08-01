@@ -6,21 +6,23 @@
 
 namespace YBehavior
 {
-	typedef bool(STDCALL *OnSharpNodeLoadedDelegate)(TreeNode* pNode, const pugi::xml_node* data);
-	typedef NodeState(STDCALL *OnSharpNodeUpdateDelegate)(TreeNode* pNode, AgentPtr pAgent);
+	typedef bool(STDCALL *OnSharpNodeLoadedDelegate)(TreeNode* pNode, const pugi::xml_node* data, int index);
+	typedef NodeState(STDCALL *OnSharpNodeUpdateDelegate)(TreeNode* pNode, AgentPtr pAgent, int index);
 
 	class SharpNode : public LeafNode<>
 	{
 	public:
-		void SetOnLoadCallback(OnSharpNodeLoadedDelegate callback) { _OnLoadCallback = callback; }
-		void SetOnUpdateCallback(OnSharpNodeUpdateDelegate callback) { _OnUpdateCallback = callback; }
+		static void SetCallback(OnSharpNodeLoadedDelegate onload, OnSharpNodeUpdateDelegate onupdate) { s_OnLoadCallback = onload; s_OnUpdateCallback = onupdate; }
+
 		void SetName(const STRING& name) { m_ClassName = name; }
+		void SetIndexInSharp(int index) { m_IndexInSharp = index; }
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;
+		int m_IndexInSharp;
 
-		OnSharpNodeLoadedDelegate _OnLoadCallback;
-		OnSharpNodeUpdateDelegate _OnUpdateCallback;
+		static OnSharpNodeLoadedDelegate s_OnLoadCallback;
+		static OnSharpNodeUpdateDelegate s_OnUpdateCallback;
 	};
 }
 
