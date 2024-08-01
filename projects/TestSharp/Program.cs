@@ -1,24 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Xml.Linq;
-using YBehaviorSharp;
+﻿using YBehaviorSharp;
 
 namespace TestSharp
 {
     class Program
     {
+        class SharpLauncher : YBehaviorSharp.ISharpLauncher
+        {
+            public int DebugPort => 444;
+            public void OnLog()
+            {
+                string data = SharpHelper.GetFromBufferString();
+                Console.WriteLine(data);
+            }
+            public void OnError()
+            {
+                string data = SharpHelper.GetFromBufferString();
+                Console.WriteLine(data);
+            }
+
+            public void OnGetFilePath()
+            {
+                string filename = SharpHelper.GetFromBufferString();
+                filename = "E:\\Develop\\YBehavior\\projects\\YBehaviorEditor\\bin\\exported\\" + filename;
+                SharpHelper.SetToBufferString(filename);
+            }
+
+        }
         static void Main(string[] args)
         {
-            YBehaviorSharp.SharpHelper.OnLogCallback = ShowLog;
-            YBehaviorSharp.SharpHelper.OnErrorCallback = ShowLog;
-            YBehaviorSharp.SharpHelper.OnThreadLogCallback = ShowLog;
-            YBehaviorSharp.SharpHelper.OnThreadErrorCallback = ShowLog;
-            SharpHelper.OnGetFilePathCallback = GetFilePath;
-            YBehaviorSharp.SharpHelper.Init();
+            SharpLauncher launcher = new SharpLauncher();
+            YBehaviorSharp.SharpHelper.Init(launcher);
             SharpHelper.Register<XCustomAction>();
 
             XEntity entity0 = new XEntity("Hehe");
@@ -28,13 +39,13 @@ namespace TestSharp
             Scene.Instance.entities[1] = entity1;
 
             string[] state2tree = new string[] { "Main", "Test0"};
-            YBehaviorSharp.SharpHelper.SetBehavior(entity0.Agent.Core, "EmptyFSM", state2tree, 2, null, 0);
-            YBehaviorSharp.SharpHelper.SetSharedDataByString(entity0.Agent.Core, "II0", "1342^32^643", '^');
+            YBehaviorSharp.SharpHelper.SetBehavior(entity0.Agent.Ptr, "EmptyFSM", state2tree, 2, null, 0);
+            YBehaviorSharp.SharpHelper.SetSharedDataByString(entity0.Agent.Ptr, "II0", "1342^32^643", '^');
 
             int i = 0;
             while (++i > 0)
             {
-                YBehaviorSharp.SharpHelper.Tick(entity0.Agent.Core);
+                YBehaviorSharp.SharpHelper.Tick(entity0.Agent.Ptr);
                 System.Threading.Thread.Sleep(1000);
             }
 
@@ -45,13 +56,13 @@ namespace TestSharp
 
         static void ShowLog()
         {
-            string data = YBehaviorSharp.SUtility.GetFromBufferString();
+            string data = SharpHelper.GetFromBufferString();
             Console.WriteLine(data);
         }
 
         static void GetFilePath()
         {
-            string filename = YBehaviorSharp.SUtility.GetFromBufferString();
+            string filename = SharpHelper.GetFromBufferString();
             filename = "E:\\Develop\\YBehavior\\projects\\YBehaviorEditor\\bin\\exported\\" + filename;
             SharpHelper.SetToBufferString(filename);
         }
@@ -65,51 +76,118 @@ namespace TestSharp
     /// <summary>
     /// Entity used in Real Game
     /// </summary>
-    class XEntity
+    class XEntity : IEntity
     {
-        XSEntity m_SEntity;
+        public IntPtr Ptr { get; set; } = IntPtr.Zero;
         XSAgent m_SAgent;
         public XSAgent Agent { get { return m_SAgent; } }
-        public XSEntity Entity { get { return m_SEntity; } }
+
         string m_Name;
         public string Name { get { return m_Name; } }
 
         public XEntity(string name)
         {
             m_Name = name;
-            m_SEntity = new XSEntity(this);
-            m_SAgent = new XSAgent(m_SEntity);
+            SharpHelper.CreateEntity(this);
+
+            m_SAgent = new XSAgent(this);
         }
 
         public void Destroy()
         {
-            m_SAgent.Dispose();
-            m_SEntity.Dispose();
-            m_SEntity = null;
-            m_SAgent = null;
+            m_SAgent.Destroy();
+            SharpHelper.DestroyEntity(this);
         }
     }
 
-    /// <summary>
-    /// XEntity can be reached by this in an AINode
-    /// </summary>
-    class XSEntity : SEntity
+    class XSAgent : IAgent
     {
-        XEntity m_Entity;
-        public XEntity GetEntity { get { return m_Entity; } }
-
-        public XSEntity(XEntity entity)
+        public IntPtr Ptr { get; set; } = IntPtr.Zero;
+        public IEntity? Entity { get; set; } = null;
+        public XSAgent(XEntity entity)
         {
-            m_Entity = entity;
+            SharpHelper.CreateAgent(this, entity);
+        }
+
+        public void Destroy()
+        {
+            SharpHelper.DestroyAgent(this);
+        }
+    }
+    public class SelectTargetAction : STreeNode
+    {
+        SVariableEntity m_Target;
+
+        public SelectTargetAction()
+        {
+            m_Name = "SelectTargetAction";
+        }
+
+        protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
+        {
+            m_Target = new SVariableEntity(YBehaviorSharp.SharpHelper.CreateVariable(pNode, "Target", pData, true));
+            if (!m_Target.IsValid)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        protected override NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        {
+            Console.WriteLine("SelectTargetAction Update");
+            IEntity entity = m_Target.Get(pAgent);
+            return NodeState.NS_SUCCESS;
         }
     }
 
-    class XSAgent : SAgent
+    public class GetTargetNameAction : STreeNode
     {
-        public XSAgent(XSEntity entity)
-            : base(entity)
+        public GetTargetNameAction()
         {
+            m_Name = "GetTargetNameAction";
+        }
 
+        protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
+        {
+            return true;
+        }
+
+        protected override NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        {
+            Console.WriteLine("GetTargetNameAction Update");
+            return NodeState.NS_SUCCESS;
+        }
+    }
+
+    public class SetVector3Action : STreeNode
+    {
+        SVariable m_Src;
+        SVariable m_Des;
+
+        public SetVector3Action()
+        {
+            m_Name = "SetVector3Action";
+        }
+
+        protected override bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
+        {
+            m_Src = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Src", pData, true);
+            m_Des = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Des", pData, true);
+
+            return true;
+        }
+
+        protected override NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        {
+            Console.WriteLine("SetVector3Action Update");
+
+            Vector3 src = (m_Src as SVariableVector3).Get(pAgent);
+            src.x += 1;
+            (m_Des as SVariableVector3).Set(pAgent, src);
+
+            return NodeState.NS_SUCCESS;
         }
     }
 
@@ -139,7 +217,7 @@ namespace TestSharp
 
             if (YBehaviorSharp.SharpHelper.TryGetValue(pNode, "Type", pData))
             {
-                string s = SUtility.GetFromBufferString();
+                string s = SharpHelper.GetFromBufferString();
                 Console.WriteLine(string.Format("Type: {0}", s));
             }
             return true;
@@ -166,7 +244,7 @@ namespace TestSharp
             SSharedData.SetSharedString(pAgent, key0, sharedData0);
 
             SharpHelper.GetSharedData(pAgent, key1, GetClassType<string>.ID);
-            string sharedData1 = SUtility.GetFromBufferString();
+            string sharedData1 = SharpHelper.GetFromBufferString();
             //sharedData1 = sharedData1 + "1";
             SharpHelper.SetToBufferString(sharedData1);
             //SharpHelper.SetSharedData(pAgent, key1, GetClassType<string>.ID);

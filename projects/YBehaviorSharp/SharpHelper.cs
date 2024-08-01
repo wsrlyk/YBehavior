@@ -58,7 +58,7 @@ namespace YBehaviorSharp
             GetClassType<ULONG>.id = SharpHelper.GetClassTypeNumberIdUlong();
             GetClassType<STRING>.id = SharpHelper.GetClassTypeNumberIdString();
             GetClassType<Vector3>.id = SharpHelper.GetClassTypeNumberIdVector3();
-            GetClassType<SEntity>.id = SharpHelper.GetClassTypeNumberIdEntityWrapper();
+            GetClassType<IEntity>.id = SharpHelper.GetClassTypeNumberIdEntityWrapper();
 
             GetClassType<BOOL>.vecid = SharpHelper.GetClassTypeNumberIdVecBool();
             GetClassType<bool>.vecid = SharpHelper.GetClassTypeNumberIdVecBool();
@@ -67,7 +67,7 @@ namespace YBehaviorSharp
             GetClassType<ULONG>.vecid = SharpHelper.GetClassTypeNumberIdVecUlong();
             GetClassType<STRING>.vecid = SharpHelper.GetClassTypeNumberIdVecString();
             GetClassType<Vector3>.vecid = SharpHelper.GetClassTypeNumberIdVecVector3();
-            GetClassType<SEntity>.vecid = SharpHelper.GetClassTypeNumberIdVecEntityWrapper();
+            GetClassType<IEntity>.vecid = SharpHelper.GetClassTypeNumberIdVecEntityWrapper();
         }
     }
 
@@ -92,26 +92,29 @@ namespace YBehaviorSharp
         public const string dll = "YBehavior";
 #endif
     }
+    public interface ISharpLauncher
+    {
+        int DebugPort { get; }
+        void OnLog();
+        void OnError();
+
+        void OnGetFilePath();
+    }
 
     public partial class SharpHelper
     {
-        public static LogCallback OnLogCallback { get; set; }
-        public static LogCallback OnErrorCallback { get; set; }
-        public static LogCallback OnThreadLogCallback { get; set; }
-        public static LogCallback OnThreadErrorCallback { get; set; }
-        public static GetFilePathCallback OnGetFilePathCallback { get; set; }
 
         static List<STreeNode> s_NodeList = new List<STreeNode>();
-        public static void Init()
+        public static void Init(ISharpLauncher launcher)
         {
-            InitSharp(444);
+            InitSharp(launcher.DebugPort);
 
             RegisterLogCallback(
-                OnLogCallback,
-                OnErrorCallback,
-                OnThreadLogCallback,
-                OnThreadErrorCallback);
-            RegisterGetFilePathCallback(OnGetFilePathCallback);
+                launcher.OnLog,
+                launcher.OnError,
+                launcher.OnLog,
+                launcher.OnError);
+            RegisterGetFilePathCallback(launcher.OnGetFilePath);
 
             var subTypeQuery = from t in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
                                where SUtility.IsSubClassOf(t, typeof(STreeNode))
@@ -134,13 +137,13 @@ namespace YBehaviorSharp
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////
         [DllImport(VERSION.dll)]
-        static public extern void InitSharp(int debugPort);
+        static extern void InitSharp(int debugPort);
 
         [DllImport(VERSION.dll)]
-        static public extern void RegisterGetFilePathCallback(GetFilePathCallback callback);
+        static extern void RegisterGetFilePathCallback(GetFilePathCallback callback);
 
         [DllImport(VERSION.dll, CallingConvention = CallingConvention.StdCall)]
-        static public extern void RegisterLogCallback(
+        static extern void RegisterLogCallback(
             LogCallback log,
             LogCallback error,
             LogCallback threadlog,
@@ -148,16 +151,16 @@ namespace YBehaviorSharp
             );
 
         [DllImport(VERSION.dll)]
-        static public extern IntPtr CreateEntity();
+        static extern IntPtr CreateEntity();
 
         [DllImport(VERSION.dll)]
-        static public extern void DeleteEntity(IntPtr pEntity);
+        static extern void DeleteEntity(IntPtr pEntity);
 
         [DllImport(VERSION.dll)]
-        static public extern IntPtr CreateAgent(IntPtr pEntity);
+        static extern IntPtr CreateAgent(IntPtr pEntity);
 
         [DllImport(VERSION.dll)]
-        static public extern void DeleteAgent(IntPtr pAgent);
+        static extern void DeleteAgent(IntPtr pAgent);
 
         [DllImport(VERSION.dll, CallingConvention = CallingConvention.StdCall)]
         static public extern void RegisterSharpNode(

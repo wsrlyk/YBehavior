@@ -60,7 +60,7 @@ namespace YBehaviorSharp
             s_ArrayTypes[GetClassType<bool>.ID] = typeof(SArrayBool);
             s_ArrayTypes[GetClassType<Vector3>.ID] = typeof(SArrayVector3);
             s_ArrayTypes[GetClassType<string>.ID] = typeof(SArrayString);
-            s_ArrayTypes[GetClassType<SEntity>.ID] = typeof(SArrayEntity);
+            s_ArrayTypes[GetClassType<IEntity>.ID] = typeof(SArrayEntity);
         }
     }
     ////////////////////////////////////////////////////////////////
@@ -175,25 +175,25 @@ namespace YBehaviorSharp
         }
     }
 
-    public class SArrayEntity : SArray<SEntity>
+    public class SArrayEntity : SArray<IEntity>
     {
-        public SArrayEntity(IntPtr core) : base(core, GetClassType<SEntity>.ID) { }
-        public override void PushBack(SEntity data)
+        public SArrayEntity(IntPtr core) : base(core, GetClassType<IEntity>.ID) { }
+        public override void PushBack(IEntity data)
         {
-            SharpHelper.SetToBufferEntity(data.Core);
+            SharpHelper.SetToBufferEntity(data.Ptr);
             SharpHelper.ArrayPushBack(m_Core, m_TypeID);
         }
 
-        public override void Set(SEntity data, int idx)
+        public override void Set(IEntity data, int idx)
         {
-            SharpHelper.SetToBufferEntity(data.Core);
+            SharpHelper.SetToBufferEntity(data.Ptr);
             SharpHelper.ArraySet(m_Core, idx, m_TypeID);
         }
 
-        public override SEntity Get(int idx)
+        public override IEntity Get(int idx)
         {
             SharpHelper.ArrayGet(m_Core, idx, m_TypeID);
-            return SPtrMgr.Instance.Get(SharpHelper.GetFromBufferEntity()) as SEntity;
+            return SPtrMgr.Instance.Get(SharpHelper.GetFromBufferEntity()) as IEntity;
         }
     }
 

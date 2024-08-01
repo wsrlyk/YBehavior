@@ -51,6 +51,11 @@ namespace YBehaviorSharp
 
         [DllImport(VERSION.dll)]
         static public extern void GetFromBufferString(byte[] s, int len);
+        public static unsafe string GetFromBufferString()
+        {
+            GetFromBufferString(SUtility.CharBuffer, SUtility.CharBuffer.Length);
+            return SUtility.BuildStringFromCharBuffer();
+        }
 
         [DllImport(VERSION.dll)]
         static public extern void SetToBufferString(string data);

@@ -37,7 +37,7 @@ namespace YBehaviorSharp
         }
         public static IntPtr GetSharedEntity(IntPtr pAgent, int key)
         {
-            SharpHelper.GetSharedData(pAgent, key, GetClassType<SEntity>.ID);
+            SharpHelper.GetSharedData(pAgent, key, GetClassType<IEntity>.ID);
             return SharpHelper.GetFromBufferEntity();
         }
 
@@ -76,7 +76,7 @@ namespace YBehaviorSharp
         public static void SetSharedEntity(IntPtr pAgent, int key, IntPtr v)
         {
             SharpHelper.SetToBufferEntity(v);
-            SharpHelper.SetSharedData(pAgent, key, GetClassType<SEntity>.ID);
+            SharpHelper.SetSharedData(pAgent, key, GetClassType<IEntity>.ID);
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////

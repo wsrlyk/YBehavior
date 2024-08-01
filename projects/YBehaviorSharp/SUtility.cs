@@ -30,12 +30,6 @@ namespace YBehaviorSharp
 
         public static string StringBuffer = new string((char)0, MaxStringBufferLen);
         public static byte[] CharBuffer = new byte[MaxStringBufferLen];
-
-        public static unsafe string GetFromBufferString()
-        {
-            SharpHelper.GetFromBufferString(CharBuffer, CharBuffer.Length);
-            return BuildStringFromCharBuffer();
-        }
         public static unsafe string BuildStringFromCharBuffer()
         {
             fixed (char* ptr = StringBuffer)

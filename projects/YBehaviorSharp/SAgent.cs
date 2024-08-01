@@ -1,90 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace YBehaviorSharp
 {
     public interface IPtr
     {
-        IntPtr Ptr { get; }
+        IntPtr Ptr { get; set; }
     }
 
-    public class SPtr : IDisposable, IPtr
+    public interface IAgent : IPtr
     {
-        protected IntPtr m_Ptr;
-        public IntPtr Ptr { get { return m_Ptr; } }
-        #region IDisposable Support
-        private bool disposedValue = false;
+        IEntity? Entity { get; set; }
+    }
 
-        protected virtual void OnDispose(bool disposing) { }
+    public interface IEntity : IPtr
+    {
 
-        protected void Dispose(bool disposing)
+    }
+
+    public partial class SharpHelper
+    {
+        public static void CreateEntity(IEntity entity)
         {
-            if (!disposedValue)
+            if (entity != null && entity.Ptr == IntPtr.Zero)
             {
-                if (disposing)
-                {
-                }
-
-                if (m_Ptr != IntPtr.Zero)
-                {
-                    SPtrMgr.Instance.Remove(this);
-                    OnDispose(disposing);
-                    m_Ptr = IntPtr.Zero;
-                }
-
-                disposedValue = true;
+                entity.Ptr = CreateEntity();
+                SPtrMgr.Instance.Add(entity);
             }
         }
 
-        ~SPtr()
+        public static void DestroyEntity(IEntity entity)
         {
-            Dispose(false);
+            if (entity != null && entity.Ptr != IntPtr.Zero)
+            {
+                SPtrMgr.Instance.Remove(entity);
+                SharpHelper.DeleteEntity(entity.Ptr);
+                entity.Ptr = IntPtr.Zero;
+            }
         }
 
-        public void Dispose()
+        public static void CreateAgent(IAgent agent, IEntity entity)
         {
-            Dispose(true);
-
-            GC.SuppressFinalize(this);
+            if (agent != null && agent.Ptr == IntPtr.Zero && entity != null)
+            {
+                agent.Ptr = CreateAgent(entity.Ptr);
+                agent.Entity = entity;
+                SPtrMgr.Instance.Add(agent);
+            }
         }
-        #endregion
-
-    }
-    public class SEntity : SPtr
-    {
-        public IntPtr Core { get { return m_Ptr; } }
-
-        public SEntity()
+        public static void DestroyAgent(IAgent agent)
         {
-            m_Ptr = SharpHelper.CreateEntity();
-            SPtrMgr.Instance.Add(this);
+            if (agent != null && agent.Ptr != IntPtr.Zero)
+            {
+                SPtrMgr.Instance.Remove(agent);
+                agent.Entity = null;
+                DeleteAgent(agent.Ptr);
+                agent.Ptr = IntPtr.Zero;
+            }
         }
 
-        protected override void OnDispose(bool disposing)
-        {
-            SharpHelper.DeleteEntity(m_Ptr);
-        }
-    }
-
-    public class SAgent : SPtr
-    {
-        SEntity m_Entity;
-        public SEntity Entity { get { return m_Entity; } }
-
-        public IntPtr Core { get { return m_Ptr; } }
-
-        public SAgent(SEntity entity)
-        {
-            m_Entity = entity;
-            m_Ptr = SharpHelper.CreateAgent(m_Entity.Core);
-            SPtrMgr.Instance.Add(this);
-        }
-        protected override void OnDispose(bool disposing)
-        {
-            SharpHelper.DeleteAgent(m_Ptr);
-        }
     }
 
     public class SPtrMgr
@@ -110,7 +84,7 @@ namespace YBehaviorSharp
             m_Dic.Remove(entity.Ptr);
         }
 
-        public IPtr Get(IntPtr core)
+        public IPtr? Get(IntPtr core)
         {
             if (m_Dic.TryGetValue(core, out IPtr entity))
                 return entity;

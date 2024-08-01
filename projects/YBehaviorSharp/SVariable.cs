@@ -39,7 +39,7 @@ namespace YBehaviorSharp
             s_VariableTypes[GetClassType<bool>.ID] = typeof(SVariableBool);
             s_VariableTypes[GetClassType<Vector3>.ID] = typeof(SVariableVector3);
             s_VariableTypes[GetClassType<string>.ID] = typeof(SVariableString);
-            s_VariableTypes[GetClassType<SEntity>.ID] = typeof(SVariableEntity);
+            s_VariableTypes[GetClassType<IEntity>.ID] = typeof(SVariableEntity);
         }
     }
 
@@ -105,22 +105,22 @@ namespace YBehaviorSharp
 
     ////////////////////////////////////////////////////////////////
 
-    public class SVariableEntity : SVariable<SEntity>
+    public class SVariableEntity : SVariable<IEntity>
     {
         public SVariableEntity(IntPtr core) : base(core) { }
 
-        public override SEntity Get(IntPtr pAgent)
+        public override IEntity Get(IntPtr pAgent)
         {
             if (SharpHelper.GetVariableValue(pAgent, m_Core))
             {
-                return SPtrMgr.Instance.Get(SharpHelper.GetFromBufferEntity()) as SEntity;
+                return SPtrMgr.Instance.Get(SharpHelper.GetFromBufferEntity()) as IEntity;
             }
             return null;
         }
 
-        public override void Set(IntPtr pAgent, SEntity data)
+        public override void Set(IntPtr pAgent, IEntity data)
         {
-            SharpHelper.SetToBufferEntity(data.Core);
+            SharpHelper.SetToBufferEntity(data.Ptr);
             SharpHelper.SetVariableValue(pAgent, m_Core);
         }
     }
@@ -233,7 +233,7 @@ namespace YBehaviorSharp
         {
             if (SharpHelper.GetVariableValue(pAgent, m_Core))
             {
-                return SUtility.GetFromBufferString();
+                return SharpHelper.GetFromBufferString();
             }
             return string.Empty;
         }
