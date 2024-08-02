@@ -70,6 +70,7 @@ namespace YBehavior
 		{
 			SharpNode* pSharpNode = new SharpNode();
 			pSharpNode->SetName(name);
+			pSharpNode->SetIndexInSharp(it->second.indexInSharp);
 			return pSharpNode;
 		}
 
