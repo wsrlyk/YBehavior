@@ -51,8 +51,6 @@ extern "C" YBEHAVIOR_API void InitSharp(int debugPort)
 
 extern "C" YBEHAVIOR_API void RegisterSharpNode(
 	YBehavior::CSTRING_CONST name,
-	YBehavior::OnSharpNodeLoadedDelegate onload,
-	YBehavior::OnSharpNodeUpdateDelegate onupdate,
 	int index)
 {
 	YBehavior::NodeFactory::Instance()->RegisterSharpNode(name, index);
