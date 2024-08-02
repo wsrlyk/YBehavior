@@ -180,6 +180,8 @@ namespace YBehaviorSharp
         [DllImport(VERSION.dll)]
         static public extern void LogInfo(IntPtr pNode, string info);
         #endregion
+        [DllImport(VERSION.dll)]
+        static public extern void NodeError(IntPtr pNode, string info);
 
         [DllImport(VERSION.dll)]
         static public extern TYPEID GetVariableTypeID(IntPtr pVariable);

@@ -191,4 +191,9 @@ extern "C" YBEHAVIOR_API void LogInfo(YBehavior::TreeNode* pNode, YBehavior::CST
 #endif
 }
 
+extern "C" YBEHAVIOR_API void NodeError(YBehavior::TreeNode* pNode, YBehavior::CSTRING_CONST str)
+{
+	ERROR_BEGIN << pNode->GetUID() << "." << pNode->GetClassName() << ERROR_END;
+}
+
 #endif
