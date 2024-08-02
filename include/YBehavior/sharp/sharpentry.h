@@ -1,6 +1,6 @@
 #ifdef YSHARP
 #pragma once
-#include "YBehavior/agent.h"
+#include "YBehavior/sharp/sharpagent.h"
 #include "YBehavior/sharp/sharpnode.h"
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/behaviortreemgr.h"
@@ -15,12 +15,12 @@
 #include "YBehavior/sharp/sharpentry_buffer.h"
 #include "YBehavior/sharp/sharputility.h"
 #include "YBehavior/sharp/sharpnode.h"
-extern "C" YBEHAVIOR_API YBehavior::Entity* CreateEntity()
+extern "C" YBEHAVIOR_API YBehavior::SharpEntity* CreateEntity(YBehavior::UINT64 uid)
 {
-	return new YBehavior::Entity();
+	return new YBehavior::SharpEntity(uid);
 }
 
-extern "C" YBEHAVIOR_API void DeleteEntity(YBehavior::Entity* pObject)
+extern "C" YBEHAVIOR_API void DeleteEntity(YBehavior::SharpEntity* pObject)
 {
 	if (pObject != NULL)
 	{
@@ -28,12 +28,12 @@ extern "C" YBEHAVIOR_API void DeleteEntity(YBehavior::Entity* pObject)
 		pObject = NULL;
 	}
 }
-extern "C" YBEHAVIOR_API YBehavior::Agent* CreateAgent(YBehavior::Entity* pEntity)
+extern "C" YBEHAVIOR_API YBehavior::SharpAgent* CreateAgent(YBehavior::SharpEntity* pEntity)
 {
-	return new YBehavior::Agent(pEntity);
+	return new YBehavior::SharpAgent(pEntity);
 }
 
-extern "C" YBEHAVIOR_API void DeleteAgent(YBehavior::Agent* pObject)
+extern "C" YBEHAVIOR_API void DeleteAgent(YBehavior::SharpAgent* pObject)
 {
 	if (pObject != NULL)
 	{

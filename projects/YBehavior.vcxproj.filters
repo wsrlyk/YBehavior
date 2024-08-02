@@ -315,6 +315,9 @@
     <ClInclude Include="..\include\YBehavior\sharp\sharputility.h">
       <Filter>头文件\sharp</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\sharp\sharpagent.h">
+      <Filter>头文件\sharp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">
@@ -507,6 +510,9 @@
       <Filter>源文件\variables</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\sharp\sharputility.cpp">
+      <Filter>源文件\sharp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\sharp\sharpagent.cpp">
       <Filter>源文件\sharp</Filter>
     </ClCompile>
   </ItemGroup>

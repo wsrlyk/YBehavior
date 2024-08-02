@@ -16,13 +16,13 @@ namespace YBehaviorSharp
 
     public interface IEntity : IPtr
     {
-
+        ulong UID { get; }
     }
 
     public partial class SharpHelper
     {
         [DllImport(VERSION.dll)]
-        static extern IntPtr CreateEntity();
+        static extern IntPtr CreateEntity(ulong uid);
 
         [DllImport(VERSION.dll)]
         static extern void DeleteEntity(IntPtr pEntity);
@@ -37,7 +37,7 @@ namespace YBehaviorSharp
         {
             if (entity != null && entity.Ptr == IntPtr.Zero)
             {
-                entity.Ptr = CreateEntity();
+                entity.Ptr = CreateEntity(entity.UID);
                 SPtrMgr.Instance.Add(entity);
             }
         }

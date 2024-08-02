@@ -8,12 +8,12 @@ namespace YBehavior
 {
 	UINT64 Agent::s_UID = 0;
 
-	Behavior* Agent::GetBehavior() { return m_pProcess->pBehavior; }
-	Memory* Agent::GetMemory() { return &m_pProcess->memory; }
-	MachineContext* Agent::GetMachineContext() { return &m_pProcess->machineContext; }
-	TreeContext* Agent::GetTreeContext() { return &m_pProcess->treeContext; }
-	BehaviorTree* Agent::GetRunningTree() { return m_pProcess->machineContext.GetCurRunningTree(); }
-	EventQueue* Agent::GetEventQueue() { return &m_pProcess->eventQueue; }
+	Behavior* Agent::GetBehavior() const { return m_pProcess->pBehavior; }
+	Memory* Agent::GetMemory() const { return &m_pProcess->memory; }
+	MachineContext* Agent::GetMachineContext() const { return &m_pProcess->machineContext; }
+	TreeContext* Agent::GetTreeContext() const { return &m_pProcess->treeContext; }
+	BehaviorTree* Agent::GetRunningTree() const { return m_pProcess->machineContext.GetCurRunningTree(); }
+	EventQueue* Agent::GetEventQueue() const { return &m_pProcess->eventQueue; }
 
 	bool Agent::SetBehavior(const BehaviorKey& key)
 	{

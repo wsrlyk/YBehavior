@@ -78,6 +78,9 @@ namespace TestSharp
     /// </summary>
     class XEntity : IEntity
     {
+        static ulong s_UID = 0;
+        ulong m_UID = 0;
+        public ulong UID => m_UID;
         public IntPtr Ptr { get; set; } = IntPtr.Zero;
         XSAgent m_SAgent;
         public XSAgent Agent { get { return m_SAgent; } }
@@ -87,6 +90,7 @@ namespace TestSharp
 
         public XEntity(string name)
         {
+            m_UID = ++s_UID;
             m_Name = name;
             SharpHelper.CreateEntity(this);
 

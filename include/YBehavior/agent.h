@@ -28,6 +28,7 @@ namespace YBehavior
 
 	class Agent
 	{
+	protected:
 		static UINT64 s_UID;
 		UINT64 m_UID;
 		BehaviorProcess* m_pProcess;
@@ -36,22 +37,22 @@ namespace YBehavior
 	public:
 		Agent(Entity* entity);
 		virtual ~Agent();
-		inline Entity* GetEntity() { return m_Entity; }
+		inline Entity* GetEntity() const { return m_Entity; }
 		inline void SetEntity(Entity* entity) { m_Entity = entity; }
 
-		Behavior* GetBehavior();
-		Memory* GetMemory();
-		MachineContext* GetMachineContext();
-		TreeContext* GetTreeContext();
-		BehaviorTree* GetRunningTree();
-		EventQueue* GetEventQueue();
+		Behavior* GetBehavior() const;
+		Memory* GetMemory() const;
+		MachineContext* GetMachineContext() const;
+		TreeContext* GetTreeContext() const;
+		BehaviorTree* GetRunningTree() const;
+		EventQueue* GetEventQueue() const;
 
 		bool SetBehavior(const BehaviorKey& key);
 		void UnloadBehavior();
 		void Tick();
 
-		inline UINT64 GetUID() { return m_UID; }
-		virtual UINT64 GetDebugUID() { return GetUID(); }
+		inline UINT64 GetUID() const { return m_UID; }
+		virtual UINT64 GetDebugUID() const { return GetUID(); }
 
 	};
 }
