@@ -19,10 +19,10 @@ namespace YBehaviorSharp
     {
         protected IntPtr m_Core;
         protected TYPEID m_TypeID;
-        public SArray(IntPtr core, TYPEID type)
+        public SArray(IntPtr core)
         {
-            m_Core = core;
-            m_TypeID = type;
+            m_TypeID = GetClassType<T>.ID;
+            Init(core);
         }
         public void Init(IntPtr core)
         {
@@ -42,9 +42,16 @@ namespace YBehaviorSharp
         {
             return other.m_Core == m_Core && other.m_TypeID == m_TypeID;
         }
+
+        public bool EraseAt(int index)
+        {
+            return SharpHelper.ArrayEraseAt(m_Core, index, m_TypeID);
+        }
+
         abstract public void PushBack(T data);
         abstract public void Set(T data, int idx);
         abstract public T Get(int idx);
+        //abstract public bool TryFind(T v, out int index);
     }
 
     public class SArrayHelper
@@ -71,7 +78,7 @@ namespace YBehaviorSharp
 
     public class SArrayInt : SArray<int>
     {
-        public SArrayInt(IntPtr core) : base(core, GetClassType<int>.ID) { }
+        public SArrayInt(IntPtr core) : base(core) { }
         public override void PushBack(int data)
         {
             SharpHelper.SetToBufferInt(data);
@@ -93,7 +100,7 @@ namespace YBehaviorSharp
 
     public class SArrayFloat : SArray<float>
     {
-        public SArrayFloat(IntPtr core) : base(core, GetClassType<float>.ID) { }
+        public SArrayFloat(IntPtr core) : base(core) { }
         public override void PushBack(float data)
         {
             SharpHelper.SetToBufferFloat(data);
@@ -115,7 +122,7 @@ namespace YBehaviorSharp
 
     public class SArrayUlong : SArray<ulong>
     {
-        public SArrayUlong(IntPtr core) : base(core, GetClassType<ulong>.ID) { }
+        public SArrayUlong(IntPtr core) : base(core) { }
         public override void PushBack(ulong data)
         {
             SharpHelper.SetToBufferUlong(data);
@@ -137,7 +144,7 @@ namespace YBehaviorSharp
 
     public class SArrayBool : SArray<bool>
     {
-        public SArrayBool(IntPtr core) : base(core, GetClassType<bool>.ID) { }
+        public SArrayBool(IntPtr core) : base(core) { }
         public override void PushBack(bool data)
         {
             SharpHelper.SetToBufferBool(SharpHelper.ConvertBool(data));
@@ -159,7 +166,7 @@ namespace YBehaviorSharp
 
     public class SArrayVector3 : SArray<Vector3>
     {
-        public SArrayVector3(IntPtr core) : base(core, GetClassType<Vector3>.ID) { }
+        public SArrayVector3(IntPtr core) : base(core) { }
         public override void PushBack(Vector3 data)
         {
             SharpHelper.SetToBufferVector3(data);
@@ -181,7 +188,7 @@ namespace YBehaviorSharp
 
     public class SArrayEntity : SArray<IEntity>
     {
-        public SArrayEntity(IntPtr core) : base(core, GetClassType<IEntity>.ID) { }
+        public SArrayEntity(IntPtr core) : base(core) { }
         public override void PushBack(IEntity data)
         {
             SharpHelper.SetToBufferEntity(data.Ptr);
@@ -203,7 +210,7 @@ namespace YBehaviorSharp
 
     public class SArrayString : SArray<string>
     {
-        public SArrayString(IntPtr core) : base(core, GetClassType<string>.ID) { }
+        public SArrayString(IntPtr core) : base(core) { }
         public override void PushBack(string data)
         {
             SharpHelper.SetToBufferString(data);
