@@ -27,7 +27,7 @@ extern "C" YBEHAVIOR_API const void* GetVariableValuePtr(YBehavior::Agent* pAgen
 
 extern "C" YBEHAVIOR_API void SetVariableValue(YBehavior::Agent* pAgent, YBehavior::ISharedVariableEx* pVariable)
 {
-	if (pVariable != nullptr && pAgent != nullptr)
+	if (pVariable != nullptr && !pVariable->IsConst() && pAgent != nullptr)
 		pVariable->SetValue(pAgent->GetMemory(), YBehavior::SharpBuffer::Get(pVariable->TypeID()));
 }
 

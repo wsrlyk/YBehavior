@@ -38,6 +38,10 @@ namespace YBehaviorSharp
             return (int)SharpHelper.ArrayGetSize(m_Core, m_TypeID);
         }
 
+        public bool IsTheSame(SArray<T> other)
+        {
+            return other.m_Core == m_Core && other.m_TypeID == m_TypeID;
+        }
         abstract public void PushBack(T data);
         abstract public void Set(T data, int idx);
         abstract public T Get(int idx);

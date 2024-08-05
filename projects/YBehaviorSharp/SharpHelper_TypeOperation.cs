@@ -94,6 +94,12 @@ namespace YBehaviorSharp
         static public extern bool ArraySet(IntPtr pVector, int index, int type);
         [DllImport(VERSION.dll)]
         static public extern bool ArrayGet(IntPtr pVector, int index, int type);
+        [DllImport(VERSION.dll)]
+        static public extern bool ArrayErase(IntPtr pVector, int type);
+        [DllImport(VERSION.dll)]
+        static public extern bool ArrayEraseAt(IntPtr pVector, int index, int type);
+        [DllImport(VERSION.dll)]
+        static public extern int ArrayFind(IntPtr pVector, int type);
 
         ///////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////

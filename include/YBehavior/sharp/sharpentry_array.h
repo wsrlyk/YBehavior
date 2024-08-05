@@ -15,8 +15,9 @@ namespace YBehavior
 		virtual void PushBack(void* pVector) = 0;
 		virtual bool Set(void* pVector, int index) = 0;
 		virtual bool Get(void* pVector, int index) = 0;
-		///> void SetIntVectorAtIndex(VecInt* pVec, int index, int value)
-		///> int GetIntVectorAtIndex(VecInt* pVec, int index)
+		virtual bool ArrayErase(void* pVector) = 0;
+		virtual bool ArrayEraseAt(void* pVector, int index) = 0;
+		virtual int ArrayFind(void* pVector) = 0;
 	};
 
 	template<typename T>
@@ -72,6 +73,50 @@ namespace YBehavior
 				return true;
 			}
 			return false;
+		}
+		bool ArrayErase(void* pVector) override
+		{
+			if (pVector)
+			{
+				StdVector<T>& vec = *((StdVector<T>*)pVector);
+				T value = *SharpBuffer::Get<T>();
+				auto it = std::find(vec.begin(), vec.end(), value);
+				if (it != vec.end())
+				{
+					vec.erase(it);
+					return true;
+				}
+
+				return false;
+			}
+			return false;
+		}
+		bool ArrayEraseAt(void* pVector, int index) override
+		{
+			if (pVector)
+			{
+				StdVector<T>& vec = *((StdVector<T>*)pVector);
+				if (index >= 0 && index < (int)vec.size())
+				{
+					vec.erase(vec.begin() + index);
+					return true;
+				}
+
+				return false;
+			}
+			return false;
+		}
+		int ArrayFind(void* pVector) override
+		{
+			if (pVector)
+			{
+				StdVector<T>& vec = *((StdVector<T>*)pVector);
+				auto it = std::find(vec.begin(), vec.end(), *SharpBuffer::Get<T>());
+				if (it != vec.end())
+					return (int)(it - vec.begin());
+				return -1;
+			}
+			return -1;
 		}
 	};
 
@@ -135,5 +180,17 @@ extern "C" YBEHAVIOR_API bool ArraySet(void* pVector, int index, YBehavior::TYPE
 extern "C" YBEHAVIOR_API bool ArrayGet(void* pVector, int index, YBehavior::TYPEID type)
 {
 	return YBehavior::ArrayHelperMgr::Get(type)->Get(pVector, index);
+}
+extern "C" YBEHAVIOR_API bool ArrayErase(void* pVector, YBehavior::TYPEID type)
+{
+	return YBehavior::ArrayHelperMgr::Get(type)->ArrayErase(pVector);
+}
+extern "C" YBEHAVIOR_API bool ArrayEraseAt(void* pVector, int index, YBehavior::TYPEID type)
+{
+	return YBehavior::ArrayHelperMgr::Get(type)->ArrayEraseAt(pVector, index);
+}
+extern "C" YBEHAVIOR_API int ArrayFind(void* pVector, YBehavior::TYPEID type)
+{
+	return YBehavior::ArrayHelperMgr::Get(type)->ArrayFind(pVector);
 }
 #endif
