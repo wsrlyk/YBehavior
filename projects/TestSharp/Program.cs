@@ -43,14 +43,18 @@ namespace TestSharp
             YBehaviorSharp.SharpHelper.SetSharedDataByString(entity0.Agent.Ptr, "II0", "1342^32^643", '^');
 
             int i = 0;
-            while (++i > 0)
+            while (++i < 5)
             {
                 YBehaviorSharp.SharpHelper.Tick(entity0.Agent.Ptr);
                 System.Threading.Thread.Sleep(1000);
             }
 
+            //Put it here only for TEST. SHOULD put it at the end.
+            SharpHelper.UninitSharp();
+
             entity0.Destroy();
             entity1.Destroy();
+            Console.WriteLine("End.");
             Console.Read();
         }
 

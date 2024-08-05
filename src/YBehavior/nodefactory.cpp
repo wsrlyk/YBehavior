@@ -92,6 +92,11 @@ namespace YBehavior
 		}
 	}
 
+	void NodeFactory::ClearSharpNodes()
+	{
+		m_SharpNodeDatas.clear();
+	}
+
 #endif // SHARP
 
 	NodeFactory* NodeFactory::Instance()

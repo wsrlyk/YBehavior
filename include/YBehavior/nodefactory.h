@@ -33,6 +33,7 @@ namespace YBehavior
 #ifdef YSHARP
 		TreeNode* Get(const STRING& name) override;
 		void RegisterSharpNode(const STRING& name, int index);
+		void ClearSharpNodes();
 #endif // SHARP
 
 		static NodeFactory* Instance();

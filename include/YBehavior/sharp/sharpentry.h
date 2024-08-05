@@ -17,35 +17,32 @@
 #include "YBehavior/sharp/sharpnode.h"
 extern "C" YBEHAVIOR_API YBehavior::SharpEntity* CreateEntity(YBehavior::UINT64 uid)
 {
-	return new YBehavior::SharpEntity(uid);
+	return YBehavior::SharpUnitMgr::Instance()->CreateEntity(uid);
 }
 
 extern "C" YBEHAVIOR_API void DeleteEntity(YBehavior::SharpEntity* pObject)
 {
-	if (pObject != NULL)
-	{
-		delete pObject;
-		pObject = NULL;
-	}
+	YBehavior::SharpUnitMgr::Instance()->Destroy(pObject);
 }
 extern "C" YBEHAVIOR_API YBehavior::SharpAgent* CreateAgent(YBehavior::SharpEntity* pEntity)
 {
-	return new YBehavior::SharpAgent(pEntity);
+	return YBehavior::SharpUnitMgr::Instance()->CreateAgent(pEntity);
 }
-
 extern "C" YBEHAVIOR_API void DeleteAgent(YBehavior::SharpAgent* pObject)
 {
-	if (pObject != NULL)
-	{
-		delete pObject;
-		pObject = NULL;
-	}
+	YBehavior::SharpUnitMgr::Instance()->Destroy(pObject);
 }
+
 extern "C" YBEHAVIOR_API void InitSharp(int debugPort)
 {
 	YBehavior::SharpLaunchCore core(debugPort);
 	YBehavior::Launcher::Launch(core);
+}
 
+extern "C" YBEHAVIOR_API void UninitSharp()
+{
+	YBehavior::SharpUnitMgr::Instance()->Clear();
+	YBehavior::NodeFactory::Instance()->ClearSharpNodes();
 	YBehavior::Mgrs::Instance()->Reset();
 }
 

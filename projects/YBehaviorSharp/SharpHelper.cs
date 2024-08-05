@@ -131,6 +131,9 @@ namespace YBehaviorSharp
         static extern void InitSharp(int debugPort);
 
         [DllImport(VERSION.dll)]
+        static public extern void UninitSharp();
+
+        [DllImport(VERSION.dll)]
         static extern void RegisterGetFilePathCallback(GetFilePathCallback callback);
 
         [DllImport(VERSION.dll, CallingConvention = CallingConvention.StdCall)]
