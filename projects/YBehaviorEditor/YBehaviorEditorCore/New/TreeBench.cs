@@ -210,7 +210,7 @@ namespace YBehavior.Editor.Core.New
         void _LoadSuo(TreeNode tree)
         {
             string fileName = this.FileInfo.RelativeName;
-            var map = Config.Instance.Suo.GetDebugPointInfo(fileName);
+            var map = Config.Instance.Suo.GetSuo(fileName);
             if (map != null)
             {
                 Action<NodeBase> action = (NodeBase node) =>

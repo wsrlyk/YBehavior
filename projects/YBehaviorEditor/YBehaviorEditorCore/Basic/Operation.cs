@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -14,6 +11,9 @@ namespace YBehavior.Editor.Core.New
         FrameworkElement Canvas { get; }
     }
 
+    /// <summary>
+    /// A wrapper for the mouse event handlers
+    /// </summary>
     public class Operation
     {
         public delegate void ClickHandler(Point absPos);
@@ -42,6 +42,10 @@ namespace YBehavior.Editor.Core.New
 
         int m_ValidButtonMask = 0;
 
+        /// <summary>
+        /// Register handlers to the UIElement
+        /// </summary>
+        /// <param name="target"></param>
         public Operation(UIElement target)
         {
             target.MouseDown -= _MouseDown;
@@ -56,6 +60,9 @@ namespace YBehavior.Editor.Core.New
             m_Target = target as IGetCanvas;
         }
 
+        /// <summary>
+        /// Try to focus on this canvas
+        /// </summary>
         public void MakeCanvasFocused()
         {
             //RenderCanvas.Panel.Focus();

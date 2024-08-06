@@ -30,7 +30,7 @@ namespace YBehavior.Editor.Core.New
         void _LoadSuo()
         {
             string fileName = this.FileInfo.RelativeName;
-            var map = Config.Instance.Suo.GetDebugPointInfo(fileName);
+            var map = Config.Instance.Suo.GetSuo(fileName);
             if (map != null)
             {
                 Action<FSMStateNode> action = (FSMStateNode node) =>

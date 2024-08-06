@@ -1,41 +1,115 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Event Types
+    /// </summary>
     public enum EventType
     {
+        /// <summary>
+        /// Invalid
+        /// </summary>
         None,
+        /// <summary>
+        /// A tree/fsm is loaded
+        /// </summary>
         WorkBenchLoaded,
+        /// <summary>
+        /// A tree/fsm is selected
+        /// </summary>
         WorkBenchSelected,
+        /// <summary>
+        /// A tree/fsm is closed
+        /// </summary>
         WorkBenchClosed,
+        /// <summary>
+        /// Command to select a tree/fsm
+        /// </summary>
         SelectWorkBench,
+        /// <summary>
+        /// A tree/fsm is saved
+        /// </summary>
         WorkBenchSaved,
+        /// <summary>
+        /// A node is added
+        /// </summary>
         NewNodeAdded,
+        /// <summary>
+        /// A node is moved
+        /// </summary>
         NodeMoved,
+        /// <summary>
+        /// A node is duplicated
+        /// </summary>
         NodeDuplicated,
+        /// <summary>
+        /// Selection node/line is changed
+        /// </summary>
         SelectionChanged,
+        /// <summary>
+        /// Variable is changed
+        /// </summary>
         SharedVariableChanged,
+        /// <summary>
+        /// Network is changed
+        /// </summary>
         NetworkConnectionChanged,
+        /// <summary>
+        /// Debug target is changed
+        /// </summary>
         DebugTargetChanged,
+        /// <summary>
+        /// A new runtime tick result comes
+        /// </summary>
         TickResult,
+        /// <summary>
+        /// A comment is created
+        /// </summary>
         CommentCreated,
+        /// <summary>
+        /// Command to show system tips
+        /// </summary>
         ShowSystemTips,
+        /// <summary>
+        /// Command to make the nodes at the center of the canvas
+        /// </summary>
         MakeCenter,
+        /// <summary>
+        /// Command to pop menu
+        /// </summary>
         PopMenu,
+        /// <summary>
+        /// Command to select a UI tab
+        /// </summary>
         SelectSharedDataTab,
+        /// <summary>
+        /// A variable is clicked
+        /// </summary>
         VariableClicked,
+        /// <summary>
+        /// Command to show node list
+        /// </summary>
         ShowNodeList,
+        /// <summary>
+        /// Command to show file list
+        /// </summary>
         ShowWorkSpace,
     }
 
+    /// <summary>
+    /// Event Management
+    /// </summary>
     public class EventMgr : Singleton<EventMgr>
     {
         public delegate void EventHandler(EventArg arg);
         Dictionary<EventType, EventHandler> m_EventDic = new Dictionary<EventType, EventHandler>();
 
+        /// <summary>
+        /// Register a listener
+        /// </summary>
+        /// <param name="type">Event type</param>
+        /// <param name="handler">Callback</param>
         public void Register(EventType type, EventHandler handler)
         {
             if (!m_EventDic.TryGetValue(type, out EventHandler exist))
@@ -51,6 +125,11 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        /// <summary>
+        /// Remove a listener
+        /// </summary>
+        /// <param name="type">Event type</param>
+        /// <param name="handler">Callback</param>
         public void Unregister(EventType type, EventHandler handler)
         {
             if (m_EventDic.TryGetValue(type, out EventHandler exist))
@@ -60,6 +139,10 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        /// <summary>
+        /// Send the event to the listeners
+        /// </summary>
+        /// <param name="arg"></param>
         public void Send(EventArg arg)
         {
             if (m_EventDic.TryGetValue(arg.Type, out EventHandler exist))
@@ -69,6 +152,9 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
+    /// <summary>
+    /// Base class of the event argument
+    /// </summary>
     public class EventArg
     {
 

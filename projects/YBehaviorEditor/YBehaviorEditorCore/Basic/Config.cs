@@ -1,24 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Configuration Management
+    /// </summary>
     public class Config : Singleton<Config>
     {
+        /// <summary>
+        /// Working Directory with backslash
+        /// </summary>
         public string WorkingDirWin { get; set; }
+        /// <summary>
+        /// Working Directory
+        /// </summary>
         public string WorkingDir { get; set; }
+        /// <summary>
+        /// Output Directory
+        /// </summary>
         public string ExportingDir { get; set; }
 
-        public bool PrintIntermediateInfo { get; set; }
+        //public bool PrintIntermediateInfo { get; set; }
+
+        /// <summary>
+        /// Mouse hover time to show tooltips
+        /// </summary>
         public int NodeTooltipDelayTime { get; set; }
 
         private string m_DebugIP;
+        /// <summary>
+        /// IP address that will be connected to for debugging
+        /// </summary>
         public string DebugIP
         {
             get { return m_DebugIP; }
@@ -34,6 +48,9 @@ namespace YBehavior.Editor.Core.New
         }
 
         private string m_DebugPort;
+        /// <summary>
+        /// Port that will be connected to for debugging
+        /// </summary>
         public string DebugPort
         {
             get { return m_DebugPort; }
@@ -53,9 +70,15 @@ namespace YBehavior.Editor.Core.New
             get { return m_Suo.ExpandedFolders; }
         }
 
+        /// <summary>
+        /// Preserve and recover some status of the Editor
+        /// </summary>
         public Suo Suo { get { return m_Suo; } }
         private Suo m_Suo;
 
+        /// <summary>
+        /// Key bindings of some frequently used commands
+        /// </summary>
         public KeyBindings KeyBindings { get { return m_KeyBindings; } }
         private KeyBindings m_KeyBindings;
 
@@ -93,7 +116,7 @@ namespace YBehavior.Editor.Core.New
             m_DebugIP = configFile.ReadString("Debug", "IP", "127.0.0.1");
             m_DebugPort = configFile.ReadString("Debug", "Port", "444");
 
-            PrintIntermediateInfo = configFile.ReadInt("Debug", "PrintIntermediateInfo", 0) != 0;
+            //PrintIntermediateInfo = configFile.ReadInt("Debug", "PrintIntermediateInfo", 0) != 0;
 
             NodeTooltipDelayTime = configFile.ReadInt("Editor", "NodeTooltipDelayTime", -1);
             if (NodeTooltipDelayTime < 0)
@@ -131,6 +154,9 @@ namespace YBehavior.Editor.Core.New
             m_KeyBindings.Init();
         }
 
+        /// <summary>
+        /// Save the .suo and keybindings to the file system
+        /// </summary>
         public void Save()
         {
             WorkBenchMgr.Instance.SaveAllSuos();

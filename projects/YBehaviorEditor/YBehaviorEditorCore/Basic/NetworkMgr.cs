@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -25,10 +24,14 @@ namespace YBehavior.Editor.Core.New
     }
     public class MsgReceiver
     {
-        // Assumes the following message format:
-        //  - 1 byte with message size (not including this byte),
-        //  - message contents
-
+        /// <summary>
+        /// Assumes the following message format:
+        ///  - 1 byte with message size (not including this byte),
+        ///  - message contents
+        /// </summary>
+        /// <param name="dataBuffer"></param>
+        /// <param name="receivedBytes"></param>
+        /// <returns></returns>
         public List<byte[]> OnDataReceived(byte[] dataBuffer, int receivedBytes)
         {
             List<byte[]> messages = new List<byte[]>();
@@ -87,7 +90,9 @@ namespace YBehavior.Editor.Core.New
 
         byte[] m_pendingData = null;
     }
-
+    /// <summary>
+    /// Network Management
+    /// </summary>
     public class NetworkMgr : Singleton<NetworkMgr>
     {
         class SocketPacket
@@ -338,18 +343,18 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        public uint PacketsReceived
-        {
-            get
-            {
-                return this.m_packetsReceived;
-            }
-        }
+        //public uint PacketsReceived
+        //{
+        //    get
+        //    {
+        //        return this.m_packetsReceived;
+        //    }
+        //}
 
-        static private uint GetInt(byte[] data, int i)
-        {
-            return (uint)((data[i + 3] << 24) + (data[i + 2] << 16) + (data[i + 1] << 8) + (data[i + 0]));
-        }
+        //static private uint GetInt(byte[] data, int i)
+        //{
+        //    return (uint)((data[i + 3] << 24) + (data[i + 2] << 16) + (data[i + 1] << 8) + (data[i + 0]));
+        //}
 
         private static string GetStringFromBuffer(byte[] data, int dataIdx, int maxLen, bool isAsc)
         {
@@ -428,8 +433,8 @@ namespace YBehavior.Editor.Core.New
         private void handleText(byte[] msgData)
         {
             string text = GetStringFromBuffer(msgData, 0, kMaxTextLength, false);
-            if (Config.Instance.PrintIntermediateInfo)
-                LogMgr.Instance.Log(text);
+            //if (Config.Instance.PrintIntermediateInfo)
+            //    LogMgr.Instance.Log(text);
             MessageProcessor.Receive(text);
         }
 

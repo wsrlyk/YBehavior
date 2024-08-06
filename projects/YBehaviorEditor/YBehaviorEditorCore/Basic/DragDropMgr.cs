@@ -1,28 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace YBehavior.Editor.Core.New
+﻿namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Interface of objects can be dragged
+    /// </summary>
     public interface IDragable
     {
+        /// <summary>
+        /// Called when dragging state changed
+        /// </summary>
+        /// <param name="bDragged"></param>
         void SetDragged(bool bDragged);
     }
+    /// <summary>
+    /// Interface of objects can be dropped
+    /// </summary>
     public interface IDropable
     {
+        /// <summary>
+        /// Called when dropping state changed
+        /// </summary>
         void SetDropped(bool bDropped);
+        /// <summary>
+        /// Called when a dragable is dropped
+        /// </summary>
+        /// <param name="dragable"></param>
         void OnDropped(IDragable dragable);
     }
 
     public delegate void DragHandler(IDragable obj, bool bState);
     public delegate void DropHandler(IDropable obj);
 
+    /// <summary>
+    /// Drag and drop management
+    /// </summary>
     public class DragDropMgr : Singleton<DragDropMgr>
     {
+        /// <summary>
+        /// Current dragging object
+        /// </summary>
         IDragable m_Dragging;
+        /// <summary>
+        /// Current dropping object
+        /// </summary>
         IDropable m_Dropping;
 
+        /// <summary>
+        /// Clear the current drag and drop objects
+        /// </summary>
         public void Clear()
         {
             if (m_Dragging != null)
@@ -37,6 +61,11 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        /// <summary>
+        /// Called when an object is dragged or not
+        /// </summary>
+        /// <param name="dragging">object</param>
+        /// <param name="bState">dragged or not</param>
         public void OnDragged(IDragable dragging, bool bState)
         {
             if (dragging == null)
@@ -62,6 +91,10 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        /// <summary>
+        /// Called when an object is on hover
+        /// </summary>
+        /// <param name="dropping"></param>
         public void OnHover(IDropable dropping)
         {
             if (m_Dropping != null && m_Dropping != dropping)
@@ -71,6 +104,10 @@ namespace YBehavior.Editor.Core.New
                 m_Dropping.SetDropped(true);
         }
 
+        /// <summary>
+        /// Called when an object is dropped by the current dragging object
+        /// </summary>
+        /// <param name="dropping"></param>
         public void OnDropped(IDropable dropping)
         {
             do

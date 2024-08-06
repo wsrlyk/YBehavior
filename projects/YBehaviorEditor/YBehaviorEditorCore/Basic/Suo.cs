@@ -4,14 +4,28 @@ using System.Collections.Generic;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// A file to save and restore some states of Editor
+    /// </summary>
     [JsonObject(MemberSerialization.OptOut)]
     public class Suo
     {
+        /// <summary>
+        /// Editor state of a tree/fsm, including: 
+        /// debug points,
+        /// and folded nodes
+        /// </summary>
         [JsonObject]
         public class SuoData
         {
+            /// <summary>
+            /// Node uid -> debug point state mapping
+            /// </summary>
             [JsonProperty(PropertyName = "DebugPoints")]
             Dictionary<uint, int> m_DebugPoints = null;
+            /// <summary>
+            /// uids of folded nodes
+            /// </summary>
             [JsonProperty(PropertyName = "Fold")]
             HashSet<uint> m_Fold = null;
 
@@ -53,6 +67,9 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        /// <summary>
+        /// Tree/fsm name -> suo mapping
+        /// </summary>
         [JsonProperty(PropertyName = "Suos")]
         Dictionary<string, SuoData> m_Suos = new Dictionary<string, SuoData>();
         [JsonProperty(PropertyName = "ExpandedFolders")]
@@ -60,10 +77,17 @@ namespace YBehavior.Editor.Core.New
 
         [JsonIgnore]
         public IEnumerable<string> Files { get { return m_Suos.Keys; } }
+        /// <summary>
+        /// List of expanded folders
+        /// </summary>
         [JsonIgnore]
         public HashSet<string> ExpandedFolders { get { return m_ExpandedFolders; } }
-
-        public SuoData GetDebugPointInfo(string fileName)
+        /// <summary>
+        /// Get SuoData of a tree/fsm
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public SuoData GetSuo(string fileName)
         {
             if (m_Suos.TryGetValue(fileName, out var res))
             {
@@ -72,6 +96,10 @@ namespace YBehavior.Editor.Core.New
             return null;
         }
 
+        /// <summary>
+        /// Clear the state of a tree/fsm
+        /// </summary>
+        /// <param name="fileName"></param>
         public void ResetFile(string fileName)
         {
             m_Suos.Remove(fileName);

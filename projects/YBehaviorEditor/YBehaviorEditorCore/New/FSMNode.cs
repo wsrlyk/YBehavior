@@ -735,9 +735,6 @@ namespace YBehavior.Editor.Core.New
                     case "Name":
                         m_NickName = attr.Value;
                         break;
-                    case "DebugPoint":
-                        DebugPointInfo.HitCount = int.Parse(attr.Value);
-                        break;
                     case "Comment":
                         Comment = attr.Value;
                         break;
@@ -760,9 +757,6 @@ namespace YBehavior.Editor.Core.New
 
             Point intPos = new Point((int)Geo.Pos.X, (int)Geo.Pos.Y);
             data.SetAttribute("Pos", intPos.ToString());
-
-            if (!DebugPointInfo.NoDebugPoint)
-                data.SetAttribute("DebugPoint", DebugPointInfo.HitCount.ToString());
 
             if (!string.IsNullOrEmpty(Comment))
             {

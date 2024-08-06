@@ -7,31 +7,103 @@ using Newtonsoft.Json.Converters;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Commands for key bindings
+    /// </summary>
     public enum Command
     {
+        /// <summary>
+        /// Invalid
+        /// </summary>
         None,
+        /// <summary>
+        /// Delete a node/line
+        /// </summary>
         Delete,
+        /// <summary>
+        /// Duplicate a node/nodes
+        /// </summary>
         Duplicate,
+        /// <summary>
+        /// Copy a node/nodes
+        /// </summary>
         Copy,
+        /// <summary>
+        /// Paster a node/nodes
+        /// </summary>
         Paste,
+        /// <summary>
+        /// Undo an operation
+        /// </summary>
         Undo,
+        /// <summary>
+        /// Redo an operation
+        /// </summary>
         Redo,
+        /// <summary>
+        /// Open a tree/fsm
+        /// </summary>
         Open,
+        /// <summary>
+        /// Save a tree/fsm
+        /// </summary>
         Save,
+        /// <summary>
+        /// Save as a tree/fsm
+        /// </summary>
         SaveAs,
+        /// <summary>
+        /// Open/close search window
+        /// </summary>
         Search,
+        /// <summary>
+        /// Toggle the break point of a node
+        /// </summary>
         BreakPoint,
+        /// <summary>
+        /// Toggle the log point of a node
+        /// </summary>
         LogPoint,
+        /// <summary>
+        /// Disable/enable a node
+        /// </summary>
         Disable,
+        /// <summary>
+        /// Open/close the condition pin of a node
+        /// </summary>
         Condition,
+        /// <summary>
+        /// Fold/unfold a node
+        /// </summary>
         Fold,
+        /// <summary>
+        /// Make a fsm node the default one
+        /// </summary>
         Default,
+        /// <summary>
+        /// Make the nodes at the center of the canvas
+        /// </summary>
         Center,
+        /// <summary>
+        /// Clear the command lines
+        /// </summary>
         Clear,
+        /// <summary>
+        /// Continue when debugging
+        /// </summary>
         DebugContinue,
+        /// <summary>
+        /// Step over the children when debugging
+        /// </summary>
         DebugStepOver,
+        /// <summary>
+        /// Step into the children when debugging
+        /// </summary>
         DebugStepIn,
     }
+    /// <summary>
+    /// Key bindings management
+    /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public class KeyBindings
     {
@@ -39,11 +111,23 @@ namespace YBehavior.Editor.Core.New
         UserConfig m_UserConfig = new UserConfig();
 
         ModifierKeys m_MultiKey = ModifierKeys.Shift;
+        /// <summary>
+        /// Multiple operation key
+        /// </summary>
         public ModifierKeys MultiKey { get { return m_MultiKey; } }
 
+        /// <summary>
+        /// A key structure
+        /// </summary>
         public struct KeyBinding
         {
+            /// <summary>
+            /// The key
+            /// </summary>
             public Key key;
+            /// <summary>
+            /// The modifier
+            /// </summary>
             public ModifierKeys modifier;
 
             public KeyBinding(Key k, ModifierKeys m)
@@ -52,6 +136,10 @@ namespace YBehavior.Editor.Core.New
                 modifier = m;
             }
         }
+        /// <summary>
+        /// A default key binding configuration.
+        /// Can be overwrite by user configuration.
+        /// </summary>
         Dictionary<Command, KeyBinding> m_KeyBindings = new Dictionary<Command, KeyBinding>()
         {
             {Command.Delete, new KeyBinding(Key.Delete, ModifierKeys.None)},
@@ -75,6 +163,9 @@ namespace YBehavior.Editor.Core.New
             {Command.DebugStepOver, new KeyBinding(Key.F10, ModifierKeys.None)},
             {Command.DebugStepIn, new KeyBinding(Key.F11, ModifierKeys.None)},
         };
+        /// <summary>
+        /// A key->command map
+        /// </summary>
         Dictionary<Key, Dictionary<ModifierKeys, Command>> m_Maps = new Dictionary<Key, Dictionary<ModifierKeys, Command>>();
 
         [JsonObject]
@@ -87,6 +178,9 @@ namespace YBehavior.Editor.Core.New
         }
 
         bool m_bDirty;
+        /// <summary>
+        /// The setting is changed
+        /// </summary>
         public bool IsDirty { get { return m_bDirty; } }
         public void Init()
         {
@@ -228,6 +322,12 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        /// <summary>
+        /// Find a command with the key and modifier
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="modifier"></param>
+        /// <returns></returns>
         public Command GetCommand(Key key, ModifierKeys modifier)
         {
             if (!m_Maps.TryGetValue(key, out var dic))
@@ -246,11 +346,21 @@ namespace YBehavior.Editor.Core.New
             return Command.None;
         }
 
+        /// <summary>
+        /// Is multiple operation key
+        /// </summary>
+        /// <param name="modifier"></param>
+        /// <returns></returns>
         public bool IsMulti(ModifierKeys modifier)
         {
             return (modifier & m_MultiKey) != 0;
         }
 
+        /// <summary>
+        /// Get the key bindings of a command
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
         public KeyBinding GetKeyBinding(Command cmd)
         {
             m_KeyBindings.TryGetValue(cmd, out var kb);

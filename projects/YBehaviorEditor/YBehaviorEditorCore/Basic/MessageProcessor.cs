@@ -5,18 +5,44 @@ using System.Text;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Runtime tick result
+    /// </summary>
     class TickResultData
     {
+        /// <summary>
+        /// Variables
+        /// </summary>
         public string MainData;
+        /// <summary>
+        /// FSM running result
+        /// </summary>
         public string FSMRunData;
+        /// <summary>
+        /// Trees running results
+        /// </summary>
         public Dictionary<string, TreeResult> TreeRunDatas = new Dictionary<string, TreeResult>();
+
         public struct TreeResult
         {
+            /// <summary>
+            /// Tree name
+            /// </summary>
             public string Name;
+            /// <summary>
+            /// Tree local variables
+            /// </summary>
             public string LocalData;
+            /// <summary>
+            /// Tree running results
+            /// </summary>
             public string RunData;
         }
 
+        /// <summary>
+        /// Create from network data
+        /// </summary>
+        /// <param name="ss"></param>
         public void BuildFromString(string ss)
         {
             if (ss == null)
@@ -57,6 +83,9 @@ namespace YBehavior.Editor.Core.New
 
         }
     }
+    /// <summary>
+    /// Process network messages
+    /// </summary>
     public class MessageProcessor
     {
         object m_Lock = new object();
@@ -65,7 +94,12 @@ namespace YBehavior.Editor.Core.New
 
         System.Windows.Threading.DispatcherTimer m_Timer;
         delegate void DebugTreeWithAgentAppendOneNode(NodeBase node, StringBuilder stringBuilder);
-        
+
+        /// <summary>
+        /// Called when network is changed.
+        /// When connected, process the messages and send the TickResult event.
+        /// </summary>
+        /// <param name="bConnected"></param>
         public void OnNetworkConnectionChanged(bool bConnected)
         {
             if (bConnected)
@@ -135,6 +169,12 @@ namespace YBehavior.Editor.Core.New
             m_LastTickResultToken = 0;
             m_TickResultToken = 0;
         }
+        /// <summary>
+        /// Send the data to runtime
+        /// </summary>
+        /// <param name="fileInfo"></param>
+        /// <param name="agentUID"></param>
+        /// <param name="waitforbegin"></param>
         public void DebugTreeWithAgent(FileMgr.FileInfo fileInfo, ulong agentUID, bool waitforbegin)
         {
             StringBuilder sb = new StringBuilder();
@@ -199,24 +239,36 @@ namespace YBehavior.Editor.Core.New
         //    Clear();
         //}
 
+        /// <summary>
+        /// Send the data to runtime
+        /// </summary>
         public void DoContinue()
         {
             NetworkMgr.Instance.SendText("[Continue]");
             DebugMgr.Instance.ClearRunState();
         }
-
+        /// <summary>
+        /// Send the data to runtime
+        /// </summary>
         public void DoStepInto()
         {
             NetworkMgr.Instance.SendText("[StepInto]");
             DebugMgr.Instance.ClearRunState();
         }
-
+        /// <summary>
+        /// Send the data to runtime
+        /// </summary>
         public void DoStepOver()
         {
             NetworkMgr.Instance.SendText("[StepOver]");
             DebugMgr.Instance.ClearRunState();
         }
-
+        /// <summary>
+        /// Send the data to runtime
+        /// </summary>
+        /// <param name="fileInfo"></param>
+        /// <param name="uid"></param>
+        /// <param name="count"></param>
         public void SetDebugPoint(FileMgr.FileInfo fileInfo, uint uid, int count)
         {
             StringBuilder sb = new StringBuilder();
@@ -265,7 +317,10 @@ namespace YBehavior.Editor.Core.New
                     break;
             }
         }
-
+        /// <summary>
+        /// Called when receive a message.
+        /// </summary>
+        /// <param name="msg"></param>
         public void Receive(string msg)
         {
             lock(m_Lock)
@@ -294,6 +349,11 @@ namespace YBehavior.Editor.Core.New
             data.BuildFromString(ss);
             return data;
         }
+        /// <summary>
+        /// Compare this tick result with others.
+        /// We only show the most significant tick result in one second
+        /// </summary>
+        /// <param name="ss"></param>
         void _CompareTickResult(TickResultData ss)
         {
             if (m_PreviousTickResultData == null)
@@ -386,6 +446,10 @@ namespace YBehavior.Editor.Core.New
                 }
             }
         }
+        /// <summary>
+        /// Save this tickresult to the DebugMgr for display
+        /// </summary>
+        /// <param name="data"></param>
         void _HandleTickResult(TickResultData data)
         {
             if (data == null)
@@ -463,10 +527,14 @@ namespace YBehavior.Editor.Core.New
             DebugMgr.Instance.bBreaked = true;
         }
 
+        /// <summary>
+        /// Print the log point information
+        /// </summary>
+        /// <param name="ss"></param>
         void _HandleLogPoint(string ss)
         {
-            if (Config.Instance.PrintIntermediateInfo)
-                LogMgr.Instance.Log(ss);
+            //if (Config.Instance.PrintIntermediateInfo)
+            //    LogMgr.Instance.Log(ss);
 
             string[] data = ss.Split(msgContentSplitter, StringSplitOptions.RemoveEmptyEntries);
             if (data.Length > 0)
@@ -579,10 +647,15 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        /// <summary>
+        /// Get and check all the sub trees.
+        /// Hash of the file must be the same to the runtime.
+        /// </summary>
+        /// <param name="ss"></param>
         void _HandleSubTrees(string ss)
         {
-            if (Config.Instance.PrintIntermediateInfo)
-                LogMgr.Instance.Log(ss);
+            //if (Config.Instance.PrintIntermediateInfo)
+            //    LogMgr.Instance.Log(ss);
 
             string[] data = ss.Split(msgListSplitter, StringSplitOptions.RemoveEmptyEntries);
             if (data.Length > 0)

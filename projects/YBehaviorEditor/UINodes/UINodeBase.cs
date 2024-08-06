@@ -174,7 +174,7 @@ namespace YBehavior.Editor
 
         public void ToggleBreakPoint()
         {
-            if (Node.DebugPointInfo.HitCount > 0)
+            if (Node.DebugPointInfo.HasBreakPoint)
                 Node.SetDebugPoint(0);
             else
                 Node.SetDebugPoint(1);
@@ -182,7 +182,7 @@ namespace YBehavior.Editor
 
         public void ToggleLogPoint()
         {
-            if (Node.DebugPointInfo.HitCount < 0)
+            if (Node.DebugPointInfo.HasLogPoint)
                 Node.SetDebugPoint(0);
             else
                 Node.SetDebugPoint(-1);
