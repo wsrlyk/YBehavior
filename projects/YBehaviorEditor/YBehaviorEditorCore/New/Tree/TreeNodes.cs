@@ -279,7 +279,7 @@ namespace YBehavior.Editor.Core.New
         public override void CreateVariables()
         {
             m_Tree = new TreeVariable(NodeMemory.Owner);
-            NodeMemory.CreateVariable(m_Tree,
+            NodeMemory.AddVariable(m_Tree,
                 "Tree",
                 "",
                 Variable.CreateParams_String,

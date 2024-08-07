@@ -43,12 +43,12 @@ namespace YBehavior.Editor
                         break;
                     if (Config.Instance.KeyBindings.IsMulti(modifier))
                     {
-                        ///> Duplicate all children
+                        ///> Delete all children
                         SelectionMgr.Instance.TryDeleteSelection(1);
                     }
                     else
                     {
-                        ///> Duplicate only one
+                        ///> Delete only one
                         SelectionMgr.Instance.TryDeleteSelection(0);
                     }
                     break;

@@ -9,10 +9,17 @@ using System.Windows.Shapes;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// ViewModel of a line
+    /// </summary>
     public class ConnectionRenderer : System.ComponentModel.INotifyPropertyChanged
     {
         public ConnectionRenderer()
         { }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="isVertical">Connector.IsVertical</param>
         public ConnectionRenderer(bool isVertical)
         {
             m_bIsVertical = isVertical;
@@ -20,9 +27,21 @@ namespace YBehavior.Editor.Core.New
         bool m_bIsVertical = true;
         bool m_bIsValid = true;
         public bool IsValid { get { return m_bIsValid; } }
+        /// <summary>
+        /// Model
+        /// </summary>
         public Connection Owner { get; set; }
+        /// <summary>
+        /// Position of Start
+        /// </summary>
         public Point ParentPos { get { return ParentConnectorGeo.Pos; } }
+        /// <summary>
+        /// Position of End
+        /// </summary>
         public Point ChildPos { get { return ChildConnectorGeo.Pos; } }
+        /// <summary>
+        /// Position of the first corner
+        /// </summary>
         public Point FirstCorner 
         {
             get
@@ -32,6 +51,9 @@ namespace YBehavior.Editor.Core.New
                     new Point(ParentConnectorGeo.Pos.X + 20, ParentConnectorGeo.Pos.Y);
             }
         }
+        /// <summary>
+        /// Position of the second corner
+        /// </summary>
         public Point SecondCorner
         {
             get
@@ -41,10 +63,19 @@ namespace YBehavior.Editor.Core.New
                     new Point(ChildConnectorGeo.Pos.X - 20, ChildConnectorGeo.Pos.Y);
             }
         }
+        /// <summary>
+        /// Position of the note
+        /// </summary>
         public Point NotePos { get { return new Point(SecondCorner.X + 5, SecondCorner.Y - 20); } }
+        /// <summary>
+        /// Note of the line
+        /// </summary>
         public string Note { get { return Owner.Note; } }
 
         ConnectorGeometry m_ParentConnectorGeo;
+        /// <summary>
+        /// Position information of the Start
+        /// </summary>
         public ConnectorGeometry ParentConnectorGeo
         {
             get { return m_ParentConnectorGeo; }
@@ -64,6 +95,9 @@ namespace YBehavior.Editor.Core.New
             }
         }
         ConnectorGeometry m_ChildConnectorGeo;
+        /// <summary>
+        /// Position information of the End
+        /// </summary>
         public ConnectorGeometry ChildConnectorGeo
         {
             get { return m_ChildConnectorGeo; }
@@ -97,16 +131,22 @@ namespace YBehavior.Editor.Core.New
             OnPropertyChanged("NotePos");
         }
 
-        public void Destroy()
-        {
-            ParentConnectorGeo = null;
-            ChildConnectorGeo = null;
-            m_bIsValid = false;
-        }
+        //public void Destroy()
+        //{
+        //    ParentConnectorGeo = null;
+        //    ChildConnectorGeo = null;
+        //    m_bIsValid = false;
+        //}
 
+        /// <summary>
+        /// Running state when debugging. Will return the state of End node
+        /// </summary>
         public NodeState RunState { get { return DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(Owner.Ctr.To.Owner.UID, false) : NodeState.NS_INVALID; } }
 
         public event Action DebugEvent;
+        /// <summary>
+        /// Invoke the debug event
+        /// </summary>
         public void RefreshDebug()
         {
             DebugEvent?.Invoke();
@@ -122,25 +162,61 @@ namespace YBehavior.Editor.Core.New
             }
         }
     }
+    /// <summary>
+    /// Property used to refresh the view
+    /// </summary>
     public enum RenderProperty
     {
+        /// <summary>
+        /// Nickname changed
+        /// </summary>
         NickName,
+        /// <summary>
+        /// Comment changed
+        /// </summary>
         Comment,
+        /// <summary>
+        /// UID changed
+        /// </summary>
         UID,
+        /// <summary>
+        /// Disable state changed
+        /// </summary>
         Disabled,
+        /// <summary>
+        /// Note chagned
+        /// </summary>
         Note,
+        /// <summary>
+        /// Debug point state changed
+        /// </summary>
         DebugPoint,
-
+        /// <summary>
+        /// Fold state changed
+        /// </summary>
         Folded,
+        /// <summary>
+        /// ReturnType changed
+        /// </summary>
         ReturnType,
+        /// <summary>
+        /// Condition of node changed
+        /// </summary>
         Condition,
-
+        /// <summary>
+        /// Default state of fsm changed
+        /// </summary>
         DefaultState,
     }
-
+    /// <summary>
+    /// Base class of ViewModel of node
+    /// </summary>
     public class NodeBaseRenderer : System.ComponentModel.INotifyPropertyChanged
     {
         NodeBase m_Owner;
+        /// <summary>
+        /// Model
+        /// </summary>
         public NodeBase Owner { get { return m_Owner; } }
 
         public NodeBaseRenderer(NodeBase node)
@@ -184,11 +260,16 @@ namespace YBehavior.Editor.Core.New
                     break;
             }
         }
-
+        /// <summary>
+        /// Display name (Nickname or original name
+        /// </summary>
         public virtual string FullName
         {
             get { return string.IsNullOrEmpty(Owner.NickName) ? Owner.Name : Owner.NickName; }
         }
+        /// <summary>
+        /// Nickname of node
+        /// </summary>
         public string NickName
         {
             get { return Owner.NickName; }
@@ -206,11 +287,16 @@ namespace YBehavior.Editor.Core.New
                 WorkBenchMgr.Instance.PushCommand(command);
             }
         }
-
+        /// <summary>
+        /// Toggle disabled state
+        /// </summary>
         public void ToggleDisabled()
         {
             Disabled = !Owner.SelfDisabled;
         }
+        /// <summary>
+        /// Whether it's disabled
+        /// </summary>
         public bool Disabled
         {
             get { return Owner.Disabled; }
@@ -229,16 +315,25 @@ namespace YBehavior.Editor.Core.New
                 WorkBenchMgr.Instance.PushCommand(command);
             }
         }
-
+        /// <summary>
+        /// When it's debugging, it's not editable
+        /// </summary>
         public bool IsEditable
         {
             get { return !NetworkMgr.Instance.IsConnected; }
         }
-
+        /// <summary>
+        /// UID.FullName
+        /// </summary>
         public string UITitle { get { return Owner.UID.ToString() + "." + FullName; } }
         public DebugPointInfo DebugPointInfo { get { return Owner.DebugPointInfo; } }
+        /// <summary>
+        /// Note of the node
+        /// </summary>
         public string Note { get { return Owner.Note; } }
-
+        /// <summary>
+        /// Comment of the node
+        /// </summary>
         public string Comment
         {
             get { return Owner.Comment; }
@@ -258,12 +353,18 @@ namespace YBehavior.Editor.Core.New
         }
 
         public event Action DebugEvent;
+        /// <summary>
+        /// Invoke debug events
+        /// </summary>
         public void RefreshDebug()
         {
             DebugEvent?.Invoke();
         }
 
         public event Action SelectEvent;
+        /// <summary>
+        /// Invoke select events
+        /// </summary>
         public void SetSelect()
         {
             SelectEvent?.Invoke();
@@ -291,17 +392,28 @@ namespace YBehavior.Editor.Core.New
                 OnPropertyChanged("CenterOffsetY");
             }
         }
-
+        /// <summary>
+        /// Running state of the node in debugging
+        /// </summary>
         public NodeState RunState { get { return DebugMgr.Instance.IsDebugging() ? DebugMgr.Instance.GetRunState(m_Owner.UID, true) : NodeState.NS_INVALID; } }
 
         int m_DragParam = -1;
+        /// <summary>
+        /// Move the node
+        /// </summary>
+        /// <param name="delta">Delta position</param>
+        /// <param name="param">if 0, move the children</param>
         public void DragMain(Vector delta, int param)
         {
             if (m_DragParam == -1)
                 m_DragParam = param;
             Owner.Move(delta, m_DragParam);
         }
-
+        /// <summary>
+        /// Finish move the node
+        /// </summary>
+        /// <param name="delta">Delta position</param>
+        /// <param name="pos">Final position</param>
         public void FinishDrag(Vector delta, Point pos)
         {
             Point finalPos = new Point(Math.Round(Owner.Geo.Pos.X / 10) * 10, Math.Round(Owner.Geo.Pos.Y / 10) * 10);
@@ -333,17 +445,27 @@ namespace YBehavior.Editor.Core.New
             WorkBenchMgr.Instance.PushCommand(moveNodeCommand);
             m_DragParam = -1;
         }
+        /// <summary>
+        /// Set the position
+        /// </summary>
+        /// <param name="pos"></param>
         public void SetPos(Point pos)
         {
             Owner.Move(pos - Owner.Geo.Pos, 0);
         }
-
+        /// <summary>
+        /// Refresh view
+        /// </summary>
         public void OnMove()
         {
             OnPropertyChanged("Owner");
         }
 
         protected virtual bool _BeforeDelete(int param) { return true; }
+        /// <summary>
+        /// Delete the node
+        /// </summary>
+        /// <param name="param">if 1, children will be deleted</param>
         public void Delete(int param)
         {
             if (!_BeforeDelete(param))
@@ -382,10 +504,15 @@ namespace YBehavior.Editor.Core.New
             }
         }
     }
-
+    /// <summary>
+    /// ViewModel of tree node
+    /// </summary>
     public class TreeNodeRenderer : NodeBaseRenderer
     {
         TreeNode m_TreeOwner;
+        /// <summary>
+        /// Model
+        /// </summary>
         public TreeNode TreeOwner { get { return m_TreeOwner; } }
 
         public TreeNodeRenderer(TreeNode treeNode) : base(treeNode)
@@ -405,7 +532,9 @@ namespace YBehavior.Editor.Core.New
 
             return true;
         }
-
+        /// <summary>
+        /// ReturnType of tree node
+        /// </summary>
         public string ReturnType
         {
             get { return TreeOwner.ReturnType; }
@@ -425,7 +554,9 @@ namespace YBehavior.Editor.Core.New
                 WorkBenchMgr.Instance.PushCommand(command);
             }
         }
-
+        /// <summary>
+        /// Fold state of tree node
+        /// </summary>
         public bool Folded
         {
             get { return TreeOwner.Folded; }
@@ -445,7 +576,9 @@ namespace YBehavior.Editor.Core.New
 
             }
         }
-
+        /// <summary>
+        /// Whether the condition connector is enabled
+        /// </summary>
         public bool EnableCondition
         {
             get { return TreeOwner.EnableCondition; }
@@ -470,9 +603,14 @@ namespace YBehavior.Editor.Core.New
             }
         }
     }
-
+    /// <summary>
+    /// ViewModel of connector
+    /// </summary>
     public class ConnectorRenderer : System.ComponentModel.INotifyPropertyChanged
     {
+        /// <summary>
+        /// Model
+        /// </summary>
         public Connector Owner { get; private set; }
 
         public string Identifier { get { return Owner.Identifier; } }

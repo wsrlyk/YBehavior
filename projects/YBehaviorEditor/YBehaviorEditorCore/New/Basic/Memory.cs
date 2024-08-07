@@ -5,6 +5,9 @@ using System.Text;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Shared or local variable of tree
+    /// </summary>
     public class TreeVariable : Variable
     {
         public TreeVariable(IVariableDataSource source) : base(source)
@@ -14,7 +17,9 @@ namespace YBehavior.Editor.Core.New
 
         public override bool CanSwitchContainer => true;
     }
-
+    /// <summary>
+    /// Collection of shared and local variables
+    /// </summary>
     public class TreeMemory : IVariableCollection
     {
         protected IVariableCollectionOwner m_Owner;
@@ -22,12 +27,26 @@ namespace YBehavior.Editor.Core.New
         VariableCollection m_SharedVariables;
         VariableCollection m_LocalVariables;
         DelayableNotificationCollection<VariableHolder> m_DataList = new DelayableNotificationCollection<VariableHolder>();
+        /// <summary>
+        /// All variables
+        /// </summary>
         public DelayableNotificationCollection<VariableHolder> Datas { get { return m_DataList; } }
         public Variable GetVariable(string name) { return null; }
+        /// <summary>
+        /// Collection of shared variables
+        /// </summary>
         public IVariableCollection SharedMemory { get { return m_SharedVariables; } }
+        /// <summary>
+        /// Collection of local variables
+        /// </summary>
         public IVariableCollection LocalMemory { get { return m_LocalVariables; } }
-
+        /// <summary>
+        /// Candidates for each type
+        /// </summary>
         public VariableCandidates Candidatas { get; } = new VariableCandidates();
+        /// <summary>
+        /// Refresh the candidates when variables change
+        /// </summary>
         public void RefreshCandidatas()
         {
             Candidatas.Refresh(this);
@@ -40,7 +59,12 @@ namespace YBehavior.Editor.Core.New
             m_SharedVariables = new VariableCollection(owner);
             m_LocalVariables = new VariableCollection(owner);
         }
-
+        /// <summary>
+        /// Create a variable from file
+        /// </summary>
+        /// <param name="name">Name</param>
+        /// <param name="value">Formatted value with types</param>
+        /// <returns></returns>
         public bool TryAddData(string name, string value)
         {
             if (!VariableCollection.IsValidVariableName(name))
@@ -57,9 +81,17 @@ namespace YBehavior.Editor.Core.New
             //if (!v.CheckValid())
             //    return false;
 
-            return AddVariable(v);
+            return _AddVariable(v);
         }
-
+        /// <summary>
+        /// Create a variable from user
+        /// </summary>
+        /// <param name="name">Variable Name</param>
+        /// <param name="value">Value</param>
+        /// <param name="vType">ValueType</param>
+        /// <param name="cType">CountType</param>
+        /// <param name="isLocal">Local or shared</param>
+        /// <returns></returns>
         public bool TryCreateVariable(string name, string value, Variable.ValueType vType, Variable.CountType cType, bool isLocal)
         {
             if (!VariableCollection.IsValidVariableName(name))
@@ -76,7 +108,7 @@ namespace YBehavior.Editor.Core.New
                 v.LockCType = false;
                 v.CanBeRemoved = true;
 
-                bool res = AddVariable(v);
+                bool res = _AddVariable(v);
                 if (!res)
                     return false;
             }
@@ -91,7 +123,7 @@ namespace YBehavior.Editor.Core.New
             return true;
         }
 
-        public bool AddVariable(Variable v)
+        bool _AddVariable(Variable v)
         {
             if (v == null)
                 return false;
@@ -122,7 +154,11 @@ namespace YBehavior.Editor.Core.New
 
             return true;
         }
-
+        /// <summary>
+        /// Add the variable from Undo/Redo
+        /// </summary>
+        /// <param name="holder"></param>
+        /// <returns></returns>
         public bool AddBackVariable(VariableHolder holder)
         {
             if (holder.Variable.IsLocal)
@@ -143,7 +179,11 @@ namespace YBehavior.Editor.Core.New
 
             return true;
         }
-
+        /// <summary>
+        /// Remove a variable
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
         public bool RemoveVariable(Variable v)
         {
             if (v == null)
@@ -174,7 +214,11 @@ namespace YBehavior.Editor.Core.New
 
             return true;
         }
-
+        /// <summary>
+        /// Switch between local and shared collections
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
         public bool SwitchVariable(Variable v)
         {
             if (v == null)
@@ -214,7 +258,12 @@ namespace YBehavior.Editor.Core.New
 
             return true;
         }
-
+        /// <summary>
+        /// Get the holder of a variable by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="bIsLocal"></param>
+        /// <returns></returns>
         public VariableHolder GetVariableHolder(string name, bool bIsLocal)
         {
             VariableHolder holder = null;
@@ -228,12 +277,22 @@ namespace YBehavior.Editor.Core.New
             }
             return holder;
         }
-
+        /// <summary>
+        /// Get the variable by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="bIsLocal"></param>
+        /// <returns></returns>
         public Variable GetVariable(string name, bool bIsLocal)
         {
             return GetVariableHolder(name, bIsLocal)?.Variable;
         }
-
+        /// <summary>
+        /// Clone this to other. 
+        /// For debugging.
+        /// </summary>
+        /// <param name="owner"></param>
+        /// <returns></returns>
         public TreeMemory Clone(IVariableCollectionOwner owner = null)
         {
             TreeMemory memory = new TreeMemory(owner ?? m_Owner);
@@ -246,7 +305,9 @@ namespace YBehavior.Editor.Core.New
             return memory;
         }
     }
-
+    /// <summary>
+    /// Input and output pin
+    /// </summary>
     public class InOutVariable : Variable
     {
         public InOutVariable(IVariableDataSource source): base(source)
@@ -254,14 +315,22 @@ namespace YBehavior.Editor.Core.New
 
         }
     }
+    /// <summary>
+    /// Collection of input and output pins
+    /// </summary>
     public class InOutMemory
     {
         protected IVariableCollectionOwner m_Owner;
         bool m_bIsCore = true;
         VariableCollection m_InputVariables;
         VariableCollection m_OutputVariables;
-
+        /// <summary>
+        /// Input collection
+        /// </summary>
         public IVariableCollection InputMemory { get { return m_InputVariables; } }
+        /// <summary>
+        /// Output collection
+        /// </summary>
         public IVariableCollection OutputMemory { get { return m_OutputVariables; } }
 
         public InOutMemory(IVariableCollectionOwner owner, bool bIsCore)
@@ -271,7 +340,13 @@ namespace YBehavior.Editor.Core.New
             m_InputVariables = new VariableCollection(owner);
             m_OutputVariables = new VariableCollection(owner);
         }
-
+        /// <summary>
+        /// Try to create pin from file
+        /// </summary>
+        /// <param name="name">Pin name</param>
+        /// <param name="value">Formatted value with types</param>
+        /// <param name="bIsInput">Input or output</param>
+        /// <returns></returns>
         public bool TryAddData(string name, string value, bool bIsInput)
         {
             if (!VariableCollection.IsValidVariableName(name))
@@ -311,9 +386,16 @@ namespace YBehavior.Editor.Core.New
                 }
             }
 
-            return AddVariable(v);
+            return _AddVariable(v);
         }
-
+        /// <summary>
+        /// Try to create pin from user
+        /// </summary>
+        /// <param name="name">Pin name</param>
+        /// <param name="vType">ValueType</param>
+        /// <param name="cType">CountType</param>
+        /// <param name="bIsInput">Input or output</param>
+        /// <returns></returns>
         public bool TryCreateVariable(string name, Variable.ValueType vType, Variable.CountType cType, bool bIsInput)
         {
             if (!VariableCollection.IsValidVariableName(name))
@@ -339,7 +421,7 @@ namespace YBehavior.Editor.Core.New
                 v.CanBeRemoved = true;
                 v.IsInput = bIsInput;
 
-                bool res = AddVariable(v);
+                bool res = _AddVariable(v);
                 if (!res)
                     return false;
             }
@@ -347,14 +429,14 @@ namespace YBehavior.Editor.Core.New
             {
                 AddInOutVariableCommand addInOutVariableCommand = new AddInOutVariableCommand()
                 {
-                    VariableHolder = GetVariableHolder(v.Name, v.IsInput)
+                    VariableHolder = _GetVariableHolder(v.Name, v.IsInput)
                 };
                 WorkBenchMgr.Instance.PushCommand(addInOutVariableCommand);
             }
             return true;
         }
 
-        public bool AddVariable(InOutVariable v)
+        protected bool _AddVariable(InOutVariable v)
         {
             if (v == null)
                 return false;
@@ -381,31 +463,36 @@ namespace YBehavior.Editor.Core.New
             return true;
         }
 
-        public bool AddBackVariable(VariableHolder holder)
-        {
-            if (!(holder.Variable is InOutVariable))
-                return false;
-            InOutVariable v = holder.Variable as InOutVariable;
-            if (v.IsInput)
-            {
-                if (!m_InputVariables.DoInsertVariable(holder))
-                    return false;
-            }
-            else
-            {
-                if (!m_OutputVariables.DoInsertVariable(holder))
-                    return false;
-            }
+        //public bool AddBackVariable(VariableHolder holder)
+        //{
+        //    if (!(holder.Variable is InOutVariable))
+        //        return false;
+        //    InOutVariable v = holder.Variable as InOutVariable;
+        //    if (v.IsInput)
+        //    {
+        //        if (!m_InputVariables.DoInsertVariable(holder))
+        //            return false;
+        //    }
+        //    else
+        //    {
+        //        if (!m_OutputVariables.DoInsertVariable(holder))
+        //            return false;
+        //    }
 
-            return true;
-        }
+        //    return true;
+        //}
 
+        /// <summary>
+        /// Remove a pin
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
         public bool RemoveVariable(Variable v)
         {
             if (v == null || !(v is InOutVariable))
                 return false;
             InOutVariable vv = v as InOutVariable;
-            VariableHolder holder = GetVariableHolder(v.Name, vv.IsInput);
+            VariableHolder holder = _GetVariableHolder(v.Name, vv.IsInput);
             if (vv.IsInput)
             {
                 if (!m_InputVariables.DoRemove(holder))
@@ -426,7 +513,7 @@ namespace YBehavior.Editor.Core.New
             return true;
         }
 
-        public VariableHolder GetVariableHolder(string name, bool bIsInput)
+        VariableHolder _GetVariableHolder(string name, bool bIsInput)
         {
             VariableHolder holder = null;
             if (bIsInput)
@@ -440,11 +527,14 @@ namespace YBehavior.Editor.Core.New
             return holder;
         }
 
-        public Variable GetVariable(string name, bool bIsInput)
-        {
-            return GetVariableHolder(name, bIsInput)?.Variable;
-        }
+        //public Variable GetVariable(string name, bool bIsInput)
+        //{
+        //    return _GetVariableHolder(name, bIsInput)?.Variable;
+        //}
 
+        /// <summary>
+        /// Refresh candidates
+        /// </summary>
         public void RefreshVariables()
         {
             _RefreshVariables(m_InputVariables);
@@ -459,16 +549,20 @@ namespace YBehavior.Editor.Core.New
                     v.Variable.VectorIndex.RefreshCandidates(true);
             }
         }
-        public InOutMemory Clone(IVariableCollectionOwner owner = null)
-        {
-            InOutMemory memory = new InOutMemory(owner ?? m_Owner, m_bIsCore);
+        //public InOutMemory Clone(IVariableCollectionOwner owner = null)
+        //{
+        //    InOutMemory memory = new InOutMemory(owner ?? m_Owner, m_bIsCore);
 
-            memory.m_InputVariables.CloneFrom(m_InputVariables);
-            memory.m_OutputVariables.CloneFrom(m_OutputVariables);
+        //    memory.m_InputVariables.CloneFrom(m_InputVariables);
+        //    memory.m_OutputVariables.CloneFrom(m_OutputVariables);
 
-            return memory;
-        }
+        //    return memory;
+        //}
 
+        /// <summary>
+        /// Clone from others
+        /// </summary>
+        /// <param name="other"></param>
         public void CloneFrom(InOutMemory other)
         {
             m_InputVariables.CloneFrom(other.m_InputVariables);
@@ -476,9 +570,9 @@ namespace YBehavior.Editor.Core.New
         }
 
         /// <summary>
-        /// If do have same variable, do nothing to it;
-        /// If dont have a variable, add it;
-        /// If have an extra variable, remove it;
+        /// If do have same pin, do nothing to it;
+        /// If dont have a pin, add it;
+        /// If have an extra pin, remove it;
         /// </summary>
         /// <param name="other"></param>
         public void DiffReplaceBy(InOutMemory other)
@@ -494,6 +588,9 @@ namespace YBehavior.Editor.Core.New
     //    void OnCTypeChanged(string name);
     //}
 
+    /// <summary>
+    /// Collection of node pins
+    /// </summary>
     public class NodeMemory : VariableCollection, IVariableCollection/*, ISameTypeGroupTypeChanged*/
     {
         public SameTypeGroup vTypeGroup { get; set; } = null;
@@ -505,7 +602,21 @@ namespace YBehavior.Editor.Core.New
             cTypeChanged += _OnCTypeChanged;
         }
 
-        public bool CreateVariable(
+        /// <summary>
+        /// Add a pin
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="name">New name</param>
+        /// <param name="defaultValue"></param>
+        /// <param name="valueType"></param>
+        /// <param name="countType"></param>
+        /// <param name="vbType"></param>
+        /// <param name="eType"></param>
+        /// <param name="vTypeGroup">ValueType group</param>
+        /// <param name="cTypeGroup">CountType group</param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public bool AddVariable(
             Variable v,
             string name,
             string defaultValue,
@@ -521,11 +632,23 @@ namespace YBehavior.Editor.Core.New
 
             v.SetVariable(valueType[0], countType, vbType, eType, false, defaultValue, param, name);
 
-            if (AddVariable(v, vTypeGroup, cTypeGroup))
+            if (_AddVariable(v, vTypeGroup, cTypeGroup))
                 return true;
             return false;
         }
-
+        /// <summary>
+        /// Create a pin
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="defaultValue"></param>
+        /// <param name="valueType"></param>
+        /// <param name="countType"></param>
+        /// <param name="vbType"></param>
+        /// <param name="eType"></param>
+        /// <param name="vTypeGroup">ValueType group</param>
+        /// <param name="cTypeGroup">CountType group</param>
+        /// <param name="param"></param>
+        /// <returns></returns>
         public Variable CreateVariable(
             string name,
             string defaultValue,
@@ -538,16 +661,12 @@ namespace YBehavior.Editor.Core.New
             string param = null)
         {
             Variable v = new Variable(m_Owner);
-            v.vTypeSet.AddRange(valueType);
-
-            v.SetVariable(valueType[0], countType, vbType, eType, false, defaultValue, param, name);
-
-            if (AddVariable(v, vTypeGroup, cTypeGroup))
+            if (AddVariable(v, name, defaultValue, valueType, countType, vbType, eType, vTypeGroup, cTypeGroup, param))
                 return v;
             return null;
         }
 
-        public bool AddVariable(Variable v, int vTypeGroup = 0, int cTypeGroup = 0)
+        bool _AddVariable(Variable v, int vTypeGroup = 0, int cTypeGroup = 0)
         {
             if (v == null)
                 return false;
@@ -577,7 +696,9 @@ namespace YBehavior.Editor.Core.New
 
             return true;
         }
-
+        /// <summary>
+        /// Called when candidates change
+        /// </summary>
         public void RefreshVariables()
         {
             foreach (var v in m_Variables.Values)
@@ -585,7 +706,10 @@ namespace YBehavior.Editor.Core.New
                 v.Variable.OnCandidatesChange();
             }
         }
-
+        /// <summary>
+        /// Clone from other
+        /// </summary>
+        /// <param name="other"></param>
         public void CloneFrom(NodeMemory other)
         {
             base.CloneFrom(other);

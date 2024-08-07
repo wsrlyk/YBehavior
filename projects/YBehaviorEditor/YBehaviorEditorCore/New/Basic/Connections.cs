@@ -148,6 +148,9 @@ namespace YBehavior.Editor.Core.New
         protected Dir m_Dir = Dir.OUT;
         public Dir GetDir => m_Dir;
 
+        /// <summary>
+        /// If this is a connection to the "parent" connector of a tree node, then it is vertical
+        /// </summary>
         public bool IsVertical { get; private set; }
 
         protected List<Connection> m_Conns = new List<Connection>();
