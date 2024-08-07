@@ -6,6 +6,9 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// User customized action nodes management
+    /// </summary>
     class ExternalActionMgr : Singleton<ExternalActionMgr>
     {
         Dictionary<string, ActionTreeNode> m_ActionDic = new Dictionary<string, ActionTreeNode>();
@@ -13,7 +16,11 @@ namespace YBehavior.Editor.Core.New
         public ExternalActionMgr()
         {
         }
-
+        /// <summary>
+        /// Get node by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public New.ActionTreeNode GetTreeNode(string name)
         {
             if (m_ActionDic.TryGetValue(name, out New.ActionTreeNode node))
@@ -22,6 +29,10 @@ namespace YBehavior.Editor.Core.New
             }
             return null;
         }
+        /// <summary>
+        /// Load from configuration
+        /// </summary>
+        /// <param name="path"></param>
         public void Load(string path)
         {
             XmlDocument xmlDoc = new XmlDocument();

@@ -6,11 +6,20 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Operating an FSM
+    /// </summary>
     public class FSMBench : WorkBench
     {
         FSM m_FSM;
         public FSM FSM { get { return m_FSM; } }
+        /// <summary>
+        /// The layers of fsm
+        /// </summary>
         public DelayableNotificationCollection<FSMMachineNode> StackMachines { get; } = new DelayableNotificationCollection<FSMMachineNode>();
+        /// <summary>
+        /// The top layer
+        /// </summary>
         public FSMMachineNode CurMachine { get { return StackMachines.Count > 0 ? StackMachines[0] : null; } }
 
         protected override FileType FileType => FileType.FSM;
@@ -487,7 +496,12 @@ namespace YBehavior.Editor.Core.New
                     ++idx;
             }
         }
-
+        /// <summary>
+        /// Disconnect the transition of two states,
+        /// and if there's no more transition between these two states, disconnect them and remove the viewmodel of line.
+        /// </summary>
+        /// <param name="fromto"></param>
+        /// <param name="trans"></param>
         public void Disconnect(Connection.FromTo fromto, Transition trans)
         {
             FSMConnection conn = fromto.From.FindConnection(fromto) as FSMConnection;
@@ -521,10 +535,10 @@ namespace YBehavior.Editor.Core.New
 
         public override void ConnectNodes(Connector from, Connector to)
         {
-            MakeTrans(from, to);
+            _MakeTrans(from, to);
         }
 
-        public Transition MakeTrans(Connector from, Connector to)
+        Transition _MakeTrans(Connector from, Connector to)
         {
             if (from == null || to == null || from.GetDir != Connector.Dir.OUT || to.GetDir != Connector.Dir.IN)
                 return null;
@@ -540,7 +554,13 @@ namespace YBehavior.Editor.Core.New
             _OnTransMade(from, to, ref res);
             return res.Trans;
         }
-
+        /// <summary>
+        /// Try to make a new transition between two states
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="existTrans"></param>
+        /// <returns></returns>
         public Transition MakeTrans(Connector from, Connector to, Transition existTrans)
         {
             if (from == null || to == null || from.GetDir != Connector.Dir.OUT || to.GetDir != Connector.Dir.IN)
@@ -592,12 +612,18 @@ namespace YBehavior.Editor.Core.New
                 Trans = res.Trans,
             });
         }
-
+        /// <summary>
+        /// Clear the default state
+        /// </summary>
+        /// <param name="machine"></param>
         public void ResetDefault(FSMMachineNode machine)
         {
             _SetDefault(machine, null);
         }
-
+        /// <summary>
+        /// Set the state default 
+        /// </summary>
+        /// <param name="state"></param>
         public void SetDefault(FSMStateNode state)
         {
             FSMMachineNode machine = state == null ? CurMachine : state.OwnerMachine;

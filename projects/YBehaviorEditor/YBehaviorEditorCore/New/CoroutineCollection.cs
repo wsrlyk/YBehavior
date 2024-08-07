@@ -6,6 +6,11 @@ using System.Text;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// A collection that could add or remove elements in multiple frames using UnityCoroutines
+    /// </summary>
+    /// <typeparam name="C"></typeparam>
+    /// <typeparam name="T"></typeparam>
     public class CoroutineCollection<C, T> where C : Collection<T>, new()
     {
         enum Op
@@ -27,6 +32,10 @@ namespace YBehavior.Editor.Core.New
 
         public C Collection { get { return m_Collection; } }
 
+        /// <summary>
+        /// If no operations in queue, directly add the element to the collection
+        /// </summary>
+        /// <param name="item"></param>
         public void Add(T item)
         {
             if (m_Ops.Count == 0)
@@ -37,6 +46,10 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        /// <summary>
+        /// Add the element to the queue
+        /// </summary>
+        /// <param name="item"></param>
         public void DelayAdd(T item)
         {
             ToDo toDo;
@@ -44,6 +57,9 @@ namespace YBehavior.Editor.Core.New
             toDo.data = item;
             m_Ops.Enqueue(toDo);
         }
+        /// <summary>
+        /// Clear all
+        /// </summary>
         public void Clear()
         {
             ///> Just clear all.
@@ -51,6 +67,10 @@ namespace YBehavior.Editor.Core.New
             m_Collection.Clear();
         }
 
+        /// <summary>
+        /// If no operations in queue, directly remove the element from the collection
+        /// </summary>
+        /// <param name="item"></param>
         public bool Remove(T item)
         {
             if (m_Ops.Count == 0)
@@ -63,6 +83,10 @@ namespace YBehavior.Editor.Core.New
             return true;
         }
 
+        /// <summary>
+        /// Add the request of removing element to the queue
+        /// </summary>
+        /// <param name="item"></param>
         public void DelayRemove(T item)
         {
             ToDo toDo;
@@ -71,6 +95,9 @@ namespace YBehavior.Editor.Core.New
             m_Ops.Enqueue(toDo);
         }
 
+        /// <summary>
+        /// Start coroutine to slowly process the collection
+        /// </summary>
         public void Dispose()
         {
             if (m_Ops.Count > 0 && !m_Oping)
@@ -118,6 +145,9 @@ namespace YBehavior.Editor.Core.New
         }
 
         static Queue<ToDo> s_Temp = new Queue<ToDo>();
+        /// <summary>
+        /// Stop the current process, clear the collection and add the elements to the collection from start
+        /// </summary>
         public void ReAdd()
         {
             if (m_Collection.Count == 0)

@@ -11,6 +11,9 @@ namespace YBehavior.Editor.Core.New
     /// </summary>
     public class Connection
     {
+        /// <summary>
+        /// A struct describing head and tail of a line
+        /// </summary>
         public struct FromTo : IEquatable<FromTo>
         {
             public Connector From { get; set; }
@@ -21,9 +24,15 @@ namespace YBehavior.Editor.Core.New
                 return From == other.From && To == other.To;
             }
         }
+        /// <summary>
+        /// Head and tail of the line
+        /// </summary>
         public FromTo Ctr { get; set; }
 
         private string m_Note = string.Empty;
+        /// <summary>
+        /// Description
+        /// </summary>
         public string Note
         {
             get { return m_Note; }
@@ -35,6 +44,9 @@ namespace YBehavior.Editor.Core.New
                 Renderer.OnPropertyChanged("Note");
             }
         }
+        /// <summary>
+        /// The ViewModel of the line
+        /// </summary>
         public ConnectionRenderer Renderer { get; set; }
 
         public Connection(Connector from, Connector to)
@@ -57,6 +69,9 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
+    /// <summary>
+    /// Position of the connector
+    /// </summary>
     public class ConnectorGeometry
     {
         public Connector Owner { get; set; }
@@ -75,6 +90,9 @@ namespace YBehavior.Editor.Core.New
         }
 
         double m_MidY;
+        /// <summary>
+        /// A position above all the children nodes connecting this connector
+        /// </summary>
         public double MidY
         {
             get { return m_MidY; }
@@ -133,6 +151,9 @@ namespace YBehavior.Editor.Core.New
         public bool IsVertical { get; private set; }
 
         protected List<Connection> m_Conns = new List<Connection>();
+        /// <summary>
+        /// All connections from this connector
+        /// </summary>
         public List<Connection> Conns { get { return m_Conns; } }
 
         protected NodeBase m_Owner;
@@ -141,6 +162,9 @@ namespace YBehavior.Editor.Core.New
         public ConnectorGeometry Geo => m_Geo;
         ConnectorGeometry m_Geo;
 
+        /// <summary>
+        /// ViewModel
+        /// </summary>
         public ConnectorRenderer Renderer => m_Renderer;
         ConnectorRenderer m_Renderer;
         public ConnectionCreateDelegate ConnectionCreator { get; set; }
@@ -201,12 +225,15 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        /// <summary>
+        /// Calculate the MidY when children change
+        /// </summary>
         public void RecalcMidY()
         {
             if (!IsVertical)
                 return;
 
-            double childPos = CalcHorizontalPos();
+            double childPos = _CalcVerticalPos();
             double parentPos = Geo.Pos.Y;
             double midPos;
             if (m_AtBottom > 0)
@@ -235,7 +262,7 @@ namespace YBehavior.Editor.Core.New
             RecalcMidY();
         }
 
-        public double CalcHorizontalPos()
+        double _CalcVerticalPos()
         {
             double miny = double.MaxValue;
             foreach (Connection conn in m_Conns)
@@ -248,6 +275,11 @@ namespace YBehavior.Editor.Core.New
         }
 
         protected virtual bool _CanAdd() { return true; }
+        /// <summary>
+        /// Make a new connection to another connector
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
         public Connection Connect(Connector target)
         {
             if (target == null)
@@ -289,6 +321,15 @@ namespace YBehavior.Editor.Core.New
             return connection;
         }
 
+        /// <summary>
+        /// Check and Try to make connection between two connectors.
+        /// Only an incoming connector and an outgoing connector could make a connection.
+        /// </summary>
+        /// <param name="left">One connector</param>
+        /// <param name="right">Another connector</param>
+        /// <param name="parent">Outgoing connector</param>
+        /// <param name="child">Incoming connector</param>
+        /// <returns>If null, it fails to make a connection</returns>
         public static Connection TryConnect(Connector left, Connector right, out Connector parent, out Connector child)
         {
             parent = null;
@@ -317,13 +358,18 @@ namespace YBehavior.Editor.Core.New
             return parent.Connect(child);
         }
 
+        /// <summary>
+        /// Disconnect two connectors
+        /// </summary>
+        /// <param name="fromto"></param>
+        /// <returns></returns>
         public static bool TryDisconnect(Connection.FromTo fromto)
         {
             Connector parent = fromto.From;
             Connector child = fromto.To;
 
-            parent.SimpleRemove(fromto);
-            child.SimpleRemove(fromto);
+            parent._SimpleRemove(fromto);
+            child._SimpleRemove(fromto);
 
 
             parent.Owner.Conns.MarkDirty();
@@ -335,7 +381,7 @@ namespace YBehavior.Editor.Core.New
             return true;
         }
 
-        public void SimpleRemove(Connection.FromTo fromto)
+        void _SimpleRemove(Connection.FromTo fromto)
         {
             for(int i = 0; i < m_Conns.Count; ++i)
             {
@@ -347,6 +393,11 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        /// <summary>
+        /// Try to find the connection of a pair of connectors
+        /// </summary>
+        /// <param name="fromto"></param>
+        /// <returns></returns>
         public Connection FindConnection(Connection.FromTo fromto)
         {
             foreach (var c in m_Conns)
@@ -357,6 +408,11 @@ namespace YBehavior.Editor.Core.New
             return null;
         }
 
+        /// <summary>
+        /// Try to find the ViewModel of a pair of connectors
+        /// </summary>
+        /// <param name="fromto"></param>
+        /// <returns></returns>
         public ConnectionRenderer GetRenderer(Connection.FromTo fromto)
         {
             foreach (var c in m_Conns)
@@ -370,7 +426,9 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-
+    /// <summary>
+    /// The collection of connectors in a node
+    /// </summary>
     public class Connections : System.Collections.IEnumerable
     {
         NodeBase m_Owner;
@@ -388,24 +446,43 @@ namespace YBehavior.Editor.Core.New
         public System.Collections.IEnumerable AllConnectors => m_AllConnectorsList;
         List<Connector> m_AllConnectorsList = new List<Connector>();
         /// <summary>
-        /// For managing the connections starting from Owner
+        /// The connections starting from here, including children and output
         /// </summary>
         public System.Collections.IEnumerable MainConnectors => m_MainConnectorsList;
         List<Connector> m_MainConnectorsList = new List<Connector>();
+        /// <summary>
+        /// The connections of children in tree
+        /// </summary>
         public System.Collections.IEnumerable ChildrenConnectors => m_ChildrenConnectorsList;
         List<Connector> m_ChildrenConnectorsList = new List<Connector>();
 
+        /// <summary>
+        /// Connect to parent
+        /// </summary>
         public Connector ParentConnector { get; private set; }
+        /// <summary>
+        /// When an input pin don't want to be assigned with a constant value or a variable in the node panel 
+        /// but wants to be connected directly with another output pin, an InputConnector would be created here
+        /// </summary>
         public System.Collections.IEnumerable InputConnectors => m_InputConnectors;
         List<Connector> m_InputConnectors = new List<Connector>();
+        /// <summary>
+        /// When an output pin don't want to be assigned with a constant value or a variable in the node panel 
+        /// but wants to be connected directly with another input pin, an OutputConnector would be created here
+        /// </summary>
         public System.Collections.IEnumerable OutputConnectors => m_OutputConnectors;
         List<Connector> m_OutputConnectors = new List<Connector>();
 
-
+        /// <summary>
+        /// Children nodes 
+        /// </summary>
         List<NodeBase> m_Nodes = new List<NodeBase>();
         public int NodeCount { get { _ProcessDirty(); return m_Nodes.Count; } }
 
         bool m_bDirty = true;
+        /// <summary>
+        /// Called when children change
+        /// </summary>
         public void MarkDirty()
         {
             m_bDirty = true;
@@ -416,6 +493,13 @@ namespace YBehavior.Editor.Core.New
             m_Owner = owner;
         }
 
+        /// <summary>
+        /// Create a connector
+        /// </summary>
+        /// <param name="identifier">Name of the connector</param>
+        /// <param name="isMultiple">Whether multiple nodes could connect this connector</param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public Connector Add(string identifier, bool isMultiple, Connector.PosType type)
         {
             Connector res;
@@ -484,6 +568,12 @@ namespace YBehavior.Editor.Core.New
             return m_Nodes.GetEnumerator();
         }
 
+        /// <summary>
+        /// Try to find a connector
+        /// </summary>
+        /// <param name="identifier">Name</param>
+        /// <param name="posType">Type</param>
+        /// <returns></returns>
         public Connector GetConnector(string identifier, Connector.PosType posType)
         {
             foreach (var conn in m_AllConnectorsList)
@@ -495,6 +585,12 @@ namespace YBehavior.Editor.Core.New
             return null;
         }
 
+        /// <summary>
+        /// Try to connect the parent connector of a node with a connector
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="identifier">Connector name</param>
+        /// <returns></returns>
         public Connection Connect(NodeBase target, string identifier)
         {
             Connector conn = GetConnector(identifier, Connector.PosType.CHILDREN);
@@ -520,7 +616,9 @@ namespace YBehavior.Editor.Core.New
 
     ///////////////////////////////
 
-
+    /// <summary>
+    /// Connector that could have only one child
+    /// </summary>
     public class ConnectorSingle : Connector
     {
         public ConnectorSingle(NodeBase node, string identifier, PosType type)
@@ -533,7 +631,9 @@ namespace YBehavior.Editor.Core.New
             return m_Conns.Count == 0;
         }
     }
-
+    /// <summary>
+    /// Connector that could have Multiple children
+    /// </summary>
     public class ConnectorMultiple : Connector
     {
         public ConnectorMultiple(NodeBase node, string identifier, PosType type)

@@ -7,17 +7,35 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Base class for operating a tree/fsm
+    /// </summary>
     public abstract class WorkBench : System.ComponentModel.INotifyPropertyChanged
     {
         protected Graph m_Graph;
+        /// <summary>
+        /// tree/fsm
+        /// </summary>
         public Graph MainGraph { get { return m_Graph; } }
         public CommandMgr CommandMgr { get; } = new CommandMgr();
 
+        /// <summary>
+        /// Comment collection
+        /// </summary>
         public DelayableNotificationCollection<Comment> Comments { get; } = new DelayableNotificationCollection<Comment>();
+        /// <summary>
+        /// ViewModels of nodes
+        /// </summary>
         public CoroutineCollection<DelayableNotificationCollection<NodeBaseRenderer>, NodeBaseRenderer> NodeList { get; } = new CoroutineCollection<DelayableNotificationCollection<NodeBaseRenderer>, NodeBaseRenderer>();
+        /// <summary>
+        /// ViewModels of lines
+        /// </summary>
         public CoroutineCollection<DelayableNotificationCollection<ConnectionRenderer>, ConnectionRenderer> ConnectionList { get; } = new CoroutineCollection<DelayableNotificationCollection<ConnectionRenderer>, ConnectionRenderer>();
 
         string filePath = string.Empty;
+        /// <summary>
+        /// Path of the tree/fsm
+        /// </summary>
         public string FilePath
         {
             get { return filePath; }
@@ -34,8 +52,13 @@ namespace YBehavior.Editor.Core.New
                 }
             }
         }
-
+        /// <summary>
+        /// Name for Tab ui
+        /// </summary>
         public string DisplayName { get { return FileInfo.DisplayName + (CommandMgr.Dirty ? " *" : ""); } }
+        /// <summary>
+        /// Make the name shorter for better displaying
+        /// </summary>
         public string ShortDisplayName
         {
             get 
@@ -50,6 +73,9 @@ namespace YBehavior.Editor.Core.New
         }
 
         private FileMgr.FileInfo m_UntitledFileInfo = null;
+        /// <summary>
+        /// Reference to the FileInfo of this tree/fsm
+        /// </summary>
         public FileMgr.FileInfo FileInfo
         {
             get
@@ -64,20 +90,81 @@ namespace YBehavior.Editor.Core.New
             //NodeList.Step = 1;
             //ConnectionList.Step = 20;
         }
-
+        /// <summary>
+        /// Load from file
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="bRendering"></param>
+        /// <returns></returns>
         public virtual bool Load(XmlElement data, bool bRendering) { return true; }
+        /// <summary>
+        /// Check error when saving
+        /// </summary>
+        /// <returns></returns>
         public virtual bool CheckError() { return true; }
+        /// <summary>
+        /// Save to the file
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="xmlDoc"></param>
         public virtual void Save(XmlElement data, XmlDocument xmlDoc) { }
+        /// <summary>
+        /// Export the runtime version
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="xmlDoc"></param>
         public virtual void Export(XmlElement data, XmlDocument xmlDoc) { }
+        /// <summary>
+        /// Called when a node is moved
+        /// </summary>
+        /// <param name="arg"></param>
         public virtual void OnNodeMoved(EventArg arg) { }
+        /// <summary>
+        /// Connect two nodes
+        /// </summary>
+        /// <param name="ctr0"></param>
+        /// <param name="ctr1"></param>
         public virtual void ConnectNodes(Connector ctr0, Connector ctr1) { }
+        /// <summary>
+        /// Disconnect two nodes
+        /// </summary>
+        /// <param name="connection"></param>
         public virtual void DisconnectNodes(Connection.FromTo connection) { }
+        /// <summary>
+        /// Remove a node
+        /// </summary>
+        /// <param name="node"></param>
         public virtual void RemoveNode(NodeBase node) { }
+        /// <summary>
+        /// Add a node
+        /// </summary>
+        /// <param name="node"></param>
         public virtual void AddNode(NodeBase node) { }
+        /// <summary>
+        /// Create a ViewModel for node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="batchAdd">When true, create viewmodels for children</param>
+        /// <param name="excludeRoot">When true, exclude the root node</param>
         public virtual void AddRenderers(NodeBase node, bool batchAdd, bool excludeRoot = false) { }
+        /// <summary>
+        /// Remove the ViewModels for node and its children
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="excludeRoot">When true, exclude the root node</param>
         public virtual void RemoveRenderers(NodeBase node, bool excludeRoot = false) { }
+        /// <summary>
+        /// Init an empty one when newly creating a tree/fsm
+        /// </summary>
         public virtual void InitEmpty() { }
+        /// <summary>
+        /// Save the current states to suo
+        /// </summary>
         public virtual void SaveSuo() { }
+        /// <summary>
+        /// Push a command to Undo/Redo
+        /// </summary>
+        /// <param name="command"></param>
         public void PushDoneCommand(ICommand command)
         {
             bool bOldDirty = CommandMgr.Dirty;
@@ -86,7 +173,10 @@ namespace YBehavior.Editor.Core.New
             if (!bOldDirty)
                 OnPropertyChanged("ShortDisplayName");
         }
-
+        /// <summary>
+        /// Remove a comment node
+        /// </summary>
+        /// <param name="comment"></param>
         public void RemoveComment(Comment comment)
         {
             if (comment != null)
@@ -98,7 +188,10 @@ namespace YBehavior.Editor.Core.New
             };
             PushDoneCommand(removeCommentCommand);
         }
-
+        /// <summary>
+        /// Add a comment node
+        /// </summary>
+        /// <param name="comment"></param>
         public void AddComment(Comment comment)
         {
             if (comment != null)
@@ -110,7 +203,10 @@ namespace YBehavior.Editor.Core.New
             };
             PushDoneCommand(addCommentCommand);
         }
-
+        /// <summary>
+        /// Create a comment at a position
+        /// </summary>
+        /// <param name="viewPos"></param>
         public void CreateComment(System.Windows.Point viewPos)
         {
             Comment comment = new Comment();
@@ -165,6 +261,9 @@ namespace YBehavior.Editor.Core.New
         }
 
         protected uint m_ExportFileHash = 0;
+        /// <summary>
+        /// Get the hash of runtime version
+        /// </summary>
         public uint ExportFileHash
         {
             get
@@ -173,20 +272,24 @@ namespace YBehavior.Editor.Core.New
                 {
                     XmlDocument xmlDoc = new XmlDocument();
                     xmlDoc.Load(FileInfo.ExportingPath);
-                    return GenerateHash(xmlDoc.DocumentElement.OuterXml.Replace(" ", string.Empty));
+                    return _GenerateHash(xmlDoc.DocumentElement.OuterXml.Replace(" ", string.Empty));
                 }
                 return m_ExportFileHash;
             }
         }
-        public uint GenerateHash(string str)
+        protected uint _GenerateHash(string str)
         {
             m_ExportFileHash = Utility.Hash(str);
 
             return m_ExportFileHash;
         }
-
+        /// <summary>
+        /// Invoked when a tick result comes
+        /// </summary>
         public event Action DebugEvent;
-
+        /// <summary>
+        /// Invoke the debugging events of the nodes and lines 
+        /// </summary>
         public void RefreshContentDebug()
         {
             foreach (var node in NodeList.Collection)
@@ -198,12 +301,16 @@ namespace YBehavior.Editor.Core.New
                 conn.RefreshDebug();
             }
         }
-
+        /// <summary>
+        /// Invoke the debugging events of this tree/fsm 
+        /// </summary>
         public void RefreshBenchDebug()
         {
             DebugEvent?.Invoke();
         }
-
+        /// <summary>
+        /// Get the current final running state of this tree/fsm
+        /// </summary>
         public NodeState RunState => DebugMgr.Instance.GetRunState(this);
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;

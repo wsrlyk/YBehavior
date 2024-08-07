@@ -9,13 +9,20 @@ namespace YBehavior.Editor.Core.New
         TREE,
         FSM,
     }
-
+    /// <summary>
+    /// File list management
+    /// </summary>
     public class FileMgr : Singleton<FileMgr>
     {
         public static readonly string TreeExtension = ".tree";
 
         ////private List<List<string>> m_Folders = new List<List<string>>();
 
+        /// <summary>
+        /// Import file information into FileMgr
+        /// </summary>
+        /// <param name="relativePath"></param>
+        /// <param name="relativeName"></param>
         public void Load(string relativePath, string relativeName)
         {
             if (m_FileDic.ContainsKey(relativeName))
@@ -65,6 +72,9 @@ namespace YBehavior.Editor.Core.New
             if (thisFile.FileType == FileType.TREE)
                 m_TreeList.Add(thisFile.RelativeName);
         }
+        /// <summary>
+        /// Import all files in WorkingDir into FileMgr 
+        /// </summary>
         public void Load()
         {
             using (var h = m_TreeList.Delay())
@@ -84,7 +94,9 @@ namespace YBehavior.Editor.Core.New
 
             _CheckSuo();
         }
-
+        /// <summary>
+        /// Remove invalid file in .suo
+        /// </summary>
         void _CheckSuo()
         {
             List<string> notexist = null;
@@ -171,17 +183,37 @@ namespace YBehavior.Editor.Core.New
         ////    }
         ////}
 
+        /// <summary>
+        /// File Information
+        /// </summary>
         public class FileInfo
         {
+            /// <summary>
+            /// Used in Tab
+            /// </summary>
             public string DisplayName { get { return Name; } }
+            /// <summary>
+            /// Used in Tab tips
+            /// </summary>
             public string DisplayPath { get { return RelativeName ?? "NULL"; } }
-
+            /// <summary>
+            /// File name
+            /// </summary>
             public string Name { get; private set; } = string.Empty;
+            /// <summary>
+            /// File name with relative path
+            /// </summary>
             public string RelativeName { get; private set; } = string.Empty;
+            /// <summary>
+            /// File relative path
+            /// </summary>
             public string RelativePath { get; private set; } = string.Empty;
 
             public FileType FileType = FileType.TREE;
             private string m_Path = string.Empty;
+            /// <summary>
+            /// Absolute path
+            /// </summary>
             public string Path
             {
                 get { return m_Path; }
@@ -219,8 +251,14 @@ namespace YBehavior.Editor.Core.New
                     }
                 }
             }
+            /// <summary>
+            /// Absolute output path
+            /// </summary>
             public string ExportingPath { get; set; }
             private static int s_UntitledIndex = 0;
+            /// <summary>
+            /// A newly created file will have an untitled name
+            /// </summary>
             public static string UntitledName { get { return "Untitled" + s_UntitledIndex++; } }
 
             public List<string> FolderStack;
@@ -230,19 +268,34 @@ namespace YBehavior.Editor.Core.New
         private DelayableNotificationCollection<string> m_TreeList = new DelayableNotificationCollection<string>();
         private Dictionary<string, FileInfo> m_FileDic = new Dictionary<string, FileInfo>();
 
+        /// <summary>
+        /// Reload and get all files
+        /// </summary>
+        /// <returns></returns>
         public List<FileInfo> ReloadAndGetAllFiles()
         {
             Load();
             return m_FileInfos;
         }
+        /// <summary>
+        /// Get all files
+        /// </summary>
         public List<FileInfo> AllFiles
         {
             get { return m_FileInfos; }
         }
+        /// <summary>
+        /// Get all trees
+        /// </summary>
         public DelayableNotificationCollection<string> TreeList
         {
             get { return m_TreeList; }
         }
+        /// <summary>
+        /// Get a file by relative name
+        /// </summary>
+        /// <param name="path">RelativeName</param>
+        /// <returns></returns>
         public FileInfo GetFileInfo(string path)
         {
             if (m_FileDic.TryGetValue(path, out FileInfo info))

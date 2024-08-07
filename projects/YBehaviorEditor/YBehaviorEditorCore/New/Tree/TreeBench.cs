@@ -7,6 +7,9 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Operating a tree
+    /// </summary>
     public class TreeBench : WorkBench
     {
         /// <summary>
@@ -14,6 +17,9 @@ namespace YBehavior.Editor.Core.New
         /// Just for getting a proper start uid for the forest.
         /// </summary>
         uint m_TotalForestCount = 0;
+        /// <summary>
+        /// Main tree is excluded
+        /// </summary>
         List<TreeNode> m_Forest = new List<TreeNode>();
 
         /// <summary>
@@ -22,6 +28,9 @@ namespace YBehavior.Editor.Core.New
         List<TreeNode> m_AllTrees = new List<TreeNode>();
 
         Tree m_Tree;
+        /// <summary>
+        /// The main tree
+        /// </summary>
         public Tree Tree { get { return m_Tree; } }
         public TreeBench()
         {
@@ -38,7 +47,11 @@ namespace YBehavior.Editor.Core.New
             m_Tree.RefreshNodeUID(0);
             AddRenderers(m_Tree.Root, true);
         }
-
+        /// <summary>
+        /// Try to connect an OUTPUT pin and an INPUT pin
+        /// </summary>
+        /// <param name="ctr0"></param>
+        /// <param name="ctr1"></param>
         public void ConnectVariables(Connector ctr0, Connector ctr1)
         {
             Connector parent;
@@ -492,7 +505,7 @@ namespace YBehavior.Editor.Core.New
             XmlElement variableRoot = null;
             _SaveVariableConnections(m_Tree.Root, ref variableRoot, data, xmlDoc, true);
 
-            m_ExportFileHash = GenerateHash(data.OuterXml.Replace(" ", string.Empty));
+            m_ExportFileHash = _GenerateHash(data.OuterXml.Replace(" ", string.Empty));
         }
 
         void _ExportNode(TreeNode node, XmlElement data, XmlDocument xmlDoc)
@@ -512,6 +525,11 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
+        /// <summary>
+        /// Remove a tree from forest
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="bRemoveRenderer">When true, its viewmodel will be removed in this function</param>
         public void RemoveForestTree(TreeNode root, bool bRemoveRenderer = true)
         {
             if (root == null)
@@ -523,7 +541,11 @@ namespace YBehavior.Editor.Core.New
             m_AllTrees.Remove(root);
             m_Forest.Remove(root);
         }
-
+        /// <summary>
+        /// Add a tree to forest
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="bAddRenderer">When true, its viewmodel will be added in this function</param>
         public void AddForestTree(TreeNode root, bool bAddRenderer)
         {
             if (root == null)
@@ -759,7 +781,9 @@ namespace YBehavior.Editor.Core.New
             );
            return bRes;
         }
-
+        /// <summary>
+        /// Each node will have a GUID. The newly added node will NOT have the GUID of the removed node
+        /// </summary>
         uint m_GUID;
         void _RefreshGUID()
         {
@@ -787,6 +811,9 @@ namespace YBehavior.Editor.Core.New
             if (node.GUID == 0)
                 node.GUID = ++m_GUID;
         }
+        /// <summary>
+        /// Check if the variables are referenced by the nodes
+        /// </summary>
         void _RefreshReferenceStates()
         {
             foreach (var v in m_Tree.TreeMemory.SharedMemory.Datas)
@@ -880,7 +907,10 @@ namespace YBehavior.Editor.Core.New
             }
 
         }
-
+        /// <summary>
+        /// Switch a variable between shared and local collection
+        /// </summary>
+        /// <param name="v"></param>
         public void Switch(Variable v)
         {
             if (m_Tree.SharedData.SwitchVariable(v))
@@ -971,7 +1001,10 @@ namespace YBehavior.Editor.Core.New
 
             return true;
         }
-
+        /// <summary>
+        /// Check if any shared variables could be local.
+        /// This function is for refinement.
+        /// </summary>
         public void CheckLocal()
         {
             Dictionary<VariableHolder, List<Tuple<bool, int, int>>> res = new Dictionary<VariableHolder, List<Tuple<bool, int, int>>>();

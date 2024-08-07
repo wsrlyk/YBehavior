@@ -3,12 +3,24 @@ using System.Collections.Generic;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Interface of a command
+    /// </summary>
     public interface ICommand
     {
+        /// <summary>
+        /// Called when Redo
+        /// </summary>
         void Redo();
+        /// <summary>
+        /// Called when Undo
+        /// </summary>
         void Undo();
     }
 
+    /// <summary>
+    /// Undo/Redo commands management
+    /// </summary>
     public class CommandMgr : System.ComponentModel.INotifyPropertyChanged
     {
         LinkedList<ICommand> m_DoneCommands = new LinkedList<ICommand>();
@@ -23,6 +35,10 @@ namespace YBehavior.Editor.Core.New
 
         public bool Dirty { get; set; }
         bool m_bDoing = false;
+        /// <summary>
+        /// Push a command to done list, and clear the undo list.
+        /// </summary>
+        /// <param name="command"></param>
         public void PushDoneCommand(ICommand command)
         {
             if (m_bDoing || Blocked)
@@ -42,7 +58,9 @@ namespace YBehavior.Editor.Core.New
 
             Dirty = true;
         }
-
+        /// <summary>
+        /// Undo the last command from the done list, and push it to the back of the undo list
+        /// </summary>
         public void Undo()
         {
             if (m_DoneCommands.Count > 0)
@@ -61,7 +79,9 @@ namespace YBehavior.Editor.Core.New
                 //OnPropertyChanged("HasUndoCommands");
             }
         }
-
+        /// <summary>
+        /// Redo the last command from the undo list, and push it to the back of the done list
+        /// </summary>
         public void Redo()
         {
             if (m_UndoCommands.Count > 0)
@@ -105,6 +125,9 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
+    /// <summary>
+    /// Disconnect two nodes
+    /// </summary>
     public class DisconnectNodeCommand : ICommand
     {
         public Connection.FromTo Conn { get; set; }
@@ -118,7 +141,9 @@ namespace YBehavior.Editor.Core.New
             WorkBenchMgr.Instance.ConnectNodes(Conn.From, Conn.To);
         }
     }
-
+    /// <summary>
+    /// Add a node to the current tree/fsm
+    /// </summary>
     public class AddNodeCommand : ICommand
     {
         public NodeBase Node { get; set; }
@@ -132,7 +157,9 @@ namespace YBehavior.Editor.Core.New
             WorkBenchMgr.Instance.RemoveNode(Node);
         }
     }
-
+    /// <summary>
+    /// remove a node from the current tree/fsm
+    /// </summary>
     public class RemoveNodeCommand : ICommand
     {
         public NodeBase Node { get; set; }
@@ -146,7 +173,9 @@ namespace YBehavior.Editor.Core.New
             WorkBenchMgr.Instance.AddNode(Node);
         }
     }
-
+    /// <summary>
+    /// Add a variable to the current tree
+    /// </summary>
     public class AddSharedVariableCommand : ICommand
     {
         public VariableHolder VariableHolder { get; set; }
@@ -166,7 +195,9 @@ namespace YBehavior.Editor.Core.New
             }
         }
     }
-
+    /// <summary>
+    /// Remove a variable from the current tree
+    /// </summary>
     public class RemoveSharedVariableCommand : ICommand
     {
         public VariableHolder VariableHolder { get; set; }
@@ -186,7 +217,9 @@ namespace YBehavior.Editor.Core.New
             }
         }
     }
-
+    /// <summary>
+    /// Add an input/output
+    /// </summary>
     public class AddInOutVariableCommand : ICommand
     {
         public VariableHolder VariableHolder { get; set; }
@@ -209,7 +242,9 @@ namespace YBehavior.Editor.Core.New
             //}
         }
     }
-
+    /// <summary>
+    /// Remove an input/output
+    /// </summary>
     public class RemoveInOutVariableCommand : ICommand
     {
         public VariableHolder VariableHolder { get; set; }
@@ -231,7 +266,9 @@ namespace YBehavior.Editor.Core.New
             //}
         }
     }
-
+    /// <summary>
+    /// Move a node
+    /// </summary>
     public class MoveNodeCommand : ICommand
     {
         public NodeBaseRenderer NodeRenderer { get; set; }
@@ -249,7 +286,9 @@ namespace YBehavior.Editor.Core.New
             NodeRenderer.FinishDrag(OriginPos - FinalPos, OriginPos);
         }
     }
-
+    /// <summary>
+    /// Change a node comment
+    /// </summary>
     public class ChangeNodeCommentCommand : ICommand
     {
         public NodeBaseRenderer NodeRenderer { get; set; }
@@ -265,7 +304,9 @@ namespace YBehavior.Editor.Core.New
             NodeRenderer.Comment = OriginComment;
         }
     }
-
+    /// <summary>
+    /// Change node disable state
+    /// </summary>
     public class ChangeNodeDisableCommand : ICommand
     {
         public NodeBaseRenderer NodeRenderer { get; set; }
@@ -280,7 +321,9 @@ namespace YBehavior.Editor.Core.New
             NodeRenderer.Disabled  = OriginState;
         }
     }
-
+    /// <summary>
+    /// Change node nickname
+    /// </summary>
     public class ChangeNodeNickNameCommand : ICommand
     {
         public NodeBaseRenderer NodeRenderer { get; set; }
@@ -296,7 +339,9 @@ namespace YBehavior.Editor.Core.New
             NodeRenderer.NickName = OriginNickName;
         }
     }
-
+    /// <summary>
+    /// Add a comment
+    /// </summary>
     public class AddCommentCommand : ICommand
     {
         public Comment Comment { get; set; }
@@ -310,6 +355,9 @@ namespace YBehavior.Editor.Core.New
             WorkBenchMgr.Instance.RemoveComment(Comment);
         }
     }
+    /// <summary>
+    /// Remove a comment
+    /// </summary>
 
     public class RemoveCommentCommand : ICommand
     {
@@ -324,7 +372,9 @@ namespace YBehavior.Editor.Core.New
             WorkBenchMgr.Instance.AddComment(Comment);
         }
     }
-
+    /// <summary>
+    /// Change the comment content
+    /// </summary>
     public class ChangeCommentCommand : ICommand
     {
         public Comment Comment { get; set; }
@@ -340,7 +390,9 @@ namespace YBehavior.Editor.Core.New
             Comment.Content = OriginContent;
         }
     }
-
+    /// <summary>
+    /// Move a comment
+    /// </summary>
     public class MoveCommentCommand : ICommand
     {
         public Comment Comment { get; set; }
@@ -358,7 +410,9 @@ namespace YBehavior.Editor.Core.New
             Comment.OnGeometryChangedWithoutCommand();
         }
     }
-
+    /// <summary>
+    /// Change the value of a variable
+    /// </summary>
     public class ChangeVariableValueCommand : ICommand
     {
         public Variable Variable { get; set; }
@@ -382,7 +436,9 @@ namespace YBehavior.Editor.Core.New
             //}
         }
     }
-
+    /// <summary>
+    /// Change the VariableType of a variable
+    /// </summary>
     public class ChangeVariableVBTypeCommand : ICommand
     {
         public Variable Variable { get; set; }
@@ -398,7 +454,9 @@ namespace YBehavior.Editor.Core.New
             Variable.vbType = OldType;
         }
     }
-
+    /// <summary>
+    /// Change the CountType of a variable
+    /// </summary>
     public class ChangeVariableCTypeCommand : ICommand
     {
         public Variable Variable { get; set; }
@@ -414,7 +472,9 @@ namespace YBehavior.Editor.Core.New
             Variable.cType = OldType;
         }
     }
-
+    /// <summary>
+    /// Change the ValueType of a variable
+    /// </summary>
     public class ChangeVariableVTypeCommand : ICommand
     {
         public Variable Variable { get; set; }
@@ -430,7 +490,9 @@ namespace YBehavior.Editor.Core.New
             Variable.vType = OldType;
         }
     }
-
+    /// <summary>
+    /// Change the ReturnType of a treenode
+    /// </summary>
     public class ChangeTreeNodeReturnTypeCommand : ICommand
     {
         public TreeNodeRenderer NodeRenderer { get; set; }
@@ -446,6 +508,9 @@ namespace YBehavior.Editor.Core.New
             NodeRenderer.ReturnType = OriginReturnType;
         }
     }
+    /// <summary>
+    /// Change the EnableType of a variable
+    /// </summary>
     public class ChangeVariableETypeCommand : ICommand
     {
         public Variable Variable { get; set; }
@@ -461,7 +526,9 @@ namespace YBehavior.Editor.Core.New
             Variable.eType = OldType;
         }
     }
-
+    /// <summary>
+    /// Remove a transition of the active fsm
+    /// </summary>
     public class RemoveTransCommand : ICommand
     {
         public Connection.FromTo Conn { get; set; }
@@ -475,7 +542,9 @@ namespace YBehavior.Editor.Core.New
             Trans = (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).MakeTrans(Conn.From, Conn.To, Trans);
         }
     }
-
+    /// <summary>
+    /// Make a transition of the active fsm
+    /// </summary>
     public class MakeTransCommand : ICommand
     {
         public Connection.FromTo Conn { get; set; }
@@ -489,7 +558,9 @@ namespace YBehavior.Editor.Core.New
             (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).Disconnect(Conn, Trans);
         }
     }
-
+    /// <summary>
+    /// Add a condition to the active fsm
+    /// </summary>
     public class AddCondCommand : ICommand
     {
         public TransitionMapValue Cond { get; set; }
@@ -503,7 +574,9 @@ namespace YBehavior.Editor.Core.New
             Trans.Value.Remove(Cond);
         }
     }
-
+    /// <summary>
+    /// Remove a condition from the active fsm
+    /// </summary>
     public class RemoveCondCommand : ICommand
     {
         public TransitionMapValue Cond { get; set; }
@@ -517,8 +590,9 @@ namespace YBehavior.Editor.Core.New
             Trans.Value.Add(Cond);
         }
     }
-
-
+    /// <summary>
+    /// Set default node of the active fsm
+    /// </summary>
     public class SetDefaultStateCommand : ICommand
     {
         public FSMStateNode Origin { get; set; }
@@ -532,7 +606,9 @@ namespace YBehavior.Editor.Core.New
             (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).SetDefault(Origin);
         }
     }
-
+    /// <summary>
+    /// Set current state machine of fsm
+    /// </summary>
     public class SetCurMachineCommand : ICommand
     {
         public FSMMachineNode Origin { get; set; }

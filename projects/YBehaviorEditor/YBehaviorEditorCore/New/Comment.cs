@@ -5,6 +5,9 @@ using System.Text;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Comment node
+    /// </summary>
     public class Comment: System.ComponentModel.INotifyPropertyChanged
     {
         //string m_Name;
@@ -19,6 +22,9 @@ namespace YBehavior.Editor.Core.New
         //    }
         //}
         string m_Content;
+        /// <summary>
+        /// Comment content
+        /// </summary>
         public string Content
         {
             get { return m_Content; }
@@ -38,6 +44,9 @@ namespace YBehavior.Editor.Core.New
             }
         }
         //public string UITitle { get { return Name; } }
+        /// <summary>
+        /// Comment position and size
+        /// </summary>
         public Geometry Geo { get; } = new Geometry();
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;

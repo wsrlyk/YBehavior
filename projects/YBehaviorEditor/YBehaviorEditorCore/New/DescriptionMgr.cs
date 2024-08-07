@@ -6,6 +6,9 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Description to the node and its pins
+    /// </summary>
     public class NodeDescription
     {
         Dictionary<string, string> variables = new Dictionary<string, string>();
@@ -21,11 +24,17 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
+    /// <summary>
+    /// Tips to the toolbar command
+    /// </summary>
     public struct CommandDescription
     {
         public string name;
         public string tips;
     }
+    /// <summary>
+    /// Description management
+    /// </summary>
     public class DescriptionMgr : Singleton<DescriptionMgr>
     {
         Dictionary<string, string> m_LanguagesDic = new Dictionary<string, string>();
@@ -33,6 +42,11 @@ namespace YBehavior.Editor.Core.New
         Dictionary<int, string> m_HierachyDic = new Dictionary<int, string>();
         Dictionary<string, CommandDescription> m_CommandDic = new Dictionary<string, CommandDescription>();
 
+        /// <summary>
+        /// Get the description by node name
+        /// </summary>
+        /// <param name="name">Node name</param>
+        /// <returns></returns>
         public NodeDescription GetNodeDescription(string name)
         {
             if (m_DescriptionDic.TryGetValue(name, out NodeDescription desc))
@@ -41,6 +55,11 @@ namespace YBehavior.Editor.Core.New
             }
             return null;
         }
+        /// <summary>
+        /// Get the description by toolbar button name
+        /// </summary>
+        /// <param name="name">Node name</param>
+        /// <returns></returns>
         public CommandDescription GetCommandDescription(string name)
         {
             if (m_CommandDic.TryGetValue(name, out var desc))
@@ -49,7 +68,11 @@ namespace YBehavior.Editor.Core.New
             }
             return new CommandDescription();
         }
-
+        /// <summary>
+        /// Get the name of node hierachy
+        /// </summary>
+        /// <param name="hierachy"></param>
+        /// <returns></returns>
         public string GetHierachyDescription(int hierachy)
         {
             if (m_HierachyDic.TryGetValue(hierachy, out string desc))
@@ -58,7 +81,10 @@ namespace YBehavior.Editor.Core.New
             }
             return string.Empty;
         }
-
+        /// <summary>
+        /// Load from configuration
+        /// </summary>
+        /// <param name="path"></param>
         public void Load(string path)
         {
             XmlDocument xmlDoc = new XmlDocument();
