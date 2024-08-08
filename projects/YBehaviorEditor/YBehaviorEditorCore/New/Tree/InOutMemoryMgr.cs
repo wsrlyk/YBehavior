@@ -6,10 +6,17 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// InOut interface management
+    /// </summary>
     public class InOutMemoryMgr : Singleton<InOutMemoryMgr>
     {
         Dictionary<string, InOutMemory> m_Dic = new Dictionary<string, InOutMemory>();
-
+        /// <summary>
+        /// Get an interface by tree name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public InOutMemory Get(string name)
         {
             if (m_Dic.TryGetValue(name, out InOutMemory inOutMemory))
@@ -21,7 +28,11 @@ namespace YBehavior.Editor.Core.New
             m_Dic[name] = inOutMemory;
             return inOutMemory;
         }
-
+        /// <summary>
+        /// Reload a tree and get its interface
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public InOutMemory Reload(string name)
         {
             if (string.IsNullOrEmpty(name))

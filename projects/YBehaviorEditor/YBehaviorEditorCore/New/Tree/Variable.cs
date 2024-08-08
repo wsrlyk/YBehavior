@@ -7,11 +7,20 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Interface of getting collection of data
+    /// </summary>
     public interface IVariableDataSource
     {
         TreeMemory SharedData { get; }
         InOutMemory InOutData { get; }
     }
+    /// <summary>
+    /// A shared or local variable of the tree,
+    /// an input or output pin of the tree used in subtree,
+    /// or the pin of a tree node.
+    /// We would separate them into different classes in the future
+    /// </summary>
     public class Variable : System.ComponentModel.INotifyPropertyChanged
     {
         public static readonly char[] ListSpliter = new char[] { '|' };
@@ -52,17 +61,46 @@ namespace YBehavior.Editor.Core.New
         public static readonly ValueType[] CreateParams_CalculatorTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_STRING, ValueType.VT_VECTOR3 };
         public static readonly ValueType[] CreateParams_ConvertTypes = new ValueType[] { ValueType.VT_INT, ValueType.VT_FLOAT, ValueType.VT_BOOL, ValueType.VT_STRING };
 
-
+        /// <summary>
+        /// Type of value
+        /// </summary>
         public enum ValueType
         {
+            /// <summary>
+            /// Invalid
+            /// </summary>
             VT_NONE,
+            /// <summary>
+            /// Integer
+            /// </summary>
             VT_INT,
+            /// <summary>
+            /// Float
+            /// </summary>
             VT_FLOAT,
+            /// <summary>
+            /// Boolean
+            /// </summary>
             VT_BOOL,
+            /// <summary>
+            /// (x, y, z)
+            /// </summary>
             VT_VECTOR3,
+            /// <summary>
+            /// String
+            /// </summary>
             VT_STRING,
+            /// <summary>
+            /// Enum
+            /// </summary>
             VT_ENUM,
+            /// <summary>
+            /// References to an entity in game
+            /// </summary>
             VT_ENTITY,
+            /// <summary>
+            /// UINT64
+            /// </summary>
             VT_ULONG,
         }
 
@@ -100,11 +138,22 @@ namespace YBehavior.Editor.Core.New
             {Variable.ValueType.VT_ENTITY, "" },
             {Variable.ValueType.VT_ULONG, "0" }
         };
-
+        /// <summary>
+        /// Type of count
+        /// </summary>
         public enum CountType
         {
+            /// <summary>
+            /// Invalid
+            /// </summary>
             CT_NONE,
+            /// <summary>
+            /// Just a single value
+            /// </summary>
             CT_SINGLE,
+            /// <summary>
+            /// Array of multiple values
+            /// </summary>
             CT_LIST,
         }
 
@@ -114,11 +163,22 @@ namespace YBehavior.Editor.Core.New
                 return CountType.CT_SINGLE;
             return CountType.CT_LIST;
         }
-
+        /// <summary>
+        /// Type of pin
+        /// </summary>
         public enum VariableType
         {
+            /// <summary>
+            /// Invalid
+            /// </summary>
             VBT_NONE,
+            /// <summary>
+            /// A constant value
+            /// </summary>
             VBT_Const,
+            /// <summary>
+            /// A reference to a variable of the tree
+            /// </summary>
             VBT_Pointer,
         }
         public static Bimap<VariableType, char> VariableTypeDic = new Bimap<VariableType, char>
@@ -145,12 +205,26 @@ namespace YBehavior.Editor.Core.New
         {
             return Char.IsLower(c);
         }
-
+        /// <summary>
+        /// Type of Enable/Disable
+        /// </summary>
         public enum EnableType
         {
+            /// <summary>
+            /// Invalid
+            /// </summary>
             ET_NONE,
-            ET_FIXED,   ///> This Variable is always enabled
+            /// <summary>
+            /// Always enabled
+            /// </summary>
+            ET_FIXED,
+            /// <summary>
+            /// Currently enabled
+            /// </summary>
             ET_Enable,
+            /// <summary>
+            /// Currently disabled
+            /// </summary>
             ET_Disable,
         }
         public static Bimap<EnableType, char> EnableTypeDic = new Bimap<EnableType, char>
@@ -179,7 +253,9 @@ namespace YBehavior.Editor.Core.New
         CountType m_cType = CountType.CT_NONE;
         VariableType m_vbType = VariableType.VBT_Const;
         EnableType m_eType = EnableType.ET_NONE;
-
+        /// <summary>
+        /// ValueType
+        /// </summary>
         public ValueType vType
         {
             get { return m_vType; }
@@ -213,7 +289,9 @@ namespace YBehavior.Editor.Core.New
                 WorkBenchMgr.Instance.PushCommand(command);
             }
         }
-
+        /// <summary>
+        /// CountType
+        /// </summary>
         public CountType cType
         {
             get { return m_cType; }
@@ -239,7 +317,9 @@ namespace YBehavior.Editor.Core.New
                 WorkBenchMgr.Instance.PushCommand(command);
             }
         }
-
+        /// <summary>
+        /// EnableType
+        /// </summary>
         public EnableType eType
         {
             get { return m_eType; }
@@ -264,11 +344,16 @@ namespace YBehavior.Editor.Core.New
         }
 
         public event Action CandidatesResetEvent;
+        /// <summary>
+        /// Invoked when candidates are reset
+        /// </summary>
         public void CandidatesReset()
         {
             CandidatesResetEvent?.Invoke();
         }
-
+        /// <summary>
+        /// VariableType
+        /// </summary>
         public VariableType vbType
         {
             get { return m_vbType; }
@@ -299,9 +384,15 @@ namespace YBehavior.Editor.Core.New
 
         List<ValueType> m_vTypeSet = new List<ValueType>();
         //List<CountType> m_cTypeSet = new List<CountType>();
+        /// <summary>
+        /// Collection of ValueTypes this can be
+        /// </summary>
         public List<ValueType> vTypeSet { get { return m_vTypeSet; } }
         //public List<CountType> cTypeSet { get { return m_cTypeSet; } }
         bool m_bIsLocal = false;
+        /// <summary>
+        /// Whether it's local variable
+        /// </summary>
         public bool IsLocal
         {
             get { return m_bIsLocal; }
@@ -317,9 +408,7 @@ namespace YBehavior.Editor.Core.New
             }
         }
         /// <summary>
-        /// The meaning of IsInput is different between the node variables and inout variables
-        /// In node variables, input means reading the data from the tree memory.
-        /// While in tree inout variables, input means reading the data from outside and write it to the tree memory.
+        /// Whether the data comes in or goes out
         /// </summary>
         public bool IsInput { get; set; } = true;
 
@@ -331,13 +420,21 @@ namespace YBehavior.Editor.Core.New
         string m_Name;
         string m_Params = null;
         bool m_bCanbeRemoved = false;
+        /// <summary>
+        /// The variables of tree
+        /// </summary>
         public IVariableDataSource SharedDataSource { get; set; } = null;
+        /// <summary>
+        /// The container
+        /// </summary>
         public VariableCollection Container { get; set; } = null;
-
         public string Description { get; set; }
 
         public Variable(IVariableDataSource sharedData) => SharedDataSource = sharedData;
-
+        /// <summary>
+        /// Refresh candidates for a pin when any type, variable, etc. changes
+        /// </summary>
+        /// <param name="bForce"></param>
         public void RefreshCandidates(bool bForce = false)
         {
             if (!m_bInited && !bForce)
@@ -386,7 +483,9 @@ namespace YBehavior.Editor.Core.New
                     SetValue(null, false);
             }
         }
-
+        /// <summary>
+        /// Candidates of the pin
+        /// </summary>
         public VariableCandidates.Candidates Candidates { get; set; }
 
         /// <summary>
@@ -395,13 +494,23 @@ namespace YBehavior.Editor.Core.New
         Variable m_Parent;
         Variable m_VectorIndex = null;
         bool m_bVectorIndexEnabled = false;
+        /// <summary>
+        /// Index pin of array when it's a single pin
+        /// </summary>
         public Variable VectorIndex { get { return m_VectorIndex; } set { m_VectorIndex = value; OnPropertyChanged("VectorIndex"); } }
-
+        /// <summary>
+        /// Whether it's single but references to an array
+        /// </summary>
         public bool IsElement { get { return cType == CountType.CT_SINGLE && m_bVectorIndexEnabled && m_VectorIndex != null; } }
+        /// <summary>
+        /// Whether it's an index pin
+        /// </summary>
         public bool IsIndex { get { return m_Parent != null; } }
         //bool m_bCandidatesDirty = true;
         bool m_bInited = false;
-
+        /// <summary>
+        /// Collections of all enum values
+        /// </summary>
         public string[] Enums
         {
             get
@@ -412,6 +521,9 @@ namespace YBehavior.Editor.Core.New
             }
         }
         public string Name { get { return m_Name; } }
+        /// <summary>
+        /// Mainly for log
+        /// </summary>
         public string DisplayName
         {
             get
@@ -422,7 +534,9 @@ namespace YBehavior.Editor.Core.New
                     ? m_Name + "'" : m_Name;
             }
         }
-
+        /// <summary>
+        /// Used to build the note of a tree node
+        /// </summary>
         public string NoteValue
         {
             get
@@ -434,6 +548,9 @@ namespace YBehavior.Editor.Core.New
                 return DisplayValue;
             }
         }
+        /// <summary>
+        /// Formatted value
+        /// </summary>
         public string DisplayValue
         {
             get { return m_DisplayValue; }
@@ -475,7 +592,11 @@ namespace YBehavior.Editor.Core.New
         {
             get { return m_Value; }
         }
-
+        /// <summary>
+        /// Set the value
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="isLocal"></param>
         public void SetValue(string value, bool isLocal)
         {
             {
@@ -590,8 +711,17 @@ namespace YBehavior.Editor.Core.New
             else if (m_Parent != null && m_Parent.Container != null)
                 m_Parent.Container.OnVBTypeChanged(m_Parent);
         }
+        /// <summary>
+        /// Whether the VariableType is unchangeable
+        /// </summary>
         public bool LockVBType { get; set; } = false;
+        /// <summary>
+        /// Whether the CountType is unchangeable
+        /// </summary>
         public bool LockCType { get; set; } = false;
+        /// <summary>
+        /// Whether the EnableType is unchangeable
+        /// </summary>
         public bool LockEType { get { return eType == EnableType.ET_FIXED; } }
         public bool CanBeRemoved { get { return m_bCanbeRemoved; } set { m_bCanbeRemoved = value; } }
         public bool CanSwitchConst { get { return !LockVBType; } }
@@ -609,7 +739,9 @@ namespace YBehavior.Editor.Core.New
                 this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
             }
         }
-
+        /// <summary>
+        /// Used to save to file
+        /// </summary>
         public string ValueInXml {
             get
             {
@@ -651,6 +783,9 @@ namespace YBehavior.Editor.Core.New
         }
 
         bool m_IsRefreshed = false;
+        /// <summary>
+        /// Just to trigger UI
+        /// </summary>
         public bool IsRefreshed
         {
             get { return m_IsRefreshed; }
@@ -660,15 +795,29 @@ namespace YBehavior.Editor.Core.New
                 OnPropertyChanged("IsRefreshed");
             }
         }
-
+        /// <summary>
+        /// Whether a variable is referenced by other pins
+        /// </summary>
         public enum ReferencedType
         {
+            /// <summary>
+            /// Invalid
+            /// </summary>
             None,
+            /// <summary>
+            /// Is defined but never used
+            /// </summary>
             Disactive,
+            /// <summary>
+            /// Is in use
+            /// </summary>
             Active,
         }
 
         ReferencedType m_ReferencedType = ReferencedType.None;
+        /// <summary>
+        /// ReferencedType
+        /// </summary>
         public ReferencedType referencedType
         {
             get { return m_ReferencedType; }
@@ -681,6 +830,10 @@ namespace YBehavior.Editor.Core.New
                 }
             }
         }
+        /// <summary>
+        /// Change the ReferencedType
+        /// </summary>
+        /// <param name="t"></param>
         public void TrySetReferencedType(ReferencedType t)
         {
             if (m_ReferencedType < t)
@@ -851,7 +1004,12 @@ namespace YBehavior.Editor.Core.New
 
             return false;
         }
-
+        /// <summary>
+        /// Load from file
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="newName"></param>
+        /// <returns></returns>
         public bool SetVariableInNode(string s, string newName = null)
         {
             string[] ss = s.Split(SpaceSpliter);
@@ -863,7 +1021,7 @@ namespace YBehavior.Editor.Core.New
             if (newName != null)
                 m_Name = newName;
 
-            if(!SetVariable(ss[0][1], ss[0][0], ss[0][2], ss[0].Length > 3 ? ss[0][3] : NONE, ss.Length >= 2 ? ss[1] : string.Empty))
+            if(!_SetVariable(ss[0][1], ss[0][0], ss[0][2], ss[0].Length > 3 ? ss[0][3] : NONE, ss.Length >= 2 ? ss[1] : string.Empty))
                 return false;
 
             if (ss.Length >= 5 && ss[2] == "VI")
@@ -889,7 +1047,7 @@ namespace YBehavior.Editor.Core.New
                 Name + ".Index");
             return true;
         }
-        public bool SetVariable(char valueType, char countType, char variableType, char enableType, string value, string param = null)
+        bool _SetVariable(char valueType, char countType, char variableType, char enableType, string value, string param = null)
         {
             m_bInited = false;
             m_vType = ValueTypeDic.GetKey(valueType, ValueType.VT_NONE);
@@ -936,6 +1094,18 @@ namespace YBehavior.Editor.Core.New
             RefreshCandidates(true);
             return true;
         }
+        /// <summary>
+        /// Create from user
+        /// </summary>
+        /// <param name="vtype"></param>
+        /// <param name="ctype"></param>
+        /// <param name="vbtype"></param>
+        /// <param name="etype"></param>
+        /// <param name="isLocal"></param>
+        /// <param name="value"></param>
+        /// <param name="param"></param>
+        /// <param name="newName"></param>
+        /// <returns></returns>
         public bool SetVariable(ValueType vtype, CountType ctype, VariableType vbtype, EnableType etype, bool isLocal, string value, string param = null, string newName = null)
         {
             m_bInited = false;

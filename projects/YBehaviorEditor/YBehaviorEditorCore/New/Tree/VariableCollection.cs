@@ -5,10 +5,17 @@ using System.Text;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// When in a group, changes of any pin in the group about the types will apply to other pins in the group
+    /// </summary>
     public class SameTypeGroup : System.Collections.IEnumerable
     {
         Dictionary<int, HashSet<string>> m_Groups = new Dictionary<int, HashSet<string>>();
-
+        /// <summary>
+        /// Add to group
+        /// </summary>
+        /// <param name="key">Pin name</param>
+        /// <param name="group">Group ID</param>
         public void Add(string key, int group)
         {
             HashSet<string> groupSet;
@@ -45,26 +52,43 @@ namespace YBehavior.Editor.Core.New
             return other;
         }
     }
-
+    /// <summary>
+    /// A wrapper with an index,
+    /// just for sorting to make the order in the collection unchanged
+    /// </summary>
     public class VariableHolder
     {
         public Variable Variable { get; set; }
         public int Index;
     }
-
+    /// <summary>
+    /// Interface of collection
+    /// </summary>
     public interface IVariableCollection
     {
+        /// <summary>
+        /// Collection of data
+        /// </summary>
         DelayableNotificationCollection<VariableHolder> Datas { get; }
+        /// <summary>
+        /// Get by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         Variable GetVariable(string name);
     }
-
+    /// <summary>
+    /// Interface of callbacks
+    /// </summary>
     public interface IVariableCollectionOwner : IVariableDataSource
     {
         void OnVariableValueChanged(Variable v);
         void OnVariableVBTypeChanged(Variable v);
         void OnVariableETypeChanged(Variable v);
     }
-
+    /// <summary>
+    /// Collection of variables/pins
+    /// </summary>
     public class VariableCollection: IVariableCollection
     {
         public event Action<Variable> valueChanged;
@@ -179,6 +203,11 @@ namespace YBehavior.Editor.Core.New
             }
             return true;
         }
+        /// <summary>
+        /// Get holder by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public VariableHolder GetVariableHolder(string name)
         {
             if (m_Variables.TryGetValue(name, out VariableHolder v))
@@ -207,7 +236,10 @@ namespace YBehavior.Editor.Core.New
                 }
             }
         }
-
+        /// <summary>
+        /// Try to make me the same with other
+        /// </summary>
+        /// <param name="other"></param>
         public void DiffReplaceBy(VariableCollection other)
         {
             using (var locker = WorkBenchMgr.Instance.CommandLocker.StartLock())

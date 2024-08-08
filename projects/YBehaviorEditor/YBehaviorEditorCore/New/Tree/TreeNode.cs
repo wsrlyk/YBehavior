@@ -6,13 +6,18 @@ using System.Windows;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// A wrapper to tree node
+    /// </summary>
     public class TreeNodeWrapper : NodeWrapper, IVariableCollectionOwner
     {
+        /// <summary>
+        /// The tree
+        /// </summary>
         public Tree Tree { get { return Graph as Tree; } }
         public IVariableDataSource VariableDataSource { get { return Tree; } }
         public TreeMemory SharedData { get { return Tree == null ? null : Tree.SharedData; } }
         public InOutMemory InOutData { get { return Tree == null ? null : Tree.InOutData; } }
-
         public void OnVariableValueChanged(Variable v)
         {
             (Node as TreeNode).OnVariableValueChanged(v);
@@ -26,18 +31,37 @@ namespace YBehavior.Editor.Core.New
             (Node as TreeNode).OnVariableETypeChanged(v);
         }
     }
-
+    /// <summary>
+    /// Types of tree node
+    /// </summary>
     public enum TreeNodeType
     {
+        /// <summary>
+        /// Invalid
+        /// </summary>
         TNT_Invalid,
+        /// <summary>
+        /// Root node
+        /// </summary>
         TNT_Root,
+        /// <summary>
+        /// Other built-in node
+        /// </summary>
         TNT_Default,
+        /// <summary>
+        /// User customized node
+        /// </summary>
         TNT_External,
     }
-
+    /// <summary>
+    /// Tree node management
+    /// </summary>
     public class TreeNodeMgr : Singleton<TreeNodeMgr>
     {
         List<TreeNode> m_NodeList = new List<TreeNode>();
+        /// <summary>
+        /// Collection of nodes
+        /// </summary>
         public List<TreeNode> NodeList { get { return m_NodeList; } }
         private Dictionary<string, Type> m_TypeDic = new Dictionary<string, Type>();
 
@@ -62,7 +86,11 @@ namespace YBehavior.Editor.Core.New
                 //LogMgr.Instance.Log(type.ToString());
             }
         }
-
+        /// <summary>
+        /// Create a node by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public TreeNode CreateNodeByName(string name)
         {
             TreeNode node = null;
@@ -83,7 +111,9 @@ namespace YBehavior.Editor.Core.New
             return node;
         }
     }
-
+    /// <summary>
+    /// Tree node class
+    /// </summary>
     public class TreeNode : NodeBase
     {
         private string m_ReturnType = "Default";
@@ -93,12 +123,24 @@ namespace YBehavior.Editor.Core.New
         public TreeNodeType Type { get; set; }
         public int Hierachy { get; set; }
         public bool IsChildrenRendering { get { return !m_Folded; } }
+        /// <summary>
+        /// Whether this node is folded
+        /// </summary>
         public bool Folded { get { return m_Folded; } set { m_Folded = value; } }
+        /// <summary>
+        /// Return type of tree node
+        /// </summary>
         public string ReturnType { get { return m_ReturnType; } set { m_ReturnType = value; } }
 
         protected NodeMemory m_NodeMemory;
+        /// <summary>
+        /// Collection of pins
+        /// </summary>
         public NodeMemory NodeMemory { get { return m_NodeMemory; } }
         protected IVariableCollection m_Variables;
+        /// <summary>
+        /// Collections of pins (for normal tree nodes) or collection of tree variables (for root tree nodes)
+        /// </summary>
         public IVariableCollection Variables { get { return m_Variables; } }
 
         TypeMap m_TypeMap = new TypeMap();
@@ -171,7 +213,9 @@ namespace YBehavior.Editor.Core.New
         {
             m_Renderer = new TreeNodeRenderer(this);
         }
-
+        /// <summary>
+        /// Get the parent tree node
+        /// </summary>
         public TreeNode Parent
         {
             get
@@ -181,7 +225,9 @@ namespace YBehavior.Editor.Core.New
                 return m_Connections.ParentConnector.Conns[0].Ctr.From.Owner as TreeNode;
             }
         }
-
+        /// <summary>
+        /// Get the root tree node
+        /// </summary>
         public TreeNode Root
         {
             get
@@ -196,12 +242,16 @@ namespace YBehavior.Editor.Core.New
                 return root;
             }
         }
-
+        /// <summary>
+        /// Create all pins
+        /// </summary>
         public virtual void CreateVariables()
         {
 
         }
-
+        /// <summary>
+        /// Create the connectors of the pins
+        /// </summary>
         public void CreateVariableConnectors()
         {
             foreach (var v in m_Variables.Datas)
@@ -216,6 +266,9 @@ namespace YBehavior.Editor.Core.New
                     _SetConnectorVisibility(ctr, v.Variable);
             }
         }
+        /// <summary>
+        /// Load the description of the tree node and its pins
+        /// </summary>
         public void LoadDescription()
         {
             m_NodeDescripion = DescriptionMgr.Instance.GetNodeDescription(this.Name);
@@ -227,7 +280,10 @@ namespace YBehavior.Editor.Core.New
                 }
             }
         }
-
+        /// <summary>
+        /// Load from file
+        /// </summary>
+        /// <param name="data"></param>
         public void Load(System.Xml.XmlNode data)
         {
             foreach (System.Xml.XmlAttribute attr in data.Attributes)
@@ -243,7 +299,10 @@ namespace YBehavior.Editor.Core.New
         protected virtual void _OnLoaded()
         {
         }
-
+        /// <summary>
+        /// Load the XmlNode config for this node
+        /// </summary>
+        /// <param name="data"></param>
         public void LoadChild(System.Xml.XmlNode data)
         {
             _OnLoadChild(data);
@@ -301,7 +360,11 @@ namespace YBehavior.Editor.Core.New
             }
             return false;
         }
-
+        /// <summary>
+        /// Save to file
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="xmlDoc"></param>
         public void Save(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
         {
             if (GUID != 0)
@@ -357,6 +420,11 @@ namespace YBehavior.Editor.Core.New
         {
             _SaveVariables(Variables, data);
         }
+        /// <summary>
+        /// Export to file
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="xmlDoc"></param>
         public void Export(System.Xml.XmlElement data, System.Xml.XmlDocument xmlDoc)
         {
             if (Conns.ParentConnector != null && Conns.ParentConnector.Conns.Count > 0)
@@ -642,6 +710,9 @@ namespace YBehavior.Editor.Core.New
         }
 
         #region CONDITION
+        /// <summary>
+        /// The condition connector of this tree node
+        /// </summary>
         Connector m_ConditonConnector;
         bool m_bEnableConditionConnection = false;
         public bool HasConditionConnection { get { return m_ConditonConnector.Conns.Count > 0; } }

@@ -8,6 +8,9 @@ using System.Xml;
 namespace YBehavior.Editor.Core.New
 {
     using ConvertType = KeyValuePair<Variable.ValueType, Variable.ValueType>;
+    /// <summary>
+    /// Root tree node
+    /// </summary>
     public class RootTreeNode : SingleChildNode
     {
         public RootTreeNode() : base()
@@ -128,20 +131,26 @@ namespace YBehavior.Editor.Core.New
         }
 
     }
-
+    /// <summary>
+    /// Tree node that could have children
+    /// </summary>
     public class BranchNode : TreeNode
     {
         protected Connector m_Ctr;
         public Connector Ctr { get { return m_Ctr; } }
     }
-
+    /// <summary>
+    /// Tree node that can't have children
+    /// </summary>
     public class LeafNode : TreeNode
     {
         public LeafNode()
         {
         }
     }
-
+    /// <summary>
+    /// Tree node that could have only one child
+    /// </summary>
     public class SingleChildNode : BranchNode
     {
         public SingleChildNode()
@@ -149,7 +158,9 @@ namespace YBehavior.Editor.Core.New
             m_Ctr = m_Connections.Add(Connector.IdentifierChildren, false, Connector.PosType.CHILDREN);
         }
     }
-
+    /// <summary>
+    /// Tree node that could have multiple children
+    /// </summary>
     public class CompositeNode : BranchNode
     {
         public CompositeNode()
@@ -157,7 +168,9 @@ namespace YBehavior.Editor.Core.New
             m_Ctr = m_Connections.Add(Connector.IdentifierChildren, true, Connector.PosType.CHILDREN);
         }
     }
-
+    /// <summary>
+    /// Base class of action tree node
+    /// </summary>
     public class ActionTreeNode : LeafNode
     {
         public string NoteFormat { get; set; }

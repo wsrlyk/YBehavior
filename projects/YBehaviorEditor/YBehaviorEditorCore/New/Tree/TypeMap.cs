@@ -5,6 +5,10 @@ using System.Text;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// A class that make two pins match.
+    /// That is, if one pin changes to a value, the other pin must change to a specified type
+    /// </summary>
     public class TypeMap
     {
         public class Item
@@ -26,8 +30,16 @@ namespace YBehavior.Editor.Core.New
         }
 
         Dictionary<KeyValuePair<string, string>, Item> m_Dic = new Dictionary<KeyValuePair<string, string>, Item>();
+        /// <summary>
+        /// key: src name + src value
+        /// value: des name, des count-type, des value-type
+        /// </summary>
         public Dictionary<KeyValuePair<string, string>, Item>.ValueCollection Items { get { return m_Dic.Values; } }
-
+        /// <summary>
+        /// Build a match
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public bool TryAdd(System.Xml.XmlNode data)
         {
             Item item = new Item();
@@ -64,7 +76,12 @@ namespace YBehavior.Editor.Core.New
             m_Dic.Add(new KeyValuePair<string, string>(item.SrcVariable, item.SrcValue), item);
             return true;
         }
-
+        /// <summary>
+        /// Try to get a match for a pin
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public bool TryGet(Variable v, out Item item)
         {
             item = null;

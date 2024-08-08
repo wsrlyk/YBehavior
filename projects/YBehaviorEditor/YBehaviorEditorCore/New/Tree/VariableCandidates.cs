@@ -5,8 +5,14 @@ using System.Text;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Management of candidate variables for pins
+    /// </summary>
     public class VariableCandidates
     {
+        /// <summary>
+        /// A pair of given ValueType and CountType makes the key
+        /// </summary>
         public struct Key
         {
             public Variable.ValueType vType;
@@ -86,6 +92,9 @@ namespace YBehavior.Editor.Core.New
             return false;
         }
         Dictionary<Key, Candidates> m_Dic = new Dictionary<Key, Candidates>();
+        /// <summary>
+        /// Only single integer variable is suitable for index
+        /// </summary>
         Candidates m_IndexCandidates;
 
         public VariableCandidates()
@@ -115,7 +124,10 @@ namespace YBehavior.Editor.Core.New
             m_IndexCandidates.key.vType = Variable.ValueType.VT_INT;
             m_Dic[m_IndexCandidates.key] = m_IndexCandidates;
         }
-
+        /// <summary>
+        /// Refresh the candidates
+        /// </summary>
+        /// <param name="collection"></param>
         public void Refresh(IVariableCollection collection)
         {
             foreach (var v in m_Dic.Values)
@@ -146,17 +158,29 @@ namespace YBehavior.Editor.Core.New
                 v.EndRefresh();
             }
         }
-
+        /// <summary>
+        /// Get the candidates for a pin
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
         public Candidates Get(Variable v)
         {
             return Get(v.vType, v.cType == Variable.CountType.CT_SINGLE ? Variable.CountType.CT_NONE : v.cType);
         }
-
+        /// <summary>
+        /// Get the candidates of index
+        /// </summary>
+        /// <returns></returns>
         public Candidates GetIndex()
         {
             return m_IndexCandidates;
         }
-
+        /// <summary>
+        /// Get the candidates for a pair of given types
+        /// </summary>
+        /// <param name="vType"></param>
+        /// <param name="cType"></param>
+        /// <returns></returns>
         public Candidates Get(Variable.ValueType vType, Variable.CountType cType)
         {
             Key key;
