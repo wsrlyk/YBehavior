@@ -2,6 +2,12 @@
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Two-direction map.
+    /// A -> B, B -> A
+    /// </summary>
+    /// <typeparam name="T0"></typeparam>
+    /// <typeparam name="T1"></typeparam>
     public class Bimap<T0, T1> : System.Collections.IEnumerable
     {
         Dictionary<T0, T1> map0 = new Dictionary<T0, T1>();

@@ -5,6 +5,10 @@ using System.Text;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Get some string from a node for filtering the node from a list
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public struct TextForFilterGetter<T> : IEnumerable<string> where T : IEnumerator<string>, INodeBaseConstructor, new()
     {
         public TextForFilterGetter(NodeBase node)
@@ -31,6 +35,9 @@ namespace YBehavior.Editor.Core.New
     {
         void Constructor(NodeBase node);
     }
+    /// <summary>
+    /// Just return the Nickname for filtering
+    /// </summary>
     public struct BaseTextForFilter : IEnumerator<string>, INodeBaseConstructor
     {
         public string Current { get { return m_I == 0 ? m_Node.Name : m_Node.NickName; } }
@@ -51,7 +58,9 @@ namespace YBehavior.Editor.Core.New
         NodeBase m_Node;
     }
 
-
+    /// <summary>
+    /// Return the Name, Nickname, Description, etc. for filtering
+    /// </summary>
     public struct TreeNodeTextForFilter : IEnumerator<string>, INodeBaseConstructor
     {
         public string Current

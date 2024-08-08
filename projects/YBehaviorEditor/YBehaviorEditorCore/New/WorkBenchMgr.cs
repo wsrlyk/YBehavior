@@ -8,11 +8,20 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Management of workbenches
+    /// </summary>
     public class WorkBenchMgr : Singleton<WorkBenchMgr>
     {
         List<WorkBench> m_OpenedWorkBenchs = new List<WorkBench>();
         WorkBench m_ActiveWorkBench;
+        /// <summary>
+        /// Current active tree/fsm
+        /// </summary>
         public WorkBench ActiveWorkBench { get { return m_ActiveWorkBench; } set { m_ActiveWorkBench = value; } }
+        /// <summary>
+        /// All opened files
+        /// </summary>
         public List<WorkBench> OpenedBenches { get { return m_OpenedWorkBenchs; } }
         public string ActiveTreeName
         {
@@ -33,66 +42,102 @@ namespace YBehavior.Editor.Core.New
             EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
         }
-
+        /// <summary>
+        /// Connect two connectors
+        /// </summary>
+        /// <param name="ctr0"></param>
+        /// <param name="ctr1"></param>
         public void ConnectNodes(Connector ctr0, Connector ctr1)
         {
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.ConnectNodes(ctr0, ctr1);
         }
-
+        /// <summary>
+        /// Break a connection
+        /// </summary>
+        /// <param name="conn"></param>
         public void DisconnectNodes(Connection.FromTo conn)
         {
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.DisconnectNodes(conn);
         }
-
+        /// <summary>
+        /// Remove node from active bench
+        /// </summary>
+        /// <param name="node"></param>
         public void RemoveNode(NodeBase node)
         {
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.RemoveNode(node);
         }
-
+        /// <summary>
+        /// Remove ViewModel of the node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="excludeRoot"></param>
         public void RemoveRenderers(NodeBase node, bool excludeRoot)
         {
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.RemoveRenderers(node, excludeRoot);
         }
-
+        /// <summary>
+        /// Add node to active bench
+        /// </summary>
+        /// <param name="node"></param>
         public void AddNode(NodeBase node)
         {
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.AddNode(node);
         }
-
+        /// <summary>
+        /// Add ViewModel of the node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="batchAdd"></param>
+        /// <param name="excludeRoot"></param>
         public void AddRenderers(NodeBase node, bool batchAdd, bool excludeRoot)
         {
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.AddRenderers(node, batchAdd, excludeRoot);
         }
-
+        /// <summary>
+        /// Remove comment
+        /// </summary>
+        /// <param name="comment"></param>
         public void RemoveComment(Comment comment)
         {
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.RemoveComment(comment);
         }
-
+        /// <summary>
+        /// Add comment
+        /// </summary>
+        /// <param name="comment"></param>
         public void AddComment(Comment comment)
         {
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.AddComment(comment);
         }
-
+        /// <summary>
+        /// Create comment at a position
+        /// </summary>
+        /// <param name="viewPos"></param>
         public void CreateComment(Point viewPos)
         {
             if (m_ActiveWorkBench != null)
                 m_ActiveWorkBench.CreateComment(viewPos);
         }
 
-        public void RefreshNodeUID()
-        {
-            if (m_ActiveWorkBench != null)
-                m_ActiveWorkBench.MainGraph.RefreshNodeUID(0);
-        }
+        //public void RefreshNodeUID()
+        //{
+        //    if (m_ActiveWorkBench != null)
+        //        m_ActiveWorkBench.MainGraph.RefreshNodeUID(0);
+        //}
+
+        /// <summary>
+        /// Close a bench
+        /// </summary>
+        /// <param name="target"></param>
         public void Remove(WorkBench target)
         {
             m_OpenedWorkBenchs.Remove(target);
@@ -172,16 +217,20 @@ namespace YBehavior.Editor.Core.New
             LogMgr.Instance.Error("Try to switch to a workbench that is not in the mgr: " + target.FileInfo.Name);
             return false;
         }
-
+        /// <summary>
+        /// Open a file
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         public WorkBench OpenWorkBench(FileMgr.FileInfo file)
         {
-            WorkBench bench = OpenWorkBenchInBackGround(file);
+            WorkBench bench = _OpenWorkBenchInBackGround(file);
             if (bench != null)
                 m_ActiveWorkBench = bench;
 
             return bench;
         }
-        public WorkBench OpenWorkBenchInBackGround(FileMgr.FileInfo file)
+        WorkBench _OpenWorkBenchInBackGround(FileMgr.FileInfo file)
         {
             if (file == null)
                 return null;
@@ -273,7 +322,11 @@ namespace YBehavior.Editor.Core.New
 
             return workBench;
         }
-
+        /// <summary>
+        /// Save and Export the tree/fsm when not debugging
+        /// </summary>
+        /// <param name="bench"></param>
+        /// <returns></returns>
         public int TrySaveAndExport(WorkBench bench = null)
         {
             if (NetworkMgr.Instance.IsConnected)
@@ -296,6 +349,11 @@ namespace YBehavior.Editor.Core.New
         public static readonly int SaveResultFlag_NewFile = 1 << 1;
         public static readonly int SaveResultFlag_Saved = 1 << 2;
 
+        /// <summary>
+        /// Save and Export the tree/fsm
+        /// </summary>
+        /// <param name="bench"></param>
+        /// <returns>SaveResultFlag</returns>
         public int SaveAndExport(WorkBench bench)
         {
             int res = SaveWorkBench(bench);
@@ -332,10 +390,10 @@ namespace YBehavior.Editor.Core.New
         }
 
         /// <summary>
-        /// 
+        /// Only save the tree/fsm
         /// </summary>
         /// <param name="bench"></param>
-        /// <returns> 0: normal; 1: new file created; -1: cancel; -2: error</returns>
+        /// <returns></returns>
         public int SaveWorkBench(WorkBench bench)
         {
             int res = SaveResultFlag_None;
@@ -400,7 +458,11 @@ namespace YBehavior.Editor.Core.New
 
             return res;
         }
-
+        /// <summary>
+        /// Only export the tree/fsm
+        /// </summary>
+        /// <param name="bench"></param>
+        /// <returns></returns>
         public bool ExportWorkBench(WorkBench bench = null)
         {
             if (bench == null)
@@ -422,7 +484,12 @@ namespace YBehavior.Editor.Core.New
 
             return true;
         }
-
+        /// <summary>
+        /// Create a node at a position
+        /// </summary>
+        /// <param name="template">Node template, we use its type and name</param>
+        /// <param name="viewPos"></param>
+        /// <returns></returns>
         public NodeBase CreateNodeToBench(NodeBase template, Point viewPos)
         {
             NodeBase node = null;
@@ -457,7 +524,12 @@ namespace YBehavior.Editor.Core.New
 
             return node;
         }
-
+        /// <summary>
+        /// Clone a node
+        /// </summary>
+        /// <param name="template"></param>
+        /// <param name="bIncludeChildren">All children or just single node</param>
+        /// <returns></returns>
         public NodeBase CloneTreeNodeToBench(NodeBase template, bool bIncludeChildren)
         {
             WorkBench bench = ActiveWorkBench;
@@ -484,18 +556,24 @@ namespace YBehavior.Editor.Core.New
 
             return node;
         }
-
+        /// <summary>
+        /// Copy the node
+        /// </summary>
+        /// <param name="template"></param>
+        /// <param name="bIncludeChildren">All children or just single node</param>
         public void CopyNode(NodeBase template, bool bIncludeChildren)
         {
             CopiedSubTree = Utility.CloneNode(template, bIncludeChildren);
         }
-
+        /// <summary>
+        /// Paste the copied nodes to bench
+        /// </summary>
         public void PasteCopiedToBench()
         {
-            PasteNodeToBench(CopiedSubTree, true);
+            _PasteNodeToBench(CopiedSubTree, true);
         }
 
-        public NodeBase PasteNodeToBench(NodeBase template, bool bIncludeChildren)
+        NodeBase _PasteNodeToBench(NodeBase template, bool bIncludeChildren)
         {
             if (CopiedSubTree == null)
                 return null;
@@ -521,7 +599,11 @@ namespace YBehavior.Editor.Core.New
 
             return node;
         }
-
+        /// <summary>
+        /// Create a tree/fsm
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public WorkBench CreateNewBench(FileType type)
         {
             WorkBench workBench = null;
@@ -550,8 +632,14 @@ namespace YBehavior.Editor.Core.New
             workBench.InitEmpty();
             return workBench;
         }
-
+        /// <summary>
+        /// Stop pushing command when last pushing is not finished
+        /// </summary>
         public Lock CommandLocker { get; } = new Lock();
+        /// <summary>
+        /// Push a command for undo/redo
+        /// </summary>
+        /// <param name="command"></param>
         public void PushCommand(ICommand command)
         {
             if (ActiveWorkBench == null || CommandLocker.IsLocked)
@@ -573,7 +661,11 @@ namespace YBehavior.Editor.Core.New
                 return;
             ActiveWorkBench.CommandMgr.Redo();
         }
-
+        /// <summary>
+        /// Open files with a list of names
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public List<WorkBench> OpenAList(IEnumerable<string> list)
         {
             List<WorkBench> res = new List<WorkBench>();
@@ -597,7 +689,7 @@ namespace YBehavior.Editor.Core.New
                     LogMgr.Instance.Error("File not exists: " + f);
                     continue;
                 }
-                WorkBench newBench = OpenWorkBenchInBackGround(fileInfo);
+                WorkBench newBench = _OpenWorkBenchInBackGround(fileInfo);
 
                 WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
                 arg.Bench = newBench;
@@ -608,7 +700,9 @@ namespace YBehavior.Editor.Core.New
 
             return res;
         }
-
+        /// <summary>
+        /// Save the suo of all opened files
+        /// </summary>
         public void SaveAllSuos()
         {
             foreach (var bench in m_OpenedWorkBenchs)

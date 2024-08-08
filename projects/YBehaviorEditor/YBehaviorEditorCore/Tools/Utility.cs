@@ -4,6 +4,9 @@ using System.Text;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// A simple lock
+    /// </summary>
     public class Lock : IDisposable
     {
         int m_LockCount = 0;
@@ -18,7 +21,9 @@ namespace YBehavior.Editor.Core.New
             --m_LockCount;
         }
     }
-
+    /// <summary>
+    /// fsm transition route from one state to other state in different machines
+    /// </summary>
     public struct TransRoute
     {
         public TransRoute(FSMStateNode fromState, FSMStateNode toState)
@@ -127,6 +132,7 @@ namespace YBehavior.Editor.Core.New
         //    }
         //}
         /// <summary>
+        /// Operate the node and its children.
         /// If func return true, it means we find the target node and return
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -145,6 +151,11 @@ namespace YBehavior.Editor.Core.New
             }
             return false;
         }
+        /// <summary>
+        /// Operate the node and its children.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="action"></param>
         public static void OperateNode(NodeBase node, Action<NodeBase> action)
         {
             action(node);
@@ -154,7 +165,13 @@ namespace YBehavior.Editor.Core.New
                 OperateNode(child, action);
             }
         }
-
+        /// <summary>
+        /// Operate the node and its children.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="node"></param>
+        /// <param name="param"></param>
+        /// <param name="action"></param>
         public static void OperateNode<T>(NodeBase node, T param, Action<NodeBase, T> action)
         {
             action(node, param);
@@ -164,7 +181,15 @@ namespace YBehavior.Editor.Core.New
                 OperateNode(child, param, action);
             }
         }
-
+        /// <summary>
+        /// Operate the node and its children.
+        /// </summary>
+        /// <typeparam name="T0"></typeparam>
+        /// <typeparam name="T1"></typeparam>
+        /// <param name="node"></param>
+        /// <param name="param0"></param>
+        /// <param name="param1"></param>
+        /// <param name="action"></param>
         public static void OperateNode<T0, T1>(NodeBase node, T0 param0, T1 param1, Action<NodeBase, T0, T1> action)
         {
             action(node, param0, param1);
@@ -174,12 +199,20 @@ namespace YBehavior.Editor.Core.New
                 OperateNode(child, param0, param1, action);
             }
         }
-
+        /// <summary>
+        /// Operate the states
+        /// </summary>
+        /// <param name="fsm"></param>
+        /// <param name="action"></param>
         public static void ForEachFSMState(FSM fsm, Action<FSMStateNode> action)
         {
             ForEachFSMState(fsm.RootMachine, action);
         }
-
+        /// <summary>
+        /// Operate the states
+        /// </summary>
+        /// <param name="machine"></param>
+        /// <param name="action"></param>
         public static void ForEachFSMState(FSMMachineNode machine, Action<FSMStateNode> action)
         {
             foreach (NodeBase child in machine.States)
@@ -193,8 +226,14 @@ namespace YBehavior.Editor.Core.New
             }
         }
 
-        ///> TODO: make it universal
-        public static FSMMachineNode FindAncestor(FSMMachineNode a, FSMMachineNode b, ref FSMMachineNode toppestLevelChild)
+        /// <summary>
+        /// Find ancestor of two machines
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="toppestLevelChild"></param>
+        /// <returns></returns>
+        static FSMMachineNode _FindAncestor(FSMMachineNode a, FSMMachineNode b, ref FSMMachineNode toppestLevelChild)
         {
             if (a == null || b == null)
                 return null;
@@ -230,7 +269,12 @@ namespace YBehavior.Editor.Core.New
 
             return c;
         }
-
+        /// <summary>
+        /// If type is subclass of baseType
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="baseType"></param>
+        /// <returns></returns>
         public static bool IsSubClassOf(Type type, Type baseType)
         {
             var b = type.BaseType;
@@ -249,7 +293,12 @@ namespace YBehavior.Editor.Core.New
         {
             return aa.SortIndex.CompareTo(bb.SortIndex);
         }
-
+        /// <summary>
+        /// Try to find a route from fromState to toState in different machines
+        /// </summary>
+        /// <param name="fromState"></param>
+        /// <param name="toState"></param>
+        /// <returns></returns>
         public static TransRoute FindTransRoute(FSMStateNode fromState, FSMStateNode toState)
         {
             TransRoute route = new TransRoute(fromState, toState);
@@ -275,7 +324,7 @@ namespace YBehavior.Editor.Core.New
             else
             {
                 FSMMachineNode toppestLevelChild = null;
-                FSMMachineNode ancestorMachine = Utility.FindAncestor(fromState.OwnerMachine, toState.OwnerMachine, ref toppestLevelChild);
+                FSMMachineNode ancestorMachine = _FindAncestor(fromState.OwnerMachine, toState.OwnerMachine, ref toppestLevelChild);
 
                 ///> fromState is the parent of toState 
                 ///>    ---> fromState=>toppestLevelChild

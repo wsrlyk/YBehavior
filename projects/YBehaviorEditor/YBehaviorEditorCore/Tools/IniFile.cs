@@ -7,6 +7,9 @@ using System.Text;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// Read/write the .ini file
+    /// </summary>
     class IniFile
     {
         private string m_FileName;

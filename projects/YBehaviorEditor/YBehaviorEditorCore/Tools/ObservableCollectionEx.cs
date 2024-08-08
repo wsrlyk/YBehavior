@@ -1,10 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Reflection;
 using System.Collections.ObjectModel;
 using System;
 
@@ -17,7 +13,11 @@ public static class DelayableNotificationCollectionExtension
             observable.Move(observable.IndexOf(sorted[i]), i);
     }
 }
-
+/// <summary>
+/// An ObservableCollection that can delay the notification.
+/// Useful when initializing a collection with lots of elements.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class DelayableNotificationCollection<T> : ObservableCollection<T>
 {
     #region Types
