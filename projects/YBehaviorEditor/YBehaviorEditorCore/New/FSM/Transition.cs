@@ -4,9 +4,15 @@ using System.Collections.ObjectModel;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// A string describing an event
+    /// </summary>
     public struct TransitionEvent : IEquatable<TransitionEvent>
     {
         private string m_Event;
+        /// <summary>
+        /// The event content
+        /// </summary>
         public string Event
         {
             get { return m_Event; }
@@ -29,7 +35,9 @@ namespace YBehavior.Editor.Core.New
             return Event.Equals(other.Event);
         }
 	};
-
+    /// <summary>
+    /// A from and a to state make the key of mapping
+    /// </summary>
     public struct TransitionMapKey : IEquatable<TransitionMapKey>
     {
         public FSMStateNode FromState { get; set; }
@@ -62,7 +70,9 @@ namespace YBehavior.Editor.Core.New
                 && (s1 == null || s1 is FSMAnyStateNode));
         }
 	};
-
+    /// <summary>
+    /// A TransitionEvent makes the value of mapping
+    /// </summary>
     public class TransitionMapValue
     {
         public TransitionMapValue(string e)
@@ -80,15 +90,31 @@ namespace YBehavior.Editor.Core.New
             }
         }
     };
-
+    /// <summary>
+    /// Types of transition
+    /// </summary>
     public enum TransitionType
     {
+        /// <summary>
+        /// Normal transition
+        /// </summary>
         Normal,
+        /// <summary>
+        /// Transition to the default state
+        /// </summary>
         Default,
+        /// <summary>
+        /// Transition from the entry node
+        /// </summary>
         Entry,
+        /// <summary>
+        /// Transition to the exit node
+        /// </summary>
         Exit,
     }
-
+    /// <summary>
+    /// A transition between two exact states, containing multiple different TransitionEvents
+    /// </summary>
     public class Transition
     {
         public Transition(TransitionMapKey key, TransitionMapValue value)
@@ -106,10 +132,17 @@ namespace YBehavior.Editor.Core.New
 
             _Init();
         }
-
+        /// <summary>
+        /// The from-state and to-state
+        /// </summary>
         public TransitionMapKey Key { get; }
+        /// <summary>
+        /// Collection of events
+        /// </summary>
         public ObservableCollection<TransitionMapValue> Value { get; } = new ObservableCollection<TransitionMapValue>();
-
+        /// <summary>
+        /// ViewModel
+        /// </summary>
         public TransitionRenderer Renderer { get; set; } = new TransitionRenderer();
         public TransitionType Type = TransitionType.Normal;
 
@@ -121,12 +154,18 @@ namespace YBehavior.Editor.Core.New
                 Type = TransitionType.Exit;
         }
     }
-
+    /// <summary>
+    /// Collection of transitions
+    /// </summary>
     public class Transitions : System.Collections.IEnumerable
     {
         List<Transition> m_Trans = new List<Transition>();
         public System.Collections.IEnumerator GetEnumerator() { return m_Trans.GetEnumerator(); }
-
+        /// <summary>
+        /// Create a transition for a pair of states
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public Transition CreateEmpty(TransitionMapKey key)
         {
             var res = new Transition(key);
@@ -134,13 +173,18 @@ namespace YBehavior.Editor.Core.New
             return res;
         }
 
-        public Transition Insert(TransitionMapKey key, TransitionMapValue value)
-        {
-            var res = new Transition(key, value);
-            m_Trans.Add(res);
-            return res;
-        }
+        //public Transition Insert(TransitionMapKey key, TransitionMapValue value)
+        //{
+        //    var res = new Transition(key, value);
+        //    m_Trans.Add(res);
+        //    return res;
+        //}
 
+        /// <summary>
+        /// Create a transition for a pair of states
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public Transition Insert(FSMStateNode from, FSMStateNode to)
         {
             TransitionMapKey key = new TransitionMapKey(from, to);
@@ -158,7 +202,13 @@ namespace YBehavior.Editor.Core.New
             m_Trans.Add(trans);
             return trans;
         }
-
+        /// <summary>
+        /// For Inserting from file
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="events"></param>
+        /// <returns></returns>
         public Transition Insert(FSMStateNode from, FSMStateNode to, List<string> events)
         {
             TransitionMapKey key = new TransitionMapKey(from, to);
@@ -174,7 +224,11 @@ namespace YBehavior.Editor.Core.New
             }
             return res;
         }
-
+        /// <summary>
+        /// Remove a transition
+        /// </summary>
+        /// <param name="trans"></param>
+        /// <returns></returns>
         public bool Remove(Transition trans)
         {
             return m_Trans.Remove(trans);
@@ -187,16 +241,25 @@ namespace YBehavior.Editor.Core.New
         //    return res;
         //}
     }
-
+    /// <summary>
+    /// ViewModel of transition
+    /// </summary>
     public class TransitionRenderer : System.ComponentModel.INotifyPropertyChanged
     {
+        /// <summary>
+        /// Model
+        /// </summary>
         public Transition Owner { get; set; }
-
+        /// <summary>
+        /// Collection of events
+        /// </summary>
         public ObservableCollection<TransitionMapValue> Events
         {
             get { return Owner.Value; }
         }
-
+        /// <summary>
+        /// Name of the transition
+        /// </summary>
         public string Name
         {
             get

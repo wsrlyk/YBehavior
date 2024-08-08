@@ -7,9 +7,15 @@ using System.Xml;
 
 namespace YBehavior.Editor.Core.New
 {
+    /// <summary>
+    /// FSM node management
+    /// </summary>
     public class FSMNodeMgr : Singleton<FSMNodeMgr>
     {
         List<FSMStateNode> m_StateList = new List<FSMStateNode>();
+        /// <summary>
+        /// All kinds of states
+        /// </summary>
         public List<FSMStateNode> NodeList { get { return m_StateList; } }
         private Dictionary<string, Type> m_TypeDic = new Dictionary<string, Type>();
 
@@ -30,7 +36,11 @@ namespace YBehavior.Editor.Core.New
                 //LogMgr.Instance.Log(type.ToString());
             }
         }
-
+        /// <summary>
+        /// Create state by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public FSMStateNode CreateStateByName(string name)
         {
             FSMStateNode node = null;
@@ -44,7 +54,11 @@ namespace YBehavior.Editor.Core.New
 
             return null;
         }
-
+        /// <summary>
+        /// Create state by type
+        /// </summary>
+        /// <typeparam name="T">FSMNode type</typeparam>
+        /// <returns></returns>
         public T CreateNode<T>() where T: FSMNode, new()
         {
             T t = new T();
@@ -52,16 +66,27 @@ namespace YBehavior.Editor.Core.New
             return t;
         }
     }
-
+    /// <summary>
+    /// A wrapper to the fsm node
+    /// </summary>
     public class FSMNodeWrapper : NodeWrapper
     {
         public FSM FSM { get { return Graph as FSM; } }
         FSMRootMachineNode m_RootMachine;
+        /// <summary>
+        /// The root of fsm
+        /// </summary>
         public FSMRootMachineNode RootMachine { get { return m_RootMachine; } }
 
         FSMMachineNode m_OwnerMachine;
+        /// <summary>
+        /// The machine this node belongs to
+        /// </summary>
         public FSMMachineNode OwnerMachine { get { return m_OwnerMachine; } }
-
+        /// <summary>
+        /// Change the owner
+        /// </summary>
+        /// <param name="machine"></param>
         public void SetOwner(FSMMachineNode machine)
         {
             m_OwnerMachine = machine;
@@ -80,27 +105,39 @@ namespace YBehavior.Editor.Core.New
             }
         }
     }
-
+    /// <summary>
+    /// FSM node class
+    /// </summary>
     public class FSMNode : NodeBase
     {
         protected override void _CreateWrapper()
         {
             m_Wrapper = new FSMNodeWrapper();
         }
-
+        /// <summary>
+        /// Get the root machine
+        /// </summary>
         public FSMRootMachineNode RootMachine
         {
             get { return (m_Wrapper as FSMNodeWrapper).RootMachine; }
         }
-
+        /// <summary>
+        /// The machine this node belongs to
+        /// </summary>
         public FSMMachineNode OwnerMachine
         {
             get { return (m_Wrapper as FSMNodeWrapper).OwnerMachine; }
             set { (m_Wrapper as FSMNodeWrapper).SetOwner(value); }
         }
     }
+    /// <summary>
+    /// The machine node, containing multiple states
+    /// </summary>
     public class FSMMachineNode : FSMNode
     {
+        /// <summary>
+        /// State pointing to the sub machine
+        /// </summary>
         public FSMMetaStateNode MetaState { get; set; }
 
         List<FSMStateNode> m_States = new List<FSMStateNode>();
@@ -109,17 +146,41 @@ namespace YBehavior.Editor.Core.New
         FSMStateNode m_Default;
         FSMStateNode m_Any;
         FSMStateNode m_Upper;
-
+        /// <summary>
+        /// Collection of states
+        /// </summary>
         public List<FSMStateNode> States { get { return m_States; } }
+        /// <summary>
+        /// Entry to the machine
+        /// </summary>
         public FSMStateNode EntryState { get { return m_Entry; } }
+        /// <summary>
+        /// Exit to the machine
+        /// </summary>
         public FSMStateNode ExitState { get { return m_Exit; } }
+        /// <summary>
+        /// After entry, the default state the machine will go to
+        /// </summary>
         public FSMStateNode DefaultState { get { return m_Default; } }
+        /// <summary>
+        /// State meaning any other states.
+        /// Used for creating connections from any states
+        /// </summary>
         public FSMStateNode AnyState { get { return m_Any; } }
+        /// <summary>
+        /// State meaning the parent machine.
+        /// Used for creating connections with parents
+        /// </summary>
         public FSMStateNode UpperState { get { return m_Upper; } }
 
         Transitions m_LocalTransition = new Transitions();
+        /// <summary>
+        /// Collections of transitions
+        /// </summary>
         public Transitions LocalTransition { get { return m_LocalTransition; } }
-
+        /// <summary>
+        /// Level of machine, start from 0
+        /// </summary>
         public uint Level { get; set; } = 0;
 
         public FSMMachineNode()
@@ -129,16 +190,18 @@ namespace YBehavior.Editor.Core.New
         public override void CreateBase()
         {
             base.CreateBase();
-            CreateEmpty();
+            _CreateEmpty();
         }
 
-        public void CreateEmpty()
+        void _CreateEmpty()
         {
             _ForceAddSpecialState(ref m_Entry, FSMStateNode.TypeEntry);
             _ForceAddSpecialState(ref m_Exit, FSMStateNode.TypeExit);
             _ForceAddSpecialState(ref m_Any, FSMStateNode.TypeAny);
         }
-
+        /// <summary>
+        /// Create upper state for non-root machine
+        /// </summary>
         public void CreateUpper()
         {
             if (OwnerMachine != null)
@@ -150,11 +213,16 @@ namespace YBehavior.Editor.Core.New
             m_Renderer = new FSMMachineRenderer(this);
         }
 
-        public bool PreLoad()
-        {
-            return true;
-        }
+        //public bool PreLoad()
+        //{
+        //    return true;
+        //}
 
+        /// <summary>
+        /// Set default, and build connections
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public bool PostLoad(XmlNode data)
         {
             var attr = data.Attributes["Default"];
@@ -174,9 +242,15 @@ namespace YBehavior.Editor.Core.New
                 }
             }
 
+            _BuildConnections(m_LocalTransition);
+
             return true;
         }
-
+        /// <summary>
+        /// Find a state by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public FSMStateNode FindState(string name)
         {
             foreach (var state in m_States)
@@ -189,6 +263,11 @@ namespace YBehavior.Editor.Core.New
         }
 
         static int s_StateSortIndex = 0;
+        /// <summary>
+        /// Remove a state
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
         public bool RemoveState(FSMStateNode state)
         {
             if (state.Type == FSMStateType.Special)
@@ -203,6 +282,11 @@ namespace YBehavior.Editor.Core.New
             }
             return true;
         }
+        /// <summary>
+        /// Add a state
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
         public bool AddState(FSMStateNode state)
         {
             state.OwnerMachine = this;
@@ -227,7 +311,13 @@ namespace YBehavior.Editor.Core.New
 
             return true;
         }
-
+        /// <summary>
+        /// Set default
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="oldConn">The connection between entry to old default state</param>
+        /// <param name="newConn">The connection between entry and this state</param>
+        /// <returns></returns>
         public bool SetDefault(FSMStateNode state, ref FSMConnection oldConn, ref FSMConnection newConn)
         {
             if (state != null)
@@ -323,7 +413,13 @@ namespace YBehavior.Editor.Core.New
 
             AddState(state);
         }
-
+        /// <summary>
+        /// Create transitions from file
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="events"></param>
+        /// <returns></returns>
         public bool TryAddTrans(string from, string to, List<string> events)
         {
             FSMStateNode fromState = null;
@@ -356,7 +452,12 @@ namespace YBehavior.Editor.Core.New
             
             return true;
         }
-
+        /// <summary>
+        /// Create transitions from file
+        /// </summary>
+        /// <param name="to"></param>
+        /// <param name="events"></param>
+        /// <returns></returns>
         public bool TryAddEntryTrans(string to, List<string> events)
         {
             FSMStateNode fromState = this.EntryState;
@@ -379,7 +480,12 @@ namespace YBehavior.Editor.Core.New
 
             return true;
         }
-
+        /// <summary>
+        /// Create transitions from file
+        /// </summary>
+        /// <param name="to"></param>
+        /// <param name="events"></param>
+        /// <returns></returns>
         public bool TryAddExitTrans(string from, List<string> events)
         {
             FSMStateNode toState = this.ExitState;
@@ -401,11 +507,6 @@ namespace YBehavior.Editor.Core.New
                 return false;
 
             return true;
-        }
-
-        public void BuildLocalConnections()
-        {
-            _BuildConnections(m_LocalTransition);
         }
 
         protected void _BuildConnections(Transitions transitions)
@@ -472,12 +573,12 @@ namespace YBehavior.Editor.Core.New
                 Connector.TryDisconnect(fromto);
         }
 
-        public TransitionResult MakeLocalTrans(FSMStateNode fromState, FSMStateNode toState)
+        TransitionResult _MakeLocalTrans(FSMStateNode fromState, FSMStateNode toState)
         {
             return _MakeTrans(fromState, toState, m_LocalTransition);
         }
 
-        public TransitionResult MakeLocalTrans(Transition existTrans)
+        TransitionResult _MakeLocalTrans(Transition existTrans)
         {
             return _MakeTrans(existTrans, m_LocalTransition);
         }
@@ -521,7 +622,11 @@ namespace YBehavior.Editor.Core.New
             if (conn != null)
                 conn.Trans.Add(t);
         }
-
+        /// <summary>
+        /// Remove a transition
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public bool RemoveTrans(Transition t)
         {
             if ((t.Key.FromState != null && t.Key.FromState.Type == FSMStateType.Special && !(t.Key.FromState is FSMAnyStateNode))
@@ -529,22 +634,31 @@ namespace YBehavior.Editor.Core.New
                 return RemoveLocalTrans(t);
             return RootMachine.RemoveGlobalTrans(t);
         }
-
+        /// <summary>
+        /// Make a transition between two states
+        /// </summary>
+        /// <param name="fromState"></param>
+        /// <param name="toState"></param>
+        /// <returns></returns>
         public TransitionResult MakeTrans(FSMStateNode fromState, FSMStateNode toState)
         {
             if ((fromState != null && fromState.Type == FSMStateType.Special && !(fromState is FSMAnyStateNode))
                 || (toState != null && toState.Type == FSMStateType.Special))
-                return MakeLocalTrans(fromState, toState);
+                return _MakeLocalTrans(fromState, toState);
             return RootMachine.MakeGlobalTrans(fromState, toState);
         }
-
+        /// <summary>
+        /// Add or create a new transition
+        /// </summary>
+        /// <param name="existTrans">if null, a new transition will be created. Or a transition will be added to it</param>
+        /// <returns></returns>
         public TransitionResult MakeTrans(Transition existTrans)
         {
             if (existTrans == null)
                 return new TransitionResult();
             if ((existTrans.Key.FromState != null && existTrans.Key.FromState.Type == FSMStateType.Special && !(existTrans.Key.FromState is FSMAnyStateNode))
                 || (existTrans.Key.ToState != null && existTrans.Key.ToState.Type == FSMStateType.Special))
-                return MakeLocalTrans(existTrans);
+                return _MakeLocalTrans(existTrans);
             return RootMachine.MakeGlobalTrans(existTrans);
         }
 
@@ -565,17 +679,34 @@ namespace YBehavior.Editor.Core.New
             return res;
         }
     }
-
+    /// <summary>
+    /// Describe the result of making a transition
+    /// </summary>
     public struct TransitionResult
     {
+        /// <summary>
+        /// The newly created or updated transition
+        /// </summary>
         public Transition Trans;
+        /// <summary>
+        /// The route of the new transition
+        /// </summary>
         public TransRoute Route;
     }
-
+    /// <summary>
+    /// The root machine node.
+    /// It will have all states to make global transition.
+    /// </summary>
     public class FSMRootMachineNode : FSMMachineNode
     {
+        /// <summary>
+        /// All states
+        /// </summary>
         List<FSMStateNode> m_AllStates = new List<FSMStateNode>();
         Transitions m_Transition = new Transitions();
+        /// <summary>
+        /// All transitions
+        /// </summary>
         public Transitions Transition { get { return m_Transition; } }
 
         public override void CreateBase()
@@ -583,7 +714,11 @@ namespace YBehavior.Editor.Core.New
             base.CreateBase();
             OwnerMachine = null;
         }
-
+        /// <summary>
+        /// Remove a state from global list
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
         public bool RemoveGlobalState(FSMStateNode state)
         {
             if (state == null/* || string.IsNullOrEmpty(state.NickName)*/)
@@ -601,6 +736,11 @@ namespace YBehavior.Editor.Core.New
 
             return true;
         }
+        /// <summary>
+        /// Add a state to global list
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
         public bool AddGlobalState(FSMStateNode state)
         {
             if (state == null/* || string.IsNullOrEmpty(state.NickName)*/)
@@ -618,7 +758,11 @@ namespace YBehavior.Editor.Core.New
 
             return true;
         }
-
+        /// <summary>
+        /// Find a state by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public FSMStateNode FindGloablState(string name)
         {
             //FSMStateNode state;
@@ -632,22 +776,37 @@ namespace YBehavior.Editor.Core.New
             return null;
             //return state;
         }
-
+        /// <summary>
+        /// Build all local connections based on global connections after loading file
+        /// </summary>
         public void BuildConnections()
         {
             _BuildConnections(m_Transition);
         }
-
+        /// <summary>
+        /// Remove a global transition
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public bool RemoveGlobalTrans(Transition t)
         {
             return _RemoveTrans(t, m_Transition);
         }
-
+        /// <summary>
+        /// Make a global transition
+        /// </summary>
+        /// <param name="fromState"></param>
+        /// <param name="toState"></param>
+        /// <returns></returns>
         public TransitionResult MakeGlobalTrans(FSMStateNode fromState, FSMStateNode toState)
         {
             return _MakeTrans(fromState, toState, m_Transition);
         }
-
+        /// <summary>
+        /// Create a new or add to an exist global transition
+        /// </summary>
+        /// <param name="existTrans"></param>
+        /// <returns></returns>
         public TransitionResult MakeGlobalTrans(Transition existTrans)
         {
             return _MakeTrans(existTrans, m_Transition);
@@ -673,14 +832,27 @@ namespace YBehavior.Editor.Core.New
         }
     }
 
-
+    /// <summary>
+    /// FSM state type
+    /// </summary>
     public enum FSMStateType
     {
+        /// <summary>
+        /// Invalid
+        /// </summary>
         Invalid,
+        /// <summary>
+        /// User created
+        /// </summary>
         User,
+        /// <summary>
+        /// Special states like Entry, Exit, etc.
+        /// </summary>
         Special,
     }
-
+    /// <summary>
+    /// Base class of FSM state node
+    /// </summary>
     public abstract class FSMStateNode : FSMNode
     {
         public static readonly string TypeNormal = "Normal";
@@ -693,7 +865,9 @@ namespace YBehavior.Editor.Core.New
 
         public FSMStateType Type { get; set; } = FSMStateType.Invalid;
         public bool IsUserState { get { return Type == FSMStateType.User; } }
-
+        /// <summary>
+        /// The tree this state will execute
+        /// </summary>
         public string Tree { get; set; } = string.Empty;
         public string Identification { get; set; } = string.Empty;
 
@@ -719,7 +893,11 @@ namespace YBehavior.Editor.Core.New
                 return Tree;
             }
         }
-
+        /// <summary>
+        /// Load from file
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public bool Load(System.Xml.XmlNode data)
         {
             foreach (System.Xml.XmlAttribute attr in data.Attributes)
@@ -746,7 +924,10 @@ namespace YBehavior.Editor.Core.New
             _OnLoaded();
             return true;
         }
-
+        /// <summary>
+        /// Save to file
+        /// </summary>
+        /// <param name="data"></param>
         public void Save(XmlElement data)
         {
             if (!string.IsNullOrEmpty(m_NickName))
@@ -768,7 +949,10 @@ namespace YBehavior.Editor.Core.New
                 data.SetAttribute("Disabled", "true");
             }
         }
-
+        /// <summary>
+        /// Export to file
+        /// </summary>
+        /// <param name="data"></param>
         public void Export(XmlElement data)
         {
             if (!string.IsNullOrEmpty(m_NickName))
@@ -798,7 +982,9 @@ namespace YBehavior.Editor.Core.New
             return new FSMConnection(from, to);
         }
     }
-
+    /// <summary>
+    /// FSM user created state node
+    /// </summary>
     public class FSMUserStateNode : FSMStateNode
     {
         public FSMUserStateNode()
@@ -823,6 +1009,9 @@ namespace YBehavior.Editor.Core.New
             return res;
         }
     }
+    /// <summary>
+    /// A normal state
+    /// </summary>
     public class FSMNormalStateNode : FSMUserStateNode
     {
         public FSMNormalStateNode() : base()
@@ -831,7 +1020,9 @@ namespace YBehavior.Editor.Core.New
             Type = FSMStateType.User;
         }
     }
-
+    /// <summary>
+    /// A state containing submachine
+    /// </summary>
     public class FSMMetaStateNode : FSMUserStateNode
     {
         FSMMachineNode m_SubMachine;
@@ -860,7 +1051,9 @@ namespace YBehavior.Editor.Core.New
             return res;
         }
     }
-
+    /// <summary>
+    /// Entry state
+    /// </summary>
     public class FSMEntryStateNode : FSMStateNode
     {
         public FSMEntryStateNode()
@@ -873,7 +1066,9 @@ namespace YBehavior.Editor.Core.New
             Geo.Pos = new Point(100, 100);
         }
     }
-
+    /// <summary>
+    /// Exit state
+    /// </summary>
     public class FSMExitStateNode : FSMStateNode
     {
         public FSMExitStateNode()
@@ -886,7 +1081,9 @@ namespace YBehavior.Editor.Core.New
             Geo.Pos = new Point(400, 400);
         }
     }
-
+    /// <summary>
+    /// Any state used for creating transition with any other states
+    /// </summary>
     public class FSMAnyStateNode : FSMStateNode
     {
         public FSMAnyStateNode()
@@ -899,7 +1096,9 @@ namespace YBehavior.Editor.Core.New
             Geo.Pos = new Point(250, 250);
         }
     }
-
+    /// <summary>
+    /// Upper state used for creating transition with states in upper layer machines
+    /// </summary>
     public class FSMUpperStateNode : FSMStateNode
     {
         public FSMUpperStateNode()

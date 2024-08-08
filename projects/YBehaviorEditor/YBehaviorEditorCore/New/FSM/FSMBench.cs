@@ -83,8 +83,8 @@ namespace YBehavior.Editor.Core.New
             NodeBase.OnAddToGraph(machine, m_Graph);
             //Utility.OperateNode(machine, m_Graph, false, NodeBase.OnAddToGraph);
 
-            if (!machine.PreLoad())
-                return false;
+            //if (!machine.PreLoad())
+            //    return false;
 
             foreach (XmlNode chi in data.ChildNodes)
             {
@@ -121,7 +121,6 @@ namespace YBehavior.Editor.Core.New
 
             if (!machine.PostLoad(data))
                 return false;
-            machine.BuildLocalConnections();
             machine.States.Sort(Utility.SortByFSMNodeSortIndex);
 
             return true;
@@ -247,7 +246,7 @@ namespace YBehavior.Editor.Core.New
                 events.Add(chi.Name);
             }
 
-            if (!machine.TryAddEntryTrans(from, events))
+            if (!machine.TryAddExitTrans(from, events))
             {
                 LogMgr.Instance.Error("Invalid trans: " + data.OuterXml.ToString());
                 return false;
@@ -559,7 +558,7 @@ namespace YBehavior.Editor.Core.New
         /// </summary>
         /// <param name="from"></param>
         /// <param name="to"></param>
-        /// <param name="existTrans"></param>
+        /// <param name="existTrans">if null, a new transition will be created. Or a transition will be added to it</param>
         /// <returns></returns>
         public Transition MakeTrans(Connector from, Connector to, Transition existTrans)
         {
