@@ -10,13 +10,13 @@
 #include "YBehavior/singleton.h"
 namespace YBehavior
 {
-	class IVariableOperationHelper;
+	class IDataOperationHelper;
 	struct TempObject
 	{
 		void* pData{ nullptr };
-		const IVariableOperationHelper* pHelper{ nullptr };
+		const IDataOperationHelper* pHelper{ nullptr };
 
-		TempObject(void* data, const IVariableOperationHelper* helper)
+		TempObject(void* data, const IDataOperationHelper* helper)
 			: pData(data), pHelper(helper)
 		{}
 		~TempObject();
@@ -28,10 +28,10 @@ namespace YBehavior
 		TempObject& operator=(const TempObject& o) = delete;
 	};
 
-	class IVariableOperationHelper
+	class IDataOperationHelper
 	{
 	public:
-		virtual ~IVariableOperationHelper() {}
+		virtual ~IDataOperationHelper() {}
 		virtual void Set(void* pLeft, const void* pRight0) const = 0;
 		virtual void* AllocData() const = 0;
 		virtual TempObject AllocTempData() const = 0;
@@ -54,7 +54,7 @@ namespace YBehavior
 	/////////////////////////////////////
 
 	template<typename T>
-	class VariableOperationHelper : public IVariableOperationHelper
+	class DataOperationHelper : public IDataOperationHelper
 	{
 	public:
 		void Set(void* pLeft, const void* pRight0) const override
@@ -83,17 +83,17 @@ namespace YBehavior
 	/////////////////////////////////////
 /////////////////////////////////////
 /////////////////////////////////////
-	class VariableOperationMgr : public Singleton<VariableOperationMgr>
+	class DataOperationMgr : public Singleton<DataOperationMgr>
 	{
-		small_map<TYPEID, const IVariableOperationHelper*> m_Operations;
+		small_map<TYPEID, const IDataOperationHelper*> m_Operations;
 	public:
-		VariableOperationMgr();
-		~VariableOperationMgr();
+		DataOperationMgr();
+		~DataOperationMgr();
 
-		const IVariableOperationHelper* Get(TYPEID t) const;
+		const IDataOperationHelper* Get(TYPEID t) const;
 
 		template<typename T>
-		const IVariableOperationHelper* Get() const
+		const IDataOperationHelper* Get() const
 		{
 			return Get(GetTypeID<T>());
 		}

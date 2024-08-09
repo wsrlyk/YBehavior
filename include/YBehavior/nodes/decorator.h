@@ -41,7 +41,7 @@ namespace YBehavior
 		TREENODE_DEFINE(ConvertToBool)
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
-		SharedVariableEx<BOOL>* m_Output;
+		Pin<BOOL>* m_Output;
 	};
 
 	///> Never need anymore

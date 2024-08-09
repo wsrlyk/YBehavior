@@ -312,7 +312,7 @@ namespace YBehavior
 			Clear();
 	}
 
-	void _OutputMemoryInfo(SharedDataEx* pSharedData, STRING& buffer)
+	void _OutputMemoryInfo(VariableCollection* pSharedData, STRING& buffer)
 	{
 		if (pSharedData == nullptr)
 			return;
@@ -357,7 +357,7 @@ namespace YBehavior
 		///> MainData
 		{
 			STRING buffer;
-			SharedDataEx* pSharedData = pTarget->GetMemory()->GetMainData();
+			VariableCollection* pSharedData = pTarget->GetMemory()->GetMainData();
 
 			_OutputMemoryInfo(pSharedData, buffer);
 			AppendSendContent(buffer);
@@ -674,23 +674,23 @@ namespace YBehavior
 		DebugMgr::Instance()->Send(false);
 	}
 
-	void DebugTreeHelper::LogSharedData(ISharedVariableEx* pVariable, bool bBefore)
+	void DebugTreeHelper::LogSharedData(IPin* pPin, bool bBefore)
 	{
-		if (!IsValid() || m_pLogInfo == nullptr || pVariable == nullptr)
+		if (!IsValid() || m_pLogInfo == nullptr || pPin == nullptr)
 			return;
 
 		std::stringstream ss;
-		ss << pVariable->GetName() << " ";
+		ss << pPin->GetName() << " ";
 
 		///>  Like:      Int0 <CONST> 44
-		if (pVariable->IsConst())
-			ss << "<CONST> " << pVariable->GetValueToSTRING(m_Target->GetMemory());
+		if (pPin->IsConst())
+			ss << "<CONST> " << pPin->GetValueToSTRING(m_Target->GetMemory());
 		else
 		{
-			ISharedVariableEx* pVectorIndex = pVariable->GetVectorIndex();
-			const STRING& sharedDataVariableName = TreeKeyMgr::Instance()->GetNameByKey(pVariable->GetKey());
+			IPin* pVectorIndex = pPin->GetArrayIndex();
+			const STRING& sharedDataVariableName = TreeKeyMgr::Instance()->GetNameByKey(pPin->GetKey());
 			ss << sharedDataVariableName;
-			if (pVariable->IsLocal())
+			if (pPin->IsLocal())
 				ss << "'";
 
 			///>  Like:      Int0 IntArrayM[7] 44
@@ -704,7 +704,7 @@ namespace YBehavior
 			{
 				ss << " ";
 			}
-			ss << pVariable->GetValueToSTRING(m_Target->GetMemory());
+			ss << pPin->GetValueToSTRING(m_Target->GetMemory());
 		}
 
 		STRING res(ss.str());

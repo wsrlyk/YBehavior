@@ -9,41 +9,41 @@ namespace YBehaviorSharp
     using BOOL = System.Byte;
 
 
-    public class SVariableHelper
+    public class SPinHelper
     {
-        public static SVariable CreateVariable(IntPtr pNode, string attrName, IntPtr data, bool noConst = false)
+        public static SPin CreatePin(IntPtr pNode, string attrName, IntPtr data, bool noConst = false)
         {
-            IntPtr v = SharpHelper.CreateVariable(pNode, attrName, data, noConst);
+            IntPtr v = SharpHelper.CreatePin(pNode, attrName, data, noConst);
             if (v == IntPtr.Zero)
                 return null;
-            return GetVaraible(v);
+            return GetPin(v);
         }
-        private static SVariable GetVaraible(IntPtr ptr)
+        private static SPin GetPin(IntPtr ptr)
         {
-            var type = SharpHelper.GetVariableTypeID(ptr);
-            var elementtype = SharpHelper.GetVariableElementTypeID(ptr);
+            var type = SharpHelper.GetPinTypeID(ptr);
+            var elementtype = SharpHelper.GetPinElementTypeID(ptr);
             if (type == elementtype)
             {
-                var t = s_VariableTypes[type];
-                return Activator.CreateInstance(t, ptr) as SVariable;
+                var t = s_PinTypes[type];
+                return Activator.CreateInstance(t, ptr) as SPin;
             }
-            return new SArrayVaraible(ptr);
+            return new SArrayPin(ptr);
         }
 
-        static System.Type[] s_VariableTypes = new Type[7];
-        static SVariableHelper()
+        static System.Type[] s_PinTypes = new Type[7];
+        static SPinHelper()
         {
-            s_VariableTypes[GetClassType<int>.ID] = typeof(SVariableInt);
-            s_VariableTypes[GetClassType<float>.ID] = typeof(SVariableFloat);
-            s_VariableTypes[GetClassType<ulong>.ID] = typeof(SVariableUlong);
-            s_VariableTypes[GetClassType<bool>.ID] = typeof(SVariableBool);
-            s_VariableTypes[GetClassType<Vector3>.ID] = typeof(SVariableVector3);
-            s_VariableTypes[GetClassType<string>.ID] = typeof(SVariableString);
-            s_VariableTypes[GetClassType<IEntity>.ID] = typeof(SVariableEntity);
+            s_PinTypes[GetClassType<int>.ID] = typeof(SPinInt);
+            s_PinTypes[GetClassType<float>.ID] = typeof(SPinFloat);
+            s_PinTypes[GetClassType<ulong>.ID] = typeof(SPinUlong);
+            s_PinTypes[GetClassType<bool>.ID] = typeof(SPinBool);
+            s_PinTypes[GetClassType<Vector3>.ID] = typeof(SPinVector3);
+            s_PinTypes[GetClassType<string>.ID] = typeof(SPinString);
+            s_PinTypes[GetClassType<IEntity>.ID] = typeof(SPinEntity);
         }
     }
 
-    public class SVariable
+    public class SPin
     {
         public IntPtr Ptr { get; protected set; } = IntPtr.Zero;
 
@@ -51,27 +51,27 @@ namespace YBehaviorSharp
 
         public bool IsValid { get { return Ptr != IntPtr.Zero; } }
 
-        public SVariable(IntPtr ptr)
+        public SPin(IntPtr ptr)
         {
             Ptr = ptr;
-            m_TypeID = SharpHelper.GetVariableTypeID(ptr);
+            m_TypeID = SharpHelper.GetPinTypeID(ptr);
         }
     }
 
-    public class SArrayVaraible : SVariable
+    public class SArrayPin : SPin
     {
         protected TYPEID m_ElementTypeID;
         protected ISArray m_Array;
 
-        public SArrayVaraible(IntPtr core) : base(core)
+        public SArrayPin(IntPtr core) : base(core)
         {
-            m_ElementTypeID = SharpHelper.GetVariableElementTypeID(core);
+            m_ElementTypeID = SharpHelper.GetPinElementTypeID(core);
             m_Array = SArrayHelper.GetArray(IntPtr.Zero, m_ElementTypeID);
         }
 
         public ISArray Get(IntPtr pAgent)
         {
-            IntPtr ptr = SharpHelper.GetVariableValuePtr(pAgent, Ptr);
+            IntPtr ptr = SharpHelper.GetPinValuePtr(pAgent, Ptr);
             m_Array.Init(ptr);
             return m_Array;
         }
@@ -83,9 +83,9 @@ namespace YBehaviorSharp
         //}
     }
 
-    public abstract class SVariable<T> : SVariable
+    public abstract class SPin<T> : SPin
     {
-        public SVariable(IntPtr core)
+        public SPin(IntPtr core)
             : base(core)
         {
             if (core != IntPtr.Zero && GetClassType<T>.ID != m_TypeID)
@@ -100,13 +100,13 @@ namespace YBehaviorSharp
 
     ////////////////////////////////////////////////////////////////
 
-    public class SVariableEntity : SVariable<IEntity>
+    public class SPinEntity : SPin<IEntity>
     {
-        public SVariableEntity(IntPtr core) : base(core) { }
+        public SPinEntity(IntPtr core) : base(core) { }
 
         public override IEntity Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, Ptr))
+            if (SharpHelper.GetPinValue(pAgent, Ptr))
             {
                 return SPtrMgr.Instance.Get(SharpHelper.GetFromBufferEntity()) as IEntity;
             }
@@ -116,17 +116,17 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, IEntity data)
         {
             SharpHelper.SetToBufferEntity(data.Ptr);
-            SharpHelper.SetVariableValue(pAgent, Ptr);
+            SharpHelper.SetPinValue(pAgent, Ptr);
         }
     }
 
-    public class SVariableInt : SVariable<int>
+    public class SPinInt : SPin<int>
     {
-        public SVariableInt(IntPtr core) : base(core) { }
+        public SPinInt(IntPtr core) : base(core) { }
 
         public override int Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, Ptr))
+            if (SharpHelper.GetPinValue(pAgent, Ptr))
             {
                 return SharpHelper.GetFromBufferInt();
             }
@@ -136,17 +136,17 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, int data)
         {
             SharpHelper.SetToBufferInt(data);
-            SharpHelper.SetVariableValue(pAgent, Ptr);
+            SharpHelper.SetPinValue(pAgent, Ptr);
         }
     }
 
-    public class SVariableFloat : SVariable<float>
+    public class SPinFloat : SPin<float>
     {
-        public SVariableFloat(IntPtr core) : base(core) { }
+        public SPinFloat(IntPtr core) : base(core) { }
 
         public override float Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, Ptr))
+            if (SharpHelper.GetPinValue(pAgent, Ptr))
             {
                 return SharpHelper.GetFromBufferFloat();
             }
@@ -156,17 +156,17 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, float data)
         {
             SharpHelper.SetToBufferFloat(data);
-            SharpHelper.SetVariableValue(pAgent, Ptr);
+            SharpHelper.SetPinValue(pAgent, Ptr);
         }
     }
 
-    public class SVariableUlong : SVariable<ulong>
+    public class SPinUlong : SPin<ulong>
     {
-        public SVariableUlong(IntPtr core) : base(core) { }
+        public SPinUlong(IntPtr core) : base(core) { }
 
         public override ulong Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, Ptr))
+            if (SharpHelper.GetPinValue(pAgent, Ptr))
             {
                 return SharpHelper.GetFromBufferUlong();
             }
@@ -176,17 +176,17 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, ulong data)
         {
             SharpHelper.SetToBufferUlong(data);
-            SharpHelper.SetVariableValue(pAgent, Ptr);
+            SharpHelper.SetPinValue(pAgent, Ptr);
         }
     }
 
-    public class SVariableBool : SVariable<bool>
+    public class SPinBool : SPin<bool>
     {
-        public SVariableBool(IntPtr core) : base(core) { }
+        public SPinBool(IntPtr core) : base(core) { }
 
         public override bool Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, Ptr))
+            if (SharpHelper.GetPinValue(pAgent, Ptr))
             {
                 return SharpHelper.ConvertBool(SharpHelper.GetFromBufferBool());
             }
@@ -196,17 +196,17 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, bool data)
         {
             SharpHelper.SetToBufferBool(SharpHelper.ConvertBool(data));
-            SharpHelper.SetVariableValue(pAgent, Ptr);
+            SharpHelper.SetPinValue(pAgent, Ptr);
         }
     }
 
-    public class SVariableVector3 : SVariable<Vector3>
+    public class SPinVector3 : SPin<Vector3>
     {
-        public SVariableVector3(IntPtr core) : base(core) { }
+        public SPinVector3(IntPtr core) : base(core) { }
 
         public override Vector3 Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, Ptr))
+            if (SharpHelper.GetPinValue(pAgent, Ptr))
             {
                 return SharpHelper.GetFromBufferVector3();
             }
@@ -216,17 +216,17 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, Vector3 data)
         {
             SharpHelper.SetToBufferVector3(data);
-            SharpHelper.SetVariableValue(pAgent, Ptr);
+            SharpHelper.SetPinValue(pAgent, Ptr);
         }
     }
 
-    public class SVariableString : SVariable<string>
+    public class SPinString : SPin<string>
     {
-        public SVariableString(IntPtr core) : base(core) { }
+        public SPinString(IntPtr core) : base(core) { }
 
         public override string Get(IntPtr pAgent)
         {
-            if (SharpHelper.GetVariableValue(pAgent, Ptr))
+            if (SharpHelper.GetPinValue(pAgent, Ptr))
             {
                 return SharpHelper.GetFromBufferString();
             }
@@ -236,7 +236,7 @@ namespace YBehaviorSharp
         public override void Set(IntPtr pAgent, string data)
         {
             SharpHelper.SetToBufferString(data);
-            SharpHelper.SetVariableValue(pAgent, Ptr);
+            SharpHelper.SetPinValue(pAgent, Ptr);
         }
     }
 }

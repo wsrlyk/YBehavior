@@ -9,13 +9,13 @@
 
 namespace YBehavior
 {
-	class IVariableConvertHelper
+	class IDataConvertHelper
 	{
 	public:
-		virtual ~IVariableConvertHelper() {}
+		virtual ~IDataConvertHelper() {}
 	public:
 		virtual bool Convert(const void* pFrom, void* pTo) const = 0;
-		virtual bool Convert(IMemory* pMemory, ISharedVariableEx* pFrom, ISharedVariableEx* pTo) const = 0;
+		virtual bool Convert(IMemory* pMemory, IPin* pFrom, IPin* pTo) const = 0;
 	};
 
 	struct NormalConvertTag {};
@@ -90,19 +90,19 @@ namespace YBehavior
 	/////////////////////////////////////
 
 	template<typename FromType, typename ToType>
-	class VariableConvertHelper : public IVariableConvertHelper
+	class DataConvertHelper : public IDataConvertHelper
 	{
-		static VariableConvertHelper<FromType, ToType> s_Instance;
+		static DataConvertHelper<FromType, ToType> s_Instance;
 	public:
-		static IVariableConvertHelper* Get() { return &s_Instance; }
+		static IDataConvertHelper* Get() { return &s_Instance; }
 
 		bool Convert(const void* pFrom, void* pTo) const override
 		{
 			return ValueConvert::Convert<FromType, ToType>(pFrom, pTo);
 		}
-		bool Convert(IMemory* pMemory, ISharedVariableEx* pFrom, ISharedVariableEx* pTo) const override
+		bool Convert(IMemory* pMemory, IPin* pFrom, IPin* pTo) const override
 		{
-			return ValueConvert::Convert<FromType, ToType>(pFrom->GetValue(pMemory), const_cast<void*>(pTo->GetValue(pMemory)));
+			return ValueConvert::Convert<FromType, ToType>(pFrom->GetValuePtr(pMemory), const_cast<void*>(pTo->GetValuePtr(pMemory)));
 		}
 	};
 
@@ -110,17 +110,17 @@ namespace YBehavior
 	/////////////////////////////////////
 	/////////////////////////////////////
 	/////////////////////////////////////
-	class VariableConvertMgr : public Singleton<VariableConvertMgr>
+	class DataConvertMgr : public Singleton<DataConvertMgr>
 	{
-		small_map<std::pair<TYPEID, TYPEID>, const IVariableConvertHelper*> m_Converts;
+		small_map<std::pair<TYPEID, TYPEID>, const IDataConvertHelper*> m_Converts;
 	public:
-		VariableConvertMgr();
-		~VariableConvertMgr();
+		DataConvertMgr();
+		~DataConvertMgr();
 
-		const IVariableConvertHelper* GetConvert(TYPEID from, TYPEID to) const;
+		const IDataConvertHelper* GetConvert(TYPEID from, TYPEID to) const;
 
 		template<typename FromType, typename ToType>
-		const IVariableConvertHelper* GetConvert() const
+		const IDataConvertHelper* GetConvert() const
 		{
 			return GetConvert(GetTypeID<FromType>(), GetTypeID<ToType>());
 		}

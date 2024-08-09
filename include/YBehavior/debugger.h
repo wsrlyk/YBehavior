@@ -42,12 +42,6 @@ namespace YBehavior
 		}
 	};
 
-	struct SharedVariableInfo
-	{
-		STRING name;
-		STRING value;
-	};
-
 	struct DebugPointInfo
 	{
 		UINT nodeUID;
@@ -238,7 +232,7 @@ namespace YBehavior
 		void TryRefresh();
 		void SendLogPoint();
 	public:
-		void LogSharedData(ISharedVariableEx* pVariable, bool bBefore);
+		void LogSharedData(IPin* pPin, bool bBefore);
 		inline std::stringstream& GetDebugLogInfo() { return m_DebugLogInfo; }
 	private:
 		void _CreateTreeRunInfo();

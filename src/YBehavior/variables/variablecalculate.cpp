@@ -34,17 +34,17 @@ namespace YBehavior
 		left = op == CalculateType::MUL ? right0 * right1 : right0 / right1;
 	}
 
-	VariableCalculateMgr::VariableCalculateMgr()
+	DataCalculateMgr::DataCalculateMgr()
 	{
 #define REGISTER_CALCULATE_1(T)\
 	{\
 		auto key = std::make_tuple(GetTypeID<T>(), GetTypeID<T>(), GetTypeID<T>());\
-		m_Calculates[key] = new VariableCalculateHelper<T>();\
+		m_Calculates[key] = new DataCalculateHelper<T>();\
 	}
 #define REGISTER_CALCULATE_3(TL, TR0, TR1)\
 	{\
 		auto key = std::make_tuple(GetTypeID<TL>(), GetTypeID<TR0>(), GetTypeID<TR1>());\
-		m_Calculates[key] = new VariableCalculateHelper<TL, TR0, TR1>();\
+		m_Calculates[key] = new DataCalculateHelper<TL, TR0, TR1>();\
 	}
 
 		REGISTER_CALCULATE_1(INT);
@@ -55,7 +55,7 @@ namespace YBehavior
 		REGISTER_CALCULATE_3(Vector3, Vector3, FLOAT);
 
 	}
-	VariableCalculateMgr::~VariableCalculateMgr()
+	DataCalculateMgr::~DataCalculateMgr()
 	{
 		for (auto it = m_Calculates.begin(); it != m_Calculates.end(); ++it)
 		{
@@ -63,7 +63,7 @@ namespace YBehavior
 		}
 		m_Calculates.clear();
 	}
-	const IVariableCalculateHelper* VariableCalculateMgr::Get(TYPEID tl, TYPEID tr0, TYPEID tr1) const
+	const IDataCalculateHelper* DataCalculateMgr::Get(TYPEID tl, TYPEID tr0, TYPEID tr1) const
 	{
 		auto it = m_Calculates.find(std::make_tuple(tl, tr0, tr1));
 		if (it != m_Calculates.end())

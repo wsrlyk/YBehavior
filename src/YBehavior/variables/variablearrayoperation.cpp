@@ -2,12 +2,12 @@
 
 namespace YBehavior
 {
-	VariableArrayOperationMgr::VariableArrayOperationMgr()
+	DataArrayOperationMgr::DataArrayOperationMgr()
 	{
 #define REGISTER_ARRAYOPERATION(T)\
 	{\
 		auto key = GetTypeID<StdVector<T>>();\
-		m_Operations[key] = new VariableArrayOperationHelper<StdVector<T>>();\
+		m_Operations[key] = new DataArrayOperationHelper<StdVector<T>>();\
 	}
 
 		REGISTER_ARRAYOPERATION(INT);
@@ -18,7 +18,7 @@ namespace YBehavior
 		REGISTER_ARRAYOPERATION(EntityWrapper);
 		REGISTER_ARRAYOPERATION(BOOL);
 	}
-	VariableArrayOperationMgr::~VariableArrayOperationMgr()
+	DataArrayOperationMgr::~DataArrayOperationMgr()
 	{
 		for (auto it = m_Operations.begin(); it != m_Operations.end(); ++it)
 		{
@@ -26,7 +26,7 @@ namespace YBehavior
 		}
 		m_Operations.clear();
 	}
-	const IVariableArrayOperationHelper* VariableArrayOperationMgr::Get(TYPEID t) const
+	const IDataArrayOperationHelper* DataArrayOperationMgr::Get(TYPEID t) const
 	{
 		auto it = m_Operations.find(t);
 		if (it != m_Operations.end())

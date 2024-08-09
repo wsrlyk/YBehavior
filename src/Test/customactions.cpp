@@ -93,29 +93,29 @@ YBehavior::STRING XEntity::ToString() const
 
 YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 {
-	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Target, true);
+	YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Target, true);
 
 	YBehavior::EntityWrapper currentTarget;
-	m_Target->GetCastedValue(pAgent->GetMemory(), currentTarget);
+	m_Target->GetValue(pAgent->GetMemory(), currentTarget);
 	if (currentTarget.IsValid())
 	{
 		YBehavior::EntityWrapper wrapper;
-		m_Target->SetCastedValue(pAgent->GetMemory(), &wrapper);
+		m_Target->SetValue(pAgent->GetMemory(), &wrapper);
 	}
 	else
 	{
 		YBehavior::EntityWrapper wrapper(pAgent->GetEntity()->GetWrapper());
-		m_Target->SetCastedValue(pAgent->GetMemory(), &wrapper);
+		m_Target->SetValue(pAgent->GetMemory(), &wrapper);
 	}
 
-	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Target, false);
+	YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Target, false);
 
 	return YBehavior::NS_SUCCESS;
 }
 
 bool SelectTargetAction::OnLoaded(const pugi::xml_node& data)
 {
-	YB::VariableCreation::CreateVariable(this, m_Target, "Target", data, true);
+	YB::PinCreation::CreatePin(this, m_Target, "Target", data, true);
 	if (!m_Target)
 	{
 		return false;
@@ -126,7 +126,7 @@ bool SelectTargetAction::OnLoaded(const pugi::xml_node& data)
 
 YBehavior::NodeState GetTargetNameAction::Update(YBehavior::AgentPtr pAgent)
 {
-	const YBehavior::EntityWrapper* currentTarget = m_Target->GetCastedValue(pAgent->GetMemory());
+	const YBehavior::EntityWrapper* currentTarget = m_Target->GetValue(pAgent->GetMemory());
 	if (currentTarget && currentTarget->IsValid())
 	{
 		////LOG_BEGIN << ((XEntity*)currentTarget->Get())->ToString() << LOG_END;
@@ -141,48 +141,48 @@ YBehavior::NodeState GetTargetNameAction::Update(YBehavior::AgentPtr pAgent)
 
 bool GetTargetNameAction::OnLoaded(const pugi::xml_node& data)
 {
-	YB::VariableCreation::CreateVariable(this, m_Target, "Target", data, true);
+	YB::PinCreation::CreatePin(this, m_Target, "Target", data, true);
 	if (!m_Target)
 	{
 		return false;
 	}
 	
-	YBehavior::ISharedVariableEx* pTestVariable = nullptr;
-	YB::VariableCreation::CreateVariable(this, pTestVariable, "TestVariable", data, 0, YBehavior::Utility::GetCreateStr<YBehavior::INT>());
+	YBehavior::IPin* pTestVariable = nullptr;
+	YB::PinCreation::CreatePin(this, pTestVariable, "TestVariable", data, 0, YBehavior::Utility::GetCreateStr<YBehavior::INT>());
 
 	return true;
 }
 
 bool ProjectVector3::OnLoaded(const pugi::xml_node& data)
 {
-	YBehavior::VariableCreation::CreateVariable(this, m_Input, "Input", data, true);
-	YBehavior::VariableCreation::CreateVariableIfExist(this, m_X, "X", data, true);
-	YBehavior::VariableCreation::CreateVariableIfExist(this, m_Y, "Y", data, true);
-	YBehavior::VariableCreation::CreateVariableIfExist(this, m_Z, "Z", data, true);
+	YBehavior::PinCreation::CreatePin(this, m_Input, "Input", data, true);
+	YBehavior::PinCreation::CreatePinIfExist(this, m_X, "X", data, true);
+	YBehavior::PinCreation::CreatePinIfExist(this, m_Y, "Y", data, true);
+	YBehavior::PinCreation::CreatePinIfExist(this, m_Z, "Z", data, true);
 
 	return true;
 }
 
 YBehavior::NodeState ProjectVector3::Update(YBehavior::AgentPtr pAgent)
 {
-	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Input, true);
+	YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Input, true);
 	YBehavior::Vector3 v;
-	m_Input->GetCastedValue(pAgent->GetMemory(), v);
+	m_Input->GetValue(pAgent->GetMemory(), v);
 	if (m_X)
-		m_X->SetCastedValue(pAgent->GetMemory(), v.x);
+		m_X->SetValue(pAgent->GetMemory(), v.x);
 	if (m_Y)
-		m_Y->SetCastedValue(pAgent->GetMemory(), v.y);
+		m_Y->SetValue(pAgent->GetMemory(), v.y);
 	if (m_Z)
-		m_Z->SetCastedValue(pAgent->GetMemory(), v.z);
+		m_Z->SetValue(pAgent->GetMemory(), v.z);
 	return YBehavior::NS_SUCCESS;
 }
 
 bool SetVector3::OnLoaded(const pugi::xml_node& data)
 {
-	YBehavior::VariableCreation::CreateVariable(this, m_Output, "Output", data, true);
-	YBehavior::VariableCreation::CreateVariable(this, m_X, "X", data);
-	YBehavior::VariableCreation::CreateVariable(this, m_Y, "Y", data);
-	YBehavior::VariableCreation::CreateVariable(this, m_Z, "Z", data);
+	YBehavior::PinCreation::CreatePin(this, m_Output, "Output", data, true);
+	YBehavior::PinCreation::CreatePin(this, m_X, "X", data);
+	YBehavior::PinCreation::CreatePin(this, m_Y, "Y", data);
+	YBehavior::PinCreation::CreatePin(this, m_Z, "Z", data);
 
 	return true;
 }
@@ -190,10 +190,10 @@ bool SetVector3::OnLoaded(const pugi::xml_node& data)
 YBehavior::NodeState SetVector3::Update(YBehavior::AgentPtr pAgent)
 {
 	YBehavior::Vector3 v;
-	m_X->GetCastedValue(pAgent->GetMemory(), v.x);
-	m_Y->GetCastedValue(pAgent->GetMemory(), v.y);
-	m_Z->GetCastedValue(pAgent->GetMemory(), v.z);
-	m_Output->SetCastedValue(pAgent->GetMemory(), v);
-	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Output, false);
+	m_X->GetValue(pAgent->GetMemory(), v.x);
+	m_Y->GetValue(pAgent->GetMemory(), v.y);
+	m_Z->GetValue(pAgent->GetMemory(), v.z);
+	m_Output->SetValue(pAgent->GetMemory(), v);
+	YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Output, false);
 	return YBehavior::NS_SUCCESS;
 }

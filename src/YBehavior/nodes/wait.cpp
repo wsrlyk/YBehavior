@@ -9,7 +9,7 @@ namespace YBehavior
 	bool Wait::OnLoaded(const pugi::xml_node& data)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		VariableCreation::CreateVariable(this, m_TickCount, "TickCount", data);
+		PinCreation::CreatePin(this, m_TickCount, "TickCount", data);
 		if (!m_TickCount)
 		{
 			return false;
@@ -28,7 +28,7 @@ namespace YBehavior
 	{
 		Wait* pNode = (Wait*)m_pNode;
 		INT tickCount = 0;
-		pNode->m_TickCount->GetCastedValue(pAgent->GetMemory(), tickCount);
+		pNode->m_TickCount->GetValue(pAgent->GetMemory(), tickCount);
 		YB_LOG_INFO(".." << m_Count);
 		if (++m_Count > tickCount)
 			return NS_SUCCESS;

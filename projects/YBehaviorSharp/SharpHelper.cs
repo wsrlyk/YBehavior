@@ -161,14 +161,14 @@ namespace YBehaviorSharp
             IntPtr data);
 
         [DllImport(VERSION.dll)]
-        static public extern IntPtr CreateVariable(
+        static public extern IntPtr CreatePin(
             IntPtr pNode,
             string attrName,
             IntPtr data,
             bool noConst);
 
         [DllImport(VERSION.dll)]
-        static public extern IntPtr SetSharedDataByString(
+        static public extern IntPtr SetSharedVariableByString(
             IntPtr pAgent,
             string name,
             string value,
@@ -177,7 +177,7 @@ namespace YBehaviorSharp
 
         #region DEBUGGER
         [DllImport(VERSION.dll)]
-        static public extern void LogVariable(IntPtr pNode, IntPtr pVariable, bool before);
+        static public extern void LogVariable(IntPtr pNode, IntPtr pPin, bool before);
         [DllImport(VERSION.dll)]
         static public extern bool HasDebugPoint(IntPtr pNode);
         [DllImport(VERSION.dll)]
@@ -187,9 +187,9 @@ namespace YBehaviorSharp
         static public extern void NodeError(IntPtr pNode, string info);
 
         [DllImport(VERSION.dll)]
-        static public extern TYPEID GetVariableTypeID(IntPtr pVariable);
+        static public extern TYPEID GetPinTypeID(IntPtr pPin);
         [DllImport(VERSION.dll)]
-        static public extern TYPEID GetVariableElementTypeID(IntPtr pVariable);
+        static public extern TYPEID GetPinElementTypeID(IntPtr pPin);
         [DllImport(VERSION.dll)]
         static public extern KEY GetTypeKeyByName(string name, TYPEID type);
 

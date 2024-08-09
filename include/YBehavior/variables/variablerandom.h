@@ -10,13 +10,13 @@
 
 namespace YBehavior
 {
-	class IVariableRandomHelper
+	class IDataRandomHelper
 	{
 	public:
-		virtual ~IVariableRandomHelper() {}
+		virtual ~IDataRandomHelper() {}
 	public:
 		virtual void Random(void* pLeft, const void* pRight0, const void* pRight1) const = 0;
-		virtual void Random(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1) const = 0;
+		virtual void Random(IMemory* pMemory, IPin* pLeft, IPin* pRight0, IPin* pRight1) const = 0;
 	};
 
 	//struct NormalCalculateTag {};
@@ -81,20 +81,20 @@ namespace YBehavior
 	/////////////////////////////////////
 
 	template<typename T>
-	class VariableRandomHelper : public IVariableRandomHelper
+	class DataRandomHelper : public IDataRandomHelper
 	{
-		static VariableRandomHelper<T> s_Instance;
+		static DataRandomHelper<T> s_Instance;
 	public:
-		static IVariableRandomHelper* Get() { return &s_Instance; }
+		static IDataRandomHelper* Get() { return &s_Instance; }
 
 		void Random(void* pLeft, const void* pRight0, const void* pRight1) const override
 		{
 			return ValueRandom::Random<T>(pLeft, pRight0, pRight1);
 		}
-		void Random(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1) const override
+		void Random(IMemory* pMemory, IPin* pLeft, IPin* pRight0, IPin* pRight1) const override
 		{
 			T left;
-			ValueRandom::Random<T>(&left, pRight0->GetValue(pMemory), pRight1->GetValue(pMemory));
+			ValueRandom::Random<T>(&left, pRight0->GetValuePtr(pMemory), pRight1->GetValuePtr(pMemory));
 			pLeft->SetValue(pMemory, &left);
 		}
 	};
@@ -103,17 +103,17 @@ namespace YBehavior
 	/////////////////////////////////////
 	/////////////////////////////////////
 	/////////////////////////////////////
-	class VariableRandomMgr : public Singleton<VariableRandomMgr>
+	class DataRandomMgr : public Singleton<DataRandomMgr>
 	{
-		small_map<TYPEID, const IVariableRandomHelper*> m_Randoms;
+		small_map<TYPEID, const IDataRandomHelper*> m_Randoms;
 	public:
-		VariableRandomMgr();
-		~VariableRandomMgr();
+		DataRandomMgr();
+		~DataRandomMgr();
 
-		const IVariableRandomHelper* Get(TYPEID t) const;
+		const IDataRandomHelper* Get(TYPEID t) const;
 
 		template<typename T>
-		const IVariableRandomHelper* Get() const
+		const IDataRandomHelper* Get() const
 		{
 			return Get(GetTypeID<T>());
 		}

@@ -5,39 +5,39 @@
 #include "YBehavior/interface.h"
 #include "sharpentry_buffer.h"
 
-extern "C" YBEHAVIOR_API bool GetVariableValue(YBehavior::Agent* pAgent, YBehavior::ISharedVariableEx* pVariable)
+extern "C" YBEHAVIOR_API bool GetPinValue(YBehavior::Agent* pAgent, YBehavior::IPin* pPin)
 {
-	if (pVariable != nullptr && pAgent != nullptr)
+	if (pPin != nullptr && pAgent != nullptr)
 	{
-		auto data = pVariable->GetValue(pAgent->GetMemory());
-		YBehavior::SharpBuffer::Set(data, pVariable->TypeID());
+		auto data = pPin->GetValuePtr(pAgent->GetMemory());
+		YBehavior::SharpBuffer::Set(data, pPin->TypeID());
 		return true;
 	}
 	return false;
 }
 
-extern "C" YBEHAVIOR_API const void* GetVariableValuePtr(YBehavior::Agent* pAgent, YBehavior::ISharedVariableEx* pVariable)
+extern "C" YBEHAVIOR_API const void* GetPinValuePtr(YBehavior::Agent* pAgent, YBehavior::IPin* pPin)
 {
-	if (pVariable != nullptr && pAgent != nullptr)
+	if (pPin != nullptr && pAgent != nullptr)
 	{
-		return pVariable->GetValue(pAgent->GetMemory());
+		return pPin->GetValuePtr(pAgent->GetMemory());
 	}
 	return nullptr;
 }
 
-extern "C" YBEHAVIOR_API void SetVariableValue(YBehavior::Agent* pAgent, YBehavior::ISharedVariableEx* pVariable)
+extern "C" YBEHAVIOR_API void SetPinValue(YBehavior::Agent* pAgent, YBehavior::IPin* pPin)
 {
-	if (pVariable != nullptr && !pVariable->IsConst() && pAgent != nullptr)
-		pVariable->SetValue(pAgent->GetMemory(), YBehavior::SharpBuffer::Get(pVariable->TypeID()));
+	if (pPin != nullptr && !pPin->IsConst() && pAgent != nullptr)
+		pPin->SetValue(pAgent->GetMemory(), YBehavior::SharpBuffer::Get(pPin->TypeID()));
 }
 
-extern "C" YBEHAVIOR_API YBehavior::TYPEID GetVariableTypeID(YBehavior::ISharedVariableEx* pVariable)
+extern "C" YBEHAVIOR_API YBehavior::TYPEID GetPinTypeID(YBehavior::IPin* pPin)
 {
-	return pVariable->TypeID();
+	return pPin->TypeID();
 }
 
-extern "C" YBEHAVIOR_API YBehavior::TYPEID GetVariableElementTypeID(YBehavior::ISharedVariableEx* pVariable)
+extern "C" YBEHAVIOR_API YBehavior::TYPEID GetPinElementTypeID(YBehavior::IPin* pPin)
 {
-	return pVariable->ElementTypeID();
+	return pPin->ElementTypeID();
 }
 #endif

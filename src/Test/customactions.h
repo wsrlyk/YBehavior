@@ -87,7 +87,7 @@ protected:
 	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;
 	bool OnLoaded(const pugi::xml_node& data) override;
 
-	YBehavior::SharedVariableEx<YBehavior::EntityWrapper>* m_Target;
+	YBehavior::Pin<YBehavior::EntityWrapper>* m_Target;
 };
 
 class SelectTargetAction : public Action
@@ -99,7 +99,7 @@ protected:
 	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;
 	bool OnLoaded(const pugi::xml_node& data) override;
 
-	YBehavior::SharedVariableEx<YBehavior::EntityWrapper>* m_Target;
+	YBehavior::Pin<YBehavior::EntityWrapper>* m_Target;
 };
 
 class ProjectVector3 : public Action
@@ -111,10 +111,10 @@ protected:
 	bool OnLoaded(const pugi::xml_node& data) override;
 	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;
 
-	YBehavior::SharedVariableEx<YBehavior::Vector3>* m_Input;
-	YBehavior::SharedVariableEx<YBehavior::Float>* m_X;
-	YBehavior::SharedVariableEx<YBehavior::Float>* m_Y;
-	YBehavior::SharedVariableEx<YBehavior::Float>* m_Z;
+	YBehavior::Pin<YBehavior::Vector3>* m_Input;
+	YBehavior::Pin<YBehavior::Float>* m_X;
+	YBehavior::Pin<YBehavior::Float>* m_Y;
+	YBehavior::Pin<YBehavior::Float>* m_Z;
 };
 
 class SetVector3 : public Action
@@ -126,10 +126,10 @@ protected:
 	bool OnLoaded(const pugi::xml_node& data) override;
 	YBehavior::NodeState Update(YBehavior::AgentPtr pAgent) override;
 
-	YBehavior::SharedVariableEx<YBehavior::Vector3>* m_Output;
-	YBehavior::SharedVariableEx<YBehavior::Float>* m_X;
-	YBehavior::SharedVariableEx<YBehavior::Float>* m_Y;
-	YBehavior::SharedVariableEx<YBehavior::Float>* m_Z;
+	YBehavior::Pin<YBehavior::Vector3>* m_Output;
+	YBehavior::Pin<YBehavior::Float>* m_X;
+	YBehavior::Pin<YBehavior::Float>* m_Y;
+	YBehavior::Pin<YBehavior::Float>* m_Z;
 };
 
 class MyLaunchCore : public YBehavior::LaunchCore

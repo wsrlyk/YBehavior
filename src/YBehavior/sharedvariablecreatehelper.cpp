@@ -2,8 +2,8 @@
 
 namespace YBehavior
 {
-	SharedVariableCreateHelperMgr::HelperMapType SharedVariableCreateHelperMgr::_Helpers;
-	YBehavior::ISharedVariableCreateHelper* SharedVariableCreateHelperMgr::_HelperList[MAX_TYPE_KEY];
+	DataCreateHelperMgr::HelperMapType DataCreateHelperMgr::_Helpers;
+	YBehavior::IDataCreateHelper* DataCreateHelperMgr::_HelperList[MAX_TYPE_KEY];
 
-	SharedVariableCreateHelperMgr::Constructor SharedVariableCreateHelperMgr::cons;
+	DataCreateHelperMgr::Constructor DataCreateHelperMgr::cons;
 }

@@ -3,11 +3,11 @@
 
 namespace YBehavior
 {
-	SharedDataEx::SharedDataEx()
+	VariableCollection::VariableCollection()
 	{
 	}
 
-	SharedDataEx::SharedDataEx(const SharedDataEx& other)
+	VariableCollection::VariableCollection(const VariableCollection& other)
 	{
 		for (int i = 0; i < MAX_TYPE_KEY; ++i)
 		{
@@ -18,7 +18,7 @@ namespace YBehavior
 		}
 	}
 
-	SharedDataEx::~SharedDataEx()
+	VariableCollection::~VariableCollection()
 	{
 		for (int i = 0; i < MAX_TYPE_KEY; ++i)
 		{
@@ -27,7 +27,7 @@ namespace YBehavior
 		}
 	}
 
-	void SharedDataEx::CloneFrom(const SharedDataEx& other)
+	void VariableCollection::CloneFrom(const VariableCollection& other)
 	{
 		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
 		{
@@ -49,7 +49,7 @@ namespace YBehavior
 		}
 	}
 
-	void SharedDataEx::MergeFrom(const SharedDataEx& other, bool useNewValue)
+	void VariableCollection::MergeFrom(const VariableCollection& other, bool useNewValue)
 	{
 		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
 		{
@@ -63,7 +63,7 @@ namespace YBehavior
 		}
 	}
 
-	void* SharedDataEx::Get(KEY key, TYPEID typeID)
+	void* VariableCollection::Get(KEY key, TYPEID typeID)
 	{
 		IDataArray* iarray = m_Datas[typeID];
 		if (!iarray)
@@ -71,7 +71,7 @@ namespace YBehavior
 		return (void*)iarray->Get(key);
 	}
 
-	STRING SharedDataEx::GetToString(KEY key, TYPEID typeID)
+	STRING VariableCollection::GetToString(KEY key, TYPEID typeID)
 	{
 		IDataArray* iarray = m_Datas[typeID];
 		if (!iarray)
@@ -79,19 +79,19 @@ namespace YBehavior
 		return iarray->GetToString(key);
 	}
 
-	bool SharedDataEx::Set(KEY key, TYPEID typeID, const void* src)
+	bool VariableCollection::Set(KEY key, TYPEID typeID, const void* src)
 	{
 		IDataArray* iarray = _ForceGetDataArray(typeID);
 		return iarray->Set(key, src);
 	}
 
-	bool SharedDataEx::SetDefault(KEY key, TYPEID typeID)
+	bool VariableCollection::SetDefault(KEY key, TYPEID typeID)
 	{
 		IDataArray* iarray = _ForceGetDataArray(typeID);
 		return iarray->SetDefault(key);
 	}
 
-	bool SharedDataEx::TrySet(KEY key, TYPEID typeKey, const void* src)
+	bool VariableCollection::TrySet(KEY key, TYPEID typeKey, const void* src)
 	{
 		IDataArray* iarray = m_Datas[typeKey];
 		if (!iarray)
@@ -99,7 +99,7 @@ namespace YBehavior
 		return iarray->TrySet(key, src);
 	}
 
-	void SharedDataEx::Clear()
+	void VariableCollection::Clear()
 	{
 		for (KEY i = 0; i < MAX_TYPE_KEY; ++i)
 		{
@@ -108,12 +108,12 @@ namespace YBehavior
 		}
 	}
 
-	YBehavior::IDataArray* SharedDataEx::_ForceGetDataArray(TYPEID typeID)
+	YBehavior::IDataArray* VariableCollection::_ForceGetDataArray(TYPEID typeID)
 	{
 		IDataArray* iarray = m_Datas[typeID];
 		if (iarray == nullptr)
 		{
-			iarray = SharedVariableCreateHelperMgr::Get(typeID)->CreateDataArray();
+			iarray = DataCreateHelperMgr::Get(typeID)->CreateDataArray();
 			m_Datas[typeID] = iarray;
 		}
 		return iarray;

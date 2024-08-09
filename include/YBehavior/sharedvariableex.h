@@ -11,25 +11,25 @@
 namespace YBehavior
 {
 	template<typename T>
-	class SharedVariableEx : public ISharedVariableEx
+	class Pin : public IPin
 	{
 	public:
 		typedef typename IsVector<T>::ElementType ElementType;
-		SharedVariableEx()
+		Pin()
 		{
 			Utility::SetDefault(m_Value);
-			m_VectorIndex = nullptr;
+			m_ArrayIndex = nullptr;
 			m_Key = Utility::INVALID_KEY;
 			m_IsLocal = false;
 		}
-		~SharedVariableEx()
+		~Pin()
 		{
-			if (m_VectorIndex != nullptr)
-				delete m_VectorIndex;
+			if (m_ArrayIndex != nullptr)
+				delete m_ArrayIndex;
 		}
 	protected:
 		T m_Value;
-		SharedVariableEx<INT>* m_VectorIndex;
+		Pin<INT>* m_ArrayIndex;
 
 		inline void _SetValue(const void* pValue)
 		{
@@ -51,18 +51,18 @@ namespace YBehavior
 			return m_Value;
 		}
 
-		void _SetCastedValue(IMemory* pMemory, const ElementType* src)
+		void _SetValue(IMemory* pMemory, const ElementType* src)
 		{
 			if (src == nullptr)
 				return;
 			INT index = -1;
-			m_VectorIndex->GetCastedValue(pMemory, index);
+			m_ArrayIndex->GetValue(pMemory, index);
 			if (index < 0)
 			{
 				ERROR_BEGIN << "Invalid Index of Array: " << index << " at " << this->GetLogName() << ERROR_END;
 				return;
 			}
-			SharedDataEx* pData;
+			VariableCollection* pData;
 			if (!IsLocal())
 				pData = pMemory->GetMainData();
 			else
@@ -81,16 +81,16 @@ namespace YBehavior
 					ERROR_BEGIN << "Index " << index << " out of range, Array Length " << pVector->size() << " at " << this->GetLogName() << ERROR_END;
 			}
 		}
-		const ElementType* _GetCastedElement(IMemory* pMemory)
+		const ElementType* _GetElementPtr(IMemory* pMemory)
 		{
 			INT index = -1;
-			m_VectorIndex->GetCastedValue(pMemory, index);
+			m_ArrayIndex->GetValue(pMemory, index);
 			if (index < 0)
 			{
 				ERROR_BEGIN << "Invalid Index of Array: " << index << " at " << this->GetLogName() << ERROR_END;
 				return nullptr;
 			}
-			SharedDataEx* pData;
+			VariableCollection* pData;
 			if (!IsLocal())
 				pData = pMemory->GetMainData();
 			else
@@ -117,17 +117,17 @@ namespace YBehavior
 			return nullptr;
 		}
 
-		T* _GetCastedValue(IMemory* pMemory)
+		T* _GetValuePtr(IMemory* pMemory)
 		{
 			if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
 				return &m_Value;
 			///> It's an element of a vector
-			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
+			if (!IsVector<T>::Result && m_ArrayIndex != nullptr)
 			{
-				return (T*)_GetCastedElement(pMemory);
+				return (T*)_GetElementPtr(pMemory);
 			}
 
-			SharedDataEx* pData;
+			VariableCollection* pData;
 			if (!IsLocal())
 				pData = pMemory->GetMainData();
 			else
@@ -141,7 +141,7 @@ namespace YBehavior
 			return (T*)pData->Get<T>(m_Key);
 		}
 
-		StdVector<ElementType>* _Convert2Vector(IMemory* pMemory)
+		StdVector<ElementType>* _Convert2VectorPtr(IMemory* pMemory)
 		{
 			if (IsVector<T>::Result)
 			{
@@ -150,7 +150,7 @@ namespace YBehavior
 				if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
 					mValue = (StdVector<ElementType>*)_GetValuePtr();
 				else
-					mValue = (StdVector<ElementType>*)const_cast<void*>(GetValue(pMemory));
+					mValue = (StdVector<ElementType>*)const_cast<void*>(GetValuePtr(pMemory));
 
 				return mValue;
 			}
@@ -167,22 +167,22 @@ namespace YBehavior
 			if (m_Key == Utility::INVALID_KEY)
 				return GetTypeID<T>();
 
-			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
+			if (!IsVector<T>::Result && m_ArrayIndex != nullptr)
 			{
 				return GetTypeID<StdVector<T>>();
 			}
 
 			return GetTypeID<T>();
 		}
-		bool IsThisVector() const override
+		bool IsThisArray() const override
 		{
 			return IsVector<T>::Result;
 		}
 
-		ISharedVariableEx* GetVectorIndex() override
+		IPin* GetArrayIndex() override
 		{
 			if (!IsVector<T>::Result)
-				return m_VectorIndex;
+				return m_ArrayIndex;
 			return nullptr;
 		}
 
@@ -191,14 +191,14 @@ namespace YBehavior
 			return m_Key == Utility::INVALID_KEY;
 		}
 
-		StdVector<ElementType>* GetCastedVector(IMemory* pMemory)
+		StdVector<ElementType>* GetArrayPtr(IMemory* pMemory)
 		{
-			return _Convert2Vector(pMemory);
+			return _Convert2VectorPtr(pMemory);
 		}
 
-		INT VectorSize(IMemory* pMemory) override
+		INT ArraySize(IMemory* pMemory) override
 		{
-			const StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
+			const StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
 
 			if (mValue != nullptr)
 				return (INT)mValue->size();
@@ -208,7 +208,7 @@ namespace YBehavior
 
 		void Clear(IMemory* pMemory) override
 		{
-			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
+			StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
 
 			if (mValue != nullptr)
 				mValue->clear();
@@ -216,14 +216,14 @@ namespace YBehavior
 
 		STRING GetValueToSTRING(IMemory* pMemory) override
 		{
-			const T* v = GetCastedValue(pMemory);
+			const T* v = GetValue(pMemory);
 			if (v != nullptr)
 				return Utility::ToStringWithLength(*v);
 			return Utility::StringEmpty;
 		}
-		const void* GetElement(IMemory* pMemory, INT index) override
+		const void* GetElementPtr(IMemory* pMemory, INT index) override
 		{
-			const StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
+			const StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
 
 			if (mValue != nullptr)
 			{
@@ -244,7 +244,7 @@ namespace YBehavior
 		}
 		void SetElement(IMemory* pMemory, const void* v, INT index) override
 		{
-			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
+			StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
 
 			if (mValue != nullptr && v != nullptr)
 			{
@@ -260,7 +260,7 @@ namespace YBehavior
 		}
 		void PushBackElement(IMemory* pMemory, const void* v) override
 		{
-			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
+			StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
 
 			if (mValue != nullptr && v != nullptr)
 			{
@@ -270,7 +270,7 @@ namespace YBehavior
 
 		bool RemoveElement(IMemory* pMemory, const void* v, bool isAll) override
 		{
-			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
+			StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
 
 			if (mValue != nullptr && v != nullptr && !mValue->empty())
 			{
@@ -300,7 +300,7 @@ namespace YBehavior
 
 		bool HasElement(IMemory* pMemory, const void* v, INT& firstIndex) override
 		{
-			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
+			StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
 			firstIndex = -1;
 			if (mValue != nullptr && v != nullptr && !mValue->empty())
 			{
@@ -313,7 +313,7 @@ namespace YBehavior
 		}
 		INT CountElement(IMemory* pMemory, const void* v, INT& firstIndex) override
 		{
-			StdVector<ElementType>* mValue = _Convert2Vector(pMemory);
+			StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
 			firstIndex = -1;
 			if (mValue != nullptr && v != nullptr && !mValue->empty())
 			{
@@ -339,13 +339,13 @@ namespace YBehavior
 			return 0;
 		}
 
-		const void* GetValue(IMemory* pMemory) override
+		const void* GetValuePtr(IMemory* pMemory) override
 		{
-			return GetCastedValue(pMemory);
+			return GetValue(pMemory);
 		}
 		void SetValue(IMemory* pMemory, const void* src) override
 		{
-			SetCastedValue(pMemory, (const T*)src);
+			SetValue(pMemory, (const T*)src);
 		}
 
 		void SetValueFromString(const STRING& str) override
@@ -393,19 +393,19 @@ namespace YBehavior
 			SetKey(key);
 		}
 
-		const T* GetCastedValue(IMemory* pMemory)
+		const T* GetValue(IMemory* pMemory)
 		{
-			return (const T*)_GetCastedValue(pMemory);
+			return (const T*)_GetValuePtr(pMemory);
 		}
 
-		void GetCastedValue(IMemory* pMemory, T& t)
+		void GetValue(IMemory* pMemory, T& t)
 		{
-			const T* v = GetCastedValue(pMemory);
+			const T* v = GetValue(pMemory);
 			if (v != nullptr)
 				t = *v;
 		}
 
-		void SetCastedValue(IMemory* pMemory, const T* src)
+		void SetValue(IMemory* pMemory, const T* src)
 		{
 			if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
 			{
@@ -415,13 +415,13 @@ namespace YBehavior
 				return;
 			}
 			///> It's an element of a vector
-			if (!IsVector<T>::Result && m_VectorIndex != nullptr)
+			if (!IsVector<T>::Result && m_ArrayIndex != nullptr)
 			{
-				_SetCastedValue(pMemory, (const ElementType*)src);
+				_SetValue(pMemory, (const ElementType*)src);
 			}
 			else
 			{
-				SharedDataEx* pData;
+				VariableCollection* pData;
 				if (IsLocal())
 				{
 					pData = pMemory->GetStackTop();
@@ -437,33 +437,33 @@ namespace YBehavior
 			}
 		}
 
-		void SetCastedValue(IMemory* pData, const T&& src)
+		void SetValue(IMemory* pData, const T&& src)
 		{
 			T t(src);
-			SetCastedValue(pData, &t);
+			SetValue(pData, &t);
 		}
 
-		void SetCastedValue(IMemory* pData, const T& src)
+		void SetValue(IMemory* pData, const T& src)
 		{
-			SetCastedValue(pData, &src);
+			SetValue(pData, &src);
 		}
 
 		///> This function must be called BEFORE SetIndexFromString
-		void SetVectorIndex(const STRING& vbType, const STRING& s) override
+		void SetArrayIndex(const STRING& vbType, const STRING& s) override
 		{
 			if (vbType.length() < 1)
 				return;
 			const char t = Utility::ToUpper(vbType[0]);
 			if (t == Utility::POINTER_CHAR)
 			{
-				m_VectorIndex = new SharedVariableEx<INT>();
-				m_VectorIndex->SetKeyFromString(s);
-				m_VectorIndex->SetIsLocal(Utility::IsLower(vbType[0]));
+				m_ArrayIndex = new Pin<INT>();
+				m_ArrayIndex->SetKeyFromString(s);
+				m_ArrayIndex->SetIsLocal(Utility::IsLower(vbType[0]));
 			}
 			else if (t == Utility::CONST_CHAR)
 			{
-				m_VectorIndex = new SharedVariableEx<INT>();
-				m_VectorIndex->SetValueFromString(s);
+				m_ArrayIndex = new Pin<INT>();
+				m_ArrayIndex->SetValueFromString(s);
 			}
 		}
 

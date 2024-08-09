@@ -15,16 +15,16 @@ namespace YBehavior
 			if (m_bAutoDeleteMergedSharedData && m_MergedSharedData)
 				delete m_MergedSharedData;
 		}
-		SharedDataEx* CreateMergedSharedData()
+		VariableCollection* CreateMergedSharedData()
 		{
 			if (m_MergedSharedData && m_bAutoDeleteMergedSharedData)
 				delete m_MergedSharedData;
-			m_MergedSharedData = new SharedDataEx();
+			m_MergedSharedData = new VariableCollection();
 			m_bAutoDeleteMergedSharedData = true;
 			return m_MergedSharedData;
 		}
-		SharedDataEx* GetSharedData() { return m_MergedSharedData; }
-		void SetSharedData(SharedDataEx* data)
+		VariableCollection* GetSharedData() { return m_MergedSharedData; }
+		void SetSharedData(VariableCollection* data)
 		{
 			if (m_MergedSharedData && m_bAutoDeleteMergedSharedData)
 				delete m_MergedSharedData;
@@ -32,7 +32,7 @@ namespace YBehavior
 			m_bAutoDeleteMergedSharedData = false;
 		}
 	private:
-		SharedDataEx * m_MergedSharedData = nullptr;
+		VariableCollection * m_MergedSharedData = nullptr;
 		bool m_bAutoDeleteMergedSharedData = false;
 
 	};
@@ -217,7 +217,7 @@ namespace YBehavior
 			{
 				bool built = _BuildSharedData(*it, current, builingInfo);
 				if (built)
-					current->GetSharedData()->MergeFrom(*(*it)->GetSharedData(), false);
+					current->GetSharedData()->MergeFrom(*(*it)->GetSharedVariable(), false);
 
 				allChildrenBuilt &= built;
 			}
@@ -300,7 +300,7 @@ namespace YBehavior
 			LOG_BEGIN << "Something is wrong that MergedTreeNode has no tree." << LOG_END;
 			return;
 		}
-		SharedDataEx* commonData;
+		VariableCollection* commonData;
 		if (node->trees.size() != 1)
 		{
 			commonData = node->CreateMergedSharedData();
@@ -319,7 +319,7 @@ namespace YBehavior
 			for (auto it = node->children.begin(); it != node->children.end(); ++it)
 			{
 				_FinalBuild(*it, buildingInfo);
-				commonData->MergeFrom(*(*it)->GetSharedData(), true);
+				commonData->MergeFrom(*(*it)->GetSharedVariable(), true);
 			}
 		}
 

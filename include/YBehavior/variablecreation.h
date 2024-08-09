@@ -8,21 +8,21 @@
 
 namespace YBehavior
 {
-	class ISharedVariableEx;
+	class IPin;
 	class TreeNode;
-	class VariableCreation
+	class PinCreation
 	{
 	public:
-		///> If no config, a default CONST variable will be created
-		static TYPEID CreateVariable(TreeNode* pTreeNode, ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false, const STRING& defaultCreateStr = Utility::StringEmpty);
-		///> If no config, a default CONST variable will be created
+		///> If no config, a default CONST pin will be created
+		static TYPEID CreatePin(TreeNode* pTreeNode, IPin*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false, const STRING& defaultCreateStr = Utility::StringEmpty);
+		///> If no config, a default CONST pin will be created
 		template <typename T>
-		static TYPEID CreateVariable(TreeNode* pTreeNode, SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
-		///> If no config, variable will NOT be created
-		static TYPEID CreateVariableIfExist(TreeNode* pTreeNode, ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
-		///> If no config, variable will NOT be created
+		static TYPEID CreatePin(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
+		///> If no config, pin will NOT be created
+		static TYPEID CreatePinIfExist(TreeNode* pTreeNode, IPin*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
+		///> If no config, pin will NOT be created
 		template <typename T>
-		static TYPEID CreateVariableIfExist(TreeNode* pTreeNode, SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
+		static TYPEID CreatePinIfExist(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
 
 		
 		static STRING GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data);
@@ -31,14 +31,14 @@ namespace YBehavior
 		static bool GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T defaultValue, T& outValue);
 		template<typename T>
 		static bool GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T& outValue);
-		static bool ParseVariable(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, bool noConst = false);
+		static bool ParsePin(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, bool noConst = false);
 
 	private:
-		static TYPEID _CreateVariable(TreeNode* pTreeNode, ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, bool noConst);
+		static TYPEID _CreatePin(TreeNode* pTreeNode, IPin*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, bool noConst);
 	};
 
 	template<typename T>
-	bool VariableCreation::GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T& outValue)
+	bool PinCreation::GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T& outValue)
 	{
 		STRING s(GetValue(pTreeNode, attriName, data));
 		if (strMap.TryGetKey(s, outValue))
@@ -49,7 +49,7 @@ namespace YBehavior
 	}
 
 	template<typename T>
-	bool VariableCreation::GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T defaultValue, T& outValue)
+	bool PinCreation::GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T defaultValue, T& outValue)
 	{
 		STRING s;
 		if (!TryGetValue(pTreeNode, attriName, data, s))
@@ -66,18 +66,18 @@ namespace YBehavior
 	}
 
 	template <typename T>
-	TYPEID VariableCreation::CreateVariableIfExist(TreeNode* pTreeNode, SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst /*= false*/)
+	TYPEID PinCreation::CreatePinIfExist(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst /*= false*/)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
 		if (attrOptr.empty())
 			return -1;
 
-		ISharedVariableEx* pTemp = nullptr;
-		TYPEID typeID = _CreateVariable(pTreeNode, pTemp, attrOptr, data, noConst);
+		IPin* pTemp = nullptr;
+		TYPEID typeID = _CreatePin(pTreeNode, pTemp, attrOptr, data, noConst);
 		if (typeID == GetTypeID<T>())
 		{
-			op = (SharedVariableEx<T>*)pTemp;
+			op = (Pin<T>*)pTemp;
 		}
 		else
 		{
@@ -88,7 +88,7 @@ namespace YBehavior
 	}
 
 	template <typename T>
-	TYPEID VariableCreation::CreateVariable(TreeNode* pTreeNode, SharedVariableEx<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst /*= false*/)
+	TYPEID PinCreation::CreatePin(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst /*= false*/)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
@@ -96,23 +96,23 @@ namespace YBehavior
 		{
 			if (!noConst)
 			{
-				op = new SharedVariableEx<T>();
-				pTreeNode->AddVariable(op);
+				op = new Pin<T>();
+				pTreeNode->AddPin(op);
 //#ifdef YDEBUGGER
 				op->SetName(attriName, pTreeNode->GetUID(), pTreeNode->GetClassName(), pTreeNode->GetTreeName());
 //#endif
 				return GetTypeID<T>();
 			}
 
-			ERROR_BEGIN_NODE(pTreeNode) << "Cant create default variable for " << attriName << " with typeid = " << GetTypeID<T>() << ERROR_END;
+			ERROR_BEGIN_NODE(pTreeNode) << "Cant create default pin for " << attriName << " with typeid = " << GetTypeID<T>() << ERROR_END;
 			return -1;
 		}
 
-		ISharedVariableEx* pTemp = nullptr;
-		TYPEID typeID = _CreateVariable(pTreeNode, pTemp, attrOptr, data, noConst);
+		IPin* pTemp = nullptr;
+		TYPEID typeID = _CreatePin(pTreeNode, pTemp, attrOptr, data, noConst);
 		if (typeID == GetTypeID<T>())
 		{
-			op = (SharedVariableEx<T>*)pTemp;
+			op = (Pin<T>*)pTemp;
 		}
 		else
 		{

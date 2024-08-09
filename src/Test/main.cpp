@@ -51,10 +51,10 @@ int main(int argc, char** argv)
 
 	YBehavior::KEY f = YBehavior::TreeKeyMgr::Instance()->GetKeyByName<YBehavior::INT>("b");
 	YBehavior::TreeKeyMgr::Instance()->CreateKeyByName<int>("a");
-	auto maps = YB::SharedVariableCreateHelperMgr::GetAllHelpers();
+	auto maps = YB::DataCreateHelperMgr::GetAllHelpers();
 	for (int i = 0; i < MAX_TYPE_KEY; ++i)
 	{
-		if (maps[i]->TrySetSharedData(pEntity->GetAgent()->GetMemory()->GetMainData(), "a", "444"))
+		if (maps[i]->TrySetVariable(pEntity->GetAgent()->GetMemory()->GetMainData(), "a", "444"))
 			break;
 	}
 

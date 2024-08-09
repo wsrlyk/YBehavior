@@ -40,7 +40,7 @@ namespace YBehavior
 
 		if (m_Stage == 0)
 		{
-			YB_LOG_VARIABLE_BEFORE_IF_HAS_DEBUG_POINT(pNode->m_Events);
+			YB_LOG_PIN_BEFORE_IF_HAS_DEBUG_POINT(pNode->m_Events);
 
 			if (!pNode->m_Events)
 			{
@@ -74,35 +74,35 @@ namespace YBehavior
 			{
 				if (pNode->m_Current)
 				{
-					pNode->m_Current->SetCastedValue(pAgent->GetMemory(), pEvent->name);
+					pNode->m_Current->SetValue(pAgent->GetMemory(), pEvent->name);
 				}
 				if (pNode->m_Int && pEvent->pVecInt)
 				{
-					pNode->m_Int->SetCastedValue(pAgent->GetMemory(), *pEvent->pVecInt);
+					pNode->m_Int->SetValue(pAgent->GetMemory(), *pEvent->pVecInt);
 				}
 				if (pNode->m_Float && pEvent->pVecFloat)
 				{
-					pNode->m_Float->SetCastedValue(pAgent->GetMemory(), *pEvent->pVecFloat);
+					pNode->m_Float->SetValue(pAgent->GetMemory(), *pEvent->pVecFloat);
 				}
 				if (pNode->m_Bool && pEvent->pVecBool)
 				{
-					pNode->m_Bool->SetCastedValue(pAgent->GetMemory(), *pEvent->pVecBool);
+					pNode->m_Bool->SetValue(pAgent->GetMemory(), *pEvent->pVecBool);
 				}
 				if (pNode->m_String && pEvent->pVecString)
 				{
-					pNode->m_String->SetCastedValue(pAgent->GetMemory(), *pEvent->pVecString);
+					pNode->m_String->SetValue(pAgent->GetMemory(), *pEvent->pVecString);
 				}
 				if (pNode->m_Vector3 && pEvent->pVecVector3)
 				{
-					pNode->m_Vector3->SetCastedValue(pAgent->GetMemory(), *pEvent->pVecVector3);
+					pNode->m_Vector3->SetValue(pAgent->GetMemory(), *pEvent->pVecVector3);
 				}
 				if (pNode->m_Entity && pEvent->pVecEntityWrapper)
 				{
-					pNode->m_Entity->SetCastedValue(pAgent->GetMemory(), *pEvent->pVecEntityWrapper);
+					pNode->m_Entity->SetValue(pAgent->GetMemory(), *pEvent->pVecEntityWrapper);
 				}
 				if (pNode->m_Ulong && pEvent->pVecUlong)
 				{
-					pNode->m_Ulong->SetCastedValue(pAgent->GetMemory(), *pEvent->pVecUlong);
+					pNode->m_Ulong->SetValue(pAgent->GetMemory(), *pEvent->pVecUlong);
 				}
 			}
 
@@ -134,21 +134,21 @@ namespace YBehavior
 
 	bool HandleEvent::OnLoaded(const pugi::xml_node& data)
 	{
-		VariableCreation::CreateVariableIfExist(this, m_Events, "Events", data);
+		PinCreation::CreatePinIfExist(this, m_Events, "Events", data);
 		//if (!m_Events)
 		//	return false;
 
-		if (!VariableCreation::GetValue(this, "Type", data, OperatorMap, m_Type))
+		if (!PinCreation::GetValue(this, "Type", data, OperatorMap, m_Type))
 			return false;
 
-		VariableCreation::CreateVariableIfExist(this, m_Current, "Current", data, true);
-		VariableCreation::CreateVariableIfExist(this, m_Int, "Int", data, true);
-		VariableCreation::CreateVariableIfExist(this, m_Float, "Float", data, true);
-		VariableCreation::CreateVariableIfExist(this, m_Bool, "Bool", data, true);
-		VariableCreation::CreateVariableIfExist(this, m_String, "String", data, true);
-		VariableCreation::CreateVariableIfExist(this, m_Vector3, "Vector3", data, true);
-		VariableCreation::CreateVariableIfExist(this, m_Entity, "Entity", data, true);
-		VariableCreation::CreateVariableIfExist(this, m_Ulong, "Ulong", data, true);
+		PinCreation::CreatePinIfExist(this, m_Current, "Current", data, true);
+		PinCreation::CreatePinIfExist(this, m_Int, "Int", data, true);
+		PinCreation::CreatePinIfExist(this, m_Float, "Float", data, true);
+		PinCreation::CreatePinIfExist(this, m_Bool, "Bool", data, true);
+		PinCreation::CreatePinIfExist(this, m_String, "String", data, true);
+		PinCreation::CreatePinIfExist(this, m_Vector3, "Vector3", data, true);
+		PinCreation::CreatePinIfExist(this, m_Entity, "Entity", data, true);
+		PinCreation::CreatePinIfExist(this, m_Ulong, "Ulong", data, true);
 
 		m_bHasParam = m_Current || m_Int || m_Float || m_Bool || m_String || m_Vector3 || m_Entity || m_Ulong;
 
@@ -159,7 +159,7 @@ namespace YBehavior
 	{
 		size_t eventCount = 0;
 		if (m_Events && m_Events->IsConst())
-			eventCount = m_Events->VectorSize(nullptr);
+			eventCount = m_Events->ArraySize(nullptr);
 		else
 			eventCount = 1;
 

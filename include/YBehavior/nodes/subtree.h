@@ -23,13 +23,13 @@ namespace YBehavior
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		bool OnLoadChild(const pugi::xml_node& data) override;
-		bool _TryCreateFromTo(const pugi::xml_node& data, std::vector<ISharedVariableEx*>& container);
+		bool _TryCreateFromTo(const pugi::xml_node& data, std::vector<IPin*>& container);
 	private:
-		SharedVariableEx<STRING>* m_TreeName;
-		SharedVariableEx<STRING>* m_Identification;
+		Pin<STRING>* m_TreeName;
+		Pin<STRING>* m_Identification;
 
-		std::vector<ISharedVariableEx* > m_Inputs;
-		std::vector<ISharedVariableEx* > m_Outputs;
+		std::vector<IPin* > m_Inputs;
+		std::vector<IPin* > m_Outputs;
 	};
 }
 

@@ -16,14 +16,14 @@ namespace YBehavior
 		EXCLUDE,
 	};
 
-	class IVariableArrayOperationHelper
+	class IDataArrayOperationHelper
 	{
 	public:
-		virtual ~IVariableArrayOperationHelper() {}
+		virtual ~IDataArrayOperationHelper() {}
 	public:
 		virtual void ArrayOperation(void* pLeft, const void* pRight0, const void* pRight1, ArrayOperationType op) const = 0;
 		virtual const void* ArrayOperation(const void* pRight0, const void* pRight1, ArrayOperationType op) const = 0;
-		virtual void ArrayOperation(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, ArrayOperationType op) const = 0;
+		virtual void ArrayOperation(IMemory* pMemory, IPin* pLeft, IPin* pRight0, IPin* pRight1, ArrayOperationType op) const = 0;
 	};
 
 	class ValueArrayOperation
@@ -139,11 +139,11 @@ namespace YBehavior
 	/////////////////////////////////////
 
 	template<typename T>
-	class VariableArrayOperationHelper : public IVariableArrayOperationHelper
+	class DataArrayOperationHelper : public IDataArrayOperationHelper
 	{
-		static VariableArrayOperationHelper<T> s_Instance;
+		static DataArrayOperationHelper<T> s_Instance;
 	public:
-		static IVariableArrayOperationHelper* Get() { return &s_Instance; }
+		static IDataArrayOperationHelper* Get() { return &s_Instance; }
 
 		void ArrayOperation(void* pLeft, const void* pRight0, const void* pRight1, ArrayOperationType op) const override
 		{
@@ -155,10 +155,10 @@ namespace YBehavior
 			ValueArrayOperation::ArrayOperation<T>(&left, pRight0, pRight1, op);
 			return &left;
 		}
-		void ArrayOperation(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, ArrayOperationType op) const override
+		void ArrayOperation(IMemory* pMemory, IPin* pLeft, IPin* pRight0, IPin* pRight1, ArrayOperationType op) const override
 		{
-			auto left =const_cast<void*>(pLeft->GetValue(pMemory));
-			ValueArrayOperation::ArrayOperation<T>(left, pRight0->GetValue(pMemory), pRight1->GetValue(pMemory), op);
+			auto left =const_cast<void*>(pLeft->GetValuePtr(pMemory));
+			ValueArrayOperation::ArrayOperation<T>(left, pRight0->GetValuePtr(pMemory), pRight1->GetValuePtr(pMemory), op);
 			//pLeft->SetValue(pMemory, &left);
 		}
 	};
@@ -167,25 +167,25 @@ namespace YBehavior
 	/////////////////////////////////////
 	/////////////////////////////////////
 	/////////////////////////////////////
-	class VariableArrayOperationMgr : public Singleton<VariableArrayOperationMgr>
+	class DataArrayOperationMgr : public Singleton<DataArrayOperationMgr>
 	{
 		/// <summary>
 		/// Left, Right0, Right1
 		/// </summary>
-		small_map<TYPEID, const IVariableArrayOperationHelper*> m_Operations;
+		small_map<TYPEID, const IDataArrayOperationHelper*> m_Operations;
 	public:
-		VariableArrayOperationMgr();
-		~VariableArrayOperationMgr();
+		DataArrayOperationMgr();
+		~DataArrayOperationMgr();
 
-		const IVariableArrayOperationHelper* Get(TYPEID t) const;
+		const IDataArrayOperationHelper* Get(TYPEID t) const;
 
 		template<typename T>
-		const IVariableArrayOperationHelper* Get() const
+		const IDataArrayOperationHelper* Get() const
 		{
 			return Get(GetTypeID<T>());
 		}
 		template<typename TL, typename TR0, typename TR1>
-		const IVariableArrayOperationHelper* Get() const
+		const IDataArrayOperationHelper* Get() const
 		{
 			return Get(GetTypeID<TL>(), GetTypeID<TR0>(), GetTypeID<TR0>());
 		}

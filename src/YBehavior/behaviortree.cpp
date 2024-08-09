@@ -53,7 +53,7 @@ namespace YBehavior
 		m_TreeNameWithPath = name;
 		m_TreeName = Utility::GetNameFromPath(m_TreeNameWithPath);
 
-		m_SharedData = new SharedDataEx();
+		m_SharedData = new VariableCollection();
 		m_LocalData = nullptr;
 		m_ClassName = "Root";
 		//m_NameKeyMgr = new NameKeyMgr();
@@ -82,16 +82,16 @@ namespace YBehavior
 			{
 				if (KEY_WORDS.count(it->name()))
 					continue;
-				if (!VariableCreation::ParseVariable(this, *it, data, buffer, ST_NONE))
+				if (!PinCreation::ParsePin(this, *it, data, buffer, ST_NONE))
 					return false;
-				const ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
+				const IDataCreateHelper* helper = DataCreateHelperMgr::Get(buffer[0].substr(0, 2));
 				if (helper == nullptr)
 					continue;
 
 				if (buffer[0][2] == Utility::CONST_CHAR)
-					helper->SetSharedData(m_SharedData, it->name(), buffer[1]);
+					helper->SetVariable(m_SharedData, it->name(), buffer[1]);
 				else
-					helper->SetSharedData(GetLocalData(), it->name(), buffer[1]);
+					helper->SetVariable(GetLocalData(), it->name(), buffer[1]);
 			}
 		}
 		///> Inputs & Outputs
@@ -100,10 +100,10 @@ namespace YBehavior
 			auto& container = data.name()[0] == 'I' ? m_Inputs : m_Outputs;
 			for (auto it = data.attributes_begin(); it != data.attributes_end(); ++it)
 			{
-				ISharedVariableEx* pVariable = nullptr;
+				IPin* pPin = nullptr;
 
-				VariableCreation::CreateVariable(this, pVariable, it->name(), data, ST_NONE);
-				if (!pVariable)
+				PinCreation::CreatePin(this, pPin, it->name(), data, ST_NONE);
+				if (!pPin)
 				{
 					ERROR_BEGIN_NODE_HEAD << "Failed to Create " << data.name() << ERROR_END;
 					return false;
@@ -113,17 +113,17 @@ namespace YBehavior
 				//	ERROR_BEGIN_NODE_HEAD << "Duplicate " << data.name() << " Variable: " << it->name() << ERROR_END;
 				//	return false;
 				//}
-				container.emplace_back(pVariable);
+				container.emplace_back(pPin);
 			}
 		}
 
 		return true;
 	}
 
-	YBehavior::SharedDataEx* BehaviorTree::GetLocalData()
+	YBehavior::VariableCollection* BehaviorTree::GetLocalData()
 	{
 		if (!m_LocalData)
-			m_LocalData = new SharedDataEx();
+			m_LocalData = new VariableCollection();
 		return m_LocalData;
 	}
 
@@ -191,39 +191,39 @@ namespace YBehavior
 			}
 
 			auto fromNode = treeNodeCache[fromUID];
-			auto fromVariable = fromNode->GetVariable(fromName);
-			if (!fromVariable)
+			auto fromPin = fromNode->GetPin(fromName);
+			if (!fromPin)
 			{
 				ERROR_BEGIN << "DataConnection invalid FromName " << fromName << ERROR_END;
 				return false;
 			}
 			auto toNode = treeNodeCache[toUID];
-			auto toVariable = toNode->GetVariable(toName);
-			if (!toVariable)
+			auto toPin = toNode->GetPin(toName);
+			if (!toPin)
 			{
 				ERROR_BEGIN << "DataConnection invalid ToName " << toName << ERROR_END;
 				return false;
 			}
 
-			TYPEID typeID = fromVariable->TypeID();
-			if (toVariable->TypeID() != typeID)
+			TYPEID typeID = fromPin->TypeID();
+			if (toPin->TypeID() != typeID)
 			{
 				ERROR_BEGIN << "DataConnection Different types: " << fromName << " & " << toName << ERROR_END;
 				return false;
 			}
 			
-			auto setCurrentKey = [&fromVariable, &toVariable, this](KEY key)
+			auto setCurrentKey = [&fromPin, &toPin, this](KEY key)
 			{
-				fromVariable->SetIsLocal(true);
-				fromVariable->SetKey(key);
-				toVariable->SetIsLocal(true);
-				toVariable->SetKey(key);
-				GetLocalData()->SetDefault(key, fromVariable->TypeID());
+				fromPin->SetIsLocal(true);
+				fromPin->SetKey(key);
+				toPin->SetIsLocal(true);
+				toPin->SetKey(key);
+				GetLocalData()->SetDefault(key, fromPin->TypeID());
 			};
-			auto setLastInfos = [&lastFromUID, &lastFromVariableIndex, &lastRangesListIndex, fromUID, fromVariable](int rangesListIndex)
+			auto setLastInfos = [&lastFromUID, &lastFromVariableIndex, &lastRangesListIndex, fromUID, fromPin](int rangesListIndex)
 			{
 				lastFromUID = fromUID;
-				lastFromVariableIndex = fromVariable->GetIndex();
+				lastFromVariableIndex = fromPin->GetIndex();
 				lastRangesListIndex = rangesListIndex;
 			};
 
@@ -234,7 +234,7 @@ namespace YBehavior
 				std::vector<Ranges> rangesList;
 				Ranges ranges;
 				ranges.key = ++currentKey;
-				ranges.ranges.emplace_back(fromUID, fromVariable->GetIndex(), toUID, toVariable->GetIndex());
+				ranges.ranges.emplace_back(fromUID, fromPin->GetIndex(), toUID, toPin->GetIndex());
 				rangesList.emplace_back(ranges);
 				usedRanges[typeID] = rangesList;
 
@@ -251,7 +251,7 @@ namespace YBehavior
 				std::vector<Ranges>& rangesList = it2->second;
 
 				///> In this case, an output is connected to multiple inputs. Just merge them.
-				if (lastFromUID == fromUID && lastFromVariableIndex == fromVariable->GetIndex())
+				if (lastFromUID == fromUID && lastFromVariableIndex == fromPin->GetIndex())
 				{
 					///> It must be the last range cause of ORDER
 					Ranges& ranges = rangesList[lastRangesListIndex];
@@ -260,7 +260,7 @@ namespace YBehavior
 					if (toUID > std::get<2>(range))
 					{
 						std::get<2>(range) = toUID;
-						std::get<3>(range) = toVariable->GetIndex();
+						std::get<3>(range) = toPin->GetIndex();
 					}
 					setCurrentKey(ranges.key);
 					continue;
@@ -287,7 +287,7 @@ namespace YBehavior
 						if (fromUID == std::get<2>(range))
 						{
 							std::get<2>(range) = toUID;
-							std::get<3>(range) = toVariable->GetIndex();
+							std::get<3>(range) = toPin->GetIndex();
 							setCurrentKey(ranges.key);
 							setLastInfos(i);
 							finish = true;
@@ -297,13 +297,13 @@ namespace YBehavior
 						if (fromUID == std::get<0>(range))
 						{
 							///> A variable is connected with two more nodes, merge them
-							if (std::get<1>(range) == fromVariable->GetIndex())
+							if (std::get<1>(range) == fromPin->GetIndex())
 							{
 								///> Use the larger range
 								if (toUID > std::get<2>(range))
 								{
 									std::get<2>(range) = toUID;
-									std::get<3>(range) = toVariable->GetIndex();
+									std::get<3>(range) = toPin->GetIndex();
 								}
 								setCurrentKey(ranges.key);
 								setLastInfos(i);
@@ -330,7 +330,7 @@ namespace YBehavior
 					if (validRangesListIndex >= 0)
 					{
 						Ranges& ranges = rangesList[validRangesListIndex];
-						ranges.ranges.emplace_back(fromUID, fromVariable->GetIndex(), toUID, toVariable->GetIndex());
+						ranges.ranges.emplace_back(fromUID, fromPin->GetIndex(), toUID, toPin->GetIndex());
 						setCurrentKey(ranges.key);
 						setLastInfos(validRangesListIndex);
 					}
@@ -339,7 +339,7 @@ namespace YBehavior
 					{
 						Ranges ranges;
 						ranges.key = ++currentKey;
-						ranges.ranges.emplace_back(fromUID, fromVariable->GetIndex(), toUID, toVariable->GetIndex());
+						ranges.ranges.emplace_back(fromUID, fromPin->GetIndex(), toUID, toPin->GetIndex());
 						rangesList.emplace_back(ranges);
 
 						setCurrentKey(currentKey);
@@ -356,13 +356,13 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 
 
-	LocalMemoryInOut::LocalMemoryInOut(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo)
+	LocalMemoryInOut::LocalMemoryInOut(AgentPtr pAgent, std::vector<IPin* >* pInputsFrom, std::vector<IPin* >* pOutputsTo)
 	{
 		Set(pAgent, pInputsFrom, pOutputsTo);
 	}
 
 
-	void LocalMemoryInOut::Set(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo)
+	void LocalMemoryInOut::Set(AgentPtr pAgent, std::vector<IPin* >* pInputsFrom, std::vector<IPin* >* pOutputsTo)
 	{
 		m_pAgent = pAgent;
 		m_pInputsFrom = pInputsFrom;
@@ -370,15 +370,15 @@ namespace YBehavior
 		m_TempMemory.Set(pAgent->GetMemory()->GetMainData(), pAgent->GetMemory()->GetStackTop());
 	}
 
-	void LocalMemoryInOut::OnInput(StdVector<ISharedVariableEx*>* pInputsTo)
+	void LocalMemoryInOut::OnInput(StdVector<IPin*>* pInputsTo)
 	{
 		if (m_pInputsFrom && pInputsTo && m_pInputsFrom->size() == pInputsTo->size())
 		{
 			auto len = m_pInputsFrom->size();
 			for (size_t i = 0; i < len; ++i)
 			{
-				ISharedVariableEx* pFrom = (*m_pInputsFrom)[i];
-				ISharedVariableEx* pTo = (*pInputsTo)[i];
+				IPin* pFrom = (*m_pInputsFrom)[i];
+				IPin* pTo = (*pInputsTo)[i];
 				if (!pFrom || !pTo)
 					continue;
 				if (pFrom->TypeID() != pTo->TypeID())
@@ -386,20 +386,20 @@ namespace YBehavior
 					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetRunningTree()->GetTreeName() << ERROR_END;
 					continue;
 				}
-				pTo->SetValue(m_pAgent->GetMemory(), pFrom->GetValue(&m_TempMemory));
+				pTo->SetValue(m_pAgent->GetMemory(), pFrom->GetValuePtr(&m_TempMemory));
 			}
 		}
 	}
 
-	void LocalMemoryInOut::OnOutput(StdVector<ISharedVariableEx*>* pOutputsFrom)
+	void LocalMemoryInOut::OnOutput(StdVector<IPin*>* pOutputsFrom)
 	{
 		if (m_pOutputsTo && pOutputsFrom && m_pOutputsTo->size() == pOutputsFrom->size())
 		{
 			auto len = m_pOutputsTo->size();
 			for (size_t i = 0; i < len; ++i)
 			{
-				ISharedVariableEx* pTo = (*m_pOutputsTo)[i];
-				ISharedVariableEx* pFrom = (*pOutputsFrom)[i];
+				IPin* pTo = (*m_pOutputsTo)[i];
+				IPin* pFrom = (*pOutputsFrom)[i];
 				if (!pFrom || !pTo)
 					continue;
 				if (pFrom->TypeID() != pTo->TypeID())
@@ -407,7 +407,7 @@ namespace YBehavior
 					ERROR_BEGIN << "From & To Types not match: " << pFrom->GetLogName() << ", at main tree: " << m_pAgent->GetRunningTree()->GetTreeName() << ERROR_END;
 					continue;
 				}
-				pTo->SetValue(&m_TempMemory, pFrom->GetValue(m_pAgent->GetMemory()));
+				pTo->SetValue(&m_TempMemory, pFrom->GetValuePtr(m_pAgent->GetMemory()));
 			}
 		}
 	}

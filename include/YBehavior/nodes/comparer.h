@@ -16,10 +16,10 @@ namespace YBehavior
 
 	private:
 		CompareType m_Operator;
-		ISharedVariableEx* m_Opl;
-		ISharedVariableEx* m_Opr;
+		IPin* m_Opl;
+		IPin* m_Opr;
 
-		const IVariableCompareHelper* m_pHelper;
+		const IDataCompareHelper* m_pHelper;
 
 	};
 }

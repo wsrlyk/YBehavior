@@ -18,14 +18,14 @@ namespace YBehavior
 	{
 	public:
 		LocalMemoryInOut() {};
-		LocalMemoryInOut(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo);
-		void Set(AgentPtr pAgent, std::vector<ISharedVariableEx* >* pInputsFrom, std::vector<ISharedVariableEx* >* pOutputsTo);
-		void OnInput(StdVector<ISharedVariableEx*>* pInputsTo);
-		void OnOutput(StdVector<ISharedVariableEx*>* pOutputsFrom);
+		LocalMemoryInOut(AgentPtr pAgent, std::vector<IPin* >* pInputsFrom, std::vector<IPin* >* pOutputsTo);
+		void Set(AgentPtr pAgent, std::vector<IPin* >* pInputsFrom, std::vector<IPin* >* pOutputsTo);
+		void OnInput(StdVector<IPin*>* pInputsTo);
+		void OnOutput(StdVector<IPin*>* pOutputsFrom);
 	private:
 		AgentPtr m_pAgent{};
-		std::vector<ISharedVariableEx* >* m_pInputsFrom{};
-		std::vector<ISharedVariableEx* >* m_pOutputsTo{};
+		std::vector<IPin* >* m_pInputsFrom{};
+		std::vector<IPin* >* m_pOutputsTo{};
 		TempMemory m_TempMemory;
 	};
 
@@ -48,9 +48,9 @@ namespace YBehavior
 		inline void SetHash(UINT hash) { m_Hash = hash; }
 #endif
 	private:
-		SharedDataEx* m_SharedData;	///> Original data, copied to each agent using this tree
-		SharedDataEx* m_LocalData;	///> Original local data, pushed to the memory of an agent once run this tree
-		ObjectPool<SharedDataEx> m_LocalDataPool;
+		VariableCollection* m_SharedData;	///> Original data, copied to each agent using this tree
+		VariableCollection* m_LocalData;	///> Original local data, pushed to the memory of an agent once run this tree
+		ObjectPool<VariableCollection> m_LocalDataPool;
 		//NameKeyMgr* m_NameKeyMgr;
 		STRING m_TreeNameWithPath;	///> Full Path
 		STRING m_TreeName;	///> Only File
@@ -63,20 +63,20 @@ namespace YBehavior
 		UINT m_Hash;
 #endif
 
-		StdVector<ISharedVariableEx*> m_Inputs;
-		StdVector<ISharedVariableEx*> m_Outputs;
+		StdVector<IPin*> m_Inputs;
+		StdVector<IPin*> m_Outputs;
 	public:
 		BehaviorTree(const STRING& name);
 		~BehaviorTree();
 		inline const STRING& GetKey() const { return m_TreeNameWithPath; }
 		inline const STRING& GetFullName() const { return m_TreeNameWithPath; }
 		inline const STRING& GetTreeName() const { return m_TreeName; }
-		inline const SharedDataEx* GetSharedData() const { return m_SharedData; }
+		inline const VariableCollection* GetSharedData() const { return m_SharedData; }
 		inline const auto& GetValidEvents() const { return m_ValidEvents; }
 		inline const auto& GetTreeNodeCounts() const { return m_TreeNodeCounts; }
-		SharedDataEx* GetLocalData();
-		inline SharedDataEx* GetLocalDataIfExists() { return m_LocalData; }
-		inline ObjectPool<SharedDataEx>& GetLocalDataPool() { return m_LocalDataPool; }
+		VariableCollection* GetLocalData();
+		inline VariableCollection* GetLocalDataIfExists() { return m_LocalData; }
+		inline ObjectPool<VariableCollection>& GetLocalDataPool() { return m_LocalDataPool; }
 
 		inline TreeMap& GetTreeMap() { return m_TreeMap; }
 		//inline NameKeyMgr* GetNameKeyMgr() { return m_NameKeyMgr; }

@@ -14,7 +14,7 @@ namespace YBehavior
 		bool OnLoaded(const pugi::xml_node& data) override;
 
 	private:
-		ISharedVariableEx* m_Conditions;
+		IPin* m_Conditions;
 		bool m_IsOn;
 	};
 

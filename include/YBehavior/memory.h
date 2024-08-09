@@ -7,7 +7,7 @@
 namespace YBehavior
 {
 	class BehaviorTree;
-	class SharedDataEx;
+	class VariableCollection;
 	struct StackInfo
 	{
 		StackInfo();
@@ -17,9 +17,9 @@ namespace YBehavior
 		StackInfo& operator=(const StackInfo& other);
 		~StackInfo();
 		BehaviorTree* Owner;
-		SharedDataEx* Data;
+		VariableCollection* Data;
 	private:
-		ObjectPool<SharedDataEx> *m_DataPool;
+		ObjectPool<VariableCollection> *m_DataPool;
 	};
 
 	///> Deque has poor performance at traversing;
@@ -32,8 +32,8 @@ namespace YBehavior
 	public:
 		Memory();
 		~Memory();
-		SharedDataEx* GetMainData() override { return m_pMainData; }
-		SharedDataEx* GetStackTop() override;
+		VariableCollection* GetMainData() override { return m_pMainData; }
+		VariableCollection* GetStackTop() override;
 		const StackInfo* GetStackTopInfo();
 
 		inline MemoryStack& GetStack() { return m_Stack; }
@@ -41,7 +41,7 @@ namespace YBehavior
 		void Push(BehaviorTree* pTree);
 		void Pop();
 	protected:
-		SharedDataEx* m_pMainData;
+		VariableCollection* m_pMainData;
 		MemoryStack m_Stack;
 	};
 
@@ -49,13 +49,13 @@ namespace YBehavior
 	{
 	public:
 		TempMemory() {}
-		TempMemory(SharedDataEx* pMain, SharedDataEx* pLocal);
-		void Set(SharedDataEx* pMain, SharedDataEx* pLocal);
-		SharedDataEx* GetMainData() override { return m_pMainData; }
-		SharedDataEx* GetStackTop() override { return m_pLocalData; }
+		TempMemory(VariableCollection* pMain, VariableCollection* pLocal);
+		void Set(VariableCollection* pMain, VariableCollection* pLocal);
+		VariableCollection* GetMainData() override { return m_pMainData; }
+		VariableCollection* GetStackTop() override { return m_pLocalData; }
 	private:
-		SharedDataEx* m_pMainData{};
-		SharedDataEx* m_pLocalData{};
+		VariableCollection* m_pMainData{};
+		VariableCollection* m_pLocalData{};
 	};
 }
 

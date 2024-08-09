@@ -5,19 +5,19 @@
 
 namespace YBehavior
 {
-	class IVariableOperationHelper;
-	class SharedDataEx;
+	class IDataOperationHelper;
+	class VariableCollection;
 	class IMemory
 	{
 	public:
-		virtual SharedDataEx* GetMainData() = 0;
-		virtual SharedDataEx* GetStackTop() = 0;
+		virtual VariableCollection* GetMainData() = 0;
+		virtual VariableCollection* GetStackTop() = 0;
 		virtual ~IMemory() {}
 	};
-	class ISharedVariableEx
+	class IPin
 	{
 	public:
-		virtual ~ISharedVariableEx() {}
+		virtual ~IPin() {}
 		inline void SetKey(KEY key) { m_Key = key; }
 		inline KEY GetKey() { return m_Key; }
 		inline void SetIsLocal(bool local) { m_IsLocal = local; }
@@ -45,9 +45,9 @@ namespace YBehavior
 		inline const STRING& GetName() { return m_Name; }
 		inline const STRING& GetLogName() { return m_LogName; }
 
-		virtual void SetVectorIndex(const STRING& vbType, const STRING& s) { }
+		virtual void SetArrayIndex(const STRING& vbType, const STRING& s) { }
 		virtual void SetKeyFromString(const STRING& s) = 0;
-		virtual const void* GetValue(IMemory* pMemory) = 0;
+		virtual const void* GetValuePtr(IMemory* pMemory) = 0;
 		virtual void SetValue(IMemory* pMemory, const void* src) = 0;
 		virtual void SetValueFromString(const STRING& str) = 0;
 		virtual TYPEID TypeID() const = 0;
@@ -55,14 +55,14 @@ namespace YBehavior
 		///> if this variable is an INT, and it refers to an element of an INT[], this method will return the type of INT[] instead of INT;   Used in log..
 		virtual TYPEID GetReferenceSharedDataSelfID() = 0;
 
-		virtual ISharedVariableEx* GetVectorIndex() = 0;
+		virtual IPin* GetArrayIndex() = 0;
 		virtual STRING GetValueToSTRING(IMemory* pMemory) = 0;
 
-		virtual bool IsThisVector() const = 0;
+		virtual bool IsThisArray() const = 0;
 		///> Belows are functions for vector
-		virtual INT VectorSize(IMemory* pMemory) = 0;
+		virtual INT ArraySize(IMemory* pMemory) = 0;
 		virtual void Clear(IMemory* pMemory) = 0;
-		virtual const void* GetElement(IMemory* pMemory, INT index) = 0;
+		virtual const void* GetElementPtr(IMemory* pMemory, INT index) = 0;
 		virtual void SetElement(IMemory* pMemory, const void* v, INT index) = 0;
 		virtual void PushBackElement(IMemory* pMemory, const void* v) = 0;
 		virtual bool RemoveElement(IMemory* pMemory, const void* v, bool isAll) = 0;

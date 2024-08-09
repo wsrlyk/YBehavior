@@ -16,11 +16,11 @@ namespace YBehavior
 
 	private:
 		CalculateType m_Operator;
-		ISharedVariableEx* m_Output;
-		ISharedVariableEx* m_Input1;
-		ISharedVariableEx* m_Input2;
+		IPin* m_Output;
+		IPin* m_Input1;
+		IPin* m_Input2;
 
-		const IVariableCalculateHelper* m_pHelper{};
+		const IDataCalculateHelper* m_pHelper{};
 	};
 }
 

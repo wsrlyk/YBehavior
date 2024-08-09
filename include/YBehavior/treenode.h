@@ -33,7 +33,7 @@ namespace YBehavior
 		ST_ARRAY,
 	};
 
-	class SharedDataEx;
+	class VariableCollection;
 	struct NameKeyMgr;
 #ifdef YDEBUGGER
 	class DebugTreeHelper;
@@ -61,7 +61,7 @@ namespace YBehavior
 		TreeNodePtr m_Parent;
 		TreeNodePtr m_Condition;
 		UINT m_UID;	// Unique in a tree
-		StdVector<ISharedVariableEx*> m_Variables;	///> Just for destructions of variables
+		StdVector<IPin*> m_Pins;	///> Just for destructions of variables
 		BehaviorTree* m_Root;
 		ReturnType m_ReturnType;
 		STRING m_ClassName;
@@ -103,8 +103,8 @@ namespace YBehavior
 		TreeNodeContext* CreateContext();
 		void DestroyContext(TreeNodeContext*&);
 
-		void AddVariable(ISharedVariableEx* pVariable);
-		ISharedVariableEx* GetVariable(const STRING& name) const;
+		void AddPin(IPin* pPin);
+		IPin* GetPin(const STRING& name) const;
 #ifdef YDEBUGGER
 		void SetDebugHelper(DebugTreeHelper* pDebugHelper) { m_pDebugHelper = pDebugHelper; };
 		inline DebugTreeHelper* GetDebugHelper() const { return m_pDebugHelper; }
@@ -154,7 +154,7 @@ namespace YBehavior
 	public:
 		static bool HasDebugPoint(DebugTreeHelper* pDebugHelper);
 		static std::stringstream& GetLogInfo(DebugTreeHelper* pDebugHelper);
-		static void LogVariable(DebugTreeHelper* pDebugHelper, ISharedVariableEx* pVariable, bool bBefore);
+		static void LogPin(DebugTreeHelper* pDebugHelper, IPin* pPin, bool bBefore);
 		void SendLog();
 	protected:
 		DebugTreeHelper* m_pDebugHelper{};
@@ -173,34 +173,34 @@ namespace YBehavior
 		YB_IF_HAS_DEBUG_POINT\
 			YBehavior::TreeNodeContext::GetLogInfo(m_pDebugHelper) << info << "; ";\
 	}
-#define YB_LOG_VARIABLE(variable, isbefore)\
-		YBehavior::TreeNodeContext::LogVariable(m_pDebugHelper, variable, isbefore);
+#define YB_LOG_PIN(pin, isbefore)\
+		YBehavior::TreeNodeContext::LogPin(m_pDebugHelper, pin, isbefore);
 
-#define YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(variable, isbefore) \
+#define YB_LOG_PIN_IF_HAS_DEBUG_POINT(pin, isbefore) \
 	{\
 		YB_IF_HAS_DEBUG_POINT\
-			YB_LOG_VARIABLE(variable, isbefore);\
+			YB_LOG_PIN(pin, isbefore);\
 	}
 
-#define YB_LOG_VARIABLE_BEFORE(variable)\
-	YB_LOG_VARIABLE(variable, true)
-#define YB_LOG_VARIABLE_AFTER(variable)\
-	YB_LOG_VARIABLE(variable, false)
-#define YB_LOG_VARIABLE_BEFORE_IF_HAS_DEBUG_POINT(variable)\
-	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(variable, true)
-#define YB_LOG_VARIABLE_AFTER_IF_HAS_DEBUG_POINT(variable)\
-	YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(variable, false)
+#define YB_LOG_PIN_BEFORE(pin)\
+	YB_LOG_PIN(pin, true)
+#define YB_LOG_PIN_AFTER(pin)\
+	YB_LOG_PIN(pin, false)
+#define YB_LOG_PIN_BEFORE_IF_HAS_DEBUG_POINT(pin)\
+	YB_LOG_PIN_IF_HAS_DEBUG_POINT(pin, true)
+#define YB_LOG_PIN_AFTER_IF_HAS_DEBUG_POINT(pin)\
+	YB_LOG_PIN_IF_HAS_DEBUG_POINT(pin, false)
 
 #else
 #define YB_LOG_INFO(info);
 #define YB_LOG_INFO_WITH_END(info);
 #define YB_IF_HAS_DEBUG_POINT
-#define YB_LOG_VARIABLE(variable, isbefore)
-#define YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(variable, isbefore)
-#define YB_LOG_VARIABLE_BEFORE(variable)
-#define YB_LOG_VARIABLE_AFTER(variable)
-#define YB_LOG_VARIABLE_BEFORE_IF_HAS_DEBUG_POINT(variable)
-#define YB_LOG_VARIABLE_AFTER_IF_HAS_DEBUG_POINT(variable)
+#define YB_LOG_PIN(pin, isbefore)
+#define YB_LOG_PIN_IF_HAS_DEBUG_POINT(pin, isbefore)
+#define YB_LOG_PIN_BEFORE(pin)
+#define YB_LOG_PIN_AFTER(pin)
+#define YB_LOG_PIN_BEFORE_IF_HAS_DEBUG_POINT(pin)
+#define YB_LOG_PIN_AFTER_IF_HAS_DEBUG_POINT(pin)
 #endif 
 
 	//////////////////////////////////////////////////////////////////////////

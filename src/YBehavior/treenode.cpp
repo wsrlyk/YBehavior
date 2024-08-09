@@ -45,11 +45,11 @@ namespace YBehavior
 		if (m_Condition != nullptr)
 			delete m_Condition;
 
-		for (auto it = m_Variables.begin(); it != m_Variables.end(); ++it)
+		for (auto it = m_Pins.begin(); it != m_Pins.end(); ++it)
 		{
 			delete *it;
 		}
-		m_Variables.clear();
+		m_Pins.clear();
 	}
 
 	TreeNode* TreeNode::CreateNodeByName(const STRING& name)
@@ -137,18 +137,18 @@ namespace YBehavior
 		_DestroyContext(pContext);
 	}
 
-	void TreeNode::AddVariable(ISharedVariableEx* pVariable)
+	void TreeNode::AddPin(IPin* pPin)
 	{
-		if (pVariable)
+		if (pPin)
 		{
-			pVariable->SetIndex((UINT)m_Variables.size());
-			m_Variables.push_back(pVariable);
+			pPin->SetIndex((UINT)m_Pins.size());
+			m_Pins.push_back(pPin);
 		}
 	}
 
-	YBehavior::ISharedVariableEx* TreeNode::GetVariable(const STRING& name) const
+	YBehavior::IPin* TreeNode::GetPin(const STRING& name) const
 	{
-		for (auto it : m_Variables)
+		for (auto it : m_Pins)
 		{
 			if (it->GetName() == name)
 				return it;
@@ -305,9 +305,9 @@ namespace YBehavior
 		return pDebugHelper->GetDebugLogInfo();
 	}
 
-	void TreeNodeContext::LogVariable(DebugTreeHelper* pDebugHelper, ISharedVariableEx* pVariable, bool bBefore)
+	void TreeNodeContext::LogPin(DebugTreeHelper* pDebugHelper, IPin* pPin, bool bBefore)
 	{
-		pDebugHelper->LogSharedData(pVariable, bBefore);
+		pDebugHelper->LogSharedData(pPin, bBefore);
 	}
 
 	void TreeNodeContext::SendLog()

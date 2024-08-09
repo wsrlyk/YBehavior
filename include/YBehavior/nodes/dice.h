@@ -5,10 +5,10 @@
 
 namespace YBehavior
 {
-	class IVariableCompareHelper;
-	class IVariableCalculateHelper;
-	class IVariableOperationHelper;
-	class IVariableRandomHelper;
+	class IDataCompareHelper;
+	class IDataCalculateHelper;
+	class IDataOperationHelper;
+	class IDataRandomHelper;
 	class Dice : public LeafNode<>
 	{
 	public:
@@ -17,16 +17,16 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;
 
-		ISharedVariableEx* m_Distribution;
-		ISharedVariableEx* m_Values;
+		IPin* m_Distribution;
+		IPin* m_Values;
 
-		ISharedVariableEx* m_Input;
-		ISharedVariableEx* m_Output;
+		IPin* m_Input;
+		IPin* m_Output;
 
-		const IVariableCompareHelper* m_pCompareHelper;
-		const IVariableCalculateHelper* m_pCalculateHelper;
-		const IVariableOperationHelper* m_pOperationHelper;
-		const IVariableRandomHelper* m_pRandomHelper;
+		const IDataCompareHelper* m_pCompareHelper;
+		const IDataCalculateHelper* m_pCalculateHelper;
+		const IDataOperationHelper* m_pOperationHelper;
+		const IDataRandomHelper* m_pRandomHelper;
 	};
 }
 

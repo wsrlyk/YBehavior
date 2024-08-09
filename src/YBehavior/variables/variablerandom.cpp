@@ -2,12 +2,12 @@
 
 namespace YBehavior
 {
-	VariableRandomMgr::VariableRandomMgr()
+	DataRandomMgr::DataRandomMgr()
 	{
 #define REGISTER_RANDOM(T)\
 	{\
 		auto key = GetTypeID<T>();\
-		m_Randoms[key] = new VariableRandomHelper<T>();\
+		m_Randoms[key] = new DataRandomHelper<T>();\
 	}
 
 		REGISTER_RANDOM(INT);
@@ -15,7 +15,7 @@ namespace YBehavior
 		REGISTER_RANDOM(BOOL);
 
 	}
-	VariableRandomMgr::~VariableRandomMgr()
+	DataRandomMgr::~DataRandomMgr()
 	{
 		for (auto it = m_Randoms.begin(); it != m_Randoms.end(); ++it)
 		{
@@ -23,7 +23,7 @@ namespace YBehavior
 		}
 		m_Randoms.clear();
 	}
-	const IVariableRandomHelper* VariableRandomMgr::Get(TYPEID t) const
+	const IDataRandomHelper* DataRandomMgr::Get(TYPEID t) const
 	{
 		auto it = m_Randoms.find(t);
 		if (it != m_Randoms.end())

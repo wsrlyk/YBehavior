@@ -31,7 +31,7 @@ namespace YBehavior
 		bool OnLoaded(const pugi::xml_node& data) override;
 		void OnAddChild(TreeNode * child, const STRING & connection) override;
 
-		SharedVariableEx<BOOL>* m_BreakValue = nullptr;
+		Pin<BOOL>* m_BreakValue = nullptr;
 		TreeNodePtr m_InitChild = nullptr;
 		TreeNodePtr m_CondChild = nullptr;
 		TreeNodePtr m_IncChild = nullptr;
@@ -53,9 +53,9 @@ namespace YBehavior
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 
-		SharedVariableEx<BOOL>* m_BreakValue = nullptr;
-		ISharedVariableEx* m_Collection = nullptr;
-		ISharedVariableEx* m_Current = nullptr;
+		Pin<BOOL>* m_BreakValue = nullptr;
+		IPin* m_Collection = nullptr;
+		IPin* m_Current = nullptr;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -74,9 +74,9 @@ namespace YBehavior
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 
-		SharedVariableEx<BOOL>* m_BreakValue = nullptr;
-		SharedVariableEx<INT>* m_Count = nullptr;
-		SharedVariableEx<INT>* m_Current = nullptr;
+		Pin<BOOL>* m_BreakValue = nullptr;
+		Pin<INT>* m_Count = nullptr;
+		Pin<INT>* m_Current = nullptr;
 	};
 
 }

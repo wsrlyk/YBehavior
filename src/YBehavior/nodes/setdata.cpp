@@ -11,14 +11,14 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		TYPEID leftType = VariableCreation::CreateVariable(this, m_Opl, "Target", data, true);
+		TYPEID leftType = PinCreation::CreatePin(this, m_Opl, "Target", data, true);
 		if (leftType == Utility::INVALID_TYPE)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in SetData: " << leftType << ERROR_END;
 			return false;
 		}
 		///> Right
-		TYPEID rightType = VariableCreation::CreateVariable(this, m_Opr, "Source", data);
+		TYPEID rightType = PinCreation::CreatePin(this, m_Opr, "Source", data);
 		if (leftType != rightType)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types:  Opl & Opr" << ERROR_END;
@@ -30,9 +30,9 @@ namespace YBehavior
 
 	YBehavior::NodeState SetData::Update(AgentPtr pAgent)
 	{
-		m_Opl->SetValue(pAgent->GetMemory(), m_Opr->GetValue(pAgent->GetMemory()));
+		m_Opl->SetValue(pAgent->GetMemory(), m_Opr->GetValuePtr(pAgent->GetMemory()));
 
-		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Opl, false);
+		YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Opl, false);
 
 		return NS_SUCCESS;
 	}

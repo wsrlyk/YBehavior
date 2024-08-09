@@ -7,7 +7,7 @@ namespace YBehavior
 {
 	bool For::OnLoaded(const pugi::xml_node& data)
 	{
-		VariableCreation::CreateVariableIfExist(this, m_BreakValue, "BreakValue", data);
+		PinCreation::CreatePinIfExist(this, m_BreakValue, "BreakValue", data);
 
 		return true;
 	}
@@ -67,15 +67,15 @@ namespace YBehavior
 
 	bool ForEach::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID collectionType = VariableCreation::CreateVariable(this, m_Collection, "Collection", data);
-		TYPEID currentType = VariableCreation::CreateVariable(this, m_Current, "Current", data);
+		TYPEID collectionType = PinCreation::CreatePin(this, m_Collection, "Collection", data);
+		TYPEID currentType = PinCreation::CreatePin(this, m_Current, "Current", data);
 		if (!Utility::IsElement(currentType, collectionType))
 		{
 			ERROR_BEGIN_NODE_HEAD << "Types not match: " << currentType << " and " << collectionType << ERROR_END;
 			return false;
 		}
 
-		VariableCreation::CreateVariableIfExist(this, m_BreakValue, "BreakValue", data);
+		PinCreation::CreatePinIfExist(this, m_BreakValue, "BreakValue", data);
 
 		return true;
 	}
@@ -86,18 +86,18 @@ namespace YBehavior
 
 	bool Loop::OnLoaded(const pugi::xml_node& data)
 	{
-		VariableCreation::CreateVariable(this, m_Current, "Current", data);
+		PinCreation::CreatePin(this, m_Current, "Current", data);
 		if (!m_Current)
 		{
 			return false;
 		}
-		VariableCreation::CreateVariable(this, m_Count, "Count", data);
+		PinCreation::CreatePin(this, m_Count, "Count", data);
 		if (!m_Count)
 		{
 			return false;
 		}
 
-		VariableCreation::CreateVariableIfExist(this, m_BreakValue, "BreakValue", data);
+		PinCreation::CreatePinIfExist(this, m_BreakValue, "BreakValue", data);
 
 		return true;
 	}
@@ -162,7 +162,7 @@ namespace YBehavior
 				if (pNode->m_MainChild && pNode->m_BreakValue)
 				{
 					BOOL bBreak = Utility::FALSE_VALUE;
-					pNode->m_BreakValue->GetCastedValue(pAgent->GetMemory(), bBreak);
+					pNode->m_BreakValue->GetValue(pAgent->GetMemory(), bBreak);
 
 					if ((bBreak && lastState == NS_SUCCESS)
 						|| (!bBreak && lastState == NS_FAILURE))
@@ -191,13 +191,13 @@ namespace YBehavior
 			return NS_FAILURE;
 		}
 
-		INT size = pNode->m_Collection->VectorSize(pAgent->GetMemory());
+		INT size = pNode->m_Collection->ArraySize(pAgent->GetMemory());
 		if (m_Stage > 0)
 		{
 			if (pNode->m_BreakValue)
 			{
 				BOOL bBreak = Utility::FALSE_VALUE;
-				pNode->m_BreakValue->GetCastedValue(pAgent->GetMemory(), bBreak);
+				pNode->m_BreakValue->GetValue(pAgent->GetMemory(), bBreak);
 
 				if ((bBreak && lastState == NS_SUCCESS)
 					|| (!bBreak && lastState == NS_FAILURE))
@@ -209,12 +209,12 @@ namespace YBehavior
 		}
 		else
 		{
-			YB_LOG_VARIABLE_BEFORE_IF_HAS_DEBUG_POINT(pNode->m_Collection);
+			YB_LOG_PIN_BEFORE_IF_HAS_DEBUG_POINT(pNode->m_Collection);
 		}
 
 		if (m_Stage < size)
 		{
-			const void* element = pNode->m_Collection->GetElement(pAgent->GetMemory(), m_Stage);
+			const void* element = pNode->m_Collection->GetElementPtr(pAgent->GetMemory(), m_Stage);
 			if (element != nullptr)
 			{
 				pNode->m_Current->SetValue(pAgent->GetMemory(), element);
@@ -250,13 +250,13 @@ namespace YBehavior
 			return NS_FAILURE;
 		}
 		INT size = 0;
-		pNode->m_Count->GetCastedValue(pAgent->GetMemory(), size);
+		pNode->m_Count->GetValue(pAgent->GetMemory(), size);
 		if (m_Stage > 0)
 		{
 			if (pNode->m_BreakValue)
 			{
 				BOOL bBreak = Utility::FALSE_VALUE;
-				pNode->m_BreakValue->GetCastedValue(pAgent->GetMemory(), bBreak);
+				pNode->m_BreakValue->GetValue(pAgent->GetMemory(), bBreak);
 
 				if ((bBreak && lastState == NS_SUCCESS)
 					|| (!bBreak && lastState == NS_FAILURE))
@@ -268,11 +268,11 @@ namespace YBehavior
 		}
 		else
 		{
-			YB_LOG_VARIABLE_BEFORE_IF_HAS_DEBUG_POINT(pNode->m_Count);
+			YB_LOG_PIN_BEFORE_IF_HAS_DEBUG_POINT(pNode->m_Count);
 		}
 		if (m_Stage < size)
 		{
-			pNode->m_Current->SetCastedValue(pAgent->GetMemory(), &m_Stage);
+			pNode->m_Current->SetValue(pAgent->GetMemory(), &m_Stage);
 
 			++m_Stage;
 			//if (pNode->m_Child)

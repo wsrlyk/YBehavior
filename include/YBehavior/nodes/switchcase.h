@@ -12,7 +12,7 @@ namespace YBehavior
 		NodeState _Update(AgentPtr pAgent, NodeState lastState) override;
 	};
 
-	class IVariableCompareHelper;
+	class IDataCompareHelper;
 	class SwitchCase : public CompositeNode<SwitchCaseNodeContext>
 	{
 		friend SwitchCaseNodeContext;
@@ -22,13 +22,13 @@ namespace YBehavior
 		bool OnLoaded(const pugi::xml_node& data) override;
 		void OnAddChild(TreeNode * child, const STRING & connection) override;
 
-		ISharedVariableEx* m_Switch;
-		ISharedVariableEx* m_Cases;
+		IPin* m_Switch;
+		IPin* m_Cases;
 
 		StdVector<TreeNodePtr> m_CasesChilds;
 		TreeNodePtr m_DefaultChild = nullptr;
 
-		const IVariableCompareHelper* m_pHelper;
+		const IDataCompareHelper* m_pHelper;
 	};
 }
 

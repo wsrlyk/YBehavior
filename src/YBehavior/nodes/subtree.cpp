@@ -19,22 +19,22 @@ namespace YBehavior
 			return false;
 		}
 
-		VariableCreation::CreateVariable(this, m_Identification, "Identification", data, false);
+		PinCreation::CreatePin(this, m_Identification, "Identification", data, false);
 		if (!m_Identification)
 		{
 			return false;
 		}
 		
-		VariableCreation::CreateVariable(this, m_TreeName, "Tree", data, false);
+		PinCreation::CreatePin(this, m_TreeName, "Tree", data, false);
 		if (!m_TreeName)
 		{
 			return false;
 		}
 
 		STRING defaultTreeName;
-		m_TreeName->GetCastedValue(nullptr, defaultTreeName);
+		m_TreeName->GetValue(nullptr, defaultTreeName);
 		STRING id;
-		m_Identification->GetCastedValue(nullptr, id);
+		m_Identification->GetValue(nullptr, id);
 
 		/*m_Root->GetTreeID()->TryGet(id, defaultTreeName, m_FinalTreeName);
 		
@@ -79,14 +79,14 @@ namespace YBehavior
 		return true;
 	}
 
-	bool SubTree::_TryCreateFromTo(const pugi::xml_node& data, std::vector<ISharedVariableEx*>& container)
+	bool SubTree::_TryCreateFromTo(const pugi::xml_node& data, std::vector<IPin*>& container)
 	{
 		for (auto it = data.attributes_begin(); it != data.attributes_end(); ++it)
 		{
-			ISharedVariableEx* pVariable = nullptr;
+			IPin* pPin = nullptr;
 
-			VariableCreation::CreateVariable(this, pVariable, it->name(), data, ST_NONE);
-			if (!pVariable)
+			PinCreation::CreatePin(this, pPin, it->name(), data, ST_NONE);
+			if (!pPin)
 			{
 				ERROR_BEGIN_NODE_HEAD << "Failed to Create " << data.name() << ERROR_END;
 				return false;
@@ -96,7 +96,7 @@ namespace YBehavior
 			//	ERROR_BEGIN_NODE_HEAD << "Duplicate " << data.name() << " Variable: " << it->name() << ERROR_END;
 			//	return false;
 			//}
-			container.push_back(pVariable);
+			container.push_back(pPin);
 		}
 
 		return true;

@@ -19,14 +19,14 @@ namespace YBehavior
 		GREATER_EQUAL,
 	};
 
-	class IVariableCompareHelper
+	class IDataCompareHelper
 	{
 	public:
-		virtual ~IVariableCompareHelper() {}
+		virtual ~IDataCompareHelper() {}
 	public:
 
 		virtual bool Compare(const void* pLeft, const void* pRight, CompareType op) const = 0;
-		virtual bool Compare(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, CompareType op) const = 0;
+		virtual bool Compare(IMemory* pMemory, IPin* pLeft, IPin* pRight, CompareType op) const = 0;
 	};
 
 	//struct NormalCalculateTag {};
@@ -87,19 +87,19 @@ namespace YBehavior
 	/////////////////////////////////////
 
 	template<typename T>
-	class VariableCompareHelper : public IVariableCompareHelper
+	class DataCompareHelper : public IDataCompareHelper
 	{
-		static VariableCompareHelper<T> s_Instance;
+		static DataCompareHelper<T> s_Instance;
 	public:
-		static IVariableCompareHelper* Get() { return &s_Instance; }
+		static IDataCompareHelper* Get() { return &s_Instance; }
 
 		bool Compare(const void* pLeft, const void* pRight, CompareType op) const override
 		{
 			return ValueCompare::Compare<T>(pLeft, pRight, op);
 		}
-		bool Compare(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight, CompareType op) const override
+		bool Compare(IMemory* pMemory, IPin* pLeft, IPin* pRight, CompareType op) const override
 		{
-			return ValueCompare::Compare<T>(pLeft->GetValue(pMemory), pRight->GetValue(pMemory), op);
+			return ValueCompare::Compare<T>(pLeft->GetValuePtr(pMemory), pRight->GetValuePtr(pMemory), op);
 		}
 	};
 
@@ -107,17 +107,17 @@ namespace YBehavior
 	/////////////////////////////////////
 	/////////////////////////////////////
 	/////////////////////////////////////
-	class VariableCompareMgr : public Singleton<VariableCompareMgr>
+	class DataCompareMgr : public Singleton<DataCompareMgr>
 	{
-		small_map<TYPEID, const IVariableCompareHelper*> m_Compares;
+		small_map<TYPEID, const IDataCompareHelper*> m_Compares;
 	public:
-		VariableCompareMgr();
-		~VariableCompareMgr();
+		DataCompareMgr();
+		~DataCompareMgr();
 
-		const IVariableCompareHelper* Get(TYPEID t) const;
+		const IDataCompareHelper* Get(TYPEID t) const;
 
 		template<typename T>
-		const IVariableCompareHelper* Get() const
+		const IDataCompareHelper* Get() const
 		{
 			return Get(GetTypeID<T>());
 		}

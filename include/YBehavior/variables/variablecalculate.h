@@ -17,14 +17,14 @@ namespace YBehavior
 		DIV,
 	};
 
-	class IVariableCalculateHelper
+	class IDataCalculateHelper
 	{
 	public:
-		virtual ~IVariableCalculateHelper() {}
+		virtual ~IDataCalculateHelper() {}
 	public:
 		virtual void Calculate(void* pLeft, const void* pRight0, const void* pRight1, CalculateType op) const = 0;
 		virtual const void* Calculate(const void* pRight0, const void* pRight1, CalculateType op) const = 0;
-		virtual void Calculate(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, CalculateType op) const = 0;
+		virtual void Calculate(IMemory* pMemory, IPin* pLeft, IPin* pRight0, IPin* pRight1, CalculateType op) const = 0;
 	};
 
 	//struct NormalCalculateTag {};
@@ -140,11 +140,11 @@ namespace YBehavior
 	/////////////////////////////////////
 
 	template<typename TL, typename ...TR>
-	class VariableCalculateHelper : public IVariableCalculateHelper
+	class DataCalculateHelper : public IDataCalculateHelper
 	{
-		static VariableCalculateHelper<TL, TR...> s_Instance;
+		static DataCalculateHelper<TL, TR...> s_Instance;
 	public:
-		static IVariableCalculateHelper* Get() { return &s_Instance; }
+		static IDataCalculateHelper* Get() { return &s_Instance; }
 
 		void Calculate(void* pLeft, const void* pRight0, const void* pRight1, CalculateType op) const override
 		{
@@ -156,10 +156,10 @@ namespace YBehavior
 			ValueCalculate::Calculate<TL, TR...>(&left, pRight0, pRight1, op);
 			return &left;
 		}
-		void Calculate(IMemory* pMemory, ISharedVariableEx* pLeft, ISharedVariableEx* pRight0, ISharedVariableEx* pRight1, CalculateType op) const override
+		void Calculate(IMemory* pMemory, IPin* pLeft, IPin* pRight0, IPin* pRight1, CalculateType op) const override
 		{
 			TL left;
-			ValueCalculate::Calculate<TL, TR...>(&left, pRight0->GetValue(pMemory), pRight1->GetValue(pMemory), op);
+			ValueCalculate::Calculate<TL, TR...>(&left, pRight0->GetValuePtr(pMemory), pRight1->GetValuePtr(pMemory), op);
 			pLeft->SetValue(pMemory, &left);
 		}
 	};
@@ -168,26 +168,26 @@ namespace YBehavior
 	/////////////////////////////////////
 	/////////////////////////////////////
 	/////////////////////////////////////
-	class VariableCalculateMgr : public Singleton<VariableCalculateMgr>
+	class DataCalculateMgr : public Singleton<DataCalculateMgr>
 	{
 		/// <summary>
 		/// Left, Right0, Right1
 		/// </summary>
-		small_map<std::tuple<TYPEID, TYPEID, TYPEID>, const IVariableCalculateHelper*> m_Calculates;
+		small_map<std::tuple<TYPEID, TYPEID, TYPEID>, const IDataCalculateHelper*> m_Calculates;
 	public:
-		VariableCalculateMgr();
-		~VariableCalculateMgr();
+		DataCalculateMgr();
+		~DataCalculateMgr();
 
-		const IVariableCalculateHelper* Get(TYPEID tl, TYPEID tr0, TYPEID tr1) const;
-		const IVariableCalculateHelper* Get(TYPEID t) const { return Get(t, t, t); }
+		const IDataCalculateHelper* Get(TYPEID tl, TYPEID tr0, TYPEID tr1) const;
+		const IDataCalculateHelper* Get(TYPEID t) const { return Get(t, t, t); }
 
 		template<typename T>
-		const IVariableCalculateHelper* Get() const
+		const IDataCalculateHelper* Get() const
 		{
 			return Get(GetTypeID<T>());
 		}
 		template<typename TL, typename TR0, typename TR1>
-		const IVariableCalculateHelper* Get() const
+		const IDataCalculateHelper* Get() const
 		{
 			return Get(GetTypeID<TL>(), GetTypeID<TR0>(), GetTypeID<TR0>());
 		}

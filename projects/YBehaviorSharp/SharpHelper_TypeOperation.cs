@@ -66,11 +66,11 @@ namespace YBehaviorSharp
         ///////////////////////////////////////////////////////////////
 
         [DllImport(VERSION.dll)]
-        static public extern bool GetVariableValue(IntPtr pAgent, IntPtr pVariable);
+        static public extern bool GetPinValue(IntPtr pAgent, IntPtr pPin);
         [DllImport(VERSION.dll)]
-        static public extern IntPtr GetVariableValuePtr(IntPtr pAgent, IntPtr pVariable);
+        static public extern IntPtr GetPinValuePtr(IntPtr pAgent, IntPtr pPin);
         [DllImport(VERSION.dll)]
-        static public extern void SetVariableValue(IntPtr pAgent, IntPtr pVariable);
+        static public extern void SetPinValue(IntPtr pAgent, IntPtr pPin);
 
 
         ///////////////////////////////////////////////////////////////

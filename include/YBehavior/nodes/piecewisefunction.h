@@ -5,9 +5,9 @@
 
 namespace YBehavior
 {
-	class IVariableCompareHelper;
-	class IVariableCalculateHelper;
-	class IVariableOperationHelper;
+	class IDataCompareHelper;
+	class IDataCalculateHelper;
+	class IDataOperationHelper;
 	class PiecewiseFunction : public LeafNode<>
 	{
 	public:
@@ -16,15 +16,15 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;
 
-		ISharedVariableEx* m_KeyPointX;
-		ISharedVariableEx* m_KeyPointY;
+		IPin* m_KeyPointX;
+		IPin* m_KeyPointY;
 
-		ISharedVariableEx* m_InputX;
-		ISharedVariableEx* m_OutputY;
+		IPin* m_InputX;
+		IPin* m_OutputY;
 
-		const IVariableCompareHelper* m_pCompareHelper;
-		const IVariableCalculateHelper* m_pCalculateHelper;
-		const IVariableOperationHelper* m_pOperationHelper;
+		const IDataCompareHelper* m_pCompareHelper;
+		const IDataCalculateHelper* m_pCalculateHelper;
+		const IDataOperationHelper* m_pOperationHelper;
 	};
 }
 

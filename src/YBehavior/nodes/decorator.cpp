@@ -22,7 +22,7 @@ namespace YBehavior
 
 	bool ConvertToBool::OnLoaded(const pugi::xml_node& data)
 	{
-		VariableCreation::CreateVariable(this, m_Output, "Output", data, true);
+		PinCreation::CreatePin(this, m_Output, "Output", data, true);
 
 		if (!m_Output)
 			return false;
@@ -38,9 +38,9 @@ namespace YBehavior
 
 		ConvertToBool* pNode = (ConvertToBool*)m_pNode;
 		if (ns == NS_SUCCESS)
-			pNode->m_Output->SetCastedValue(pAgent->GetMemory(), Utility::TRUE_VALUE);
+			pNode->m_Output->SetValue(pAgent->GetMemory(), Utility::TRUE_VALUE);
 		else
-			pNode->m_Output->SetCastedValue(pAgent->GetMemory(), Utility::FALSE_VALUE);
+			pNode->m_Output->SetValue(pAgent->GetMemory(), Utility::FALSE_VALUE);
 
 		return ns;
 	}

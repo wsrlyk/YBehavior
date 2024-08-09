@@ -2,12 +2,12 @@
 
 namespace YBehavior
 {
-	VariableOperationMgr::VariableOperationMgr()
+	DataOperationMgr::DataOperationMgr()
 	{
 #define REGISTER_OPERATION(T)\
 	{\
 		auto key = GetTypeID<T>();\
-		m_Operations[key] = new VariableOperationHelper<T>();\
+		m_Operations[key] = new DataOperationHelper<T>();\
 	}
 
 		REGISTER_OPERATION(INT);
@@ -19,7 +19,7 @@ namespace YBehavior
 		REGISTER_OPERATION(STRING);
 
 	}
-	VariableOperationMgr::~VariableOperationMgr()
+	DataOperationMgr::~DataOperationMgr()
 	{
 		for (auto it = m_Operations.begin(); it != m_Operations.end(); ++it)
 		{
@@ -27,7 +27,7 @@ namespace YBehavior
 		}
 		m_Operations.clear();
 	}
-	const IVariableOperationHelper* VariableOperationMgr::Get(TYPEID t) const
+	const IDataOperationHelper* DataOperationMgr::Get(TYPEID t) const
 	{
 		auto it = m_Operations.find(t);
 		if (it != m_Operations.end())

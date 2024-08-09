@@ -234,22 +234,22 @@ namespace YBehavior
 	//////////////////////////////////////////////////////////////////////////
 
 #define MAX_TYPE_KEY 14
-	class SharedDataEx
+	class VariableCollection
 	{
 	protected:
 		IDataArray* m_Datas[MAX_TYPE_KEY]{ nullptr };
 
 	public:
-		SharedDataEx();
-		SharedDataEx(const SharedDataEx& other);
+		VariableCollection();
+		VariableCollection(const VariableCollection& other);
 
-		~SharedDataEx();
+		~VariableCollection();
 
 		inline const IDataArray* GetDataArray(TYPEID typeID) { return m_Datas[typeID]; }
 
-		void CloneFrom(const SharedDataEx& other);
+		void CloneFrom(const VariableCollection& other);
 
-		void MergeFrom(const SharedDataEx& other, bool useNewValue);
+		void MergeFrom(const VariableCollection& other, bool useNewValue);
 
 		template<typename T>
 		bool Get(KEY key, T& res);
@@ -286,7 +286,7 @@ namespace YBehavior
 
 
 	template<typename T>
-	bool SharedDataEx::Get(KEY key, T& res)
+	bool VariableCollection::Get(KEY key, T& res)
 	{
 		TYPEID typeID = GetTypeID<T>();
 		if (typeID < 0)
@@ -297,7 +297,7 @@ namespace YBehavior
 		return parray->Get(key, res);
 	}
 	template<typename T>
-	T* SharedDataEx::Get(KEY key)
+	T* VariableCollection::Get(KEY key)
 	{
 		TYPEID typeID = GetTypeID<T>();
 		if (typeID < 0)
@@ -309,7 +309,7 @@ namespace YBehavior
 	}
 
 	template<typename T>
-	bool SharedDataEx::Set(KEY key, const T* src)
+	bool VariableCollection::Set(KEY key, const T* src)
 	{
 		if (src == nullptr)
 			return false;
@@ -321,7 +321,7 @@ namespace YBehavior
 	}
 
 	template<typename T>
-	bool SharedDataEx::Set(KEY key, T&& src)
+	bool VariableCollection::Set(KEY key, T&& src)
 	{
 		using t_type = typename std::remove_const<typename std::remove_reference<T>::type>::type;
 		TYPEID typeID = GetTypeID<t_type>();
@@ -332,7 +332,7 @@ namespace YBehavior
 	}
 
 	template<typename T>
-	bool SharedDataEx::TrySet(KEY key, const T* src)
+	bool VariableCollection::TrySet(KEY key, const T* src)
 	{
 		if (src == nullptr)
 			return false;
@@ -347,7 +347,7 @@ namespace YBehavior
 	}
 
 	template<typename T>
-	bool SharedDataEx::TrySet(KEY key, T&& src)
+	bool VariableCollection::TrySet(KEY key, T&& src)
 	{
 		using t_type = typename std::remove_const<typename std::remove_reference<T>::type>::type;
 		TYPEID typeID = GetTypeID<t_type>();

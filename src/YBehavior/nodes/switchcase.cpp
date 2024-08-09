@@ -25,13 +25,13 @@ namespace YBehavior
 
 	bool SwitchCase::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID switchType = VariableCreation::CreateVariable(this, m_Switch, "Switch", data);
+		TYPEID switchType = PinCreation::CreatePin(this, m_Switch, "Switch", data);
 		if (s_ValidTypes.find(switchType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Switch: " << switchType << ERROR_END;
 			return false;
 		}
-		TYPEID casesType = VariableCreation::CreateVariable(this, m_Cases, "Cases", data);
+		TYPEID casesType = PinCreation::CreatePin(this, m_Cases, "Cases", data);
 		if (s_ValidVecTypes.find(casesType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Cases: " << casesType << ERROR_END;
@@ -44,7 +44,7 @@ namespace YBehavior
 			return false;
 		}
 		
-		m_pHelper = VariableCompareMgr::Instance()->Get(switchType);
+		m_pHelper = DataCompareMgr::Instance()->Get(switchType);
 		if (!m_pHelper)
 		{
 			return false;
@@ -80,10 +80,10 @@ namespace YBehavior
 			++m_Stage;
 			YB_IF_HAS_DEBUG_POINT
 			{
-				YB_LOG_VARIABLE_BEFORE(pNode->m_Switch);
-				YB_LOG_VARIABLE_BEFORE(pNode->m_Cases);
+				YB_LOG_PIN_BEFORE(pNode->m_Switch);
+				YB_LOG_PIN_BEFORE(pNode->m_Cases);
 			}
-			if ((INT)pNode->m_CasesChilds.size() != pNode->m_Cases->VectorSize(pAgent->GetMemory()))
+			if ((INT)pNode->m_CasesChilds.size() != pNode->m_Cases->ArraySize(pAgent->GetMemory()))
 			{
 				YB_LOG_INFO_WITH_END("Cases size != Children size");
 				return NS_FAILURE;
@@ -91,10 +91,10 @@ namespace YBehavior
 
 			INT size = (INT)pNode->m_CasesChilds.size();
 			TreeNodePtr targetNode = nullptr;
-			auto pSwitchValue = pNode->m_Switch->GetValue(pAgent->GetMemory());
+			auto pSwitchValue = pNode->m_Switch->GetValuePtr(pAgent->GetMemory());
 			for (INT i = 0; i < size; ++i)
 			{
-				const void* onecase = pNode->m_Cases->GetElement(pAgent->GetMemory(), i);
+				const void* onecase = pNode->m_Cases->GetElementPtr(pAgent->GetMemory(), i);
 				if (onecase == nullptr)
 					continue;
 

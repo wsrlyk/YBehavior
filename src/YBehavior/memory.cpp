@@ -81,7 +81,7 @@ namespace YBehavior
 
 	Memory::Memory()
 	{
-		m_pMainData = new SharedDataEx();
+		m_pMainData = new VariableCollection();
 	}
 
 	Memory::~Memory()
@@ -91,7 +91,7 @@ namespace YBehavior
 		m_Stack.clear();
 	}
 
-	YBehavior::SharedDataEx* Memory::GetStackTop()
+	YBehavior::VariableCollection* Memory::GetStackTop()
 	{
 		if (m_Stack.empty())
 			return nullptr;
@@ -123,12 +123,12 @@ namespace YBehavior
 		m_Stack.pop_back();
 	}
 
-	TempMemory::TempMemory(SharedDataEx* pMain, SharedDataEx* pLocal)
+	TempMemory::TempMemory(VariableCollection* pMain, VariableCollection* pLocal)
 	{
 		Set(pMain, pLocal);
 	}
 
-	void TempMemory::Set(SharedDataEx* pMain, SharedDataEx* pLocal)
+	void TempMemory::Set(VariableCollection* pMain, VariableCollection* pLocal)
 	{
 		m_pMainData = pMain;
 		m_pLocalData = pLocal;

@@ -2,12 +2,12 @@
 
 namespace YBehavior
 {
-	VariableConvertMgr::VariableConvertMgr()
+	DataConvertMgr::DataConvertMgr()
 	{
 #define REGISTER_CONVERTOR(FromType, ToType)\
 	{\
 		auto key = std::make_pair(GetTypeID<FromType>(), GetTypeID<ToType>());\
-		m_Converts[key] = new VariableConvertHelper<FromType, ToType>();\
+		m_Converts[key] = new DataConvertHelper<FromType, ToType>();\
 	}
 
 		REGISTER_CONVERTOR(INT, FLOAT);
@@ -23,7 +23,7 @@ namespace YBehavior
 		REGISTER_CONVERTOR(STRING, FLOAT);
 		REGISTER_CONVERTOR(STRING, BOOL);
 	}
-	VariableConvertMgr::~VariableConvertMgr()
+	DataConvertMgr::~DataConvertMgr()
 	{
 		for (auto it = m_Converts.begin(); it != m_Converts.end(); ++it)
 		{
@@ -31,7 +31,7 @@ namespace YBehavior
 		}
 		m_Converts.clear();
 	}
-	const IVariableConvertHelper* VariableConvertMgr::GetConvert(TYPEID from, TYPEID to) const
+	const IDataConvertHelper* DataConvertMgr::GetConvert(TYPEID from, TYPEID to) const
 	{
 		auto it = m_Converts.find(std::make_pair(from, to));
 		if (it != m_Converts.end())

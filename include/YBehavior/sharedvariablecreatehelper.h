@@ -8,34 +8,34 @@
 
 namespace YBehavior
 {
-	class ISharedVariableCreateHelper
+	class IDataCreateHelper
 	{
 	public:
-		virtual ~ISharedVariableCreateHelper() {}
-		virtual ISharedVariableEx* CreateVariable() const = 0;
+		virtual ~IDataCreateHelper() {}
+		virtual IPin* CreatePin() const = 0;
 		virtual IDataArray* CreateDataArray() const = 0;
-		virtual void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) const = 0;
-		virtual bool TrySetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str, CHAR separator = '|') const = 0;
+		virtual void SetVariable(VariableCollection* pData, const STRING& name, const STRING& str) const = 0;
+		virtual bool TrySetVariable(VariableCollection* pData, const STRING& name, const STRING& str, CHAR separator = '|') const = 0;
 	};
 
 	template<typename valueType>
-	class SharedVariableCreateHelper: public ISharedVariableCreateHelper
+	class DataCreateHelper: public IDataCreateHelper
 	{
 	public:
-		ISharedVariableEx* CreateVariable() const override
+		IPin* CreatePin() const override
 		{
-			return new SharedVariableEx<valueType>();
+			return new Pin<valueType>();
 		}
 		IDataArray* CreateDataArray() const override
 		{
 			return new DataArray<valueType>();
 		}
-		void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) const override
+		void SetVariable(VariableCollection* pData, const STRING& name, const STRING& str) const override
 		{
 			KEY key = TreeKeyMgr::Instance()->CreateKeyByName(name);
 			pData->Set(key, Utility::ToType<valueType>(str));
 		}
-		bool TrySetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str, CHAR separator = '|') const override
+		bool TrySetVariable(VariableCollection* pData, const STRING& name, const STRING& str, CHAR separator = '|') const override
 		{
 			KEY key = TreeKeyMgr::Instance()->GetKeyByName(name);
 			if (key == Utility::INVALID_KEY)
@@ -45,18 +45,18 @@ namespace YBehavior
 	};
 
 	template<typename elementType>
-	class SharedVariableCreateHelper<StdVector<elementType>> : public ISharedVariableCreateHelper
+	class DataCreateHelper<StdVector<elementType>> : public IDataCreateHelper
 	{
 	public:
-		ISharedVariableEx* CreateVariable() const override
+		IPin* CreatePin() const override
 		{
-			return new SharedVariableEx<StdVector<elementType>>();
+			return new Pin<StdVector<elementType>>();
 		}
 		IDataArray* CreateDataArray() const override
 		{
 			return new DataArray<StdVector<elementType>>();
 		}
-		void SetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str) const override
+		void SetVariable(VariableCollection* pData, const STRING& name, const STRING& str) const override
 		{
 			KEY key = TreeKeyMgr::Instance()->CreateKeyByName(name);
 			StdVector<STRING> splitRes;
@@ -68,7 +68,7 @@ namespace YBehavior
 			}
 			pData->Set(key, std::move(res));
 		}
-		bool TrySetSharedData(SharedDataEx* pData, const STRING& name, const STRING& str, CHAR separator = '|') const override
+		bool TrySetVariable(VariableCollection* pData, const STRING& name, const STRING& str, CHAR separator = '|') const override
 		{
 			KEY key = TreeKeyMgr::Instance()->GetKeyByName(name);
 			if (key == Utility::INVALID_KEY)
@@ -84,16 +84,16 @@ namespace YBehavior
 		}
 	};
 
-	class SharedVariableCreateHelperMgr
+	class DataCreateHelperMgr
 	{
 	public:
-		typedef std::map<STRING, ISharedVariableCreateHelper*> HelperMapType;
+		typedef std::map<STRING, IDataCreateHelper*> HelperMapType;
 	protected:
 		static HelperMapType _Helpers;
-		static ISharedVariableCreateHelper* _HelperList[MAX_TYPE_KEY];
+		static IDataCreateHelper* _HelperList[MAX_TYPE_KEY];
 	public:
 
-		static const ISharedVariableCreateHelper* Get(const STRING& s)
+		static const IDataCreateHelper* Get(const STRING& s)
 		{
 			HelperMapType::iterator it;
 			if ((it = _Helpers.find(s)) != _Helpers.end())
@@ -104,24 +104,24 @@ namespace YBehavior
 		}
 
 		template<typename T>
-		static const ISharedVariableCreateHelper* Get()
+		static const IDataCreateHelper* Get()
 		{
 			return _HelperList[GetTypeID<T>()];
 		}
 
-		static const ISharedVariableCreateHelper* Get(TYPEID id)
+		static const IDataCreateHelper* Get(TYPEID id)
 		{
 			return _HelperList[id];
 		}
 
-		static ISharedVariableCreateHelper** GetAllHelpers() { return _HelperList; }
+		static IDataCreateHelper** GetAllHelpers() { return _HelperList; }
 		friend class Constructor;
 		class Constructor {
 		public:
 			Constructor()
 			{
 #define CREATE_HELPER(T)\
-				_HelperList[GetTypeID<T>()] = new SharedVariableCreateHelper<T>();
+				_HelperList[GetTypeID<T>()] = new DataCreateHelper<T>();
 				FOR_EACH_TYPE(CREATE_HELPER);
 
 				//_Helpers = new HelperMapType();

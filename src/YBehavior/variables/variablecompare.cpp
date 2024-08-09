@@ -2,12 +2,12 @@
 
 namespace YBehavior
 {
-	VariableCompareMgr::VariableCompareMgr()
+	DataCompareMgr::DataCompareMgr()
 	{
 #define REGISTER_COMPARE(T)\
 	{\
 		auto key = GetTypeID<T>();\
-		m_Compares[key] = new VariableCompareHelper<T>();\
+		m_Compares[key] = new DataCompareHelper<T>();\
 	}
 
 		REGISTER_COMPARE(INT);
@@ -19,7 +19,7 @@ namespace YBehavior
 		REGISTER_COMPARE(BOOL);
 
 	}
-	VariableCompareMgr::~VariableCompareMgr()
+	DataCompareMgr::~DataCompareMgr()
 	{
 		for (auto it = m_Compares.begin(); it != m_Compares.end(); ++it)
 		{
@@ -27,7 +27,7 @@ namespace YBehavior
 		}
 		m_Compares.clear();
 	}
-	const IVariableCompareHelper* VariableCompareMgr::Get(TYPEID t) const
+	const IDataCompareHelper* DataCompareMgr::Get(TYPEID t) const
 	{
 		auto it = m_Compares.find(t);
 		if (it != m_Compares.end())

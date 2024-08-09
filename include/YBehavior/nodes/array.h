@@ -15,8 +15,8 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 
 	private:
-		ISharedVariableEx* m_Array;
-		SharedVariableEx<INT>* m_Length;
+		IPin* m_Array;
+		Pin<INT>* m_Length;
 	};
 
 	class ClearArray : public LeafNode<>
@@ -28,7 +28,7 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 
 	private:
-		ISharedVariableEx* m_Array;
+		IPin* m_Array;
 	};
 
 	class ArrayPushElement : public LeafNode<>
@@ -40,8 +40,8 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 
 	private:
-		ISharedVariableEx* m_Array;
-		ISharedVariableEx* m_Element;
+		IPin* m_Array;
+		IPin* m_Element;
 	};
 
 	class ArrayRemoveElement : public LeafNode<>
@@ -53,9 +53,9 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 
 	private:
-		ISharedVariableEx* m_Array;
-		ISharedVariableEx* m_Element;
-		SharedVariableEx<BOOL>* m_IsAll;
+		IPin* m_Array;
+		IPin* m_Element;
+		Pin<BOOL>* m_IsAll;
 	};
 
 	class ArrayHasElement : public LeafNode<>
@@ -67,10 +67,10 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 
 	private:
-		ISharedVariableEx* m_Array;
-		ISharedVariableEx* m_Element;
-		SharedVariableEx<INT>* m_Count;
-		SharedVariableEx<INT>* m_Index;
+		IPin* m_Array;
+		IPin* m_Element;
+		Pin<INT>* m_Count;
+		Pin<INT>* m_Index;
 	};
 
 	class IsArrayEmpty : public LeafNode<>
@@ -82,7 +82,7 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 
 	private:
-		ISharedVariableEx* m_Array;
+		IPin* m_Array;
 	};
 
 	class GenIndexArray : public LeafNode<>
@@ -94,8 +94,8 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 
 	private:
-		ISharedVariableEx* m_Input;
-		SharedVariableEx<VecInt>* m_Output;
+		IPin* m_Input;
+		Pin<VecInt>* m_Output;
 	};
 
 	class ArrayOperation : public LeafNode<>
@@ -108,11 +108,11 @@ namespace YBehavior
 
 	private:
 		ArrayOperationType m_Operator;
-		ISharedVariableEx* m_Output;
-		ISharedVariableEx* m_Input1;
-		ISharedVariableEx* m_Input2;
+		IPin* m_Output;
+		IPin* m_Input1;
+		IPin* m_Input2;
 
-		const IVariableArrayOperationHelper* m_pHelper{};
+		const IDataArrayOperationHelper* m_pHelper{};
 	};
 
 }

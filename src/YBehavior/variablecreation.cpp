@@ -4,7 +4,7 @@
 namespace YBehavior
 {
 
-	YBehavior::TYPEID VariableCreation::CreateVariable(TreeNode* pTreeNode, ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst /*= false*/, const STRING& defaultCreateStr /*= Utility::StringEmpty*/)
+	YBehavior::TYPEID PinCreation::CreatePin(TreeNode* pTreeNode, IPin*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst /*= false*/, const STRING& defaultCreateStr /*= Utility::StringEmpty*/)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
@@ -12,11 +12,11 @@ namespace YBehavior
 		{
 			if (!noConst && defaultCreateStr.length() > 0)
 			{
-				const ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(defaultCreateStr);
+				const IDataCreateHelper* helper = DataCreateHelperMgr::Get(defaultCreateStr);
 				if (helper != nullptr)
 				{
-					op = helper->CreateVariable();
-					pTreeNode->AddVariable(op);
+					op = helper->CreatePin();
+					pTreeNode->AddPin(op);
 
 //#ifdef YDEBUGGER
 					op->SetName(attriName, pTreeNode->GetUID(), pTreeNode->GetClassName(), pTreeNode->GetTreeName());
@@ -33,29 +33,29 @@ namespace YBehavior
 			ERROR_BEGIN_NODE(pTreeNode) << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
 			return -1;
 		}
-		return _CreateVariable(pTreeNode, op, attrOptr, data, noConst);
+		return _CreatePin(pTreeNode, op, attrOptr, data, noConst);
 	}
 
-	YBehavior::TYPEID VariableCreation::CreateVariableIfExist(TreeNode* pTreeNode, ISharedVariableEx*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst /*= false*/)
+	YBehavior::TYPEID PinCreation::CreatePinIfExist(TreeNode* pTreeNode, IPin*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst /*= false*/)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
 		if (attrOptr.empty())
 			return -1;
-		return _CreateVariable(pTreeNode, op, attrOptr, data, noConst);
+		return _CreatePin(pTreeNode, op, attrOptr, data, noConst);
 	}
 
-	YBehavior::TYPEID VariableCreation::_CreateVariable(TreeNode* pTreeNode, ISharedVariableEx*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, bool noConst)
+	YBehavior::TYPEID PinCreation::_CreatePin(TreeNode* pTreeNode, IPin*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, bool noConst)
 	{
 		StdVector<STRING> buffer;
-		if (!ParseVariable(pTreeNode, attrOptr, data, buffer, ST_NONE, noConst))
+		if (!ParsePin(pTreeNode, attrOptr, data, buffer, ST_NONE, noConst))
 			return -1;
 
-		const ISharedVariableCreateHelper* helper = SharedVariableCreateHelperMgr::Get(buffer[0].substr(0, 2));
+		const IDataCreateHelper* helper = DataCreateHelperMgr::Get(buffer[0].substr(0, 2));
 		if (helper != nullptr)
 		{
-			op = helper->CreateVariable();
-			pTreeNode->AddVariable(op);
+			op = helper->CreatePin();
+			pTreeNode->AddPin(op);
 
 //#ifdef YDEBUGGER
 			///> There may be some errors in code below, so we must set some names first
@@ -65,7 +65,7 @@ namespace YBehavior
 			///> Vector Index
 			if (buffer.size() >= 5 && buffer[2] == "VI")
 			{
-				op->SetVectorIndex(buffer[3], buffer[4]);
+				op->SetArrayIndex(buffer[3], buffer[4]);
 			}
 
 			if (Utility::ToUpper(buffer[0][2]) == Utility::POINTER_CHAR)
@@ -96,7 +96,7 @@ namespace YBehavior
 		}
 	}
 
-	bool VariableCreation::ParseVariable(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, bool noConst /*= false*/)
+	bool PinCreation::ParsePin(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, bool noConst /*= false*/)
 	{
 		auto tempChar = attri.value();
 		///> split all spaces
@@ -133,7 +133,7 @@ namespace YBehavior
 
 	}
 
-	YBehavior::STRING VariableCreation::GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data)
+	YBehavior::STRING PinCreation::GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 
@@ -143,20 +143,20 @@ namespace YBehavior
 			return "";
 		}
 		StdVector<STRING> buffer;
-		if (!ParseVariable(pTreeNode, attrOptr, data, buffer, ST_SINGLE, false))
+		if (!ParsePin(pTreeNode, attrOptr, data, buffer, ST_SINGLE, false))
 			return "";
 
 		return buffer[1];
 	}
 
-	bool VariableCreation::TryGetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, STRING& output)
+	bool PinCreation::TryGetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, STRING& output)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 
 		if (attrOptr.empty())
 			return false;
 		StdVector<STRING> buffer;
-		if (!ParseVariable(pTreeNode, attrOptr, data, buffer, ST_SINGLE, false))
+		if (!ParsePin(pTreeNode, attrOptr, data, buffer, ST_SINGLE, false))
 			return false;
 
 		output = buffer[1];

@@ -112,7 +112,7 @@ extern "C" YBEHAVIOR_API void Tick(YBehavior::Agent* pAgent)
 	pAgent->Tick();
 }
 
-extern "C" YBEHAVIOR_API YBehavior::ISharedVariableEx* CreateVariable(
+extern "C" YBEHAVIOR_API YBehavior::IPin* CreatePin(
 	YBehavior::TreeNode* pNode,
 	YBehavior::CSTRING_CONST attrName,
 	const pugi::xml_node* data,
@@ -120,8 +120,8 @@ extern "C" YBEHAVIOR_API YBehavior::ISharedVariableEx* CreateVariable(
 {
 	if (pNode != nullptr)
 	{
-		YBehavior::ISharedVariableEx* v;
-		auto res = YBehavior::VariableCreation::CreateVariableIfExist(pNode, v, attrName, *data, noConst);
+		YBehavior::IPin* v;
+		auto res = YBehavior::PinCreation::CreatePinIfExist(pNode, v, attrName, *data, noConst);
 		return v;
 	}
 	return nullptr;
@@ -135,7 +135,7 @@ extern "C" YBEHAVIOR_API bool TryGetValue(
 	if (pNode != nullptr)
 	{
 		YBehavior::STRING s;
-		if (YBehavior::VariableCreation::TryGetValue(pNode, attrName, *data, s))
+		if (YBehavior::PinCreation::TryGetValue(pNode, attrName, *data, s))
 		{
 			YBehavior::SharpBuffer::Set(&s, YBehavior::GetTypeID<YBehavior::STRING>());
 			return true;
@@ -146,23 +146,23 @@ extern "C" YBEHAVIOR_API bool TryGetValue(
 }
 
 
-extern "C" YBEHAVIOR_API void SetSharedDataByString(YBehavior::Agent* pAgent, YBehavior::CSTRING name, YBehavior::CSTRING value, YBehavior::CHAR separator)
+extern "C" YBEHAVIOR_API void SetSharedVariableByString(YBehavior::Agent* pAgent, YBehavior::CSTRING name, YBehavior::CSTRING value, YBehavior::CHAR separator)
 {
-	auto maps = YBehavior::SharedVariableCreateHelperMgr::GetAllHelpers();
+	auto maps = YBehavior::DataCreateHelperMgr::GetAllHelpers();
 	for (int i = 0; i < MAX_TYPE_KEY; ++i)
 	{
-		if (maps[i]->TrySetSharedData(pAgent->GetMemory()->GetMainData(), name, value, separator))
+		if (maps[i]->TrySetVariable(pAgent->GetMemory()->GetMainData(), name, value, separator))
 		{
 			break;
 		}
 	}
 }
 
-extern "C" YBEHAVIOR_API void LogVariable(YBehavior::TreeNode* pNode, YBehavior::ISharedVariableEx* pVariable, bool before)
+extern "C" YBEHAVIOR_API void LogPin(YBehavior::TreeNode* pNode, YBehavior::IPin* pPin, bool before)
 {
 #ifdef YDEBUGGER
 	if (YB::TreeNodeContext::HasDebugPoint(pNode->GetDebugHelper()))
-		YB::TreeNodeContext::LogVariable(pNode->GetDebugHelper(), pVariable, before);
+		YB::TreeNodeContext::LogPin(pNode->GetDebugHelper(), pPin, before);
 #else
 #endif
 }

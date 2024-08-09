@@ -5,7 +5,7 @@
 
 namespace YBehavior
 {
-	class IVariableRandomHelper;
+	class IDataRandomHelper;
 	class Random : public LeafNode<>
 	{
 	public:
@@ -15,11 +15,11 @@ namespace YBehavior
 		bool OnLoaded(const pugi::xml_node& data) override;
 
 	private:
-		ISharedVariableEx* m_Bound1;
-		ISharedVariableEx* m_Bound2;
-		ISharedVariableEx* m_Target;
+		IPin* m_Bound1;
+		IPin* m_Bound2;
+		IPin* m_Target;
 
-		const IVariableRandomHelper* m_pHelper;
+		const IDataRandomHelper* m_pHelper;
 	};
 
 	class RandomSelect : public LeafNode<>
@@ -31,13 +31,13 @@ namespace YBehavior
 		bool OnLoaded(const pugi::xml_node& data) override;
 
 	private:
-		ISharedVariableEx* m_Input;
-		ISharedVariableEx* m_Output;
+		IPin* m_Input;
+		IPin* m_Output;
 
 		TYPEID m_DataType;
 	};
 
-	class IVariableOperationHelper;
+	class IDataOperationHelper;
 	class Shuffle : public LeafNode<>
 	{
 	public:
@@ -47,11 +47,11 @@ namespace YBehavior
 		NodeState Update(AgentPtr pAgent) override;
 
 	private:
-		ISharedVariableEx* m_Input;
-		ISharedVariableEx* m_Output;
+		IPin* m_Input;
+		IPin* m_Output;
 
 		bool m_bSameArray;
-		const IVariableOperationHelper* m_pHelper;
+		const IDataOperationHelper* m_pHelper;
 	};
 
 }

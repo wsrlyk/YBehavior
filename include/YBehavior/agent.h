@@ -7,7 +7,7 @@
 namespace YBehavior
 {
 	class BehaviorTree;
-	class SharedDataEx;
+	class VariableCollection;
 	class EventQueue;
 	class Memory;
 	class MachineContext;

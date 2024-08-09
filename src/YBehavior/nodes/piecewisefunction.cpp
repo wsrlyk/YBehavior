@@ -25,14 +25,14 @@ namespace YBehavior
 
 		YB_IF_HAS_DEBUG_POINT
 		{
-			YB_LOG_VARIABLE(m_KeyPointX, true);
-			YB_LOG_VARIABLE(m_KeyPointY, true);
-			YB_LOG_VARIABLE(m_InputX, true);
-			YB_LOG_VARIABLE(m_OutputY, true);
+			YB_LOG_PIN(m_KeyPointX, true);
+			YB_LOG_PIN(m_KeyPointY, true);
+			YB_LOG_PIN(m_InputX, true);
+			YB_LOG_PIN(m_OutputY, true);
 		}
 
-		INT sizeX = m_KeyPointX->VectorSize(pAgent->GetMemory());
-		INT sizeY = m_KeyPointY->VectorSize(pAgent->GetMemory());
+		INT sizeX = m_KeyPointX->ArraySize(pAgent->GetMemory());
+		INT sizeY = m_KeyPointY->ArraySize(pAgent->GetMemory());
 		if (sizeX != sizeY)
 		{
 			YB_LOG_INFO("Different length of X and Y; ");
@@ -46,7 +46,7 @@ namespace YBehavior
 		else if (sizeX == 1)
 		{
 			YB_LOG_INFO("Only one key point, return it; ");
-			m_OutputY->SetValue(pAgent->GetMemory(), m_KeyPointY->GetValue(pAgent->GetMemory()));
+			m_OutputY->SetValue(pAgent->GetMemory(), m_KeyPointY->GetValuePtr(pAgent->GetMemory()));
 			return NS_SUCCESS;
 		}
 
@@ -62,17 +62,17 @@ namespace YBehavior
 		auto deltaYxpOffsetX = m_pOperationHelper->AllocTempData();
 		auto offsetY = m_pOperationHelper->AllocTempData();
 
-		const void* x = m_InputX->GetValue(pAgent->GetMemory());
+		const void* x = m_InputX->GetValuePtr(pAgent->GetMemory());
 		for (INT i = 0; i < sizeX - 1; ++i)
 		{
-			const void* x0 = m_KeyPointX->GetElement(pAgent->GetMemory(), i);
-			const void* x1 = m_KeyPointX->GetElement(pAgent->GetMemory(), i + 1);
+			const void* x0 = m_KeyPointX->GetElementPtr(pAgent->GetMemory(), i);
+			const void* x1 = m_KeyPointX->GetElementPtr(pAgent->GetMemory(), i + 1);
 
 			///> Not in the range of this (x0, x1]
 			if (m_pCompareHelper->Compare(x, x1, CompareType::GREATER) && i < sizeX - 2)
 				continue;
-			const void* y0 = m_KeyPointY->GetElement(pAgent->GetMemory(), i);
-			const void* y1 = m_KeyPointY->GetElement(pAgent->GetMemory(), i + 1);
+			const void* y0 = m_KeyPointY->GetElementPtr(pAgent->GetMemory(), i);
+			const void* y1 = m_KeyPointY->GetElementPtr(pAgent->GetMemory(), i + 1);
 
 			if (x0 == nullptr || x1 == nullptr || y0 == nullptr || y1 == nullptr)
 			{
@@ -108,33 +108,33 @@ namespace YBehavior
 		//	ns = m_DefaultChild->Execute(pAgent);
 		//}
 
-		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_OutputY, false);
+		YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_OutputY, false);
 
 		return ns;
 	}
 
 	bool PiecewiseFunction::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID xVecType = VariableCreation::CreateVariable(this, m_KeyPointX, "KeyPointX", data);
+		TYPEID xVecType = PinCreation::CreatePin(this, m_KeyPointX, "KeyPointX", data);
 		if (s_ValidVecTypes.find(xVecType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for KeyPointX: " << xVecType << ERROR_END;
 			return false;
 		}
-		TYPEID yVecType = VariableCreation::CreateVariable(this, m_KeyPointY, "KeyPointY", data);
+		TYPEID yVecType = PinCreation::CreatePin(this, m_KeyPointY, "KeyPointY", data);
 		if (s_ValidVecTypes.find(yVecType) == s_ValidVecTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for KeyPointY: " << yVecType << ERROR_END;
 			return false;
 		}
 
-		TYPEID xType = VariableCreation::CreateVariable(this, m_InputX, "InputX", data);
+		TYPEID xType = PinCreation::CreatePin(this, m_InputX, "InputX", data);
 		if (s_ValidTypes.find(xType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for InputX: " << xType << ERROR_END;
 			return false;
 		}
-		TYPEID yType = VariableCreation::CreateVariable(this, m_OutputY, "OutputY", data);
+		TYPEID yType = PinCreation::CreatePin(this, m_OutputY, "OutputY", data);
 		if (s_ValidTypes.find(yType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for OutputY: " << yType << ERROR_END;
@@ -153,9 +153,9 @@ namespace YBehavior
 			return false;
 		}
 
-		m_pCalculateHelper = VariableCalculateMgr::Instance()->Get(xType);
-		m_pCompareHelper = VariableCompareMgr::Instance()->Get(xType);
-		m_pOperationHelper = VariableOperationMgr::Instance()->Get(xType);
+		m_pCalculateHelper = DataCalculateMgr::Instance()->Get(xType);
+		m_pCompareHelper = DataCompareMgr::Instance()->Get(xType);
+		m_pOperationHelper = DataOperationMgr::Instance()->Get(xType);
 		if (!m_pCalculateHelper || !m_pCompareHelper || !m_pOperationHelper)
 		{
 			ERROR_BEGIN_NODE_HEAD << "This type is not supported by PiecewiseNode." << ERROR_END;

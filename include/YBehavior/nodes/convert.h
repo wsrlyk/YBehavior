@@ -5,7 +5,7 @@
 
 namespace YBehavior
 {
-	class IVariableConvertHelper;
+	class IDataConvertHelper;
 	class Convert : public LeafNode<>
 	{
 	public:
@@ -15,10 +15,10 @@ namespace YBehavior
 		bool OnLoaded(const pugi::xml_node& data) override;
 
 	private:
-		ISharedVariableEx* m_Source;
-		ISharedVariableEx* m_Target;
+		IPin* m_Source;
+		IPin* m_Target;
 
-		const IVariableConvertHelper* m_pConvert{};
+		const IDataConvertHelper* m_pConvert{};
 	};
 }
 

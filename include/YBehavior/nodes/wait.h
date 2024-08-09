@@ -22,7 +22,7 @@ namespace YBehavior
 		bool OnLoaded(const pugi::xml_node& data) override;
 
 	private:
-		SharedVariableEx<INT>* m_TickCount;
+		Pin<INT>* m_TickCount;
 	};
 }
 

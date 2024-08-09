@@ -35,15 +35,15 @@ namespace YBehavior
 		void _GetHashes(StdVector<UINT>& hashes, IMemory* pMemory);
 
 	protected:
-		SharedVariableEx<VecString>* m_Events;
-		SharedVariableEx<String>* m_Current;
-		SharedVariableEx<VecInt>* m_Int;
-		SharedVariableEx<VecFloat>* m_Float;
-		SharedVariableEx<VecBool>* m_Bool;
-		SharedVariableEx<VecUlong>* m_Ulong;
-		SharedVariableEx<VecString>* m_String;
-		SharedVariableEx<VecEntityWrapper>* m_Entity;
-		SharedVariableEx<VecVector3>* m_Vector3;
+		Pin<VecString>* m_Events;
+		Pin<String>* m_Current;
+		Pin<VecInt>* m_Int;
+		Pin<VecFloat>* m_Float;
+		Pin<VecBool>* m_Bool;
+		Pin<VecUlong>* m_Ulong;
+		Pin<VecString>* m_String;
+		Pin<VecEntityWrapper>* m_Entity;
+		Pin<VecVector3>* m_Vector3;
 		
 		bool m_bHasParam{};
 

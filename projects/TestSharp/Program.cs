@@ -40,7 +40,7 @@ namespace TestSharp
 
             string[] state2tree = new string[] { "Main", "Test0"};
             YBehaviorSharp.SharpHelper.SetBehavior(entity0.Agent.Ptr, "EmptyFSM", state2tree, 2, null, 0);
-            YBehaviorSharp.SharpHelper.SetSharedDataByString(entity0.Agent.Ptr, "II0", "1342^32^643", '^');
+            YBehaviorSharp.SharpHelper.SetSharedVariableByString(entity0.Agent.Ptr, "II0", "1342^32^643", '^');
 
             int i = 0;
             while (++i < 5)
@@ -124,13 +124,13 @@ namespace TestSharp
     }
     public class SelectTargetAction : ITreeNode
     {
-        SVariableEntity m_Target;
+        SPinEntity m_Target;
 
         public string NodeName => "SelectTargetAction";
 
         public bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
-            m_Target = new SVariableEntity(YBehaviorSharp.SharpHelper.CreateVariable(pNode, "Target", pData, true));
+            m_Target = new SPinEntity(YBehaviorSharp.SharpHelper.CreatePin(pNode, "Target", pData, true));
             if (!m_Target.IsValid)
             {
                 return false;
@@ -160,15 +160,15 @@ namespace TestSharp
 
     public class SetVector3Action : ITreeNode
     {
-        SVariable m_Src;
-        SVariable m_Des;
+        SPin m_Src;
+        SPin m_Des;
 
         public string NodeName => "SetVector3Action";
 
         public bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
-            m_Src = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Src", pData, true);
-            m_Des = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Des", pData, true);
+            m_Src = YBehaviorSharp.SPinHelper.CreatePin(pNode, "Src", pData, true);
+            m_Des = YBehaviorSharp.SPinHelper.CreatePin(pNode, "Des", pData, true);
 
             return true;
         }
@@ -177,9 +177,9 @@ namespace TestSharp
         {
             Console.WriteLine("SetVector3Action Update");
 
-            Vector3 src = (m_Src as SVariableVector3).Get(pAgent);
+            Vector3 src = (m_Src as SPinVector3).Get(pAgent);
             src.x += 1;
-            (m_Des as SVariableVector3).Set(pAgent, src);
+            (m_Des as SPinVector3).Set(pAgent, src);
 
             return NodeState.NS_SUCCESS;
         }
@@ -188,23 +188,23 @@ namespace TestSharp
     public class XCustomAction : ITreeNode
     {
         //SVariableString m_String0;
-        SVariableInt m_Int0;
+        SPinInt m_Int0;
 
         //SVariableEntity m_Entity0;
 
-        SVariable m_Array0;
+        SPin m_Array0;
 
         public string NodeName => "XCustomAction";
 
         public bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
-            //m_String0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "String0", pData) as SVariableString;
+            //m_String0 = YBehaviorSharp.SVariableHelper.CreatePin(pNode, "String0", pData) as SVariableString;
 
-            m_Int0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Int0", pData) as SVariableInt;
+            m_Int0 = YBehaviorSharp.SPinHelper.CreatePin(pNode, "Int0", pData) as SPinInt;
 
-            //m_Entity0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Entity0", pData) as SVariableEntity;
+            //m_Entity0 = YBehaviorSharp.SVariableHelper.CreatePin(pNode, "Entity0", pData) as SVariableEntity;
 
-            m_Array0 = YBehaviorSharp.SVariableHelper.CreateVariable(pNode, "Array0", pData);
+            m_Array0 = YBehaviorSharp.SPinHelper.CreatePin(pNode, "Array0", pData);
 
             if (YBehaviorSharp.SharpHelper.TryGetValue(pNode, "Type", pData))
             {
@@ -270,9 +270,9 @@ namespace TestSharp
             arr.PushBack(100);
             SharpHelper.SetSharedData(pAgent, keya, GetClassType<int>.VecID);
 
-            if (m_Array0 is SArrayVaraible)
+            if (m_Array0 is SArrayPin)
             {
-                SArrayVaraible av = m_Array0 as SArrayVaraible;
+                SArrayPin av = m_Array0 as SArrayPin;
                 SArrayInt array = av.Get(pAgent) as SArrayInt;
                 if (array != null)
                 {

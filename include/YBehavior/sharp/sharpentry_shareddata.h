@@ -4,19 +4,19 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/interface.h"
 
-extern "C" YBEHAVIOR_API void GetSharedData(YBehavior::Agent* pAgent, YBehavior::KEY key, YBehavior::KEY type)
+extern "C" YBEHAVIOR_API void GetSharedVariable(YBehavior::Agent* pAgent, YBehavior::KEY key, YBehavior::KEY type)
 {
 	auto data = pAgent->GetMemory()->GetMainData()->Get(key, type);
 	///> Let KEY and TYPEID be the same
 	YBehavior::SharpBuffer::Set(data, type);
 }
 
-extern "C" YBEHAVIOR_API void* GetSharedDataValuePtr(YBehavior::Agent* pAgent, YBehavior::KEY key, YBehavior::KEY type)
+extern "C" YBEHAVIOR_API void* GetSharedVariableValuePtr(YBehavior::Agent* pAgent, YBehavior::KEY key, YBehavior::KEY type)
 {
 	return pAgent->GetMemory()->GetMainData()->Get(key, type);
 }
 
-extern "C" YBEHAVIOR_API void SetSharedData(YBehavior::Agent* pAgent, YBehavior::KEY key, YBehavior::KEY type)
+extern "C" YBEHAVIOR_API void SetSharedVariable(YBehavior::Agent* pAgent, YBehavior::KEY key, YBehavior::KEY type)
 {
 	pAgent->GetMemory()->GetMainData()->Set(key, type, YBehavior::SharpBuffer::Get(type));
 }

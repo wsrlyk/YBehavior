@@ -26,26 +26,26 @@ namespace YBehavior
 	bool Comparer::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Operator
-		if (!VariableCreation::GetValue(this, "Operator", data, OperatorMap, m_Operator))
+		if (!PinCreation::GetValue(this, "Operator", data, OperatorMap, m_Operator))
 			return false;
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		auto dataTypeL = VariableCreation::CreateVariable(this, m_Opl, "Opl", data, true);
+		auto dataTypeL = PinCreation::CreatePin(this, m_Opl, "Opl", data, true);
 		if (s_ValidTypes.find(dataTypeL) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in Comparer: " << dataTypeL << ERROR_END;
 			return false;
 		}
 		///> Right
-		auto dataTypeR = VariableCreation::CreateVariable(this, m_Opr, "Opr", data);
+		auto dataTypeR = PinCreation::CreatePin(this, m_Opr, "Opr", data);
 		if (dataTypeL != dataTypeR)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Different types:  Opl & Opr" << ERROR_END;
 			return false;
 		}
 
-		m_pHelper = VariableCompareMgr::Instance()->Get(dataTypeL);
+		m_pHelper = DataCompareMgr::Instance()->Get(dataTypeL);
 		if (!m_pHelper)
 		{
 			ERROR_BEGIN_NODE_HEAD << "This type is not supported by ComparerNode." << ERROR_END;
@@ -58,8 +58,8 @@ namespace YBehavior
 	{
 		YB_IF_HAS_DEBUG_POINT
 		{
-			YB_LOG_VARIABLE(m_Opl, true);
-			YB_LOG_VARIABLE(m_Opr, true);
+			YB_LOG_PIN(m_Opl, true);
+			YB_LOG_PIN(m_Opr, true);
 		}
 
 		return m_pHelper->Compare(pAgent->GetMemory(), m_Opl, m_Opr, m_Operator) ? NS_SUCCESS : NS_FAILURE;

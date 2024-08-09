@@ -11,14 +11,14 @@ namespace YBehavior
 	bool FSMSetCondition::OnLoaded(const pugi::xml_node& data)
 	{
 		//////////////////////////////////////////////////////////////////////////
-		TYPEID type = VariableCreation::CreateVariable(this, m_Conditions, "Conditions", data);
+		TYPEID type = PinCreation::CreatePin(this, m_Conditions, "Conditions", data);
 		if (type == Utility::INVALID_TYPE)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Conditions in FSMSetCondition: " << type << ERROR_END;
 			return false;
 		}
 
-		STRING op(VariableCreation::GetValue(this, "Operator", data));
+		STRING op(PinCreation::GetValue(this, "Operator", data));
 		if (op == "On")
 			m_IsOn = true;
 		else if (op == "Off")
@@ -34,15 +34,15 @@ namespace YBehavior
 
 	YBehavior::NodeState FSMSetCondition::Update(AgentPtr pAgent)
 	{
-		YB_LOG_VARIABLE_IF_HAS_DEBUG_POINT(m_Conditions, true);
+		YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Conditions, true);
 
 
-		if (m_Conditions->IsThisVector())
+		if (m_Conditions->IsThisArray())
 		{
-			auto size = m_Conditions->VectorSize(pAgent->GetMemory());
+			auto size = m_Conditions->ArraySize(pAgent->GetMemory());
 			for (INT i = 0; i < size; ++i)
 			{
-				auto s = m_Conditions->GetElement(pAgent->GetMemory(), i);
+				auto s = m_Conditions->GetElementPtr(pAgent->GetMemory(), i);
 				if (m_IsOn)
 					pAgent->GetMachineContext()->GetTransition().Set(*static_cast<const STRING*>(s));
 				else
@@ -51,7 +51,7 @@ namespace YBehavior
 		}
 		else
 		{
-			auto s = m_Conditions->GetValue(pAgent->GetMemory());
+			auto s = m_Conditions->GetValuePtr(pAgent->GetMemory());
 			if (m_IsOn)
 				pAgent->GetMachineContext()->GetTransition().Set(*static_cast<const STRING*>(s));
 			else
