@@ -17,7 +17,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// SystemTipsFrame.xaml 的交互逻辑
+    /// UI of system tips
     /// </summary>
     public partial class SystemTipsFrame : UserControl
     {

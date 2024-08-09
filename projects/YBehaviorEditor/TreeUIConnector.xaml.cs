@@ -16,7 +16,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// UIConnector.xaml 的交互逻辑
+    /// UI of tree connector
     /// </summary>
     public partial class TreeUIConnector : UIConnector, IDragable, IDropable
     {
@@ -40,7 +40,9 @@ namespace YBehavior.Editor
 
             m_Operation.RegisterLeftDrag(_OnDragged, _OnStartDragged, _OnFinishDragged);
         }
-
+        /// <summary>
+        /// Name of the connector
+        /// </summary>
         public string Title
         {
             get { return title.Text; }

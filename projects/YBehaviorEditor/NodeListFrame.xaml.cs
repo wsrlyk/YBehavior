@@ -16,7 +16,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// NodeListFrame.xaml 的交互逻辑
+    /// UI of list of nodes for selection
     /// </summary>
     public partial class NodeListFrame : UserControl
     {

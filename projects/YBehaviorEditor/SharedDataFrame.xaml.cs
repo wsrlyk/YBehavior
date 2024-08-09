@@ -16,7 +16,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// SharedDataFrame.xaml 的交互逻辑
+    /// UI of shared/local variables and input/output pins of tree
     /// </summary>
     public partial class SharedDataFrame : UserControl
     {

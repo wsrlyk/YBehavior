@@ -16,7 +16,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// UIConnector.xaml 的交互逻辑
+    /// UI of fsm node outgoing connector
     /// </summary>
     public partial class FSMUIOutConnector : UIConnector, IDragable
     {

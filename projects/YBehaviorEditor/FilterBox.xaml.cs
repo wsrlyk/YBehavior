@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// FilterBox.xaml 的交互逻辑
+    /// UI of a text box for filtering and searching
     /// </summary>
     public partial class FilterBox : UserControl
     {
@@ -39,7 +39,9 @@ namespace YBehavior.Editor
         {
             this.SearchText.Text = string.Empty;
         }
-
+        /// <summary>
+        /// Set the TextBox focused
+        /// </summary>
         public void SetFocus()
         {
             SearchText.Focus();

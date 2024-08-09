@@ -17,9 +17,8 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// UIConnection.xaml 的交互逻辑
+    /// UI of dragging line
     /// </summary>
-
     public partial class UIDragConnection : YUserControl, IDraggingConnection
     {
         PathFigure figure;

@@ -28,7 +28,9 @@ namespace YBehavior.Editor
             return NormalTemplate;
         }
     }
-
+    /// <summary>
+    /// UI of tree node pins
+    /// </summary>
     public partial class VariablesFrame : UserControl
     {
         public VariablesFrame()

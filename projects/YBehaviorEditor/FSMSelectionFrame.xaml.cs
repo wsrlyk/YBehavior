@@ -16,7 +16,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// FSMSelectionFrame.xaml 的交互逻辑
+    /// UI for editing fsm node/fsm connection/fsm comment
     /// </summary>
     public partial class FSMSelectionFrame : UserControl
     {
@@ -26,13 +26,13 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.WorkBenchSelected, _OnWorkBenchSelected);
         }
 
-        public void Enable()
+        void Enable()
         {
             EventMgr.Instance.Register(EventType.SelectionChanged, _OnSelectionChanged);
 
         }
 
-        public void Disable()
+        void Disable()
         {
             EventMgr.Instance.Unregister(EventType.SelectionChanged, _OnSelectionChanged);
         }

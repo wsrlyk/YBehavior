@@ -10,19 +10,33 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// WorkSpaceFrame.xaml 的交互逻辑
+    /// UI of file list
     /// </summary>
     public partial class WorkSpaceFrame : UserControl
     {
         FileInfo m_FileInfos = new FileInfo();
-
+        /// <summary>
+        /// Class of a file or folder with its children
+        /// </summary>
         public class FileInfo
         {
             private DelayableNotificationCollection<FileInfo> m_children = new DelayableNotificationCollection<FileInfo>();
+            /// <summary>
+            /// Collection of children
+            /// </summary>
             public DelayableNotificationCollection<FileInfo> Children { get { return m_children; } }
+            /// <summary>
+            /// Name of file or folder
+            /// </summary>
             public string Name { get; set; }
+            /// <summary>
+            /// Icon of file or folder
+            /// </summary>
             public string Icon { get; set; }
             FileMgr.FileInfo source;
+            /// <summary>
+            /// Model
+            /// </summary>
             public FileMgr.FileInfo Source { get { return source; } }
             private int m_Depth = 0;
             private bool exp = false;
@@ -34,7 +48,12 @@ namespace YBehavior.Editor
                     exp = value;
                 }
             }
-
+            /// <summary>
+            /// Build from FileMgr with filter
+            /// </summary>
+            /// <param name="datas"></param>
+            /// <param name="filter"></param>
+            /// <param name="expandedItems">The state of open/close for a folder will not change after rebuild</param>
             public void Build(List<FileMgr.FileInfo> datas, string filter, HashSet<string> expandedItems = null)
             {
                 using (var handler = Children.Delay())

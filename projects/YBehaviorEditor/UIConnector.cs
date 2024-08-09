@@ -16,7 +16,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// UIConnector.xaml 的交互逻辑
+    /// Base class of ui of connector
     /// </summary>
     public abstract class UIConnector : YUserControl
     {
@@ -32,25 +32,14 @@ namespace YBehavior.Editor
 
         #region Dependency Property/Event Definitions
 
-        public static readonly DependencyProperty HotspotProperty =
-            DependencyProperty.Register("Hotspot", typeof(Point), typeof(UIConnector));
         public static readonly DependencyProperty OwnerNodeProperty =
             DependencyProperty.Register("OwnerNode", typeof(YUserControl), typeof(UIConnector));
 
         #endregion Dependency Property/Event Definitions
 
-        public Point Hotspot
-        {
-            get
-            {
-                return (Point)GetValue(HotspotProperty);
-            }
-            set
-            {
-                SetValue(HotspotProperty, value);
-            }
-        }
-
+        /// <summary>
+        /// Owner of the connector
+        /// </summary>
         public YUserControl OwnerNode
         {
             get
@@ -62,7 +51,9 @@ namespace YBehavior.Editor
                 SetValue(OwnerNodeProperty, value);
             }
         }
-
+        /// <summary>
+        /// The shape
+        /// </summary>
         public abstract Border Main { get; }
 
         ////Vector m_RelativePos = new Vector(double.MaxValue, double.MaxValue);
@@ -115,7 +106,11 @@ namespace YBehavior.Editor
         //}
 
         public Connector Ctr { get; set; }
-
+        /// <summary>
+        /// Get the position of the connector
+        /// </summary>
+        /// <param name="visual"></param>
+        /// <returns></returns>
         public Point GetPos(Visual visual)
         {
             if (visual == null)

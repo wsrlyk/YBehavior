@@ -7,6 +7,9 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
+    /// <summary>
+    /// Select template according to the type of state node
+    /// </summary>
     public class FSMStateTypeTemplateSelector : DataTemplateSelector
     {
         public DataTemplate NormalTemplate { get; set; }
@@ -27,7 +30,7 @@ namespace YBehavior.Editor
         }
     }
     /// <summary>
-    /// WorkBenchFrame.xaml 的交互逻辑
+    /// UI of fsm workbench
     /// </summary>
     public partial class FSMBenchFrame : WorkBenchFrame
     {

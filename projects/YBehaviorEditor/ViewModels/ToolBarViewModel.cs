@@ -8,19 +8,30 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
+    /// <summary>
+    /// ViewModel of Toolbar buttons
+    /// </summary>
     class ToolBarViewModel
     {
+        /// <summary>
+        /// Class of a tool in toolbar
+        /// </summary>
         public class Tool
         {
             public interface ICanExecute
             {
                 bool CanExecute { get; }
             }
-
+            /// <summary>
+            /// Type of command
+            /// </summary>
             public Command Command { get; private set; }
             public Func<bool> CanExecute { get; private set; }
-            public System.Windows.Input.ICommand CMD { get; private set; }
 
+            public System.Windows.Input.ICommand CMD { get; private set; }
+            /// <summary>
+            /// Content shown on the button
+            /// </summary>
             public string Content
             {
                 get
@@ -51,7 +62,9 @@ namespace YBehavior.Editor
                     return sb.ToString();
                 }
             }
-
+            /// <summary>
+            /// Tips from description file
+            /// </summary>
             public string Tips
             {
                 get
@@ -85,6 +98,9 @@ namespace YBehavior.Editor
                 return true;
             }
         }
+        /// <summary>
+        /// Collection of tools
+        /// </summary>
         public DelayableNotificationCollection<Tool> Tools { get; } = new DelayableNotificationCollection<Tool>();
 
         public ToolBarViewModel()

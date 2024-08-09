@@ -16,7 +16,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// UIConnection.xaml 的交互逻辑
+    /// UI of fsm connection line
     /// </summary>
     public partial class FSMUIConnection : YUserControl, ISelectable, IDeletable, IDraggingConnection
     {

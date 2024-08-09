@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
 namespace YBehavior.Editor
 {
+    /// <summary>
+    /// https://stackoverflow.com/questions/563195/bind-textbox-on-enter-key-press
+    /// </summary>
     public static class InputBindingsManager
     {
 

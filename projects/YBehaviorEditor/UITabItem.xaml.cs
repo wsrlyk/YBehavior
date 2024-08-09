@@ -16,10 +16,8 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
-    /// Some code From https://www.cnblogs.com/tsliwei/p/5625398.html
-    
     /// <summary>
-    /// UITabItem.xaml 的交互逻辑
+    /// https://www.cnblogs.com/tsliwei/p/5625398.html
     /// </summary>
     public partial class UITabItem : TabItem, IDebugControl
     {

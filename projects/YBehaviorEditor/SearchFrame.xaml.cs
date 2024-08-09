@@ -7,7 +7,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// SearchWindow.xaml 的交互逻辑
+    /// UI of search window
     /// </summary>
     public partial class SearchFrame : UserControl
     {
@@ -27,12 +27,12 @@ namespace YBehavior.Editor
             InitializeComponent();
         }
 
-        public void Enable()
+        void Enable()
         {
             EventMgr.Instance.Register(EventType.VariableClicked, _OnVariableClicked);
         }
 
-        public void Disable()
+        void Disable()
         {
             EventMgr.Instance.Unregister(EventType.VariableClicked, _OnVariableClicked);
         }

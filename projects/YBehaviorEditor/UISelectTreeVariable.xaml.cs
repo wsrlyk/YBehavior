@@ -9,7 +9,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// UIVariable.xaml 的交互逻辑
+    /// UI of subtree selection pin
     /// </summary>
     public partial class UISelectTreeVariable : UserControl
     {

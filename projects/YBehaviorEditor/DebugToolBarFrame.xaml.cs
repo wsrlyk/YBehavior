@@ -8,7 +8,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// DebugFrame.xaml 的交互逻辑
+    /// UI of debug toolbar
     /// </summary>
     public partial class DebugToolBarFrame : UserControl
     {

@@ -8,6 +8,9 @@ using System.Windows.Data;
 
 namespace YBehavior.Editor
 {
+    /// <summary>
+    /// Base class of a UserControl, can easily get the canvas it belongs to
+    /// </summary>
     public class YUserControl : UserControl, Core.New.IGetCanvas
     {
         public static readonly DependencyProperty CanvasProperty =

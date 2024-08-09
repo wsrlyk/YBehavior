@@ -16,7 +16,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// ToolBarFrame.xaml 的交互逻辑
+    /// UI of toolbar
     /// </summary>
     public partial class ToolBarFrame : UserControl
     {

@@ -7,6 +7,9 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
+    /// <summary>
+    /// Select template according to the type of tree node
+    /// </summary>
     public class TreeNodeTypeTemplateSelector : DataTemplateSelector
     {
         public DataTemplate NormalTemplate { get; set; }
@@ -20,6 +23,9 @@ namespace YBehavior.Editor
             return NormalTemplate;
         }
     }
+    /// <summary>
+    /// Select template according to the type of connection
+    /// </summary>
     public class ConnectionTypeTemplateSelector : DataTemplateSelector
     {
         public DataTemplate NormalTemplate { get; set; }
@@ -35,7 +41,7 @@ namespace YBehavior.Editor
     }
 
     /// <summary>
-    /// WorkBenchFrame.xaml 的交互逻辑
+    /// UI of tree bench
     /// </summary>
     public partial class TreeBenchFrame : WorkBenchFrame
     {

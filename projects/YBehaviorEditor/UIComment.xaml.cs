@@ -16,7 +16,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// UIComment.xaml 的交互逻辑
+    /// UI of comment node
     /// </summary>
     public partial class UIComment : YUserControl, ISelectable, IDeletable
     {

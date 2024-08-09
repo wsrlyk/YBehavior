@@ -9,14 +9,31 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
+    /// <summary>
+    /// Interface of that can have debug control
+    /// </summary>
     public interface IDebugControl
     {
+        /// <summary>
+        /// Target UI
+        /// </summary>
         FrameworkElement DebugUI { get; }
+        /// <summary>
+        /// The color
+        /// </summary>
         Brush DebugBrush { get; set; }
-
+        /// <summary>
+        /// The instant animation
+        /// </summary>
         Storyboard InstantAnim { get; }
+        /// <summary>
+        /// Get the running state
+        /// </summary>
         NodeState RunState { get; }
     }
+    /// <summary>
+    /// Debug display
+    /// </summary>
     public class DebugControl
     {
         IDebugControl m_Target;
@@ -24,7 +41,10 @@ namespace YBehavior.Editor
         {
             m_Target = target;
         }
-
+        /// <summary>
+        /// Play a short animation (and then stop)
+        /// </summary>
+        /// <param name="state"></param>
         public void SetDebugInstant(NodeState state = NodeState.NS_INVALID)
         {
             if (m_Target.DebugUI == null)
@@ -60,7 +80,10 @@ namespace YBehavior.Editor
                 m_Target.InstantAnim.Begin(m_Target.DebugUI, true);
             }
         }
-
+        /// <summary>
+        /// Set the color with debug running state
+        /// </summary>
+        /// <param name="state"></param>
         public void SetDebug(NodeState state = NodeState.NS_INVALID)
         {
             if (m_Target.DebugUI == null)
@@ -96,7 +119,9 @@ namespace YBehavior.Editor
                 m_Target.DebugUI.Visibility = Visibility.Visible;
             }
         }
-
+        /// <summary>
+        /// Call SetDebug when it hit break point, or call SetDebugInstant
+        /// </summary>
         public void Renderer_DebugEvent()
         {
             if (DebugMgr.Instance.bBreaked)

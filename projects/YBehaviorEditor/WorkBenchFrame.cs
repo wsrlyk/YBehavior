@@ -8,7 +8,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// WorkBenchFrame.xaml 的交互逻辑
+    /// Base class of UI of workbench
     /// </summary>
     public abstract class WorkBenchFrame : UserControl, IGetCanvas
     {
@@ -45,7 +45,9 @@ namespace YBehavior.Editor
             CurPageData.TranslateTransform.X += delta.X;
             CurPageData.TranslateTransform.Y += delta.Y;
         }
-
+        /// <summary>
+        /// Register events when this workbench switched to foreground
+        /// </summary>
         public void Enable()
         {
             EventMgr.Instance.Register(EventType.NewNodeAdded, _OnNewNodeAdded);
@@ -54,7 +56,9 @@ namespace YBehavior.Editor
             EventMgr.Instance.Register(EventType.MakeCenter, _OnMakeCenter);
             Focus();
         }
-
+        /// <summary>
+        /// Unregister events when this workbench switched to background
+        /// </summary>
         public void Disable()
         {
             EventMgr.Instance.Unregister(EventType.NewNodeAdded, _OnNewNodeAdded);
@@ -62,12 +66,18 @@ namespace YBehavior.Editor
             EventMgr.Instance.Unregister(EventType.CommentCreated, _OnCommentCreated);
             EventMgr.Instance.Unregister(EventType.MakeCenter, _OnMakeCenter);
         }
-
+        /// <summary>
+        /// Called when workbench loaded
+        /// </summary>
+        /// <param name="bench"></param>
         public virtual void OnWorkBenchLoaded(WorkBench bench)
         {
-            ClearCanvas();
+            //ClearCanvas();
         }
-
+        /// <summary>
+        /// Called when workbench selected
+        /// </summary>
+        /// <param name="bench"></param>
         public virtual void OnWorkBenchSelected()
         {
 
@@ -114,10 +124,10 @@ namespace YBehavior.Editor
             oArg.Comment.OnGeometryChanged();
         }
 
-        public void ClearCanvas()
-        {
-            //RenderMgr.Instance.ClearNodes();
-        }
+        //public void ClearCanvas()
+        //{
+        //    //RenderMgr.Instance.ClearNodes();
+        //}
 
         private void _MouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -169,15 +179,15 @@ namespace YBehavior.Editor
             EventMgr.Instance.Send(new ShowNodeListArg() { Pos = pos });
         }
 
-        public void ResetTransform()
-        {
-            if (CurPageData == null)
-                return;
-            CurPageData.ScaleTransform.ScaleX = 0;
-            CurPageData.ScaleTransform.ScaleY = 0;
-            CurPageData.TranslateTransform.X = 0;
-            CurPageData.TranslateTransform.Y = 0;
-        }
+        //public void ResetTransform()
+        //{
+        //    if (CurPageData == null)
+        //        return;
+        //    CurPageData.ScaleTransform.ScaleX = 0;
+        //    CurPageData.ScaleTransform.ScaleY = 0;
+        //    CurPageData.TranslateTransform.X = 0;
+        //    CurPageData.TranslateTransform.Y = 0;
+        //}
 
         private void _OnMakeCenter(EventArg arg)
         {

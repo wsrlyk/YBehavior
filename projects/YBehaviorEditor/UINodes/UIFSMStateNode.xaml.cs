@@ -8,12 +8,15 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
+    /// <summary>
+    /// Base class of ui of fsm state node
+    /// </summary>
     public abstract class UIFSMStateNodeBase : UINodeBase<FSMStateNode, FSMStateRenderer>
     {
     }
 
     /// <summary>
-    /// BehaviorNode.xaml 的交互逻辑
+    /// UI of fsm state node
     /// </summary>
     public partial class UIFSMStateNode : UIFSMStateNodeBase
     {
@@ -113,7 +116,9 @@ namespace YBehavior.Editor
             }
         }
     }
-
+    /// <summary>
+    /// UI of normal fsm state node
+    /// </summary>
     public class UIFSMUserStateNode : UIFSMStateNode, ISelectable, IDeletable, IDuplicatable, IDebugPointable, ICanDisable, ICanMakeDefault
     {
         public void MakeDefault()
@@ -124,7 +129,9 @@ namespace YBehavior.Editor
             }
         }
     }
-
+    /// <summary>
+    /// UI of submachine fsm state node
+    /// </summary>
     public class UIFSMMetaStateNode : UIFSMUserStateNode
     {
         public UIFSMMetaStateNode()
@@ -139,11 +146,16 @@ namespace YBehavior.Editor
             WorkBenchMgr.Instance.AddRenderers((Node as FSMMetaStateNode).SubMachine, true, false);
         }
     }
+    /// <summary>
+    /// UI of entry or exit special fsm state node
+    /// </summary>
     public class UIFSMSpecialStateNode : UIFSMStateNode, ISelectable, IDebugPointable
     {
 
     }
-
+    /// <summary>
+    /// UI of any or uppper fsm state node
+    /// </summary>
     public class UIFSMSpecialVirtualStateNode : UIFSMStateNode, ISelectable
     {
 

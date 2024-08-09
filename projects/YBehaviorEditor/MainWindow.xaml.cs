@@ -16,7 +16,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// MainWindow.xaml 的交互逻辑
+    /// Main UI, handling key down events, window closing event, etc.
     /// </summary>
     public partial class MainWindow : Window
     {

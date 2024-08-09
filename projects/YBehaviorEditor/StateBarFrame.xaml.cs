@@ -15,9 +15,7 @@ using YBehavior.Editor.Core;
 
 namespace YBehavior.Editor
 {
-    /// <summary>
-    /// StateBarFrame.xaml 的交互逻辑
-    /// </summary>
+    [Obsolete]
     public partial class StateBarFrame : UserControl
     {
         public StateBarFrame()

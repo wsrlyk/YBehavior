@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 
 namespace YBehavior.Editor
 {
-    // https://stackoverflow.com/questions/1083224/pushing-read-only-gui-properties-back-into-viewmodel
+    /// <summary>
+    /// https://stackoverflow.com/questions/1083224/pushing-read-only-gui-properties-back-into-viewmodel
+    /// </summary>
     public static class SizeObserver
     {
         public static readonly DependencyProperty ObserveProperty = DependencyProperty.RegisterAttached(

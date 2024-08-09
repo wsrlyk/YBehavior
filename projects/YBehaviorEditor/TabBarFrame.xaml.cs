@@ -9,6 +9,9 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
+    /// <summary>
+    /// Class of keeping the translate and scale transform of a page for a workbench
+    /// </summary>
     public class PageData
     {
         public TransformGroup TransGroup { get; } = new TransformGroup();
@@ -22,13 +25,15 @@ namespace YBehavior.Editor
             TransGroup.Children.Add(TranslateTransform);
         }
     }
-
+    /// <summary>
+    /// Tab data containing a workbench
+    /// </summary>
     public class TabData
     {
         public WorkBenchFrame Frame;
     }
     /// <summary>
-    /// TabBarFrame.xaml 的交互逻辑
+    /// UI of tab bar
     /// </summary>
     public partial class TabBarFrame : UserControl
     {

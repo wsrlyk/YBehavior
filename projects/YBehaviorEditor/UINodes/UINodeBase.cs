@@ -10,24 +10,44 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// BehaviorNode.xaml 的交互逻辑
+    /// UI of node
     /// </summary>
-    
     public abstract class UINodeBase<NodeType, NodeRendererType>: YUserControl, IDebugControl where NodeRendererType: NodeBaseRenderer where NodeType : NodeBase
     {
         static protected SelectionStateChangeHandler defaultSelectHandler = SelectionMgr.Instance.OnSingleSelectedChange;
 
         public SelectionStateChangeHandler SelectHandler { get; set; }
-
+        /// <summary>
+        /// Model
+        /// </summary>
         public NodeType Node { get; set; }
+        /// <summary>
+        /// ViewModel
+        /// </summary>
         public NodeRendererType Renderer { get; set; }
-
+        /// <summary>
+        /// Showed when selected
+        /// </summary>
         public abstract FrameworkElement SelectCoverUI { get; }
+        /// <summary>
+        /// Main color
+        /// </summary>
         public abstract Brush OutlookBrush { get; set; }
+        /// <summary>
+        /// UI of comment
+        /// </summary>
         public abstract FrameworkElement CommentUI { get; }
+        /// <summary>
+        /// Showed when it's in debugging
+        /// </summary>
         public abstract FrameworkElement DebugUI { get; }
+        /// <summary>
+        /// Debug color
+        /// </summary>
         public abstract Brush DebugBrush { get; set; }
-
+        /// <summary>
+        /// Get the debug running state
+        /// </summary>
         public NodeState RunState => Node.Renderer.RunState;
         protected Operation m_Operation;
         protected DebugControl m_DebugControl;

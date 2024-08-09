@@ -16,7 +16,7 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// FSMStateFrame.xaml 的交互逻辑
+    /// UI for editing fsm state
     /// </summary>
     public partial class FSMStateFrame : UserControl
     {

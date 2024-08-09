@@ -6,15 +6,23 @@ using YBehavior.Editor.Core.New;
 
 namespace YBehavior.Editor
 {
+    /// <summary>
+    /// Interface of menu item ViewModel
+    /// </summary>
     public interface IMenuItemViewModel
     {
         string Text { get; set; }
     }
+    /// <summary>
+    /// Class of MenuItem Headline ViewModel
+    /// </summary>
     public class MenuItemHeadViewModel : IMenuItemViewModel
     {
         public string Text { get; set; }
     }
-
+    /// <summary>
+    /// Class of MenuItem ViewModel
+    /// </summary>
     public class MenuItemViewModel : IMenuItemViewModel
     {
         private readonly System.Windows.Input.ICommand _command;
@@ -25,7 +33,9 @@ namespace YBehavior.Editor
         }
 
         public string Text { get; set; }
-
+        /// <summary>
+        /// Collection of items
+        /// </summary>
         public List<IMenuItemViewModel> MenuItems { get; set; }
 
         public System.Windows.Input.ICommand Command
@@ -36,7 +46,9 @@ namespace YBehavior.Editor
             }
         }
     }
-
+    /// <summary>
+    /// A simple command ViewModel for menuitem
+    /// </summary>
     public class CommandViewModel : System.Windows.Input.ICommand
     {
         private readonly Action _action;
@@ -62,9 +74,17 @@ namespace YBehavior.Editor
             remove { }
         }
     }
-
+    /// <summary>
+    /// Utility about pop menu
+    /// </summary>
     public class PopMenuUtility
     {
+        /// <summary>
+        /// Create a pop menu for connecting two fsm state nodes
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
         public static MenuItemViewModel CreateFSMConnectionDropMenu(FSMStateNode from, FSMStateNode to)
         {
             MenuItemViewModel menu = null;

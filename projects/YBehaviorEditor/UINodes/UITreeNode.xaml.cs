@@ -17,12 +17,15 @@ using YBehavior.Editor.Core.New;
 namespace YBehavior.Editor
 {
     /// <summary>
-    /// BehaviorNode.xaml 的交互逻辑
+    /// Base class of ui of tree node
     /// </summary>
     public abstract class UITreeNodeBase : UINodeBase<TreeNode, TreeNodeRenderer>
     {
     }
 
+    /// <summary>
+    /// UI of tree node
+    /// </summary>
     public partial class UITreeNode : UITreeNodeBase
     {
         public static readonly DependencyProperty CenterOffsetXProperty = DependencyProperty.RegisterAttached(
