@@ -1,7 +1,7 @@
 #ifndef _YBEHAVIOR_MEMORY_H_
 #define _YBEHAVIOR_MEMORY_H_
 
-#include "YBehavior/shareddataex.h"
+#include "YBehavior/variable.h"
 #include <vector>
 
 namespace YBehavior

@@ -2,8 +2,8 @@
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/sharedvariableex.h"
-#include "YBehavior/variablecreation.h"
+#include "YBehavior/pin.h"
+#include "YBehavior/pincreation.h"
 
 namespace YBehavior
 {

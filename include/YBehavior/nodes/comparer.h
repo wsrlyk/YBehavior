@@ -2,7 +2,7 @@
 #define _YBEHAVIOR_COMPARER_H_
 
 #include "YBehavior/treenode.h"
-#include "YBehavior/variables/variablecompare.h"
+#include "YBehavior/operations/datacompare.h"
 
 namespace YBehavior
 {

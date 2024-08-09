@@ -1,6 +1,6 @@
 #include "YBehavior/nodes/array.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/variablecreation.h"
+#include "YBehavior/pincreation.h"
 
 namespace YBehavior
 {

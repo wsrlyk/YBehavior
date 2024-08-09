@@ -1,5 +1,4 @@
-#ifndef _YBEHAVIOR_SHAREDDATAEX_H_
-#define _YBEHAVIOR_SHAREDDATAEX_H_
+#pragma once
 
 #include "YBehavior/types/types.h"
 #include "YBehavior/utility.h"
@@ -362,5 +361,3 @@ namespace YBehavior
 
 	///
 }
-
-#endif

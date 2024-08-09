@@ -230,9 +230,9 @@ namespace TestSharp
             var key0 = SharpHelper.GetTypeKeyByName("S0", GetClassType<string>.ID);
             var key1 = SharpHelper.GetTypeKeyByName("S1", GetClassType<string>.ID);
 
-            string sharedData0 = SSharedData.GetSharedString(pAgent, key0);
+            string sharedData0 = SSharedVariable.GetSharedString(pAgent, key0);
             sharedData0 = sharedData0 + "0";
-            SSharedData.SetSharedString(pAgent, key0, sharedData0);
+            SSharedVariable.SetSharedString(pAgent, key0, sharedData0);
 
             SharpHelper.GetSharedData(pAgent, key1, GetClassType<string>.ID);
             string sharedData1 = SharpHelper.GetFromBufferString();
@@ -265,7 +265,7 @@ namespace TestSharp
             var keya = SharpHelper.GetTypeKeyByName("II0", GetClassType<int>.VecID);
 
             SharpHelper.GetSharedData(pAgent, keya, GetClassType<int>.VecID);
-            SArrayInt arr = SSharedData.GetSharedArray<int>(pAgent, keya) as SArrayInt;
+            SArrayInt arr = SSharedVariable.GetSharedArray<int>(pAgent, keya) as SArrayInt;
             //arr.Clear();
             arr.PushBack(100);
             SharpHelper.SetSharedData(pAgent, keya, GetClassType<int>.VecID);

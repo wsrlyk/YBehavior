@@ -2,7 +2,7 @@
 
 namespace YBehaviorSharp
 {
-    public class SSharedData
+    public class SSharedVariable
     {
         public static int GetSharedInt(IntPtr pAgent, int key)
         {

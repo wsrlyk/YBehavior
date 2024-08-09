@@ -1,6 +1,4 @@
-#ifndef _YBEHAVIOR_VARIABLECREATION_H_
-#define _YBEHAVIOR_VARIABLECREATION_H_
-
+#pragma once
 #include "YBehavior/types/types.h"
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/treenode.h"
@@ -125,4 +123,3 @@ namespace YBehavior
 
 }
 
-#endif

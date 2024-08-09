@@ -5,7 +5,7 @@
 #include "YBehavior/types/types.h"
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/logger.h"
-#include "YBehavior/sharedvariableex.h"
+#include "YBehavior/pin.h"
 
 namespace YBehavior
 {

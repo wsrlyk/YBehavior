@@ -1,7 +1,7 @@
 #include "YBehavior/nodes/switchcase.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/variablecreation.h"
-#include "YBehavior/variables/variablecompare.h"
+#include "YBehavior/pincreation.h"
+#include "YBehavior/operations/datacompare.h"
 #include <set>
 #include "YBehavior/fsm/context.h"
 

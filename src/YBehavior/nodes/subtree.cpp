@@ -5,7 +5,7 @@
 #include "YBehavior/behaviortreemgr.h"
 #include "YBehavior/mgrs.h"
 #include "YBehavior/fsm/behavior.h"
-#include "YBehavior/variablecreation.h"
+#include "YBehavior/pincreation.h"
 #include <cstring>
 #include "YBehavior/fsm/context.h"
 

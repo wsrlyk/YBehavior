@@ -1,7 +1,7 @@
 #include "YBehavior/behaviortreemgr.h"
 #include "YBehavior/launcher.h"
 #include "customactions.h"
-#include "YBehavior/shareddataex.h"
+#include "YBehavior/variable.h"
 
 #ifdef YB_MSVC
 #include <windows.h>
@@ -9,7 +9,7 @@
 #else
 #include <unistd.h>
 #endif
-#include "YBehavior/sharedvariablecreatehelper.h"
+#include "YBehavior/datacreatehelper.h"
 
 int main(int argc, char** argv)
 {

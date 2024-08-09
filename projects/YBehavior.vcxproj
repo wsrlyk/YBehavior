@@ -31,6 +31,12 @@
     <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugixml.hpp" />
     <ClInclude Include="..\include\YBehavior\agent.h" />
     <ClInclude Include="..\include\YBehavior\nodes\convert.h" />
+    <ClInclude Include="..\include\YBehavior\operations\dataarrayoperation.h" />
+    <ClInclude Include="..\include\YBehavior\operations\datacalculate.h" />
+    <ClInclude Include="..\include\YBehavior\operations\datacompare.h" />
+    <ClInclude Include="..\include\YBehavior\operations\dataconvert.h" />
+    <ClInclude Include="..\include\YBehavior\operations\dataoperation.h" />
+    <ClInclude Include="..\include\YBehavior\operations\datarandom.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpagent.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharputility.h" />
     <ClInclude Include="..\include\YBehavior\treenode.h" />
@@ -78,15 +84,15 @@
     <ClInclude Include="..\include\YBehavior\profile\profileprocessor.h" />
     <ClInclude Include="..\include\YBehavior\profile\profiler.h" />
     <ClInclude Include="..\include\YBehavior\eventqueue.h" />
-    <ClInclude Include="..\include\YBehavior\shareddataex.h" />
-    <ClInclude Include="..\include\YBehavior\sharedvariablecreatehelper.h" />
-    <ClInclude Include="..\include\YBehavior\sharedvariableex.h" />
+    <ClInclude Include="..\include\YBehavior\variable.h" />
+    <ClInclude Include="..\include\YBehavior\datacreatehelper.h" />
+    <ClInclude Include="..\include\YBehavior\pin.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry_array.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry_buffer.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry_data.h" />
-    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_shareddata.h" />
-    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_variable.h" />
+    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_sharedvariable.h" />
+    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_pin.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharplaunch.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpnode.h" />
     <ClInclude Include="..\include\YBehavior\singleton.h" />
@@ -100,19 +106,19 @@
     <ClInclude Include="..\include\YBehavior\types\treemap.h" />
     <ClInclude Include="..\include\YBehavior\types\types.h" />
     <ClInclude Include="..\include\YBehavior\utility.h" />
-    <ClInclude Include="..\include\YBehavior\variablecreation.h" />
-    <ClInclude Include="..\include\YBehavior\variables\variablecalculate.h" />
-    <ClInclude Include="..\include\YBehavior\variables\variablecompare.h" />
-    <ClInclude Include="..\include\YBehavior\variables\variableconvert.h" />
-    <ClInclude Include="..\include\YBehavior\variables\variableoperation.h" />
-    <ClInclude Include="..\include\YBehavior\variables\variablerandom.h" />
-    <ClInclude Include="..\include\YBehavior\variables\variablearrayoperation.h" />
+    <ClInclude Include="..\include\YBehavior\pincreation.h" />
     <ClInclude Include="..\include\YBehavior\version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\3rd\pugixml\pugixml.cpp" />
     <ClCompile Include="..\src\YBehavior\agent.cpp" />
     <ClCompile Include="..\src\YBehavior\nodes\convert.cpp" />
+    <ClCompile Include="..\src\YBehavior\operations\dataarrayoperation.cpp" />
+    <ClCompile Include="..\src\YBehavior\operations\datacalculate.cpp" />
+    <ClCompile Include="..\src\YBehavior\operations\datacompare.cpp" />
+    <ClCompile Include="..\src\YBehavior\operations\dataconvert.cpp" />
+    <ClCompile Include="..\src\YBehavior\operations\dataoperation.cpp" />
+    <ClCompile Include="..\src\YBehavior\operations\datarandom.cpp" />
     <ClCompile Include="..\src\YBehavior\sharp\sharpagent.cpp" />
     <ClCompile Include="..\src\YBehavior\sharp\sharputility.cpp" />
     <ClCompile Include="..\src\YBehavior\treenode.cpp" />
@@ -157,8 +163,8 @@
     <ClCompile Include="..\src\YBehavior\profile\profileprocessor.cpp" />
     <ClCompile Include="..\src\YBehavior\profile\profiler.cpp" />
     <ClCompile Include="..\src\YBehavior\eventqueue.cpp" />
-    <ClCompile Include="..\src\YBehavior\shareddataex.cpp" />
-    <ClCompile Include="..\src\YBehavior\sharedvariablecreatehelper.cpp" />
+    <ClCompile Include="..\src\YBehavior\variable.cpp" />
+    <ClCompile Include="..\src\YBehavior\datacreatehelper.cpp" />
     <ClCompile Include="..\src\YBehavior\sharp\sharpentry.cpp" />
     <ClCompile Include="..\src\YBehavior\sharp\sharpentry_buffer.cpp" />
     <ClCompile Include="..\src\YBehavior\sharp\sharplaunch.cpp" />
@@ -168,13 +174,7 @@
     <ClCompile Include="..\src\YBehavior\treekeymgr.cpp" />
     <ClCompile Include="..\src\YBehavior\types\types.cpp" />
     <ClCompile Include="..\src\YBehavior\utility.cpp" />
-    <ClCompile Include="..\src\YBehavior\variablecreation.cpp" />
-    <ClCompile Include="..\src\YBehavior\variables\variablecalculate.cpp" />
-    <ClCompile Include="..\src\YBehavior\variables\variablecompare.cpp" />
-    <ClCompile Include="..\src\YBehavior\variables\variableconvert.cpp" />
-    <ClCompile Include="..\src\YBehavior\variables\variableoperation.cpp" />
-    <ClCompile Include="..\src\YBehavior\variables\variablerandom.cpp" />
-    <ClCompile Include="..\src\YBehavior\variables\variablearrayoperation.cpp" />
+    <ClCompile Include="..\src\YBehavior\pincreation.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C1582006-77B9-497E-A630-43FC48DD4B18}</ProjectGuid>

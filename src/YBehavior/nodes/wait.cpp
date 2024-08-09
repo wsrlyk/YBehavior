@@ -2,7 +2,7 @@
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/variablecreation.h"
+#include "YBehavior/pincreation.h"
 
 namespace YBehavior
 {

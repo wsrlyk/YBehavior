@@ -64,14 +64,14 @@
     <Filter Include="头文件\operations">
       <UniqueIdentifier>{0a8cbe58-332e-4267-b7e9-090e67a64d30}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\variables">
-      <UniqueIdentifier>{92a88e70-4747-4205-89d6-bc796d9a5432}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\types">
       <UniqueIdentifier>{40de35e0-902a-47c7-a882-7b0871e59489}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\types">
       <UniqueIdentifier>{94ad1323-088b-4378-8150-bc14d6d67f17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\operations">
+      <UniqueIdentifier>{92a88e70-4747-4205-89d6-bc796d9a5432}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -111,7 +111,7 @@
     <ClInclude Include="..\include\YBehavior\nodefactory.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\YBehavior\sharedvariablecreatehelper.h">
+    <ClInclude Include="..\include\YBehavior\datacreatehelper.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\YBehavior\tools\bimap.h">
@@ -123,13 +123,13 @@
     <ClInclude Include="..\include\YBehavior\nodes\comparer.h">
       <Filter>头文件\nodes</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\YBehavior\shareddataex.h">
+    <ClInclude Include="..\include\YBehavior\variable.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\YBehavior\tools\meta.h">
       <Filter>头文件\tools</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\YBehavior\sharedvariableex.h">
+    <ClInclude Include="..\include\YBehavior\pin.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\YBehavior\nodes\ifthenelse.h">
@@ -252,10 +252,10 @@
     <ClInclude Include="..\include\YBehavior\sharp\sharpnode.h">
       <Filter>头文件\sharp</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_shareddata.h">
+    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_sharedvariable.h">
       <Filter>头文件\sharp</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_variable.h">
+    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_pin.h">
       <Filter>头文件\sharp</Filter>
     </ClInclude>
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry.h">
@@ -279,22 +279,7 @@
     <ClInclude Include="..\include\YBehavior\nodes\convert.h">
       <Filter>头文件\nodes</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\YBehavior\variables\variablecalculate.h">
-      <Filter>头文件\operations</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\YBehavior\variables\variablecompare.h">
-      <Filter>头文件\operations</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\YBehavior\variables\variableconvert.h">
-      <Filter>头文件\operations</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\YBehavior\variables\variableoperation.h">
-      <Filter>头文件\operations</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\YBehavior\variables\variablerandom.h">
-      <Filter>头文件\operations</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\YBehavior\variablecreation.h">
+    <ClInclude Include="..\include\YBehavior\pincreation.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\YBehavior\types\types.h">
@@ -309,14 +294,29 @@
     <ClInclude Include="..\include\YBehavior\nodes\handleevent.h">
       <Filter>头文件\nodes</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\YBehavior\variables\variablearrayoperation.h">
-      <Filter>头文件\operations</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\YBehavior\sharp\sharputility.h">
       <Filter>头文件\sharp</Filter>
     </ClInclude>
     <ClInclude Include="..\include\YBehavior\sharp\sharpagent.h">
       <Filter>头文件\sharp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\operations\dataarrayoperation.h">
+      <Filter>头文件\operations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\operations\datacalculate.h">
+      <Filter>头文件\operations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\operations\datacompare.h">
+      <Filter>头文件\operations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\operations\dataconvert.h">
+      <Filter>头文件\operations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\operations\dataoperation.h">
+      <Filter>头文件\operations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\YBehavior\operations\datarandom.h">
+      <Filter>头文件\operations</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -356,7 +356,7 @@
     <ClCompile Include="..\src\YBehavior\nodes\decorator.cpp">
       <Filter>源文件\nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\YBehavior\shareddataex.cpp">
+    <ClCompile Include="..\src\YBehavior\variable.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\network\network.cpp">
@@ -422,7 +422,7 @@
     <ClCompile Include="..\src\YBehavior\tools\objectpool.cpp">
       <Filter>源文件\tools</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\YBehavior\sharedvariablecreatehelper.cpp">
+    <ClCompile Include="..\src\YBehavior\datacreatehelper.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\fsm\statemachine.cpp">
@@ -485,35 +485,35 @@
     <ClCompile Include="..\src\YBehavior\nodes\convert.cpp">
       <Filter>源文件\nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\YBehavior\variables\variablecalculate.cpp">
-      <Filter>源文件\variables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\variables\variablecompare.cpp">
-      <Filter>源文件\variables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\variables\variableconvert.cpp">
-      <Filter>源文件\variables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\variables\variableoperation.cpp">
-      <Filter>源文件\variables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\variables\variablerandom.cpp">
-      <Filter>源文件\variables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\variablecreation.cpp">
+    <ClCompile Include="..\src\YBehavior\pincreation.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\types\types.cpp">
       <Filter>源文件\types</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\YBehavior\variables\variablearrayoperation.cpp">
-      <Filter>源文件\variables</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\sharp\sharputility.cpp">
       <Filter>源文件\sharp</Filter>
     </ClCompile>
     <ClCompile Include="..\src\YBehavior\sharp\sharpagent.cpp">
       <Filter>源文件\sharp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\operations\dataarrayoperation.cpp">
+      <Filter>源文件\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\operations\datacalculate.cpp">
+      <Filter>源文件\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\operations\datacompare.cpp">
+      <Filter>源文件\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\operations\dataconvert.cpp">
+      <Filter>源文件\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\operations\dataoperation.cpp">
+      <Filter>源文件\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\YBehavior\operations\datarandom.cpp">
+      <Filter>源文件\operations</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

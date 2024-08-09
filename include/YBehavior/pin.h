@@ -1,7 +1,6 @@
-#ifndef _YBEHAVIOR_SHAREDVARIABLEEX_H_
-#define _YBEHAVIOR_SHAREDVARIABLEEX_H_
+#pragma once
 
-#include "YBehavior/shareddataex.h"
+#include "YBehavior/variable.h"
 #include "YBehavior/interface.h"
 #include "YBehavior/treekeymgr.h"
 #include "YBehavior/memory.h"
@@ -469,5 +468,3 @@ namespace YBehavior
 
 	};
 }
-
-#endif

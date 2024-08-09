@@ -1,6 +1,4 @@
-#ifndef _YBEHAVIOR_VARIABLECONVERT_H_
-#define _YBEHAVIOR_VARIABLECONVERT_H_
-
+#pragma once
 #include "YBehavior/interface.h"
 #include "YBehavior/types/types.h"
 #include "YBehavior/singleton.h"
@@ -126,5 +124,3 @@ namespace YBehavior
 		}
 	};
 }
-
-#endif

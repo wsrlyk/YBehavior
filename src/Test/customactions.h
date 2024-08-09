@@ -1,7 +1,7 @@
 #pragma once
 #include "YBehavior/launcher.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/shareddataex.h"
+#include "YBehavior/variable.h"
 #include "YBehavior/behaviorprocess.h"
 class XEntity;
 class XAgent : public YBehavior::Agent

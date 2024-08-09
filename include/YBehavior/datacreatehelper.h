@@ -1,10 +1,9 @@
-#ifndef _YBEHAVIOR_SHAREDVARIABLECREATEHELPER_H_
-#define _YBEHAVIOR_SHAREDVARIABLECREATEHELPER_H_
+#pragma once
 
 #include "YBehavior/types/types.h"
-#include "shareddataex.h"
+#include "variable.h"
 #include <map>
-#include "sharedvariableex.h"
+#include "pin.h"
 
 namespace YBehavior
 {
@@ -149,5 +148,3 @@ namespace YBehavior
 
 	};
 }
-
-#endif

@@ -3,18 +3,18 @@
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include <sstream>
-#include "YBehavior/sharedvariablecreatehelper.h"
-#include "YBehavior/sharedvariableex.h"
+#include "YBehavior/datacreatehelper.h"
+#include "YBehavior/pin.h"
 #ifdef YDEBUGGER
 #include "YBehavior/debugger.h"
 #endif
-#include "YBehavior/shareddataex.h"
+#include "YBehavior/variable.h"
 #include "YBehavior/agent.h"
 #include <cstring>
 #ifdef YPROFILER
 #include "YBehavior/profile/profileheader.h"
 #endif
-#include "YBehavior/variablecreation.h"
+#include "YBehavior/pincreation.h"
 #include <set>
 
 namespace YBehavior

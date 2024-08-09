@@ -1,6 +1,4 @@
-#ifndef _YBEHAVIOR_VARIABLEOPERATION_H_
-#define _YBEHAVIOR_VARIABLEOPERATION_H_
-
+#pragma once
 #define YB_ABOUT_EQUAL_FLOAT
 
 #include "YBehavior/interface.h"
@@ -100,5 +98,3 @@ namespace YBehavior
 	};
 
 }
-
-#endif

@@ -1,5 +1,5 @@
 #include "YBehavior/nodes/decorator.h"
-#include "YBehavior/variablecreation.h"
+#include "YBehavior/pincreation.h"
 #include "YBehavior/agent.h"
 
 namespace YBehavior

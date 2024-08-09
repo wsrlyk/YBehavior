@@ -1,7 +1,7 @@
 #include "customactions.h"
 #include "YBehavior/eventqueue.h"
 #include "YBehavior/behaviortree.h"
-#include "YBehavior/variablecreation.h"
+#include "YBehavior/pincreation.h"
 
 void MyLaunchCore::RegisterActions() const
 {

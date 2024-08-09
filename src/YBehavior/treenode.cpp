@@ -3,13 +3,13 @@
 #include "YBehavior/utility.h"
 #include <sstream>
 #include "YBehavior/nodefactory.h"
-#include "YBehavior/sharedvariableex.h"
+#include "YBehavior/pin.h"
 #ifdef YDEBUGGER
 #include "YBehavior/debugger.h"
 #endif
-#include "YBehavior/shareddataex.h"
+#include "YBehavior/variable.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/variablecreation.h"
+#include "YBehavior/pincreation.h"
 #include "YBehavior/fsm/context.h"
 
 namespace YBehavior

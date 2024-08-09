@@ -1,9 +1,9 @@
 #include "YBehavior/nodes/piecewisefunction.h"
 #include "YBehavior/agent.h"
-#include "YBehavior/variablecreation.h"
-#include "YBehavior/variables/variablecompare.h"
-#include "YBehavior/variables/variablecalculate.h"
-#include "YBehavior/variables/variableoperation.h"
+#include "YBehavior/pincreation.h"
+#include "YBehavior/operations/datacompare.h"
+#include "YBehavior/operations/datacalculate.h"
+#include "YBehavior/operations/dataoperation.h"
 #include <set>
 namespace YBehavior
 {

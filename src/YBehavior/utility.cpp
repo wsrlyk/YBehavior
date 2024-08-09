@@ -1,7 +1,7 @@
 #include "YBehavior/utility.h"
 #include <vector>
 #include "YBehavior/types/types.h"
-#include "YBehavior/shareddataex.h"
+#include "YBehavior/variable.h"
 #include <time.h>
 #include <stdio.h>
 

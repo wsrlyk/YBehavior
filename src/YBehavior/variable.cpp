@@ -1,5 +1,5 @@
-#include "YBehavior/shareddataex.h"
-#include "YBehavior/sharedvariablecreatehelper.h"
+#include "YBehavior/variable.h"
+#include "YBehavior/datacreatehelper.h"
 
 namespace YBehavior
 {
