@@ -1,9 +1,29 @@
-﻿using System;
+﻿using YBehaviorSharp;
+
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace YBehaviorSharp
 {
+    /// <summary>
+    /// To recode running data for a treenode running for multiple frames
+    /// </summary>
+    public interface ITreeNodeContext
+    {
+        void OnInit();
+        NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, NodeState lastState);
+    }
+
+    /// <summary>
+    /// A treenode may keep running for multiple frames
+    /// </summary>
+    public interface IHasTreeNodeContext
+    {
+        ITreeNodeContext CreateContext();
+        void DestroyContext(ITreeNodeContext context);
+
+    }
     /// <summary>
     /// This kind of node will share one instance and will not have its own data
     /// </summary>
@@ -16,7 +36,9 @@ namespace YBehaviorSharp
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <returns></returns>
         NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent);
-
+        /// <summary>
+        /// Name of node
+        /// </summary>
         string NodeName { get; }
     }
 
@@ -36,10 +58,14 @@ namespace YBehaviorSharp
     public partial class SharpHelper
     {
         [DllImport(VERSION.dll)]
-        static extern void RegisterSharpNode(string name, int index);
+        static extern void RegisterSharpNode(string name, int index, bool hasContext);
 
         [DllImport(VERSION.dll)]
-        public static extern void RegisterSharpNodeCallback(OnNodeLoaded onload, OnNodeUpdate onupdate);
+        public static extern void RegisterSharpNodeCallback(
+            OnNodeLoaded onNodeLoaded,
+            OnNodeUpdate onNodeUpdate, 
+            OnNodeContextInit onContextInit,
+            OnNodeContextUpdate onContextUpdate);
 
         /// <summary>
         /// Every treenode in C# should be registered by this function at the start of the game
@@ -50,7 +76,7 @@ namespace YBehaviorSharp
             int index = STreeNodeMgr.Instance.Register(node);
             if (index < 0)
                 return;
-            RegisterSharpNode(node.NodeName, index);
+            RegisterSharpNode(node.NodeName, index, node is IHasTreeNodeContext);
         }
     }
 
@@ -61,9 +87,18 @@ namespace YBehaviorSharp
         Dictionary<IntPtr, ITreeNode> m_dynamicNodes = new Dictionary<IntPtr, ITreeNode>();
         List<IStaticTreeNode> m_allNodes = new List<IStaticTreeNode>();
 
+        Dictionary<uint, ITreeNodeContext> m_contexts = new Dictionary<uint, ITreeNodeContext>();
+
         public STreeNodeMgr()
         {
-            SharpHelper.RegisterSharpNodeCallback(OnNodeLoaded, OnNodeUpdate);
+            SharpHelper.RegisterSharpNodeCallback(OnNodeLoaded, OnNodeUpdate, OnContextInit, OnContextUpdate);
+        }
+
+        public void Clear()
+        {
+            m_allNodes.Clear();
+            m_dynamicNodes.Clear();
+            m_contexts.Clear();
         }
         public int Register(IStaticTreeNode node)
         {
@@ -106,6 +141,44 @@ namespace YBehaviorSharp
                 return dynamicNode.OnNodeUpdate(pNode, pAgent);
             }
             //not found, should not run to here
+            return NodeState.NS_INVALID;
+        }
+
+        void OnContextInit(IntPtr pNode, int index, uint contextUID)
+        {
+            if (index < 0 || index >= m_allNodes.Count)
+                return;
+            var node = m_allNodes[index];
+            if (node == null) return;
+            IHasTreeNodeContext? hasTreeNodeContext = node as IHasTreeNodeContext;
+            if (hasTreeNodeContext != null)
+            {
+                var context = hasTreeNodeContext.FetchContext();
+                m_contexts.Add(contextUID, context);
+                context.OnInit();
+            }
+        }
+
+        NodeState OnContextUpdate(IntPtr pNode, IntPtr pAgent, int index, uint contextUID, NodeState lastState)
+        {
+            if (index < 0 || index >= m_allNodes.Count)
+                return NodeState.NS_INVALID;
+            var node = m_allNodes[index];
+            if (node == null) return NodeState.NS_INVALID;
+            if (m_contexts.TryGetValue(contextUID, out var context))
+            {
+                var res = context.OnNodeUpdate(pNode, pAgent, lastState);
+                if (res != NodeState.NS_RUNNING && res != NodeState.NS_BREAK)
+                {
+                    IHasTreeNodeContext? hasTreeNodeContext = node as IHasTreeNodeContext;
+                    if (hasTreeNodeContext != null)
+                    {
+                        hasTreeNodeContext.DestroyContext(context);
+                    }
+                    m_contexts.Remove(contextUID);
+                }
+                return res;
+            }
             return NodeState.NS_INVALID;
         }
     }

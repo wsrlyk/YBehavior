@@ -71,23 +71,26 @@ namespace YBehavior
 			SharpNode* pSharpNode = new SharpNode();
 			pSharpNode->SetName(name);
 			pSharpNode->SetIndexInSharp(it->second.indexInSharp);
+			pSharpNode->SetHasContext(it->second.hasContext);
 			return pSharpNode;
 		}
 
 		return Factory<TreeNode>::Get(name);
 	}
 
-	void NodeFactory::RegisterSharpNode(const STRING& name, int indexInSharp)
+	void NodeFactory::RegisterSharpNode(const STRING& name, int indexInSharp, bool hasContext)
 	{
 		auto it = m_SharpNodeDatas.find(name);
 		if (it != m_SharpNodeDatas.end())
 		{
 			it->second.indexInSharp = indexInSharp;
+			it->second.hasContext = hasContext;
 		}
 		else
 		{
 			SharpNodeData data;
 			data.indexInSharp = indexInSharp;
+			data.hasContext = hasContext;
 			m_SharpNodeDatas[name] = data;
 		}
 	}

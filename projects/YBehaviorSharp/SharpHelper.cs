@@ -17,6 +17,9 @@ namespace YBehaviorSharp
 
     public delegate bool OnNodeLoaded(IntPtr pNode, IntPtr pData, int index);
     public delegate NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int index);
+    public delegate void OnNodeContextInit(IntPtr pNode, int index, uint contextUID);
+    public delegate NodeState OnNodeContextUpdate(IntPtr pNode, IntPtr pAgent, int index, uint contextUID, NodeState lastState);
+
     public delegate string LoadDataCallback(string treeName);
     public delegate void LogCallback();
     public delegate void GetFilePathCallback();

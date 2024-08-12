@@ -1,4 +1,5 @@
-﻿using YBehaviorSharp;
+﻿using System.Diagnostics;
+using YBehaviorSharp;
 
 namespace TestSharp
 {
@@ -43,7 +44,7 @@ namespace TestSharp
             YBehaviorSharp.SharpHelper.SetSharedVariableByString(entity0.Agent.Ptr, "II0", "1342^32^643", '^');
 
             int i = 0;
-            while (++i < 5)
+            while (++i < 50)
             {
                 YBehaviorSharp.SharpHelper.Tick(entity0.Agent.Ptr);
                 System.Threading.Thread.Sleep(1000);
@@ -184,8 +185,27 @@ namespace TestSharp
             return NodeState.NS_SUCCESS;
         }
     }
+    public class XCustomActionContext : ITreeNodeContext
+    {
+        int i = 0;
+        public void OnInit()
+        {
+            i = 0;
+            Console.WriteLine("XCustomActionContext.OnInit");
+        }
 
-    public class XCustomAction : ITreeNode
+        public NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, NodeState lastState)
+        {
+            ++i;
+            if (i > 10)
+            {
+                Console.WriteLine("XCustomActionContext.Running " + i);
+                return NodeState.NS_SUCCESS;
+            }
+            return NodeState.NS_RUNNING;
+        }
+    }
+    public class XCustomAction : ITreeNode, IHasTreeNodeContext
     {
         //SVariableString m_String0;
         SPinInt m_Int0;
@@ -196,6 +216,12 @@ namespace TestSharp
 
         public string NodeName => "XCustomAction";
 
+        public ITreeNodeContext CreateContext()
+        {
+            return new XCustomActionContext();
+        }
+
+        public void DestroyContext(ITreeNodeContext context) { }
         public bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
             //m_String0 = YBehaviorSharp.SVariableHelper.CreatePin(pNode, "String0", pData) as SVariableString;

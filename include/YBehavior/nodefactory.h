@@ -13,11 +13,8 @@ namespace YBehavior
 #ifdef YSHARP
 	struct SharpNodeData
 	{
-		SharpNodeData()
-		{
-			indexInSharp = -1;
-		}
-		int indexInSharp;
+		int indexInSharp{-1};
+		bool hasContext{false};
 	};
 #endif
 
@@ -32,7 +29,7 @@ namespace YBehavior
 	public:
 #ifdef YSHARP
 		TreeNode* Get(const STRING& name) override;
-		void RegisterSharpNode(const STRING& name, int index);
+		void RegisterSharpNode(const STRING& name, int index, bool hasContext);
 		void ClearSharpNodes();
 #endif // SHARP
 

@@ -48,16 +48,20 @@ extern "C" YBEHAVIOR_API void UninitSharp()
 
 extern "C" YBEHAVIOR_API void RegisterSharpNode(
 	YBehavior::CSTRING_CONST name,
-	int index)
+	int index,
+	bool hasContext)
 {
-	YBehavior::NodeFactory::Instance()->RegisterSharpNode(name, index);
+	YBehavior::NodeFactory::Instance()->RegisterSharpNode(name, index, hasContext);
 }
 extern "C" YBEHAVIOR_API void RegisterSharpNodeCallback(
-	YBehavior::OnSharpNodeLoadedDelegate onload,
-	YBehavior::OnSharpNodeUpdateDelegate onupdate
+	YBehavior::OnSharpNodeLoadedDelegate onNodeLoaded,
+	YBehavior::OnSharpNodeUpdateDelegate onNodeUpdate,
+	YBehavior::OnSharpNodeContextInitDelegate onContextInit,
+	YBehavior::OnSharpNodeContextUpdateDelegate onContextUpdate
 	)
 {
-	YBehavior::SharpNode::SetCallback(onload, onupdate);
+	YBehavior::SharpNode::SetCallback(onNodeLoaded, onNodeUpdate);
+	YBehavior::SharpNodeContext::SetCallback(onContextInit, onContextUpdate);
 }
 
 extern "C" YBEHAVIOR_API void RegisterGetFilePathCallback(YBehavior::SharpGetFilePathDelegate callback)
