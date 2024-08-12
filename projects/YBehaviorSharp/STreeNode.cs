@@ -153,7 +153,7 @@ namespace YBehaviorSharp
             IHasTreeNodeContext? hasTreeNodeContext = node as IHasTreeNodeContext;
             if (hasTreeNodeContext != null)
             {
-                var context = hasTreeNodeContext.FetchContext();
+                var context = hasTreeNodeContext.CreateContext();
                 m_contexts.Add(contextUID, context);
                 context.OnInit();
             }
