@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 namespace YBehaviorSharp
 {
     /// <summary>
-    /// To recode running data for a treenode running for multiple frames
+    /// To record running data for a treenode running for multiple frames
     /// </summary>
     public interface ITreeNodeContext
     {
@@ -16,7 +16,8 @@ namespace YBehaviorSharp
     }
 
     /// <summary>
-    /// A treenode may keep running for multiple frames
+    /// A tree node may keep running for multiple frames.
+    /// A context is needed to record the states, etc.
     /// </summary>
     public interface IHasTreeNodeContext
     {
@@ -25,9 +26,9 @@ namespace YBehaviorSharp
 
     }
     /// <summary>
-    /// This kind of node will share one instance and will not have its own data
+    /// No context, just use the shared tree node object
     /// </summary>
-    public interface IStaticTreeNode
+    public interface INoTreeNodeContext
     {
         /// <summary>
         /// Will be called every tick
@@ -36,6 +37,13 @@ namespace YBehaviorSharp
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <returns></returns>
         NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent);
+    }
+
+    /// <summary>
+    /// Base interface of tree node. 
+    /// </summary>
+    public interface ITreeNode
+    {
         /// <summary>
         /// Name of node
         /// </summary>
@@ -43,9 +51,9 @@ namespace YBehaviorSharp
     }
 
     /// <summary>
-    /// Every node will be instanced and keep its own variables
+    /// Have a chance to load pins from config
     /// </summary>
-    public interface ITreeNode : IStaticTreeNode
+    public interface IHasPin
     {
         /// <summary>
         /// Will be called only once when loaded
@@ -55,6 +63,12 @@ namespace YBehaviorSharp
         /// <returns></returns>
         bool OnNodeLoaded(IntPtr pNode, IntPtr pData);
     }
+
+    public interface ITreeNodeWithPinContext : ITreeNode, IHasPin, IHasTreeNodeContext { }
+    public interface ITreeNodeWithPin : ITreeNode, IHasPin, INoTreeNodeContext { }
+    public interface ITreeNodeWithContext : ITreeNode, IHasTreeNodeContext { }
+    public interface ITreeNodeWithNothing : ITreeNode, INoTreeNodeContext { }
+
     public partial class SharpHelper
     {
         [DllImport(VERSION.dll)]
@@ -71,12 +85,13 @@ namespace YBehaviorSharp
         /// Every treenode in C# should be registered by this function at the start of the game
         /// </summary>
         /// <param name="node"></param>
-        public static void RegisterTreeNode(ITreeNode node)
+        public static bool RegisterTreeNode(ITreeNode node)
         {
             int index = STreeNodeMgr.Instance.Register(node);
             if (index < 0)
-                return;
+                return false;
             RegisterSharpNode(node.NodeName, index, node is IHasTreeNodeContext);
+            return true;
         }
     }
 
@@ -84,8 +99,8 @@ namespace YBehaviorSharp
     {
         public static STreeNodeMgr Instance { get; private set; } = new STreeNodeMgr();
 
-        Dictionary<IntPtr, ITreeNode> m_dynamicNodes = new Dictionary<IntPtr, ITreeNode>();
-        List<IStaticTreeNode> m_allNodes = new List<IStaticTreeNode>();
+        Dictionary<IntPtr, IHasPin> m_dynamicNodes = new Dictionary<IntPtr, IHasPin>();
+        List<ITreeNode> m_allNodes = new List<ITreeNode>();
 
         Dictionary<uint, ITreeNodeContext> m_contexts = new Dictionary<uint, ITreeNodeContext>();
 
@@ -100,12 +115,20 @@ namespace YBehaviorSharp
             m_dynamicNodes.Clear();
             m_contexts.Clear();
         }
-        public int Register(IStaticTreeNode node)
+        public int Register(ITreeNode node)
         {
             if (node == null)
                 return -1;
-            m_allNodes.Add(node);
-            return m_allNodes.Count - 1;
+
+            if ((node is IHasTreeNodeContext) ^ (node is INoTreeNodeContext))
+            {
+                m_allNodes.Add(node);
+                return m_allNodes.Count - 1;
+            }
+            else
+            {
+                return -1;
+            }
         }
 
         bool OnNodeLoaded(IntPtr pNode, IntPtr pData, int index)
@@ -114,11 +137,11 @@ namespace YBehaviorSharp
                 return false;
             var node = m_allNodes[index];
             if (node == null) return false;
-            if (!(node is ITreeNode))
+            if (!(node is IHasPin))
                 return true;
             if (!m_dynamicNodes.TryGetValue(pNode, out var dynamicNode))
             {
-                dynamicNode = Activator.CreateInstance(node.GetType()) as ITreeNode;
+                dynamicNode = Activator.CreateInstance(node.GetType()) as IHasPin;
                 m_dynamicNodes.Add(pNode, dynamicNode);
             }
             else
@@ -134,11 +157,11 @@ namespace YBehaviorSharp
                 return NodeState.NS_INVALID;
             var node = m_allNodes[index];
             if (node == null) return NodeState.NS_INVALID;
-            if (!(node is ITreeNode))
-                return node.OnNodeUpdate(pNode, pAgent);
+            if (!(node is IHasPin))
+                return (node as INoTreeNodeContext).OnNodeUpdate(pNode, pAgent);
             if (m_dynamicNodes.TryGetValue(pNode, out var dynamicNode))
             {
-                return dynamicNode.OnNodeUpdate(pNode, pAgent);
+                return (dynamicNode as INoTreeNodeContext).OnNodeUpdate(pNode, pAgent);
             }
             //not found, should not run to here
             return NodeState.NS_INVALID;

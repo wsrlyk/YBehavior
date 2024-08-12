@@ -123,7 +123,7 @@ namespace TestSharp
             SharpHelper.DestroyAgent(this);
         }
     }
-    public class SelectTargetAction : ITreeNode
+    public class SelectTargetAction : ITreeNodeWithPin
     {
         SPinEntity m_Target;
 
@@ -148,7 +148,7 @@ namespace TestSharp
         }
     }
 
-    public class GetTargetNameAction : IStaticTreeNode
+    public class GetTargetNameAction : ITreeNodeWithNothing
     {
         public string NodeName => "GetTargetNameAction";
 
@@ -159,7 +159,7 @@ namespace TestSharp
         }
     }
 
-    public class SetVector3Action : ITreeNode
+    public class SetVector3Action : ITreeNodeWithPin
     {
         SPin m_Src;
         SPin m_Des;
@@ -205,7 +205,7 @@ namespace TestSharp
             return NodeState.NS_RUNNING;
         }
     }
-    public class XCustomAction : ITreeNode, IHasTreeNodeContext
+    public class XCustomAction : ITreeNodeWithPinContext
     {
         //SVariableString m_String0;
         SPinInt m_Int0;
