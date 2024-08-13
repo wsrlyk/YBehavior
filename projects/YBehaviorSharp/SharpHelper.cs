@@ -18,64 +18,89 @@ namespace YBehaviorSharp
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate bool OnNodeLoaded(IntPtr pNode, IntPtr pData, int index);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int index);
+    public delegate ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int index);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void OnNodeContextInit(IntPtr pNode, int index, uint contextUID);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate NodeState OnNodeContextUpdate(IntPtr pNode, IntPtr pAgent, int index, uint contextUID, NodeState lastState);
+    public delegate ENodeState OnNodeContextUpdate(IntPtr pNode, IntPtr pAgent, int index, uint contextUID, ENodeState lastState);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void LogCallback();
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void GetFilePathCallback();
-
-    public enum NodeState
+    /// <summary>
+    /// Running state of tree node
+    /// </summary>
+    public enum ENodeState
     {
-        NS_INVALID = -1,
-        NS_SUCCESS,
-        NS_FAILURE,
-        NS_BREAK,
-        NS_RUNNING,
+        /// <summary>
+        /// Error
+        /// </summary>
+        Invalid = -1,
+        /// <summary>
+        /// Return successfully
+        /// </summary>
+        Success,
+        /// <summary>
+        /// Return with failure
+        /// </summary>
+        Failure,
+        /// <summary>
+        /// Hit a break point
+        /// </summary>
+        Break,
+        /// <summary>
+        /// Child hit a break point, or it's still working
+        /// </summary>
+        Running,
     };
     public struct Vector3
 	{
 		public float x;
         public float y;
         public float z;
-
-        public static Vector3 zero = new Vector3() { x = 0, y = 0, z = 0 };
+        public Vector3(float _x, float _y, float _z)
+        {
+            x = _x; y = _y; z = _z;
+        }
+        public static Vector3 zero = new Vector3(0f, 0f, 0f);
     }
-
-    public struct EntityWrapper
-    {
-    }
-
-    public class GetClassType<T>
+    /// <summary>
+    /// Get the TypeID of a type
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class GetType<T>
     {
         static TYPEID id = -1;
         static TYPEID vecid = -1;
+        /// <summary>
+        /// The TypeID of single type
+        /// </summary>
         public static TYPEID ID { get { return id; } }
+        /// <summary>
+        /// The TypeID of array type
+        /// </summary>
         public static TYPEID VecID { get { return vecid; } }
 
-        static GetClassType()
+        static GetType()
         {
-            GetClassType<BOOL>.id = SharpHelper.GetClassTypeNumberIdBool();
-            GetClassType<bool>.id = SharpHelper.GetClassTypeNumberIdBool();
-            GetClassType<INT>.id = SharpHelper.GetClassTypeNumberIdInt();
-            GetClassType<FLOAT>.id = SharpHelper.GetClassTypeNumberIdFloat();
-            GetClassType<ULONG>.id = SharpHelper.GetClassTypeNumberIdUlong();
-            GetClassType<STRING>.id = SharpHelper.GetClassTypeNumberIdString();
-            GetClassType<Vector3>.id = SharpHelper.GetClassTypeNumberIdVector3();
-            GetClassType<IEntity>.id = SharpHelper.GetClassTypeNumberIdEntityWrapper();
+            GetType<BOOL>.id = SUtility.GetTypeIdBool();
+            GetType<bool>.id = SUtility.GetTypeIdBool();
+            GetType<INT>.id = SUtility.GetTypeIdInt();
+            GetType<FLOAT>.id = SUtility.GetTypeIdFloat();
+            GetType<ULONG>.id = SUtility.GetTypeIdUlong();
+            GetType<STRING>.id = SUtility.GetTypeIdString();
+            GetType<Vector3>.id = SUtility.GetTypeIdVector3();
+            GetType<IEntity>.id = SUtility.GetTypeIdEntityWrapper();
 
-            GetClassType<BOOL>.vecid = SharpHelper.GetClassTypeNumberIdVecBool();
-            GetClassType<bool>.vecid = SharpHelper.GetClassTypeNumberIdVecBool();
-            GetClassType<INT>.vecid = SharpHelper.GetClassTypeNumberIdVecInt();
-            GetClassType<FLOAT>.vecid = SharpHelper.GetClassTypeNumberIdVecFloat();
-            GetClassType<ULONG>.vecid = SharpHelper.GetClassTypeNumberIdVecUlong();
-            GetClassType<STRING>.vecid = SharpHelper.GetClassTypeNumberIdVecString();
-            GetClassType<Vector3>.vecid = SharpHelper.GetClassTypeNumberIdVecVector3();
-            GetClassType<IEntity>.vecid = SharpHelper.GetClassTypeNumberIdVecEntityWrapper();
+            GetType<BOOL>.vecid = SUtility.GetTypeIdVecBool();
+            GetType<bool>.vecid = SUtility.GetTypeIdVecBool();
+            GetType<INT>.vecid = SUtility.GetTypeIdVecInt();
+            GetType<FLOAT>.vecid = SUtility.GetTypeIdVecFloat();
+            GetType<ULONG>.vecid = SUtility.GetTypeIdVecUlong();
+            GetType<STRING>.vecid = SUtility.GetTypeIdVecString();
+            GetType<Vector3>.vecid = SUtility.GetTypeIdVecVector3();
+            GetType<IEntity>.vecid = SUtility.GetTypeIdVecEntityWrapper();
         }
     }
 
@@ -100,87 +125,109 @@ namespace YBehaviorSharp
         public const string dll = "YBehavior";
 #endif
     }
+    /// <summary>
+    /// Interface of class for initializing the system
+    /// </summary>
     public interface ISharpLauncher
     {
+        /// <summary>
+        /// Port to debug
+        /// </summary>
         int DebugPort { get; }
+        /// <summary>
+        /// Log callback
+        /// The string can be fetched by SharpHelper.GetFromBufferString;
+        /// </summary>
         void OnLog();
+        /// <summary>
+        /// Error callback.
+        /// The string can be fetched by SharpHelper.GetFromBufferString;
+        /// </summary>
         void OnError();
-
+        /// <summary>
+        /// Get the file path.
+        /// File name can be fetched by SharpHelper.GetFromBufferString, 
+        /// and the path should be saved by SharpHelper.SetToBufferString
+        /// </summary>
         void OnGetFilePath();
     }
 
+    /// <summary>
+    /// Utilities
+    /// </summary>
     public partial class SharpHelper
     {
         static LogCallback? s_onLog;
         static LogCallback? s_onError;
         static GetFilePathCallback? s_onGetFilePath;
+        /// <summary>
+        /// Init the system. Should be called at first
+        /// </summary>
+        /// <param name="launcher"></param>
         public static void Init(ISharpLauncher launcher)
         {
-            InitSharp(launcher.DebugPort);
+            SUtility.InitSharp(launcher.DebugPort);
 
             s_onLog = launcher.OnLog;
             s_onError = launcher.OnError;
             s_onGetFilePath = launcher.OnGetFilePath;
-            RegisterLogCallback(
+            SUtility.RegisterLogCallback(
                 s_onLog,
                 s_onError,
                 s_onLog,
                 s_onError);
-            RegisterGetFilePathCallback(s_onGetFilePath);
+            SUtility.RegisterGetFilePathCallback(s_onGetFilePath);
 
-            //var subTypeQuery = from t in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
-            //                   where SUtility.IsSubClassOf(t, typeof(STreeNode))
-            //                   select t;
-
-            //foreach (var type in subTypeQuery)
-            //{
-            //    STreeNode node = Activator.CreateInstance(type) as STreeNode;
-            //    node.Register();
-            //    s_NodeList.Add(node);
-            //}
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////
-        [DllImport(VERSION.dll)]
-        static extern void InitSharp(int debugPort);
-
+        /// <summary>
+        /// Uninit the system. Should be call at the end of game
+        /// </summary>
         [DllImport(VERSION.dll)]
         static public extern void UninitSharp();
 
-        [DllImport(VERSION.dll)]
-        static extern void RegisterGetFilePathCallback(GetFilePathCallback callback);
-
-        [DllImport(VERSION.dll, CallingConvention = CallingConvention.StdCall)]
-        static extern void RegisterLogCallback(
-            LogCallback log,
-            LogCallback error,
-            LogCallback threadlog,
-            LogCallback threaderror
-            );
-
+        /// <summary>
+        /// Set the behavior
+        /// </summary>
+        /// <param name="pAgent">Pointer to the agent in cpp</param>
+        /// <param name="fsmname">FSM name</param>
+        /// <param name="state2Tree">A mapping from state name to tree name, [state0, tree0, state1, tree1, ...]</param>
+        /// <param name="stSize">Length of state2Tree</param>
+        /// <param name="tree2Tree">A mapping from parent tree to subtree, [parent0, child0, parent1, child1, ...]</param>
+        /// <param name="ttSize">Length of tree2Tree</param>
+        /// <returns></returns>
         [DllImport(VERSION.dll)]
         static public extern bool SetBehavior(
             IntPtr pAgent,
             string fsmname,
             string[] state2Tree, uint stSize,
             string[] tree2Tree, uint ttSize);
-
+        /// <summary>
+        /// Tick the agent
+        /// </summary>
+        /// <param name="pAgent"></param>
         [DllImport(VERSION.dll)]
         static public extern void Tick(IntPtr pAgent);
-
+        /// <summary>
+        /// Get the data from config
+        /// </summary>
+        /// <param name="pNode">Pointer to the tree node in cpp</param>
+        /// <param name="attrName">Attribute name in xml</param>
+        /// <param name="data">Pointer to the xml data in cpp</param>
+        /// <returns>If true, the data can be fetch by SharpHelper.GetFromBufferString</returns>
         [DllImport(VERSION.dll)]
         static public extern bool TryGetValue(
             IntPtr pNode,
             string attrName,
             IntPtr data);
-
-        [DllImport(VERSION.dll)]
-        static public extern IntPtr CreatePin(
-            IntPtr pNode,
-            string attrName,
-            IntPtr data,
-            bool noConst);
-
+        /// <summary>
+        /// Set the shared variable
+        /// </summary>
+        /// <param name="pAgent">Pointer to the agent in cpp</param>
+        /// <param name="name">Variable name</param>
+        /// <param name="value">Variable value in string</param>
+        /// <param name="separator">Separator for an array</param>
+        /// <returns>Pointer to the variable</returns>
         [DllImport(VERSION.dll)]
         static public extern IntPtr SetSharedVariableByString(
             IntPtr pAgent,
@@ -190,50 +237,114 @@ namespace YBehaviorSharp
         );
 
         #region DEBUGGER
+        /// <summary>
+        /// Try to log the value of pin when debugging
+        /// </summary>
+        /// <param name="pNode">Pointer to the tree node in cpp</param>
+        /// <param name="pin">The pin object</param>
+        /// <param name="before">If true, the log will be put in the front of the debug information; otherwise, in the end of it</param>
+        public static void TryLogVariable(IntPtr pNode, SPin pin, bool before)
+        {
+#if YDEBUGGER
+            SUtility.LogVariable(pNode, pin.Ptr, before);
+#endif
+        }
+        /// <summary>
+        /// Try to log some information when debugging
+        /// </summary>
+        /// <param name="pNode">Pointer to the tree node in cpp</param>
+        /// <param name="info"></param>
+        public static void TryLogInfo(IntPtr pNode, string info)
+        {
+#if YDEBUGGER
+            SUtility.LogInfo(pNode, info);
+#endif
+        }
+        #endregion
+        /// <summary>
+        /// Make an error log with node title and name
+        /// </summary>
+        /// <param name="pNode">Pointer to the tree node in cpp</param>
+        /// <param name="info">error content</param>
+        [DllImport(VERSION.dll)]
+        static public extern void NodeError(IntPtr pNode, string info);
+        /// <summary>
+        /// Get the ID of the variable by its name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        [DllImport(VERSION.dll)]
+        static public extern KEY GetVariableKeyByName(string name);
+
+    }
+
+    internal partial class SUtility
+    {
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdInt();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdUlong();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdFloat();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdString();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdBool();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdEntityWrapper();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdVector3();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdVecInt();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdVecUlong();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdVecFloat();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdVecString();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdVecBool();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdVecEntityWrapper();
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetTypeIdVecVector3();
+
+
+        [DllImport(VERSION.dll)]
+        static public extern void InitSharp(int debugPort);
+
+        [DllImport(VERSION.dll)]
+        static public extern void RegisterGetFilePathCallback(GetFilePathCallback callback);
+
+        [DllImport(VERSION.dll, CallingConvention = CallingConvention.StdCall)]
+        static public extern void RegisterLogCallback(
+            LogCallback log,
+            LogCallback error,
+            LogCallback threadlog,
+            LogCallback threaderror
+            );
+
+
+        [DllImport(VERSION.dll)]
+        static public extern IntPtr CreatePin(
+            IntPtr pNode,
+            string attrName,
+            IntPtr data,
+            bool noConst);
+
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetPinTypeID(IntPtr pPin);
+        [DllImport(VERSION.dll)]
+        static public extern TYPEID GetPinElementTypeID(IntPtr pPin);
+
+#if YDEBUGGER
         [DllImport(VERSION.dll)]
         static public extern void LogVariable(IntPtr pNode, IntPtr pPin, bool before);
         [DllImport(VERSION.dll)]
         static public extern bool HasDebugPoint(IntPtr pNode);
         [DllImport(VERSION.dll)]
         static public extern void LogInfo(IntPtr pNode, string info);
-        #endregion
-        [DllImport(VERSION.dll)]
-        static public extern void NodeError(IntPtr pNode, string info);
+#endif
 
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetPinTypeID(IntPtr pPin);
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetPinElementTypeID(IntPtr pPin);
-        [DllImport(VERSION.dll)]
-        static public extern KEY GetTypeKeyByName(string name, TYPEID type);
-
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdInt();
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdUlong();
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdFloat();
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdString();
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdBool();
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdEntityWrapper();
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdVector3();
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdVecInt();
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdVecUlong();
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdVecFloat();
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdVecString();
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdVecBool();
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdVecEntityWrapper();
-        [DllImport(VERSION.dll)]
-        static public extern TYPEID GetClassTypeNumberIdVecVector3();
     }
 }

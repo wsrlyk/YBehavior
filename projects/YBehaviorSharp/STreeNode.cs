@@ -12,7 +12,14 @@ namespace YBehaviorSharp
     public interface ITreeNodeContext
     {
         void OnInit();
-        NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, NodeState lastState);
+        /// <summary>
+        /// Called every tick
+        /// </summary>
+        /// <param name="pNode">Pointer to the node in cpp</param>
+        /// <param name="pAgent">Pointer to the agent in cpp</param>
+        /// <param name="lastState">The result of last node, usually used in branch node to get the result of child node</param>
+        /// <returns></returns>
+        ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, ENodeState lastState);
     }
 
     /// <summary>
@@ -21,7 +28,15 @@ namespace YBehaviorSharp
     /// </summary>
     public interface IHasTreeNodeContext
     {
+        /// <summary>
+        /// Get the context object
+        /// </summary>
+        /// <returns></returns>
         ITreeNodeContext CreateContext();
+        /// <summary>
+        /// Recycle or destroy the context
+        /// </summary>
+        /// <param name="context"></param>
         void DestroyContext(ITreeNodeContext context);
 
     }
@@ -31,12 +46,12 @@ namespace YBehaviorSharp
     public interface INoTreeNodeContext
     {
         /// <summary>
-        /// Will be called every tick
+        /// Called every tick
         /// </summary>
         /// <param name="pNode">Pointer to the node in cpp</param>
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <returns></returns>
-        NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent);
+        ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent);
     }
 
     /// <summary>
@@ -63,24 +78,37 @@ namespace YBehaviorSharp
         /// <returns></returns>
         bool OnNodeLoaded(IntPtr pNode, IntPtr pData);
     }
-
+    /// <summary>
+    /// Tree node that have pins and context
+    /// </summary>
     public interface ITreeNodeWithPinContext : ITreeNode, IHasPin, IHasTreeNodeContext { }
+    /// <summary>
+    /// Tree node that have pins but no context
+    /// </summary>
     public interface ITreeNodeWithPin : ITreeNode, IHasPin, INoTreeNodeContext { }
+    /// <summary>
+    /// Tree node that have context but no pins
+    /// </summary>
     public interface ITreeNodeWithContext : ITreeNode, IHasTreeNodeContext { }
+    /// <summary>
+    /// Tree node that have no context or pins
+    /// </summary>
     public interface ITreeNodeWithNothing : ITreeNode, INoTreeNodeContext { }
 
-    public partial class SharpHelper
+    internal partial class SUtility
     {
         [DllImport(VERSION.dll)]
-        static extern void RegisterSharpNode(string name, int index, bool hasContext);
+        public static extern void RegisterSharpNode(string name, int index, bool hasContext);
 
         [DllImport(VERSION.dll)]
         public static extern void RegisterSharpNodeCallback(
             OnNodeLoaded onNodeLoaded,
-            OnNodeUpdate onNodeUpdate, 
+            OnNodeUpdate onNodeUpdate,
             OnNodeContextInit onContextInit,
             OnNodeContextUpdate onContextUpdate);
-
+    }
+    public partial class SharpHelper
+    { 
         /// <summary>
         /// Every treenode in C# should be registered by this function at the start of the game
         /// </summary>
@@ -90,12 +118,12 @@ namespace YBehaviorSharp
             int index = STreeNodeMgr.Instance.Register(node);
             if (index < 0)
                 return false;
-            RegisterSharpNode(node.NodeName, index, node is IHasTreeNodeContext);
+            SUtility.RegisterSharpNode(node.NodeName, index, node is IHasTreeNodeContext);
             return true;
         }
     }
 
-    class STreeNodeMgr
+    internal class STreeNodeMgr
     {
         public static STreeNodeMgr Instance { get; private set; } = new STreeNodeMgr();
 
@@ -114,7 +142,7 @@ namespace YBehaviorSharp
             m_onNodeUpdate = OnNodeUpdate;
             m_onContextInit = OnContextInit;
             m_onContextUpdate = OnContextUpdate;
-            SharpHelper.RegisterSharpNodeCallback(m_onNodeLoaded, m_onNodeUpdate, m_onContextInit, m_onContextUpdate);
+            SUtility.RegisterSharpNodeCallback(m_onNodeLoaded, m_onNodeUpdate, m_onContextInit, m_onContextUpdate);
         }
 
         public void Clear()
@@ -159,12 +187,12 @@ namespace YBehaviorSharp
             return dynamicNode.OnNodeLoaded(pNode, pData);
         }
 
-        NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int index)
+        ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int index)
         {
             if (index < 0 || index >= m_allNodes.Count)
-                return NodeState.NS_INVALID;
+                return ENodeState.Invalid;
             var node = m_allNodes[index];
-            if (node == null) return NodeState.NS_INVALID;
+            if (node == null) return ENodeState.Invalid;
             if (!(node is IHasPin))
                 return (node as INoTreeNodeContext).OnNodeUpdate(pNode, pAgent);
             if (m_dynamicNodes.TryGetValue(pNode, out var dynamicNode))
@@ -172,7 +200,7 @@ namespace YBehaviorSharp
                 return (dynamicNode as INoTreeNodeContext).OnNodeUpdate(pNode, pAgent);
             }
             //not found, should not run to here
-            return NodeState.NS_INVALID;
+            return ENodeState.Invalid;
         }
 
         void OnContextInit(IntPtr pNode, int index, uint contextUID)
@@ -190,16 +218,16 @@ namespace YBehaviorSharp
             }
         }
 
-        NodeState OnContextUpdate(IntPtr pNode, IntPtr pAgent, int index, uint contextUID, NodeState lastState)
+        ENodeState OnContextUpdate(IntPtr pNode, IntPtr pAgent, int index, uint contextUID, ENodeState lastState)
         {
             if (index < 0 || index >= m_allNodes.Count)
-                return NodeState.NS_INVALID;
+                return ENodeState.Invalid;
             var node = m_allNodes[index];
-            if (node == null) return NodeState.NS_INVALID;
+            if (node == null) return ENodeState.Invalid;
             if (m_contexts.TryGetValue(contextUID, out var context))
             {
                 var res = context.OnNodeUpdate(pNode, pAgent, lastState);
-                if (res != NodeState.NS_RUNNING && res != NodeState.NS_BREAK)
+                if (res != ENodeState.Running && res != ENodeState.Break)
                 {
                     IHasTreeNodeContext? hasTreeNodeContext = node as IHasTreeNodeContext;
                     if (hasTreeNodeContext != null)
@@ -210,7 +238,7 @@ namespace YBehaviorSharp
                 }
                 return res;
             }
-            return NodeState.NS_INVALID;
+            return ENodeState.Invalid;
         }
     }
 }

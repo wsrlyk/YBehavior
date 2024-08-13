@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Linq;
 
 namespace YBehaviorSharp
 {
-    public class SUtility
+    internal partial class SUtility
     {
         public static bool IsSubClassOf(Type type, Type baseType)
         {

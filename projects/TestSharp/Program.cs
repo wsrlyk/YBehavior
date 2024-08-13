@@ -131,7 +131,7 @@ namespace TestSharp
 
         public bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
-            m_Target = new SPinEntity(YBehaviorSharp.SharpHelper.CreatePin(pNode, "Target", pData, true));
+            m_Target = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Target", pData, true) as SPinEntity;
             if (!m_Target.IsValid)
             {
                 return false;
@@ -140,11 +140,11 @@ namespace TestSharp
             return true;
         }
 
-        public NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
         {
             Console.WriteLine("SelectTargetAction Update");
             IEntity entity = m_Target.Get(pAgent);
-            return NodeState.NS_SUCCESS;
+            return ENodeState.Success;
         }
     }
 
@@ -152,10 +152,10 @@ namespace TestSharp
     {
         public string NodeName => "GetTargetNameAction";
 
-        public NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
         {
             Console.WriteLine("GetTargetNameAction Update");
-            return NodeState.NS_SUCCESS;
+            return ENodeState.Success;
         }
     }
 
@@ -168,13 +168,13 @@ namespace TestSharp
 
         public bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
-            m_Src = YBehaviorSharp.SPinHelper.CreatePin(pNode, "Src", pData, true);
-            m_Des = YBehaviorSharp.SPinHelper.CreatePin(pNode, "Des", pData, true);
+            m_Src = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Src", pData, true);
+            m_Des = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Des", pData, true);
 
             return true;
         }
 
-        public NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
         {
             Console.WriteLine("SetVector3Action Update");
 
@@ -182,7 +182,7 @@ namespace TestSharp
             src.x += 1;
             (m_Des as SPinVector3).Set(pAgent, src);
 
-            return NodeState.NS_SUCCESS;
+            return ENodeState.Success;
         }
     }
     public class XCustomActionContext : ITreeNodeContext
@@ -194,15 +194,15 @@ namespace TestSharp
             Console.WriteLine("XCustomActionContext.OnInit");
         }
 
-        public NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, NodeState lastState)
+        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, ENodeState lastState)
         {
             ++i;
             if (i > 10)
             {
                 Console.WriteLine("XCustomActionContext.Running " + i);
-                return NodeState.NS_SUCCESS;
+                return ENodeState.Success;
             }
-            return NodeState.NS_RUNNING;
+            return ENodeState.Running;
         }
     }
     public class XCustomAction : ITreeNodeWithPinContext
@@ -226,11 +226,11 @@ namespace TestSharp
         {
             //m_String0 = YBehaviorSharp.SVariableHelper.CreatePin(pNode, "String0", pData) as SVariableString;
 
-            m_Int0 = YBehaviorSharp.SPinHelper.CreatePin(pNode, "Int0", pData) as SPinInt;
+            m_Int0 = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Int0", pData) as SPinInt;
 
             //m_Entity0 = YBehaviorSharp.SVariableHelper.CreatePin(pNode, "Entity0", pData) as SVariableEntity;
 
-            m_Array0 = YBehaviorSharp.SPinHelper.CreatePin(pNode, "Array0", pData);
+            m_Array0 = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Array0", pData);
 
             if (YBehaviorSharp.SharpHelper.TryGetValue(pNode, "Type", pData))
             {
@@ -240,28 +240,27 @@ namespace TestSharp
             return true;
         }
 
-        public NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
         {
             Console.WriteLine();
             Console.WriteLine("XCustomAction Update");
 
             //this.LogVariable(m_String0, true);
-            SharpHelper.LogVariable(pNode, m_Int0.Ptr, true);
+            SharpHelper.TryLogVariable(pNode, m_Int0, true);
             //this.LogVariable(m_Entity0, true);
             //this.LogVariable(m_Array0, true);
             XSAgent agent = YBehaviorSharp.SPtrMgr.Instance.Get(pAgent) as XSAgent;
             if (agent == null)
-                return NodeState.NS_FAILURE;
+                return ENodeState.Failure;
 
-            var key0 = SharpHelper.GetTypeKeyByName("S0", GetClassType<string>.ID);
-            var key1 = SharpHelper.GetTypeKeyByName("S1", GetClassType<string>.ID);
+            var key0 = SharpHelper.GetVariableKeyByName("S0");
+            var key1 = SharpHelper.GetVariableKeyByName("S1");
 
-            string sharedData0 = SSharedVariable.GetSharedString(pAgent, key0);
+            string sharedData0 = SharpHelper.GetSharedString(pAgent, key0);
             sharedData0 = sharedData0 + "0";
-            SSharedVariable.SetSharedString(pAgent, key0, sharedData0);
+            SharpHelper.SetSharedString(pAgent, key0, sharedData0);
 
-            SharpHelper.GetSharedData(pAgent, key1, GetClassType<string>.ID);
-            string sharedData1 = SharpHelper.GetFromBufferString();
+            string sharedData1 = SharpHelper.GetSharedString(pAgent, key1);
             //sharedData1 = sharedData1 + "1";
             SharpHelper.SetToBufferString(sharedData1);
             //SharpHelper.SetSharedData(pAgent, key1, GetClassType<string>.ID);
@@ -288,13 +287,12 @@ namespace TestSharp
             //m_Entity0.Set(pAgent, entity);
 
             ////////////////////////////////////////////////////////////////////////////
-            var keya = SharpHelper.GetTypeKeyByName("II0", GetClassType<int>.VecID);
+            var keya = SharpHelper.GetVariableKeyByName("II0");
 
-            SharpHelper.GetSharedData(pAgent, keya, GetClassType<int>.VecID);
-            SArrayInt arr = SSharedVariable.GetSharedArray<int>(pAgent, keya) as SArrayInt;
+            SArrayInt arr = SharpHelper.GetSharedArray<int>(pAgent, keya) as SArrayInt;
             //arr.Clear();
             arr.PushBack(100);
-            SharpHelper.SetSharedData(pAgent, keya, GetClassType<int>.VecID);
+            //SharpHelper.SetSharedData(pAgent, keya, GetType<int>.VecID);
 
             if (m_Array0 is SArrayPin)
             {
@@ -317,11 +315,11 @@ namespace TestSharp
             }
 
             //this.LogVariable(m_String0, false);
-            SharpHelper.LogVariable(pNode, m_Int0.Ptr, false);
+            SharpHelper.TryLogVariable(pNode, m_Int0, false);
             //this.LogVariable(m_Entity0, false);
-            SharpHelper.LogVariable(pNode, m_Array0.Ptr, false);
+            SharpHelper.TryLogVariable(pNode, m_Array0, false);
 
-            return NodeState.NS_SUCCESS;
+            return ENodeState.Success;
         }
 
         static int counter = 0;

@@ -14,11 +14,8 @@ namespace YBehaviorSharp
     using Bool = System.Byte;
     using KEY = System.Int32;
 
-    public partial class SharpHelper
+    internal partial class SUtility
     {
-        static public bool ConvertBool(BOOL b) { return b != 0; }
-        static public BOOL ConvertBool(bool b) { return (BOOL)(b ? 1 : 0); }
-
         [DllImport(VERSION.dll)]
         static public extern int GetFromBufferInt();
         [DllImport(VERSION.dll)]
@@ -51,19 +48,9 @@ namespace YBehaviorSharp
 
         [DllImport(VERSION.dll)]
         static public extern void GetFromBufferString(byte[] s, int len);
-        public static unsafe string GetFromBufferString()
-        {
-            GetFromBufferString(SUtility.CharBuffer, SUtility.CharBuffer.Length);
-            return SUtility.BuildStringFromCharBuffer();
-        }
-
-        [DllImport(VERSION.dll)]
-        static public extern void SetToBufferString(string data);
 
         [DllImport(VERSION.dll)]
         static public extern IntPtr GetFromBufferArray(int type);
-
-        ///////////////////////////////////////////////////////////////
 
         [DllImport(VERSION.dll)]
         static public extern bool GetPinValue(IntPtr pAgent, IntPtr pPin);
@@ -73,7 +60,6 @@ namespace YBehaviorSharp
         static public extern void SetPinValue(IntPtr pAgent, IntPtr pPin);
 
 
-        ///////////////////////////////////////////////////////////////
         [DllImport(VERSION.dll)]
         static public extern void GetSharedData(IntPtr pAgent, int key, int type);
         [DllImport(VERSION.dll)]
@@ -82,8 +68,6 @@ namespace YBehaviorSharp
         static public extern void SetSharedData(IntPtr pAgent, int key, int type);
 
 
-        ///////////////////////////////////////////////////////////////
-        ///////////////////////////////////////////////////////////////
         [DllImport(VERSION.dll)]
         static public extern uint ArrayGetSize(IntPtr pVector, int type);
         [DllImport(VERSION.dll)]
@@ -101,8 +85,8 @@ namespace YBehaviorSharp
         [DllImport(VERSION.dll)]
         static public extern int ArrayFind(IntPtr pVector, int type);
 
-        ///////////////////////////////////////////////////////////////
-        ///////////////////////////////////////////////////////////////
+
+
         [DllImport(VERSION.dll)]
         static public extern int ToInt(IntPtr ptr);
         [DllImport(VERSION.dll)]
@@ -117,6 +101,25 @@ namespace YBehaviorSharp
         static public extern IntPtr ToEntity(IntPtr ptr);
         [DllImport(VERSION.dll)]
         static public extern bool ToString(IntPtr ptr, char[] s, int len);
-
+    }
+    public partial class SharpHelper
+    {
+        static public bool ConvertBool(BOOL b) { return b != 0; }
+        static public BOOL ConvertBool(bool b) { return (BOOL)(b ? 1 : 0); }
+        /// <summary>
+        /// Get the string cpp put in the buffer
+        /// </summary>
+        /// <returns></returns>
+        public static unsafe string GetFromBufferString()
+        {
+            SUtility.GetFromBufferString(SUtility.CharBuffer, SUtility.CharBuffer.Length);
+            return SUtility.BuildStringFromCharBuffer();
+        }
+        /// <summary>
+        /// Put the string to the buffer, to let the cpp fetch
+        /// </summary>
+        /// <param name="data"></param>
+        [DllImport(VERSION.dll)]
+        static public extern void SetToBufferString(string? data);
     }
 }

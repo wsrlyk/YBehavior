@@ -22,13 +22,13 @@ extern "C" YBEHAVIOR_API void SetSharedVariable(YBehavior::Agent* pAgent, YBehav
 }
 
 
-extern "C" YBEHAVIOR_API YBehavior::KEY GetTypeKeyByName(YBehavior::CSTRING name)
+extern "C" YBEHAVIOR_API YBehavior::KEY GetVariableKeyByName(YBehavior::CSTRING name)
 {
 	return YBehavior::TreeKeyMgr::Instance()->GetKeyByName(name);
 }
 
 #define SHAREDDATA_ALLTYPES_OPERATIONS(TYPE)\
-extern "C" YBEHAVIOR_API YBehavior::TYPEID GetClassTypeNumberId##TYPE()\
+extern "C" YBEHAVIOR_API YBehavior::TYPEID GetTypeId##TYPE()\
 {\
 	return YBehavior::GetTypeID<YB::TYPE>();\
 }
