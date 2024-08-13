@@ -104,9 +104,17 @@ namespace YBehaviorSharp
 
         Dictionary<uint, ITreeNodeContext> m_contexts = new Dictionary<uint, ITreeNodeContext>();
 
+        OnNodeLoaded m_onNodeLoaded;
+        OnNodeUpdate m_onNodeUpdate;
+        OnNodeContextInit m_onContextInit;
+        OnNodeContextUpdate m_onContextUpdate;
         public STreeNodeMgr()
         {
-            SharpHelper.RegisterSharpNodeCallback(OnNodeLoaded, OnNodeUpdate, OnContextInit, OnContextUpdate);
+            m_onNodeLoaded = OnNodeLoaded;
+            m_onNodeUpdate = OnNodeUpdate;
+            m_onContextInit = OnContextInit;
+            m_onContextUpdate = OnContextUpdate;
+            SharpHelper.RegisterSharpNodeCallback(m_onNodeLoaded, m_onNodeUpdate, m_onContextInit, m_onContextUpdate);
         }
 
         public void Clear()

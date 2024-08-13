@@ -15,13 +15,18 @@ namespace YBehaviorSharp
     using STRING = System.String;
     using Bool = System.Byte;
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate bool OnNodeLoaded(IntPtr pNode, IntPtr pData, int index);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate NodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int index);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void OnNodeContextInit(IntPtr pNode, int index, uint contextUID);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate NodeState OnNodeContextUpdate(IntPtr pNode, IntPtr pAgent, int index, uint contextUID, NodeState lastState);
 
-    public delegate string LoadDataCallback(string treeName);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void LogCallback();
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void GetFilePathCallback();
 
     public enum NodeState
@@ -106,16 +111,22 @@ namespace YBehaviorSharp
 
     public partial class SharpHelper
     {
+        static LogCallback? s_onLog;
+        static LogCallback? s_onError;
+        static GetFilePathCallback? s_onGetFilePath;
         public static void Init(ISharpLauncher launcher)
         {
             InitSharp(launcher.DebugPort);
 
+            s_onLog = launcher.OnLog;
+            s_onError = launcher.OnError;
+            s_onGetFilePath = launcher.OnGetFilePath;
             RegisterLogCallback(
-                launcher.OnLog,
-                launcher.OnError,
-                launcher.OnLog,
-                launcher.OnError);
-            RegisterGetFilePathCallback(launcher.OnGetFilePath);
+                s_onLog,
+                s_onError,
+                s_onLog,
+                s_onError);
+            RegisterGetFilePathCallback(s_onGetFilePath);
 
             //var subTypeQuery = from t in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
             //                   where SUtility.IsSubClassOf(t, typeof(STreeNode))

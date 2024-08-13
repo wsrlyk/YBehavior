@@ -47,14 +47,14 @@ namespace YBehaviorSharp
     {
         public IntPtr Ptr { get; protected set; } = IntPtr.Zero;
 
-        protected TYPEID m_TypeID;
+        public TYPEID TypeID { get; protected set; }
 
         public bool IsValid { get { return Ptr != IntPtr.Zero; } }
 
         public SPin(IntPtr ptr)
         {
             Ptr = ptr;
-            m_TypeID = SharpHelper.GetPinTypeID(ptr);
+            TypeID = SharpHelper.GetPinTypeID(ptr);
         }
     }
 
@@ -88,7 +88,7 @@ namespace YBehaviorSharp
         public SPin(IntPtr core)
             : base(core)
         {
-            if (core != IntPtr.Zero && GetClassType<T>.ID != m_TypeID)
+            if (core != IntPtr.Zero && GetClassType<T>.ID != TypeID)
             {
                 Ptr = IntPtr.Zero;
             }
