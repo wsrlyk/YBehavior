@@ -61,11 +61,11 @@ namespace YBehaviorSharp
 
 
         [DllImport(VERSION.dll)]
-        static public extern void GetSharedData(IntPtr pAgent, int key, int type);
+        static public extern void GetSharedVariable(IntPtr pAgent, int key, int type);
         [DllImport(VERSION.dll)]
-        static public extern IntPtr GetSharedDataPtr(IntPtr pAgent, int key, int type);
+        static public extern IntPtr GetSharedVariablePtr(IntPtr pAgent, int key, int type);
         [DllImport(VERSION.dll)]
-        static public extern void SetSharedData(IntPtr pAgent, int key, int type);
+        static public extern void SetSharedVariable(IntPtr pAgent, int key, int type);
 
 
         [DllImport(VERSION.dll)]

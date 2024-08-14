@@ -15,6 +15,7 @@
 #include "YBehavior/sharp/sharpentry_buffer.h"
 #include "YBehavior/sharp/sharputility.h"
 #include "YBehavior/sharp/sharpnode.h"
+
 extern "C" YBEHAVIOR_API YBehavior::SharpEntity* CreateEntity(YBehavior::UINT64 uid)
 {
 	return YBehavior::SharpUnitMgr::Instance()->CreateEntity(uid);
@@ -77,7 +78,12 @@ extern "C" YBEHAVIOR_API void RegisterLogCallback(
 {
 	YBehavior::SharpLaunchCore::SetCallback(log, error, threadlog, threaderror);
 }
-
+#ifdef YDEBUGGER
+extern "C" YBEHAVIOR_API void RegisterOnDebugStateChangedCallback(YBehavior::OnDebugStateChangedDelegate callback)
+{
+	YBehavior::SharpUtility::SetOnDebugStateChangedCallback(callback);
+}
+#endif
 extern "C" YBEHAVIOR_API bool SetBehavior(
 	YBehavior::Agent* pAgent, 
 	YBehavior::CSTRING_CONST fsmName,
@@ -194,5 +200,4 @@ extern "C" YBEHAVIOR_API void NodeError(YBehavior::TreeNode* pNode, YBehavior::C
 {
 	ERROR_BEGIN << pNode->GetUID() << "." << pNode->GetClassName() << ERROR_END;
 }
-
 #endif

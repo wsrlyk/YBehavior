@@ -44,7 +44,7 @@ namespace TestSharp
             YBehaviorSharp.SharpHelper.SetSharedVariableByString(entity0.Agent.Ptr, "II0", "1342^32^643", '^');
 
             int i = 0;
-            while (++i < 50)
+            while (++i < 500)
             {
                 YBehaviorSharp.SharpHelper.Tick(entity0.Agent.Ptr);
                 System.Threading.Thread.Sleep(1000);
@@ -205,7 +205,7 @@ namespace TestSharp
             return ENodeState.Running;
         }
     }
-    public class XCustomAction : ITreeNodeWithPinContext
+    public class XCustomAction : ITreeNodeWithPin
     {
         //SVariableString m_String0;
         SPinInt m_Int0;
@@ -246,7 +246,8 @@ namespace TestSharp
             Console.WriteLine("XCustomAction Update");
 
             //this.LogVariable(m_String0, true);
-            SharpHelper.TryLogVariable(pNode, m_Int0, true);
+            if (SharpHelper.IsDebugging)
+                SharpHelper.TryLogPin(pNode, m_Int0, true);
             //this.LogVariable(m_Entity0, true);
             //this.LogVariable(m_Array0, true);
             XSAgent agent = YBehaviorSharp.SPtrMgr.Instance.Get(pAgent) as XSAgent;
@@ -315,9 +316,9 @@ namespace TestSharp
             }
 
             //this.LogVariable(m_String0, false);
-            SharpHelper.TryLogVariable(pNode, m_Int0, false);
+            SharpHelper.TryLogPin(pNode, m_Int0, false);
             //this.LogVariable(m_Entity0, false);
-            SharpHelper.TryLogVariable(pNode, m_Array0, false);
+            SharpHelper.TryLogPin(pNode, m_Array0, false);
 
             return ENodeState.Success;
         }

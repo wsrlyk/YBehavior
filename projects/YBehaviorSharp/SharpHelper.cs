@@ -28,6 +28,10 @@ namespace YBehaviorSharp
     public delegate void LogCallback();
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void GetFilePathCallback();
+#if YDEBUGGER
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void OnDebugStateChangedCallback(bool isDebugging);
+#endif
     /// <summary>
     /// Running state of tree node
     /// </summary>
@@ -171,6 +175,7 @@ namespace YBehaviorSharp
             s_onLog = launcher.OnLog;
             s_onError = launcher.OnError;
             s_onGetFilePath = launcher.OnGetFilePath;
+
             SUtility.RegisterLogCallback(
                 s_onLog,
                 s_onError,
@@ -243,10 +248,10 @@ namespace YBehaviorSharp
         /// <param name="pNode">Pointer to the tree node in cpp</param>
         /// <param name="pin">The pin object</param>
         /// <param name="before">If true, the log will be put in the front of the debug information; otherwise, in the end of it</param>
-        public static void TryLogVariable(IntPtr pNode, SPin pin, bool before)
+        public static void TryLogPin(IntPtr pNode, SPin pin, bool before)
         {
 #if YDEBUGGER
-            SUtility.LogVariable(pNode, pin.Ptr, before);
+            SUtility.LogPin(pNode, pin.Ptr, before);
 #endif
         }
         /// <summary>
@@ -260,7 +265,18 @@ namespace YBehaviorSharp
             SUtility.LogInfo(pNode, info);
 #endif
         }
-        #endregion
+        /// <summary>
+        /// Is connecting an editor and debugging
+        /// </summary>
+        public static bool IsDebugging =>
+#if YDEBUGGER
+            SUtility.IsDebugging;
+#else
+            false;
+#endif
+
+
+#endregion
         /// <summary>
         /// Make an error log with node title and name
         /// </summary>
@@ -280,6 +296,13 @@ namespace YBehaviorSharp
 
     internal partial class SUtility
     {
+        static SUtility()
+        {
+#if YDEBUGGER
+            s_onDebugStateChanged = OnDebugStateChanged;
+            RegisterOnDebugStateChangedCallback(s_onDebugStateChanged);
+#endif
+        }
         [DllImport(VERSION.dll)]
         static public extern TYPEID GetTypeIdInt();
         [DllImport(VERSION.dll)]
@@ -339,11 +362,20 @@ namespace YBehaviorSharp
 
 #if YDEBUGGER
         [DllImport(VERSION.dll)]
-        static public extern void LogVariable(IntPtr pNode, IntPtr pPin, bool before);
+        static public extern void LogPin(IntPtr pNode, IntPtr pPin, bool before);
         [DllImport(VERSION.dll)]
         static public extern bool HasDebugPoint(IntPtr pNode);
         [DllImport(VERSION.dll)]
         static public extern void LogInfo(IntPtr pNode, string info);
+        [DllImport(VERSION.dll)]
+        static public extern void RegisterOnDebugStateChangedCallback(OnDebugStateChangedCallback callback);
+
+        static OnDebugStateChangedCallback s_onDebugStateChanged;
+        public static bool IsDebugging { get; private set; }
+        static void OnDebugStateChanged(bool isDebugging)
+        {
+            IsDebugging = isDebugging;
+        }
 #endif
 
     }

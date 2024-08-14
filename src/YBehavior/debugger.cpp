@@ -8,6 +8,9 @@
 #include "YBehavior/fsm/behavior.h"
 #include "YBehavior/treekeymgr.h"
 #include "YBehavior/fsm/machinestate.h"
+#ifdef YSHARP
+#include "YBehavior/sharp/sharputility.h"
+#endif
 namespace YBehavior
 {
 	const STRING NodeRunInfo::ToString() const
@@ -55,6 +58,10 @@ namespace YBehavior
 
 		if (m_bWaitForBegin)
 			m_bWaitForBegin = false;
+#ifdef YSHARP
+		SharpUtility::OnDebugStateChanged(true);
+#endif // YSHARP
+
 	}
 
 	void DebugMgr::Failed()
@@ -65,6 +72,10 @@ namespace YBehavior
 	void DebugMgr::ResetTarget()
 	{
 		SetTarget(0, false);
+
+#ifdef YSHARP
+		SharpUtility::OnDebugStateChanged(false);
+#endif
 	}
 
 	void DebugMgr::Stop()
