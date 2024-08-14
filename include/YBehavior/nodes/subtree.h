@@ -23,7 +23,7 @@ namespace YBehavior
 	protected:
 		bool OnLoaded(const pugi::xml_node& data) override;
 		bool OnLoadChild(const pugi::xml_node& data) override;
-		bool _TryCreateFromTo(const pugi::xml_node& data, std::vector<IPin*>& container);
+		bool _TryCreateFromTo(const pugi::xml_node& data, std::vector<IPin*>& container, bool isInput);
 	private:
 		Pin<STRING>* m_TreeName;
 		Pin<STRING>* m_Identification;

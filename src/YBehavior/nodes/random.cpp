@@ -19,7 +19,7 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		auto dataTypeL = PinCreation::CreatePin(this, m_Target, "Target", data, true);
+		auto dataTypeL = PinCreation::CreatePin(this, m_Target, "Target", data, PinCreation::Flag::IsOutput);
 		if (s_ValidTypes.find(dataTypeL) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Target in Random: " << dataTypeL << ERROR_END;
@@ -51,19 +51,7 @@ namespace YBehavior
 
 	YBehavior::NodeState Random::Update(AgentPtr pAgent)
 	{
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN(m_Bound1, true);
-			YB_LOG_PIN(m_Bound2, true);
-			YB_LOG_PIN(m_Target, true);
-		}
-
 		m_pHelper->Random(pAgent->GetMemory(), m_Target, m_Bound1, m_Bound2);
-
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN(m_Target, false);
-		}
 
 		return NS_SUCCESS;
 	}
@@ -87,8 +75,6 @@ namespace YBehavior
 
 	YBehavior::NodeState RandomSelect::Update(AgentPtr pAgent)
 	{
-		YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Input, true);
-
 		INT size = m_Input->ArraySize(pAgent->GetMemory());
 		if (size == 0)
 		{
@@ -98,7 +84,6 @@ namespace YBehavior
 
 		m_Output->SetValue(pAgent->GetMemory(), m_Input->GetElementPtr(pAgent->GetMemory(), idx));
 
-		YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Output, false);
 		return NS_SUCCESS;
 	}
 
@@ -110,7 +95,7 @@ namespace YBehavior
 			return false;
 		}
 
-		TYPEID typeIDOutput = PinCreation::CreatePin(this, m_Output, "Output", data, true);
+		TYPEID typeIDOutput = PinCreation::CreatePin(this, m_Output, "Output", data, PinCreation::Flag::IsOutput);
 		if (typeIDOutput != typeIDInput)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Permulation types not match " << typeIDOutput << " and " << typeIDInput << ERROR_END;
@@ -127,8 +112,6 @@ namespace YBehavior
 
 	YBehavior::NodeState Shuffle::Update(AgentPtr pAgent)
 	{
-		YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Input, true);
-
 		int length = m_Input->ArraySize(pAgent->GetMemory());
 		if (length == 0)
 			return NS_SUCCESS;
@@ -164,8 +147,6 @@ namespace YBehavior
 			m_pHelper->Set(const_cast<void*>(pTargetVariable->GetElementPtr(pAgent->GetMemory(), j)), pTargetVariable->GetElementPtr(pAgent->GetMemory(), i));
 			m_pHelper->Set(const_cast<void*>(pTargetVariable->GetElementPtr(pAgent->GetMemory(), i)), temp.pData);
 		}
-
-		YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Output, false);
 
 		return NS_SUCCESS;
 	}

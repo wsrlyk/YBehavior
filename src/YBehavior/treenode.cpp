@@ -59,7 +59,27 @@ namespace YBehavior
 
 	YBehavior::NodeState TreeNode::Execute(AgentPtr pAgent, NodeState parentState)
 	{
-		return Update(pAgent);
+		YB_IF_HAS_DEBUG_POINT
+		{
+			for (auto it : m_Pins)
+			{
+				if (it->IsOutput())
+					continue;
+				YB_LOG_PIN_BEFORE(it);
+			}
+		}
+		auto res = Update(pAgent);
+		YB_IF_HAS_DEBUG_POINT
+		{
+			for (auto it : m_Pins)
+			{
+				if (!it->IsOutput())
+					continue;
+				YB_LOG_PIN_AFTER(it);
+			}
+		}
+
+		return res;
 	}
 
 	const YBehavior::STRING& TreeNode::GetTreeName() const

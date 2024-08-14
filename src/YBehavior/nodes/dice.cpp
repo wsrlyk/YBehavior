@@ -24,14 +24,6 @@ namespace YBehavior
 	{
 		NodeState ns = NS_FAILURE;
 
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN(m_Distribution, true);
-			YB_LOG_PIN(m_Values, true);
-			YB_LOG_PIN(m_Input, true);
-			YB_LOG_PIN(m_Output, true);
-		}
-
 		INT sizeX = m_Distribution->ArraySize(pAgent->GetMemory());
 		INT sizeY = m_Values->ArraySize(pAgent->GetMemory());
 		if (sizeX != sizeY)
@@ -98,8 +90,6 @@ namespace YBehavior
 		//	YB_LOG_INFO("Switch to default; ");
 		//	ns = m_DefaultChild->Execute(pAgent);
 		//}
-
-		YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Output, false);
 
 		return ns;
 	}

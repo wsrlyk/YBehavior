@@ -131,7 +131,7 @@ namespace TestSharp
 
         public bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
-            m_Target = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Target", pData, true) as SPinEntity;
+            m_Target = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Target", pData, EPinCreateFlag.IsOutput) as SPinEntity;
             if (!m_Target.IsValid)
             {
                 return false;
@@ -168,8 +168,8 @@ namespace TestSharp
 
         public bool OnNodeLoaded(IntPtr pNode, IntPtr pData)
         {
-            m_Src = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Src", pData, true);
-            m_Des = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Des", pData, true);
+            m_Src = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Src", pData);
+            m_Des = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Des", pData, EPinCreateFlag.IsOutput);
 
             return true;
         }
@@ -230,7 +230,7 @@ namespace TestSharp
 
             //m_Entity0 = YBehaviorSharp.SVariableHelper.CreatePin(pNode, "Entity0", pData) as SVariableEntity;
 
-            m_Array0 = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Array0", pData);
+            m_Array0 = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Array0", pData, EPinCreateFlag.IsOutput);
 
             if (YBehaviorSharp.SharpHelper.TryGetValue(pNode, "Type", pData))
             {
@@ -246,8 +246,8 @@ namespace TestSharp
             Console.WriteLine("XCustomAction Update");
 
             //this.LogVariable(m_String0, true);
-            if (SharpHelper.IsDebugging)
-                SharpHelper.TryLogPin(pNode, m_Int0, true);
+            //if (SharpHelper.IsDebugging)
+            //    SharpHelper.TryLogPin(pNode, m_Int0, true);
             //this.LogVariable(m_Entity0, true);
             //this.LogVariable(m_Array0, true);
             XSAgent agent = YBehaviorSharp.SPtrMgr.Instance.Get(pAgent) as XSAgent;
@@ -315,10 +315,8 @@ namespace TestSharp
                 }
             }
 
-            //this.LogVariable(m_String0, false);
-            SharpHelper.TryLogPin(pNode, m_Int0, false);
-            //this.LogVariable(m_Entity0, false);
-            SharpHelper.TryLogPin(pNode, m_Array0, false);
+            //SharpHelper.TryLogPin(pNode, m_Int0, false);
+            //SharpHelper.TryLogPin(pNode, m_Array0, false);
 
             return ENodeState.Success;
         }

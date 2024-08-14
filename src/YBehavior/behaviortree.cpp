@@ -97,12 +97,13 @@ namespace YBehavior
 		///> Inputs & Outputs
 		else if (strcmp(data.name(), "Input") == 0 || strcmp(data.name(), "Output") == 0)
 		{
-			auto& container = data.name()[0] == 'I' ? m_Inputs : m_Outputs;
+			bool isInput = data.name()[0] == 'I';
+			auto& container = isInput ? m_Inputs : m_Outputs;
 			for (auto it = data.attributes_begin(); it != data.attributes_end(); ++it)
 			{
 				IPin* pPin = nullptr;
 
-				PinCreation::CreatePin(this, pPin, it->name(), data, ST_NONE);
+				PinCreation::CreatePin(this, pPin, it->name(), data, isInput ? PinCreation::Flag::None : PinCreation::Flag::IsOutput);
 				if (!pPin)
 				{
 					ERROR_BEGIN_NODE_HEAD << "Failed to Create " << data.name() << ERROR_END;

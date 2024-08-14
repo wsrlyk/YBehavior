@@ -19,13 +19,13 @@ namespace YBehavior
 			return false;
 		}
 
-		PinCreation::CreatePin(this, m_Identification, "Identification", data, false);
+		PinCreation::CreatePin(this, m_Identification, "Identification", data);
 		if (!m_Identification)
 		{
 			return false;
 		}
 		
-		PinCreation::CreatePin(this, m_TreeName, "Tree", data, false);
+		PinCreation::CreatePin(this, m_TreeName, "Tree", data);
 		if (!m_TreeName)
 		{
 			return false;
@@ -70,22 +70,22 @@ namespace YBehavior
 	{
 		if (strcmp(data.name(), "Input") == 0)
 		{
-			return _TryCreateFromTo(data, m_Inputs);
+			return _TryCreateFromTo(data, m_Inputs, true);
 		}
 		else if (strcmp(data.name(), "Output") == 0)
 		{
-			return _TryCreateFromTo(data, m_Outputs);
+			return _TryCreateFromTo(data, m_Outputs, false);
 		}
 		return true;
 	}
 
-	bool SubTree::_TryCreateFromTo(const pugi::xml_node& data, std::vector<IPin*>& container)
+	bool SubTree::_TryCreateFromTo(const pugi::xml_node& data, std::vector<IPin*>& container, bool isInput)
 	{
 		for (auto it = data.attributes_begin(); it != data.attributes_end(); ++it)
 		{
 			IPin* pPin = nullptr;
 
-			PinCreation::CreatePin(this, pPin, it->name(), data, ST_NONE);
+			PinCreation::CreatePin(this, pPin, it->name(), data, isInput ? PinCreation::Flag::None : PinCreation::Flag::IsOutput);
 			if (!pPin)
 			{
 				ERROR_BEGIN_NODE_HEAD << "Failed to Create " << data.name() << ERROR_END;

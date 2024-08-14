@@ -141,14 +141,14 @@ namespace YBehavior
 		if (!PinCreation::GetValue(this, "Type", data, OperatorMap, m_Type))
 			return false;
 
-		PinCreation::CreatePinIfExist(this, m_Current, "Current", data, true);
-		PinCreation::CreatePinIfExist(this, m_Int, "Int", data, true);
-		PinCreation::CreatePinIfExist(this, m_Float, "Float", data, true);
-		PinCreation::CreatePinIfExist(this, m_Bool, "Bool", data, true);
-		PinCreation::CreatePinIfExist(this, m_String, "String", data, true);
-		PinCreation::CreatePinIfExist(this, m_Vector3, "Vector3", data, true);
-		PinCreation::CreatePinIfExist(this, m_Entity, "Entity", data, true);
-		PinCreation::CreatePinIfExist(this, m_Ulong, "Ulong", data, true);
+		PinCreation::CreatePinIfExist(this, m_Current, "Current", data, PinCreation::Flag::IsOutput);
+		PinCreation::CreatePinIfExist(this, m_Int, "Int", data, PinCreation::Flag::IsOutput);
+		PinCreation::CreatePinIfExist(this, m_Float, "Float", data, PinCreation::Flag::IsOutput);
+		PinCreation::CreatePinIfExist(this, m_Bool, "Bool", data, PinCreation::Flag::IsOutput);
+		PinCreation::CreatePinIfExist(this, m_String, "String", data, PinCreation::Flag::IsOutput);
+		PinCreation::CreatePinIfExist(this, m_Vector3, "Vector3", data, PinCreation::Flag::IsOutput);
+		PinCreation::CreatePinIfExist(this, m_Entity, "Entity", data, PinCreation::Flag::IsOutput);
+		PinCreation::CreatePinIfExist(this, m_Ulong, "Ulong", data, PinCreation::Flag::IsOutput);
 
 		m_bHasParam = m_Current || m_Int || m_Float || m_Bool || m_String || m_Vector3 || m_Entity || m_Ulong;
 

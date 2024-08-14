@@ -22,7 +22,7 @@ namespace YBehavior
 
 	bool ConvertToBool::OnLoaded(const pugi::xml_node& data)
 	{
-		PinCreation::CreatePin(this, m_Output, "Output", data, true);
+		PinCreation::CreatePin(this, m_Output, "Output", data, PinCreation::Flag::IsOutput);
 
 		if (!m_Output)
 			return false;

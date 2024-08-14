@@ -241,9 +241,10 @@ namespace YBehaviorSharp
             char separator = '|'
         );
 
-        #region DEBUGGER
+        #region YDEBUGGER
         /// <summary>
-        /// Try to log the value of pin when debugging
+        /// Try to log the value of pin when debugging.
+        /// Only needed in TreeContext
         /// </summary>
         /// <param name="pNode">Pointer to the tree node in cpp</param>
         /// <param name="pin">The pin object</param>
@@ -353,7 +354,7 @@ namespace YBehaviorSharp
             IntPtr pNode,
             string attrName,
             IntPtr data,
-            bool noConst);
+            int flag);
 
         [DllImport(VERSION.dll)]
         static public extern TYPEID GetPinTypeID(IntPtr pPin);

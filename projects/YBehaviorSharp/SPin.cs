@@ -8,6 +8,12 @@ namespace YBehaviorSharp
     using INT = System.Int32;
     using BOOL = System.Byte;
 
+    public enum EPinCreateFlag
+    {
+        None = 0,
+        NoConst = 1,
+        IsOutput = 3,
+    }
     public partial class SharpHelper
     {
         /// <summary>
@@ -18,9 +24,9 @@ namespace YBehaviorSharp
         /// <param name="data">Pointer to the config in cpp</param>
         /// <param name="noConst">If true, the pin must be assigned with a variable</param>
         /// <returns></returns>
-        public static SPin? CreatePin(IntPtr pNode, string attrName, IntPtr data, bool noConst = false)
+        public static SPin? CreatePin(IntPtr pNode, string attrName, IntPtr data, EPinCreateFlag flag = EPinCreateFlag.None)
         {
-            IntPtr v = SUtility.CreatePin(pNode, attrName, data, noConst);
+            IntPtr v = SUtility.CreatePin(pNode, attrName, data, (int)flag);
             if (v == IntPtr.Zero)
                 return null;
             return SPinHelper.GetPin(v);

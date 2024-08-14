@@ -61,7 +61,7 @@ namespace YBehavior
 		TreeNodePtr m_Parent;
 		TreeNodePtr m_Condition;
 		UINT m_UID;	// Unique in a tree
-		StdVector<IPin*> m_Pins;	///> Just for destructions of variables
+		StdVector<IPin*> m_Pins;	///> Just for destructions of pins and printing debug info
 		BehaviorTree* m_Root;
 		ReturnType m_ReturnType;
 		STRING m_ClassName;

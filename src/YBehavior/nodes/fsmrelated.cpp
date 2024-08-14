@@ -34,9 +34,6 @@ namespace YBehavior
 
 	YBehavior::NodeState FSMSetCondition::Update(AgentPtr pAgent)
 	{
-		YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Conditions, true);
-
-
 		if (m_Conditions->IsThisArray())
 		{
 			auto size = m_Conditions->ArraySize(pAgent->GetMemory());

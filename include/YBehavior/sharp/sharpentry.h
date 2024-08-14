@@ -126,12 +126,12 @@ extern "C" YBEHAVIOR_API YBehavior::IPin* CreatePin(
 	YBehavior::TreeNode* pNode,
 	YBehavior::CSTRING_CONST attrName,
 	const pugi::xml_node* data,
-	bool noConst)
+	int flag)
 {
 	if (pNode != nullptr)
 	{
 		YBehavior::IPin* v;
-		auto res = YBehavior::PinCreation::CreatePinIfExist(pNode, v, attrName, *data, noConst);
+		auto res = YBehavior::PinCreation::CreatePinIfExist(pNode, v, attrName, *data, (YBehavior::PinCreation::Flag)flag);
 		return v;
 	}
 	return nullptr;

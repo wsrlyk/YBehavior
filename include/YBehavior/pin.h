@@ -185,7 +185,7 @@ namespace YBehavior
 			return nullptr;
 		}
 
-		bool IsConst() override
+		bool IsConst() const override
 		{
 			return m_Key == Utility::INVALID_KEY;
 		}

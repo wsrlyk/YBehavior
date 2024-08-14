@@ -13,7 +13,7 @@ namespace YBehavior
 			return false;
 		}
 
-		PinCreation::CreatePin(this, m_Length, "Length", data, true);
+		PinCreation::CreatePin(this, m_Length, "Length", data, PinCreation::Flag::IsOutput);
 		if (!m_Length)
 		{
 			return false;
@@ -23,24 +23,15 @@ namespace YBehavior
 
 	YBehavior::NodeState GetArrayLength::Update(AgentPtr pAgent)
 	{
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN(m_Array, true);
-		}
 		INT size = m_Array->ArraySize(pAgent->GetMemory());
 		m_Length->SetValue(pAgent->GetMemory(), &size);
-
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN(m_Length, false);
-		}
 
 		return NS_SUCCESS;
 	}
 
 	bool ClearArray::OnLoaded(const pugi::xml_node& data)
 	{
-		PinCreation::CreatePin(this, m_Array, "Array", data, true);
+		PinCreation::CreatePin(this, m_Array, "Array", data, PinCreation::Flag::NoConst);
 		if (m_Array == nullptr)
 		{
 			return false;
@@ -56,7 +47,7 @@ namespace YBehavior
 
 	bool ArrayPushElement::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeIDArray = PinCreation::CreatePin(this, m_Array, "Array", data, true);
+		TYPEID typeIDArray = PinCreation::CreatePin(this, m_Array, "Array", data, PinCreation::Flag::NoConst);
 		if (m_Array == nullptr)
 		{
 			return false;
@@ -73,16 +64,7 @@ namespace YBehavior
 
 	YBehavior::NodeState ArrayPushElement::Update(AgentPtr pAgent)
 	{
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN(m_Element, true);
-		}
 		m_Array->PushBackElement(pAgent->GetMemory(), m_Element->GetValuePtr(pAgent->GetMemory()));
-
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN(m_Array, false);
-		}
 
 		return NS_SUCCESS;
 	}
@@ -99,10 +81,6 @@ namespace YBehavior
 
 	YBehavior::NodeState IsArrayEmpty::Update(AgentPtr pAgent)
 	{
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN(m_Array, true);
-		}
 		INT size = m_Array->ArraySize(pAgent->GetMemory());
 		if (size != 0)
 			return NS_FAILURE;
@@ -116,7 +94,7 @@ namespace YBehavior
 		{
 			return false;
 		}
-		PinCreation::CreatePin(this, m_Output, "Output", data, true);
+		PinCreation::CreatePin(this, m_Output, "Output", data, PinCreation::Flag::IsOutput);
 		if (m_Output == nullptr)
 		{
 			return false;
@@ -132,7 +110,6 @@ namespace YBehavior
 
 	YBehavior::NodeState GenIndexArray::Update(AgentPtr pAgent)
 	{
-		YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Input, true);
 		INT size = 0;
 		if (m_Input->IsThisArray())
 		{
@@ -158,13 +135,12 @@ namespace YBehavior
 			o.push_back(i);
 		}
 		m_Output->SetValue(pAgent->GetMemory(), o);
-		YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Output, false);
 		return NS_SUCCESS;
 	}
 
 	bool ArrayRemoveElement::OnLoaded(const pugi::xml_node& data)
 	{
-		TYPEID typeIDArray = PinCreation::CreatePin(this, m_Array, "Array", data, true);
+		TYPEID typeIDArray = PinCreation::CreatePin(this, m_Array, "Array", data, PinCreation::Flag::NoConst);
 		if (m_Array == nullptr)
 		{
 			return false;
@@ -188,20 +164,9 @@ namespace YBehavior
 
 	YBehavior::NodeState ArrayRemoveElement::Update(AgentPtr pAgent)
 	{
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN_BEFORE(m_Array);
-			YB_LOG_PIN_BEFORE(m_Element);
-			YB_LOG_PIN_BEFORE(m_IsAll);
-		}
 		BOOL isAll;
 		m_IsAll->GetValue(pAgent->GetMemory(), isAll);
 		m_Array->RemoveElement(pAgent->GetMemory(), m_Element->GetValuePtr(pAgent->GetMemory()), isAll);
-
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN(m_Array, false);
-		}
 
 		return NS_SUCCESS;
 
@@ -222,19 +187,13 @@ namespace YBehavior
 			return false;
 		}
 
-		PinCreation::CreatePinIfExist(this, m_Count, "Count", data, true);
-		PinCreation::CreatePinIfExist(this, m_Index, "Index", data, true);
+		PinCreation::CreatePinIfExist(this, m_Count, "Count", data, PinCreation::Flag::IsOutput);
+		PinCreation::CreatePinIfExist(this, m_Index, "Index", data, PinCreation::Flag::IsOutput);
 		return true;
 	}
 
 	YBehavior::NodeState ArrayHasElement::Update(AgentPtr pAgent)
 	{
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN_BEFORE(m_Array);
-			YB_LOG_PIN_BEFORE(m_Element);
-		}
-
 		bool res = false;
 		INT index;
 		if (m_Count != nullptr)
@@ -251,12 +210,6 @@ namespace YBehavior
 		if (res && m_Index)
 		{
 			m_Index->SetValue(pAgent->GetMemory(), index);
-		}
-
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN_AFTER(m_Count);
-			YB_LOG_PIN_AFTER(m_Index);
 		}
 
 		return res ? NS_SUCCESS : NS_FAILURE;
@@ -276,7 +229,7 @@ namespace YBehavior
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		auto outputType = PinCreation::CreatePin(this, m_Output, "Output", data, true);
+		auto outputType = PinCreation::CreatePin(this, m_Output, "Output", data, PinCreation::Flag::IsOutput);
 
 		///> Right1
 		auto inputType1 = PinCreation::CreatePin(this, m_Input1, "Input1", data);
@@ -300,18 +253,7 @@ namespace YBehavior
 
 	YBehavior::NodeState ArrayOperation::Update(AgentPtr pAgent)
 	{
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN_BEFORE(m_Input1);
-			YB_LOG_PIN_BEFORE(m_Input2);
-		}
-
 		m_pHelper->ArrayOperation(pAgent->GetMemory(), m_Output, m_Input1, m_Input2, m_Operator);
-
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN_AFTER(m_Output);
-		}
 
 		return NS_SUCCESS;
 	}

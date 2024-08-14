@@ -19,7 +19,7 @@ namespace YBehavior
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		auto outputType = PinCreation::CreatePin(this, m_Output, "Output", data, true);
+		auto outputType = PinCreation::CreatePin(this, m_Output, "Output", data, PinCreation::Flag::IsOutput);
 
 		///> Right1
 		auto inputType1 = PinCreation::CreatePin(this, m_Input1, "Input1", data);
@@ -38,19 +38,7 @@ namespace YBehavior
 
 	YBehavior::NodeState Calculator::Update(AgentPtr pAgent)
 	{
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN_BEFORE(m_Input1);
-			YB_LOG_PIN_BEFORE(m_Input2);
-		}
-
 		m_pHelper->Calculate(pAgent->GetMemory(), m_Output, m_Input1, m_Input2, m_Operator);
-
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN_AFTER(m_Output);
-		}
-
 		return NS_SUCCESS;
 	}
 

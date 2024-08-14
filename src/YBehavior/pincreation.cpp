@@ -4,13 +4,13 @@
 namespace YBehavior
 {
 
-	YBehavior::TYPEID PinCreation::CreatePin(TreeNode* pTreeNode, IPin*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst /*= false*/, const STRING& defaultCreateStr /*= Utility::StringEmpty*/)
+	YBehavior::TYPEID PinCreation::CreatePin(TreeNode* pTreeNode, IPin*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag /*= Flag::None*/, const STRING& defaultCreateStr /*= Utility::StringEmpty*/)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
 		if (attrOptr.empty())
 		{
-			if (!noConst && defaultCreateStr.length() > 0)
+			if (!_HasFlag(flag, Flag::NoConst) && defaultCreateStr.length() > 0)
 			{
 				const IDataCreateHelper* helper = DataCreateHelperMgr::Get(defaultCreateStr);
 				if (helper != nullptr)
@@ -33,22 +33,22 @@ namespace YBehavior
 			ERROR_BEGIN_NODE(pTreeNode) << "Cant Find Attribute " << attriName << " in " << data.name() << ERROR_END;
 			return -1;
 		}
-		return _CreatePin(pTreeNode, op, attrOptr, data, noConst);
+		return _CreatePin(pTreeNode, op, attrOptr, data, flag);
 	}
 
-	YBehavior::TYPEID PinCreation::CreatePinIfExist(TreeNode* pTreeNode, IPin*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst /*= false*/)
+	YBehavior::TYPEID PinCreation::CreatePinIfExist(TreeNode* pTreeNode, IPin*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
 		if (attrOptr.empty())
 			return -1;
-		return _CreatePin(pTreeNode, op, attrOptr, data, noConst);
+		return _CreatePin(pTreeNode, op, attrOptr, data, flag);
 	}
 
-	YBehavior::TYPEID PinCreation::_CreatePin(TreeNode* pTreeNode, IPin*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, bool noConst)
+	YBehavior::TYPEID PinCreation::_CreatePin(TreeNode* pTreeNode, IPin*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, Flag flag)
 	{
 		StdVector<STRING> buffer;
-		if (!ParsePin(pTreeNode, attrOptr, data, buffer, ST_NONE, noConst))
+		if (!ParsePin(pTreeNode, attrOptr, data, buffer, ST_NONE, flag))
 			return -1;
 
 		const IDataCreateHelper* helper = DataCreateHelperMgr::Get(buffer[0].substr(0, 2));
@@ -86,17 +86,18 @@ namespace YBehavior
 			///> Set the final names
 			op->SetName(attrOptr.name(), pTreeNode->GetUID(), pTreeNode->GetClassName(), pTreeNode->GetTreeName());
 //#endif
-
+			if (_HasFlag(flag, Flag::IsOutput))
+				op->SetIsOutput(true);
 			return op->TypeID();
 		}
 		else
 		{
-			ERROR_BEGIN_NODE(pTreeNode) << "Get VariableCreateHelper Failed: " << buffer[0].substr(0, 2) << ERROR_END;
+			ERROR_BEGIN_NODE(pTreeNode) << "Get DataCreateHelper Failed: " << buffer[0].substr(0, 2) << ERROR_END;
 			return -1;
 		}
 	}
 
-	bool PinCreation::ParsePin(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, bool noConst /*= false*/)
+	bool PinCreation::ParsePin(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, Flag flag/* = Flag::None*/)
 	{
 		auto tempChar = attri.value();
 		///> split all spaces
@@ -116,12 +117,12 @@ namespace YBehavior
 			}
 		}
 
-		if (noConst)
+		if (_HasFlag(flag, Flag::NoConst))
 		{
 			//if (Utility::ToLower(buffer[0][2]) != Utility::ToLower(variableType))
 			if (Utility::ToUpper(buffer[0][2]) != Utility::POINTER_CHAR)
 			{
-				ERROR_BEGIN_NODE(pTreeNode) << "Cant be a const variable, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
+				ERROR_BEGIN_NODE(pTreeNode) << "Cant be a const pin, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
 				return false;
 			}
 		}
@@ -143,7 +144,7 @@ namespace YBehavior
 			return "";
 		}
 		StdVector<STRING> buffer;
-		if (!ParsePin(pTreeNode, attrOptr, data, buffer, ST_SINGLE, false))
+		if (!ParsePin(pTreeNode, attrOptr, data, buffer, ST_SINGLE, Flag::None))
 			return "";
 
 		return buffer[1];
@@ -156,7 +157,7 @@ namespace YBehavior
 		if (attrOptr.empty())
 			return false;
 		StdVector<STRING> buffer;
-		if (!ParsePin(pTreeNode, attrOptr, data, buffer, ST_SINGLE, false))
+		if (!ParsePin(pTreeNode, attrOptr, data, buffer, ST_SINGLE, Flag::None))
 			return false;
 
 		output = buffer[1];

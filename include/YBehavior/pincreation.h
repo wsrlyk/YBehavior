@@ -11,16 +11,22 @@ namespace YBehavior
 	class PinCreation
 	{
 	public:
+		enum class Flag
+		{
+			None = 0,
+			NoConst = 1,
+			IsOutput = 3,	//Output must be noConst
+		};
 		///> If no config, a default CONST pin will be created
-		static TYPEID CreatePin(TreeNode* pTreeNode, IPin*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false, const STRING& defaultCreateStr = Utility::StringEmpty);
+		static TYPEID CreatePin(TreeNode* pTreeNode, IPin*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag = Flag::None, const STRING& defaultCreateStr = Utility::StringEmpty);
 		///> If no config, a default CONST pin will be created
 		template <typename T>
-		static TYPEID CreatePin(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
+		static TYPEID CreatePin(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag = Flag::None);
 		///> If no config, pin will NOT be created
-		static TYPEID CreatePinIfExist(TreeNode* pTreeNode, IPin*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
+		static TYPEID CreatePinIfExist(TreeNode* pTreeNode, IPin*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag = Flag::None);
 		///> If no config, pin will NOT be created
 		template <typename T>
-		static TYPEID CreatePinIfExist(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst = false);
+		static TYPEID CreatePinIfExist(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag = Flag::None);
 
 		
 		static STRING GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data);
@@ -29,10 +35,11 @@ namespace YBehavior
 		static bool GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T defaultValue, T& outValue);
 		template<typename T>
 		static bool GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T& outValue);
-		static bool ParsePin(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, bool noConst = false);
+		static bool ParsePin(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, Flag flag = Flag::None);
 
 	private:
-		static TYPEID _CreatePin(TreeNode* pTreeNode, IPin*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, bool noConst);
+		static bool _HasFlag(Flag mask, Flag flag) { return (static_cast<int>(mask) & static_cast<int>(flag)) != 0;}
+		static TYPEID _CreatePin(TreeNode* pTreeNode, IPin*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, Flag flag);
 	};
 
 	template<typename T>
@@ -64,7 +71,7 @@ namespace YBehavior
 	}
 
 	template <typename T>
-	TYPEID PinCreation::CreatePinIfExist(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst /*= false*/)
+	TYPEID PinCreation::CreatePinIfExist(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag /*= Flag::None*/)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
@@ -72,7 +79,7 @@ namespace YBehavior
 			return -1;
 
 		IPin* pTemp = nullptr;
-		TYPEID typeID = _CreatePin(pTreeNode, pTemp, attrOptr, data, noConst);
+		TYPEID typeID = _CreatePin(pTreeNode, pTemp, attrOptr, data, flag);
 		if (typeID == GetTypeID<T>())
 		{
 			op = (Pin<T>*)pTemp;
@@ -86,13 +93,13 @@ namespace YBehavior
 	}
 
 	template <typename T>
-	TYPEID PinCreation::CreatePin(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, bool noConst /*= false*/)
+	TYPEID PinCreation::CreatePin(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag /*= Flag::None*/)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
 		if (attrOptr.empty())
 		{
-			if (!noConst)
+			if (!_HasFlag(flag, Flag::NoConst))
 			{
 				op = new Pin<T>();
 				pTreeNode->AddPin(op);
@@ -107,7 +114,7 @@ namespace YBehavior
 		}
 
 		IPin* pTemp = nullptr;
-		TYPEID typeID = _CreatePin(pTreeNode, pTemp, attrOptr, data, noConst);
+		TYPEID typeID = _CreatePin(pTreeNode, pTemp, attrOptr, data, flag);
 		if (typeID == GetTypeID<T>())
 		{
 			op = (Pin<T>*)pTemp;

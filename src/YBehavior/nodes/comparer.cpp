@@ -31,7 +31,7 @@ namespace YBehavior
 
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		auto dataTypeL = PinCreation::CreatePin(this, m_Opl, "Opl", data, true);
+		auto dataTypeL = PinCreation::CreatePin(this, m_Opl, "Opl", data, PinCreation::Flag::IsOutput);
 		if (s_ValidTypes.find(dataTypeL) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in Comparer: " << dataTypeL << ERROR_END;
@@ -56,12 +56,6 @@ namespace YBehavior
 
 	YBehavior::NodeState Comparer::Update(AgentPtr pAgent)
 	{
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN(m_Opl, true);
-			YB_LOG_PIN(m_Opr, true);
-		}
-
 		return m_pHelper->Compare(pAgent->GetMemory(), m_Opl, m_Opr, m_Operator) ? NS_SUCCESS : NS_FAILURE;
 	}
 

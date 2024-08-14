@@ -23,14 +23,6 @@ namespace YBehavior
 	{
 		NodeState ns = NS_FAILURE;
 
-		YB_IF_HAS_DEBUG_POINT
-		{
-			YB_LOG_PIN(m_KeyPointX, true);
-			YB_LOG_PIN(m_KeyPointY, true);
-			YB_LOG_PIN(m_InputX, true);
-			YB_LOG_PIN(m_OutputY, true);
-		}
-
 		INT sizeX = m_KeyPointX->ArraySize(pAgent->GetMemory());
 		INT sizeY = m_KeyPointY->ArraySize(pAgent->GetMemory());
 		if (sizeX != sizeY)
@@ -90,25 +82,7 @@ namespace YBehavior
 			m_OutputY->SetValue(pAgent->GetMemory(), res);
 			ns = NS_SUCCESS;
 			break;
-			//if (onecase == nullptr)
-			//	continue;
-
-			//if (pHelper->Compare(pAgent->GetSharedData(), m_Switch->GetValue(pAgent->GetSharedData()), onecase, OT_EQUAL))
-			//{
-			//	YB_LOG_INFO("Switch to case " << Utility::ToString(m_CasesChilds[i]->GetUID()) << "; ");
-
-			//	ns = m_CasesChilds[i]->Execute(pAgent);
-			//	return ns;
-			//}
 		}
-
-		//if (m_DefaultChild != nullptr)
-		//{
-		//	YB_LOG_INFO("Switch to default; ");
-		//	ns = m_DefaultChild->Execute(pAgent);
-		//}
-
-		YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_OutputY, false);
 
 		return ns;
 	}

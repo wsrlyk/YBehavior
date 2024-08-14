@@ -19,10 +19,12 @@ namespace YBehavior
 	public:
 		virtual ~IPin() {}
 		inline void SetKey(KEY key) { m_Key = key; }
-		inline KEY GetKey() { return m_Key; }
+		inline KEY GetKey() const { return m_Key; }
 		inline void SetIsLocal(bool local) { m_IsLocal = local; }
-		inline bool IsLocal() { return m_IsLocal; }
-		virtual bool IsConst() = 0;
+		inline bool IsLocal() const { return m_IsLocal; }
+		inline void SetIsOutput(bool isOutput) { m_IsOutput = isOutput; }
+		inline bool IsOutput() const { return m_IsOutput; }
+		virtual bool IsConst() const = 0;
 		inline UINT GetIndex() const { return m_Idx; }
 		inline void SetIndex(UINT idx) { m_Idx = idx; }
 
@@ -71,6 +73,7 @@ namespace YBehavior
 	protected:
 		KEY m_Key;
 		bool m_IsLocal;
+		bool m_IsOutput {false};
 		STRING m_Name;
 		STRING m_LogName;
 		STRING m_ReferenceName;

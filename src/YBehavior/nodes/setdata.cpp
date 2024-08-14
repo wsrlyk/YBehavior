@@ -11,7 +11,7 @@ namespace YBehavior
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///> Left
-		TYPEID leftType = PinCreation::CreatePin(this, m_Opl, "Target", data, true);
+		TYPEID leftType = PinCreation::CreatePin(this, m_Opl, "Target", data, PinCreation::Flag::IsOutput);
 		if (leftType == Utility::INVALID_TYPE)
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Opl in SetData: " << leftType << ERROR_END;
@@ -31,8 +31,6 @@ namespace YBehavior
 	YBehavior::NodeState SetData::Update(AgentPtr pAgent)
 	{
 		m_Opl->SetValue(pAgent->GetMemory(), m_Opr->GetValuePtr(pAgent->GetMemory()));
-
-		YB_LOG_PIN_IF_HAS_DEBUG_POINT(m_Opl, false);
 
 		return NS_SUCCESS;
 	}
