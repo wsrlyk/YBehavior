@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Test0 IsEditor="">
   <Node Class="Root" GUID="1" Pos="120,-280">
-    <Shared Vec="_VC 0,7,0" S0="_SC string0" S1="_SC string1" E0="_AC " E1="_AC " II0="IIC 0|1" a="_IC 0" />
+    <Shared Vec="_VC 0,7,0" S0="_SC string0" S1="_SC string1" E0="_AC " E1="AAC " II0="IIC 0|1" a="_IC 0" />
     <Node Class="Sequence" GUID="2" Pos="120,-120">
       <Node Class="IfThenElse" GUID="6" Pos="-74,11">
         <Node Class="Comparer" GUID="7" Connection="if" Pos="-210,120" Operator="_EC &gt;=" Opl="_IP a" Opr="_IC 9" />
         <Node Class="Sequence" GUID="10" Connection="then" Pos="-90,140">
           <Node Class="Calculator" GUID="14" Pos="-190,270" Operator="_EC -" Output="_IP a" Input1="_IP a" Input2="_IC 9" />
-          <Node Class="XCustomAction" GUID="12" Pos="-50,280" Type="_EC Enum2" String0="_SPE S0" Int0="_IPE a" Entity0="_APD " Array0="IIPE II0" />
+          <Node Class="XCustomAction" GUID="12" Pos="-50,280" Type="_EC Enum2" String0="_SPE S0" Int0="_IPE a" Entity0="AAPE E1" Array0="IIPE II0" />
         </Node>
         <Node Class="Calculator" GUID="9" Connection="else" Pos="130,160" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 2" />
       </Node>

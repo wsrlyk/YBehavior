@@ -15,6 +15,10 @@ namespace YBehavior
 	Network::Network()
 	{
 		m_ThreadHandle = 0;
+		m_isConnected = 0;
+		m_WriteSocket = 0;
+		m_ListeningHandle = 0;
+		m_bTerminating = false;
 	}
 
 	bool Network::IsConnected() const

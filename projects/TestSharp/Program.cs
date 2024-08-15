@@ -213,7 +213,7 @@ namespace TestSharp
         //SVariableEntity m_Entity0;
 
         SPin m_Array0;
-
+        SArrayPin? m_Entity0;
         public string NodeName => "XCustomAction";
 
         public ITreeNodeContext CreateContext()
@@ -229,6 +229,7 @@ namespace TestSharp
             m_Int0 = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Int0", pData) as SPinInt;
 
             //m_Entity0 = YBehaviorSharp.SVariableHelper.CreatePin(pNode, "Entity0", pData) as SVariableEntity;
+            YBehaviorSharp.SharpHelper.CreatePin(ref m_Entity0, pNode, "Entity0", pData);
 
             m_Array0 = YBehaviorSharp.SharpHelper.CreatePin(pNode, "Array0", pData, EPinCreateFlag.IsOutput);
 
@@ -315,6 +316,18 @@ namespace TestSharp
                 }
             }
 
+            if (m_Entity0 != null)
+            {
+                var array = m_Entity0.Get(pAgent) as SArrayEntity;
+                if (array != null)
+                {
+                    array.Clear();
+                    foreach (var item in Scene.Instance.entities)
+                    {
+                        array.PushBack(null);
+                    }
+                }
+            }
             //SharpHelper.TryLogPin(pNode, m_Int0, false);
             //SharpHelper.TryLogPin(pNode, m_Array0, false);
 

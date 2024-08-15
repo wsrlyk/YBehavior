@@ -124,7 +124,7 @@ namespace YBehavior
 	public:
 		EntityWrapper()
 			: m_Data(nullptr)
-			, m_IsValid(new bool(false))
+			, m_IsValid()
 		{
 		}
 		EntityWrapper(Entity* pEntity)
@@ -227,8 +227,8 @@ namespace YBehavior
 		}
 
 		inline Entity* Get() const { return m_Data; }
-		inline bool IsValid() const { return *m_IsValid; }
-		inline void SetValid(bool b) { *m_IsValid = b; }
+		inline bool IsValid() const { return m_IsValid && *m_IsValid; }
+		inline void SetValid(bool b) { if (m_IsValid) *m_IsValid = b; }
 	};
 	///> Let the POINTER of the result of calculation returnable
 	template<typename T>

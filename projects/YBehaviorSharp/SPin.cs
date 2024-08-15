@@ -8,10 +8,22 @@ namespace YBehaviorSharp
     using INT = System.Int32;
     using BOOL = System.Byte;
 
+    /// <summary>
+    /// Flags for creating a pin
+    /// </summary>
     public enum EPinCreateFlag
     {
+        /// <summary>
+        /// Nothing
+        /// </summary>
         None = 0,
+        /// <summary>
+        /// The pin must references to a variable
+        /// </summary>
         NoConst = 1,
+        /// <summary>
+        /// The pin is output, so it must references to a variable, and its value will be printed at the end when debugging.
+        /// </summary>
         IsOutput = 3,
     }
     public partial class SharpHelper
@@ -21,16 +33,57 @@ namespace YBehaviorSharp
         /// </summary>
         /// <param name="pNode">Pointer to the tree node in cpp</param>
         /// <param name="attrName">Attribute name</param>
-        /// <param name="data">Pointer to the config in cpp</param>
-        /// <param name="noConst">If true, the pin must be assigned with a variable</param>
+        /// <param name="pData">Pointer to the config in cpp</param>
+        /// <param name="flag">Flags for creating the pin</param>
         /// <returns></returns>
-        public static SPin? CreatePin(IntPtr pNode, string attrName, IntPtr data, EPinCreateFlag flag = EPinCreateFlag.None)
+        public static SPin? CreatePin(IntPtr pNode, string attrName, IntPtr pData, EPinCreateFlag flag = EPinCreateFlag.None)
         {
-            IntPtr v = SUtility.CreatePin(pNode, attrName, data, (int)flag);
+            IntPtr v = SUtility.CreatePin(pNode, attrName, pData, (int)flag);
             if (v == IntPtr.Zero)
                 return null;
             return SPinHelper.GetPin(v);
         }
+        /// <summary>
+        /// Create a pin object
+        /// </summary>
+        /// <param name="pin">Output</param>
+        /// <param name="pNode">Pointer to the tree node in cpp</param>
+        /// <param name="attrName">Attribute name</param>
+        /// <param name="pData">Pointer to the config in cpp</param>
+        /// <param name="flag">Flags for creating the pin</param>
+        /// <returns></returns>
+        public static bool CreatePin<T>(ref T? pin, IntPtr pNode, string attrName, IntPtr pData, EPinCreateFlag flag = EPinCreateFlag.None) where T : SPin
+        {
+            IntPtr v = SUtility.CreatePin(pNode, attrName, pData, (int)flag);
+            if (v == IntPtr.Zero)
+                return false;
+            pin = SPinHelper.GetPin(v) as T;
+            return true;
+        }
+        /// <summary>
+        /// Load a enum
+        /// </summary>
+        /// <typeparam name="TEnum"></typeparam>
+        /// <param name="e">Output</param>
+        /// <param name="pNode">Pointer to the tree node in cpp</param>
+        /// <param name="pData">Pointer to the config in cpp</param>
+        /// <param name="attrName">Attribute name</param>
+        /// <returns></returns>
+        public static bool TryGetEnum<TEnum>(ref TEnum e, IntPtr pNode, IntPtr pData, string attrName) where TEnum : struct
+        {
+            if (TryGetValue(pNode, attrName, pData))
+            {
+                if (!System.Enum.TryParse(GetFromBufferString(), out e))
+                {
+                    NodeError(pNode, attrName + " error: " + GetFromBufferString());
+                    return false;
+                }
+                return true;
+            }
+            else
+                return false;
+        }
+
     }
     /// <summary>
     /// Utilities of pin
