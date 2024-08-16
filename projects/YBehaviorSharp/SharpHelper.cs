@@ -252,6 +252,7 @@ namespace YBehaviorSharp
         public static void TryLogPin(IntPtr pNode, SPin pin, bool before)
         {
 #if YDEBUGGER
+            if (pin == null) return;
             SUtility.LogPin(pNode, pin.Ptr, before);
 #endif
         }

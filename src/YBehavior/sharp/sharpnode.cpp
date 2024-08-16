@@ -13,6 +13,10 @@ namespace YBehavior
 			m_UID = ++s_UID;
 			s_OnInitCallback(pNode, pNode->m_IndexInSharp, m_UID);
 		}
+		else
+		{
+			m_UID = 0;
+		}
 	}
 
 	NodeState SharpNodeContext::_Update(AgentPtr pAgent, NodeState lastState)

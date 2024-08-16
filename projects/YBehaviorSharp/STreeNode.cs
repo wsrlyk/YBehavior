@@ -178,7 +178,10 @@ namespace YBehaviorSharp
             if (!m_dynamicNodes.TryGetValue(pNode, out var dynamicNode))
             {
                 dynamicNode = Activator.CreateInstance(node.GetType()) as IHasPin;
-                m_dynamicNodes.Add(pNode, dynamicNode);
+                if (dynamicNode != null)
+                    m_dynamicNodes.Add(pNode, dynamicNode);
+                else
+                    return false;
             }
             else
             {
@@ -189,15 +192,9 @@ namespace YBehaviorSharp
 
         ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int index)
         {
-            if (index < 0 || index >= m_allNodes.Count)
-                return ENodeState.Invalid;
-            var node = m_allNodes[index];
-            if (node == null) return ENodeState.Invalid;
-            if (!(node is IHasPin))
-                return (node as INoTreeNodeContext).OnNodeUpdate(pNode, pAgent);
-            if (m_dynamicNodes.TryGetValue(pNode, out var dynamicNode))
+            if (TryGetNode(pNode, index, out var node))
             {
-                return (dynamicNode as INoTreeNodeContext).OnNodeUpdate(pNode, pAgent);
+                return (node as INoTreeNodeContext).OnNodeUpdate(pNode, pAgent);
             }
             //not found, should not run to here
             return ENodeState.Invalid;
@@ -205,10 +202,9 @@ namespace YBehaviorSharp
 
         void OnContextInit(IntPtr pNode, int index, uint contextUID)
         {
-            if (index < 0 || index >= m_allNodes.Count)
+            if (!TryGetNode(pNode, index, out var node))
                 return;
-            var node = m_allNodes[index];
-            if (node == null) return;
+
             IHasTreeNodeContext? hasTreeNodeContext = node as IHasTreeNodeContext;
             if (hasTreeNodeContext != null)
             {
@@ -220,10 +216,9 @@ namespace YBehaviorSharp
 
         ENodeState OnContextUpdate(IntPtr pNode, IntPtr pAgent, int index, uint contextUID, ENodeState lastState)
         {
-            if (index < 0 || index >= m_allNodes.Count)
+            if (!TryGetNode(pNode, index, out var node))
                 return ENodeState.Invalid;
-            var node = m_allNodes[index];
-            if (node == null) return ENodeState.Invalid;
+
             if (m_contexts.TryGetValue(contextUID, out var context))
             {
                 var res = context.OnNodeUpdate(pNode, pAgent, lastState);
@@ -239,6 +234,23 @@ namespace YBehaviorSharp
                 return res;
             }
             return ENodeState.Invalid;
+        }
+
+        bool TryGetNode(IntPtr pNode, int index, out object? node)
+        {
+            node = null;
+            if (index < 0 || index >= m_allNodes.Count)
+                return false;
+            node = m_allNodes[index];
+            if (node == null) return false;
+            if (!(node is IHasPin))
+                return true;
+            if (m_dynamicNodes.TryGetValue(pNode, out var dynamicNode))
+            {
+                node = dynamicNode;
+                return true;
+            }
+            return false;
         }
     }
 }
