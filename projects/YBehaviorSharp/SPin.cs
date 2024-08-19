@@ -83,7 +83,15 @@ namespace YBehaviorSharp
             else
                 return false;
         }
-
+        /// <summary>
+        /// Override the pin class
+        /// </summary>
+        /// <typeparam name="TType">Type of value of pin</typeparam>
+        /// <typeparam name="TClass">Pin class</typeparam>
+        public static void OverridePin<TType, TClass>()where TClass : SPin
+        {
+            SPinHelper.OverridePin<TType, TClass>();
+        }
     }
     /// <summary>
     /// Utilities of pin
@@ -101,7 +109,14 @@ namespace YBehaviorSharp
             }
             return new SArrayPin(ptr);
         }
-
+        public static void OverridePin<TType, TClass>() where TClass : SPin
+        {
+            var idx = GetType<TType>.ID;
+            if (idx >= 0 && idx < 7)
+            {
+                s_PinTypes[idx] = typeof(TClass);
+            }
+        }
         static System.Type[] s_PinTypes = new Type[7];
         static SPinHelper()
         {
@@ -141,6 +156,10 @@ namespace YBehaviorSharp
             Ptr = ptr;
             TypeID = SUtility.GetPinTypeID(ptr);
         }
+        /// <summary>
+        /// Whether this pin has a constant value or references to a variable
+        /// </summary>
+        public bool IsConst => SUtility.IsPinConst(Ptr);
     }
     /// <summary>
     /// Array type pin

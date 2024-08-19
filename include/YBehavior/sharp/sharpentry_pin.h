@@ -40,4 +40,9 @@ extern "C" YBEHAVIOR_API YBehavior::TYPEID GetPinElementTypeID(YBehavior::IPin* 
 {
 	return pPin->ElementTypeID();
 }
+
+extern "C" YBEHAVIOR_API bool IsPinConst(YBehavior::IPin* pPin)
+{
+	return pPin && pPin->IsConst();
+}
 #endif

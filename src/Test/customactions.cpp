@@ -115,7 +115,7 @@ YBehavior::NodeState SelectTargetAction::Update(YBehavior::AgentPtr pAgent)
 
 bool SelectTargetAction::OnLoaded(const pugi::xml_node& data)
 {
-	YB::PinCreation::CreatePin(this, m_Target, "Target", data, true);
+	YB::PinCreation::CreatePin(this, m_Target, "Target", data, YBehavior::PinCreation::Flag::IsOutput);
 	if (!m_Target)
 	{
 		return false;
@@ -141,24 +141,24 @@ YBehavior::NodeState GetTargetNameAction::Update(YBehavior::AgentPtr pAgent)
 
 bool GetTargetNameAction::OnLoaded(const pugi::xml_node& data)
 {
-	YB::PinCreation::CreatePin(this, m_Target, "Target", data, true);
+	YB::PinCreation::CreatePin(this, m_Target, "Target", data, YBehavior::PinCreation::Flag::NoConst);
 	if (!m_Target)
 	{
 		return false;
 	}
 	
 	YBehavior::IPin* pTestVariable = nullptr;
-	YB::PinCreation::CreatePin(this, pTestVariable, "TestVariable", data, 0, YBehavior::Utility::GetCreateStr<YBehavior::INT>());
+	YB::PinCreation::CreatePin(this, pTestVariable, "TestVariable", data, YBehavior::PinCreation::Flag::None, YBehavior::Utility::GetCreateStr<YBehavior::INT>());
 
 	return true;
 }
 
 bool ProjectVector3::OnLoaded(const pugi::xml_node& data)
 {
-	YBehavior::PinCreation::CreatePin(this, m_Input, "Input", data, true);
-	YBehavior::PinCreation::CreatePinIfExist(this, m_X, "X", data, true);
-	YBehavior::PinCreation::CreatePinIfExist(this, m_Y, "Y", data, true);
-	YBehavior::PinCreation::CreatePinIfExist(this, m_Z, "Z", data, true);
+	YBehavior::PinCreation::CreatePin(this, m_Input, "Input", data, YBehavior::PinCreation::Flag::NoConst);
+	YBehavior::PinCreation::CreatePinIfExist(this, m_X, "X", data, YBehavior::PinCreation::Flag::IsOutput);
+	YBehavior::PinCreation::CreatePinIfExist(this, m_Y, "Y", data, YBehavior::PinCreation::Flag::IsOutput);
+	YBehavior::PinCreation::CreatePinIfExist(this, m_Z, "Z", data, YBehavior::PinCreation::Flag::IsOutput);
 
 	return true;
 }
@@ -179,7 +179,7 @@ YBehavior::NodeState ProjectVector3::Update(YBehavior::AgentPtr pAgent)
 
 bool SetVector3::OnLoaded(const pugi::xml_node& data)
 {
-	YBehavior::PinCreation::CreatePin(this, m_Output, "Output", data, true);
+	YBehavior::PinCreation::CreatePin(this, m_Output, "Output", data, YBehavior::PinCreation::Flag::IsOutput);
 	YBehavior::PinCreation::CreatePin(this, m_X, "X", data);
 	YBehavior::PinCreation::CreatePin(this, m_Y, "Y", data);
 	YBehavior::PinCreation::CreatePin(this, m_Z, "Z", data);

@@ -92,7 +92,7 @@ namespace YBehavior
 		Mgrs::Instance()->GetBehaviorMgr()->ReloadAll();
 	}
 
-	void _GetToLoadTrees(const TreeMap* treemap, std::list<STRING>& toLoadTrees)
+	void _GetToLoadTrees(const TreeMap* treemap, std::vector<STRING>& toLoadTrees)
 	{
 		for (auto it : treemap->Node2Trees)
 		{
@@ -108,7 +108,7 @@ namespace YBehavior
 
 	void BehaviorProcessHelper::Load(const std::set<STRING>& fsmNames, const std::set<STRING>& treeNames)
 	{
-		std::list<STRING> toLoadTrees;
+		std::vector<STRING> toLoadTrees;
 		for (const auto& s : fsmNames)
 		{
 			const TreeMap* treeMap = nullptr;
@@ -129,8 +129,9 @@ namespace YBehavior
 
 		while (!toLoadTrees.empty())
 		{
-			auto& treename = toLoadTrees.front();
+			auto& treename = toLoadTrees.back();
 			bool visited = !loadedTrees.insert(treename).second;
+			toLoadTrees.pop_back();
 
 			if (!visited)
 			{
@@ -143,8 +144,6 @@ namespace YBehavior
 
 				_GetToLoadTrees(treeMap, toLoadTrees);
 			}
-
-			toLoadTrees.pop_front();
 		}
 	}
 

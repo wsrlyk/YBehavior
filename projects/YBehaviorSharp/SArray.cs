@@ -122,13 +122,32 @@ namespace YBehaviorSharp
         abstract public T? Get(int idx);
         //abstract public bool TryFind(T v, out int index);
     }
-
+    public partial class SharpHelper
+    {
+        /// <summary>
+        /// Override the array class
+        /// </summary>
+        /// <typeparam name="TElement">Type of element</typeparam>
+        /// <typeparam name="TClass">Array class</typeparam>
+        public static void OverrideArray<TElement, TClass>() where TClass : SArrayBase<TElement>
+        {
+            SArrayHelper.OverrideArray<TElement, TClass>();
+        }
+    }
     internal class SArrayHelper
     {
         public static ISArray GetArray(IntPtr ptr, TYPEID elementType)
         {
             var t = s_ArrayTypes[elementType];
             return Activator.CreateInstance(t, ptr) as ISArray;
+        }
+        public static void OverrideArray<TElement, TClass>() where TClass : SArrayBase<TElement>
+        {
+            var idx = GetType<TElement>.ID;
+            if (idx >= 0 && idx < 7)
+            {
+                s_ArrayTypes[idx] = typeof(TClass);
+            }
         }
 
         static System.Type[] s_ArrayTypes = new Type[7];

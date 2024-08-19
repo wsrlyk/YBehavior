@@ -264,7 +264,8 @@ namespace YBehaviorSharp
         public static void TryLogInfo(IntPtr pNode, string info)
         {
 #if YDEBUGGER
-            SUtility.LogInfo(pNode, info);
+            if (SUtility.IsDebugging)
+                SUtility.LogInfo(pNode, info);
 #endif
         }
         /// <summary>
@@ -361,6 +362,8 @@ namespace YBehaviorSharp
         static public extern TYPEID GetPinTypeID(IntPtr pPin);
         [DllImport(VERSION.dll)]
         static public extern TYPEID GetPinElementTypeID(IntPtr pPin);
+        [DllImport(VERSION.dll)]
+        static public extern bool IsPinConst(IntPtr pPin);
 
 #if YDEBUGGER
         [DllImport(VERSION.dll)]
