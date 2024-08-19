@@ -15,7 +15,9 @@
 #include "YBehavior/sharp/sharpentry_buffer.h"
 #include "YBehavior/sharp/sharputility.h"
 #include "YBehavior/sharp/sharpnode.h"
-
+#ifdef YDEBUGGER
+#include "YBehavior/network/network.h"
+#endif
 extern "C" YBEHAVIOR_API YBehavior::SharpEntity* CreateEntity(YBehavior::UINT64 uid)
 {
 	return YBehavior::SharpUnitMgr::Instance()->CreateEntity(uid);
@@ -45,6 +47,10 @@ extern "C" YBEHAVIOR_API void UninitSharp()
 	YBehavior::SharpUnitMgr::Instance()->Clear();
 	YBehavior::NodeFactory::Instance()->ClearSharpNodes();
 	YBehavior::Mgrs::Instance()->Reset();
+#ifdef YDEBUGGER
+	YBehavior::Network::Instance()->Close();
+#endif // YDEBUGGER
+
 }
 
 extern "C" YBEHAVIOR_API void RegisterSharpNode(
