@@ -193,4 +193,24 @@ extern "C" YBEHAVIOR_API int ArrayFind(void* pVector, YBehavior::TYPEID type)
 {
 	return YBehavior::ArrayHelperMgr::Get(type)->ArrayFind(pVector);
 }
+
+extern "C" YBEHAVIOR_API int ArrayGetEntityIndex(void* pVector, int index)
+{
+	if (pVector)
+	{
+		StdVector<YBehavior::EntityWrapper>& vec = *((StdVector<YBehavior::EntityWrapper>*)pVector);
+		if ((int)vec.size() <= index || index < 0)
+			return -1;
+
+		auto& wrapper = vec[index];
+		if (!wrapper.IsValid())
+			return -1;
+		if (auto e = static_cast<YBehavior::SharpEntity*>(wrapper.Get()))
+		{
+			return e->GetIndex();
+		}
+	}
+	return -1;
+}
+
 #endif

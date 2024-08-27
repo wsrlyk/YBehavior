@@ -6,11 +6,11 @@
 
 namespace YBehavior
 {
-	typedef void(STDCALL* OnSharpNodeContextInitDelegate)(TreeNode* pNode, int index, UINT contextUID);
-	typedef NodeState(STDCALL* OnSharpNodeContextUpdateDelegate)(TreeNode* pNode, AgentPtr pAgent, int index, UINT contextUID, NodeState lastState);
+	typedef void(STDCALL* OnSharpNodeContextInitDelegate)(TreeNode* pNode, int staticIndex, int dynamicIndex, UINT contextUID);
+	typedef NodeState(STDCALL* OnSharpNodeContextUpdateDelegate)(TreeNode* pNode, AgentPtr pAgent, int agentIndex, int staticIndex, int dynamicIndex, UINT contextUID, NodeState lastState);
 
-	typedef bool(STDCALL *OnSharpNodeLoadedDelegate)(TreeNode* pNode, const pugi::xml_node* data, int index);
-	typedef NodeState(STDCALL *OnSharpNodeUpdateDelegate)(TreeNode* pNode, AgentPtr pAgent, int index);
+	typedef int(STDCALL *OnSharpNodeLoadedDelegate)(TreeNode* pNode, const pugi::xml_node* data, int staticIndex);
+	typedef NodeState(STDCALL *OnSharpNodeUpdateDelegate)(TreeNode* pNode, AgentPtr pAgent, int agentIndex, int staticIndex, int dynamicIndex);
 
 	class SharpNodeContext : public TreeNodeContext
 	{
@@ -34,12 +34,13 @@ namespace YBehavior
 		static void SetCallback(OnSharpNodeLoadedDelegate onload, OnSharpNodeUpdateDelegate onupdate) { s_OnLoadCallback = onload; s_OnUpdateCallback = onupdate; }
 
 		void SetName(const STRING& name) { m_ClassName = name; }
-		void SetIndexInSharp(int index) { m_IndexInSharp = index; }
+		void SetIndexInSharp(int index) { m_StaticIndexInSharp = index; }
 		void SetHasContext(bool hasContext) { m_HasContext = hasContext; }
 	protected:
 		NodeState Update(AgentPtr pAgent) override;
 		bool OnLoaded(const pugi::xml_node& data) override;
-		int m_IndexInSharp{};
+		int m_StaticIndexInSharp{};
+		int m_DynamicIndexInSharp;
 		bool m_HasContext{};
 
 		static OnSharpNodeLoadedDelegate s_OnLoadCallback;

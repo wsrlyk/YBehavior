@@ -18,18 +18,18 @@
 #ifdef YDEBUGGER
 #include "YBehavior/network/network.h"
 #endif
-extern "C" YBEHAVIOR_API YBehavior::SharpEntity* CreateEntity(YBehavior::UINT64 uid)
+extern "C" YBEHAVIOR_API YBehavior::SharpEntity* CreateEntity(YBehavior::UINT64 uid, int index)
 {
-	return YBehavior::SharpUnitMgr::Instance()->CreateEntity(uid);
+	return YBehavior::SharpUnitMgr::Instance()->CreateEntity(uid, index);
 }
 
 extern "C" YBEHAVIOR_API void DeleteEntity(YBehavior::SharpEntity* pObject)
 {
 	YBehavior::SharpUnitMgr::Instance()->Destroy(pObject);
 }
-extern "C" YBEHAVIOR_API YBehavior::SharpAgent* CreateAgent(YBehavior::SharpEntity* pEntity)
+extern "C" YBEHAVIOR_API YBehavior::SharpAgent* CreateAgent(YBehavior::SharpEntity* pEntity, int index)
 {
-	return YBehavior::SharpUnitMgr::Instance()->CreateAgent(pEntity);
+	return YBehavior::SharpUnitMgr::Instance()->CreateAgent(pEntity, index);
 }
 extern "C" YBEHAVIOR_API void DeleteAgent(YBehavior::SharpAgent* pObject)
 {
@@ -204,6 +204,6 @@ extern "C" YBEHAVIOR_API void LogInfo(YBehavior::TreeNode* pNode, YBehavior::CST
 
 extern "C" YBEHAVIOR_API void NodeError(YBehavior::TreeNode* pNode, YBehavior::CSTRING_CONST str)
 {
-	ERROR_BEGIN << pNode->GetUID() << "." << pNode->GetClassName() << ERROR_END;
+	ERROR_BEGIN << pNode->GetUID() << "." << pNode->GetClassName() << ": " << str << ERROR_END;
 }
 #endif

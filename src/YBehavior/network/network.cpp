@@ -51,7 +51,7 @@ namespace YBehavior
 	{
 		if (!m_ThreadHandle)
 		{
-			ERROR_BEGIN << "Has no thread." << ERROR_END;
+			//ERROR_BEGIN << "Has no thread." << ERROR_END;
 			return;
 		}
 
@@ -71,8 +71,10 @@ namespace YBehavior
 		if (!Socket::Listen(m_ListeningHandle, m_Port, 1))
 		{
 			Socket::Close(m_ListeningHandle);
+			this->ClearAll();
 			return;
 		}
+		LOG_BEGIN << "Socket::Listening" << LOG_THREAD_END;
 
 		while (!m_bTerminating)
 		{
@@ -84,6 +86,7 @@ namespace YBehavior
 					if (!m_WriteSocket)
 					{
 						Socket::Close(m_ListeningHandle);
+						this->ClearAll();
 						return;
 					}
 					
@@ -113,6 +116,7 @@ namespace YBehavior
 					SendAllPackets();
 
 					Socket::Close(m_WriteSocket);
+					this->ClearAll();
 
 					LOG_BEGIN << "Socket::Close" << LOG_THREAD_END;
 
@@ -240,6 +244,7 @@ namespace YBehavior
 		ClearOneConnection();
 		m_bTerminating = false;
 		m_ListeningHandle = 0;
+		m_ThreadHandle = 0;
 	}
 
 	void Network::OnRecieveMessages(const STRING& msg)

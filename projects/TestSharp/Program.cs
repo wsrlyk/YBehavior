@@ -87,6 +87,7 @@ namespace TestSharp
         ulong m_UID = 0;
         public ulong UID => m_UID;
         public IntPtr Ptr { get; set; } = IntPtr.Zero;
+        public int Index { get; set; } = -1;
         XSAgent m_SAgent;
         public XSAgent Agent { get { return m_SAgent; } }
 
@@ -112,6 +113,7 @@ namespace TestSharp
     class XSAgent : IAgent
     {
         public IntPtr Ptr { get; set; } = IntPtr.Zero;
+        public int Index { get; set; } = -1;
         public IEntity? Entity { get; set; } = null;
         public XSAgent(XEntity entity)
         {
@@ -140,7 +142,7 @@ namespace TestSharp
             return true;
         }
 
-        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int agentIndex)
         {
             Console.WriteLine("SelectTargetAction Update");
             IEntity entity = m_Target.Get(pAgent);
@@ -152,7 +154,7 @@ namespace TestSharp
     {
         public string NodeName => "GetTargetNameAction";
 
-        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int agentIndex)
         {
             Console.WriteLine("GetTargetNameAction Update");
             return ENodeState.Success;
@@ -174,7 +176,7 @@ namespace TestSharp
             return true;
         }
 
-        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int agentIndex)
         {
             Console.WriteLine("SetVector3Action Update");
 
@@ -194,7 +196,7 @@ namespace TestSharp
             Console.WriteLine("XCustomActionContext.OnInit");
         }
 
-        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, ENodeState lastState)
+        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int agentIndex, ENodeState lastState)
         {
             ++i;
             if (i > 10)
@@ -241,7 +243,7 @@ namespace TestSharp
             return true;
         }
 
-        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent)
+        public ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int agentIndex)
         {
             Console.WriteLine();
             Console.WriteLine("XCustomAction Update");
@@ -251,12 +253,12 @@ namespace TestSharp
             //    SharpHelper.TryLogPin(pNode, m_Int0, true);
             //this.LogVariable(m_Entity0, true);
             //this.LogVariable(m_Array0, true);
-            XSAgent agent = YBehaviorSharp.SPtrMgr.Instance.Get(pAgent) as XSAgent;
+            XSAgent agent = YBehaviorSharp.SPtrMgr.Instance.Get(agentIndex) as XSAgent;
             if (agent == null)
                 return ENodeState.Failure;
 
-            var key0 = SharpHelper.GetVariableKeyByName("S0");
-            var key1 = SharpHelper.GetVariableKeyByName("S1");
+            var key0 = SharpHelper.GetOrCreateVariableKeyByName("S0");
+            var key1 = SharpHelper.GetOrCreateVariableKeyByName("S1");
 
             string sharedData0 = SharpHelper.GetSharedString(pAgent, key0);
             sharedData0 = sharedData0 + "0";
@@ -289,7 +291,7 @@ namespace TestSharp
             //m_Entity0.Set(pAgent, entity);
 
             ////////////////////////////////////////////////////////////////////////////
-            var keya = SharpHelper.GetVariableKeyByName("II0");
+            var keya = SharpHelper.GetOrCreateVariableKeyByName("II0");
 
             SArrayInt arr = SharpHelper.GetSharedArray<int>(pAgent, keya) as SArrayInt;
             //arr.Clear();

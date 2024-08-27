@@ -59,13 +59,18 @@ namespace YBehaviorSharp
         [DllImport(VERSION.dll)]
         static public extern void SetPinValue(IntPtr pAgent, IntPtr pPin);
 
+        [DllImport(VERSION.dll)]
+        static public extern int GetPinEntityIndex(IntPtr pAgent, IntPtr pPin);
+
 
         [DllImport(VERSION.dll)]
-        static public extern void GetSharedVariable(IntPtr pAgent, int key, int type);
+        static public extern void GetSharedVariableToBuffer(IntPtr pAgent, int key, int type);
         [DllImport(VERSION.dll)]
         static public extern IntPtr GetSharedVariablePtr(IntPtr pAgent, int key, int type);
         [DllImport(VERSION.dll)]
         static public extern void SetSharedVariable(IntPtr pAgent, int key, int type);
+        [DllImport(VERSION.dll)]
+        static public extern int GetSharedEntityIndex(IntPtr pAgent, int key);
 
 
         [DllImport(VERSION.dll)]
@@ -84,6 +89,8 @@ namespace YBehaviorSharp
         static public extern bool ArrayEraseAt(IntPtr pVector, int index, int type);
         [DllImport(VERSION.dll)]
         static public extern int ArrayFind(IntPtr pVector, int type);
+        [DllImport(VERSION.dll)]
+        static public extern int ArrayGetEntityIndex(IntPtr pVector, int index);
 
 
 
@@ -104,7 +111,17 @@ namespace YBehaviorSharp
     }
     public partial class SharpHelper
     {
+        /// <summary>
+        /// Convert from special bool to normal bool
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
         static public bool ConvertBool(BOOL b) { return b != 0; }
+        /// <summary>
+        /// Convert from normal bool to special bool
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
         static public BOOL ConvertBool(bool b) { return (BOOL)(b ? 1 : 0); }
         /// <summary>
         /// Get the string cpp put in the buffer

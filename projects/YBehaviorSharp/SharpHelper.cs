@@ -16,21 +16,21 @@ namespace YBehaviorSharp
     using Bool = System.Byte;
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate bool OnNodeLoaded(IntPtr pNode, IntPtr pData, int index);
+    internal delegate int OnNodeLoaded(IntPtr pNode, IntPtr pData, int staticIndex);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int index);
+    internal delegate ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int agentIndex, int staticIndex, int dynamicIndex);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void OnNodeContextInit(IntPtr pNode, int index, uint contextUID);
+    internal delegate void OnNodeContextInit(IntPtr pNode, int staticIndex, int dynamicIndex, uint contextUID);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate ENodeState OnNodeContextUpdate(IntPtr pNode, IntPtr pAgent, int index, uint contextUID, ENodeState lastState);
+    internal delegate ENodeState OnNodeContextUpdate(IntPtr pNode, IntPtr pAgent, int agentIndex, int staticIndex, int dynamicIndex, uint contextUID, ENodeState lastState);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void LogCallback();
+    internal delegate void LogCallback();
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void GetFilePathCallback();
+    internal delegate void GetFilePathCallback();
 #if YDEBUGGER
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void OnDebugStateChangedCallback(bool isDebugging);
+    internal delegate void OnDebugStateChangedCallback(bool isDebugging);
 #endif
     /// <summary>
     /// Running state of tree node
@@ -58,15 +58,36 @@ namespace YBehaviorSharp
         /// </summary>
         Running,
     };
+    /// <summary>
+    /// A simple Vector3
+    /// </summary>
     public struct Vector3
 	{
+        /// <summary>
+        /// x-axis
+        /// </summary>
 		public float x;
+        /// <summary>
+        /// y-axis
+        /// </summary>
         public float y;
+        /// <summary>
+        /// z-axis
+        /// </summary>
         public float z;
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="_x"></param>
+        /// <param name="_y"></param>
+        /// <param name="_z"></param>
         public Vector3(float _x, float _y, float _z)
         {
             x = _x; y = _y; z = _z;
         }
+        /// <summary>
+        /// Zero Vector3
+        /// </summary>
         public static Vector3 zero = new Vector3(0f, 0f, 0f);
     }
     /// <summary>
@@ -288,12 +309,12 @@ namespace YBehaviorSharp
         [DllImport(VERSION.dll)]
         static public extern void NodeError(IntPtr pNode, string info);
         /// <summary>
-        /// Get the ID of the variable by its name
+        /// Get or create the ID of the variable by its name
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
         [DllImport(VERSION.dll)]
-        static public extern KEY GetVariableKeyByName(string name);
+        static public extern KEY GetOrCreateVariableKeyByName(string name);
 
     }
 

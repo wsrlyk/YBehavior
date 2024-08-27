@@ -25,6 +25,23 @@ extern "C" YBEHAVIOR_API const void* GetPinValuePtr(YBehavior::Agent* pAgent, YB
 	return nullptr;
 }
 
+extern "C" YBEHAVIOR_API int GetPinEntityIndex(YBehavior::Agent* pAgent, YBehavior::IPin* pPin)
+{
+	if (pPin != nullptr && pPin->TypeID() == YBehavior::GetTypeID<YBehavior::EntityWrapper>() && pAgent != nullptr)
+	{
+		YBehavior::EntityWrapper wrapper;
+		static_cast<YBehavior::Pin<YBehavior::EntityWrapper>*>(pPin)->GetValue(pAgent->GetMemory(), wrapper);
+		if (wrapper.IsValid())
+		{
+			if (auto e = static_cast<YBehavior::SharpEntity*>(wrapper.Get()))
+			{
+				return e->GetIndex();
+			}
+		}
+	}
+	return -1;
+}
+
 extern "C" YBEHAVIOR_API void SetPinValue(YBehavior::Agent* pAgent, YBehavior::IPin* pPin)
 {
 	if (pPin != nullptr && !pPin->IsConst() && pAgent != nullptr)

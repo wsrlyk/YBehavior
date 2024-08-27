@@ -303,8 +303,8 @@ namespace YBehaviorSharp
 
         public override IEntity? Get(int idx)
         {
-            SUtility.ArrayGet(m_Core, idx, m_ElementID);
-            return SPtrMgr.Instance.Get(SUtility.GetFromBufferEntity()) as IEntity;
+            var index = SUtility.ArrayGetEntityIndex(m_Core, idx);
+            return SPtrMgr.Instance.Get(index) as IEntity;
         }
     }
     /// <summary>

@@ -11,15 +11,19 @@ namespace YBehaviorSharp
     /// </summary>
     public interface ITreeNodeContext
     {
+        /// <summary>
+        /// Called when created
+        /// </summary>
         void OnInit();
         /// <summary>
         /// Called every tick
         /// </summary>
         /// <param name="pNode">Pointer to the node in cpp</param>
         /// <param name="pAgent">Pointer to the agent in cpp</param>
+        /// <param name="agentIndex">Index of agent</param>
         /// <param name="lastState">The result of last node, usually used in branch node to get the result of child node</param>
         /// <returns></returns>
-        ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, ENodeState lastState);
+        ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int agentIndex, ENodeState lastState);
     }
 
     /// <summary>
@@ -50,8 +54,9 @@ namespace YBehaviorSharp
         /// </summary>
         /// <param name="pNode">Pointer to the node in cpp</param>
         /// <param name="pAgent">Pointer to the agent in cpp</param>
+        /// <param name="agentIndex">Index of agent</param>
         /// <returns></returns>
-        ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent);
+        ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int agentIndex);
     }
 
     /// <summary>
@@ -127,7 +132,7 @@ namespace YBehaviorSharp
     {
         public static STreeNodeMgr Instance { get; private set; } = new STreeNodeMgr();
 
-        Dictionary<IntPtr, IHasPin> m_dynamicNodes = new Dictionary<IntPtr, IHasPin>();
+        List<IHasPin> m_dynamicNodes = new List<IHasPin>();
         List<ITreeNode> m_allNodes = new List<ITreeNode>();
 
         Dictionary<uint, ITreeNodeContext> m_contexts = new Dictionary<uint, ITreeNodeContext>();
@@ -167,42 +172,39 @@ namespace YBehaviorSharp
             }
         }
 
-        bool OnNodeLoaded(IntPtr pNode, IntPtr pData, int index)
+        int OnNodeLoaded(IntPtr pNode, IntPtr pData, int index)
         {
             if (index < 0 || index >= m_allNodes.Count)
-                return false;
+                return -2;
             var node = m_allNodes[index];
-            if (node == null) return false;
+            if (node == null) return -2;
             if (!(node is IHasPin))
-                return true;
-            if (!m_dynamicNodes.TryGetValue(pNode, out var dynamicNode))
-            {
-                dynamicNode = Activator.CreateInstance(node.GetType()) as IHasPin;
-                if (dynamicNode != null)
-                    m_dynamicNodes.Add(pNode, dynamicNode);
-                else
-                    return false;
-            }
+                return -1;
+            int dynamicIndex = m_dynamicNodes.Count;
+            var dynamicNode = Activator.CreateInstance(node.GetType()) as IHasPin;
+            if (dynamicNode != null)
+                m_dynamicNodes.Add(dynamicNode);
             else
-            {
-                //multi load, should not run to here
-            }
-            return dynamicNode.OnNodeLoaded(pNode, pData);
+                return -2;
+
+            if (!dynamicNode.OnNodeLoaded(pNode, pData))
+                return -2;
+            return dynamicIndex;
         }
 
-        ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int index)
+        ENodeState OnNodeUpdate(IntPtr pNode, IntPtr pAgent, int agentIndex, int staticIndex, int dynamicIndex)
         {
-            if (TryGetNode(pNode, index, out var node))
+            if (TryGetNode(staticIndex, dynamicIndex, out var node))
             {
-                return (node as INoTreeNodeContext).OnNodeUpdate(pNode, pAgent);
+                return (node as INoTreeNodeContext).OnNodeUpdate(pNode, pAgent, agentIndex);
             }
             //not found, should not run to here
             return ENodeState.Invalid;
         }
 
-        void OnContextInit(IntPtr pNode, int index, uint contextUID)
+        void OnContextInit(IntPtr pNode, int staticIndex, int dynamicIndex, uint contextUID)
         {
-            if (!TryGetNode(pNode, index, out var node))
+            if (!TryGetNode(staticIndex, dynamicIndex, out var node))
                 return;
 
             IHasTreeNodeContext? hasTreeNodeContext = node as IHasTreeNodeContext;
@@ -214,14 +216,14 @@ namespace YBehaviorSharp
             }
         }
 
-        ENodeState OnContextUpdate(IntPtr pNode, IntPtr pAgent, int index, uint contextUID, ENodeState lastState)
+        ENodeState OnContextUpdate(IntPtr pNode, IntPtr pAgent, int agentIndex, int staticIndex, int dynamicIndex, uint contextUID, ENodeState lastState)
         {
-            if (!TryGetNode(pNode, index, out var node))
+            if (!TryGetNode(staticIndex, dynamicIndex, out var node))
                 return ENodeState.Invalid;
 
             if (m_contexts.TryGetValue(contextUID, out var context))
             {
-                var res = context.OnNodeUpdate(pNode, pAgent, lastState);
+                var res = context.OnNodeUpdate(pNode, pAgent, agentIndex, lastState);
                 if (res != ENodeState.Running && res != ENodeState.Break)
                 {
                     IHasTreeNodeContext? hasTreeNodeContext = node as IHasTreeNodeContext;
@@ -236,21 +238,14 @@ namespace YBehaviorSharp
             return ENodeState.Invalid;
         }
 
-        bool TryGetNode(IntPtr pNode, int index, out object? node)
+        bool TryGetNode(int staticIndex, int dynamicIndex, out object? node)
         {
             node = null;
-            if (index < 0 || index >= m_allNodes.Count)
-                return false;
-            node = m_allNodes[index];
-            if (node == null) return false;
-            if (!(node is IHasPin))
-                return true;
-            if (m_dynamicNodes.TryGetValue(pNode, out var dynamicNode))
-            {
-                node = dynamicNode;
-                return true;
-            }
-            return false;
+            if (dynamicIndex >= 0 && dynamicIndex < m_dynamicNodes.Count)
+                node = m_dynamicNodes[dynamicIndex];
+            else if (staticIndex >= 0 && staticIndex < m_allNodes.Count)
+                node = m_allNodes[staticIndex];
+            return node != null;
         }
     }
 }

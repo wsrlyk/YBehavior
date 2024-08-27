@@ -69,7 +69,7 @@ namespace YBehaviorSharp
         /// <param name="pData">Pointer to the config in cpp</param>
         /// <param name="attrName">Attribute name</param>
         /// <returns></returns>
-        public static bool TryGetEnum<TEnum>(ref TEnum e, IntPtr pNode, IntPtr pData, string attrName) where TEnum : struct
+        public static bool TryGetEnum<TEnum>(ref TEnum e, IntPtr pNode, string attrName, IntPtr pData) where TEnum : struct
         {
             if (TryGetValue(pNode, attrName, pData))
             {
@@ -243,11 +243,8 @@ namespace YBehaviorSharp
         /// <returns></returns>
         public IEntity? Get(IntPtr pAgent)
         {
-            if (SUtility.GetPinValue(pAgent, Ptr))
-            {
-                return SPtrMgr.Instance.Get(SUtility.GetFromBufferEntity()) as IEntity;
-            }
-            return null;
+            var index = SUtility.GetPinEntityIndex(pAgent, Ptr);
+            return SPtrMgr.Instance.Get(index) as IEntity;
         }
 
         /// <summary>

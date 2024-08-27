@@ -1,6 +1,7 @@
 #ifdef YSHARP
 
 #include "YBehavior/sharp/sharpnode.h"
+#include "YBehavior/sharp/sharpagent.h"
 
 namespace YBehavior
 {
@@ -11,7 +12,7 @@ namespace YBehavior
 		if (pNode->m_HasContext && s_OnInitCallback)
 		{
 			m_UID = ++s_UID;
-			s_OnInitCallback(pNode, pNode->m_IndexInSharp, m_UID);
+			s_OnInitCallback(pNode, pNode->m_StaticIndexInSharp, pNode->m_DynamicIndexInSharp, m_UID);
 		}
 		else
 		{
@@ -24,7 +25,8 @@ namespace YBehavior
 		if (m_UID && s_OnUpdateCallback)
 		{
 			auto pNode = (SharpNode*)m_pNode;
-			return s_OnUpdateCallback(pNode, pAgent, pNode->m_IndexInSharp, m_UID, lastState);
+			auto pShartAgent = (SharpAgent*)pAgent;
+			return s_OnUpdateCallback(pNode, pAgent, pShartAgent->GetIndex(), pNode->m_StaticIndexInSharp, pNode->m_DynamicIndexInSharp, m_UID, lastState);
 		}
 		return m_pNode->Execute(pAgent, lastState);
 	}
@@ -39,7 +41,8 @@ namespace YBehavior
 		if (s_OnUpdateCallback)
 		{
 			//LOG_BEGIN << "SharpNode Update" << LOG_END;
-			return s_OnUpdateCallback(this, pAgent, m_IndexInSharp);
+			auto pShartAgent = (SharpAgent*)pAgent;
+			return s_OnUpdateCallback(this, pAgent, pShartAgent->GetIndex(), m_StaticIndexInSharp, m_DynamicIndexInSharp);
 		}
 		return NS_SUCCESS;
 	}
@@ -50,7 +53,16 @@ namespace YBehavior
 		if (s_OnLoadCallback)
 		{
 			//LOG_BEGIN << "SharpNode OnLoaded" << LOG_END;
-			return s_OnLoadCallback(this, &data, m_IndexInSharp);
+			int res = s_OnLoadCallback(this, &data, m_StaticIndexInSharp);
+			if (res >= -1)
+			{
+				m_DynamicIndexInSharp = res;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		return true;
 	}

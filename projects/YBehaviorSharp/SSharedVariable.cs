@@ -13,7 +13,7 @@ namespace YBehaviorSharp
         /// <returns></returns>
         public static int GetSharedInt(IntPtr pAgent, int key)
         {
-            SUtility.GetSharedVariable(pAgent, key, GetType<int>.ID);
+            SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<int>.ID);
             return SUtility.GetFromBufferInt();
         }
         /// <summary>
@@ -25,7 +25,7 @@ namespace YBehaviorSharp
         /// <returns></returns>
         public static float GetSharedFloat(IntPtr pAgent, int key)
         {
-            SUtility.GetSharedVariable(pAgent, key, GetType<float>.ID);
+            SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<float>.ID);
             return SUtility.GetFromBufferFloat();
         }
         /// <summary>
@@ -37,7 +37,7 @@ namespace YBehaviorSharp
         /// <returns></returns>
         public static ulong GetSharedUlong(IntPtr pAgent, int key)
         {
-            SUtility.GetSharedVariable(pAgent, key, GetType<ulong>.ID);
+            SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<ulong>.ID);
             return SUtility.GetFromBufferUlong();
         }
         /// <summary>
@@ -49,7 +49,7 @@ namespace YBehaviorSharp
         /// <returns></returns>
         public static bool GetSharedBool(IntPtr pAgent, int key)
         {
-            SUtility.GetSharedVariable(pAgent, key, GetType<int>.ID);
+            SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<int>.ID);
             return SUtility.GetFromBufferBool() != 0;
         }
         /// <summary>
@@ -61,7 +61,7 @@ namespace YBehaviorSharp
         /// <returns></returns>
         public static Vector3 GetSharedVector3(IntPtr pAgent, int key)
         {
-            SUtility.GetSharedVariable(pAgent, key, GetType<Vector3>.ID);
+            SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<Vector3>.ID);
             return SUtility.GetFromBufferVector3();
         }
         /// <summary>
@@ -73,7 +73,7 @@ namespace YBehaviorSharp
         /// <returns></returns>
         public static string GetSharedString(IntPtr pAgent, int key)
         {
-            SUtility.GetSharedVariable(pAgent, key, GetType<string>.ID);
+            SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<string>.ID);
             SUtility.GetFromBufferString(SUtility.CharBuffer, SUtility.CharBuffer.Length);
             return SUtility.BuildStringFromCharBuffer();
         }
@@ -86,9 +86,9 @@ namespace YBehaviorSharp
         /// <returns></returns>
         public static IEntity? GetSharedEntity(IntPtr pAgent, int key)
         {
-            SUtility.GetSharedVariable(pAgent, key, GetType<IEntity>.ID);
-            var ptr = SUtility.GetFromBufferEntity();
-            return SPtrMgr.Instance.Get(ptr) as IEntity;
+            var index = SUtility.GetSharedEntityIndex(pAgent, key);
+            //var ptr = SUtility.GetFromBufferEntity();
+            return SPtrMgr.Instance.Get(index) as IEntity;
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -183,8 +183,7 @@ namespace YBehaviorSharp
         /// <returns>A new array object</returns>
         public static ISArray GetSharedArray<T>(IntPtr pAgent, int key)
         {
-            SUtility.GetSharedVariable(pAgent, key, GetType<T>.VecID);
-            return SArrayHelper.GetArray(SUtility.GetFromBufferArray(GetType<T>.VecID), GetType<T>.ID);
+            return SArrayHelper.GetArray(SUtility.GetSharedVariablePtr(pAgent, key, GetType<T>.VecID), GetType<T>.ID);
 
         }
         /// <summary>
@@ -198,8 +197,7 @@ namespace YBehaviorSharp
         /// <returns></returns>
         public static void GetSharedArray<T>(IntPtr pAgent, int key, SArray<T> array) where T : struct
         {
-            SUtility.GetSharedVariable(pAgent, key, GetType<T>.VecID);
-            array.Init(SUtility.GetFromBufferArray(GetType<T>.VecID));
+            array.Init(SUtility.GetSharedVariablePtr(pAgent, key, GetType<T>.VecID));
 
         }
         /// <summary>
@@ -213,8 +211,7 @@ namespace YBehaviorSharp
         /// <returns></returns>
         public static void GetSharedArray<T>(IntPtr pAgent, int key, SArrayClass<T> array) where T : class
         {
-            SUtility.GetSharedVariable(pAgent, key, GetType<T>.VecID);
-            array.Init(SUtility.GetFromBufferArray(GetType<T>.VecID));
+            array.Init(SUtility.GetSharedVariablePtr(pAgent, key, GetType<T>.VecID));
 
         }
     }

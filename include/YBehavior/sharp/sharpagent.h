@@ -10,19 +10,22 @@ namespace YBehavior
 	class SharpEntity : public Entity
 	{
 		UINT64 m_UID;
+		int m_Index;
 	public:
-		SharpEntity(UINT64 uid);
+		SharpEntity(UINT64 uid, int index);
 		STRING ToString() const override;
 		UINT64 GetUID() const { return m_UID;}
+		int GetIndex() const {return m_Index;}
 	};
 
 	class SharpAgent : public Agent
 	{
+		int m_Index;
 	public:
-		SharpAgent(SharpEntity* entity);
+		SharpAgent(SharpEntity* entity, int index);
 
 		UINT64 GetDebugUID() const override { return ((SharpEntity*)m_Entity)->GetUID(); }
-
+		int GetIndex() const { return m_Index; }
 	};
 
 	class SharpUnitMgr : public Singleton<SharpUnitMgr>
@@ -58,13 +61,13 @@ namespace YBehavior
 			container.clear();
 		}
 	public:
-		SharpAgent* CreateAgent(SharpEntity* entity)
+		SharpAgent* CreateAgent(SharpEntity* entity, int index)
 		{
-			return Create(m_agents, entity);
+			return Create(m_agents, entity, index);
 		}
-		SharpEntity* CreateEntity(ULONG uid)
+		SharpEntity* CreateEntity(ULONG uid, int index)
 		{
-			return Create(m_entities, uid);
+			return Create(m_entities, uid, index);
 		}
 		void Destroy(SharpAgent* o)
 		{

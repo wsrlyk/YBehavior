@@ -6,9 +6,10 @@
 namespace YBehavior
 {
 
-	SharpEntity::SharpEntity(UINT64 uid)
+	SharpEntity::SharpEntity(UINT64 uid, int index)
 	: Entity()
 	, m_UID(uid)
+	, m_Index(index)
 	{
 
 	}
@@ -18,8 +19,9 @@ namespace YBehavior
 		return Utility::ToString(m_UID % 1000);
 	}
 
-	SharpAgent::SharpAgent(SharpEntity* entity)
+	SharpAgent::SharpAgent(SharpEntity* entity, int index)
 	: Agent(entity)
+	, m_Index(index)
 	{
 
 	}
