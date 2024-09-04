@@ -14,6 +14,14 @@ namespace YBehaviorSharp
     public interface ISArray
     {
         /// <summary>
+        /// Get the pointer to the std::vector in cpp
+        /// </summary>
+        IntPtr Ptr { get; }
+        /// <summary>
+        /// Get the type of element
+        /// </summary>
+        TYPEID ElementType { get; }
+        /// <summary>
         /// Init the array data
         /// </summary>
         /// <param name="core">Pointer to the std::vector in cpp</param>
@@ -36,6 +44,8 @@ namespace YBehaviorSharp
     {
         protected IntPtr m_Core;
         protected TYPEID m_ElementID;
+        public IntPtr Ptr => m_Core;
+        public TYPEID ElementType => m_ElementID;
         public SArrayBase(IntPtr core)
         {
             m_ElementID = GetType<T>.ID;

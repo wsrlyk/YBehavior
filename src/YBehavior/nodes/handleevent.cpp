@@ -104,6 +104,17 @@ namespace YBehavior
 				{
 					pNode->m_Ulong->SetValue(pAgent->GetMemory(), *pEvent->pVecUlong);
 				}
+				YB_IF_HAS_DEBUG_POINT
+				{
+				YB_LOG_PIN_AFTER(pNode->m_Current);
+				YB_LOG_PIN_AFTER(pNode->m_Int);
+				YB_LOG_PIN_AFTER(pNode->m_Float);
+				YB_LOG_PIN_AFTER(pNode->m_Bool);
+				YB_LOG_PIN_AFTER(pNode->m_String);
+				YB_LOG_PIN_AFTER(pNode->m_Vector3);
+				YB_LOG_PIN_AFTER(pNode->m_Entity);
+				YB_LOG_PIN_AFTER(pNode->m_Ulong);
+				}
 			}
 
 			pEvent->Recycle();

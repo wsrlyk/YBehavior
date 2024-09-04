@@ -10,14 +10,15 @@ namespace YBehavior
 	class IArrayHelper
 	{
 	public:
-		virtual UINT GetArraySize(const void* pVector) = 0;
+		virtual UINT GetSize(const void* pVector) = 0;
 		virtual void Clear(void* pVector) = 0;
 		virtual void PushBack(void* pVector) = 0;
 		virtual bool Set(void* pVector, int index) = 0;
 		virtual bool Get(void* pVector, int index) = 0;
-		virtual bool ArrayErase(void* pVector) = 0;
-		virtual bool ArrayEraseAt(void* pVector, int index) = 0;
-		virtual int ArrayFind(void* pVector) = 0;
+		virtual bool Erase(void* pVector) = 0;
+		virtual bool EraseAt(void* pVector, int index) = 0;
+		virtual int Find(void* pVector) = 0;
+		virtual bool Assign(void* pFrom, void* pTo) = 0;
 	};
 
 	template<typename T>
@@ -26,7 +27,7 @@ namespace YBehavior
 	public:
 		static ArrayHelper<T> s_Instance;
 	public:
-		UINT GetArraySize(const void* pVector) override
+		UINT GetSize(const void* pVector) override
 		{
 			if (pVector)
 				return (UINT)((const StdVector<T>*)pVector)->size();
@@ -74,7 +75,7 @@ namespace YBehavior
 			}
 			return false;
 		}
-		bool ArrayErase(void* pVector) override
+		bool Erase(void* pVector) override
 		{
 			if (pVector)
 			{
@@ -91,7 +92,7 @@ namespace YBehavior
 			}
 			return false;
 		}
-		bool ArrayEraseAt(void* pVector, int index) override
+		bool EraseAt(void* pVector, int index) override
 		{
 			if (pVector)
 			{
@@ -106,7 +107,7 @@ namespace YBehavior
 			}
 			return false;
 		}
-		int ArrayFind(void* pVector) override
+		int Find(void* pVector) override
 		{
 			if (pVector)
 			{
@@ -118,6 +119,18 @@ namespace YBehavior
 			}
 			return -1;
 		}
+		bool Assign(void* pFrom, void* pTo) override
+		{
+			if (pFrom && pTo)
+			{
+				StdVector<T>& from = *((StdVector<T>*)pFrom);
+				StdVector<T>& to = *((StdVector<T>*)pTo);
+				to.assign(from.begin(), from.end());
+				return true;
+			}
+			return false;
+		}
+
 	};
 
 	template<typename T>
@@ -162,9 +175,8 @@ namespace YBehavior
 
 extern "C" YBEHAVIOR_API YBehavior::UINT ArrayGetSize(void* pVector, YBehavior::TYPEID type)
 {
-	return YBehavior::ArrayHelperMgr::Get(type)->GetArraySize(pVector);
+	return YBehavior::ArrayHelperMgr::Get(type)->GetSize(pVector);
 }
-
 extern "C" YBEHAVIOR_API void ArrayClear(void* pVector, YBehavior::TYPEID type)
 {
 	YBehavior::ArrayHelperMgr::Get(type)->Clear(pVector);
@@ -183,17 +195,20 @@ extern "C" YBEHAVIOR_API bool ArrayGet(void* pVector, int index, YBehavior::TYPE
 }
 extern "C" YBEHAVIOR_API bool ArrayErase(void* pVector, YBehavior::TYPEID type)
 {
-	return YBehavior::ArrayHelperMgr::Get(type)->ArrayErase(pVector);
+	return YBehavior::ArrayHelperMgr::Get(type)->Erase(pVector);
 }
 extern "C" YBEHAVIOR_API bool ArrayEraseAt(void* pVector, int index, YBehavior::TYPEID type)
 {
-	return YBehavior::ArrayHelperMgr::Get(type)->ArrayEraseAt(pVector, index);
+	return YBehavior::ArrayHelperMgr::Get(type)->EraseAt(pVector, index);
 }
 extern "C" YBEHAVIOR_API int ArrayFind(void* pVector, YBehavior::TYPEID type)
 {
-	return YBehavior::ArrayHelperMgr::Get(type)->ArrayFind(pVector);
+	return YBehavior::ArrayHelperMgr::Get(type)->Find(pVector);
 }
-
+extern "C" YBEHAVIOR_API bool ArrayAssign(void* pFrom, void* pTo, YBehavior::TYPEID type)
+{
+	return YBehavior::ArrayHelperMgr::Get(type)->Assign(pFrom, pTo);
+}
 extern "C" YBEHAVIOR_API int ArrayGetEntityIndex(void* pVector, int index)
 {
 	if (pVector)

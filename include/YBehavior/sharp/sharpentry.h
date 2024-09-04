@@ -122,10 +122,15 @@ extern "C" YBEHAVIOR_API bool SetBehavior(
 	YBehavior::BehaviorKey key(fsmName, pS2t, pT2t);
 	return pAgent->SetBehavior(key);
 }
+extern "C" YBEHAVIOR_API void UnloadBehavior(YBehavior::Agent* pAgent)
+{
+	pAgent->UnloadBehavior();
+}
 
-extern "C" YBEHAVIOR_API void Tick(YBehavior::Agent* pAgent)
+extern "C" YBEHAVIOR_API YBehavior::MachineRunRes Tick(YBehavior::Agent* pAgent)
 {
 	pAgent->Tick();
+	return pAgent->GetMachineContext()->LastRunRes;
 }
 
 extern "C" YBEHAVIOR_API YBehavior::IPin* CreatePin(
@@ -205,5 +210,18 @@ extern "C" YBEHAVIOR_API void LogInfo(YBehavior::TreeNode* pNode, YBehavior::CST
 extern "C" YBEHAVIOR_API void NodeError(YBehavior::TreeNode* pNode, YBehavior::CSTRING_CONST str)
 {
 	ERROR_BEGIN << pNode->GetUID() << "." << pNode->GetClassName() << ": " << str << ERROR_END;
+}
+
+extern "C" YBEHAVIOR_API unsigned GetTreeNodeCount(YBehavior::Agent* pAgent, YBehavior::CSTRING_CONST str)
+{
+	if (auto behavior = pAgent->GetBehavior())
+	{
+		return behavior->GetTreeNodeCount(str);
+	}
+	return 0u;
+}
+extern "C" YBEHAVIOR_API YBehavior::UINT ClearEvents(YBehavior::Agent* pAgent)
+{
+	return pAgent->GetEventQueue()->ClearAll();
 }
 #endif

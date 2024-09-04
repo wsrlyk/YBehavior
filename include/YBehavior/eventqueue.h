@@ -49,7 +49,7 @@ namespace YBehavior
 		void RegisterEvent(const STRING& e, UINT count);
 
 		void Clear(StdVector<STRING>* pClearedEvents = nullptr);
-		void ClearAll(StdVector<STRING>* pClearedEvents = nullptr);
+		UINT ClearAll(StdVector<STRING>* pClearedEvents = nullptr);
 		Event* Create(const STRING& name);
 		inline bool IsDirty() { return !m_Events.empty(); }
 

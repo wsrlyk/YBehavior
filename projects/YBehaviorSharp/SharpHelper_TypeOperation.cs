@@ -64,7 +64,7 @@ namespace YBehaviorSharp
 
 
         [DllImport(VERSION.dll)]
-        static public extern void GetSharedVariableToBuffer(IntPtr pAgent, int key, int type);
+        static public extern bool GetSharedVariableToBuffer(IntPtr pAgent, int key, int type);
         [DllImport(VERSION.dll)]
         static public extern IntPtr GetSharedVariablePtr(IntPtr pAgent, int key, int type);
         [DllImport(VERSION.dll)]

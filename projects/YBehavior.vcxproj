@@ -46,6 +46,7 @@
     <ClInclude Include="..\include\YBehavior\operations\dataoperation.h" />
     <ClInclude Include="..\include\YBehavior\operations\datarandom.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpagent.h" />
+    <ClInclude Include="..\include\YBehavior\sharp\sharpentry_event.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharputility.h" />
     <ClInclude Include="..\include\YBehavior\treenode.h" />
     <ClInclude Include="..\include\YBehavior\behaviorprocess.h" />

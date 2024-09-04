@@ -82,10 +82,11 @@ void EventQueue::Event::Assign(const StdVector<TYPE>& data)\
 		};
 		m_Events.erase(std::remove_if(m_Events.begin(), m_Events.end(), RemoveNotNotClear(pClearedEvents)), m_Events.end());
 	}
-	void EventQueue::ClearAll(StdVector<STRING>* pClearedEvents)
+	UINT EventQueue::ClearAll(StdVector<STRING>* pClearedEvents)
 	{
-		if (m_Events.empty())
-			return;
+		UINT res = m_Events.size();
+		if (res == 0)
+			return res;
 
 		if (pClearedEvents)
 		{
@@ -100,6 +101,7 @@ void EventQueue::Event::Assign(const StdVector<TYPE>& data)\
 			//ObjectPoolStatic<EventQueue::Event>::Recycle(*it);
 		}
 		m_Events.clear();
+		return res;
 	}
 
 	EventQueue::Event* EventQueue::Create(const STRING& name)

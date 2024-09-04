@@ -10,11 +10,20 @@ namespace YBehaviorSharp
         /// </summary>
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
-        /// <returns></returns>
-        public static int GetSharedInt(IntPtr pAgent, int key)
+        /// <param name="output">The value of the variable</param>
+        /// <returns>True if the variable exists</returns>
+        public static bool GetSharedVariable(IntPtr pAgent, int key, out int output)
         {
-            SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<int>.ID);
-            return SUtility.GetFromBufferInt();
+            if (SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<int>.ID))
+            {
+                output = SUtility.GetFromBufferInt();
+                return true;
+            }
+            else
+            {
+                output = 0;
+                return false;
+            }
         }
         /// <summary>
         /// Get the variable by a key.
@@ -22,11 +31,20 @@ namespace YBehaviorSharp
         /// </summary>
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
-        /// <returns></returns>
-        public static float GetSharedFloat(IntPtr pAgent, int key)
+        /// <param name="output">The value of the variable</param>
+        /// <returns>True if the variable exists</returns>
+        public static bool GetSharedVariable(IntPtr pAgent, int key, out float output)
         {
-            SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<float>.ID);
-            return SUtility.GetFromBufferFloat();
+            if (SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<float>.ID))
+            {
+                output = SUtility.GetFromBufferFloat();
+                return true;
+            }
+            else
+            {
+                output = 0f;
+                return false; 
+            }
         }
         /// <summary>
         /// Get the variable by a key.
@@ -34,11 +52,20 @@ namespace YBehaviorSharp
         /// </summary>
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
-        /// <returns></returns>
-        public static ulong GetSharedUlong(IntPtr pAgent, int key)
+        /// <param name="output">The value of the variable</param>
+        /// <returns>True if the variable exists</returns>
+        public static bool GetSharedVariable(IntPtr pAgent, int key, out ulong output)
         {
-            SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<ulong>.ID);
-            return SUtility.GetFromBufferUlong();
+            if (SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<ulong>.ID))
+            {
+                output = SUtility.GetFromBufferUlong();
+                return true;
+            }
+            else
+            {
+                output = 0;
+                return false;
+            }
         }
         /// <summary>
         /// Get the variable by a key.
@@ -46,11 +73,20 @@ namespace YBehaviorSharp
         /// </summary>
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
-        /// <returns></returns>
-        public static bool GetSharedBool(IntPtr pAgent, int key)
+        /// <param name="output">The value of the variable</param>
+        /// <returns>True if the variable exists</returns>
+        public static bool GetSharedVariable(IntPtr pAgent, int key, out bool output)
         {
-            SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<int>.ID);
-            return SUtility.GetFromBufferBool() != 0;
+            if (SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<bool>.ID))
+            {
+                output = SUtility.GetFromBufferBool() != 0;
+                return true;
+            }
+            else
+            {
+                output = false;
+                return false;
+            }
         }
         /// <summary>
         /// Get the variable by a key.
@@ -58,11 +94,20 @@ namespace YBehaviorSharp
         /// </summary>
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
-        /// <returns></returns>
-        public static Vector3 GetSharedVector3(IntPtr pAgent, int key)
+        /// <param name="output">The value of the variable</param>
+        /// <returns>True if the variable exists</returns>
+        public static bool GetSharedVariable(IntPtr pAgent, int key, out Vector3 output)
         {
-            SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<Vector3>.ID);
-            return SUtility.GetFromBufferVector3();
+            if (SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<Vector3>.ID))
+            {
+                output = SUtility.GetFromBufferVector3();
+                return true;
+            }
+            else
+            {
+                output = Vector3.zero;
+                return false;
+            }
         }
         /// <summary>
         /// Get the variable by a key.
@@ -70,12 +115,21 @@ namespace YBehaviorSharp
         /// </summary>
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
-        /// <returns></returns>
-        public static string GetSharedString(IntPtr pAgent, int key)
+        /// <param name="output">The value of the variable</param>
+        /// <returns>True if the variable exists</returns>
+        public static bool GetSharedVariable(IntPtr pAgent, int key, out string output)
         {
-            SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<string>.ID);
-            SUtility.GetFromBufferString(SUtility.CharBuffer, SUtility.CharBuffer.Length);
-            return SUtility.BuildStringFromCharBuffer();
+            if (SUtility.GetSharedVariableToBuffer(pAgent, key, GetType<string>.ID))
+            {
+                SUtility.GetFromBufferString(SUtility.CharBuffer, SUtility.CharBuffer.Length);
+                output = SUtility.BuildStringFromCharBuffer();
+                return true;
+            }
+            else
+            {
+                output = string.Empty;
+                return false;
+            }
         }
         /// <summary>
         /// Get the variable by a key.
@@ -83,12 +137,13 @@ namespace YBehaviorSharp
         /// </summary>
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
-        /// <returns></returns>
-        public static IEntity? GetSharedEntity(IntPtr pAgent, int key)
+        /// <param name="output">The value of the variable</param>
+        /// <returns>True if the variable exists</returns>
+        public static bool GetSharedVariable(IntPtr pAgent, int key, out IEntity? output)
         {
             var index = SUtility.GetSharedEntityIndex(pAgent, key);
-            //var ptr = SUtility.GetFromBufferEntity();
-            return SPtrMgr.Instance.Get(index) as IEntity;
+            output = SPtrMgr.Instance.Get(index) as IEntity;
+            return output != null;
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +153,7 @@ namespace YBehaviorSharp
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
         /// <param name="v"></param>
-        public static void SetSharedInt(IntPtr pAgent, int key, int v)
+        public static void SetSharedVariable(IntPtr pAgent, int key, int v)
         {
             SUtility.SetToBufferInt(v);
             SUtility.SetSharedVariable(pAgent, key, GetType<int>.ID);
@@ -109,7 +164,7 @@ namespace YBehaviorSharp
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
         /// <param name="v"></param>
-        public static void SetSharedFloat(IntPtr pAgent, int key, float v)
+        public static void SetSharedVariable(IntPtr pAgent, int key, float v)
         {
             SUtility.SetToBufferFloat(v);
             SUtility.SetSharedVariable(pAgent, key, GetType<float>.ID);
@@ -120,7 +175,7 @@ namespace YBehaviorSharp
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
         /// <param name="v"></param>
-        public static void SetSharedUlong(IntPtr pAgent, int key, ulong v)
+        public static void SetSharedVariable(IntPtr pAgent, int key, ulong v)
         {
             SUtility.SetToBufferUlong(v);
             SUtility.SetSharedVariable(pAgent, key, GetType<ulong>.ID);
@@ -131,7 +186,7 @@ namespace YBehaviorSharp
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
         /// <param name="v"></param>
-        public static void SetSharedBool(IntPtr pAgent, int key, bool v)
+        public static void SetSharedVariable(IntPtr pAgent, int key, bool v)
         {
             SUtility.SetToBufferBool(v ? (Byte)1 : (Byte)0);
             SUtility.SetSharedVariable(pAgent, key, GetType<int>.ID);
@@ -142,7 +197,7 @@ namespace YBehaviorSharp
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
         /// <param name="v"></param>
-        public static void SetSharedVector3(IntPtr pAgent, int key, Vector3 v)
+        public static void SetSharedVariable(IntPtr pAgent, int key, Vector3 v)
         {
             SUtility.SetToBufferVector3(v);
             SUtility.SetSharedVariable(pAgent, key, GetType<Vector3>.ID);
@@ -153,7 +208,7 @@ namespace YBehaviorSharp
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
         /// <param name="v"></param>
-        public static void SetSharedString(IntPtr pAgent, int key, string v)
+        public static void SetSharedVariable(IntPtr pAgent, int key, string v)
         {
             SharpHelper.SetToBufferString(v);
             SUtility.SetSharedVariable(pAgent, key, GetType<string>.ID);
@@ -164,7 +219,7 @@ namespace YBehaviorSharp
         /// <param name="pAgent">Pointer to the agent in cpp</param>
         /// <param name="key">The variable key</param>
         /// <param name="v"></param>
-        public static void SetSharedEntity(IntPtr pAgent, int key, IEntity? v)
+        public static void SetSharedVariable(IntPtr pAgent, int key, IEntity? v)
         {
             SUtility.SetToBufferEntity(v == null ? IntPtr.Zero : v.Ptr);
             SUtility.SetSharedVariable(pAgent, key, GetType<IEntity>.ID);

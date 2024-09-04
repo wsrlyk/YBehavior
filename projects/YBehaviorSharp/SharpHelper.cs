@@ -59,6 +59,29 @@ namespace YBehaviorSharp
         Running,
     };
     /// <summary>
+    /// Running state of fsm
+    /// </summary>
+    public enum EMachineRunRes
+    {
+        /// <summary>
+        /// Error
+        /// </summary>
+        Invalid = -1,
+        /// <summary>
+        /// Normal state
+        /// </summary>
+        Normal = 0,
+        //Exit = 1,
+        /// <summary>
+        /// Hit a break point
+        /// </summary>
+        Break = 2,
+        /// <summary>
+        /// A tree node hit a break point, or it's still working
+        /// </summary>
+        Running = 3,
+    }
+    /// <summary>
     /// A simple Vector3
     /// </summary>
     public struct Vector3
@@ -229,11 +252,18 @@ namespace YBehaviorSharp
             string[] state2Tree, uint stSize,
             string[] tree2Tree, uint ttSize);
         /// <summary>
+        /// Unload the behavior of the agent
+        /// </summary>
+        /// <param name="pAgent">Pointer to the agent in cpp</param>
+        [DllImport(VERSION.dll)]
+        static public extern void UnloadBehavior(IntPtr pAgent);
+        /// <summary>
         /// Tick the agent
         /// </summary>
         /// <param name="pAgent"></param>
+        /// <returns>The result of this tick</returns>
         [DllImport(VERSION.dll)]
-        static public extern void Tick(IntPtr pAgent);
+        static public extern EMachineRunRes Tick(IntPtr pAgent);
         /// <summary>
         /// Get the data from config
         /// </summary>
@@ -315,6 +345,46 @@ namespace YBehaviorSharp
         /// <returns></returns>
         [DllImport(VERSION.dll)]
         static public extern KEY GetOrCreateVariableKeyByName(string name);
+        /// <summary>
+        /// Get the amount of tree node in the behavior of the agent
+        /// </summary>
+        /// <param name="pAgent">Pointer to the agent in cpp</param>
+        /// <param name="nodeName">Name of tree node</param>
+        /// <returns>0 if the agent does not have a behavior</returns>
+        [DllImport(VERSION.dll)]
+        static public extern uint GetTreeNodeCount(IntPtr pAgent, string nodeName);
+        /// <summary>
+        /// Clear the events in the event queue
+        /// </summary>
+        /// <param name="pAgent">Pointer to the agent in cpp</param>
+        /// <returns>The amount of the events cleared</returns>
+        [DllImport(VERSION.dll)]
+        static public extern uint ClearEvents(IntPtr pAgent);
+        /// <summary>
+        /// Create an event that will be handled by this agent
+        /// </summary>
+        /// <param name="pAgent">Pointer to the agent in cpp</param>
+        /// <param name="eventName">Event name</param>
+        /// <returns>Pointer to the event. It will be IntPtr.Zero if the event would be ignored.</returns>
+        [DllImport(VERSION.dll)]
+        static public extern IntPtr CreateEvent(IntPtr pAgent, string eventName);
+        /// <summary>
+        /// Register an event to the agent.
+        /// </summary>
+        /// <param name="pAgent">Pointer to the agent in cpp</param>
+        /// <param name="eventName">Event name</param>
+        [DllImport(VERSION.dll)]
+        static public extern void RegisterEvent(IntPtr pAgent, string eventName);
+        /// <summary>
+        /// Assign a list of params to the event
+        /// </summary>
+        /// <param name="pAgent">Pointer to the agent in cpp</param>
+        /// <param name="pEvent">Pointer to the event</param>
+        /// <param name="array">Array of params</param>
+        static public void AssignEventParam(IntPtr pAgent, IntPtr pEvent, ISArray array)
+        {
+            SUtility.AssignEventParam(pAgent, pEvent, array.Ptr, array.ElementType);
+        }
 
     }
 
@@ -385,6 +455,8 @@ namespace YBehaviorSharp
         static public extern TYPEID GetPinElementTypeID(IntPtr pPin);
         [DllImport(VERSION.dll)]
         static public extern bool IsPinConst(IntPtr pPin);
+        [DllImport(VERSION.dll)]
+        static public extern void AssignEventParam(IntPtr pAgent, IntPtr pEvent, IntPtr pVector, int elementTypeID);
 
 #if YDEBUGGER
         [DllImport(VERSION.dll)]

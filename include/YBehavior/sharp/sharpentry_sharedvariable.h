@@ -4,10 +4,14 @@
 #include "YBehavior/agent.h"
 #include "YBehavior/interface.h"
 
-extern "C" YBEHAVIOR_API void GetSharedVariableToBuffer(YBehavior::Agent* pAgent, YBehavior::KEY key, YBehavior::TYPEID type)
+extern "C" YBEHAVIOR_API bool GetSharedVariableToBuffer(YBehavior::Agent* pAgent, YBehavior::KEY key, YBehavior::TYPEID type)
 {
-	auto data = pAgent->GetMemory()->GetMainData()->Get(key, type);
-	YBehavior::SharpBuffer::Set(data, type);
+	if (auto data = pAgent->GetMemory()->GetMainData()->Get(key, type))
+	{
+		YBehavior::SharpBuffer::Set(data, type);
+		return true;
+	}
+	return false;
 }
 
 extern "C" YBEHAVIOR_API void* GetSharedVariablePtr(YBehavior::Agent* pAgent, YBehavior::KEY key, YBehavior::TYPEID type)

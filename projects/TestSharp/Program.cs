@@ -260,11 +260,11 @@ namespace TestSharp
             var key0 = SharpHelper.GetOrCreateVariableKeyByName("S0");
             var key1 = SharpHelper.GetOrCreateVariableKeyByName("S1");
 
-            string sharedData0 = SharpHelper.GetSharedString(pAgent, key0);
+            SharpHelper.GetSharedVariable(pAgent, key0, out string sharedData0);
             sharedData0 = sharedData0 + "0";
-            SharpHelper.SetSharedString(pAgent, key0, sharedData0);
+            SharpHelper.SetSharedVariable(pAgent, key0, sharedData0);
 
-            string sharedData1 = SharpHelper.GetSharedString(pAgent, key1);
+            SharpHelper.GetSharedVariable(pAgent, key1, out string sharedData1);
             //sharedData1 = sharedData1 + "1";
             SharpHelper.SetToBufferString(sharedData1);
             //SharpHelper.SetSharedData(pAgent, key1, GetClassType<string>.ID);

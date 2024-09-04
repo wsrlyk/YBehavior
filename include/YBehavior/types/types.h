@@ -281,17 +281,17 @@ namespace YBehavior
 	typedef StdVector<Vector3>	VecVector3;
 
 #define YBEHAVIOR_BASICTYPE_NUMBER_ID(type, id)			\
-	template<> inline TYPEID GetTypeID<type>() \
+	template<> inline TYPEID constexpr GetTypeID<type>() \
 	{\
 		return id;\
 	}\
-	template<> inline TYPEID GetTypeID<const type>() \
+	template<> inline TYPEID constexpr GetTypeID<const type>() \
 	{\
 		return id; \
 	}
 
 	template<typename T>
-	inline TYPEID GetTypeID() {
+	inline TYPEID constexpr GetTypeID() {
 		return -1;
 	}
 
