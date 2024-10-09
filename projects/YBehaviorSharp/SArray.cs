@@ -35,6 +35,10 @@ namespace YBehaviorSharp
         /// </summary>
         /// <returns></returns>
         int GetLength();
+        /// <summary>
+        /// If the array has a non-null pointer
+        /// </summary>
+        public bool IsValid { get; }
     }
     /// <summary>
     /// Template class of array
@@ -46,6 +50,7 @@ namespace YBehaviorSharp
         protected TYPEID m_ElementID;
         public IntPtr Ptr => m_Core;
         public TYPEID ElementType => m_ElementID;
+        public bool IsValid => m_Core != IntPtr.Zero;
         public SArrayBase(IntPtr core)
         {
             m_ElementID = GetType<T>.ID;

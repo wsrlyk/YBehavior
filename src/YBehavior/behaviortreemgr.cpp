@@ -86,7 +86,7 @@ namespace YBehavior
 		treeNodesCache.push_back(node);
 		if (!node->Load(data))
 		{
-			ERROR_BEGIN << "Failed when load " << data.name() << ", uid " << (uid) << ERROR_END;
+			ERROR_BEGIN << "Failed when load " << data.name() << " " << node->GetClassName() << ", uid " << (uid) << ERROR_END;
 			return false;
 		}
 		for (auto it = data.begin(); it != data.end(); ++it)
