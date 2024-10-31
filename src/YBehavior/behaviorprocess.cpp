@@ -129,7 +129,7 @@ namespace YBehavior
 
 		while (!toLoadTrees.empty())
 		{
-			auto& treename = toLoadTrees.back();
+			auto treename = toLoadTrees.back();
 			bool visited = !loadedTrees.insert(treename).second;
 			toLoadTrees.pop_back();
 
