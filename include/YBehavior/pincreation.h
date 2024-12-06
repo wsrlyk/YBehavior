@@ -38,7 +38,7 @@ namespace YBehavior
 		static bool ParsePin(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, Flag flag = Flag::None);
 
 	private:
-		static bool _HasFlag(Flag mask, Flag flag) { return (static_cast<int>(mask) & static_cast<int>(flag)) != 0;}
+		static bool _HasFlag(Flag mask, Flag flag) { return (static_cast<int>(mask) & static_cast<int>(flag)) == static_cast<int>(flag);}
 		static TYPEID _CreatePin(TreeNode* pTreeNode, IPin*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, Flag flag);
 	};
 
