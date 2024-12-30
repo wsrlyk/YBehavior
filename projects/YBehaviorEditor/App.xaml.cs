@@ -182,6 +182,7 @@ namespace YBehavior.Editor
                             Config.Instance.NotAutoOpenFiles.Add(bench.FileInfo.DisplayName);
                         else
                             Config.Instance.NotAutoOpenFiles.Remove(bench.FileInfo.DisplayName);
+                        Config.Instance.Save();
                     }
                 }
             }
