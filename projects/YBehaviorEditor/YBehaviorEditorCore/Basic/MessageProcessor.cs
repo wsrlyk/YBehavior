@@ -691,7 +691,7 @@ namespace YBehavior.Editor.Core.New
 
                 if (hashes.Count > 0)
                 {
-                    List<WorkBench> res = WorkBenchMgr.Instance.OpenAList(names);
+                    List<WorkBench> res = WorkBenchMgr.Instance.OpenAList(names, true);
                     if (res.Count != hashes.Count)
                     {
                         LogMgr.Instance.Error("Open some files failed.");

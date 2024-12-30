@@ -164,6 +164,7 @@ namespace YBehavior.Editor.Core.New
     public class WorkBenchLoadedArg : EventArg
     {
         public WorkBench Bench { get; set; }
+        public bool FromAutoOpen { get; set; } = false;
         public override EventType Type => EventType.WorkBenchLoaded;
     }
 

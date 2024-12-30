@@ -40,6 +40,7 @@
             <Button Name="Operation1" Grid.Row="0" Grid.Column="1" Width="20" HorizontalAlignment="Left"></Button>
         </Grid>-->
         <Grid Background="#FF555353" Name="CanvasBoard" ClipToBounds ="True">
+            <TextBlock Name="DebugInfo" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#B2F0F0F0" Margin="5">debug</TextBlock>
             <Canvas Focusable="True" Name="canvas">
                 <ItemsControl Focusable="True" Name="commentLayer">
                     <ItemsControl.ItemsPanel>

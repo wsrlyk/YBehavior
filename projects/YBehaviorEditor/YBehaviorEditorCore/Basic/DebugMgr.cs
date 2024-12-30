@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 
 namespace YBehavior.Editor.Core.New
 {
@@ -387,6 +388,25 @@ namespace YBehavior.Editor.Core.New
                 {
                     FSMRunInfo.fsmName = bench.FileInfo.Name;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Get the list of the running files
+        /// </summary>
+        public string RunningFilesDescription
+        {
+            get
+            {
+                if (!IsSomeBenchDebugging())
+                    return string.Empty;
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine(FSMRunInfo.fsmName);
+                foreach (var tree in m_RunInfo)
+                {
+                    sb.AppendLine(tree.Value.treeName);
+                }
+                return sb.ToString();
             }
         }
     }

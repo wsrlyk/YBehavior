@@ -41,7 +41,7 @@ namespace YBehavior.Editor
                                     list.Add(s);
                                 }
                                 if (list.Count > 0)
-                                    WorkBenchMgr.Instance.OpenAList(list);
+                                    WorkBenchMgr.Instance.OpenAList(list, false);
                             }
                             break;
                         default:
@@ -97,7 +97,10 @@ namespace YBehavior.Editor
 
         void _ProcessCommand(string s)
         {
-            switch (s)
+            var ss = s.Split(' ');
+            if (ss == null || ss.Length == 0)
+                return;
+            switch (ss[0])
             {
                 case "loadandsavealltrees":
                     _LoadAndSaveAll();
@@ -107,6 +110,9 @@ namespace YBehavior.Editor
                     break;
                 case "clear":
                     Console.Clear();
+                    break;
+                case "autoopen":
+                    _AutoOpen(ss);
                     break;
             }
         }
@@ -162,6 +168,23 @@ namespace YBehavior.Editor
                 }
             }
             WorkBenchMgr.Instance.ActiveWorkBench = oldActiveBench;
+        }
+        void _AutoOpen(string[] param)
+        {
+            if (param.Length > 1)
+            {
+                if (int.TryParse(param[1], out int val))
+                {
+                    WorkBench bench = WorkBenchMgr.Instance.ActiveWorkBench;
+                    if (bench != null)
+                    {
+                        if (val == 0)
+                            Config.Instance.NotAutoOpenFiles.Add(bench.FileInfo.DisplayName);
+                        else
+                            Config.Instance.NotAutoOpenFiles.Remove(bench.FileInfo.DisplayName);
+                    }
+                }
+            }
         }
     }
 }

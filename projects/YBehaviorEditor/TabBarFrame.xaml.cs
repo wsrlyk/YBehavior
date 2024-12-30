@@ -59,7 +59,11 @@ namespace YBehavior.Editor
             WorkBenchLoadedArg oArg = arg as WorkBenchLoadedArg;
             if (oArg.Bench == null)
                 return;
-
+            if (oArg.FromAutoOpen)
+            {
+                if (Config.Instance.NotAutoOpenFiles.Contains(oArg.Bench.FileInfo.DisplayName))
+                    return;
+            }
             _LoadWorkBench(oArg.Bench);
         }
 

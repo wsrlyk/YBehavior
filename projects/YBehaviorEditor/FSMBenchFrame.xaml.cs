@@ -37,7 +37,7 @@ namespace YBehavior.Editor
         public override FrameworkElement GetCanvasBoard { get { return CanvasBoard; } }
         public override FrameworkElement GetCanvas { get { return canvas; } }
 
-
+        public override TextBlock DebugFilesInfo => this.DebugInfo;
         public FSMBenchFrame()
         {
             InitializeComponent();

@@ -70,6 +70,11 @@ namespace YBehavior.Editor.Core.New
             get { return m_Suo.ExpandedFolders; }
         }
 
+        public HashSet<string> NotAutoOpenFiles
+        {
+            get { return m_Suo.NotAutoOpenFiles; }
+        }
+
         /// <summary>
         /// Preserve and recover some status of the Editor
         /// </summary>

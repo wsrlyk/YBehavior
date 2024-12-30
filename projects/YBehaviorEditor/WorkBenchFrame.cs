@@ -15,7 +15,7 @@ namespace YBehavior.Editor
         public PageData CurPageData { get; } = new PageData();
         public abstract FrameworkElement GetCanvasBoard { get; }
         public abstract FrameworkElement GetCanvas { get; }
-
+        public abstract TextBlock DebugFilesInfo { get; }
         public FrameworkElement Canvas { get { return GetCanvasBoard; } }
 
         Operation m_Operation;
@@ -52,9 +52,11 @@ namespace YBehavior.Editor
         {
             EventMgr.Instance.Register(EventType.NewNodeAdded, _OnNewNodeAdded);
             EventMgr.Instance.Register(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Register(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Register(EventType.CommentCreated, _OnCommentCreated);
             EventMgr.Instance.Register(EventType.MakeCenter, _OnMakeCenter);
             Focus();
+            DebugFilesInfo.Text = DebugMgr.Instance.RunningFilesDescription;
         }
         /// <summary>
         /// Unregister events when this workbench switched to background
@@ -63,6 +65,7 @@ namespace YBehavior.Editor
         {
             EventMgr.Instance.Unregister(EventType.NewNodeAdded, _OnNewNodeAdded);
             EventMgr.Instance.Unregister(EventType.NetworkConnectionChanged, _OnDebugTargetChanged);
+            EventMgr.Instance.Unregister(EventType.DebugTargetChanged, _OnDebugTargetChanged);
             EventMgr.Instance.Unregister(EventType.CommentCreated, _OnCommentCreated);
             EventMgr.Instance.Unregister(EventType.MakeCenter, _OnMakeCenter);
         }
@@ -89,7 +92,7 @@ namespace YBehavior.Editor
 
         protected virtual void _OnDebugTargetChanged(EventArg arg)
         {
-
+            DebugFilesInfo.Text = DebugMgr.Instance.RunningFilesDescription;
         }
 
         private void _OnNewNodeAdded(EventArg arg)

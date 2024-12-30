@@ -666,23 +666,12 @@ namespace YBehavior.Editor.Core.New
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public List<WorkBench> OpenAList(IEnumerable<string> list)
+        public List<WorkBench> OpenAList(IEnumerable<string> list, bool autoOpen)
         {
             List<WorkBench> res = new List<WorkBench>();
 
             foreach (var f in list)
             {
-                //System.IO.FileInfo file = null;
-                //if (info.Type == GraphType.TREE)
-                //    file = new System.IO.FileInfo(Config.Instance.WorkingDirWin + info.Name + FileMgr.TreeExtension);
-                //else
-                //    file = new System.IO.FileInfo(Config.Instance.WorkingDirWin + info.Name + ".fsm");
-                //if (!file.Exists)
-                //{
-                //    LogMgr.Instance.Error("File not exists: " + file.FullName);
-                //    continue;
-                //}
-
                 FileMgr.FileInfo fileInfo = FileMgr.Instance.GetFileInfo(f);
                 if (fileInfo == null)
                 {
@@ -693,6 +682,7 @@ namespace YBehavior.Editor.Core.New
 
                 WorkBenchLoadedArg arg = new WorkBenchLoadedArg();
                 arg.Bench = newBench;
+                arg.FromAutoOpen = autoOpen;
                 EventMgr.Instance.Send(arg);
 
                 res.Add(newBench);

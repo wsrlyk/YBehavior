@@ -73,7 +73,9 @@ namespace YBehavior.Editor.Core.New
         [JsonProperty(PropertyName = "Suos")]
         Dictionary<string, SuoData> m_Suos = new Dictionary<string, SuoData>();
         [JsonProperty(PropertyName = "ExpandedFolders")]
-        HashSet<string> m_ExpandedFolders = new HashSet<string> ();
+        HashSet<string> m_ExpandedFolders = new HashSet<string>();
+        [JsonProperty(PropertyName = "NotAutoOpenFiles")]
+        HashSet<string> m_NotAutoOpenFiles = new HashSet<string>();
 
         [JsonIgnore]
         public IEnumerable<string> Files { get { return m_Suos.Keys; } }
@@ -82,6 +84,8 @@ namespace YBehavior.Editor.Core.New
         /// </summary>
         [JsonIgnore]
         public HashSet<string> ExpandedFolders { get { return m_ExpandedFolders; } }
+        [JsonIgnore]
+        public HashSet<string> NotAutoOpenFiles { get { return m_NotAutoOpenFiles; } }
         /// <summary>
         /// Get SuoData of a tree/fsm
         /// </summary>
