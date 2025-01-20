@@ -42,6 +42,7 @@ namespace YBehavior.Editor.Core.New
         public static readonly char CONST = 'C';
 
         public static readonly char SINGLE = '_';
+        public static readonly char ANY = '*';
 
         public static readonly char ENABLE = 'E';
         public static readonly char DISABLE = 'D';
@@ -159,9 +160,11 @@ namespace YBehavior.Editor.Core.New
 
         public static CountType GetCountType(char valueType, char countType)
         {
-            if (valueType != countType)
-                return CountType.CT_SINGLE;
-            return CountType.CT_LIST;
+            if (valueType == countType)
+                return CountType.CT_LIST;
+            if (countType == ANY)
+                return CountType.CT_NONE;
+            return CountType.CT_SINGLE;
         }
         /// <summary>
         /// Type of pin
