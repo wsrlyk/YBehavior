@@ -22,10 +22,15 @@ namespace YBehavior
 		///> Right1
 		auto inputType = PinCreation::CreatePin(this, m_Input, "Input", data);
 
+		if (outputType != inputType)
+		{
+			ERROR_BEGIN_NODE_HEAD << "Different types:  Input & Output" << ERROR_END;
+			return false;
+		}
 		m_pHelper = DataUnaryOpMgr::Instance()->Get(outputType);
 		if (!m_pHelper)
 		{
-			ERROR_BEGIN_NODE_HEAD << "These types are not supported by CalculatorNode." << ERROR_END;
+			ERROR_BEGIN_NODE_HEAD << "These types are not supported by UnaryOperationNode." << ERROR_END;
 			return false;
 		}
 		return true;
