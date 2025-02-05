@@ -1,17 +1,15 @@
-#include "calculator.h"
+#include "unaryoperation.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/pincreation.h"
 
 namespace YBehavior
 {
-	static Bimap<CalculateType, STRING> OperatorMap = {
-		{ CalculateType::ADD, "+" },
-		{ CalculateType::SUB, "-" },
-		{ CalculateType::MUL, "*" },
-		{ CalculateType::DIV, "/" } };
+	static Bimap<UnaryOpType, STRING> OperatorMap = {
+		{ UnaryOpType::ABS, "ABS" },
+		};
 
 	//////////////////////////////////////////////////////////////////////////////////////////
-	bool Calculator::OnLoaded(const pugi::xml_node& data)
+	bool UnaryOperation::OnLoaded(const pugi::xml_node& data)
 	{
 		///> Operator
 		if (!PinCreation::GetValue(this, "Operator", data, OperatorMap, m_Operator))
@@ -22,12 +20,9 @@ namespace YBehavior
 		auto outputType = PinCreation::CreatePin(this, m_Output, "Output", data, PinCreation::Flag::IsOutput);
 
 		///> Right1
-		auto inputType1 = PinCreation::CreatePin(this, m_Input1, "Input1", data);
+		auto inputType = PinCreation::CreatePin(this, m_Input, "Input", data);
 
-		///> Right2
-		auto inputType2 = PinCreation::CreatePin(this, m_Input2, "Input2", data);
-
-		m_pHelper = DataCalculateMgr::Instance()->Get(outputType, inputType1, inputType2);
+		m_pHelper = DataUnaryOpMgr::Instance()->Get(outputType);
 		if (!m_pHelper)
 		{
 			ERROR_BEGIN_NODE_HEAD << "These types are not supported by CalculatorNode." << ERROR_END;
@@ -36,9 +31,9 @@ namespace YBehavior
 		return true;
 	}
 
-	YBehavior::NodeState Calculator::Update(AgentPtr pAgent)
+	YBehavior::NodeState UnaryOperation::Update(AgentPtr pAgent)
 	{
-		m_pHelper->Calculate(pAgent->GetMemory(), m_Output, m_Input1, m_Input2, m_Operator);
+		m_pHelper->Operate(pAgent->GetMemory(), m_Output, m_Input, m_Operator);
 		return NS_SUCCESS;
 	}
 

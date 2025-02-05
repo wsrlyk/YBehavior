@@ -1,4 +1,4 @@
-#include "YBehavior/nodes/setdata.h"
+#include "setdata.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/agent.h"

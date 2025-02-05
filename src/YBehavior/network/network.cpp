@@ -1,7 +1,7 @@
 #ifdef YDEBUGGER
 #include "YBehavior/network/network.h"
 #include "YBehavior/logger.h"
-#include "YBehavior/network/messageprocessor.h"
+#include "messageprocessor.h"
 #include <cstring>
 
 namespace YBehavior

@@ -2,7 +2,7 @@
 #define _YBEHAVIOR_CALCULATOR_H_
 
 #include "YBehavior/treenode.h"
-#include "YBehavior/operations/datacalculate.h"
+#include "../operations/datacalculate.h"
 
 namespace YBehavior
 {

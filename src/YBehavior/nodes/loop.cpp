@@ -1,4 +1,4 @@
-#include "YBehavior/nodes/loop.h"
+#include "loop.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/pincreation.h"
 #include "YBehavior/fsm/context.h"

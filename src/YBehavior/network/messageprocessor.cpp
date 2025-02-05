@@ -1,5 +1,5 @@
 #ifdef YDEBUGGER
-#include "YBehavior/network/messageprocessor.h"
+#include "messageprocessor.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/debugger.h"

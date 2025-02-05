@@ -1,4 +1,4 @@
-#include "YBehavior/nodes/array.h"
+#include "array.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/pincreation.h"
 

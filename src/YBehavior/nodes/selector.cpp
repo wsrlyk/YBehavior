@@ -1,4 +1,4 @@
-#include "YBehavior/nodes/selector.h"
+#include "selector.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/fsm/context.h"
 

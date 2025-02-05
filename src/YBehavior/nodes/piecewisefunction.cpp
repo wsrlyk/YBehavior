@@ -1,9 +1,9 @@
-#include "YBehavior/nodes/piecewisefunction.h"
+#include "piecewisefunction.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/pincreation.h"
-#include "YBehavior/operations/datacompare.h"
-#include "YBehavior/operations/datacalculate.h"
-#include "YBehavior/operations/dataoperation.h"
+#include "../operations/datacompare.h"
+#include "../operations/datacalculate.h"
+#include "../operations/dataoperation.h"
 #include <set>
 namespace YBehavior
 {
@@ -108,7 +108,7 @@ namespace YBehavior
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for InputX: " << xType << ERROR_END;
 			return false;
 		}
-		TYPEID yType = PinCreation::CreatePin(this, m_OutputY, "OutputY", data);
+		TYPEID yType = PinCreation::CreatePin(this, m_OutputY, "OutputY", data, PinCreation::Flag::IsOutput);
 		if (s_ValidTypes.find(yType) == s_ValidTypes.end())
 		{
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for OutputY: " << yType << ERROR_END;

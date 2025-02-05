@@ -1,7 +1,7 @@
-#include "YBehavior/nodes/switchcase.h"
+#include "switchcase.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/pincreation.h"
-#include "YBehavior/operations/datacompare.h"
+#include "../operations/datacompare.h"
 #include <set>
 #include "YBehavior/fsm/context.h"
 
@@ -83,16 +83,16 @@ namespace YBehavior
 				YB_LOG_PIN_BEFORE(pNode->m_Switch);
 				YB_LOG_PIN_BEFORE(pNode->m_Cases);
 			}
-			if ((INT)pNode->m_CasesChilds.size() != pNode->m_Cases->ArraySize(pAgent->GetMemory()))
+			INT childsize = (INT)pNode->m_CasesChilds.size();
+			INT casesize = pNode->m_Cases->ArraySize(pAgent->GetMemory());
+			if (childsize != 1 && childsize != casesize)
 			{
 				YB_LOG_INFO_WITH_END("Cases size != Children size");
 				return NS_FAILURE;
 			}
-
-			INT size = (INT)pNode->m_CasesChilds.size();
 			TreeNodePtr targetNode = nullptr;
 			auto pSwitchValue = pNode->m_Switch->GetValuePtr(pAgent->GetMemory());
-			for (INT i = 0; i < size; ++i)
+			for (INT i = 0; i < casesize; ++i)
 			{
 				const void* onecase = pNode->m_Cases->GetElementPtr(pAgent->GetMemory(), i);
 				if (onecase == nullptr)
@@ -100,7 +100,7 @@ namespace YBehavior
 
 				if (pNode->m_pHelper->Compare(pSwitchValue, onecase, CompareType::EQUAL))
 				{
-					targetNode = pNode->m_CasesChilds[i];
+					targetNode = pNode->m_CasesChilds[childsize == 1 ? 0 : i];
 					break;
 				}
 			}

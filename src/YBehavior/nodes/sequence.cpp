@@ -1,4 +1,4 @@
-#include "YBehavior/nodes/sequence.h"
+#include "sequence.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/fsm/context.h"
 

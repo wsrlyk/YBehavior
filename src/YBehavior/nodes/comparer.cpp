@@ -1,4 +1,4 @@
-#include "YBehavior/nodes/comparer.h"
+#include "comparer.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/pincreation.h"
 #include <set>

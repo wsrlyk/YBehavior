@@ -2,7 +2,7 @@
 #define _YBEHAVIOR_ARRAY_H_
 
 #include "YBehavior/treenode.h"
-#include "YBehavior/operations/dataarrayoperation.h"
+#include "../operations/dataarrayoperation.h"
 
 namespace YBehavior
 {

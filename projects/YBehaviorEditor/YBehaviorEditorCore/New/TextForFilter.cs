@@ -45,8 +45,7 @@ namespace YBehavior.Editor.Core.New
         public void Reset() { m_I = -1; }
         public void Dispose() { }
 
-        object Current1 { get { return this.Current; } }
-        object System.Collections.IEnumerator.Current { get { return Current1; } }
+        object System.Collections.IEnumerator.Current => this.Current;
 
         public void Constructor(NodeBase node)
         {
@@ -76,7 +75,9 @@ namespace YBehavior.Editor.Core.New
                     case 2:
                         return m_Node.Description;
                     case 3:
-                        return m_Enums.Current as string;
+                        if (m_Enums != null && m_J >= 0 && m_J < m_Enums.Length) 
+                            return m_Enums[m_J];
+                        return m_Variables.Current.Variable.Name;
 
                 }
                 return m_I == 0 ? m_Node.Name : m_Node.NickName;
@@ -111,41 +112,35 @@ namespace YBehavior.Editor.Core.New
             }
             if (m_I == 3)
             {
-                while (true)
+                ///> Fetch each element in the enums
+                if (m_Enums != null)
                 {
-                    ///> Fetch each element in the enums
+                    ++m_J;
+                    if (m_J < m_Enums.Length)
+                        return true;
+                    m_Enums = null;
+                }
+
+                if (m_Variables.MoveNext())
+                {
+                    m_Enums = m_Variables.Current.Variable.Enums;
                     if (m_Enums != null)
-                    {
-                        if (m_Enums.MoveNext())
-                            return true;
-                    }
-
-                    ///> Get a Enum type Variable
-                    bool bFound = false;
-                    while (m_Variables.MoveNext())
-                    {
-                        if (m_Variables.Current.Variable.vType != Variable.ValueType.VT_ENUM)
-                            continue;
-
-                        m_Enums = m_Variables.Current.Variable.Enums.GetEnumerator();
-                        bFound = true;
-                    }
-                    if (!bFound)
-                        break;
+                        m_J = -2;
+                    return true;
                 }
             }
 
             return false;
         }
-        public void Reset() { m_I = -1; }
+        public void Reset() { m_I = -1; m_J = -1; }
         public void Dispose() { }
 
-        object Current1 { get { return this.Current; } }
-        object System.Collections.IEnumerator.Current { get { return Current1; } }
+        object System.Collections.IEnumerator.Current => this.Current;
 
         public void Constructor(NodeBase node)
         {
             m_I = -1;
+            m_J = -1;
             m_Node = node as TreeNode;
 
             if (m_Node == null)
@@ -154,9 +149,10 @@ namespace YBehavior.Editor.Core.New
         }
 
         int m_I;
+        int m_J;
         TreeNode m_Node;
 
         IEnumerator<VariableHolder> m_Variables;
-        System.Collections.IEnumerator m_Enums;
+        string[] m_Enums;
     }
 }

@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Test>
   <Node Class="Root">
-    <Shared />
-    <Local ff="FFc 0.5|0.1|0.2" fff="FFc 0.1|0.6" />
-    <Node Class="Sequence">
-      <Node Class="ArrayOperation" Operator="_EC APPEND" Output="FFp fff" Input1="FFp ff" Input2="FFp fff" />
-      <Node Class="ArrayOperation" Operator="_EC MERGE" Output="FFp ff" Input1="FFp ff" Input2="FFp fff" />
+    <Shared a="_IC -1" />
+    <Local />
+    <Node Class="SwitchCase" Switch="_IP a" Cases="IIC 1|2|3">
+      <Node Class="Calculator" Operator="_EC +" Output="_IP a" Input1="_IP a" Input2="_IC 1" />
+      <Node Class="SetData" Connection="default" Target="_IP a" Source="_IC 1" />
     </Node>
   </Node>
 </Test>

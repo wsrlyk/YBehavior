@@ -544,6 +544,63 @@ namespace YBehavior.Editor.Core.New
             return false;
         }
     }
+    class UnaryOperationTreeNode : LeafNode
+    {
+        public override string Icon => "y=f(x)";
+
+        public UnaryOperationTreeNode()
+        {
+            m_Name = "UnaryOperation";
+            Type = TreeNodeType.TNT_Default;
+        }
+
+        public override void CreateVariables()
+        {
+            Variable optr = NodeMemory.CreateVariable(
+                "Operator",
+                "ABS",
+                Variable.CreateParams_Enum,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Const,
+                Variable.EnableType.ET_FIXED,
+                0,
+                0,
+                "ABS"
+            );
+
+            Variable opl = NodeMemory.CreateVariable(
+                "Output",
+                "",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_Pointer,
+                Variable.EnableType.ET_FIXED,
+                1
+            );
+            opl.IsInput = false;
+
+            Variable opr1 = NodeMemory.CreateVariable(
+                "Input",
+                "",
+                Variable.CreateParams_AllNumbers,
+                Variable.CountType.CT_SINGLE,
+                Variable.VariableType.VBT_NONE,
+                Variable.EnableType.ET_FIXED,
+                1
+            );
+        }
+
+        public override string Note
+        {
+            get
+            {
+                return string.Format("{2}({1}) >> {0}",
+                    Variables.GetVariable("Output").NoteValue,
+                    Variables.GetVariable("Input").NoteValue,
+                    Variables.GetVariable("Operator").NoteValue);
+            }
+        }
+    }
 
     class AlwaysSuccessTreeNode : SingleChildNode
     {

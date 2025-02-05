@@ -45,6 +45,7 @@ namespace YBehavior.Editor
         public void SetFocus()
         {
             SearchText.Focus();
+            SearchText.SelectAll();
         }
     }
 }

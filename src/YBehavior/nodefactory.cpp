@@ -1,23 +1,24 @@
 #include "YBehavior/nodefactory.h"
 #include "YBehavior/logger.h"
-#include "YBehavior/nodes/calculator.h"
-#include "YBehavior/nodes/sequence.h"
-#include "YBehavior/nodes/comparer.h"
-#include "YBehavior/nodes/ifthenelse.h"
-#include "YBehavior/nodes/decorator.h"
-#include "YBehavior/nodes/selector.h"
-#include "YBehavior/nodes/setdata.h"
-#include "YBehavior/nodes/random.h"
-#include "YBehavior/nodes/handleevent.h"
-#include "YBehavior/nodes/switchcase.h"
-#include "YBehavior/nodes/loop.h"
-#include "YBehavior/nodes/piecewisefunction.h"
-#include "YBehavior/nodes/dice.h"
-#include "YBehavior/nodes/subtree.h"
-#include "YBehavior/nodes/wait.h"
-#include "YBehavior/nodes/array.h"
-#include "YBehavior/nodes/fsmrelated.h"
-#include "YBehavior/nodes/convert.h"
+#include "nodes/calculator.h"
+#include "nodes/sequence.h"
+#include "nodes/comparer.h"
+#include "nodes/ifthenelse.h"
+#include "nodes/decorator.h"
+#include "nodes/selector.h"
+#include "nodes/setdata.h"
+#include "nodes/random.h"
+#include "nodes/handleevent.h"
+#include "nodes/switchcase.h"
+#include "nodes/loop.h"
+#include "nodes/piecewisefunction.h"
+#include "nodes/dice.h"
+#include "nodes/subtree.h"
+#include "nodes/wait.h"
+#include "nodes/array.h"
+#include "nodes/fsmrelated.h"
+#include "nodes/convert.h"
+#include "nodes/unaryoperation.h"
 
 namespace YBehavior
 {
@@ -29,6 +30,7 @@ namespace YBehavior
 		REGISTER_TYPE(factory, RandomSequence);
 		REGISTER_TYPE(factory, RandomSelector);
 		REGISTER_TYPE(factory, Calculator);
+		REGISTER_TYPE(factory, UnaryOperation);
 		REGISTER_TYPE(factory, Comparer);
 		REGISTER_TYPE(factory, IfThenElse);
 		REGISTER_TYPE(factory, AlwaysSuccess);

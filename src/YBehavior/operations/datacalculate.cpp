@@ -1,4 +1,4 @@
-#include "YBehavior/operations/datacalculate.h"
+#include "datacalculate.h"
 
 namespace YBehavior
 {

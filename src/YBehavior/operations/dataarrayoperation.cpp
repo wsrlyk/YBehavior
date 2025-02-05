@@ -1,4 +1,4 @@
-#include "YBehavior/operations/dataarrayoperation.h"
+#include "dataarrayoperation.h"
 
 namespace YBehavior
 {

@@ -1,4 +1,4 @@
-#include "YBehavior/operations/datacompare.h"
+#include "datacompare.h"
 
 namespace YBehavior
 {

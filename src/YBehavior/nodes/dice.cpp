@@ -1,10 +1,10 @@
-#include "YBehavior/nodes/dice.h"
+#include "dice.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/pincreation.h"
-#include "YBehavior/operations/datacompare.h"
-#include "YBehavior/operations/datacalculate.h"
-#include "YBehavior/operations/dataoperation.h"
-#include "YBehavior/operations/datarandom.h"
+#include "../operations/datacompare.h"
+#include "../operations/datacalculate.h"
+#include "../operations/dataoperation.h"
+#include "../operations/datarandom.h"
 #include <set>
 namespace YBehavior
 {
@@ -119,7 +119,7 @@ namespace YBehavior
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Input in Dice: " << xType << ERROR_END;
 			return false;
 		}
-		TYPEID yType = PinCreation::CreatePin(this, m_Output, "Output", data);
+		TYPEID yType = PinCreation::CreatePin(this, m_Output, "Output", data, PinCreation::Flag::IsOutput);
 		if (!m_Output)
 		{
 			return false;

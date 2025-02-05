@@ -1,10 +1,10 @@
-#include "YBehavior/nodes/random.h"
+#include "random.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/pin.h"
 #include "YBehavior/pincreation.h"
-#include "YBehavior/operations/datarandom.h"
-#include "YBehavior/operations/dataoperation.h"
+#include "../operations/datarandom.h"
+#include "../operations/dataoperation.h"
 #include <set>
 
 namespace YBehavior

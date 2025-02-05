@@ -1,9 +1,9 @@
-#include "YBehavior/nodes/convert.h"
+#include "convert.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/pincreation.h"
-#include "YBehavior/operations/dataconvert.h"
+#include "../operations/dataconvert.h"
 
 namespace YBehavior
 {

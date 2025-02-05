@@ -1,4 +1,4 @@
-#include "YBehavior/nodes/subtree.h"
+#include "subtree.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/agent.h"

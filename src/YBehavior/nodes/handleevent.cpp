@@ -1,4 +1,4 @@
-#include "YBehavior/nodes/handleevent.h"
+#include "handleevent.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/agent.h"
 #include "YBehavior/pin.h"

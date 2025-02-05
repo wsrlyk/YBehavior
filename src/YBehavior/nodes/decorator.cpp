@@ -1,4 +1,4 @@
-#include "YBehavior/nodes/decorator.h"
+#include "decorator.h"
 #include "YBehavior/pincreation.h"
 #include "YBehavior/agent.h"
 

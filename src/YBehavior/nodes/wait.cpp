@@ -1,4 +1,4 @@
-#include "YBehavior/nodes/wait.h"
+#include "wait.h"
 #include "YBehavior/logger.h"
 #include "YBehavior/utility.h"
 #include "YBehavior/agent.h"
