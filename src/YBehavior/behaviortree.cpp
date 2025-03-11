@@ -273,6 +273,7 @@ namespace YBehavior
 				for (int i = 0, imax = (int)rangesList.size(); i < imax; ++i)
 				{
 					Ranges& ranges = rangesList[i];
+					bool isValid = true;
 					for (int j = 0, jmax = (int)ranges.ranges.size(); j < jmax; ++j)
 					{
 						Range& range = ranges.ranges[j];
@@ -280,7 +281,6 @@ namespace YBehavior
 						///  It can be appended to this range, if no better ranges exist.
 						if (fromUID > std::get<2>(range))
 						{
-							validRangesListIndex = i;
 							continue;
 						}
 
@@ -310,19 +310,21 @@ namespace YBehavior
 								setLastInfos(i);
 								finish = true;
 							}
+							isValid = false;
 							break;
 						}
 
 						///> All other cases are invalid
 
 						///> This rangesList is not fit for this connect;
-						if (validRangesListIndex == i)
-							validRangesListIndex = -1;
+						isValid = false;
 						break;
 					}
 
 					if (finish)
 						break;
+					if (isValid)
+						validRangesListIndex = i;
 				}
 
 				if (!finish)
