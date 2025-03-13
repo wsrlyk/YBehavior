@@ -154,7 +154,7 @@ namespace YBehavior
 		static const KEY TEMP_KEY_OFFSET = 1000000;
 		KEY currentKey = TEMP_KEY_OFFSET;
 
-		///> FromUID, FromVariableIndex, ToUID, ToVariableIndex
+		///> FromUID, FromPinIndex, ToUID, ToPinIndex
 		using Range = std::tuple<UINT, UINT, UINT, UINT>;
 		struct Ranges
 		{
@@ -165,7 +165,7 @@ namespace YBehavior
 
 		int lastRangesListIndex = -1;
 		UINT lastFromUID = 0;
-		UINT lastFromVariableIndex = 0;
+		UINT lastFromPinIndex = 0;
 
 		for (auto it = data.begin(); it != data.end(); ++it)
 		{
@@ -221,10 +221,10 @@ namespace YBehavior
 				toPin->SetKey(key);
 				GetLocalData()->SetDefault(key, fromPin->TypeID());
 			};
-			auto setLastInfos = [&lastFromUID, &lastFromVariableIndex, &lastRangesListIndex, fromUID, fromPin](int rangesListIndex)
+			auto setLastInfos = [&lastFromUID, &lastFromPinIndex, &lastRangesListIndex, fromUID, fromPin](int rangesListIndex)
 			{
 				lastFromUID = fromUID;
-				lastFromVariableIndex = fromPin->GetIndex();
+				lastFromPinIndex = fromPin->GetIndex();
 				lastRangesListIndex = rangesListIndex;
 			};
 
@@ -245,14 +245,14 @@ namespace YBehavior
 				continue;
 			}
 			{
-				/// We assume that these ranges are feeded IN ORDER
+				/// We assume that these ranges are feed IN ORDER
 				/// So current FromUID can only be equal or larger than the previous FromUIDs
 				/// And previous ranges cant make holes
 				
 				std::vector<Ranges>& rangesList = it2->second;
 
 				///> In this case, an output is connected to multiple inputs. Just merge them.
-				if (lastFromUID == fromUID && lastFromVariableIndex == fromPin->GetIndex())
+				if (lastFromUID == fromUID && lastFromPinIndex == fromPin->GetIndex())
 				{
 					///> It must be the last range cause of ORDER
 					Ranges& ranges = rangesList[lastRangesListIndex];
@@ -297,7 +297,7 @@ namespace YBehavior
 
 						if (fromUID == std::get<0>(range))
 						{
-							///> A variable is connected with two more nodes, merge them
+							///> A pin is connected with two more nodes, merge them
 							if (std::get<1>(range) == fromPin->GetIndex())
 							{
 								///> Use the larger range

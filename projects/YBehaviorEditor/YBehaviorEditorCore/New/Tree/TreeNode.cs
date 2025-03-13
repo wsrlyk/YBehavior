@@ -458,7 +458,7 @@ namespace YBehavior.Editor.Core.New
                         foreach (string vName in group)
                         {
                             Variable v = memory.GetVariable(vName);
-                            if (v == null)
+                            if (v == null || v.eType == Variable.EnableType.ET_Disable)
                                 continue;
 
                             if (valueType == Variable.ValueType.VT_NONE)
@@ -480,7 +480,7 @@ namespace YBehavior.Editor.Core.New
                         foreach (string vName in group)
                         {
                             Variable v = memory.GetVariable(vName);
-                            if (v == null)
+                            if (v == null || v.eType == Variable.EnableType.ET_Disable)
                                 continue;
 
                             if (countType == Variable.CountType.CT_NONE)
@@ -506,7 +506,7 @@ namespace YBehavior.Editor.Core.New
                         if (vCache.Value != mapItem.SrcValue)
                             continue;
                         Variable des = memory.GetVariable(mapItem.DesVariable);
-                        if (des == null)
+                        if (des == null || des.eType == Variable.EnableType.ET_Disable)
                             continue;
 
                         if (mapItem.DesVType != Variable.ValueType.VT_NONE && mapItem.DesVType != des.vType)
