@@ -30,6 +30,7 @@ namespace YBehavior.Editor
         void Enable()
         {
             EventMgr.Instance.Register(EventType.VariableClicked, _OnVariableClicked);
+            this.Input.SelectAll();
         }
 
         void Disable()
