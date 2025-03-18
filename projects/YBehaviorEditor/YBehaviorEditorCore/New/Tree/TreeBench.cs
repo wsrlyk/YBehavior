@@ -422,6 +422,8 @@ namespace YBehavior.Editor.Core.New
         {
             m_Tree.RefreshNodeUID(0);
 
+            _RefreshReferenceStates();
+
             SaveSuo();
             //_SaveNode(m_Tree.Root, data, xmlDoc);
 
@@ -446,8 +448,6 @@ namespace YBehavior.Editor.Core.New
             m_ExportFileHash = 0;
 
             OnPropertyChanged("ShortDisplayName");
-
-            _RefreshReferenceStates();
         }
 
         void _SaveNode(TreeNode node, XmlElement data, XmlDocument xmlDoc)
