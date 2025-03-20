@@ -13,6 +13,7 @@ namespace YBehavior
 	{
 		Transition m_Trans;
 		int m_TransCount{ 0 };
+		bool m_IsNeedCheck{ true };
 	public:
 		TransitionResult transferResult;
 	public:
@@ -20,13 +21,15 @@ namespace YBehavior
 		Transition& Get() { return m_Trans; }
 		const Transition& Get() const { return m_Trans; }
 		bool IncTransCount();
+		bool IsNeedCheck() const { return m_IsNeedCheck; }
 		inline void ResetTransCount() { m_TransCount = 0; }
-		void Set(const STRING& e) { m_Trans.TrySet(e); }
-		void UnSet(const STRING& e) { m_Trans.UnSet(e); }
+		void Set(const STRING& e) { m_Trans.TrySet(e); m_IsNeedCheck = true; }
+		void UnSet(const STRING& e) { m_Trans.UnSet(e); m_IsNeedCheck = true; }
 		inline void Reset()
 		{
-			m_Trans.Reset(); ResetTransCount();
+			m_Trans.Reset(); ResetTransCount(); m_IsNeedCheck = true;
 		}
+		void NoNeedCheck() { m_IsNeedCheck = false; }
 	};
 
 	//typedef std::list<MachineState*> CurrentStatesType;

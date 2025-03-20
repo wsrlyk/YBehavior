@@ -345,7 +345,7 @@ namespace YBehavior
 		else if (context.GetTransQueue().size() == 0)
 		{
 			///> No Trans, Just Update Current
-			if (!_Trans(pAgent))
+			if (!context.GetTransition().IsNeedCheck() || !_Trans(pAgent))
 			{
 				context.LastRunRes = context.GetCurState()->Execute(pAgent, context.LastRunRes);
 				if (context.LastRunRes == MRR_Running || context.LastRunRes == MRR_Break)
@@ -422,6 +422,7 @@ namespace YBehavior
 		}
 		else
 		{
+			transContext.NoNeedCheck();
 			return false;
 		}
 

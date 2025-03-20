@@ -1,4 +1,6 @@
 #include "YBehavior/fsm/transition.h"
+#include "YBehavior/fsm/machinestate.h"
+#include "YBehavior/fsm/statemachine.h"
 
 namespace YBehavior
 {
@@ -74,9 +76,24 @@ namespace YBehavior
 
 	}
 
+	bool IsAncestor(MachineState* child, MachineState* ancestor)
+	{
+		if (child == nullptr || ancestor == nullptr || ancestor->GetType() != MST_Meta)
+			return false;
+		auto childMachine = child->GetParentMachine();
+		auto ancestorMachine = ancestor->GetParentMachine();
+		while (childMachine && ancestorMachine && childMachine->GetLevel() > ancestorMachine->GetLevel())
+		{
+			childMachine = childMachine->GetParentMachine();
+			if (childMachine == ancestorMachine)
+				return true;
+		}
+		return false;
+	}
+
 	bool CanTransTeller::operator()(const TransitionData& other) const
 	{
-		return ((other.Key.fromState == m_TransKey.fromState || m_TransKey.fromState == nullptr)
+		return ((other.Key.fromState == m_TransKey.fromState || m_TransKey.fromState == nullptr || IsAncestor(m_TransKey.fromState, other.Key.fromState))
 			&& other.Key.trans.ContainedBy(m_TransKey.trans));
 	}
 
