@@ -261,7 +261,7 @@ namespace YBehavior.Editor.Core.New
                 c = c.OwnerMachine;
             }
 
-            while (c != d && c != null)
+            while (c != d && c != null && d != null)
             {
                 c = c.OwnerMachine;
                 d = d.OwnerMachine;

@@ -33,16 +33,12 @@ namespace YBehavior.Editor.Core.New
 
             foreach (FSMRootMachineNode machine in m_RootMachines)
             {
-                uint level = 0;
-
-                _RefreshMachineUID(machine, ref uid, level);
+                _RefreshMachineUID(machine, ref uid);
             }
         }
 
-        protected void _RefreshMachineUID(FSMMachineNode machine,  ref uint uid, uint level)
+        protected void _RefreshMachineUID(FSMMachineNode machine,  ref uint uid)
         {
-            machine.Level = level;
-
             foreach (var state in machine.States)
             {
                 state.UID = ++uid;
@@ -53,7 +49,7 @@ namespace YBehavior.Editor.Core.New
                 {
                     FSMMachineNode subMachine = (state as FSMMetaStateNode).SubMachine;
                     subMachine.UID = state.UID;
-                    _RefreshMachineUID(subMachine, ref uid, level + 1);
+                    _RefreshMachineUID(subMachine, ref uid);
                 }
             }
         }

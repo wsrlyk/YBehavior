@@ -1040,6 +1040,7 @@ namespace YBehavior.Editor.Core.New
             m_SubMachine = FSMNodeMgr.Instance.CreateNode<FSMMachineNode>();
             m_SubMachine.MetaState = this;
             SubMachine.OwnerMachine = OwnerMachine;
+            SubMachine.Level = OwnerMachine.Level + 1;
             SubMachine.CreateUpper();
         }
 
