@@ -23,10 +23,10 @@ namespace YBehavior
 		ConditionMgr* m_pConditionMgr;
 	public:
 		Transition(ConditionMgr* conditionMgr = nullptr);
-		inline bool operator==(const Transition& _rhs) const;
+		bool operator==(const Transition& _rhs) const;
 
-		inline void Reset();
-		inline void SetConditionMgr(ConditionMgr* conditionMgr);
+		void Reset();
+		void SetConditionMgr(ConditionMgr* conditionMgr);
 		
 		void Set(const STRING& e);
 		bool TrySet(const STRING& e);
@@ -40,7 +40,7 @@ namespace YBehavior
 	{
 		MachineState* fromState{};
 		Transition trans{};
-		inline bool operator==(const TransitionMapKey& _rhs) const;
+		bool operator==(const TransitionMapKey& _rhs) const;
 	};
 
 	struct TransitionMapValue
@@ -56,8 +56,8 @@ namespace YBehavior
 		TransitionMapKey Key;
 		TransitionMapValue Value;
 		TransitionData(TransitionMapKey key, TransitionMapValue value, UINT uid);
-		inline bool operator==(const TransitionData& _rhs) const;
-		inline bool operator<(const TransitionData& _rhs) const;
+		bool operator==(const TransitionData& _rhs) const;
+		bool operator<(const TransitionData& _rhs) const;
 	};
 
 	class CanTransTeller
