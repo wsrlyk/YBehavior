@@ -4,6 +4,9 @@
 #include "YBehavior/types/types.h"
 #include "YBehavior/types/smallmap.h"
 #include <list>
+#ifdef YB_MSVC
+#include <intrin.h>
+#endif
 namespace YBehavior
 {
 	class MachineState;
@@ -23,7 +26,18 @@ namespace YBehavior
 	public:
 		Transition(ConditionMgr* conditionMgr = nullptr) : m_Conditions(0), m_pConditionMgr(conditionMgr) {}
 		inline bool operator==(const Transition& _rhs) const { return m_Conditions == _rhs.m_Conditions; }
-		inline bool operator<(const Transition& _rhs) const { return m_Conditions < _rhs.m_Conditions; }
+		inline bool operator<(const Transition& _rhs) const
+		{
+			#ifdef YB_MSVC
+			auto lc = __popcnt64(m_Conditions);
+			auto rc = __popcnt64(_rhs.m_Conditions);
+			#else
+			auto lc = __builtin_popcountll(m_Conditions);
+			auto rc = __builtin_popcountll(_rhs.m_Conditions);
+			#endif
+			//prefer the more complex transition
+			return  (lc == rc && m_Conditions < _rhs.m_Conditions) || (lc > rc);
+		}
 
 		inline void Reset() 
 		{
@@ -54,7 +68,7 @@ namespace YBehavior
 		}
 		inline bool operator<(const TransitionMapKey& _rhs) const
 		{
-			return fromState < _rhs.fromState || (fromState == _rhs.fromState && trans < _rhs.trans);
+			return (trans == _rhs.trans && fromState < _rhs.fromState) || (trans < _rhs.trans);
 		}
 	};
 
