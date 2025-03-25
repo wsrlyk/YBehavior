@@ -193,12 +193,12 @@ namespace YBehavior
 			return false;
 		if (k.fromState != nullptr)
 		{
-			auto res = m_FromTransitionMap.insert(TransitionData(k, v));
+			auto res = m_FromTransitionMap.emplace(k, v, (UINT)m_FromTransitionMap.size());
 			return res.second;
 		}
 		else
 		{
-			auto res = m_AnyTransitionMap.insert(TransitionData(k, v));
+			auto res = m_AnyTransitionMap.emplace(k, v, (UINT)m_AnyTransitionMap.size());
 			return res.second;
 		}
 	}

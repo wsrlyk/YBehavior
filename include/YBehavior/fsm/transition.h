@@ -4,9 +4,7 @@
 #include "YBehavior/types/types.h"
 #include "YBehavior/types/smallmap.h"
 #include <list>
-#ifdef YB_MSVC
-#include <intrin.h>
-#endif
+
 namespace YBehavior
 {
 	class MachineState;
@@ -24,30 +22,11 @@ namespace YBehavior
 		ULONG m_Conditions;
 		ConditionMgr* m_pConditionMgr;
 	public:
-		Transition(ConditionMgr* conditionMgr = nullptr) : m_Conditions(0), m_pConditionMgr(conditionMgr) {}
-		inline bool operator==(const Transition& _rhs) const { return m_Conditions == _rhs.m_Conditions; }
-		inline bool operator<(const Transition& _rhs) const
-		{
-			#ifdef YB_MSVC
-			auto lc = __popcnt64(m_Conditions);
-			auto rc = __popcnt64(_rhs.m_Conditions);
-			#else
-			auto lc = __builtin_popcountll(m_Conditions);
-			auto rc = __builtin_popcountll(_rhs.m_Conditions);
-			#endif
-			//prefer the more complex transition
-			return  (lc == rc && m_Conditions < _rhs.m_Conditions) || (lc > rc);
-		}
+		Transition(ConditionMgr* conditionMgr = nullptr);
+		inline bool operator==(const Transition& _rhs) const;
 
-		inline void Reset() 
-		{
-			m_Conditions = 0; 
-		}
-		inline void SetConditionMgr(ConditionMgr* conditionMgr) 
-		{
-			m_pConditionMgr = conditionMgr; 
-			m_Conditions = 0;
-		}
+		inline void Reset();
+		inline void SetConditionMgr(ConditionMgr* conditionMgr);
 		
 		void Set(const STRING& e);
 		bool TrySet(const STRING& e);
@@ -59,43 +38,26 @@ namespace YBehavior
 
 	struct TransitionMapKey
 	{
-		MachineState* fromState;
-		Transition trans;
-		TransitionMapKey() : fromState(nullptr) {}
-		inline bool operator==(const TransitionMapKey& _rhs) const
-		{
-			return fromState == _rhs.fromState && trans == _rhs.trans;
-		}
-		inline bool operator<(const TransitionMapKey& _rhs) const
-		{
-			return (trans == _rhs.trans && fromState < _rhs.fromState) || (trans < _rhs.trans);
-		}
+		MachineState* fromState{};
+		Transition trans{};
+		inline bool operator==(const TransitionMapKey& _rhs) const;
 	};
 
 	struct TransitionMapValue
 	{
-		MachineState* toState;
-		TransitionMapValue() : toState(nullptr) {}
+		MachineState* toState{};
 	};
 
 	struct TransitionData
 	{
+	protected:
+		UINT m_UID;
+	public:
 		TransitionMapKey Key;
 		TransitionMapValue Value;
-		TransitionData(TransitionMapKey key, TransitionMapValue value)
-			: Key(key)
-			, Value(value)
-		{
-
-		}
-		inline bool operator==(const TransitionData& _rhs) const
-		{
-			return Key == _rhs.Key;
-		}
-		inline bool operator<(const TransitionData& _rhs) const
-		{
-			return Key < _rhs.Key;
-		}
+		TransitionData(TransitionMapKey key, TransitionMapValue value, UINT uid);
+		inline bool operator==(const TransitionData& _rhs) const;
+		inline bool operator<(const TransitionData& _rhs) const;
 	};
 
 	class CanTransTeller
@@ -109,19 +71,12 @@ namespace YBehavior
 	class StateMachine;
 	struct TransitionResult
 	{
-		MachineState* pFromState;
-		MachineState* pToState;
-		Transition trans;
-		StateMachine* pMachine;
+		MachineState* pFromState{};
+		MachineState* pToState{};
+		Transition trans{};
+		StateMachine* pMachine{};
 
 		std::list<MachineState*> lcaRoute;
-
-		TransitionResult()
-			: pFromState(nullptr)
-			, pToState(nullptr)
-			, pMachine(nullptr)
-		{
-		}
 	};
 
 	enum TransQueueOp
@@ -136,17 +91,9 @@ namespace YBehavior
 		MachineState* pState;
 		TransQueueOp op;
 
-		TransQueueData(MachineState* state)
-		{
-			pState = state;
-			op = TQO_None;
-		}
+		TransQueueData(MachineState* state);
 
-		TransQueueData(MachineState* state, TransQueueOp o)
-		{
-			pState = state;
-			op = o;
-		}
+		TransQueueData(MachineState* state, TransQueueOp o);
 	};
 }
 

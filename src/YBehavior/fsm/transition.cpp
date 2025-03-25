@@ -27,6 +27,28 @@ namespace YBehavior
 		return true;
 	}
 
+	Transition::Transition(ConditionMgr* conditionMgr /*= nullptr*/)
+		: m_Conditions(0)
+		, m_pConditionMgr(conditionMgr) 
+	{
+	}
+
+	bool Transition::operator==(const Transition& _rhs) const
+	{
+		return m_Conditions == _rhs.m_Conditions;
+	}
+
+	void Transition::Reset()
+	{
+		m_Conditions = 0;
+	}
+
+	void Transition::SetConditionMgr(ConditionMgr* conditionMgr)
+	{
+		m_pConditionMgr = conditionMgr;
+		m_Conditions = 0;
+	}
+
 	void Transition::Set(const STRING& e)
 	{
 		if (m_pConditionMgr != nullptr)
@@ -70,6 +92,29 @@ namespace YBehavior
 		return (m_Conditions & other.m_Conditions) == m_Conditions;
 	}
 
+	bool TransitionMapKey::operator==(const TransitionMapKey& _rhs) const
+	{
+		return fromState == _rhs.fromState && trans == _rhs.trans;
+	}
+
+	TransitionData::TransitionData(TransitionMapKey key, TransitionMapValue value, UINT uid)
+		: m_UID(uid)
+		, Key(key)
+		, Value(value)
+	{
+
+	}
+
+	bool TransitionData::operator==(const TransitionData& _rhs) const
+	{
+		return Key == _rhs.Key;
+	}
+
+	bool TransitionData::operator<(const TransitionData& _rhs) const
+	{
+		return m_UID < _rhs.m_UID;
+	}
+
 	CanTransTeller::CanTransTeller(const TransitionMapKey& trans)
 		: m_TransKey(trans)
 	{
@@ -97,4 +142,16 @@ namespace YBehavior
 			&& other.Key.trans.ContainedBy(m_TransKey.trans));
 	}
 
+
+	TransQueueData::TransQueueData(MachineState* state)
+	{
+		pState = state;
+		op = TQO_None;
+	}
+
+	TransQueueData::TransQueueData(MachineState* state, TransQueueOp o)
+	{
+		pState = state;
+		op = o;
+	}
 }
