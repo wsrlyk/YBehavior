@@ -437,8 +437,7 @@ namespace YBehavior
 			}
 			else
 			{
-				if (pState->GetType() == MST_Normal)
-					pFSM->GetTreeMap().Name2Trees[std::make_tuple(pState, pState->GetName())] = pState->GetTree();
+				pFSM->GetTreeMap().Name2Trees[std::make_tuple(pState, pState->GetName())] = pState->GetTree();
 			}
 		}
 	}
