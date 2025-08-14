@@ -33,9 +33,8 @@ namespace YBehavior.Editor
 
             if (Renderer != null)
             {
-                var vis = (Renderer.FSMStateOwner is FSMAnyStateNode || Renderer.FSMStateOwner is FSMUpperStateNode || Renderer.FSMStateOwner is FSMMetaStateNode) ? Visibility.Collapsed : Visibility.Visible;
-                this.NamePanel.Visibility = vis;
-                this.TreePanel.Visibility = vis;
+                this.NamePanel.Visibility = (Renderer.FSMStateOwner is FSMAnyStateNode || Renderer.FSMStateOwner is FSMUpperStateNode) ? Visibility.Collapsed : Visibility.Visible; ;
+                this.TreePanel.Visibility = (Renderer.FSMStateOwner is FSMAnyStateNode || Renderer.FSMStateOwner is FSMUpperStateNode || Renderer.FSMStateOwner is FSMMetaStateNode) ? Visibility.Collapsed : Visibility.Visible; ;
             }
         }
     }
