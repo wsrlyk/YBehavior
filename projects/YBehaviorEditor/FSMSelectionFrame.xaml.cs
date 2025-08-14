@@ -29,7 +29,7 @@ namespace YBehavior.Editor
         void Enable()
         {
             EventMgr.Instance.Register(EventType.SelectionChanged, _OnSelectionChanged);
-
+            this.TabController.SelectedItem = null;
         }
 
         void Disable()
@@ -59,43 +59,29 @@ namespace YBehavior.Editor
             if (oArg.Target is UIFSMStateNode)
             {
                 UIFSMStateNode node = oArg.Target as UIFSMStateNode;
-                this.StateTab.DataContext = node.DataContext;
+                this.DataContext = node.DataContext;
 
                 Dispatcher.BeginInvoke((Action)(() => this.TabController.SelectedItem = this.StateTab));
             }
-            else
-            {
-                this.StateTab.DataContext = null;
-            }
-
-            if (oArg.Target is UIComment)
+            else if (oArg.Target is UIComment)
             {
                 UIComment com = oArg.Target as UIComment;
-                this.CommentTab.DataContext = com.DataContext;
+                this.DataContext = com.DataContext;
 
                 Dispatcher.BeginInvoke((Action)(() => this.TabController.SelectedItem = this.CommentTab));
             }
-            else
-            {
-                this.CommentTab.DataContext = null;
-            }
-
-            if (oArg.Target is FSMUIConnection)
+            else if (oArg.Target is FSMUIConnection)
             {
                 FSMUIConnection conn = oArg.Target as FSMUIConnection;
-                this.ConnectionTab.DataContext = conn.DataContext;
+                this.DataContext = conn.DataContext;
 
                 Dispatcher.BeginInvoke((Action)(() => this.TabController.SelectedItem = this.ConnectionTab));
             }
             else
             {
-                this.ConnectionTab.DataContext = null;
+                this.DataContext = null;
+                this.TabController.SelectedItem = null;
             }
-        }
-
-        private void TabController_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
         }
     }
 }

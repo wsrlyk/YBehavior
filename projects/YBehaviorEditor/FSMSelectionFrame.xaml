@@ -14,7 +14,7 @@
         </local:ValueConverterGroup>
     </UserControl.Resources>
     <Grid>
-        <TabControl Name="TabController" Tag="300" SelectionChanged="TabController_SelectionChanged">
+        <TabControl Name="TabController" Tag="300">
             <TabItem Header="State" Name="StateTab" Width="80" Visibility="{Binding IsSelected, RelativeSource={RelativeSource Self}, Converter={StaticResource visibilityConvertor}}">
                 <local:FSMStateFrame/>
             </TabItem>
