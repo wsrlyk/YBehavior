@@ -129,7 +129,8 @@ namespace YBehavior.Editor.Core.New
         /// </summary>
         public void Clear()
         {
-            foreach(ISelectable selection in m_Selections)
+            if (m_Selections.Count == 0 && m_SingleSelection == null) return;
+            foreach (ISelectable selection in m_Selections)
             {
                 selection.SetSelect(false);
             }

@@ -101,7 +101,7 @@ namespace YBehavior.Editor.Core.New
             {
                 m_Timer = new System.Windows.Threading.DispatcherTimer();
                 m_Timer.Interval = new TimeSpan(0, 0, 0, 0, 80);
-                m_Timer.Tick += (s, e1) => { m_Timer.Stop(); if (m_ClickHandler != null) m_ClickHandler(m_Pos); };
+                m_Timer.Tick += (s, e1) => { m_Timer.Stop();/* if (m_ClickHandler != null) m_ClickHandler(m_Pos); */};
             }
         }
 
@@ -275,7 +275,7 @@ namespace YBehavior.Editor.Core.New
                     {
                         m_Timer.Start();
                     }
-                    else
+                    //else
                     {
                         if (m_ClickHandler != null)
                             m_ClickHandler(m_Pos);
