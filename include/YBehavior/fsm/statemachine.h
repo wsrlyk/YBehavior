@@ -76,6 +76,7 @@ namespace YBehavior
 
 	protected:
 		bool _Trans(AgentPtr pAgent);
+		bool _TransFromSpecialState(AgentPtr pAgent);
 	};
 
 	class MachineID;

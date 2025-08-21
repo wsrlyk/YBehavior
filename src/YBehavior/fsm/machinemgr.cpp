@@ -211,18 +211,24 @@ namespace YBehavior
 		auto it = node.attribute("Name");
 
 		STRING name(it.value());
-		it = node.attribute("To");
-		if (it.empty())
-		{
-			ERROR_BEGIN << "Trans has no destination: " << name << ERROR_END;
-			return false;
-		}
 
+		auto transtype = node.attribute("Type");
+		
+
+		it = node.attribute("To");
 		MachineState* pTo;
 		if (it.empty())
 		{
-			///> This Trans to ExitState
-			pTo = pMachine->GetExit();
+			if (strcmp(transtype.value(), "Exit") == 0)
+			{	
+				///> This Trans to ExitState
+				pTo = pMachine->GetExit();
+			}
+			else
+			{
+				ERROR_BEGIN << "Trans has no destination: " << name << ERROR_END;
+				return false;
+			}
 		}
 		else
 		{
@@ -237,7 +243,15 @@ namespace YBehavior
 
 		MachineState* pFrom = nullptr;
 		it = node.attribute("From");
-		if (!it.empty())
+		if (it.empty())
+		{
+			if (strcmp(transtype.value(), "Entry") == 0)
+			{
+				///> This Trans from EntryState
+				pFrom = pMachine->GetEntry();
+			}
+		}
+		else
 		{
 			pFrom = pMachine->GetRootMachine()->FindState(it.value());
 			if (pFrom == nullptr)

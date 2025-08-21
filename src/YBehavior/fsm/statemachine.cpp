@@ -344,8 +344,13 @@ namespace YBehavior
 		}
 		else if (context.GetTransQueue().size() == 0)
 		{
+			bool hasTrans = false;
+			if (context.GetTransition().IsNeedCheck() && _Trans(pAgent))
+				hasTrans = true;
+			else if (_TransFromSpecialState(pAgent))
+				hasTrans = true;
 			///> No Trans, Just Update Current
-			if (!context.GetTransition().IsNeedCheck() || !_Trans(pAgent))
+			if (!hasTrans)
 			{
 				context.LastRunRes = context.GetCurState()->Execute(pAgent, context.LastRunRes);
 				if (context.LastRunRes == MRR_Running || context.LastRunRes == MRR_Break)
@@ -377,28 +382,9 @@ namespace YBehavior
 			{
 				continue;
 			}
-
-			///> Trans to an Entry, and this Entry has no trans to other states, then just trans to Default
-			if (context.GetCurState()->GetType() == MST_Entry)
+			if (_TransFromSpecialState(pAgent))
 			{
-				context.GetCurState()->GetParentMachine()->EnterDefaultOrExit(pAgent);
-			}
-			else if (context.GetCurState()->GetType() == MST_Exit)
-			{
-				///> Is RootMachine, Just exit
-				if (context.GetCurState()->GetParentMachine()->GetMetaState() == nullptr)
-				{
-					context.SetCurState(nullptr);
-				}
-				///> Go to ParentMachine's Default
-				else
-				{
-					context.GetCurState()->GetParentMachine()->GetMetaState()->GetParentMachine()->EnterDefaultOrExit(pAgent);
-				}
-			}
-			else if (context.GetCurState()->GetType() == MST_Meta)
-			{
-				((MetaState*)context.GetCurState())->GetSubMachine()->EnterEntry(pAgent);
+				continue;
 			}
 		}
 	}
@@ -436,6 +422,39 @@ namespace YBehavior
 		context.GetTransQueue().push_back(transContext.transferResult.pToState);
 
 		return true;
+	}
+
+	bool RootMachine::_TransFromSpecialState(AgentPtr pAgent)
+	{
+		MachineContext& context = *pAgent->GetMachineContext();
+
+		switch (context.GetCurState()->GetType())
+		{
+		case MST_Normal:
+			return false;
+		case MST_Entry:
+			///> Trans to an Entry, and this Entry has no trans to other states, then just trans to Default
+			context.GetCurState()->GetParentMachine()->EnterDefaultOrExit(pAgent);
+			return true;
+		case MST_Exit:
+			///> Is RootMachine, Just exit
+			if (context.GetCurState()->GetParentMachine()->GetMetaState() == nullptr)
+			{
+				context.SetCurState(nullptr);
+			}
+			///> Go to ParentMachine's Default
+			else
+			{
+				context.GetCurState()->GetParentMachine()->GetMetaState()->GetParentMachine()->EnterDefaultOrExit(pAgent);
+			}
+			return true;
+		case MST_Meta:
+			((MetaState*)context.GetCurState())->GetSubMachine()->EnterEntry(pAgent);
+			return true;
+		default:
+			break;
+		}
+		return false;
 	}
 
 }

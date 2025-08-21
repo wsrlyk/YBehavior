@@ -606,21 +606,4 @@ namespace YBehavior.Editor.Core.New
             (WorkBenchMgr.Instance.ActiveWorkBench as FSMBench).SetDefault(Origin);
         }
     }
-    /// <summary>
-    /// Set current state machine of fsm
-    /// </summary>
-    public class SetCurMachineCommand : ICommand
-    {
-        public FSMMachineNode Origin { get; set; }
-        public FSMMachineNode Final { get; set; }
-        public void Redo()
-        {
-            (WorkBenchMgr.Instance.ActiveWorkBench).AddRenderers(Final, true);
-        }
-        public void Undo()
-        {
-            (WorkBenchMgr.Instance.ActiveWorkBench).AddRenderers(Origin, true);
-        }
-    }
-
 }

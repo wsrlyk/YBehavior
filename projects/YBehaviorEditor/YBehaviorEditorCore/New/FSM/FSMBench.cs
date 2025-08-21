@@ -188,7 +188,17 @@ namespace YBehavior.Editor.Core.New
 
         protected bool _LoadTrans(FSMMachineNode machine, XmlNode data)
         {
-            var attr = data.Attributes["From"];
+            TransitionType t = TransitionType.Normal;
+            var attr = data.Attributes["Type"];
+            if (attr != null)
+            {
+                if (attr.Value == "Entry")
+                    t = TransitionType.Entry;
+                else if (attr.Value == "Exit")
+                    t = TransitionType.Exit;
+            }
+
+            attr = data.Attributes["From"];
             string from = string.Empty;
             if (attr != null)
                 from = attr.Value;
@@ -204,10 +214,29 @@ namespace YBehavior.Editor.Core.New
                 events.Add(chi.Name);
             }
 
-            if (!machine.TryAddTrans(from, to, events))
+            switch (t)
             {
-                LogMgr.Instance.Error("Invalid trans: " + data.OuterXml.ToString());
-                return false;
+                case TransitionType.Entry:
+                    if (!machine.TryAddEntryTrans(to, events))
+                    {
+                        LogMgr.Instance.Error("Invalid entry trans: " + data.OuterXml.ToString());
+                        return false;
+                    }
+                    break;
+                case TransitionType.Exit:
+                    if (!machine.TryAddExitTrans(from, events))
+                    {
+                        LogMgr.Instance.Error("Invalid exit trans: " + data.OuterXml.ToString());
+                        return false;
+                    }
+                    break;
+                default:
+                    if (!machine.TryAddTrans(from, to, events))
+                    {
+                        LogMgr.Instance.Error("Invalid trans: " + data.OuterXml.ToString());
+                        return false;
+                    }
+                    break;
             }
 
             return true;
@@ -270,11 +299,6 @@ namespace YBehavior.Editor.Core.New
                         cur = cur.MetaState?.OwnerMachine;
                     }
                 }
-                PushDoneCommand(new SetCurMachineCommand()
-                {
-                    Origin = old,
-                    Final = node as FSMMachineNode,
-                });
             }
         }
 
@@ -320,18 +344,7 @@ namespace YBehavior.Editor.Core.New
             {
                 foreach (Transition trans in machine.LocalTransition)
                 {
-                    switch(trans.Type)
-                    {
-                        case TransitionType.Entry:
-                            _SaveEntryTrans(trans, nodeEl, xmlDoc);
-                            break;
-                        case TransitionType.Exit:
-                            _SaveExitTrans(trans, nodeEl, xmlDoc);
-                            break;
-                        default:
-                            _SaveTrans(trans, nodeEl, xmlDoc);
-                            break;
-                    }
+                    _SaveTrans(trans, nodeEl, xmlDoc);
                 }
             }
 
@@ -370,41 +383,16 @@ namespace YBehavior.Editor.Core.New
             XmlElement nodeEl = xmlDoc.CreateElement("Trans");
             data.AppendChild(nodeEl);
 
-            if (trans.Key.FromState != null)
+            if (trans.Type == TransitionType.Entry)
+                nodeEl.SetAttribute("Type", "Entry");
+            else if (trans.Type == TransitionType.Exit)
+                nodeEl.SetAttribute("Type", "Exit");
+
+            if (trans.Key.FromState != null && trans.Type != TransitionType.Entry)
                 nodeEl.SetAttribute("From", trans.Key.FromState.NickName);
 
-            if (trans.Key.ToState != null)
+            if (trans.Key.ToState != null && trans.Type != TransitionType.Exit)
                 nodeEl.SetAttribute("To", trans.Key.ToState.NickName);
-
-            foreach (var e in trans.Value)
-            {
-                XmlElement el = xmlDoc.CreateElement(e.Event.Event);
-                nodeEl.AppendChild(el);
-            }
-        }
-
-        void _SaveEntryTrans(Transition trans, XmlElement data, XmlDocument xmlDoc)
-        {
-            XmlElement nodeEl = xmlDoc.CreateElement("EntryTrans");
-            data.AppendChild(nodeEl);
-
-            if (trans.Key.ToState != null)
-                nodeEl.SetAttribute("To", trans.Key.ToState.NickName);
-
-            foreach (var e in trans.Value)
-            {
-                XmlElement el = xmlDoc.CreateElement(e.Event.Event);
-                nodeEl.AppendChild(el);
-            }
-        }
-
-        void _SaveExitTrans(Transition trans, XmlElement data, XmlDocument xmlDoc)
-        {
-            XmlElement nodeEl = xmlDoc.CreateElement("ExitTrans");
-            data.AppendChild(nodeEl);
-
-            if (trans.Key.FromState != null)
-                nodeEl.SetAttribute("From", trans.Key.FromState.NickName);
 
             foreach (var e in trans.Value)
             {

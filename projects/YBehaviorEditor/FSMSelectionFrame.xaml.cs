@@ -59,29 +59,41 @@ namespace YBehavior.Editor
             if (oArg.Target is UIFSMStateNode)
             {
                 UIFSMStateNode node = oArg.Target as UIFSMStateNode;
-                this.DataContext = node.DataContext;
+                this.StateTab.DataContext = node.DataContext;
 
                 Dispatcher.BeginInvoke((Action)(() => this.TabController.SelectedItem = this.StateTab));
+           }
+            else
+            {
+                this.StateTab.DataContext = null;
             }
-            else if (oArg.Target is UIComment)
+
+            if (oArg.Target is UIComment)
             {
                 UIComment com = oArg.Target as UIComment;
-                this.DataContext = com.DataContext;
+                this.CommentTab.DataContext = com.DataContext;
 
                 Dispatcher.BeginInvoke((Action)(() => this.TabController.SelectedItem = this.CommentTab));
             }
-            else if (oArg.Target is FSMUIConnection)
+            else
+            {
+                this.CommentTab.DataContext = null;
+            }
+
+            if (oArg.Target is FSMUIConnection)
             {
                 FSMUIConnection conn = oArg.Target as FSMUIConnection;
-                this.DataContext = conn.DataContext;
+                this.ConnectionTab.DataContext = conn.DataContext;
 
                 Dispatcher.BeginInvoke((Action)(() => this.TabController.SelectedItem = this.ConnectionTab));
             }
             else
             {
-                this.DataContext = null;
-                this.TabController.SelectedItem = null;
+                this.ConnectionTab.DataContext = null;
             }
+
+            if (oArg.Target == null)
+                this.TabController.SelectedItem = null;
         }
     }
 }

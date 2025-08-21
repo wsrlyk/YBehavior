@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 	BehaviorProcessHelper::Load({ "EmptyFSM" }, { "SubTree" });
 
 	STRING s;
-	XEntity* pEntity = new XEntity("Hehe", "EmptyFSM", nullptr, nullptr);
+	XEntity* pEntity = new XEntity("Hehe", "StateMachine/SimpleFSM", nullptr, nullptr);
 
 	//std::cin >> s;
 
