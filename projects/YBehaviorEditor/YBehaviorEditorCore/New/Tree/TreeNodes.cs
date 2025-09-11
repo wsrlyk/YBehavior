@@ -1523,7 +1523,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_LIST,
                 Variable.VariableType.VBT_NONE,
-                Variable.EnableType.ET_FIXED,
+                Variable.EnableType.ET_Disable,
                 2
             );
 
@@ -1561,6 +1561,20 @@ namespace YBehavior.Editor.Core.New
                 //    Variables.GetVariable("InputX").NoteValue);
                 //return sb.ToString();
             }
+        }
+        public override bool CheckValid()
+        {
+            Variable v = NodeMemory.GetVariable("Values");
+            if (v.eType == Variable.EnableType.ET_Disable)
+            {
+                Variable o = NodeMemory.GetVariable("Output");
+                if (o.vType != Variable.ValueType.VT_INT)
+                {
+                    LogMgr.Instance.Error(this.Renderer.UITitle + ": when Values is disabled, Output must be type int.");
+                    return false;
+                }
+            }
+            return base.CheckValid();
         }
     }
 

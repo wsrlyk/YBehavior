@@ -128,9 +128,9 @@ EVERY 依次处理所有事件"/>
                 <Dice Content="骰子。可自定义面数，每个面的值，和概率。"
 			ReturnFailure="Distribution和Values长度不匹配 或 Input不在范围[0, Distribution的所有数值的和)">
                         <Distribution Content="每个面的概率，可以是任意大的正数值"/>
-                        <Values Content="每个面的值，和概率一一对应"/>
+                        <Values Content="每个面的值，和概率一一对应；禁用时，为每个面的序号，从0开始"/>
                         <Input Content="手动扔骰子的随机值，须落在 [0, Distribution的所有数值的和) 之间"/>
-                        <Output Content="输出值"/>
+                        <Output Content="输出值。Values禁用时，必须为Int"/>
                         <IgnoreInput Content="是否忽略Input。忽略则自动扔骰子"/>
                 </Dice>
                 <SubTree Content="运行并返回子树"

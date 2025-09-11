@@ -25,16 +25,19 @@ namespace YBehavior
 		NodeState ns = NS_FAILURE;
 
 		INT sizeX = m_Distribution->ArraySize(pAgent->GetMemory());
-		INT sizeY = m_Values->ArraySize(pAgent->GetMemory());
-		if (sizeX != sizeY)
-		{
-			YB_LOG_INFO("Different length of Distribution and Values; ");
-			return NS_FAILURE;
-		}
 		if (sizeX == 0)
 		{
 			YB_LOG_INFO("No Distribution; ");
 			return NS_FAILURE;
+		}
+		if (m_Values)
+		{
+			INT sizeY = m_Values->ArraySize(pAgent->GetMemory());
+			if (sizeX != sizeY)
+			{
+				YB_LOG_INFO("Different length of Distribution and Values; ");
+				return NS_FAILURE;
+			}
 		}
 
 		auto zero = m_pOperationHelper->AllocTempData();
@@ -76,7 +79,10 @@ namespace YBehavior
 			if (m_pCompareHelper->Compare(input, current.pData, CompareType::LESS))
 			{
 				ns = NS_SUCCESS;
-				m_Output->SetValue(pAgent->GetMemory(), m_Values->GetElementPtr(pAgent->GetMemory(), i));
+				if (m_Values)
+					m_Output->SetValue(pAgent->GetMemory(), m_Values->GetElementPtr(pAgent->GetMemory(), i));
+				else
+					((Pin<INT>*)m_Output)->SetValue(pAgent->GetMemory(), i);
 				break;
 			}
 		}
@@ -102,11 +108,8 @@ namespace YBehavior
 			ERROR_BEGIN_NODE_HEAD << "Invalid type for Distribution in Dice: " << xVecType << ERROR_END;
 			return false;
 		}
-		TYPEID yVecType = PinCreation::CreatePin(this, m_Values, "Values", data);
-		if (!m_Values)
-		{
-			return false;
-		}
+		TYPEID yVecType = PinCreation::CreatePinIfExist(this, m_Values, "Values", data);
+
 		//if (s_ValidVecTypes.find(yVecType) == s_ValidVecTypes.end())
 		//{
 		//	ERROR_BEGIN_NODE_HEAD << "Invalid type for Values in Dice: " << yVecType << ERROR_END;
@@ -135,11 +138,22 @@ namespace YBehavior
 			ERROR_BEGIN_NODE_HEAD << "Different types in Dice:  " << xType << " and " << xVecType << ERROR_END;
 			return false;
 		}
-
-		if (!Utility::IsElement(yType, yVecType))
+		
+		if (m_Values)
 		{
-			ERROR_BEGIN_NODE_HEAD << "Different types in Dice:  " << yType << " and " << yVecType << ERROR_END;
-			return false;
+			if (!Utility::IsElement(yType, yVecType))
+			{
+				ERROR_BEGIN_NODE_HEAD << "Different types in Dice:  " << yType << " and " << yVecType << ERROR_END;
+				return false;
+			}
+		}
+		else
+		{
+			if (yType != GetTypeID<INT>())
+			{
+				ERROR_BEGIN_NODE_HEAD << "If Values is disabled, Output type MUST be INT" << ERROR_END;
+				return false;
+			}
 		}
 
 		auto helperType = m_Distribution->ElementTypeID();
