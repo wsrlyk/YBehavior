@@ -97,7 +97,7 @@ namespace YBehavior
 		}
 	}
 
-	bool PinCreation::ParsePin(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, Flag flag/* = Flag::None*/)
+	bool PinCreation::ParsePin(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, ShapeType shape, Flag flag/* = Flag::None*/)
 	{
 		auto tempChar = attri.value();
 		///> split all spaces
@@ -108,11 +108,11 @@ namespace YBehavior
 			return false;
 		}
 
-		if (single != ST_NONE)
+		if (shape != ST_NONE)
 		{
-			if (!((single == ST_SINGLE) ^ (buffer[0][0] == buffer[0][1])))
+			if (!((shape == ST_SCALAR) ^ (buffer[0][0] == buffer[0][1])))
 			{
-				ERROR_BEGIN_NODE(pTreeNode) << "Single or Array Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
+				ERROR_BEGIN_NODE(pTreeNode) << "Scalar or Array Error, " << attri.name() << " in " << data.name() << ": " << tempChar << ERROR_END;
 				return false;
 			}
 		}
@@ -144,7 +144,7 @@ namespace YBehavior
 			return "";
 		}
 		StdVector<STRING> buffer;
-		if (!ParsePin(pTreeNode, attrOptr, data, buffer, ST_SINGLE, Flag::None))
+		if (!ParsePin(pTreeNode, attrOptr, data, buffer, ST_SCALAR, Flag::None))
 			return "";
 
 		return buffer[1];
@@ -157,7 +157,7 @@ namespace YBehavior
 		if (attrOptr.empty())
 			return false;
 		StdVector<STRING> buffer;
-		if (!ParsePin(pTreeNode, attrOptr, data, buffer, ST_SINGLE, Flag::None))
+		if (!ParsePin(pTreeNode, attrOptr, data, buffer, ST_SCALAR, Flag::None))
 			return false;
 
 		output = buffer[1];

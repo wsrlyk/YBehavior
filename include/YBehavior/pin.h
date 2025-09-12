@@ -71,11 +71,11 @@ namespace YBehavior
 				ERROR_BEGIN << "SharedData NULL at " << this->GetLogName() << ERROR_END;
 			}
 
-			const StdVector<ElementType>* pVector = (const StdVector<ElementType>*)pData->Get<StdVector<ElementType>>(m_Key);
+			auto pVector = pData->Get<StdVector<ElementType>>(m_Key);
 			if (pVector)
 			{
 				if ((UINT)index < pVector->size())
-					(*const_cast<StdVector<ElementType>*>(pVector))[index] = *src;
+					(*pVector)[index] = *src;
 				else
 					ERROR_BEGIN << "Index " << index << " out of range, Array Length " << pVector->size() << " at " << this->GetLogName() << ERROR_END;
 			}
@@ -99,7 +99,7 @@ namespace YBehavior
 				ERROR_BEGIN << "SharedData NULL at " << this->GetLogName() << ERROR_END;
 				return nullptr;
 			}
-			const StdVector<ElementType>* pVector = (const StdVector<ElementType>*)pData->Get<StdVector<ElementType>>(m_Key);
+			auto pVector = pData->Get<StdVector<ElementType>>(m_Key);
 			if (pVector && (UINT)index < pVector->size())
 			{
 				const ElementType* t = &(*pVector)[index];
@@ -149,7 +149,7 @@ namespace YBehavior
 				if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
 					mValue = (StdVector<ElementType>*)_GetValuePtr();
 				else
-					mValue = (StdVector<ElementType>*)const_cast<void*>(GetValuePtr(pMemory));
+					mValue = (StdVector<ElementType>*)GetValuePtr(pMemory);
 
 				return mValue;
 			}
@@ -338,7 +338,7 @@ namespace YBehavior
 			return 0;
 		}
 
-		const void* GetValuePtr(IMemory* pMemory) override
+		void* GetValuePtr(IMemory* pMemory) override
 		{
 			return GetValue(pMemory);
 		}
@@ -373,15 +373,7 @@ namespace YBehavior
 		void SetKeyFromString(const STRING& s) override
 		{
 			KEY key = Utility::INVALID_KEY;
-			/////> if T is a single type but has vector index, it means this variable is an element of a vector.
-			//if (!IsVector<T>::Result && m_VectorIndex != nullptr)
-			//{
-			//	key = (TreeKeyMgr::Instance()->GetKeyByName<StdVector<T>>(s));
-			//}
-			//else
-			//{
-			//	key = (TreeKeyMgr::Instance()->GetKeyByName<T>(s));
-			//}
+
 			key = (TreeKeyMgr::Instance()->GetKeyByName(s));
 
 			if (key == Utility::INVALID_KEY)
@@ -392,14 +384,14 @@ namespace YBehavior
 			SetKey(key);
 		}
 
-		const T* GetValue(IMemory* pMemory)
+		T* GetValue(IMemory* pMemory)
 		{
-			return (const T*)_GetValuePtr(pMemory);
+			return _GetValuePtr(pMemory);
 		}
 
 		void GetValue(IMemory* pMemory, T& t)
 		{
-			const T* v = GetValue(pMemory);
+			auto v = GetValue(pMemory);
 			if (v != nullptr)
 				t = *v;
 		}
@@ -434,12 +426,6 @@ namespace YBehavior
 				else
 					ERROR_BEGIN << "SharedData NULL at " << this->GetLogName() << ERROR_END;
 			}
-		}
-
-		void SetValue(IMemory* pData, const T&& src)
-		{
-			T t(src);
-			SetValue(pData, &t);
 		}
 
 		void SetValue(IMemory* pData, const T& src)

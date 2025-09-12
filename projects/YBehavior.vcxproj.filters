@@ -321,6 +321,9 @@
     <ClInclude Include="..\src\YBehavior\network\messageprocessor.h">
       <Filter>源文件\network</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\YBehavior\pinany.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YBehavior\agent.cpp">

@@ -99,6 +99,8 @@ namespace YBehavior
 		static bool SetDefault(T& t) { return false; }
 		template<typename T>
 		static bool SetDefault(StdVector<T>& t) { t.clear(); return true; }
+		template<typename T>
+		static const T& GetDefault();
 
 		template<typename T>
 		static const STRING& GetCreateStr() { return StringEmpty; }	
@@ -218,7 +220,9 @@ namespace YBehavior
 
 #define DEFAULT_DECLARE(type)\
 	template<>\
-	bool Utility::SetDefault(type& t);
+	bool Utility::SetDefault(type& t);\
+	template<>\
+	const type& Utility::GetDefault();
 
 	FOR_EACH_SINGLE_NORMAL_TYPE(DEFAULT_DECLARE);
 

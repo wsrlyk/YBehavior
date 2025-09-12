@@ -223,6 +223,11 @@ namespace YBehavior
 	{\
 		t = Utility::type##Empty;\
 		return true;\
+	}\
+	template<>\
+	const type& Utility::GetDefault<type>()\
+	{\
+		return Utility::type##Empty; \
 	}
 
 	FOR_EACH_SINGLE_NORMAL_TYPE(DEFAULT_DEFINE)

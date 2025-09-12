@@ -22,11 +22,15 @@ namespace YBehavior
 		///> If no config, a default CONST pin will be created
 		template <typename T>
 		static TYPEID CreatePin(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag = Flag::None);
+		template <typename T>
+		static TYPEID CreatePin(TreeNode* pTreeNode, PinAny<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag = Flag::None);
 		///> If no config, pin will NOT be created
 		static TYPEID CreatePinIfExist(TreeNode* pTreeNode, IPin*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag = Flag::None);
 		///> If no config, pin will NOT be created
 		template <typename T>
 		static TYPEID CreatePinIfExist(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag = Flag::None);
+		template <typename T>
+		static TYPEID CreatePinIfExist(TreeNode* pTreeNode, PinAny<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag = Flag::None);
 
 		
 		static STRING GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data);
@@ -35,11 +39,15 @@ namespace YBehavior
 		static bool GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T defaultValue, T& outValue);
 		template<typename T>
 		static bool GetValue(TreeNode* pTreeNode, const STRING & attriName, const pugi::xml_node & data, const Bimap<T, STRING>& strMap, T& outValue);
-		static bool ParsePin(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, SingleType single, Flag flag = Flag::None);
+		static bool ParsePin(TreeNode* pTreeNode, const pugi::xml_attribute& attri, const pugi::xml_node& data, StdVector<STRING>& buffer, ShapeType shape, Flag flag = Flag::None);
 
 	private:
 		static bool _HasFlag(Flag mask, Flag flag) { return (static_cast<int>(mask) & static_cast<int>(flag)) == static_cast<int>(flag);}
 		static TYPEID _CreatePin(TreeNode* pTreeNode, IPin*& op, const pugi::xml_attribute& attrOptr, const pugi::xml_node& data, Flag flag);
+		template <typename T>
+		static TYPEID _CreatePin(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag, bool canBeNull);
+		template <typename T>
+		static TYPEID _CreatePin(TreeNode* pTreeNode, PinAny<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag, bool canBeNull);
 	};
 
 	template<typename T>
@@ -73,27 +81,16 @@ namespace YBehavior
 	template <typename T>
 	TYPEID PinCreation::CreatePinIfExist(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag /*= Flag::None*/)
 	{
-		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
-		op = nullptr;
-		if (attrOptr.empty())
-			return -1;
-
-		IPin* pTemp = nullptr;
-		TYPEID typeID = _CreatePin(pTreeNode, pTemp, attrOptr, data, flag);
-		if (typeID == GetTypeID<T>())
-		{
-			op = (Pin<T>*)pTemp;
-		}
-		else
-		{
-			op = nullptr;
-			ERROR_BEGIN_NODE(pTreeNode) << "Invalid type for " << attriName << " with type " << typeID << ERROR_END;
-		}
-		return typeID;
+		return _CreatePin(pTreeNode, op, attriName, data, flag, true);
 	}
 
 	template <typename T>
 	TYPEID PinCreation::CreatePin(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag /*= Flag::None*/)
+	{
+		return _CreatePin(pTreeNode, op, attriName, data, flag, false);
+	}
+	template <typename T>
+	TYPEID PinCreation::_CreatePin(TreeNode* pTreeNode, Pin<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag, bool canBeNull)
 	{
 		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
 		op = nullptr;
@@ -103,13 +100,14 @@ namespace YBehavior
 			{
 				op = new Pin<T>();
 				pTreeNode->AddPin(op);
-//#ifdef YDEBUGGER
+				//#ifdef YDEBUGGER
 				op->SetName(attriName, pTreeNode->GetUID(), pTreeNode->GetClassName(), pTreeNode->GetTreeName());
-//#endif
+				//#endif
 				return GetTypeID<T>();
 			}
 
-			ERROR_BEGIN_NODE(pTreeNode) << "Cant create default pin for " << attriName << " with typeid = " << GetTypeID<T>() << ERROR_END;
+			if (!canBeNull)
+				ERROR_BEGIN_NODE(pTreeNode) << "Cant create default pin for " << attriName << " with typeid = " << GetTypeID<T>() << ERROR_END;
 			return -1;
 		}
 
@@ -122,11 +120,50 @@ namespace YBehavior
 		else
 		{
 			op = nullptr;
+			if (pTemp)
+				delete pTemp;
 			ERROR_BEGIN_NODE(pTreeNode) << "Invalid type for " << attriName << " with type " << typeID << ERROR_END;
 		}
 		return typeID;
-
 	}
 
+
+	template <typename T>
+	TYPEID PinCreation::CreatePin(TreeNode* pTreeNode, PinAny<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag /*= Flag::None*/)
+	{
+		return _CreatePin(pTreeNode, op, attriName, data, flag, false);
+	}
+
+	template <typename T>
+	TYPEID PinCreation::CreatePinIfExist(TreeNode* pTreeNode, PinAny<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag /*= Flag::None*/)
+	{
+		return _CreatePin(pTreeNode, op, attriName, data, flag, true);
+	}
+	template <typename T>
+	TYPEID PinCreation::_CreatePin(TreeNode* pTreeNode, PinAny<T>*& op, const STRING& attriName, const pugi::xml_node& data, Flag flag, bool canBeNull)
+	{
+		const pugi::xml_attribute& attrOptr = data.attribute(attriName.c_str());
+		op = nullptr;
+		if (attrOptr.empty())
+		{
+			if (!canBeNull)
+				ERROR_BEGIN_NODE(pTreeNode) << "Cant create default pin for " << attriName << " with typeid = " << GetTypeID<T>() << ERROR_END;
+			return -1;
+		}
+
+		IPin* pTemp = nullptr;
+		TYPEID typeID = _CreatePin(pTreeNode, pTemp, attrOptr, data, flag);
+		if (pTemp && pTemp->ElementTypeID() == GetTypeID<T>())
+		{
+			op = new PinAny<T>(pTemp, true);
+		}
+		else
+		{
+			if (pTemp)
+				delete pTemp;
+			ERROR_BEGIN_NODE(pTreeNode) << "Invalid type for " << attriName << " with type " << typeID << ERROR_END;
+		}
+		return typeID;
+	}
 }
 

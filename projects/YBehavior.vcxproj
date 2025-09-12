@@ -38,6 +38,7 @@
     <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugiconfig.hpp" />
     <ClInclude Include="..\include\YBehavior\3rd\pugixml\pugixml.hpp" />
     <ClInclude Include="..\include\YBehavior\agent.h" />
+    <ClInclude Include="..\include\YBehavior\pinany.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpagent.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharpentry_event.h" />
     <ClInclude Include="..\include\YBehavior\sharp\sharputility.h" />

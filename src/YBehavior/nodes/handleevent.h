@@ -37,13 +37,14 @@ namespace YBehavior
 	protected:
 		Pin<VecString>* m_Events;
 		Pin<String>* m_Current;
-		Pin<VecInt>* m_Int;
-		Pin<VecFloat>* m_Float;
-		Pin<VecBool>* m_Bool;
-		Pin<VecUlong>* m_Ulong;
-		Pin<VecString>* m_String;
-		Pin<VecEntityWrapper>* m_Entity;
-		Pin<VecVector3>* m_Vector3;
+
+		PinAny<Int>* m_Int;
+		PinAny<Float>* m_Float;
+		PinAny<Bool>* m_Bool;
+		PinAny<Ulong>* m_Ulong;
+		PinAny<String>* m_String;
+		PinAny<EntityWrapper>* m_Entity;
+		PinAny<Vector3>* m_Vector3;
 		
 		bool m_bHasParam{};
 

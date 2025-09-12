@@ -32,6 +32,35 @@ namespace YBehavior
 		///> return success when there has one or more events.
 		return NS_SUCCESS;
 	}
+
+	template<typename T>
+	void _Process(PinAny<T>* pPin, StdVector<T>* pData, AgentPtr pAgent)
+	{
+		if (!pPin)
+			return;
+		if (pData)
+		{
+			if (pPin->IsThisArray())
+			{
+				pPin->SetArrayValue(pAgent->GetMemory(), *pData);
+			}
+			else
+			{
+				if (pData->size() > 0)
+					pPin->SetScalarValue(pAgent->GetMemory(), (*pData)[0]);
+				else
+					pPin->SetScalarValue(pAgent->GetMemory(), Utility::GetDefault<T>());
+			}
+		}
+		else
+		{
+			//if (pPin->IsThisArray())
+			//	pPin->GetArrayValue(pAgent->GetMemory())->clear();
+			//else
+			//	pPin->SetScalarValue(pAgent->GetMemory(), Utility::GetDefault<T>());
+		}
+	}
+
 	NodeState HandleEventContext::_Update(AgentPtr pAgent, NodeState lastState)
 	{
 		HandleEvent* pNode = static_cast<HandleEvent*>(m_pNode);
@@ -76,34 +105,15 @@ namespace YBehavior
 				{
 					pNode->m_Current->SetValue(pAgent->GetMemory(), pEvent->name);
 				}
-				if (pNode->m_Int && pEvent->pVecInt)
-				{
-					pNode->m_Int->SetValue(pAgent->GetMemory(), *pEvent->pVecInt);
-				}
-				if (pNode->m_Float && pEvent->pVecFloat)
-				{
-					pNode->m_Float->SetValue(pAgent->GetMemory(), *pEvent->pVecFloat);
-				}
-				if (pNode->m_Bool && pEvent->pVecBool)
-				{
-					pNode->m_Bool->SetValue(pAgent->GetMemory(), *pEvent->pVecBool);
-				}
-				if (pNode->m_String && pEvent->pVecString)
-				{
-					pNode->m_String->SetValue(pAgent->GetMemory(), *pEvent->pVecString);
-				}
-				if (pNode->m_Vector3 && pEvent->pVecVector3)
-				{
-					pNode->m_Vector3->SetValue(pAgent->GetMemory(), *pEvent->pVecVector3);
-				}
-				if (pNode->m_Entity && pEvent->pVecEntityWrapper)
-				{
-					pNode->m_Entity->SetValue(pAgent->GetMemory(), *pEvent->pVecEntityWrapper);
-				}
-				if (pNode->m_Ulong && pEvent->pVecUlong)
-				{
-					pNode->m_Ulong->SetValue(pAgent->GetMemory(), *pEvent->pVecUlong);
-				}
+
+				_Process(pNode->m_Int, pEvent->pVecInt, pAgent);
+				_Process(pNode->m_Float, pEvent->pVecFloat, pAgent);
+				_Process(pNode->m_Bool, pEvent->pVecBool, pAgent);
+				_Process(pNode->m_String, pEvent->pVecString, pAgent);
+				_Process(pNode->m_Vector3, pEvent->pVecVector3, pAgent);
+				_Process(pNode->m_Entity, pEvent->pVecEntityWrapper, pAgent);
+				_Process(pNode->m_Ulong, pEvent->pVecUlong, pAgent);
+
 				YB_IF_HAS_DEBUG_POINT
 				{
 				YB_LOG_PIN_AFTER(pNode->m_Current);

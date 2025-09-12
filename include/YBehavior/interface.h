@@ -49,7 +49,7 @@ namespace YBehavior
 
 		virtual void SetArrayIndex(const STRING& vbType, const STRING& s) { }
 		virtual void SetKeyFromString(const STRING& s) = 0;
-		virtual const void* GetValuePtr(IMemory* pMemory) = 0;
+		virtual void* GetValuePtr(IMemory* pMemory) = 0;
 		virtual void SetValue(IMemory* pMemory, const void* src) = 0;
 		virtual void SetValueFromString(const STRING& str) = 0;
 		virtual TYPEID TypeID() const = 0;

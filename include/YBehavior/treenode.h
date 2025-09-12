@@ -6,6 +6,7 @@
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
 #include "YBehavior/logger.h"
 #include "YBehavior/pin.h"
+#include "YBehavior/pinany.h"
 
 namespace YBehavior
 {
@@ -26,10 +27,10 @@ namespace YBehavior
 		RT_FAILURE,
 	};
 
-	enum SingleType
+	enum ShapeType
 	{
 		ST_NONE,
-		ST_SINGLE,
+		ST_SCALAR,
 		ST_ARRAY,
 	};
 

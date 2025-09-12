@@ -122,7 +122,7 @@ namespace YBehaviorSharp
         static TYPEID id = -1;
         static TYPEID vecid = -1;
         /// <summary>
-        /// The TypeID of single type
+        /// The TypeID of scalar type
         /// </summary>
         public static TYPEID ID { get { return id; } }
         /// <summary>
