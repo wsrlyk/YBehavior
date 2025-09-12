@@ -9,13 +9,13 @@ namespace YBehavior
 	struct IsVector
 	{
 		const static bool Result = false;
-		typedef T ElementType;
+		typedef T ScalarType;
 	};
 	template<typename T>
 	struct IsVector<StdVector<T>>
 	{
 		const static bool Result = true;
-		typedef T ElementType;
+		typedef T ScalarType;
 	};
 
 	template<typename T>

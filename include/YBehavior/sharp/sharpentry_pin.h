@@ -53,9 +53,9 @@ extern "C" YBEHAVIOR_API YBehavior::TYPEID GetPinTypeID(YBehavior::IPin* pPin)
 	return pPin->TypeID();
 }
 
-extern "C" YBEHAVIOR_API YBehavior::TYPEID GetPinElementTypeID(YBehavior::IPin* pPin)
+extern "C" YBEHAVIOR_API YBehavior::TYPEID GetPinScalarTypeID(YBehavior::IPin* pPin)
 {
-	return pPin->ElementTypeID();
+	return pPin->ScalarTypeID();
 }
 
 extern "C" YBEHAVIOR_API bool IsPinConst(YBehavior::IPin* pPin)

@@ -13,7 +13,6 @@ namespace YBehavior
 	class PinAny : public IPin
 	{
 	public:
-		typedef T ElementType;
 		typedef StdVector<T> ArrayType;
 		typedef T ScalarType;
 		PinAny(IPin* pPin, bool isOwner = false)
@@ -92,7 +91,7 @@ namespace YBehavior
 	//overrides:
 	public:
 		TYPEID TypeID() const override{ return m_RealPin->TypeID(); }
-		TYPEID ElementTypeID() const override { return m_RealPin->ElementTypeID(); }
+		TYPEID ScalarTypeID() const override { return m_RealPin->ScalarTypeID(); }
 		TYPEID GetReferenceSharedDataSelfID() override{ return m_RealPin->GetReferenceSharedDataSelfID(); }
 		bool IsThisArray() const override{ return m_ArrayPin != nullptr; }
 

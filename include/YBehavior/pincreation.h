@@ -96,18 +96,20 @@ namespace YBehavior
 		op = nullptr;
 		if (attrOptr.empty())
 		{
-			if (!_HasFlag(flag, Flag::NoConst))
-			{
-				op = new Pin<T>();
-				pTreeNode->AddPin(op);
-				//#ifdef YDEBUGGER
-				op->SetName(attriName, pTreeNode->GetUID(), pTreeNode->GetClassName(), pTreeNode->GetTreeName());
-				//#endif
-				return GetTypeID<T>();
-			}
-
 			if (!canBeNull)
+			{
+				if (!_HasFlag(flag, Flag::NoConst))
+				{
+					op = new Pin<T>();
+					pTreeNode->AddPin(op);
+					//#ifdef YDEBUGGER
+					op->SetName(attriName, pTreeNode->GetUID(), pTreeNode->GetClassName(), pTreeNode->GetTreeName());
+					//#endif
+					return GetTypeID<T>();
+				}
+
 				ERROR_BEGIN_NODE(pTreeNode) << "Cant create default pin for " << attriName << " with typeid = " << GetTypeID<T>() << ERROR_END;
+			}
 			return -1;
 		}
 
@@ -153,7 +155,7 @@ namespace YBehavior
 
 		IPin* pTemp = nullptr;
 		TYPEID typeID = _CreatePin(pTreeNode, pTemp, attrOptr, data, flag);
-		if (pTemp && pTemp->ElementTypeID() == GetTypeID<T>())
+		if (pTemp && pTemp->ScalarTypeID() == GetTypeID<T>())
 		{
 			op = new PinAny<T>(pTemp, true);
 		}

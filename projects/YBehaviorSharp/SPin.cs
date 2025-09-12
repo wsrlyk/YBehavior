@@ -101,7 +101,7 @@ namespace YBehaviorSharp
         public static SPin GetPin(IntPtr ptr)
         {
             var type = SUtility.GetPinTypeID(ptr);
-            var elementtype = SUtility.GetPinElementTypeID(ptr);
+            var elementtype = SUtility.GetPinScalarTypeID(ptr);
             if (type == elementtype)
             {
                 var t = s_PinTypes[type];
@@ -169,13 +169,13 @@ namespace YBehaviorSharp
         /// <summary>
         /// The TypeID of element of array
         /// </summary>
-        public TYPEID ElementTypeID { get; protected set; }
+        public TYPEID ScalarTypeID { get; protected set; }
         protected ISArray m_Array;
 
         public SArrayPin(IntPtr core) : base(core)
         {
-            ElementTypeID = SUtility.GetPinElementTypeID(core);
-            m_Array = SArrayHelper.GetArray(IntPtr.Zero, ElementTypeID);
+            ScalarTypeID = SUtility.GetPinScalarTypeID(core);
+            m_Array = SArrayHelper.GetArray(IntPtr.Zero, ScalarTypeID);
         }
 
         /// <summary>

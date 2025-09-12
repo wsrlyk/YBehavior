@@ -383,7 +383,7 @@ namespace YBehaviorSharp
         /// <param name="array">Array of params</param>
         static public void AssignEventParam(IntPtr pAgent, IntPtr pEvent, ISArray array)
         {
-            SUtility.AssignEventParam(pAgent, pEvent, array.Ptr, array.ElementType);
+            SUtility.AssignEventParam(pAgent, pEvent, array.Ptr, array.ScalarType);
         }
 
     }
@@ -452,7 +452,7 @@ namespace YBehaviorSharp
         [DllImport(VERSION.dll)]
         static public extern TYPEID GetPinTypeID(IntPtr pPin);
         [DllImport(VERSION.dll)]
-        static public extern TYPEID GetPinElementTypeID(IntPtr pPin);
+        static public extern TYPEID GetPinScalarTypeID(IntPtr pPin);
         [DllImport(VERSION.dll)]
         static public extern bool IsPinConst(IntPtr pPin);
         [DllImport(VERSION.dll)]

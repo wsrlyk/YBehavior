@@ -13,7 +13,7 @@ namespace YBehavior
 	class Pin : public IPin
 	{
 	public:
-		typedef typename IsVector<T>::ElementType ElementType;
+		typedef typename IsVector<T>::ScalarType ScalarType;
 		Pin()
 		{
 			Utility::SetDefault(m_Value);
@@ -50,7 +50,7 @@ namespace YBehavior
 			return m_Value;
 		}
 
-		void _SetValue(IMemory* pMemory, const ElementType* src)
+		void _SetValue(IMemory* pMemory, const ScalarType* src)
 		{
 			if (src == nullptr)
 				return;
@@ -71,7 +71,7 @@ namespace YBehavior
 				ERROR_BEGIN << "SharedData NULL at " << this->GetLogName() << ERROR_END;
 			}
 
-			auto pVector = pData->Get<StdVector<ElementType>>(m_Key);
+			auto pVector = pData->Get<StdVector<ScalarType>>(m_Key);
 			if (pVector)
 			{
 				if ((UINT)index < pVector->size())
@@ -80,7 +80,7 @@ namespace YBehavior
 					ERROR_BEGIN << "Index " << index << " out of range, Array Length " << pVector->size() << " at " << this->GetLogName() << ERROR_END;
 			}
 		}
-		const ElementType* _GetElementPtr(IMemory* pMemory)
+		const ScalarType* _GetElementPtr(IMemory* pMemory)
 		{
 			INT index = -1;
 			m_ArrayIndex->GetValue(pMemory, index);
@@ -99,10 +99,10 @@ namespace YBehavior
 				ERROR_BEGIN << "SharedData NULL at " << this->GetLogName() << ERROR_END;
 				return nullptr;
 			}
-			auto pVector = pData->Get<StdVector<ElementType>>(m_Key);
+			auto pVector = pData->Get<StdVector<ScalarType>>(m_Key);
 			if (pVector && (UINT)index < pVector->size())
 			{
-				const ElementType* t = &(*pVector)[index];
+				const ScalarType* t = &(*pVector)[index];
 				return t;
 			}
 			if (pVector)
@@ -140,16 +140,16 @@ namespace YBehavior
 			return (T*)pData->Get<T>(m_Key);
 		}
 
-		StdVector<ElementType>* _Convert2VectorPtr(IMemory* pMemory)
+		StdVector<ScalarType>* _Convert2VectorPtr(IMemory* pMemory)
 		{
 			if (IsVector<T>::Result)
 			{
 				///> would have compile error if directly operate the m_Value when T is not a StdVector<XX>
-				StdVector<ElementType>* mValue;
+				StdVector<ScalarType>* mValue;
 				if (pMemory == nullptr || m_Key == Utility::INVALID_KEY)
-					mValue = (StdVector<ElementType>*)_GetValuePtr();
+					mValue = (StdVector<ScalarType>*)_GetValuePtr();
 				else
-					mValue = (StdVector<ElementType>*)GetValuePtr(pMemory);
+					mValue = (StdVector<ScalarType>*)GetValuePtr(pMemory);
 
 				return mValue;
 			}
@@ -159,7 +159,7 @@ namespace YBehavior
 
 	public:
 		TYPEID TypeID() const override{ return GetTypeID<T>(); }
-		TYPEID ElementTypeID() const override { return GetTypeID<ElementType>(); }
+		TYPEID ScalarTypeID() const override { return GetTypeID<ScalarType>(); }
 		TYPEID GetReferenceSharedDataSelfID() override
 		{
 			///> it's const, just return itself
@@ -190,14 +190,14 @@ namespace YBehavior
 			return m_Key == Utility::INVALID_KEY;
 		}
 
-		StdVector<ElementType>* GetArrayPtr(IMemory* pMemory)
+		StdVector<ScalarType>* GetArrayPtr(IMemory* pMemory)
 		{
 			return _Convert2VectorPtr(pMemory);
 		}
 
 		INT ArraySize(IMemory* pMemory) override
 		{
-			const StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
+			const StdVector<ScalarType>* mValue = _Convert2VectorPtr(pMemory);
 
 			if (mValue != nullptr)
 				return (INT)mValue->size();
@@ -207,7 +207,7 @@ namespace YBehavior
 
 		void Clear(IMemory* pMemory) override
 		{
-			StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
+			StdVector<ScalarType>* mValue = _Convert2VectorPtr(pMemory);
 
 			if (mValue != nullptr)
 				mValue->clear();
@@ -222,7 +222,7 @@ namespace YBehavior
 		}
 		const void* GetElementPtr(IMemory* pMemory, INT index) override
 		{
-			const StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
+			const StdVector<ScalarType>* mValue = _Convert2VectorPtr(pMemory);
 
 			if (mValue != nullptr)
 			{
@@ -243,7 +243,7 @@ namespace YBehavior
 		}
 		void SetElement(IMemory* pMemory, const void* v, INT index) override
 		{
-			StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
+			StdVector<ScalarType>* mValue = _Convert2VectorPtr(pMemory);
 
 			if (mValue != nullptr && v != nullptr)
 			{
@@ -253,29 +253,29 @@ namespace YBehavior
 				}
 				else
 				{
-					(*mValue)[index] = *((const ElementType*)v);
+					(*mValue)[index] = *((const ScalarType*)v);
 				}
 			}
 		}
 		void PushBackElement(IMemory* pMemory, const void* v) override
 		{
-			StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
+			StdVector<ScalarType>* mValue = _Convert2VectorPtr(pMemory);
 
 			if (mValue != nullptr && v != nullptr)
 			{
-				mValue->push_back(*((const ElementType*)v));
+				mValue->push_back(*((const ScalarType*)v));
 			}
 		}
 
 		bool RemoveElement(IMemory* pMemory, const void* v, bool isAll) override
 		{
-			StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
+			StdVector<ScalarType>* mValue = _Convert2VectorPtr(pMemory);
 
 			if (mValue != nullptr && v != nullptr && !mValue->empty())
 			{
 				if (isAll)
 				{
-					auto end = std::remove(mValue->begin(), mValue->end(), *((const ElementType*)v));
+					auto end = std::remove(mValue->begin(), mValue->end(), *((const ScalarType*)v));
 					if (end != mValue->end())
 					{
 						mValue->erase(end, mValue->end());
@@ -285,7 +285,7 @@ namespace YBehavior
 				}
 				else
 				{
-					auto it = std::find(mValue->begin(), mValue->end(), *((const ElementType*)v));
+					auto it = std::find(mValue->begin(), mValue->end(), *((const ScalarType*)v));
 					if (it != mValue->end())
 					{
 						mValue->erase(it);
@@ -299,11 +299,11 @@ namespace YBehavior
 
 		bool HasElement(IMemory* pMemory, const void* v, INT& firstIndex) override
 		{
-			StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
+			StdVector<ScalarType>* mValue = _Convert2VectorPtr(pMemory);
 			firstIndex = -1;
 			if (mValue != nullptr && v != nullptr && !mValue->empty())
 			{
-				auto it = std::find(mValue->begin(), mValue->end(), *((const ElementType*)v));
+				auto it = std::find(mValue->begin(), mValue->end(), *((const ScalarType*)v));
 				auto idx = it - mValue->begin();
 				firstIndex = (INT)idx;
 				return it != mValue->end();
@@ -312,13 +312,13 @@ namespace YBehavior
 		}
 		INT CountElement(IMemory* pMemory, const void* v, INT& firstIndex) override
 		{
-			StdVector<ElementType>* mValue = _Convert2VectorPtr(pMemory);
+			StdVector<ScalarType>* mValue = _Convert2VectorPtr(pMemory);
 			firstIndex = -1;
 			if (mValue != nullptr && v != nullptr && !mValue->empty())
 			{
 				INT count = 0;
 				auto it = mValue->begin();
-				const auto& vv = *((const ElementType*)v);
+				const auto& vv = *((const ScalarType*)v);
 				do
 				{
 					it = std::find(it, mValue->end(), vv);
@@ -349,23 +349,23 @@ namespace YBehavior
 
 		void SetValueFromString(const STRING& str) override
 		{
-			if (CanFromString<ElementType>::Result)
+			if (CanFromString<ScalarType>::Result)
 			{
 				if (IsVector<T>::Result)
 				{
 					///> would have compile error if directly operate the m_Value when T is not a StdVector<XX>
-					StdVector<ElementType>& mValue = *((StdVector<ElementType>*)_GetValuePtr());
+					StdVector<ScalarType>& mValue = *((StdVector<ScalarType>*)_GetValuePtr());
 					mValue.clear();
 					StdVector<STRING> res;
 					Utility::SplitString(str, res, '|');
 					for (auto it = res.begin(); it != res.end(); ++it)
 					{
-						mValue.push_back(Utility::ToType<ElementType>(*it));
+						mValue.push_back(Utility::ToType<ScalarType>(*it));
 					}
 				}
 				else
 				{
-					ElementType res = Utility::ToType<ElementType>(str);
+					ScalarType res = Utility::ToType<ScalarType>(str);
 					_SetValue((const void*)&res);
 				}
 			}
@@ -408,7 +408,7 @@ namespace YBehavior
 			///> It's an element of a vector
 			if (!IsVector<T>::Result && m_ArrayIndex != nullptr)
 			{
-				_SetValue(pMemory, (const ElementType*)src);
+				_SetValue(pMemory, (const ScalarType*)src);
 			}
 			else
 			{

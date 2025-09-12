@@ -20,7 +20,7 @@ namespace YBehaviorSharp
         /// <summary>
         /// Get the type of element
         /// </summary>
-        TYPEID ElementType { get; }
+        TYPEID ScalarType { get; }
         /// <summary>
         /// Init the array data
         /// </summary>
@@ -47,13 +47,13 @@ namespace YBehaviorSharp
     abstract public class SArrayBase<T> : ISArray
     {
         protected IntPtr m_Core;
-        protected TYPEID m_ElementID;
+        protected TYPEID m_ScalarType;
         public IntPtr Ptr => m_Core;
-        public TYPEID ElementType => m_ElementID;
+        public TYPEID ScalarType => m_ScalarType;
         public bool IsValid => m_Core != IntPtr.Zero;
         public SArrayBase(IntPtr core)
         {
-            m_ElementID = GetType<T>.ID;
+            m_ScalarType = GetType<T>.ID;
             Init(core);
         }
         public void Init(IntPtr core)
@@ -62,12 +62,12 @@ namespace YBehaviorSharp
         }
         public void Clear()
         {
-            SUtility.ArrayClear(m_Core, m_ElementID);
+            SUtility.ArrayClear(m_Core, m_ScalarType);
         }
 
         public int GetLength()
         {
-            return (int)SUtility.ArrayGetSize(m_Core, m_ElementID);
+            return (int)SUtility.ArrayGetSize(m_Core, m_ScalarType);
         }
         /// <summary>
         /// Is pointing to the same array?
@@ -76,7 +76,7 @@ namespace YBehaviorSharp
         /// <returns></returns>
         public bool IsTheSame(SArrayBase<T> other)
         {
-            return other.m_Core == m_Core && other.m_ElementID == m_ElementID;
+            return other.m_Core == m_Core && other.m_ScalarType == m_ScalarType;
         }
         /// <summary>
         /// Erase an element
@@ -85,7 +85,7 @@ namespace YBehaviorSharp
         /// <returns>Whether it's successfully erased</returns>
         public bool EraseAt(int index)
         {
-            return SUtility.ArrayEraseAt(m_Core, index, m_ElementID);
+            return SUtility.ArrayEraseAt(m_Core, index, m_ScalarType);
         }
     }
     abstract public class SArray<T> : SArrayBase<T> where T : struct

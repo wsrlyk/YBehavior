@@ -104,7 +104,7 @@ namespace YBehavior
 
 		m_bSameArray = m_Input->GetKey() == m_Output->GetKey();
 
-		m_pHelper = DataOperationMgr::Instance()->Get(m_Input->ElementTypeID());
+		m_pHelper = DataOperationMgr::Instance()->Get(m_Input->ScalarTypeID());
 		if (!m_pHelper)
 			return false;
 		return true;

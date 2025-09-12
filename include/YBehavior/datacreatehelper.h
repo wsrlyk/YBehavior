@@ -43,27 +43,27 @@ namespace YBehavior
 		}
 	};
 
-	template<typename elementType>
-	class DataCreateHelper<StdVector<elementType>> : public IDataCreateHelper
+	template<typename ScalarType>
+	class DataCreateHelper<StdVector<ScalarType>> : public IDataCreateHelper
 	{
 	public:
 		IPin* CreatePin() const override
 		{
-			return new Pin<StdVector<elementType>>();
+			return new Pin<StdVector<ScalarType>>();
 		}
 		IDataArray* CreateDataArray() const override
 		{
-			return new DataArray<StdVector<elementType>>();
+			return new DataArray<StdVector<ScalarType>>();
 		}
 		void SetVariable(VariableCollection* pData, const STRING& name, const STRING& str) const override
 		{
 			KEY key = TreeKeyMgr::Instance()->CreateKeyByName(name);
 			StdVector<STRING> splitRes;
-			StdVector<elementType> res;
+			StdVector<ScalarType> res;
 			Utility::SplitString(str, splitRes, '|');
 			for (auto it = splitRes.begin(); it != splitRes.end(); ++it)
 			{
-				res.push_back(Utility::ToType<elementType>(*it));
+				res.push_back(Utility::ToType<ScalarType>(*it));
 			}
 			pData->Set(key, std::move(res));
 		}
@@ -73,11 +73,11 @@ namespace YBehavior
 			if (key == Utility::INVALID_KEY)
 				return false;
 			StdVector<STRING> splitRes;
-			StdVector<elementType> res;
+			StdVector<ScalarType> res;
 			Utility::SplitString(str, splitRes, separator);
 			for (auto it = splitRes.begin(); it != splitRes.end(); ++it)
 			{
-				res.push_back(Utility::ToType<elementType>(*it));
+				res.push_back(Utility::ToType<ScalarType>(*it));
 			}
 			return pData->TrySet(key, std::move(res));
 		}

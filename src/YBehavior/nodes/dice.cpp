@@ -156,7 +156,7 @@ namespace YBehavior
 			}
 		}
 
-		auto helperType = m_Distribution->ElementTypeID();
+		auto helperType = m_Distribution->ScalarTypeID();
 		m_pCalculateHelper = DataCalculateMgr::Instance()->Get(helperType);
 		m_pCompareHelper = DataCompareMgr::Instance()->Get(helperType);
 		m_pOperationHelper = DataOperationMgr::Instance()->Get(helperType);
