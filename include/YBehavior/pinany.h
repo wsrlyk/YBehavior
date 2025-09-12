@@ -100,8 +100,6 @@ namespace YBehavior
 
 		bool IsConst() const override { return m_RealPin->IsConst(); }
 
-		StdVector<ElementType>* GetArrayPtr(IMemory* pMemory) { return m_RealPin->GetArrayPtr(pMemory); }
-
 		INT ArraySize(IMemory* pMemory) override { return m_RealPin->ArraySize(pMemory); }
 
 		void Clear(IMemory* pMemory) override { return m_RealPin->Clear(pMemory); }
