@@ -84,7 +84,7 @@ namespace YBehavior.Editor
                 this.VBool.Visibility = Visibility.Collapsed;
                 this.VEnum.Visibility = Visibility.Visible;
             }
-            else if (v.vType == Variable.ValueType.VT_BOOL && v.cType == Variable.CountType.CT_SINGLE)
+            else if (v.vType == Variable.ValueType.VT_BOOL && v.cType == Variable.CountType.CT_SCALAR)
             {
                 this.VConst.Visibility = Visibility.Collapsed;
                 this.VBool.Visibility = Visibility.Visible;
@@ -104,7 +104,7 @@ namespace YBehavior.Editor
             if (v == null)
                 return;
 
-            v.cType = v.cType == Variable.CountType.CT_LIST ? Variable.CountType.CT_SINGLE : Variable.CountType.CT_LIST;
+            v.cType = v.cType == Variable.CountType.CT_LIST ? Variable.CountType.CT_SCALAR : Variable.CountType.CT_LIST;
             _RefreshVType(v);
         }
 

@@ -41,7 +41,7 @@ namespace YBehavior.Editor.Core.New
         public static readonly char POINTER = 'P';
         public static readonly char CONST = 'C';
 
-        public static readonly char SINGLE = '_';
+        public static readonly char SCALAR = '_';
         public static readonly char ANY = '*';
 
         public static readonly char ENABLE = 'E';
@@ -151,7 +151,7 @@ namespace YBehavior.Editor.Core.New
             /// <summary>
             /// Just a single value
             /// </summary>
-            CT_SINGLE,
+            CT_SCALAR,
             /// <summary>
             /// Array of multiple values
             /// </summary>
@@ -164,7 +164,7 @@ namespace YBehavior.Editor.Core.New
                 return CountType.CT_LIST;
             if (countType == ANY)
                 return CountType.CT_NONE;
-            return CountType.CT_SINGLE;
+            return CountType.CT_SCALAR;
         }
         /// <summary>
         /// Type of pin
@@ -504,7 +504,7 @@ namespace YBehavior.Editor.Core.New
         /// <summary>
         /// Whether it's single but references to an array
         /// </summary>
-        public bool IsElement { get { return cType == CountType.CT_SINGLE && m_bVectorIndexEnabled && m_VectorIndex != null; } }
+        public bool IsElement { get { return cType == CountType.CT_SCALAR && m_bVectorIndexEnabled && m_VectorIndex != null; } }
         /// <summary>
         /// Whether it's an index pin
         /// </summary>
@@ -650,13 +650,13 @@ namespace YBehavior.Editor.Core.New
             {
                 if (vbType == VariableType.VBT_Pointer)
                 {
-                    if (cType == CountType.CT_SINGLE && VariableCandidates.IsNeedIndex(Candidates, DisplayValue))
+                    if (cType == CountType.CT_SCALAR && VariableCandidates.IsNeedIndex(Candidates, DisplayValue))
                     {
                         if (m_VectorIndex == null)
                         {
                             m_VectorIndex = new Variable(SharedDataSource);
                             m_VectorIndex.m_Parent = this;
-                            m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SINGLE, VariableType.VBT_Const, EnableType.ET_FIXED, true, "0", null, this.Name + ".Index");
+                            m_VectorIndex.SetVariable(ValueType.VT_INT, CountType.CT_SCALAR, VariableType.VBT_Const, EnableType.ET_FIXED, true, "0", null, this.Name + ".Index");
                             OnPropertyChanged("VectorIndex");
                         }
                         m_bVectorIndexEnabled = true;
@@ -749,7 +749,7 @@ namespace YBehavior.Editor.Core.New
             get
             {
                 char _vtype = ValueTypeDic.GetValue(m_vType, INT);
-                char _ctype = m_cType == CountType.CT_LIST ? _vtype : SINGLE;
+                char _ctype = m_cType == CountType.CT_LIST ? _vtype : SCALAR;
                 char _vbtype = GetVariableChar(m_vbType, CONST, IsLocal);
                 char _eType = GetEnableChar(m_eType, NONE);
                 StringBuilder sb = new StringBuilder();
@@ -880,13 +880,13 @@ namespace YBehavior.Editor.Core.New
                 string[] ss = Value.Split(ListSpliter, StringSplitOptions.RemoveEmptyEntries);
                 foreach(var s in ss)
                 {
-                    if (!CheckValidSingle(s))
+                    if (!CheckValidScalar(s))
                         return false;
                 }
                 return true;
             }
 
-            return CheckValidSingle(Value);
+            return CheckValidScalar(Value);
         }
 
         public static bool CheckValid(Variable me, Variable other)
@@ -918,14 +918,14 @@ namespace YBehavior.Editor.Core.New
                     return false;
                 }
             }
-            else if (other.cType == CountType.CT_SINGLE && me.m_bVectorIndexEnabled)
+            else if (other.cType == CountType.CT_SCALAR && me.m_bVectorIndexEnabled)
             {
                 LogMgr.Instance.Log(string.Format("Single Variable with VectorIndex: {0} -> {1}", me.DisplayName, other.DisplayName));
                 return false;
             }
             return true;
         }
-        private bool CheckValidSingle(string v)
+        private bool CheckValidScalar(string v)
         {
             switch(vType)
             {
@@ -1041,7 +1041,7 @@ namespace YBehavior.Editor.Core.New
             m_VectorIndex.m_Parent = this;
             m_VectorIndex.SetVariable(
                 ValueType.VT_INT, 
-                CountType.CT_SINGLE, 
+                CountType.CT_SCALAR, 
                 GetVariableType(variableType[0],VariableType.VBT_NONE),
                 EnableType.ET_FIXED,
                 GetLocal(variableType[0]), 
@@ -1122,7 +1122,7 @@ namespace YBehavior.Editor.Core.New
             m_cType = ctype;
             if (cType == CountType.CT_NONE)
             {
-                m_cType = CountType.CT_SINGLE;
+                m_cType = CountType.CT_SCALAR;
                 LockCType = false;
             }
             else

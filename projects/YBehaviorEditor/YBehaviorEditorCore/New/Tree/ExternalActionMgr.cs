@@ -139,7 +139,7 @@ namespace YBehavior.Editor.Core.New
             attr = xml.Attributes["IsArray"];
             if (attr != null)
             {
-                countType = attr.Value == "True" ? Variable.CountType.CT_LIST : Variable.CountType.CT_SINGLE;
+                countType = attr.Value == "True" ? Variable.CountType.CT_LIST : Variable.CountType.CT_SCALAR;
             }
 
             Variable.EnableType eType = Variable.EnableType.ET_FIXED;

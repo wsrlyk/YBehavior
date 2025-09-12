@@ -46,7 +46,7 @@ namespace YBehavior.Editor
         {
             if (!(value is Variable.CountType))
                 return new SolidColorBrush(Colors.LightCyan);
-            return new SolidColorBrush((Variable.CountType)value == Variable.CountType.CT_SINGLE ? Colors.LightCyan : Colors.LightBlue);
+            return new SolidColorBrush((Variable.CountType)value == Variable.CountType.CT_SCALAR ? Colors.LightCyan : Colors.LightBlue);
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {

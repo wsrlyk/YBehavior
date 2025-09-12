@@ -104,7 +104,7 @@ namespace YBehavior.Editor.Core.New
             
             foreach (Variable.CountType cType in Enum.GetValues(typeof(Variable.CountType)))
             {
-                if (cType == Variable.CountType.CT_SINGLE)
+                if (cType == Variable.CountType.CT_SCALAR)
                     continue;
                 foreach (Variable.ValueType vType in Enum.GetValues(typeof(Variable.ValueType)))
                 {
@@ -120,7 +120,7 @@ namespace YBehavior.Editor.Core.New
             ///> Index of array can only be CT_SINGLE, because for now we dont want
             ///  something like a[a[a[b]]] which is difficult to present on UI
             m_IndexCandidates = new Candidates();
-            m_IndexCandidates.key.cType = Variable.CountType.CT_SINGLE;
+            m_IndexCandidates.key.cType = Variable.CountType.CT_SCALAR;
             m_IndexCandidates.key.vType = Variable.ValueType.VT_INT;
             m_Dic[m_IndexCandidates.key] = m_IndexCandidates;
         }
@@ -165,7 +165,7 @@ namespace YBehavior.Editor.Core.New
         /// <returns></returns>
         public Candidates Get(Variable v)
         {
-            return Get(v.vType, v.cType == Variable.CountType.CT_SINGLE ? Variable.CountType.CT_NONE : v.cType);
+            return Get(v.vType, v.cType == Variable.CountType.CT_SCALAR ? Variable.CountType.CT_NONE : v.cType);
         }
         /// <summary>
         /// Get the candidates of index
