@@ -1,8 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <AA>
   <Node Class="Root">
-    <Shared />
-    <Local />
-    <Node Class="Sequence" />
+    <Shared ee="IIC 1|2|3|6|4|5" i="_IC 0" />
+    <Local a="IIc " />
+    <Node Class="Sequence">
+      <Node Class="Wait" TickCount="_IC 10" />
+      <Node Class="Calculator" Operator="_EC +" Output="_IP i" Input1="_IP i" Input2="_IC 1" />
+      <Node Class="ArrayPushElement" Array="IIp a" Element="_IP i" />
+      <Node Class="ArrayOperation" Operator="_EC EXCLUDE" Output="IIP ee" Input1="IIP ee" Input2="IIp a" />
+    </Node>
   </Node>
 </AA>

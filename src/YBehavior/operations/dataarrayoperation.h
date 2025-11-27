@@ -129,7 +129,35 @@ namespace YBehavior
 	template<typename T>
 	void ValueArrayOperation::_Exclude(const StdVector<T>& left, const StdVector<T>& right, StdVector<T>& output)
 	{
-	//TODO
+		if (&output == &left)
+		{
+			output.erase(
+				std::remove_if(output.begin(), output.end(),
+					[&](const T& x) { return std::find(right.begin(), right.end(), x) != right.end(); }),
+				output.end()
+			);
+		}
+		else if (&output == &right)
+		{
+			StdVector<T> result;
+
+			std::copy_if(
+				left.begin(), left.end(),
+				std::back_inserter(result),
+				[&](const T& x) { return std::find(right.begin(), right.end(), x) == right.end(); }
+			);
+
+			output = std::move(result);
+		}
+		else
+		{
+			output.clear();
+			std::copy_if(
+				left.begin(), left.end(),
+				std::back_inserter(output),
+				[&](const T& x) { return std::find(right.begin(), right.end(), x) == right.end(); }
+			);
+		}
 	}
 
 	/////////////////////////////////////

@@ -2072,7 +2072,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.EnableType.ET_FIXED,
                 0,
                 0,
-                "APPEND|MERGE"
+                "APPEND|MERGE|EXCLUDE"
             );
 
             Variable opl = NodeMemory.CreateVariable(

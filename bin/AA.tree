@@ -1,14 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <AA IsEditor="">
   <Node Class="Root" GUID="1" Pos="0,0">
-    <Shared ee="_IC 0" />
+    <Shared ee="IIC 1|2|3|6|4|5" i="_IC 0" />
     <Local d="_Ic 0" a="IIc " />
     <Node Class="Sequence" GUID="3" Pos="-40,120">
-      <Node Class="Calculator" GUID="2" Pos="-130,250" Disabled="true" Operator="_EC +" Output="_Ip " Input1="_IP ee" Input2="_IC 0" />
-      <Node Class="Comparer" GUID="4" Pos="50,250" Disabled="true" Operator="_EC ==" Opl="_IP " Opr="_IC 0" />
+      <Node Class="Wait" GUID="8" Pos="-586,161" TickCount="_IC 10" />
+      <Node Class="Calculator" GUID="6" Pos="-510,340" Operator="_EC +" Output="_IP i" Input1="_IP i" Input2="_IC 1" />
+      <Node Class="ArrayPushElement" GUID="7" Pos="-410,410" Array="IIp a" Element="_IP i" />
+      <Node Class="ArrayOperation" GUID="5" Pos="-218,336" Operator="_EC EXCLUDE" Output="IIP ee" Input1="IIP ee" Input2="IIp a" />
     </Node>
   </Node>
-  <DataConnections>
-    <DataConnection FromGUID="2" FromName="Output" ToGUID="4" ToName="Opl" />
-  </DataConnections>
 </AA>
