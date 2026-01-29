@@ -189,6 +189,7 @@ EVERY 依次处理所有事件"/>
                         <Operator Content="
 APPEND  直接拼接，不改变顺序
 MERGE   按集合的方式合并，每个元素唯一，且排序
+EXCLUDE 从Input1剔除Input2里的内容
 "/>
                 </ArrayOperation>
         </Nodes>

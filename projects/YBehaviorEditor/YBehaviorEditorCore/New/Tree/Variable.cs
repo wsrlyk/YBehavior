@@ -531,10 +531,20 @@ namespace YBehavior.Editor.Core.New
         {
             get
             {
-                return
-                    m_bIsLocal &&
-                    this is TreeVariable
-                    ? m_Name + "'" : m_Name;
+                if (this is TreeVariable)
+                {
+                    if (IsLocal)
+                        return m_Name + "'";
+                }
+                else
+                {
+                    if (IsInput)
+                        return "▶" + m_Name;
+                    else
+                        return "◀" + m_Name;
+                }
+                
+                return m_Name;
             }
         }
         /// <summary>
