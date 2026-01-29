@@ -108,17 +108,6 @@ namespace YBehavior.Editor
             _RefreshVType(v);
         }
 
-        private void VKey_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            Variable v = DataContext as Variable;
-            if (v == null)
-                return;
-            EventMgr.Instance.Send(new VariableClickedArg()
-            {
-                v = v,
-            });
-        }
-
         private void ContainerSwitcher_Click(object sender, RoutedEventArgs e)
         {
             if (NetworkMgr.Instance.IsConnected)
@@ -138,19 +127,38 @@ namespace YBehavior.Editor
             }
         }
 
-        private void VKey_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        private void VKey_MouseUp(object sender, MouseButtonEventArgs e)
         {
             Variable v = DataContext as Variable;
             if (v == null)
                 return;
-
-            Clipboard.SetText(v.Name);
-            ShowSystemTipsArg arg = new ShowSystemTipsArg()
+            switch (e.ChangedButton)
             {
-                Content = v.Name + "   ->   Clipboard",
-                TipType = ShowSystemTipsArg.TipsType.TT_Success,
-            };
-            EventMgr.Instance.Send(arg);
+                case MouseButton.Left:
+                    {
+                        EventMgr.Instance.Send(new VariableClickedArg()
+                        {
+                            v = v,
+                        });
+                    }
+                    break;
+                case MouseButton.Right:
+                    {
+                        Clipboard.SetText(v.Name);
+                        ShowSystemTipsArg arg = new ShowSystemTipsArg()
+                        {
+                            Content = v.Name + "   ->   Clipboard",
+                            TipType = ShowSystemTipsArg.TipsType.TT_Success,
+                        };
+                        EventMgr.Instance.Send(arg);
+                    }
+                    break;
+                case MouseButton.Middle:
+                    {
+
+                    }
+                    break;
+            }
         }
     }
 }

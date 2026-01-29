@@ -75,7 +75,7 @@
     <StackPanel Opacity ="{Binding ElementName=ESwitcher, Path=IsChecked, Converter={StaticResource boolOpacityConvertor}, Mode=OneWay}">
         <DockPanel Background="LightBlue" Margin="0,1,0,1">
             <Grid DockPanel.Dock="Left">
-                <TextBlock Name="VKey" Style="{StaticResource QuickToolTipStyle}" Text="{Binding DisplayName}" FontSize="13" Width="150" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}" MouseLeftButtonUp="VKey_MouseLeftButtonUp" MouseRightButtonUp="VKey_MouseRightButtonUp"/>
+                <TextBlock Name="VKey" Style="{StaticResource QuickToolTipStyle}" Text="{Binding DisplayName}" FontSize="13" Width="150" Background="{Binding cType, Converter={StaticResource countTypeConvertor}}" ToolTip="{Binding Description}" MouseUp="VKey_MouseUp" />
                 <Button Name="CSwitcher" Style="{StaticResource TransparentHoverStyle}" Click="CSwitcher_Click" IsEnabled="{Binding IsEditable}" Visibility="{Binding Path = CanSwitchList, Converter={StaticResource visibilityConvertor}}" ToolTip="{Binding Description}" Margin="126,0,0,0">
                 </Button>
             </Grid>
