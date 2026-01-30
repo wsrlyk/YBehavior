@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Nodes>
+  <!-- Composite 节点 -->
+  <Node Class="Sequence" Category="composite" Note="Execute children in order until one fails" />
+  <Node Class="Selector" Category="composite" Note="Execute children in order until one succeeds" />
+  <Node Class="RandomSequence" Category="composite" Note="Execute children in random order until one fails" />
+  <Node Class="RandomSelector" Category="composite" Note="Execute children in random order until one succeeds" />
+  <Node Class="SwitchCase" Category="composite" Note="Switch case based on value">
+    <Variable Name="Switch" ValueType="I" IsInput="True" IsConst="False" />
+    <Variable Name="Cases" ValueType="I" IsArray="True" IsConst="True" />
+  </Node>
+  <Node Class="IfThenElse" Category="composite" Note="If condition then first child else second child" />
+
+  <!-- Decorator 节点 -->
+  <Node Class="Root" Category="decorator" Note="Root node of the tree" />
+  <Node Class="Loop" Category="decorator" Note="Loop child node">
+    <Variable Name="Count" ValueType="I" IsConst="False" Value="-1" />
+  </Node>
+  <Node Class="ForEach" Category="decorator" Note="Iterate over array">
+    <Variable Name="Array" ValueType="I" IsArray="True" IsConst="False" />
+    <Variable Name="Current" ValueType="I" IsInput="False" IsConst="False" />
+  </Node>
+  <Node Class="For" Category="decorator" Note="For loop with index">
+    <Variable Name="Start" ValueType="I" IsConst="False" Value="0" />
+    <Variable Name="End" ValueType="I" IsConst="False" />
+    <Variable Name="Step" ValueType="I" IsConst="True" Value="1" />
+    <Variable Name="Index" ValueType="I" IsInput="False" IsConst="False" />
+  </Node>
+  <Node Class="Not" Category="decorator" Note="Invert child result" />
+  <Node Class="AlwaysSuccess" Category="decorator" Note="Always return success" />
+  <Node Class="AlwaysFailed" Category="decorator" Note="Always return failed" />
+
+  <!-- Action 节点 -->
+  <Node Class="Calculator" Category="action" Note="{2} = {0} {1}">
+    <Variable Name="Operator" ValueType="E" IsConst="True" Value="+" Param="+|-|*|/|%" />
+    <Variable Name="Input1" ValueType="IF" IsConst="False" vTypeGroup="1" />
+    <Variable Name="Input2" ValueType="IF" IsConst="False" vTypeGroup="1" />
+    <Variable Name="Output" ValueType="IF" IsInput="False" IsConst="False" vTypeGroup="1" />
+  </Node>
+  <Node Class="SetData" Category="action" Note="{0} = {1}">
+    <Variable Name="Target" ValueType="IFBSVAU" IsInput="False" IsConst="False" vTypeGroup="1" />
+    <Variable Name="Source" ValueType="IFBSVAU" IsConst="False" vTypeGroup="1" />
+  </Node>
+  <Node Class="SubTree" Category="action" Note="Execute subtree: {0}">
+    <Variable Name="Tree" ValueType="S" IsConst="True" />
+  </Node>
+  <Node Class="Wait" Category="action" Note="Wait for {0} seconds">
+    <Variable Name="Duration" ValueType="F" IsConst="False" Value="1.0" />
+  </Node>
+  <Node Class="Log" Category="action" Note="Log message: {0}">
+    <Variable Name="Message" ValueType="S" IsConst="False" />
+  </Node>
+  <Node Class="HandleEvent" Category="action" Note="Handle events">
+    <Variable Name="Type" ValueType="E" IsConst="True" Value="Latest" Param="Latest|Every" />
+    <Variable Name="Events" ValueType="S" IsArray="True" IsConst="True" />
+    <Variable Name="Int" ValueType="I" IsArray="True" IsInput="False" IsEnable="False" />
+    <Variable Name="Float" ValueType="F" IsArray="True" IsInput="False" IsEnable="False" />
+    <Variable Name="String" ValueType="S" IsArray="True" IsInput="False" IsEnable="False" />
+    <Variable Name="Ulong" ValueType="U" IsArray="True" IsInput="False" IsEnable="False" />
+    <Variable Name="Bool" ValueType="B" IsArray="True" IsInput="False" IsEnable="False" />
+    <Variable Name="Vector3" ValueType="V" IsArray="True" IsInput="False" IsEnable="False" />
+    <Variable Name="Entity" ValueType="A" IsArray="True" IsInput="False" IsEnable="False" />
+    <Variable Name="Current" ValueType="S" IsInput="False" IsEnable="False" />
+  </Node>
+  <Node Class="ArrayOperation" Category="action" Note="Array operation">
+    <Variable Name="Operator" ValueType="E" IsConst="True" Value="APPEND" Param="APPEND|MERGE|REMOVE|CLEAR" />
+    <Variable Name="Input1" ValueType="IFBSVAU" IsArray="True" IsConst="False" vTypeGroup="1" />
+    <Variable Name="Input2" ValueType="IFBSVAU" IsArray="True" IsConst="False" vTypeGroup="1" />
+    <Variable Name="Output" ValueType="IFBSVAU" IsArray="True" IsInput="False" IsConst="False" vTypeGroup="1" />
+  </Node>
+  <Node Class="UnaryOperation" Category="action" Note="Unary operation">
+    <Variable Name="Operator" ValueType="E" IsConst="True" Value="ABS" Param="ABS|NEG|NOT" />
+    <Variable Name="Input" ValueType="IF" IsConst="False" vTypeGroup="1" />
+    <Variable Name="Output" ValueType="IF" IsInput="False" IsConst="False" vTypeGroup="1" />
+  </Node>
+
+  <!-- Condition 节点 -->
+  <Node Class="Comparer" Category="condition" Note="{0} {1} {2}">
+    <Variable Name="Operator" ValueType="E" IsConst="True" Value="==" Param="==|!=|&gt;|&lt;|&gt;=|&lt;=" />
+    <Variable Name="Opl" ValueType="IFBSVAU" IsConst="False" vTypeGroup="1" />
+    <Variable Name="Opr" ValueType="IFBSVAU" IsConst="False" vTypeGroup="1" />
+  </Node>
+</Nodes>

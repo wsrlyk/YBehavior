@@ -79,6 +79,14 @@ export interface TreeConnection {
   childNodeId: string;
 }
 
+export interface DataConnection {
+  id: string;
+  fromNodeId: string;
+  fromPinName: string;
+  toNodeId: string;
+  toPinName: string;
+}
+
 // ==================== Tree ====================
 
 export interface TreePin extends Pin {}
@@ -96,6 +104,7 @@ export interface Tree {
   nodes: Map<string, TreeNode>;
   rootId: string;
   connections: TreeConnection[];
+  dataConnections: DataConnection[];
   sharedVariables: Variable[];
   localVariables: Variable[];
   inputPins: TreePin[];

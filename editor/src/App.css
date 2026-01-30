@@ -19,3 +19,26 @@
     background-color: #1a1a1a;
   }
 }
+
+/* ReactFlow Controls 深色主题 */
+.react-flow__controls {
+  background-color: #1f2937 !important;
+  border: 1px solid #374151 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+.react-flow__controls-button {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  fill: #9ca3af !important;
+}
+
+.react-flow__controls-button:hover {
+  background-color: #374151 !important;
+}
+
+/* ReactFlow MiniMap 深色主题 */
+.react-flow__minimap {
+  background-color: #1f2937 !important;
+  border: 1px solid #374151 !important;
+}

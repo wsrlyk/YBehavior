@@ -2,14 +2,20 @@ import sharp from 'sharp';
 import { writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import icoEndec from 'ico-endec';
+const { encode } = icoEndec;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const iconsDir = join(__dirname, '..', 'src-tauri', 'icons');
 
-// SVG 图标内容
+// SVG 图标内容 - Adobe 风格：深紫色背景 + 浅紫色边框 + Ai 字样
 const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect x="32" y="32" width="448" height="448" rx="64" fill="#4C1D95"/>
-  <text x="256" y="340" font-family="Arial, sans-serif" font-size="280" font-weight="bold" fill="#C4B5FD" text-anchor="middle">AI</text>
+  <!-- 外边框 - 浅紫色 -->
+  <rect x="8" y="8" width="496" height="496" rx="48" fill="#C4B5FD"/>
+  <!-- 内部背景 - 深紫色 -->
+  <rect x="24" y="24" width="464" height="464" rx="36" fill="#4C1D95"/>
+  <!-- AI 文字 -->
+  <text x="256" y="400" font-family="Adobe Clean, Myriad Pro, Arial, sans-serif" font-size="320" font-weight="600" fill="#C4B5FD" text-anchor="middle">AI</text>
 </svg>`;
 
 const sizes = [
@@ -41,46 +47,14 @@ async function generateIcons() {
     console.log(`Generated: ${name}`);
   }
   
-  // 生成 ICO 文件 (包含多个尺寸)
-  const icoSizes = [16, 32, 48, 64, 128, 256];
-  const icoBuffers = await Promise.all(
-    icoSizes.map(size => 
-      sharp(svgBuffer)
-        .resize(size, size)
-        .png()
-        .toBuffer()
-    )
-  );
+  // 生成 ICO 文件 - 只用一个 128x128 高质量图像，让 Windows 自动缩放
+  const icoImage = await sharp(svgBuffer)
+    .resize(128, 128)
+    .png()
+    .toBuffer();
   
-  // ICO 文件格式
-  const icoHeader = Buffer.alloc(6);
-  icoHeader.writeUInt16LE(0, 0); // Reserved
-  icoHeader.writeUInt16LE(1, 2); // Type: 1 = ICO
-  icoHeader.writeUInt16LE(icoSizes.length, 4); // Number of images
-  
-  let offset = 6 + (16 * icoSizes.length);
-  const icoEntries = [];
-  
-  for (let i = 0; i < icoSizes.length; i++) {
-    const size = icoSizes[i];
-    const buffer = icoBuffers[i];
-    
-    const entry = Buffer.alloc(16);
-    entry.writeUInt8(size === 256 ? 0 : size, 0); // Width (0 = 256)
-    entry.writeUInt8(size === 256 ? 0 : size, 1); // Height (0 = 256)
-    entry.writeUInt8(0, 2); // Color palette
-    entry.writeUInt8(0, 3); // Reserved
-    entry.writeUInt16LE(1, 4); // Color planes
-    entry.writeUInt16LE(32, 6); // Bits per pixel
-    entry.writeUInt32LE(buffer.length, 8); // Size of image data
-    entry.writeUInt32LE(offset, 12); // Offset to image data
-    
-    icoEntries.push(entry);
-    offset += buffer.length;
-  }
-  
-  const icoFile = Buffer.concat([icoHeader, ...icoEntries, ...icoBuffers]);
-  writeFileSync(join(iconsDir, 'icon.ico'), icoFile);
+  const icoBuffer = encode([icoImage]);
+  writeFileSync(join(iconsDir, 'icon.ico'), icoBuffer);
   console.log('Generated: icon.ico');
   
   console.log('\nAll icons generated successfully!');
