@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+/* React Flow 样式 */
+@import "@xyflow/react/dist/style.css";
+
+/* 全局样式 */
+:root {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1a1a1a;
+  background-color: #f5f5f5;
+}
+
+/* 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #e5e5e5;
+    background-color: #1a1a1a;
+  }
+}
