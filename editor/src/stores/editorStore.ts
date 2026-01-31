@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Tree, TreeNode, TreeConnection } from '../types';
+import type { Tree, TreeNode, TreeConnection, Variable, Pin } from '../types';
 import { loadTree, listTreeFiles, saveFile } from '../utils/fileService';
 import { loadSettings, type Settings } from '../utils/settings';
 import { useNodeDefinitionStore } from './nodeDefinitionStore';
@@ -60,11 +60,65 @@ interface EditorState {
   addConnection: (connection: TreeConnection) => void;
   removeConnection: (connectionId: string) => void;
   
+  // 变量操作
+  addVariable: (isLocal: boolean, variable: Variable) => void;
+  removeVariable: (isLocal: boolean, name: string) => void;
+  updateVariable: (isLocal: boolean, name: string, updates: Partial<Variable>) => void;
+  
+  // Pin 操作
+  updatePin: (nodeId: string, pinName: string, updates: Partial<Pin>) => void;
+  
   // 保存操作
   saveCurrentFile: () => Promise<void>;
+  
+  // 新建文件
+  createNewTree: (name: string) => void;
 }
 
-// 辅助函数：更新已打开文件的树
+/**
+ * 计算节点的 UID（深度优先遍历）
+ * Root 节点从 1 开始，森林中其他树从 1001、2001 等开始
+ */
+function recalculateUIDs(tree: Tree): void {
+  let uid = 1;
+  
+  // 深度优先遍历
+  function dfs(nodeId: string) {
+    const node = tree.nodes.get(nodeId);
+    if (!node) return;
+    
+    node.uid = uid++;
+    
+    // 获取子节点（按连接顺序）
+    const childConns = tree.connections.filter(c => c.parentNodeId === nodeId);
+    for (const conn of childConns) {
+      dfs(conn.childNodeId);
+    }
+  }
+  
+  // 先清除所有 UID
+  for (const node of tree.nodes.values()) {
+    node.uid = undefined;
+  }
+  
+  // 从主根节点开始
+  if (tree.rootId) {
+    dfs(tree.rootId);
+  }
+  
+  // 处理森林中的其他树（从 1001、2001 等开始）
+  let forestIndex = 1;
+  for (const [nodeId, node] of tree.nodes) {
+    if (node.uid === undefined) {
+      // 这是一个未被遍历到的根节点（森林中的其他树）
+      uid = forestIndex * 1000 + 1;
+      dfs(nodeId);
+      forestIndex++;
+    }
+  }
+}
+
+// 辅助函数：更新已打开文件的树（自动重新计算 UID）
 function updateOpenedFileTree(
   openedFiles: OpenedFile[],
   activeFilePath: string | null,
@@ -77,6 +131,9 @@ function updateOpenedFileTree(
   
   const file = openedFiles[fileIndex];
   const newTree = updater(file.tree);
+  
+  // 重新计算 UID
+  recalculateUIDs(newTree);
   
   const newOpenedFiles = [...openedFiles];
   newOpenedFiles[fileIndex] = { ...file, tree: newTree, isDirty: true };
@@ -209,6 +266,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   
   removeNode: (nodeId) => set((state) => {
     const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      // 不允许删除 Root 节点
+      const node = tree.nodes.get(nodeId);
+      if (node?.type === 'Root') return tree;
+      
       const newNodes = new Map(tree.nodes);
       newNodes.delete(nodeId);
       
@@ -295,4 +356,121 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       set({ error: String(e) });
     }
   },
+  
+  // 变量操作
+  addVariable: (isLocal, variable) => set((state) => {
+    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      if (isLocal) {
+        return { ...tree, localVariables: [...tree.localVariables, variable] };
+      } else {
+        return { ...tree, sharedVariables: [...tree.sharedVariables, variable] };
+      }
+    });
+    return result || state;
+  }),
+  
+  removeVariable: (isLocal, name) => set((state) => {
+    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      if (isLocal) {
+        return { ...tree, localVariables: tree.localVariables.filter(v => v.name !== name) };
+      } else {
+        return { ...tree, sharedVariables: tree.sharedVariables.filter(v => v.name !== name) };
+      }
+    });
+    return result || state;
+  }),
+  
+  updateVariable: (isLocal, name, updates) => set((state) => {
+    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      if (isLocal) {
+        return {
+          ...tree,
+          localVariables: tree.localVariables.map(v => 
+            v.name === name ? { ...v, ...updates } : v
+          ),
+        };
+      } else {
+        return {
+          ...tree,
+          sharedVariables: tree.sharedVariables.map(v => 
+            v.name === name ? { ...v, ...updates } : v
+          ),
+        };
+      }
+    });
+    return result || state;
+  }),
+  
+  // Pin 操作
+  updatePin: (nodeId, pinName, updates) => set((state) => {
+    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      const node = tree.nodes.get(nodeId);
+      if (!node) return tree;
+      
+      const newPins = node.pins.map(pin => 
+        pin.name === pinName ? { ...pin, ...updates } : pin
+      );
+      
+      const newNodes = new Map(tree.nodes);
+      newNodes.set(nodeId, { ...node, pins: newPins });
+      
+      return { ...tree, nodes: newNodes };
+    });
+    return result || state;
+  }),
+  
+  // 新建文件
+  createNewTree: (name) => set((state) => {
+    // 生成唯一名称（如果已存在则加数字后缀）
+    let uniqueName = name;
+    let counter = 1;
+    while (state.openedFiles.some(f => f.path === `${uniqueName}.tree`)) {
+      uniqueName = `${name}${counter}`;
+      counter++;
+    }
+    const path = `${uniqueName}.tree`;
+    
+    // 创建新树，自动添加 Root 节点
+    const rootId = 'node-1';
+    const rootNode: TreeNode = {
+      id: rootId,
+      guid: 1,
+      uid: 1,
+      type: 'Root',
+      category: 'decorator',
+      position: { x: 0, y: 0 },
+      disabled: false,
+      pins: [],
+      childrenIds: [],
+    };
+    
+    const nodes = new Map<string, TreeNode>();
+    nodes.set(rootId, rootNode);
+    
+    const newTree: Tree = {
+      name,
+      path,
+      nodes,
+      rootId,
+      connections: [],
+      dataConnections: [],
+      sharedVariables: [],
+      localVariables: [],
+      inputPins: [],
+      outputPins: [],
+      comments: [],
+    };
+    
+    const newFile: OpenedFile = {
+      path,
+      name,
+      tree: newTree,
+      isDirty: true,
+    };
+    
+    return {
+      openedFiles: [...state.openedFiles, newFile],
+      activeFilePath: path,
+    };
+  }),
 }));

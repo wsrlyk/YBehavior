@@ -42,3 +42,17 @@
   background-color: #1f2937 !important;
   border: 1px solid #374151 !important;
 }
+
+/* 画布默认光标为普通指针，中键拖动时变为抓手 */
+.react-flow__pane {
+  cursor: default !important;
+}
+
+.react-flow__pane.dragging {
+  cursor: grabbing !important;
+}
+
+/* 连线悬停效果 */
+.react-flow__edge:hover path {
+  stroke: #9ca3af !important;
+}

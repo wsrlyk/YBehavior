@@ -19,6 +19,7 @@ import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import { NodeContextMenu } from './NodeContextMenu';
 import CustomNode, { type CustomNodeType } from './CustomNode';
 import TreeEdge from './TreeEdge';
+import DataEdge from './DataEdge';
 import type { TreeNode, NodeCategory, Pin } from '../types';
 
 // 注册自定义节点类型
@@ -29,6 +30,7 @@ const nodeTypes = {
 // 注册自定义边类型
 const edgeTypes = {
   tree: TreeEdge,
+  data: DataEdge,
 };
 
 function treeNodeToFlowNode(
@@ -54,6 +56,7 @@ interface NodeEditorProps {
 function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   const getCurrentTree = useEditorStore((state) => state.getCurrentTree);
   const addNode = useEditorStore((state) => state.addNode);
+  const selectNodes = useEditorStore((state) => state.selectNodes);
   const { getDefinition } = useNodeDefinitionStore();
   const currentTree = getCurrentTree();
   const { screenToFlowPosition } = useReactFlow();
@@ -94,13 +97,35 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       const siblingTargetIds = conns.map(c => c.childNodeId);
       
       conns.forEach((conn) => {
+        // 多连接器时使用连接器名称，否则使用 tree-source
+        const sourceHandle = conn.parentConnector && conn.parentConnector !== 'default' 
+          ? conn.parentConnector 
+          : 'tree-source';
         edges.push({
           id: conn.id,
           source: conn.parentNodeId,
+          sourceHandle,
           target: conn.childNodeId,
+          targetHandle: 'tree-target',
           type: 'tree',
           data: { siblingTargetIds },
         });
+      });
+    });
+    
+    // 添加数据连接的边
+    currentTree.dataConnections.forEach((dataConn) => {
+      edges.push({
+        id: dataConn.id,
+        source: dataConn.fromNodeId,
+        sourceHandle: `pin-out-${dataConn.fromPinName}`,
+        target: dataConn.toNodeId,
+        targetHandle: `pin-in-${dataConn.toPinName}`,
+        type: 'data',
+        data: {
+          fromPinName: dataConn.fromPinName,
+          toPinName: dataConn.toPinName,
+        },
       });
     });
     
@@ -166,7 +191,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     
     const newNode: TreeNode = {
       id: `node-${Date.now()}`,
-      uid: Date.now(),
+      guid: Date.now(),
       type: nodeClass,
       category: def.category as NodeCategory,
       position: screenToFlowPosition(contextMenu.screenPosition),
@@ -200,7 +225,12 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
           setContextMenu(prev => ({ ...prev, isOpen: false }));
           onPaneClick?.();
         }}
+        onNodeClick={(_, node) => {
+          selectNodes([node.id]);
+        }}
         fitView
+        panOnDrag={[1, 2]}
+        selectionOnDrag
         proOptions={{ hideAttribution: true }}
         className="bg-gray-900"
       >

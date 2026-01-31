@@ -34,12 +34,28 @@ export type CustomNodeType = Node<CustomNodeData, 'custom'>;
 function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
   const pinColor = PIN_COLORS[pin.valueType] || '#888';
   
+  // 构建 Vector Index 显示
+  const getVectorIndexDisplay = () => {
+    if (!pin.vectorIndex) return '';
+    if (pin.vectorIndex.type === 'const') {
+      return `[${pin.vectorIndex.value}]`;
+    } else {
+      return `[${pin.vectorIndex.variableName}]`;
+    }
+  };
+  
   return (
-    <div className={`flex items-center gap-1 text-xs py-0.5 ${isInput ? '' : 'flex-row-reverse'}`}>
-      <div 
-        className="w-2 h-2 rounded-full border border-gray-600"
-        style={{ backgroundColor: pinColor }}
-        title={`${pin.valueType}${pin.countType === 'list' ? '[]' : ''}`}
+    <div className={`relative flex items-center gap-1 text-xs py-0.5 ${isInput ? '' : 'flex-row-reverse'}`}>
+      {/* Pin 的 Handle，用于数据连接 */}
+      <Handle
+        type={isInput ? 'target' : 'source'}
+        position={isInput ? Position.Left : Position.Right}
+        id={`pin-${isInput ? 'in' : 'out'}-${pin.name}`}
+        className="!w-2 !h-2 !rounded-full !border-0 hover:!scale-125 !cursor-crosshair !transition-all"
+        style={{ 
+          backgroundColor: pinColor,
+          [isInput ? 'left' : 'right']: '-4px',
+        }}
       />
       <span className="text-gray-300 truncate max-w-20">{pin.name}</span>
       {pin.binding.type === 'const' && (
@@ -49,14 +65,14 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
       )}
       {pin.binding.type === 'pointer' && (
         <span className="text-blue-400 text-[10px] truncate max-w-12">
-          {pin.binding.variableName}
+          {pin.binding.variableName}{getVectorIndexDisplay()}
         </span>
       )}
     </div>
   );
 }
 
-function CustomNode({ data }: NodeProps<CustomNodeType>) {
+function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
   const { label, treeNode, nodeDefinition } = data;
   const bgColor = NODE_COLORS[treeNode.category] || '#666';
   
@@ -74,18 +90,20 @@ function CustomNode({ data }: NodeProps<CustomNodeType>) {
   
   return (
     <div 
-      className="rounded shadow-lg min-w-32"
+      className="rounded shadow-lg min-w-32 cursor-move hover:brightness-110 transition-all"
       style={{ 
         backgroundColor: '#1f2937',
-        border: `2px solid ${bgColor}`,
+        border: `2px solid ${selected ? '#fff' : bgColor}`,
+        boxShadow: selected ? '0 0 0 2px rgba(255,255,255,0.3)' : undefined,
       }}
     >
       {/* 标题栏 */}
       <div 
-        className="px-2 py-1 text-xs font-medium text-white rounded-t"
+        className="px-2 py-1 text-xs font-medium text-white rounded-t flex items-center gap-1"
         style={{ backgroundColor: bgColor }}
       >
-        {label}
+        <span className="text-white text-[10px]">{treeNode.uid ?? '?'}</span>
+        <span>{label}</span>
         {treeNode.disabled && <span className="ml-1 text-gray-300">(disabled)</span>}
       </div>
       
@@ -122,7 +140,8 @@ function CustomNode({ data }: NodeProps<CustomNodeType>) {
         <Handle
           type="target"
           position={Position.Top}
-          className="!bg-gray-400 !w-3 !h-2 !rounded-sm !border-0"
+          id="tree-target"
+          className="!bg-gray-400 !w-3 !h-2 !rounded-sm !border-0 hover:!bg-white hover:!scale-125 !cursor-crosshair !transition-all"
         />
       )}
       
@@ -131,7 +150,8 @@ function CustomNode({ data }: NodeProps<CustomNodeType>) {
         <Handle
           type="source"
           position={Position.Bottom}
-          className="!bg-gray-400 !w-3 !h-2 !rounded-sm !border-0"
+          id="tree-source"
+          className="!bg-gray-400 !w-3 !h-2 !rounded-sm !border-0 hover:!bg-white hover:!scale-125 !cursor-crosshair !transition-all"
         />
       )}
       
@@ -142,7 +162,7 @@ function CustomNode({ data }: NodeProps<CustomNodeType>) {
           type="source"
           position={Position.Bottom}
           id={conn.name}
-          className="!bg-gray-400 !w-3 !h-2 !rounded-sm !border-0"
+          className="!bg-gray-400 !w-3 !h-2 !rounded-sm !border-0 hover:!bg-white hover:!scale-125 !cursor-crosshair !transition-all"
           style={{ 
             left: `${((i + 1) / (connectorCount + 1)) * 100}%`,
           }}

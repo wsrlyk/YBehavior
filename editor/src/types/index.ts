@@ -58,7 +58,8 @@ export type NodeCategory = 'composite' | 'decorator' | 'action' | 'condition';
 
 export interface TreeNode {
   id: string;
-  uid: number;
+  guid: number;  // 文件中保存的唯一标识，不变
+  uid?: number;  // 显示用的 UID，深度遍历计算
   type: string;
   category: NodeCategory;
   nickname?: string;

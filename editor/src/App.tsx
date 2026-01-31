@@ -8,7 +8,7 @@ import { useEditorStore } from "./stores/editorStore";
 import { useNodeDefinitionStore } from "./stores/nodeDefinitionStore";
 
 function App() {
-  const { initSettings, settings, openedFiles, activeFilePath, saveCurrentFile } = useEditorStore();
+  const { initSettings, settings, openedFiles, activeFilePath, saveCurrentFile, createNewTree } = useEditorStore();
   const { loadDefinitions, isLoaded } = useNodeDefinitionStore();
   
   const [isFileTreeOpen, setIsFileTreeOpen] = useState(false);
@@ -52,6 +52,13 @@ function App() {
             title="Open File"
           >
             ☰
+          </button>
+          <button 
+            onClick={() => createNewTree('NewTree')}
+            className="px-2 py-1 text-sm text-gray-300 hover:bg-gray-700 rounded"
+            title="New Tree"
+          >
+            +
           </button>
           <FileTreePopup 
             isOpen={isFileTreeOpen} 

@@ -26,17 +26,15 @@ function TreeEdge({
   const edgeData = data as TreeEdgeData | undefined;
   const siblingTargetIds = edgeData?.siblingTargetIds || [];
   
-  // 从 store 获取所有共享值，确保所有兄弟边计算出相同的结果
-  const { horizontalY, verticalX, startY } = useStore((state) => {
+  // 从 store 获取水平线高度
+  const horizontalY = useStore((state) => {
     // 1. 获取父节点的位置和尺寸
     const sourceNode = source ? state.nodeLookup.get(source) : null;
     if (!sourceNode) {
-      return { horizontalY: sourceY + 30, verticalX: sourceX, startY: sourceY };
+      return sourceY + 30;
     }
     
-    const width = sourceNode.measured?.width ?? 128;
     const height = sourceNode.measured?.height ?? 60;
-    const vx = sourceNode.position.x + width / 2;
     const parentBottomY = sourceNode.position.y + height;
     
     // 2. 遍历所有兄弟节点，找到最小的 Y（最高的节点）
@@ -52,16 +50,15 @@ function TreeEdge({
     }
     
     // 3. 计算水平线高度
-    const hY = Math.max(
+    return Math.max(
       parentBottomY + 10,
       (parentBottomY + minChildY) / 2
     );
-    
-    return { horizontalY: hY, verticalX: vx, startY: parentBottomY };
   });
   
-  // 绘制路径：从源点出发，到共享的垂直线和水平线位置
-  const path = `M ${sourceX} ${sourceY} L ${verticalX} ${startY} L ${verticalX} ${horizontalY} L ${targetX} ${horizontalY} L ${targetX} ${targetY}`;
+  // 绘制路径：直接从连接器位置（sourceX, sourceY）出发
+  // 垂直下降到水平线，然后水平移动到目标 X，再垂直下降到目标
+  const path = `M ${sourceX} ${sourceY} L ${sourceX} ${horizontalY} L ${targetX} ${horizontalY} L ${targetX} ${targetY}`;
   
   return (
     <BaseEdge

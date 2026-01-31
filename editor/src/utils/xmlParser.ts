@@ -82,15 +82,47 @@ function parsePinValue(raw: string): ParsedPinValue {
     const bindChar = code[idx];
     if (bindChar === 'C' || bindChar === 'c') {
       result.isPointer = false;
-      result.value = value;
+      // 值可能包含 Vector Index 信息，格式: "value VI c index"
+      // 只取第一部分作为值
+      const parts = value.split(' VI ');
+      result.value = parts[0];
+      if (parts.length > 1) {
+        // 解析 Vector Index: "c 0" 或 "p varName"
+        const viParts = parts[1].split(' ');
+        if (viParts[0] === 'c') {
+          result.vectorIndex = { type: 'const', value: viParts[1] || '0' };
+        } else if (viParts[0] === 'p' || viParts[0] === 'P') {
+          result.vectorIndex = { type: 'pointer', variableName: viParts[1] || '', isLocal: viParts[0] === 'p' };
+        }
+      }
     } else if (bindChar === 'P') {
       result.isPointer = true;
       result.isLocal = false;
-      result.variableName = value;
+      // 变量名可能包含 Vector Index 信息
+      const parts = value.split(' VI ');
+      result.variableName = parts[0];
+      if (parts.length > 1) {
+        const viParts = parts[1].split(' ');
+        if (viParts[0] === 'c') {
+          result.vectorIndex = { type: 'const', value: viParts[1] || '0' };
+        } else if (viParts[0] === 'p' || viParts[0] === 'P') {
+          result.vectorIndex = { type: 'pointer', variableName: viParts[1] || '', isLocal: viParts[0] === 'p' };
+        }
+      }
     } else if (bindChar === 'p') {
       result.isPointer = true;
       result.isLocal = true;
-      result.variableName = value;
+      // 变量名可能包含 Vector Index 信息
+      const parts = value.split(' VI ');
+      result.variableName = parts[0];
+      if (parts.length > 1) {
+        const viParts = parts[1].split(' ');
+        if (viParts[0] === 'c') {
+          result.vectorIndex = { type: 'const', value: viParts[1] || '0' };
+        } else if (viParts[0] === 'p' || viParts[0] === 'P') {
+          result.vectorIndex = { type: 'pointer', variableName: viParts[1] || '', isLocal: viParts[0] === 'p' };
+        }
+      }
     }
     idx++;
   }
@@ -154,6 +186,7 @@ function createPin(name: string, raw: string, pinDef?: PinDefinition): Pin {
     binding,
     enableType,
     isInput,
+    vectorIndex: parsed.vectorIndex,
     enumValues,
     allowedValueTypes: [parsed.valueType],
   };
@@ -266,7 +299,7 @@ function parseXmlNode(
   
   const node: TreeNode = {
     id,
-    uid: parseInt(guid),
+    guid: parseInt(guid),
     type: nodeClass,
     category: getNodeCategory(nodeClass),
     position: { x: pos[0], y: pos[1] },
@@ -372,6 +405,9 @@ export function parseTreeXml(
     }
   }
   
+  // 计算 UID（深度优先遍历）
+  calculateUIDs(nodes, rootId, connections);
+  
   return {
     name: treeName,
     path: fileName,
@@ -385,4 +421,44 @@ export function parseTreeXml(
     outputPins: [],
     comments: [],
   };
+}
+
+/**
+ * 计算节点的 UID（深度优先遍历）
+ * Root 节点从 1 开始，森林中其他树从 1001、2001 等开始
+ */
+function calculateUIDs(
+  nodes: Map<string, TreeNode>,
+  rootId: string,
+  connections: TreeConnection[]
+): void {
+  let uid = 1;
+  
+  // 深度优先遍历
+  function dfs(nodeId: string) {
+    const node = nodes.get(nodeId);
+    if (!node) return;
+    
+    node.uid = uid++;
+    
+    // 获取子节点（按连接顺序）
+    const childConns = connections.filter(c => c.parentNodeId === nodeId);
+    for (const conn of childConns) {
+      dfs(conn.childNodeId);
+    }
+  }
+  
+  // 从主根节点开始
+  dfs(rootId);
+  
+  // 处理森林中的其他树（从 1001、2001 等开始）
+  let forestIndex = 1;
+  for (const [nodeId, node] of nodes) {
+    if (node.uid === undefined) {
+      // 这是一个未被遍历到的根节点（森林中的其他树）
+      uid = forestIndex * 1000 + 1;
+      dfs(nodeId);
+      forestIndex++;
+    }
+  }
 }

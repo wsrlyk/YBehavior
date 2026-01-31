@@ -19,7 +19,9 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode }: NodeCo
   const menuRef = useRef<HTMLDivElement>(null);
   
   const allNodes = CATEGORY_ORDER.flatMap(cat => 
-    getByCategory(cat).map(def => ({ ...def, category: cat }))
+    getByCategory(cat)
+      .filter(def => def.className !== 'Root') // Root 不在列表中显示
+      .map(def => ({ ...def, category: cat }))
   );
   
   const filteredNodes = allNodes.filter(node => 

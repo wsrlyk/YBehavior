@@ -98,7 +98,7 @@ function serializeNodeForEditor(
   el.setAttribute('Class', node.type);
   
   // GUID (编辑器版需要)
-  el.setAttribute('GUID', String(node.uid));
+  el.setAttribute('GUID', String(node.guid));
   
   // Connection 属性（在 GUID 之后，Pos 之前）
   if (node.extraAttrs?.Connection) {
@@ -173,15 +173,15 @@ function serializeDataConnections(
     
     if (forEditor) {
       // 编辑器版使用 GUID，顺序: FromGUID, FromName, ToGUID, ToName
-      if (fromNode) connEl.setAttribute('FromGUID', String(fromNode.uid));
+      if (fromNode) connEl.setAttribute('FromGUID', String(fromNode.guid));
       connEl.setAttribute('FromName', conn.fromPinName);
-      if (toNode) connEl.setAttribute('ToGUID', String(toNode.uid));
+      if (toNode) connEl.setAttribute('ToGUID', String(toNode.guid));
       connEl.setAttribute('ToName', conn.toPinName);
     } else {
       // 运行时版使用 UID
-      if (fromNode) connEl.setAttribute('FromUID', String(fromNode.uid));
+      if (fromNode) connEl.setAttribute('FromUID', String(fromNode.uid ?? 0));
       connEl.setAttribute('FromName', conn.fromPinName);
-      if (toNode) connEl.setAttribute('ToUID', String(toNode.uid));
+      if (toNode) connEl.setAttribute('ToUID', String(toNode.uid ?? 0));
       connEl.setAttribute('ToName', conn.toPinName);
     }
     el.appendChild(connEl);
