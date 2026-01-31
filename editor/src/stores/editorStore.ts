@@ -1,7 +1,9 @@
 import { create } from 'zustand';
 import type { Tree, TreeNode, TreeConnection } from '../types';
-import { loadTree, listTreeFiles } from '../utils/fileService';
+import { loadTree, listTreeFiles, saveFile } from '../utils/fileService';
 import { loadSettings, type Settings } from '../utils/settings';
+import { useNodeDefinitionStore } from './nodeDefinitionStore';
+import { serializeTreeForEditor, serializeTreeForRuntime } from '../utils/xmlSerializer';
 
 interface OpenedFile {
   path: string;
@@ -57,6 +59,9 @@ interface EditorState {
   // 连接操作
   addConnection: (connection: TreeConnection) => void;
   removeConnection: (connectionId: string) => void;
+  
+  // 保存操作
+  saveCurrentFile: () => Promise<void>;
 }
 
 // 辅助函数：更新已打开文件的树
@@ -121,7 +126,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const fullPath = `${editorTreeDir}/${path}`;
-      const tree = await loadTree(fullPath);
+      // 获取节点定义查找函数
+      const { getDefinition } = useNodeDefinitionStore.getState();
+      const tree = await loadTree(fullPath, getDefinition);
       const fileName = path.split('/').pop() || path;
       
       const newFile: OpenedFile = {
@@ -254,4 +261,38 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     
     return result || state;
   }),
+  
+  saveCurrentFile: async () => {
+    const { openedFiles, activeFilePath, editorTreeDir, runtimeTreeDir } = get();
+    if (!activeFilePath || !editorTreeDir || !runtimeTreeDir) return;
+    
+    const file = openedFiles.find(f => f.path === activeFilePath);
+    if (!file) return;
+    
+    try {
+      // 序列化为编辑器版和运行时版
+      const editorXml = serializeTreeForEditor(file.tree);
+      const runtimeXml = serializeTreeForRuntime(file.tree);
+      
+      // 保存编辑器版
+      const editorPath = `${editorTreeDir}/${activeFilePath}`;
+      await saveFile(editorPath, editorXml);
+      
+      // 保存运行时版
+      const runtimePath = `${runtimeTreeDir}/${activeFilePath}`;
+      await saveFile(runtimePath, runtimeXml);
+      
+      // 标记为已保存
+      set((state) => ({
+        openedFiles: state.openedFiles.map(f => 
+          f.path === activeFilePath ? { ...f, isDirty: false } : f
+        ),
+      }));
+      
+      console.log('Saved:', editorPath, runtimePath);
+    } catch (e) {
+      console.error('Save failed:', e);
+      set({ error: String(e) });
+    }
+  },
 }));

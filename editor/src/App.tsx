@@ -8,7 +8,7 @@ import { useEditorStore } from "./stores/editorStore";
 import { useNodeDefinitionStore } from "./stores/nodeDefinitionStore";
 
 function App() {
-  const { initSettings, settings, openedFiles, activeFilePath } = useEditorStore();
+  const { initSettings, settings, openedFiles, activeFilePath, saveCurrentFile } = useEditorStore();
   const { loadDefinitions, isLoaded } = useNodeDefinitionStore();
   
   const [isFileTreeOpen, setIsFileTreeOpen] = useState(false);
@@ -24,6 +24,18 @@ function App() {
       loadDefinitions();
     }
   }, [settings, initSettings, isLoaded, loadDefinitions]);
+  
+  // Ctrl+S 保存快捷键
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        saveCurrentFile();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [saveCurrentFile]);
   
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-gray-900 text-white">
@@ -46,11 +58,12 @@ function App() {
             onClose={() => setIsFileTreeOpen(false)}
           />
           <div className="w-px h-5 bg-gray-700 mx-1" />
-          <button className="px-3 py-1 text-sm bg-gray-700 rounded hover:bg-gray-600">
+          <button 
+            onClick={saveCurrentFile}
+            disabled={!activeFile}
+            className="px-3 py-1 text-sm bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             Save
-          </button>
-          <button className="px-3 py-1 text-sm bg-gray-700 rounded hover:bg-gray-600">
-            Export
           </button>
           <div className="flex-1" />
           <span className="text-sm text-gray-400">

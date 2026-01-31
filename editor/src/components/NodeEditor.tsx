@@ -7,40 +7,42 @@ import {
   useNodesState,
   useEdgesState,
   addEdge,
+  useReactFlow,
   type Node,
   type Edge,
   type OnConnect,
   BackgroundVariant,
+  ReactFlowProvider,
 } from '@xyflow/react';
 import { useEditorStore } from '../stores/editorStore';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import { NodeContextMenu } from './NodeContextMenu';
-import type { TreeNode, NodeCategory } from '../types';
+import CustomNode, { type CustomNodeType } from './CustomNode';
+import TreeEdge from './TreeEdge';
+import type { TreeNode, NodeCategory, Pin } from '../types';
 
-// 低饱和度节点颜色
-const NODE_COLORS: Record<string, string> = {
-  composite: '#5A8A5E',  // 低饱和度绿色
-  decorator: '#5A7A9A',  // 低饱和度蓝色
-  action: '#B08050',     // 低饱和度橙色
-  condition: '#7A5A8A',  // 低饱和度紫色
+// 注册自定义节点类型
+const nodeTypes = {
+  custom: CustomNode,
 };
 
-function treeNodeToFlowNode(node: TreeNode): Node {
+// 注册自定义边类型
+const edgeTypes = {
+  tree: TreeEdge,
+};
+
+function treeNodeToFlowNode(
+  node: TreeNode, 
+  getDefinition: (className: string) => import('../types/nodeDefinition').NodeDefinition | undefined
+): CustomNodeType {
   return {
     id: node.id,
-    type: 'default',
+    type: 'custom',
     position: node.position,
     data: { 
       label: node.nickname || node.type,
       treeNode: node,
-    },
-    style: {
-      background: NODE_COLORS[node.category] || '#666',
-      color: 'white',
-      border: 'none',
-      borderRadius: '4px',
-      padding: '8px 12px',
-      fontSize: '12px',
+      nodeDefinition: getDefinition(node.type),
     },
   };
 }
@@ -49,42 +51,61 @@ interface NodeEditorProps {
   onPaneClick?: () => void;
 }
 
-export function NodeEditor({ onPaneClick }: NodeEditorProps) {
+function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   const getCurrentTree = useEditorStore((state) => state.getCurrentTree);
   const addNode = useEditorStore((state) => state.addNode);
   const { getDefinition } = useNodeDefinitionStore();
   const currentTree = getCurrentTree();
+  const { screenToFlowPosition } = useReactFlow();
   
   // 右键菜单状态
   const [contextMenu, setContextMenu] = useState<{
     isOpen: boolean;
     position: { x: number; y: number };
-    flowPosition: { x: number; y: number };
-  }>({ isOpen: false, position: { x: 0, y: 0 }, flowPosition: { x: 0, y: 0 } });
+    screenPosition: { x: number; y: number };
+  }>({
+    isOpen: false,
+    position: { x: 0, y: 0 },
+    screenPosition: { x: 0, y: 0 },
+  });
   
   const { flowNodes, flowEdges } = useMemo(() => {
     if (!currentTree) {
       return { flowNodes: [], flowEdges: [] };
     }
     
-    const nodes: Node[] = [];
+    const nodes: CustomNodeType[] = [];
     const edges: Edge[] = [];
     
     currentTree.nodes.forEach((node: TreeNode) => {
-      nodes.push(treeNodeToFlowNode(node));
+      nodes.push(treeNodeToFlowNode(node, getDefinition));
     });
     
+    // 按父节点分组连接，收集兄弟节点 ID
+    const connectionsByParent = new Map<string, typeof currentTree.connections>();
     currentTree.connections.forEach((conn) => {
-      edges.push({
-        id: conn.id,
-        source: conn.parentNodeId,
-        target: conn.childNodeId,
-        type: 'smoothstep',
+      const group = connectionsByParent.get(conn.parentNodeId) || [];
+      group.push(conn);
+      connectionsByParent.set(conn.parentNodeId, group);
+    });
+    
+    // 为每条边传递兄弟节点 ID 列表，用于计算共享的水平线高度
+    connectionsByParent.forEach((conns) => {
+      const siblingTargetIds = conns.map(c => c.childNodeId);
+      
+      conns.forEach((conn) => {
+        edges.push({
+          id: conn.id,
+          source: conn.parentNodeId,
+          target: conn.childNodeId,
+          type: 'tree',
+          data: { siblingTargetIds },
+        });
       });
     });
     
     return { flowNodes: nodes, flowEdges: edges };
-  }, [currentTree]);
+  }, [currentTree, getDefinition]);
   
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -103,7 +124,7 @@ export function NodeEditor({ onPaneClick }: NodeEditorProps) {
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     
-    // 获取相对于容器的位置
+    // 获取相对于容器的位置（用于菜单显示）
     const bounds = e.currentTarget.getBoundingClientRect();
     const relativeX = e.clientX - bounds.left;
     const relativeY = e.clientY - bounds.top;
@@ -111,7 +132,7 @@ export function NodeEditor({ onPaneClick }: NodeEditorProps) {
     setContextMenu({
       isOpen: true,
       position: { x: relativeX, y: relativeY },
-      flowPosition: { x: relativeX, y: relativeY },
+      screenPosition: { x: e.clientX, y: e.clientY },
     });
   }, []);
   
@@ -119,19 +140,43 @@ export function NodeEditor({ onPaneClick }: NodeEditorProps) {
     const def = getDefinition(nodeClass);
     if (!def) return;
     
+    // 从节点定义创建默认 Pin
+    const pins: Pin[] = def.pins.map(pinDef => {
+      // 根据 constType 决定默认绑定类型
+      const bindingType = pinDef.constType === 'pointer' ? 'pointer' : 'const';
+      const binding: Pin['binding'] = bindingType === 'pointer'
+        ? { type: 'pointer', variableName: '', isLocal: false }
+        : { type: 'const', value: pinDef.defaultValue };
+      
+      // 根据 arrayType 决定 countType
+      const countType = pinDef.arrayType === 'list' ? 'list' : 'scalar';
+      
+      return {
+        name: pinDef.name,
+        valueType: pinDef.valueType,
+        countType,
+        bindingType,
+        binding,
+        enableType: pinDef.enableType,
+        isInput: pinDef.isInput,
+        enumValues: pinDef.enumValues,
+        allowedValueTypes: [pinDef.valueType],
+      };
+    });
+    
     const newNode: TreeNode = {
       id: `node-${Date.now()}`,
       uid: Date.now(),
       type: nodeClass,
       category: def.category as NodeCategory,
-      position: contextMenu.flowPosition,
-      pins: [],
+      position: screenToFlowPosition(contextMenu.screenPosition),
+      pins,
       childrenIds: [],
       disabled: false,
     };
     
     addNode(newNode);
-  }, [getDefinition, addNode, contextMenu.flowPosition]);
+  }, [getDefinition, addNode, contextMenu.screenPosition, screenToFlowPosition]);
 
   if (!currentTree) {
     return (
@@ -146,6 +191,8 @@ export function NodeEditor({ onPaneClick }: NodeEditorProps) {
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
@@ -183,5 +230,14 @@ export function NodeEditor({ onPaneClick }: NodeEditorProps) {
         onAddNode={handleAddNode}
       />
     </div>
+  );
+}
+
+// 包装组件，提供 ReactFlowProvider
+export function NodeEditor(props: NodeEditorProps) {
+  return (
+    <ReactFlowProvider>
+      <NodeEditorInner {...props} />
+    </ReactFlowProvider>
   );
 }

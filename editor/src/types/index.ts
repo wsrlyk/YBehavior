@@ -68,6 +68,8 @@ export interface TreeNode {
   pins: Pin[];
   parentId?: string;
   childrenIds: string[];
+  // 额外属性（如 Connection, Return 等）
+  extraAttrs?: Record<string, string>;
 }
 
 // ==================== Connection ====================

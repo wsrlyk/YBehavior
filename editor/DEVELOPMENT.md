@@ -175,16 +175,22 @@ npm run tauri build    # 打包（输出到 src-tauri/target/release/）
 - [x] 变量面板（显示 Shared/Local 变量）
 - [x] 深色主题统一
 
-### 第三阶段（待做）
-- [ ] 自定义节点组件（显示 Pin）
+### 第三阶段（进行中）
+- [x] 自定义节点组件（显示 Pin，类别颜色，类型颜色）
+- [x] 输出 Pin 放右侧，禁用 Pin 不显示
+- [x] 节点定义 Connector 配置（hasParent, childConnectors）
+- [x] 树文件解析基于定义文件合并数据（丢弃多余、补充默认值）
 - [ ] Pin 编辑（常量/变量切换，拖拽绑定）
 - [ ] 属性面板（选中节点时编辑）
+- [ ] 连线水平部分对齐算法
+- [ ] 一键整理节点布局按钮
 
-### 第四阶段（待做）
-- [ ] 保存/导出 XML
-- [ ] FSM 编辑器
+### 第四阶段（进行中）
+- [x] 保存/导出 XML - 编辑器版
+- [ ] 保存/导出 XML - 运行时版（变量引用计算、森林过滤、UID管理）
 
 ### 第五阶段（待做）
+- [ ] FSM 编辑器
 - [ ] 调试功能（与 C++ 运行时通信）
 
 ## 注意事项
@@ -225,6 +231,75 @@ npm run tauri build    # 打包（输出到 src-tauri/target/release/）
 - 与 actions.xml 格式类似
 - 后续新增内置节点统一在配置文件中添加
 - 配置文件：`config/builtin.xml`
+
+### Connector 配置
+
+节点定义支持配置连接器（`config/builtin.xml`）：
+
+```xml
+<!-- Root 没有父连接器，有一个子连接器（最多1个子节点） -->
+<Node Class="Root" Category="decorator" HasParent="False">
+  <Connector Name="children" MaxChildren="1" />
+</Node>
+
+<!-- Composite 节点：可以有多个子节点 -->
+<Node Class="Sequence" Category="composite">
+  <Connector Name="children" />
+</Node>
+
+<!-- IfThenElse 有三个子连接器，各最多1个子节点 -->
+<Node Class="IfThenElse" Category="composite">
+  <Connector Name="if" Label="If" MaxChildren="1" />
+  <Connector Name="then" Label="Then" MaxChildren="1" />
+  <Connector Name="else" Label="Else" MaxChildren="1" />
+</Node>
+
+<!-- For 有四个子连接器 -->
+<Node Class="For" Category="decorator">
+  <Connector Name="init" Label="Init" MaxChildren="1" />
+  <Connector Name="cond" Label="Cond" MaxChildren="1" />
+  <Connector Name="increment" Label="Incr" MaxChildren="1" />
+  <Connector Name="children" MaxChildren="1" />
+</Node>
+
+<!-- SwitchCase 有 children 和 default 两个连接器 -->
+<Node Class="SwitchCase" Category="composite">
+  <Connector Name="children" />
+  <Connector Name="default" Label="Default" MaxChildren="1" />
+</Node>
+
+<!-- Action/Condition 没有子连接器（不配置 Connector 元素） -->
+<Node Class="Calculator" Category="action">...</Node>
+```
+
+**连接器规则**：
+- `hasParent`: 默认 true，Root 设为 false
+- `childConnectors`: 空数组表示没有子连接器（Action/Condition）
+- `MaxChildren`: 不设置表示无限制，设为 1 表示最多一个子节点
+
+### Pin 属性配置规则
+
+| 属性 | 配置值 | 含义 |
+|------|--------|------|
+| **IsConst** | `True` | 固定常量 |
+| | `False` | 固定引用（指针） |
+| | 没有配置 | 默认常量，可切换 |
+| **IsArray** | `True` | 固定数组 |
+| | `False` | 固定标量 |
+| | 没有配置 | 默认标量，可切换 |
+| **IsEnable** | `True` | 默认启用，可切换 |
+| | `False` | 默认禁用，可切换 |
+| | 没有配置 | 固定启用，不可切换 |
+| **IsInput** | `True` | 输入 Pin |
+| | `False` | 输出 Pin |
+| | 没有配置 | 默认输入 |
+
+### 树文件解析规则
+
+树文件中的节点数据会与节点定义合并：
+1. **多余的 Pin**：丢弃（可能是旧配置）
+2. **缺少的 Pin**：使用定义中的默认值（可能是新增参数）
+3. **都有的 Pin**：使用树文件中的值
 
 ### 类型联动机制
 
@@ -284,3 +359,92 @@ npm run tauri build    # 打包（输出到 src-tauri/target/release/）
 - 文件树菜单：点击[≡]弹出，树状结构+搜索筛选
 - 节点菜单：右键画布弹出，节点列表+搜索筛选
 ```
+
+## XML 保存/导出规范
+
+### 文件格式
+
+- **编码**：UTF-8 with BOM
+- **换行符**：CRLF (`\r\n`)
+- **自闭合标签**：`/>` 前有空格
+
+### Pin 值序列化格式
+
+```
+单体(scalar): _[类型][绑定][启用] [值]    例如: _IP a, _IC 1, _FpE 
+数组(list):   [类型][类型][绑定][启用] [值]  例如: IIC 1|2|3, FFp fff
+```
+
+- **类型字符**：I(int), F(float), B(bool), S(string), V(vector3), A(entity), U(ulong), E(enum)
+- **绑定字符**：C/c(const), P(shared pointer), p(local pointer)
+- **启用字符**：E(enable), D(disable)，固定启用时不加
+
+### 编辑器版 XML
+
+保存到 `editorTreeDir`（如 `bin/`），包含：
+
+- `IsEditor=""` 属性标记
+- 节点 `GUID` 属性
+- 节点 `Pos` 位置
+- 节点 `Connection`、`Return` 等额外属性
+- 禁用节点（`Disabled="true"`）
+- 禁用 Pin（`D` 标记）
+- 所有 Shared/Local 变量
+- 所有 DataConnections（使用 GUID）
+- 森林中的所有树
+
+### 运行时版 XML
+
+保存到 `runtimeTreeDir`（如 `export/`），**不包含**：
+
+- `IsEditor` 属性
+- `GUID`、`Pos` 等编辑器属性
+- 禁用节点（跳过）
+- 禁用 Pin（跳过）
+- 未引用的变量（需计算引用）
+- 森林中非主树的 DataConnections
+
+### ID 管理规则
+
+#### GUID（编辑器用）
+
+- 创建节点时生成，取当前最大 GUID + 1
+- **永不改变**，除非复制节点（需重新分配）
+- 编辑器版 XML 使用 GUID
+- DataConnections 中使用 `FromGUID`/`ToGUID`
+
+#### UID（运行时用）
+
+- 每次保存时重新计算
+- 从 Root 节点开始，深度优先遍历，从 1 开始递增
+- 森林中其他树：
+  - 第一棵额外树从 1001 开始
+  - 第二棵额外树从 2001 开始
+  - 以此类推（每棵树最多 1000 节点）
+- 运行时版 XML 使用 UID
+- DataConnections 中使用 `FromUID`/`ToUID`
+
+### 变量引用计算（运行时版）
+
+遍历主树（Root 及其子树）中所有节点的 Pin：
+- 如果 Pin 绑定类型是 pointer（`P` 或 `p`）
+- 记录引用的变量名
+- 只导出被引用的 Shared/Local 变量
+
+### DataConnections 过滤（运行时版）
+
+- 只导出主树（Root 树）内部的数据连接
+- 森林中其他树的数据连接不导出
+
+### 节点属性顺序
+
+```xml
+<Node Class="..." GUID="..." Connection="..." Return="..." Pos="..." ...Pin属性...>
+```
+
+1. `Class` - 节点类名
+2. `GUID` - 编辑器版
+3. `Connection` - 如果有
+4. `Return` - 如果有
+5. `Pos` - 位置
+6. Pin 属性按定义顺序
