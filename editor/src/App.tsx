@@ -8,7 +8,7 @@ import { useEditorStore } from "./stores/editorStore";
 import { useNodeDefinitionStore } from "./stores/nodeDefinitionStore";
 
 function App() {
-  const { setWorkingDir, workingDir, openedFiles, activeFilePath } = useEditorStore();
+  const { initSettings, settings, openedFiles, activeFilePath } = useEditorStore();
   const { loadDefinitions, isLoaded } = useNodeDefinitionStore();
   
   const [isFileTreeOpen, setIsFileTreeOpen] = useState(false);
@@ -16,21 +16,14 @@ function App() {
   const activeFile = openedFiles.find(f => f.path === activeFilePath);
   
   useEffect(() => {
-    // 默认加载 YBehavior/bin 目录
-    if (!workingDir) {
-      setWorkingDir("E:/Develop/YBehavior/bin");
+    // 加载设置和节点定义
+    if (!settings) {
+      initSettings();
     }
-  }, [workingDir, setWorkingDir]);
-  
-  useEffect(() => {
-    // 加载节点定义
     if (!isLoaded) {
-      loadDefinitions(
-        "E:/Develop/YBehavior/editor/config/builtin.xml",
-        "E:/Develop/YBehavior/projects/YBehaviorEditor/bin/actions.xml"
-      );
+      loadDefinitions();
     }
-  }, [isLoaded, loadDefinitions]);
+  }, [settings, initSettings, isLoaded, loadDefinitions]);
   
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-gray-900 text-white">
@@ -61,7 +54,13 @@ function App() {
           </button>
           <div className="flex-1" />
           <span className="text-sm text-gray-400">
-            {activeFile ? (activeFile.isDirty ? '* ' : '') + activeFile.name : "No file open"}
+            {activeFile ? (
+              <>
+                {activeFile.name.endsWith('.tree') ? '\u{1F334} ' : activeFile.name.endsWith('.fsm') ? '\u{1F504} ' : ''}
+                {activeFile.isDirty ? '* ' : ''}
+                {activeFile.name.replace(/\.(tree|fsm)$/, '')}
+              </>
+            ) : "No file open"}
           </span>
         </div>
         

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Tree, TreeNode, TreeConnection } from '../types';
 import { loadTree, listTreeFiles } from '../utils/fileService';
+import { loadSettings, type Settings } from '../utils/settings';
 
 interface OpenedFile {
   path: string;
@@ -10,10 +11,16 @@ interface OpenedFile {
 }
 
 interface EditorState {
-  // 工作目录
-  workingDir: string | null;
+  // 设置
+  settings: Settings | null;
   
-  // 文件列表（工作目录下所有文件）
+  // 编辑器树目录（从 settings 加载）
+  editorTreeDir: string | null;
+  
+  // 运行时树目录（从 settings 加载）
+  runtimeTreeDir: string | null;
+  
+  // 文件列表（编辑器目录下所有文件）
   treeFiles: string[];
   
   // 已打开的文件列表
@@ -30,7 +37,7 @@ interface EditorState {
   selectedNodeIds: string[];
   
   // 操作方法
-  setWorkingDir: (dir: string) => Promise<void>;
+  initSettings: () => Promise<void>;
   openTree: (path: string) => Promise<void>;
   closeFile: (path: string) => void;
   setActiveFile: (path: string) => void;
@@ -73,7 +80,9 @@ function updateOpenedFileTree(
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
-  workingDir: null,
+  settings: null,
+  editorTreeDir: null,
+  runtimeTreeDir: null,
   treeFiles: [],
   openedFiles: [],
   activeFilePath: null,
@@ -81,19 +90,26 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   error: null,
   selectedNodeIds: [],
   
-  setWorkingDir: async (dir) => {
-    set({ workingDir: dir, isLoading: true, error: null });
+  initSettings: async () => {
+    set({ isLoading: true, error: null });
     try {
-      const files = await listTreeFiles(dir);
-      set({ treeFiles: files, isLoading: false });
+      const settings = await loadSettings();
+      const files = await listTreeFiles(settings.editorTreeDir);
+      set({
+        settings,
+        editorTreeDir: settings.editorTreeDir,
+        runtimeTreeDir: settings.runtimeTreeDir,
+        treeFiles: files,
+        isLoading: false,
+      });
     } catch (e) {
       set({ error: String(e), isLoading: false });
     }
   },
   
   openTree: async (path) => {
-    const { workingDir, openedFiles } = get();
-    if (!workingDir) return;
+    const { editorTreeDir, openedFiles } = get();
+    if (!editorTreeDir) return;
     
     // 如果已经打开，直接切换
     const existing = openedFiles.find(f => f.path === path);
@@ -104,7 +120,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     
     set({ isLoading: true, error: null });
     try {
-      const fullPath = `${workingDir}/${path}`;
+      const fullPath = `${editorTreeDir}/${path}`;
       const tree = await loadTree(fullPath);
       const fileName = path.split('/').pop() || path;
       

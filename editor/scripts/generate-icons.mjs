@@ -8,14 +8,14 @@ const { encode } = icoEndec;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const iconsDir = join(__dirname, '..', 'src-tauri', 'icons');
 
-// SVG 图标内容 - Adobe 风格：深紫色背景 + 浅紫色边框 + Ai 字样
+// SVG 图标内容 - Adobe 风格：低饱和度紫色
 const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- 外边框 - 浅紫色 -->
-  <rect x="8" y="8" width="496" height="496" rx="48" fill="#C4B5FD"/>
-  <!-- 内部背景 - 深紫色 -->
-  <rect x="24" y="24" width="464" height="464" rx="36" fill="#4C1D95"/>
+  <!-- 外边框 - 低饱和度浅紫色 -->
+  <rect x="8" y="8" width="496" height="496" rx="48" fill="#A8A0C8"/>
+  <!-- 内部背景 - 低饱和度深紫色 -->
+  <rect x="24" y="24" width="464" height="464" rx="36" fill="#3D2D5C"/>
   <!-- AI 文字 -->
-  <text x="256" y="400" font-family="Adobe Clean, Myriad Pro, Arial, sans-serif" font-size="320" font-weight="600" fill="#C4B5FD" text-anchor="middle">AI</text>
+  <text x="256" y="400" font-family="Adobe Clean, Myriad Pro, Arial, sans-serif" font-size="320" font-weight="600" fill="#A8A0C8" text-anchor="middle">AI</text>
 </svg>`;
 
 const sizes = [

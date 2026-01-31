@@ -111,14 +111,20 @@ function FileTreeNode({
     );
   }
   
+  // 根据文件类型显示不同图标，隐藏后缀
+  const isTree = node.name.endsWith('.tree');
+  const isFsm = node.name.endsWith('.fsm');
+  const icon = isTree ? '\u{1F334}' : isFsm ? '\u{1F504}' : '\u{1F4C4}';
+  const displayName = node.name.replace(/\.(tree|fsm)$/, '');
+  
   return (
     <div
       onClick={() => onFileClick(node.path)}
       className="flex items-center px-2 py-1 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer"
       style={{ paddingLeft: `${depth * 16 + 8}px` }}
     >
-      <span className="text-blue-400 mr-1">📄</span>
-      {node.name}
+      <span className="mr-1.5">{icon}</span>
+      {displayName}
     </div>
   );
 }

@@ -1,5 +1,13 @@
 use std::fs;
 use std::path::PathBuf;
+use std::env;
+
+#[tauri::command]
+fn get_exe_dir() -> Result<String, String> {
+    let exe_path = env::current_exe().map_err(|e| e.to_string())?;
+    let exe_dir = exe_path.parent().ok_or("Cannot get exe directory")?;
+    Ok(exe_dir.to_string_lossy().to_string())
+}
 
 #[tauri::command]
 fn read_file(path: String) -> Result<String, String> {
@@ -53,7 +61,7 @@ fn collect_files(
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![read_file, write_file, list_files])
+        .invoke_handler(tauri::generate_handler![get_exe_dir, read_file, write_file, list_files])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

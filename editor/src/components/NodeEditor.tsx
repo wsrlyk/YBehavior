@@ -17,11 +17,12 @@ import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import { NodeContextMenu } from './NodeContextMenu';
 import type { TreeNode, NodeCategory } from '../types';
 
+// 低饱和度节点颜色
 const NODE_COLORS: Record<string, string> = {
-  composite: '#4CAF50',
-  decorator: '#2196F3',
-  action: '#FF9800',
-  condition: '#9C27B0',
+  composite: '#5A8A5E',  // 低饱和度绿色
+  decorator: '#5A7A9A',  // 低饱和度蓝色
+  action: '#B08050',     // 低饱和度橙色
+  condition: '#7A5A8A',  // 低饱和度紫色
 };
 
 function treeNodeToFlowNode(node: TreeNode): Node {
