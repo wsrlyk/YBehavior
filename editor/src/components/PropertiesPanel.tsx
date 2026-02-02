@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useEditorStore } from '../stores/editorStore';
 import type { Variable, ValueType, CountType, Pin } from '../types';
+import { validateValue, getDefaultValue } from '../utils/validation';
+import { useNotificationStore } from '../stores/notificationStore';
+import { logger } from '../utils/logger';
 
 const TYPE_COLORS: Record<ValueType, string> = {
   int: 'text-blue-400',
@@ -104,27 +107,21 @@ function VariableItem({ variable, onUpdate, onDelete }: VariableItemProps) {
   const [editValue, setEditValue] = useState(variable.defaultValue);
   const colorClass = TYPE_COLORS[variable.valueType] || 'text-gray-400';
   const isArray = variable.countType === 'list';
+  const notify = useNotificationStore(state => state.notify);
 
   const handleValueSubmit = () => {
+    const result = validateValue(editValue, variable.valueType, variable.countType);
+    if (!result.isValid) {
+      const errorMsg = `Variable [${variable.name}] invalid: ${result.error}`;
+      notify(result.error || 'Invalid value', 'error');
+      logger.error(errorMsg);
+    }
     onUpdate(variable.name, { defaultValue: editValue });
     setIsEditing(false);
   };
 
-  // 获取类型的默认值
-  const getDefaultValue = (type: ValueType, isList: boolean): string => {
-    if (isList) return '';
-    switch (type) {
-      case 'int': return '0';
-      case 'float': return '0.0';
-      case 'bool': return 'F';
-      case 'string': return '';
-      case 'vector3': return '0,0,0';
-      case 'entity': return '';
-      case 'ulong': return '0';
-      case 'enum': return ''; // Enums might need a default from their enumValues
-      default: return '';
-    }
-  };
+  const validation = validateValue(variable.defaultValue, variable.valueType, variable.countType);
+  const isValid = validation.isValid;
 
   const handleTypeChange = (newType: ValueType) => {
     onUpdate(variable.name, { valueType: newType, defaultValue: getDefaultValue(newType, isArray) });
@@ -136,12 +133,9 @@ function VariableItem({ variable, onUpdate, onDelete }: VariableItemProps) {
     onUpdate(variable.name, { countType: newCountType, defaultValue: getDefaultValue(variable.valueType, newIsArray) });
   };
 
-
-
   return (
     <div className="px-2 py-1 text-sm bg-gray-800 rounded group">
       <div className="flex items-center gap-1">
-        {/* 类型选择 - 下拉选取 (自适应宽度) */}
         <AdaptiveSelect
           value={variable.valueType}
           options={VALUE_TYPES}
@@ -151,7 +145,6 @@ function VariableItem({ variable, onUpdate, onDelete }: VariableItemProps) {
           getOptionClass={(opt) => TYPE_COLORS[opt as ValueType] || 'text-gray-300'}
         />
 
-        {/* 数组/标量切换 */}
         <button
           className={`text-xs ${colorClass} hover:opacity-80 min-w-3`}
           onClick={handleCountTypeToggle}
@@ -160,10 +153,8 @@ function VariableItem({ variable, onUpdate, onDelete }: VariableItemProps) {
           {isArray ? '[]' : '·'}
         </button>
 
-        {/* 变量名 */}
         <span className="text-gray-300 flex-1 truncate">{variable.name}</span>
 
-        {/* 删除按钮 */}
         <button
           className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 text-xs"
           onClick={() => onDelete(variable.name)}
@@ -173,12 +164,14 @@ function VariableItem({ variable, onUpdate, onDelete }: VariableItemProps) {
         </button>
       </div>
 
-      {/* 值编辑 */}
       <div className="flex items-center gap-1 mt-1">
         <span className="text-gray-500 text-xs">=</span>
         {isEditing ? (
           <input
-            className="flex-1 bg-gray-700 text-gray-300 text-xs px-1 rounded outline-none"
+            className={`flex-1 text-xs px-1 rounded outline-none ${!validateValue(editValue, variable.valueType, variable.countType).isValid
+              ? 'bg-red-900 text-white'
+              : 'bg-gray-700 text-gray-300'
+              }`}
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
             onBlur={handleValueSubmit}
@@ -187,10 +180,11 @@ function VariableItem({ variable, onUpdate, onDelete }: VariableItemProps) {
           />
         ) : (
           <span
-            className="flex-1 text-gray-400 text-xs truncate cursor-pointer hover:text-gray-300"
+            className={`flex-1 text-xs truncate cursor-pointer hover:text-gray-300 ${!isValid ? 'bg-red-900 text-white px-1 rounded' : 'text-gray-400'
+              }`}
             onClick={() => { setEditValue(variable.defaultValue); setIsEditing(true); }}
           >
-            {variable.defaultValue || '(empty)'}
+            {variable.defaultValue || (variable.valueType === 'string' ? '""' : '(empty)')}
           </span>
         )}
       </div>
@@ -373,6 +367,8 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
               <PinEditor
                 key={pin.name}
                 pin={pin}
+                nodeUid={node.uid}
+                nodeType={node.type}
                 sharedVars={sharedVars}
                 localVars={localVars}
                 dataConnection={dataConn}
@@ -432,14 +428,18 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
 // Pin 编辑器
 interface PinEditorProps {
   pin: Pin;
+  nodeUid?: number;
+  nodeType?: string;
   sharedVars: Variable[];
   localVars: Variable[];
   dataConnection?: import('../types').DataConnection;  // 当前 Pin 的数据连接
   onUpdate: (updates: Partial<Pin>) => void;
 }
 
-function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: PinEditorProps) {
+function PinEditor({ pin, nodeUid, nodeType, sharedVars, localVars, dataConnection, onUpdate }: PinEditorProps) {
   const removeDataConnection = useEditorStore((state) => state.removeDataConnection);
+  const notify = useNotificationStore(state => state.notify);
+  const [isEditing, setIsEditing] = useState(false);
   const hasDataConnection = !!dataConnection;
 
   // 获取当前值
@@ -452,9 +452,11 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
   // 当 pin 变化时更新 editValue
   useEffect(() => {
     const value = pin.binding.type === 'const' ? pin.binding.value : '';
-    setEditValue(value);
+    if (!isEditing) {
+      setEditValue(value);
+    }
     setVectorIndexValue(pin.vectorIndex?.type === 'const' ? pin.vectorIndex.value : '');
-  }, [pin.name, pin.binding, pin.vectorIndex]);
+  }, [pin.name, pin.binding, pin.vectorIndex, isEditing]);
 
   const colorClass = TYPE_COLORS[pin.valueType] || 'text-gray-400';
   const bindingType = pin.binding.type;  // 'const' | 'pointer'
@@ -465,8 +467,6 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
   const isDataConnection = bindingType === 'pointer' &&
     (pin.binding.type === 'pointer' && !pin.binding.variableName);
 
-  // 检查选中的变量是否是数组（需要 Vector Index）
-  // 逻辑：bindingType=pointer => 查找变量 => 变量是 array & pin 是 scalar => 需要 index
   const selectedVarName = pin.binding.type === 'pointer' ? pin.binding.variableName : '';
   const selectedVar = selectedVarName
     ? [...sharedVars, ...localVars].find(v => v.name === selectedVarName)
@@ -475,15 +475,12 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
   const needsVectorIndex = selectedVar && selectedVar.countType === 'list' && pin.countType === 'scalar';
   const hasVectorIndex = pin.vectorIndex !== undefined;
 
-  // 切换绑定类型：C(常量) <-> V(变量引用)
   const handleBindingToggle = () => {
-    // 如果当前有数据连接且要切换到常量，先断开连接
     if (bindingType === 'pointer' && hasDataConnection && isDataConnection && dataConnection) {
       removeDataConnection(dataConnection.id);
     }
 
     if (bindingType === 'const') {
-      // 常量 -> 变量引用（默认选第一个兼容变量，如果没有则选空-数据连接）
       const compatibleVars = getCompatibleVariables();
       const firstVar = compatibleVars[0];
 
@@ -494,7 +491,6 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
           vectorIndex: undefined
         });
       } else {
-        // 没有兼容变量，默认为数据连接
         onUpdate({
           binding: { type: 'pointer', variableName: '', isLocal: false },
           bindingType: 'pointer',
@@ -502,8 +498,7 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
         });
       }
     } else {
-      // 变量 -> 常量
-      onUpdate({ binding: { type: 'const', value: '' }, bindingType: 'const', vectorIndex: undefined });
+      onUpdate({ binding: { type: 'const', value: getDefaultValue(pin.valueType, pin.countType === 'list') }, bindingType: 'const', vectorIndex: undefined });
     }
   };
 
@@ -514,9 +509,26 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
     }
   };
 
+  const handleValueSubmit = () => {
+    if (bindingType === 'const') {
+      const result = validateValue(editValue, pin.valueType, pin.countType);
+      if (!result.isValid) {
+        const nodeLabel = nodeType ? `${nodeType}:${nodeUid ?? '?'}` : '';
+        const prefix = nodeLabel ? `Node [${nodeLabel}] ` : '';
+        const errorMsg = `${prefix}Pin [${pin.name}] invalid: ${result.error}`;
+        notify(result.error || 'Invalid value', 'error');
+        logger.error(errorMsg);
+      }
+    }
+    setIsEditing(false);
+  };
+
+  const currentPinValidation = pin.binding.type === 'const'
+    ? validateValue(pin.binding.value, pin.valueType, pin.countType)
+    : { isValid: true };
+
   const handleVariableChange = (varName: string, isLocal: boolean) => {
     if (!varName) {
-      // 选择了 "(Data Connection)"
       onUpdate({
         binding: { type: 'pointer', variableName: '', isLocal: false },
         vectorIndex: undefined
@@ -524,12 +536,10 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
       return;
     }
 
-    // 如果当前有数据连接，切换到变量时需要断开连接
     if (dataConnection) {
       removeDataConnection(dataConnection.id);
     }
 
-    // 检查新变量是否需要 Vector Index
     const newVar = [...sharedVars, ...localVars].find(v => v.name === varName);
     const newNeedsVI = newVar && newVar.countType === 'list' && pin.countType === 'scalar';
 
@@ -544,14 +554,10 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
     onUpdate({ enableType: isEnabled ? 'disable' : 'enable' });
   };
 
-
-
-  // 数组/标量切换
   const toggleCountType = () => {
     onUpdate({ countType: pin.countType === 'list' ? 'scalar' : 'list' });
   };
 
-  // Vector Index 相关
   const handleVectorIndexChange = (value: string) => {
     setVectorIndexValue(value);
     onUpdate({ vectorIndex: { type: 'const', value } });
@@ -559,13 +565,11 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
 
   const handleVectorIndexTypeToggle = () => {
     if (pin.vectorIndex?.type === 'const') {
-      // 切换到变量
       const firstIntVar = intSharedVars[0] || intLocalVars[0];
       if (firstIntVar) {
         onUpdate({ vectorIndex: { type: 'pointer', variableName: firstIntVar.name, isLocal: !intSharedVars.includes(firstIntVar) } });
       }
     } else {
-      // 切换到常量
       onUpdate({ vectorIndex: { type: 'const', value: '0' } });
     }
   };
@@ -574,23 +578,12 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
     onUpdate({ vectorIndex: { type: 'pointer', variableName: varName, isLocal } });
   };
 
-  // 过滤兼容的变量
   const getCompatibleVariables = () => {
-    // 兼容规则：
-    // 1. 值类型匹配 (pin.valueType 或在 allowedValueTypes 中) -- 但这里通常只看当前 valueType 即可，因为切换变量不改变 pin 类型
-    // 2. 数量类型匹配：
-    //    - Pin 是 list: 只能选 list 变量
-    //    - Pin 是 scalar: 可以选 scalar 变量，也可以选 list 变量（需 vector index）
-
     return [...sharedVars, ...localVars].filter(v => {
-      // 类型检查
       if (v.valueType !== pin.valueType) return false;
-
-      // 数量检查
       if (pin.countType === 'list') {
         return v.countType === 'list';
       } else {
-        // Pin 是 scalar，scalar/list 变量都支持
         return true;
       }
     });
@@ -599,21 +592,16 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
   const compatibleVars = getCompatibleVariables();
   const compatibleShared = compatibleVars.filter(v => sharedVars.includes(v));
   const compatibleLocal = compatibleVars.filter(v => localVars.includes(v));
-
-  // 过滤 int 类型的变量（用于 Vector Index）
   const intSharedVars = sharedVars.filter(v => v.valueType === 'int' && v.countType === 'scalar');
   const intLocalVars = localVars.filter(v => v.valueType === 'int' && v.countType === 'scalar');
 
-  // 绑定按钮
   const bindingBtnInfo = bindingType === 'const'
     ? { style: 'bg-gray-600 text-gray-300', text: 'C', title: 'Constant → Click to switch to Variable' }
     : { style: 'bg-blue-600 text-white', text: 'V', title: 'Variable → Click to switch to Constant' };
 
-
   return (
     <div className={`text-xs bg-gray-800 rounded p-1.5 ${!isEnabled ? 'opacity-50' : ''}`}>
       <div className="flex items-center gap-1 mb-1">
-        {/* 启用/禁用切换 */}
         {canToggleEnable && (
           <button
             className={`w-3 h-3 rounded-sm border ${isEnabled ? 'bg-green-600 border-green-500' : 'bg-gray-600 border-gray-500'}`}
@@ -622,24 +610,27 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
           />
         )}
 
-        {/* Pin 名称 */}
         <span className={`${colorClass} font-medium`}>{pin.name}</span>
-
-        {/* 输入/输出标记 */}
         <span className="text-gray-600 text-[10px]">{pin.isInput ? 'in' : 'out'}</span>
 
-        {/* 数据类型切换 (与 Variables 面板一致交互) - 下拉选取 (自适应宽度) */}
         <AdaptiveSelect
           value={pin.valueType}
           options={pin.allowedValueTypes}
-          onChange={(val) => onUpdate({ valueType: val as ValueType })}
+          onChange={(val) => {
+            const nextType = val as ValueType;
+            onUpdate({
+              valueType: nextType,
+              binding: pin.binding.type === 'const'
+                ? { type: 'const', value: getDefaultValue(nextType, pin.countType === 'list') }
+                : pin.binding
+            });
+          }}
           baseClassName="text-[10px]"
           triggerClassName={colorClass}
           getOptionClass={(opt) => TYPE_COLORS[opt as ValueType] || 'text-gray-300'}
           disabled={pin.allowedValueTypes.length <= 1}
         />
 
-        {/* 数组/标量切换 (与 Variables 面板一致交互) */}
         {!pin.isCountTypeFixed && (
           <button
             className={`text-[10px] ${colorClass} hover:opacity-80 min-w-3 text-center`}
@@ -650,14 +641,12 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
           </button>
         )}
 
-        {/* 固定数组/标量显示 */}
         {pin.isCountTypeFixed && (
           <span className={`text-[10px] ${colorClass} opacity-50 min-w-3 text-center cursor-default`} title="Fixed count type">
             {pin.countType === 'list' ? '[]' : '·'}
           </span>
         )}
 
-        {/* 绑定类型切换：C(常量) / V(变量) */}
         {pin.isBindingTypeFixed ? (
           <span
             className={`ml-auto text-[10px] px-1 rounded ${bindingBtnInfo.style} opacity-50 cursor-default`}
@@ -676,34 +665,50 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
         )}
       </div>
 
-      {/* 值编辑区域 */}
-      {bindingType === 'const' && (
-        <>
-          {pin.valueType === 'enum' && pin.enumValues && pin.enumValues.length > 0 ? (
-            <div className="w-full bg-gray-700 rounded px-1 py-0.5">
-              <AdaptiveSelect
-                value={editValue || pin.enumValues[0]}
-                options={pin.enumValues}
-                onChange={(val) => handleValueChange(val)}
-                baseClassName="text-xs text-gray-300"
-                triggerClassName="w-full"
-                containerClassName="w-full block"
-                getOptionClass={() => 'text-gray-300'}
-                renderLabel={(val) => val}
+      <div className="flex items-center gap-1">
+        {isEditing ? (
+          <div className="flex-1">
+            {pin.valueType === 'enum' && pin.enumValues && pin.enumValues.length > 0 ? (
+              <div className="w-full bg-gray-700 rounded px-1 py-0.5">
+                <AdaptiveSelect
+                  value={editValue || pin.enumValues[0]}
+                  options={pin.enumValues}
+                  onChange={(val) => { handleValueChange(val); handleValueSubmit(); }}
+                  baseClassName="text-xs text-gray-300"
+                  triggerClassName="w-full"
+                  containerClassName="w-full block"
+                  getOptionClass={() => 'text-gray-300'}
+                  renderLabel={(val) => val}
+                />
+              </div>
+            ) : (
+              <input
+                className={`w-full text-xs px-1 py-0.5 rounded outline-none ${!validateValue(editValue, pin.valueType, pin.countType).isValid
+                  ? 'bg-red-900 text-white'
+                  : 'bg-gray-700 text-gray-300'
+                  }`}
+                value={editValue}
+                onChange={(e) => handleValueChange(e.target.value)}
+                onBlur={handleValueSubmit}
+                onKeyDown={(e) => e.key === 'Enter' && handleValueSubmit()}
+                autoFocus
+                placeholder="Value"
               />
-            </div>
-          ) : (
-            <input
-              className="w-full bg-gray-700 text-gray-300 text-xs px-1 py-0.5 rounded outline-none"
-              value={editValue}
-              onChange={(e) => handleValueChange(e.target.value)}
-              placeholder="Value"
-            />
-          )}
-        </>
-      )}
+            )}
+          </div>
+        ) : (
+          <span
+            className={`flex-1 text-xs truncate cursor-pointer hover:text-gray-300 ${!currentPinValidation.isValid ? 'bg-red-900 text-white px-1 rounded' : 'text-gray-400'
+              }`}
+            onClick={() => { setEditValue(pin.binding.type === 'const' ? pin.binding.value : ''); setIsEditing(true); }}
+          >
+            {pin.binding.type === 'const' ? (pin.binding.value || (pin.valueType === 'string' ? '""' : '(empty)')) : '(empty)'}
+          </span>
+        )}
+      </div>
+
       {bindingType === 'pointer' && (
-        <div className="space-y-1">
+        <div className="space-y-1 mt-1">
           <select
             className="w-full bg-gray-700 text-gray-300 text-xs px-1 py-0.5 rounded outline-none"
             value={`${isDataConnection ? 'data' : (pin.binding.type === 'pointer' && pin.binding.isLocal ? 'local:' : 'shared:')}${pin.binding.type === 'pointer' ? pin.binding.variableName : ''}`}
@@ -716,9 +721,7 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
               }
             }}
           >
-            {/* 顶层空值：数据连接 */}
             <option value="data">(Data Connection)</option>
-
             {compatibleShared.length > 0 && (
               <optgroup label="Shared">
                 {compatibleShared.map(v => (
@@ -726,7 +729,6 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
                 ))}
               </optgroup>
             )}
-
             {compatibleLocal.length > 0 && (
               <optgroup label="Local">
                 {compatibleLocal.map(v => (
@@ -736,7 +738,6 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
             )}
           </select>
 
-          {/* 数据连接状态提示 */}
           {isDataConnection && (
             <div className={`px-1 py-0.5 text-[10px] ${hasDataConnection ? 'text-purple-400' : 'text-gray-500 italic'}`}>
               {hasDataConnection ? '● Connected' : '○ Waiting for connection...'}
@@ -745,8 +746,6 @@ function PinEditor({ pin, sharedVars, localVars, dataConnection, onUpdate }: Pin
         </div>
       )}
 
-
-      {/* Vector Index 编辑（当选中数组变量且 Pin 是标量时） */}
       {(needsVectorIndex || hasVectorIndex) && bindingType === 'pointer' && (
         <div className="mt-1 flex items-center gap-1">
           <span className="text-gray-500 text-[10px]">Index:</span>

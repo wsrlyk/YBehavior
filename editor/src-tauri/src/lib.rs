@@ -1,6 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 use std::env;
+use tauri::Manager;
 
 #[tauri::command]
 fn get_exe_dir() -> Result<String, String> {
@@ -61,6 +62,21 @@ fn collect_files(
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { .. } = event {
+                if window.label() == "main" {
+                    let app_handle = window.app_handle().clone();
+                    // Close all other windows first
+                    for (label, win) in app_handle.webview_windows() {
+                        if label != "main" {
+                            let _ = win.destroy();
+                        }
+                    }
+                    // The main window will close after this handler, 
+                    // and since it's the last one, the app will exit naturally.
+                }
+            }
+        })
         .invoke_handler(tauri::generate_handler![get_exe_dir, read_file, write_file, list_files])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

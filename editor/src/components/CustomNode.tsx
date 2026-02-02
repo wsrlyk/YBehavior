@@ -33,7 +33,7 @@ export type CustomNodeType = Node<CustomNodeData, 'custom'>;
 
 function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
   const pinColor = PIN_COLORS[pin.valueType] || '#888';
-  
+
   // 构建 Vector Index 显示
   const getVectorIndexDisplay = () => {
     if (!pin.vectorIndex) return '';
@@ -44,7 +44,7 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
     }
     return '';
   };
-  
+
   return (
     <div className={`relative flex items-center gap-1 text-xs py-0.5 ${isInput ? '' : 'flex-row-reverse'}`}>
       {/* Pin 的 Handle，用于数据连接 */}
@@ -53,7 +53,7 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
         position={isInput ? Position.Left : Position.Right}
         id={`pin-${isInput ? 'in' : 'out'}-${pin.name}`}
         className="!w-2 !h-2 !rounded-full !border-0 hover:!scale-125 !cursor-crosshair !transition-all"
-        style={{ 
+        style={{
           backgroundColor: pinColor,
           [isInput ? 'left' : 'right']: '-4px',
         }}
@@ -79,30 +79,30 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
 function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
   const { label, treeNode, nodeDefinition } = data;
   const bgColor = NODE_COLORS[treeNode.category] || '#666';
-  
+
   // 过滤掉禁用的 Pin
   const inputPins = treeNode.pins.filter((p: Pin) => p.isInput && p.enableType !== 'disable');
   const outputPins = treeNode.pins.filter((p: Pin) => !p.isInput && p.enableType !== 'disable');
-  
+
   // 根据节点定义决定是否显示连接器
   const hasParent = nodeDefinition?.hasParent ?? true;
   const childConnectors = nodeDefinition?.childConnectors ?? [];
   const hasChildren = childConnectors.length > 0;
-  
+
   // 计算子连接器的位置（多个连接器时均匀分布）
   const connectorCount = childConnectors.length;
-  
+
   return (
-    <div 
+    <div
       className="rounded shadow-lg min-w-32 cursor-move hover:brightness-110 transition-all"
-      style={{ 
+      style={{
         backgroundColor: '#1f2937',
         border: `2px solid ${selected ? '#fff' : bgColor}`,
         boxShadow: selected ? '0 0 0 2px rgba(255,255,255,0.3)' : undefined,
       }}
     >
       {/* 标题栏 */}
-      <div 
+      <div
         className="px-2 py-1 text-xs font-medium text-white rounded-t flex items-center gap-1"
         style={{ backgroundColor: bgColor }}
       >
@@ -110,7 +110,7 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
         <span>{label}</span>
         {treeNode.disabled && <span className="ml-1 text-gray-300">(disabled)</span>}
       </div>
-      
+
       {/* Pin 区域 */}
       {(inputPins.length > 0 || outputPins.length > 0) && (
         <div className="flex justify-between px-2 py-1 gap-4">
@@ -120,7 +120,7 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
               <PinRow key={`in-${i}`} pin={pin} isInput={true} />
             ))}
           </div>
-          
+
           {/* 输出 Pin - 右侧 */}
           <div className="flex flex-col items-end">
             {outputPins.map((pin: Pin, i: number) => (
@@ -129,7 +129,7 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
           </div>
         </div>
       )}
-      
+
       {/* 子连接器标签（多个连接器时显示） */}
       {connectorCount > 1 && (
         <div className="flex justify-around px-1 pb-1 text-[9px] text-gray-400">
@@ -138,7 +138,7 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
           ))}
         </div>
       )}
-      
+
       {/* 连接点 - 父节点连接（顶部） */}
       {hasParent && (
         <Handle
@@ -148,17 +148,17 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
           className="!bg-gray-400 !w-3 !h-2 !rounded-sm !border-0 hover:!bg-white hover:!scale-125 !cursor-crosshair !transition-all"
         />
       )}
-      
+
       {/* 连接点 - 子节点连接（底部） */}
       {hasChildren && connectorCount === 1 && (
         <Handle
           type="source"
           position={Position.Bottom}
-          id="tree-source"
+          id={childConnectors[0].name}
           className="!bg-gray-400 !w-3 !h-2 !rounded-sm !border-0 hover:!bg-white hover:!scale-125 !cursor-crosshair !transition-all"
         />
       )}
-      
+
       {/* 多个子连接器时，均匀分布 */}
       {hasChildren && connectorCount > 1 && childConnectors.map((conn: ConnectorDefinition, i: number) => (
         <Handle
@@ -167,7 +167,7 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
           position={Position.Bottom}
           id={conn.name}
           className="!bg-gray-400 !w-3 !h-2 !rounded-sm !border-0 hover:!bg-white hover:!scale-125 !cursor-crosshair !transition-all"
-          style={{ 
+          style={{
             left: `${((i + 1) / (connectorCount + 1)) * 100}%`,
           }}
         />

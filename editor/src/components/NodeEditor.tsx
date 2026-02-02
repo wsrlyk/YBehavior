@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useEffect, useState, type MouseEvent } from 'react';
+import { useCallback, useMemo, useEffect, useState, type MouseEvent } from 'react';
 import {
   ReactFlow,
   Background,
@@ -6,7 +6,6 @@ import {
   MiniMap,
   useNodesState,
   useEdgesState,
-  addEdge,
   useReactFlow,
   type Node,
   type Edge,
@@ -58,6 +57,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   const selectNodes = useEditorStore((state) => state.selectNodes);
   const updateNodePosition = useEditorStore((state) => state.updateNodePosition);
   const removeNode = useEditorStore((state) => state.removeNode);
+  const addConnection = useEditorStore((state) => state.addConnection);
   const removeConnection = useEditorStore((state) => state.removeConnection);
   const removeDataConnection = useEditorStore((state) => state.removeDataConnection);
   const { getDefinition } = useNodeDefinitionStore();
@@ -78,6 +78,8 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     screenPosition: { x: 0, y: 0 },
   });
 
+  const selectedNodeIds = useEditorStore((state) => state.selectedNodeIds);
+
   const { flowNodes, flowEdges } = useMemo(() => {
     if (!currentTree) {
       return { flowNodes: [], flowEdges: [] };
@@ -91,6 +93,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         ...treeNodeToFlowNode(node, getDefinition),
         // Root 节点不可删除
         deletable: node.type !== 'Root',
+        selected: selectedNodeIds.includes(node.id),
       });
     });
 
@@ -107,14 +110,10 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       const siblingTargetIds = conns.map(c => c.childNodeId);
 
       conns.forEach((conn) => {
-        // 多连接器时使用连接器名称，否则使用 tree-source
-        const sourceHandle = conn.parentConnector && conn.parentConnector !== 'default'
-          ? conn.parentConnector
-          : 'tree-source';
         edges.push({
           id: conn.id,
           source: conn.parentNodeId,
-          sourceHandle,
+          sourceHandle: conn.parentConnector,
           target: conn.childNodeId,
           targetHandle: 'tree-target',
           type: 'tree',
@@ -186,7 +185,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   }, [onEdgesChangeBase, removeDataConnection, removeConnection]);
 
   const onConnect: OnConnect = useCallback(
-    (params) => {
+    async (params) => {
       // 判断是数据连接还是树连接
       // 数据连接的 handle id 格式: pin-in-{pinName} 或 pin-out-{pinName}
       // 树连接的 handle id 格式: connector-{index} 或 child
@@ -196,6 +195,51 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         // 解析 pin 名称
         const fromPinName = params.sourceHandle.replace('pin-out-', '');
         const toPinName = params.targetHandle.replace('pin-in-', '');
+
+        // 获取节点并检查 Pin 类型是否匹配
+        const currentTree = useEditorStore.getState().getCurrentTree();
+        const fromNode = currentTree?.nodes.get(params.source!);
+        const toNode = currentTree?.nodes.get(params.target!);
+        const fromPin = fromNode?.pins.find(p => p.name === fromPinName);
+        const toPin = toNode?.pins.find(p => p.name === toPinName);
+
+        if (fromPin && toPin) {
+          // 1. 检查类型匹配
+          const typeMatch = fromPin.valueType === toPin.valueType;
+          const countMatch = fromPin.countType === toPin.countType;
+
+          if (!typeMatch || !countMatch) {
+            const { useNotificationStore } = await import('../stores/notificationStore');
+            const { logger } = await import('../utils/logger');
+            const errorMsg = `Connection failed: Type mismatch (${fromPin.valueType}${fromPin.countType === 'list' ? '[]' : ''} vs ${toPin.valueType}${toPin.countType === 'list' ? '[]' : ''})`;
+            useNotificationStore.getState().notify(errorMsg, 'error');
+            logger.error(errorMsg);
+            return;
+          }
+
+          // 2. 检查是否在同一棵树下
+          const getNodeRootId = (nodeId: string, tree: import('../types').Tree): string => {
+            let current = nodeId;
+            while (true) {
+              const parentConn = tree.connections.find(c => c.childNodeId === current);
+              if (!parentConn) break;
+              current = parentConn.parentNodeId;
+            }
+            return current;
+          };
+
+          const fromRootId = getNodeRootId(params.source!, currentTree!);
+          const toRootId = getNodeRootId(params.target!, currentTree!);
+
+          if (fromRootId !== toRootId) {
+            const { useNotificationStore } = await import('../stores/notificationStore');
+            const { logger } = await import('../utils/logger');
+            const errorMsg = `Connection failed: Nodes must be in the same tree`;
+            useNotificationStore.getState().notify(errorMsg, 'error');
+            logger.error(errorMsg);
+            return;
+          }
+        }
 
         // 创建数据连接并添加到 store
         const dataConn = {
@@ -207,11 +251,18 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         };
         addDataConnection(dataConn);
       } else {
-        // 树连接：只更新本地 edges（树连接由 addConnection 处理）
-        setEdges((eds) => addEdge(params, eds));
+        // 树连接：添加到 store，自动触发 UID 重新计算
+        const parentConnector = params.sourceHandle || 'default';
+        const conn = {
+          id: `conn-${params.source}-${params.target}-${parentConnector}`,
+          parentNodeId: params.source!,
+          parentConnector,
+          childNodeId: params.target!,
+        };
+        addConnection(conn);
       }
     },
-    [setEdges, addDataConnection]
+    [setEdges, addDataConnection, addConnection]
   );
 
   const handleContextMenu = useCallback((e: MouseEvent) => {
@@ -233,15 +284,8 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     const def = getDefinition(nodeClass);
     if (!def) return;
 
-    // 从节点定义创建默认 Pin
     const pins: Pin[] = def.pins.map(pinDef => {
-      // 根据 constType 决定默认绑定类型
       const bindingType = pinDef.constType === 'pointer' ? 'pointer' : 'const';
-      const binding: Pin['binding'] = bindingType === 'pointer'
-        ? { type: 'pointer', variableName: '', isLocal: false }
-        : { type: 'const', value: pinDef.defaultValue };
-
-      // 根据 arrayType 决定 countType
       const countType = pinDef.arrayType === 'list' ? 'list' : 'scalar';
 
       return {
@@ -249,11 +293,16 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         valueType: pinDef.valueType,
         countType,
         bindingType,
-        binding,
+        binding: bindingType === 'pointer'
+          ? { type: 'pointer', variableName: '', isLocal: false }
+          : { type: 'const', value: pinDef.defaultValue },
         enableType: pinDef.enableType,
         isInput: pinDef.isInput,
         enumValues: pinDef.enumValues,
-        allowedValueTypes: [pinDef.valueType],
+        allowedValueTypes: pinDef.allowedValueTypes || [pinDef.valueType],
+        vTypeGroup: pinDef.vTypeGroup,
+        isCountTypeFixed: pinDef.arrayType !== 'switchable',
+        isBindingTypeFixed: pinDef.constType !== 'switchable',
       };
     });
 
@@ -298,8 +347,6 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
           // 同步选中状态到 Store
           const newNodeIds = nodes.map(n => n.id);
           const currentSelected = useEditorStore.getState().selectedNodeIds;
-
-          // 简单的浅比较防止重复更新
           const isSame = newNodeIds.length === currentSelected.length &&
             newNodeIds.every(id => currentSelected.includes(id));
 

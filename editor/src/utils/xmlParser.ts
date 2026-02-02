@@ -327,10 +327,15 @@ function parseXmlNode(
       const childId = parseXmlNode(child, nodes, connections, id, getNodeDefinition);
       node.childrenIds.push(childId);
 
+      // 决定连接器名称：优先使用 XML 中的，否则使用父节点的第一个连接器名称，最后兜底用 'default'
+      const parentNode = nodes.get(id);
+      const parentDef = parentNode ? getNodeDefinition?.(parentNode.type) : undefined;
+      const defaultConnectorName = parentDef?.childConnectors?.[0]?.name || 'default';
+
       connections.push({
         id: `conn-${id}-${childId}`,
         parentNodeId: id,
-        parentConnector: child['@_Connection'] || 'default',
+        parentConnector: child['@_Connection'] || defaultConnectorName,
         childNodeId: childId,
       });
     }

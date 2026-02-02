@@ -12,9 +12,18 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "YBehavior Editor",
         "width": 1400,
         "height": 900
+      },
+      {
+        "label": "terminal",
+        "title": "Terminal",
+        "url": "/#/terminal",
+        "width": 800,
+        "height": 300,
+        "visible": false
       }
     ],
     "security": {

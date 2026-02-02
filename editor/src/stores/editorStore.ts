@@ -4,6 +4,9 @@ import { loadTree, listTreeFiles, saveFile } from '../utils/fileService';
 import { loadSettings, type Settings } from '../utils/settings';
 import { useNodeDefinitionStore } from './nodeDefinitionStore';
 import { serializeTreeForEditor, serializeTreeForRuntime } from '../utils/xmlSerializer';
+import { validateValue, getDefaultValue } from '../utils/validation';
+import { useNotificationStore } from './notificationStore';
+import { logger } from '../utils/logger';
 
 interface OpenedFile {
   path: string;
@@ -357,6 +360,81 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const file = openedFiles.find(f => f.path === activeFilePath);
     if (!file) return;
 
+    const tree = file.tree;
+
+    // 辅助函数：获取从某个节点可达的所有节点 ID
+    const getReachableIds = (startId: string): Set<string> => {
+      const reachable = new Set<string>();
+      const dfs = (id: string) => {
+        if (reachable.has(id)) return;
+        reachable.add(id);
+        tree.connections.filter(c => c.parentNodeId === id).forEach(c => dfs(c.childNodeId));
+      };
+      if (startId) dfs(startId);
+      return reachable;
+    };
+
+    // 辅助函数：获取节点的顶层根节点 ID
+    const getNodeRootId = (nodeId: string): string => {
+      let current = nodeId;
+      while (true) {
+        const parentConn = tree.connections.find(c => c.childNodeId === current);
+        if (!parentConn) break;
+        current = parentConn.parentNodeId;
+      }
+      return current;
+    };
+
+    const mainTreeIds = getReachableIds(tree.rootId);
+
+    // 全量数据校验
+    const errors: string[] = [];
+
+    // 1. 校验全局变量
+    file.tree.sharedVariables.forEach(v => {
+      const res = validateValue(v.defaultValue, v.valueType, v.countType);
+      if (!res.isValid) errors.push(`Shared Variable [${v.name}]: ${res.error}`);
+    });
+
+    // 2. 校验局部变量
+    file.tree.localVariables.forEach(v => {
+      const res = validateValue(v.defaultValue, v.valueType, v.countType);
+      if (!res.isValid) errors.push(`Local Variable [${v.name}]: ${res.error}`);
+    });
+
+    // 3. 校验 Root 分支下节点的 Pin
+    tree.nodes.forEach(node => {
+      // 只有在 Root 分支下的节点才需要校验
+      if (!mainTreeIds.has(node.id)) return;
+
+      node.pins.forEach(pin => {
+        if (pin.binding.type === 'const') {
+          const res = validateValue(pin.binding.value, pin.valueType, pin.countType);
+          if (!res.isValid) {
+            const nodeLabel = `${node.type}:${node.uid || node.id}`;
+            errors.push(`Node [${nodeLabel}] Pin [${pin.name}]: ${res.error}`);
+          }
+        }
+      });
+    });
+
+    // 4. 校验数据连接：必须在同一个根节点下
+    tree.dataConnections.forEach(dc => {
+      const fromRootId = getNodeRootId(dc.fromNodeId);
+      const toRootId = getNodeRootId(dc.toNodeId);
+      if (fromRootId !== toRootId) {
+        const fromNode = tree.nodes.get(dc.fromNodeId);
+        const toNode = tree.nodes.get(dc.toNodeId);
+        errors.push(`DataConnection [${dc.fromPinName} -> ${dc.toPinName}]: Nodes [${fromNode?.type}:${fromNode?.uid}] and [${toNode?.type}:${toNode?.uid}] must be in the same tree`);
+      }
+    });
+
+    if (errors.length > 0) {
+      const { notify } = useNotificationStore.getState();
+      notify(`Save with ${errors.length} validation errors`, 'warning');
+      errors.forEach(err => logger.error(err));
+    }
+
     try {
       // 序列化为编辑器版和运行时版
       const editorXml = serializeTreeForEditor(file.tree);
@@ -409,21 +487,56 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   updateVariable: (isLocal, name, updates) => set((state) => {
     const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      let newTree = { ...tree };
+      const vars = isLocal ? tree.localVariables : tree.sharedVariables;
+      const targetVar = vars.find(v => v.name === name);
+
+      if (!targetVar) return tree;
+
+      // 如果更新了类型，需要检查引用它的 pins 是否失效
+      const isTypeChanged = (updates.valueType && updates.valueType !== targetVar.valueType) ||
+        (updates.countType && updates.countType !== targetVar.countType);
+
       if (isLocal) {
-        return {
-          ...tree,
-          localVariables: tree.localVariables.map(v =>
-            v.name === name ? { ...v, ...updates } : v
-          ),
-        };
+        newTree.localVariables = tree.localVariables.map(v => v.name === name ? { ...v, ...updates } : v);
       } else {
-        return {
-          ...tree,
-          sharedVariables: tree.sharedVariables.map(v =>
-            v.name === name ? { ...v, ...updates } : v
-          ),
-        };
+        newTree.sharedVariables = tree.sharedVariables.map(v => v.name === name ? { ...v, ...updates } : v);
       }
+
+      if (isTypeChanged) {
+        // 更新所有引用该变量的 pin 状态
+        const updatedVar = (isLocal ? newTree.localVariables : newTree.sharedVariables).find(v => v.name === name)!;
+
+        const newNodes = new Map(newTree.nodes);
+        for (const [nodeId, node] of newNodes) {
+          let nodeChanged = false;
+          const newPins = node.pins.map(pin => {
+            if (pin.binding.type === 'pointer' && pin.binding.variableName === name && pin.binding.isLocal === isLocal) {
+              // 检查是否依然兼容
+              const typeMatch = updatedVar.valueType === pin.valueType;
+              const countMatch = pin.countType === 'list' ? updatedVar.countType === 'list' : true;
+
+              if (!typeMatch || !countMatch) {
+                nodeChanged = true;
+                // 不再兼容，重置为数据连接模式（pointer + empty variableName）
+                return {
+                  ...pin,
+                  binding: { type: 'pointer' as const, variableName: '', isLocal: false },
+                  vectorIndex: undefined
+                } as Pin;
+              }
+            }
+            return pin;
+          });
+
+          if (nodeChanged) {
+            newNodes.set(nodeId, { ...node, pins: newPins });
+          }
+        }
+        newTree.nodes = newNodes;
+      }
+
+      return newTree;
     });
     return result || state;
   }),
@@ -434,14 +547,43 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const node = tree.nodes.get(nodeId);
       if (!node) return tree;
 
-      const newPins = node.pins.map(pin =>
-        pin.name === pinName ? { ...pin, ...updates } : pin
-      );
+      let newTree = { ...tree };
+      const currentPin = node.pins.find(p => p.name === pinName);
+      if (!currentPin) return tree;
+
+      // 如果更新了类型，需要处理连接重置
+      const isTypeChanged = (updates.valueType && updates.valueType !== currentPin.valueType) ||
+        (updates.countType && updates.countType !== currentPin.countType);
+
+      const newPins = node.pins.map(pin => {
+        if (pin.name === pinName) {
+          const updatedPin = { ...pin, ...updates };
+          if (isTypeChanged) {
+            // 重置绑定为默认常量
+            return {
+              ...updatedPin,
+              binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
+              vectorIndex: undefined
+            } as Pin;
+          }
+          return updatedPin;
+        }
+        return pin;
+      });
 
       const newNodes = new Map(tree.nodes);
       newNodes.set(nodeId, { ...node, pins: newPins });
+      newTree.nodes = newNodes;
 
-      return { ...tree, nodes: newNodes };
+      if (isTypeChanged) {
+        // 如果断开了连接，需要移除相关的数据连接
+        newTree.dataConnections = tree.dataConnections.filter(dc =>
+          !((dc.fromNodeId === nodeId && dc.fromPinName === pinName) ||
+            (dc.toNodeId === nodeId && dc.toPinName === pinName))
+        );
+      }
+
+      return newTree;
     });
     return result || state;
   }),
@@ -452,17 +594,36 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const node = tree.nodes.get(nodeId);
       if (!node) return tree;
 
+      let newTree = { ...tree };
+      const changedPinNames: string[] = [];
+
       const newPins = node.pins.map(pin => {
         if (pin.vTypeGroup === vTypeGroup) {
-          return { ...pin, valueType: newValueType };
+          if (pin.valueType !== newValueType) {
+            changedPinNames.push(pin.name);
+            return {
+              ...pin,
+              valueType: newValueType,
+              binding: { type: 'const' as const, value: getDefaultValue(newValueType, pin.countType === 'list') },
+              vectorIndex: undefined
+            } as Pin;
+          }
         }
         return pin;
       });
 
       const newNodes = new Map(tree.nodes);
       newNodes.set(nodeId, { ...node, pins: newPins });
+      newTree.nodes = newNodes;
 
-      return { ...tree, nodes: newNodes };
+      if (changedPinNames.length > 0) {
+        newTree.dataConnections = tree.dataConnections.filter(dc =>
+          !((dc.fromNodeId === nodeId && changedPinNames.includes(dc.fromPinName)) ||
+            (dc.toNodeId === nodeId && changedPinNames.includes(dc.toPinName)))
+        );
+      }
+
+      return newTree;
     });
     return result || state;
   }),

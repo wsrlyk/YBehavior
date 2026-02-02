@@ -1,4 +1,5 @@
 import type { Tree, TreeNode, Pin, TreeConnection, ValueType, Variable, DataConnection } from '../types';
+import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 
 /** ValueType 到 XML 字符的映射 */
 const VALUE_TYPE_TO_CHAR: Record<ValueType, string> = {
@@ -20,10 +21,10 @@ const VALUE_TYPE_TO_CHAR: Record<ValueType, string> = {
  */
 function serializePinValue(pin: Pin, forEditor: boolean): string {
   let code = '';
-  
+
   // 值类型
   const typeChar = VALUE_TYPE_TO_CHAR[pin.valueType] || 'I';
-  
+
   if (pin.countType === 'list') {
     // 数组: 无下划线，重复类型字符
     code = typeChar + typeChar;
@@ -31,7 +32,7 @@ function serializePinValue(pin: Pin, forEditor: boolean): string {
     // 单体: 有下划线
     code = '_' + typeChar;
   }
-  
+
   // 绑定类型
   if (pin.binding.type === 'const') {
     code += 'C'; // 或小写 c
@@ -39,7 +40,7 @@ function serializePinValue(pin: Pin, forEditor: boolean): string {
     // 指针: P = 全局, p = 本地（空变量名表示数据连接状态）
     code += pin.binding.isLocal ? 'p' : 'P';
   }
-  
+
   // Enable/Disable 标记 (仅当可切换时)
   if (pin.enableType === 'enable') {
     code += 'E';
@@ -51,7 +52,7 @@ function serializePinValue(pin: Pin, forEditor: boolean): string {
     }
   }
   // fixed 状态不添加标记
-  
+
   // 值
   let value = '';
   if (pin.binding.type === 'const') {
@@ -59,7 +60,7 @@ function serializePinValue(pin: Pin, forEditor: boolean): string {
   } else {
     value = pin.binding.variableName; // 空变量名表示数据连接状态
   }
-  
+
   return code + ' ' + value;
 }
 
@@ -70,7 +71,7 @@ function serializePinValue(pin: Pin, forEditor: boolean): string {
 function serializeVariable(v: Variable): string {
   let code = '';
   const typeChar = VALUE_TYPE_TO_CHAR[v.valueType] || 'I';
-  
+
   if (v.countType === 'list') {
     // 数组: 无下划线，重复类型字符
     code = typeChar + typeChar;
@@ -78,7 +79,7 @@ function serializeVariable(v: Variable): string {
     // 单体: 有下划线
     code = '_' + typeChar;
   }
-  
+
   code += v.isLocal ? 'c' : 'C'; // 变量默认是常量
   return code + ' ' + v.defaultValue;
 }
@@ -96,27 +97,21 @@ function serializeNodeForEditor(
 ): Element {
   const el = doc.createElement('Node');
   el.setAttribute('Class', node.type);
-  
+
   // GUID (编辑器版需要)
   el.setAttribute('GUID', String(node.guid));
-  
-  // Connection 属性（在 GUID 之后，Pos 之前）
-  if (node.extraAttrs?.Connection) {
-    el.setAttribute('Connection', node.extraAttrs.Connection);
-  }
-  
-  // Return 属性（在 Pos 之前）
+
   if (node.extraAttrs?.Return) {
     el.setAttribute('Return', node.extraAttrs.Return);
   }
-  
+
   // 位置
   el.setAttribute('Pos', `${Math.round(node.position.x)},${Math.round(node.position.y)}`);
-  
+
   if (node.nickname) el.setAttribute('NickName', node.nickname);
   if (node.comment) el.setAttribute('Comment', node.comment);
   if (node.disabled) el.setAttribute('Disabled', 'true');
-  
+
   // 如果是 Root 节点，添加 Shared 和 Local 变量
   if (node.type === 'Root') {
     if (sharedVars && sharedVars.length > 0) {
@@ -134,22 +129,34 @@ function serializeNodeForEditor(
       el.appendChild(localEl);
     }
   }
-  
+
   // Pin 值
   for (const pin of node.pins) {
     const value = serializePinValue(pin, true);
     if (value) el.setAttribute(pin.name, value);
   }
-  
+
   // 递归序列化子节点
   const childConnections = connections.filter(c => c.parentNodeId === node.id);
+
+  // 获取当前节点的连接器定义
+  const currentNodeDef = useNodeDefinitionStore.getState().getDefinition(node.type);
+  const defaultConnector = currentNodeDef?.childConnectors?.[0]?.name || 'default';
+
   for (const conn of childConnections) {
     const childNode = nodeMap.get(conn.childNodeId);
     if (childNode) {
-      el.appendChild(serializeNodeForEditor(childNode, doc, nodeMap, connections));
+      const childEl = serializeNodeForEditor(childNode, doc, nodeMap, connections);
+
+      // 如果不是默认连接器，则设置 Connection 属性
+      if (conn.parentConnector && conn.parentConnector !== defaultConnector) {
+        childEl.setAttribute('Connection', conn.parentConnector);
+      }
+
+      el.appendChild(childEl);
     }
   }
-  
+
   return el;
 }
 
@@ -164,13 +171,13 @@ function serializeDataConnections(
   forEditor: boolean
 ): Element | null {
   if (dataConnections.length === 0) return null;
-  
+
   const el = doc.createElement('DataConnections');
   for (const conn of dataConnections) {
     const connEl = doc.createElement('DataConnection');
     const fromNode = nodeMap.get(conn.fromNodeId);
     const toNode = nodeMap.get(conn.toNodeId);
-    
+
     if (forEditor) {
       // 编辑器版使用 GUID，顺序: FromGUID, FromName, ToGUID, ToName
       if (fromNode) connEl.setAttribute('FromGUID', String(fromNode.guid));
@@ -194,11 +201,11 @@ function serializeDataConnections(
  */
 function findAllRootNodes(tree: Tree): TreeNode[] {
   const roots: TreeNode[] = [];
-  
+
   // 首先添加主根节点
   const mainRoot = tree.nodes.get(tree.rootId);
   if (mainRoot) roots.push(mainRoot);
-  
+
   // 查找其他没有父节点的节点（森林中的其他树）
   const childNodeIds = new Set(tree.connections.map(c => c.childNodeId));
   tree.nodes.forEach((node, id) => {
@@ -206,7 +213,7 @@ function findAllRootNodes(tree: Tree): TreeNode[] {
       roots.push(node);
     }
   });
-  
+
   return roots;
 }
 
@@ -217,10 +224,10 @@ function formatXml(xml: string): string {
   let formatted = '';
   let indent = '';
   const tab = '  '; // 2 空格缩进
-  
+
   // 先处理自闭合标签，确保 /> 前有空格
   xml = xml.replace(/([^\s])\/>/g, '$1 />');
-  
+
   xml.split(/>\s*</).forEach((node) => {
     if (node.match(/^\/\w/)) {
       // 结束标签，减少缩进
@@ -232,7 +239,7 @@ function formatXml(xml: string): string {
       indent += tab;
     }
   });
-  
+
   // 清理首尾多余的 < 和 >
   return formatted.substring(1, formatted.length - 2);
 }
@@ -244,7 +251,7 @@ export function serializeTreeForEditor(tree: Tree): string {
   const doc = document.implementation.createDocument(null, tree.name, null);
   const root = doc.documentElement;
   root.setAttribute('IsEditor', '');
-  
+
   // 序列化所有根节点（支持森林）
   const rootNodes = findAllRootNodes(tree);
   for (const rootNode of rootNodes) {
@@ -255,11 +262,11 @@ export function serializeTreeForEditor(tree: Tree): string {
       isMainRoot ? tree.localVariables : undefined
     ));
   }
-  
+
   // 序列化 DataConnections
   const dataConnsEl = serializeDataConnections(tree.dataConnections, tree.nodes, doc, true);
   if (dataConnsEl) root.appendChild(dataConnsEl);
-  
+
   const serializer = new XMLSerializer();
   const xmlString = serializer.serializeToString(doc);
   // UTF-8 BOM + CRLF 换行符
@@ -276,20 +283,20 @@ function collectMainTreeNodeIds(
   connections: TreeConnection[]
 ): Set<string> {
   const nodeIds = new Set<string>();
-  
+
   function traverse(nodeId: string) {
     const node = nodeMap.get(nodeId);
     if (!node || node.disabled) return;
-    
+
     nodeIds.add(nodeId);
-    
+
     // 遍历子节点
     const childConns = connections.filter(c => c.parentNodeId === nodeId);
     for (const conn of childConns) {
       traverse(conn.childNodeId);
     }
   }
-  
+
   traverse(rootId);
   return nodeIds;
 }
@@ -303,11 +310,11 @@ function collectReferencedVariables(
 ): { sharedRefs: Set<string>; localRefs: Set<string> } {
   const sharedRefs = new Set<string>();
   const localRefs = new Set<string>();
-  
+
   for (const nodeId of mainTreeNodeIds) {
     const node = nodeMap.get(nodeId);
     if (!node) continue;
-    
+
     for (const pin of node.pins) {
       if (pin.binding.type === 'pointer') {
         if (pin.binding.isLocal) {
@@ -318,7 +325,7 @@ function collectReferencedVariables(
       }
     }
   }
-  
+
   return { sharedRefs, localRefs };
 }
 
@@ -333,20 +340,20 @@ function calculateRuntimeUIDs(
 ): Map<string, number> {
   const uidMap = new Map<string, number>();
   let uid = 1;
-  
+
   function traverse(nodeId: string) {
     const node = nodeMap.get(nodeId);
     if (!node || node.disabled) return;
-    
+
     uidMap.set(nodeId, uid++);
-    
+
     // 深度优先遍历子节点
     const childConns = connections.filter(c => c.parentNodeId === nodeId);
     for (const conn of childConns) {
       traverse(conn.childNodeId);
     }
   }
-  
+
   traverse(rootId);
   return uidMap;
 }
@@ -364,17 +371,17 @@ function serializeNodeForRuntimeWithUID(
   localVars?: Variable[]
 ): Element | null {
   if (node.disabled) return null;
-  
+
   const el = doc.createElement('Node');
   el.setAttribute('Class', node.type);
-  
+
   // 额外属性（Connection, Return 等）
   if (node.extraAttrs) {
     for (const [key, value] of Object.entries(node.extraAttrs)) {
       el.setAttribute(key, value);
     }
   }
-  
+
   // 如果是 Root 节点，添加被引用的 Shared 和 Local 变量（只有非空时才添加）
   if (node.type === 'Root') {
     if (sharedVars && sharedVars.length > 0) {
@@ -393,13 +400,13 @@ function serializeNodeForRuntimeWithUID(
       el.appendChild(localEl);
     }
   }
-  
+
   // Pin 值（跳过禁用的）
   for (const pin of node.pins) {
     const value = serializePinValue(pin, false);
     if (value) el.setAttribute(pin.name, value);
   }
-  
+
   // 递归序列化子节点
   const childConnections = connections.filter(c => c.parentNodeId === node.id);
   for (const conn of childConnections) {
@@ -409,7 +416,7 @@ function serializeNodeForRuntimeWithUID(
       if (childEl) el.appendChild(childEl);
     }
   }
-  
+
   return el;
 }
 
@@ -423,18 +430,18 @@ function serializeDataConnectionsForRuntime(
   doc: Document
 ): Element | null {
   // 过滤：只保留主树内部的连接
-  const filteredConns = dataConnections.filter(conn => 
+  const filteredConns = dataConnections.filter(conn =>
     mainTreeNodeIds.has(conn.fromNodeId) && mainTreeNodeIds.has(conn.toNodeId)
   );
-  
+
   if (filteredConns.length === 0) return null;
-  
+
   const el = doc.createElement('DataConnections');
   for (const conn of filteredConns) {
     const connEl = doc.createElement('DataConnection');
     const fromUID = uidMap.get(conn.fromNodeId);
     const toUID = uidMap.get(conn.toNodeId);
-    
+
     if (fromUID !== undefined) connEl.setAttribute('FromUID', String(fromUID));
     connEl.setAttribute('FromName', conn.fromPinName);
     if (toUID !== undefined) connEl.setAttribute('ToUID', String(toUID));
@@ -450,18 +457,18 @@ function serializeDataConnectionsForRuntime(
 export function serializeTreeForRuntime(tree: Tree): string {
   const doc = document.implementation.createDocument(null, tree.name, null);
   const root = doc.documentElement;
-  
+
   // 1. 收集主树中所有节点 ID
   const mainTreeNodeIds = collectMainTreeNodeIds(tree.rootId, tree.nodes, tree.connections);
-  
+
   // 2. 计算被引用的变量
   const { sharedRefs, localRefs } = collectReferencedVariables(mainTreeNodeIds, tree.nodes);
   const referencedSharedVars = tree.sharedVariables.filter(v => sharedRefs.has(v.name));
   const referencedLocalVars = tree.localVariables.filter(v => localRefs.has(v.name));
-  
+
   // 3. 计算运行时 UID
   const uidMap = calculateRuntimeUIDs(tree.rootId, tree.nodes, tree.connections);
-  
+
   // 4. 序列化主根节点
   const rootNode = tree.nodes.get(tree.rootId);
   if (rootNode) {
@@ -471,13 +478,13 @@ export function serializeTreeForRuntime(tree: Tree): string {
     );
     if (nodeEl) root.appendChild(nodeEl);
   }
-  
+
   // 5. 序列化 DataConnections（只包含主树内的连接）
   const dataConnsEl = serializeDataConnectionsForRuntime(
     tree.dataConnections, mainTreeNodeIds, uidMap, doc
   );
   if (dataConnsEl) root.appendChild(dataConnsEl);
-  
+
   const serializer = new XMLSerializer();
   const xmlString = serializer.serializeToString(doc);
   // UTF-8 BOM + CRLF 换行符
