@@ -39,9 +39,10 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
     if (!pin.vectorIndex) return '';
     if (pin.vectorIndex.type === 'const') {
       return `[${pin.vectorIndex.value}]`;
-    } else {
+    } else if (pin.vectorIndex.type === 'pointer') {
       return `[${pin.vectorIndex.variableName}]`;
     }
+    return '';
   };
   
   return (
@@ -63,10 +64,13 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
           {pin.binding.value || '-'}
         </span>
       )}
-      {pin.binding.type === 'pointer' && (
+      {pin.binding.type === 'pointer' && pin.binding.variableName && (
         <span className="text-blue-400 text-[10px] truncate max-w-12">
           {pin.binding.variableName}{getVectorIndexDisplay()}
         </span>
+      )}
+      {pin.binding.type === 'pointer' && !pin.binding.variableName && (
+        <span className="text-gray-500 text-[10px] italic">○</span>
       )}
     </div>
   );

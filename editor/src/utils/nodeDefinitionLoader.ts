@@ -19,6 +19,22 @@ function parseValueType(typeStr: string): ValueType {
   return VALUE_TYPE_MAP[char] || 'int';
 }
 
+function parseAllowedValueTypes(typeStr: string): ValueType[] {
+  // 解析所有允许的类型，如 "IF" 表示 int 和 float
+  // 注意：如果是数组类型如 "II"，第二个字符是重复的，不算多类型
+  const types: ValueType[] = [];
+  const seen = new Set<string>();
+  
+  for (const char of typeStr.toUpperCase()) {
+    if (VALUE_TYPE_MAP[char] && !seen.has(char)) {
+      types.push(VALUE_TYPE_MAP[char]);
+      seen.add(char);
+    }
+  }
+  
+  return types.length > 0 ? types : ['int'];
+}
+
 function parseCountType(typeStr: string, isArray?: string): CountType {
   if (isArray === 'True') return 'list';
   // 检查类型字符串是否表示数组（如 "II", "FF"）
@@ -90,6 +106,7 @@ function parseVariable(v: XmlVariable): PinDefinition {
     enumValues: v['@_Param']?.split('|'),
     vTypeGroup: v['@_vTypeGroup'] ? parseInt(v['@_vTypeGroup']) : undefined,
     cTypeGroup: v['@_cTypeGroup'] ? parseInt(v['@_cTypeGroup']) : undefined,
+    allowedValueTypes: parseAllowedValueTypes(valueTypeStr),
   };
 }
 

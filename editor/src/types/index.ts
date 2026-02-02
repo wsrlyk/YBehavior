@@ -35,6 +35,7 @@ export interface Variable {
 export type PinBindingType = 'const' | 'pointer';
 export type EnableType = 'fixed' | 'enable' | 'disable';
 
+// pointer 类型 + 空 variableName = 数据连接状态（等待连接或已连接）
 export type PinBinding =
   | { type: 'const'; value: string }
   | { type: 'pointer'; variableName: string; isLocal: boolean };
@@ -50,6 +51,9 @@ export interface Pin {
   vectorIndex?: PinBinding;
   enumValues?: string[];
   allowedValueTypes: ValueType[];
+  vTypeGroup?: number;  // 类型联动组，同组 Pin 类型变化时同步
+  isCountTypeFixed?: boolean; // 是否固定数量类型（不可切换数组/标量）
+  isBindingTypeFixed?: boolean; // 是否固定绑定类型（不可切换常量/引用）
 }
 
 // ==================== Node ====================
@@ -92,7 +96,7 @@ export interface DataConnection {
 
 // ==================== Tree ====================
 
-export interface TreePin extends Pin {}
+export interface TreePin extends Pin { }
 
 export interface Comment {
   id: string;

@@ -21,6 +21,7 @@ export interface PinDefinition {
   enumValues?: string[];
   vTypeGroup?: number;
   cTypeGroup?: number;
+  allowedValueTypes?: import('./index').ValueType[];  // 允许的数据类型，默认只有 valueType
 }
 
 export interface TypeMapRule {

@@ -1,7 +1,7 @@
 import { XMLParser } from 'fast-xml-parser';
-import type { 
+import type {
   Tree, TreeNode, Variable, Pin, TreeConnection, DataConnection,
-  ValueType, CountType, PinBinding, NodeCategory 
+  ValueType, CountType, PinBinding, NodeCategory
 } from '../types';
 import type { NodeDefinition, PinDefinition } from '../types/nodeDefinition';
 
@@ -44,7 +44,7 @@ function parsePinValue(raw: string): ParsedPinValue {
   //       "_Ip a" = int scalar pointer to local variable 'a'
   //       "IIC 1|2|3" = int list const [1,2,3]
   //       "_FPE " = float scalar pointer enabled (no value)
-  
+
   const result: ParsedPinValue = {
     valueType: 'int',
     countType: 'scalar',
@@ -54,29 +54,29 @@ function parsePinValue(raw: string): ParsedPinValue {
     variableName: '',
     isEnabled: true,
   };
-  
+
   if (!raw || raw.length < 3) return result;
-  
+
   const code = raw.substring(0, 4).replace(/ .*/, ''); // 取前面的类型码
   const valueStart = raw.indexOf(' ');
   const value = valueStart >= 0 ? raw.substring(valueStart + 1) : '';
-  
+
   // 解析类型码
   let idx = 0;
   if (code[idx] === '_') idx++;
-  
+
   // 值类型
   if (idx < code.length) {
     result.valueType = parseValueType(code[idx]);
     idx++;
   }
-  
+
   // 数量类型 (检查是否是 list)
   if (idx < code.length && code[idx].toUpperCase() === code[idx - 1].toUpperCase()) {
     result.countType = 'list';
     idx++;
   }
-  
+
   // 绑定类型
   if (idx < code.length) {
     const bindChar = code[idx];
@@ -126,7 +126,7 @@ function parsePinValue(raw: string): ParsedPinValue {
     }
     idx++;
   }
-  
+
   // Enable/Disable 标记
   if (idx < code.length) {
     const enableChar = code[idx];
@@ -136,7 +136,7 @@ function parsePinValue(raw: string): ParsedPinValue {
       result.isEnabled = false;
     }
   }
-  
+
   return result;
 }
 
@@ -153,15 +153,15 @@ function parseVariable(name: string, raw: string, isLocal: boolean): Variable {
 
 function createPin(name: string, raw: string, pinDef?: PinDefinition): Pin {
   const parsed = parsePinValue(raw);
-  
+
   const binding: PinBinding = parsed.isPointer
     ? { type: 'pointer', variableName: parsed.variableName, isLocal: parsed.isLocal }
     : { type: 'const', value: parsed.value };
-  
+
   // 使用节点定义中的参数，如果没有则使用解析出的值
   const isInput = pinDef?.isInput ?? true;
   const enumValues = pinDef?.enumValues;
-  
+
   // enableType: 
   // - 如果有定义且为 fixed，则固定启用
   // - 如果有定义且为 enable/disable，使用 XML 中的值（parsed.isEnabled）决定当前状态
@@ -177,7 +177,7 @@ function createPin(name: string, raw: string, pinDef?: PinDefinition): Pin {
   } else {
     enableType = parsed.isEnabled ? 'enable' : 'disable';
   }
-  
+
   return {
     name,
     valueType: parsed.valueType,
@@ -188,21 +188,25 @@ function createPin(name: string, raw: string, pinDef?: PinDefinition): Pin {
     isInput,
     vectorIndex: parsed.vectorIndex,
     enumValues,
-    allowedValueTypes: [parsed.valueType],
+    allowedValueTypes: pinDef?.allowedValueTypes || [parsed.valueType],  // 从定义中读取，默认只有当前类型
+    vTypeGroup: pinDef?.vTypeGroup,  // 类型联动组
+    isCountTypeFixed: pinDef ? pinDef.arrayType !== 'switchable' : false,
+    isBindingTypeFixed: pinDef ? pinDef.constType !== 'switchable' : false,
   };
 }
 
-// 从定义创建默认 Pin（用于树文件中缺少的 Pin）
+// 从定义创建默认 Pin（用于树文件中缺少的 Pin 或新建节点）
 function createPinFromDefinition(pinDef: PinDefinition): Pin {
   // 根据 constType 决定默认绑定类型
-  const bindingType = pinDef.constType === 'pointer' ? 'pointer' : 'const';
+  // 引用类型默认使用空变量名（表示数据连接状态，等待连接）
+  const bindingType = pinDef.constType === 'pointer' ? 'pointer' : 'const' as const;
   const binding: PinBinding = bindingType === 'pointer'
-    ? { type: 'pointer', variableName: '', isLocal: false }
+    ? { type: 'pointer', variableName: '', isLocal: false }  // 空变量名 = 数据连接状态
     : { type: 'const', value: pinDef.defaultValue };
-  
+
   // 根据 arrayType 决定 countType
   const countType = pinDef.arrayType === 'list' ? 'list' : 'scalar';
-  
+
   return {
     name: pinDef.name,
     valueType: pinDef.valueType,
@@ -212,7 +216,10 @@ function createPinFromDefinition(pinDef: PinDefinition): Pin {
     enableType: pinDef.enableType,
     isInput: pinDef.isInput,
     enumValues: pinDef.enumValues,
-    allowedValueTypes: [pinDef.valueType],
+    allowedValueTypes: pinDef.allowedValueTypes || [pinDef.valueType],  // 从定义中读取，默认只有当前类型
+    vTypeGroup: pinDef.vTypeGroup,  // 类型联动组
+    isCountTypeFixed: pinDef.arrayType !== 'switchable',
+    isBindingTypeFixed: pinDef.constType !== 'switchable',
   };
 }
 
@@ -221,7 +228,7 @@ function getNodeCategory(nodeClass: string): NodeCategory {
   const composites = ['Sequence', 'Selector', 'RandomSequence', 'RandomSelector', 'SwitchCase', 'IfThenElse'];
   const decorators = ['Loop', 'ForEach', 'For', 'Not', 'AlwaysSuccess', 'AlwaysFailed'];
   const conditions = ['Comparer'];
-  
+
   if (composites.includes(nodeClass)) return 'composite';
   if (decorators.includes(nodeClass)) return 'decorator';
   if (conditions.includes(nodeClass)) return 'condition';
@@ -243,7 +250,7 @@ interface XmlNode {
 let nodeIdCounter = 0;
 
 function parseXmlNode(
-  xmlNode: XmlNode, 
+  xmlNode: XmlNode,
   nodes: Map<string, TreeNode>,
   connections: TreeConnection[],
   parentId?: string,
@@ -252,26 +259,26 @@ function parseXmlNode(
   const nodeClass = xmlNode['@_Class'];
   const guid = xmlNode['@_GUID'] || String(++nodeIdCounter);
   const pos = xmlNode['@_Pos']?.split(',').map(Number) || [0, 0];
-  
+
   const id = `node-${guid}`;
-  
+
   // 获取节点定义
   const nodeDef = getNodeDefinition?.(nodeClass);
-  
+
   // 解析树文件中的 Pin 值
   const skipAttrs = ['@_Class', '@_GUID', '@_Pos', '@_Connection', '@_Return', 'Shared', 'Local', 'Node'];
   const xmlPinValues = new Map<string, string>();
-  
+
   for (const [key, value] of Object.entries(xmlNode)) {
     if (!skipAttrs.includes(key) && key.startsWith('@_') && typeof value === 'string') {
       const pinName = key.substring(2); // 去掉 @_
       xmlPinValues.set(pinName, value);
     }
   }
-  
+
   // 基于定义文件合并 Pin 数据
   const pins: Pin[] = [];
-  
+
   if (nodeDef) {
     // 有定义：按定义顺序生成 Pin，使用树文件中的值或默认值
     for (const pinDef of nodeDef.pins) {
@@ -291,12 +298,12 @@ function parseXmlNode(
       pins.push(createPin(pinName, xmlValue, undefined));
     }
   }
-  
+
   // 收集额外属性（Connection, Return 等）
   const extraAttrs: Record<string, string> = {};
   if (xmlNode['@_Connection']) extraAttrs['Connection'] = xmlNode['@_Connection'];
   if (xmlNode['@_Return']) extraAttrs['Return'] = xmlNode['@_Return'];
-  
+
   const node: TreeNode = {
     id,
     guid: parseInt(guid),
@@ -309,9 +316,9 @@ function parseXmlNode(
     childrenIds: [],
     extraAttrs: Object.keys(extraAttrs).length > 0 ? extraAttrs : undefined,
   };
-  
+
   nodes.set(id, node);
-  
+
   // 处理子节点
   const childNodes = xmlNode.Node;
   if (childNodes) {
@@ -319,7 +326,7 @@ function parseXmlNode(
     for (const child of children) {
       const childId = parseXmlNode(child, nodes, connections, id, getNodeDefinition);
       node.childrenIds.push(childId);
-      
+
       connections.push({
         id: `conn-${id}-${childId}`,
         parentNodeId: id,
@@ -328,48 +335,48 @@ function parseXmlNode(
       });
     }
   }
-  
+
   return id;
 }
 
 export function parseTreeXml(
-  xmlContent: string, 
+  xmlContent: string,
   fileName: string,
   getNodeDefinition?: (className: string) => NodeDefinition | undefined
 ): Tree {
   // 重置计数器
   nodeIdCounter = 0;
-  
+
   const parser = new XMLParser({
     ignoreAttributes: false,
     attributeNamePrefix: '@_',
     allowBooleanAttributes: true,
   });
-  
+
   const parsed = parser.parse(xmlContent);
   const treeName = Object.keys(parsed).find(k => k !== '?xml') || 'Unknown';
   const treeData = parsed[treeName];
-  
+
   const nodes = new Map<string, TreeNode>();
   const connections: TreeConnection[] = [];
   const sharedVariables: Variable[] = [];
   const localVariables: Variable[] = [];
   const dataConnections: DataConnection[] = [];
-  
+
   // 解析节点
   const rootNodes = treeData.Node;
   let rootId = '';
-  
+
   if (rootNodes) {
     const nodeList = Array.isArray(rootNodes) ? rootNodes : [rootNodes];
-    
+
     for (const xmlNode of nodeList) {
       const nodeId = parseXmlNode(xmlNode, nodes, connections, undefined, getNodeDefinition);
-      
+
       // 第一个 Root 节点作为根
       if (xmlNode['@_Class'] === 'Root' && !rootId) {
         rootId = nodeId;
-        
+
         // 解析 Shared 和 Local 变量
         if (xmlNode.Shared) {
           for (const [name, value] of Object.entries(xmlNode.Shared)) {
@@ -388,12 +395,12 @@ export function parseTreeXml(
       }
     }
   }
-  
+
   // 解析数据连接
   if (treeData.DataConnections?.DataConnection) {
     const dataConns = treeData.DataConnections.DataConnection;
     const connList = Array.isArray(dataConns) ? dataConns : [dataConns];
-    
+
     for (const conn of connList) {
       dataConnections.push({
         id: `data-${conn['@_FromGUID']}-${conn['@_ToGUID']}-${conn['@_FromName']}-${conn['@_ToName']}`,
@@ -404,10 +411,10 @@ export function parseTreeXml(
       });
     }
   }
-  
+
   // 计算 UID（深度优先遍历）
   calculateUIDs(nodes, rootId, connections);
-  
+
   return {
     name: treeName,
     path: fileName,
@@ -433,24 +440,24 @@ function calculateUIDs(
   connections: TreeConnection[]
 ): void {
   let uid = 1;
-  
+
   // 深度优先遍历
   function dfs(nodeId: string) {
     const node = nodes.get(nodeId);
     if (!node) return;
-    
+
     node.uid = uid++;
-    
+
     // 获取子节点（按连接顺序）
     const childConns = connections.filter(c => c.parentNodeId === nodeId);
     for (const conn of childConns) {
       dfs(conn.childNodeId);
     }
   }
-  
+
   // 从主根节点开始
   dfs(rootId);
-  
+
   // 处理森林中的其他树（从 1001、2001 等开始）
   let forestIndex = 1;
   for (const [nodeId, node] of nodes) {

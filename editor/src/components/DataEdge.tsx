@@ -22,6 +22,7 @@ function DataEdge({
   targetPosition,
   style,
   markerEnd,
+  selected,
 }: EdgeProps) {
   const [edgePath] = getBezierPath({
     sourceX,
@@ -36,10 +37,10 @@ function DataEdge({
     <BaseEdge
       id={id}
       path={edgePath}
-      style={{ 
-        ...style, 
-        stroke: '#60a5fa',  // 蓝色
-        strokeWidth: 2,
+      style={{
+        ...style,
+        stroke: selected ? '#fff' : '#60a5fa',  // 选中变白，否则蓝色
+        strokeWidth: selected ? 3 : 2,
         strokeDasharray: '5,5',  // 虚线
       }}
       markerEnd={markerEnd}

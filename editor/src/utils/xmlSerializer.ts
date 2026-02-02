@@ -36,7 +36,7 @@ function serializePinValue(pin: Pin, forEditor: boolean): string {
   if (pin.binding.type === 'const') {
     code += 'C'; // 或小写 c
   } else {
-    // 指针: P = 全局, p = 本地
+    // 指针: P = 全局, p = 本地（空变量名表示数据连接状态）
     code += pin.binding.isLocal ? 'p' : 'P';
   }
   
@@ -57,7 +57,7 @@ function serializePinValue(pin: Pin, forEditor: boolean): string {
   if (pin.binding.type === 'const') {
     value = pin.binding.value;
   } else {
-    value = pin.binding.variableName;
+    value = pin.binding.variableName; // 空变量名表示数据连接状态
   }
   
   return code + ' ' + value;
