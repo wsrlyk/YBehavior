@@ -11,7 +11,7 @@ import { useEditorMetaStore } from "../stores/editorMetaStore";
 import { getAllWindows } from "@tauri-apps/api/window";
 
 export function MainWindow() {
-    const { initSettings, settings, openedFiles, activeFilePath, saveCurrentFile, createNewTree } = useEditorStore();
+    const { initSettings, settings, openedFiles, activeFilePath, saveCurrentFile, saveFileAs, createNewTree } = useEditorStore();
     const { loadDefinitions, isLoaded } = useNodeDefinitionStore();
     const loadAllMeta = useEditorMetaStore(state => state.loadAllMeta);
 
@@ -148,6 +148,14 @@ export function MainWindow() {
                             title="Ctrl+S"
                         >
                             Save
+                        </button>
+                        <button
+                            onClick={saveFileAs}
+                            disabled={!activeFile}
+                            className="px-3 py-1 text-sm bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Save As..."
+                        >
+                            Save As
                         </button>
                         <div className="flex-1" />
                         <span className="text-sm text-gray-400 truncate">

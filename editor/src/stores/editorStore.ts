@@ -14,6 +14,7 @@ interface OpenedFile {
   name: string;
   tree: Tree;
   isDirty: boolean;
+  isNew?: boolean; // 是否是新创建未保存的文件
 }
 
 interface EditorState {
@@ -75,10 +76,10 @@ interface EditorState {
 
   // Pin 操作
   updatePin: (nodeId: string, pinName: string, updates: Partial<Pin>) => void;
-  updatePinsByTypeGroup: (nodeId: string, vTypeGroup: number, newValueType: import('../types').ValueType) => void;
 
   // 保存操作
   saveCurrentFile: () => Promise<void>;
+  saveFileAs: () => Promise<void>;
 
   // 新特性操作
   toggleNodeFold: (nodeId: string) => void;
@@ -454,11 +455,22 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   }),
 
   saveCurrentFile: async () => {
-    const { openedFiles, activeFilePath, editorTreeDir, runtimeTreeDir } = get();
-    if (!activeFilePath || !editorTreeDir || !runtimeTreeDir) return;
+    const { openedFiles, activeFilePath } = get();
+    if (!activeFilePath) return;
 
     const file = openedFiles.find(f => f.path === activeFilePath);
     if (!file) return;
+
+    // 如果是新文件，重定向到另存为
+    if (file.isNew) {
+      return get().saveFileAs();
+    }
+
+    const { editorTreeDir, runtimeTreeDir } = get();
+    if (!editorTreeDir || !runtimeTreeDir) {
+      useNotificationStore.getState().notify('Save failed: Tree directories not initialized in settings', 'error');
+      return;
+    }
 
     const tree = file.tree;
 
@@ -588,6 +600,61 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     } catch (e) {
       console.error('Save failed:', e);
       set({ error: String(e) });
+      useNotificationStore.getState().notify(`Save failed: ${e}`, 'error');
+    }
+  },
+
+  saveFileAs: async () => {
+    const { openedFiles, activeFilePath, editorTreeDir, runtimeTreeDir } = get();
+    if (!activeFilePath || !editorTreeDir || !runtimeTreeDir) return;
+
+    const file = openedFiles.find(f => f.path === activeFilePath);
+    if (!file) return;
+
+    try {
+      const { save } = await import('@tauri-apps/plugin-dialog');
+      const newPath = await save({
+        title: 'Save Behavior Tree As',
+        defaultPath: editorTreeDir,
+        filters: [{ name: 'Behavior Tree', extensions: ['tree'] }]
+      });
+
+      if (!newPath) return; // 用户取消
+
+      // 处理新路径，确保它是相对于 editorTreeDir 的相对路径
+      let relativePath = newPath;
+      const normalizedDir = editorTreeDir.replace(/\\/g, '/');
+      const normalizedNewPath = newPath.replace(/\\/g, '/');
+
+      if (normalizedNewPath.startsWith(normalizedDir)) {
+        relativePath = normalizedNewPath.slice(normalizedDir.length).replace(/^\//, '');
+      } else {
+        // 如果保存在目录外，给出提示（虽然最好能支持任意路径，但目前系统架构依赖 root dir）
+        useNotificationStore.getState().notify('Warning: Saving outside the predefined tree directory.', 'warning');
+        // 提取文件名作为相对路径名
+        relativePath = newPath.split(/[/\\]/).pop() || relativePath;
+      }
+
+      const fileName = relativePath.split(/[/\\]/).pop() || relativePath;
+
+      // 更新文件信息并执行保存逻辑（这里我们复用 saveCurrentFile 的保存部分，但先更新 store 状态）
+      set(state => ({
+        openedFiles: state.openedFiles.map(f =>
+          f.path === activeFilePath
+            ? { ...f, path: relativePath, name: fileName, isNew: false, tree: { ...f.tree, path: relativePath, name: fileName.replace(/\.tree$/, '') } }
+            : f
+        ),
+        activeFilePath: relativePath,
+        treeFiles: state.treeFiles.includes(relativePath) ? state.treeFiles : [...state.treeFiles, relativePath]
+      }));
+
+      // 执行实际保存
+      await get().saveCurrentFile();
+
+    } catch (e) {
+      console.error('Save As failed:', e);
+      set({ error: String(e) });
+      useNotificationStore.getState().notify(`Save As failed: ${e}`, 'error');
     }
   },
 
@@ -680,15 +747,17 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const currentPin = node.pins.find(p => p.name === pinName);
       if (!currentPin) return tree;
 
-      // 如果更新了类型，需要处理连接重置
       const isTypeChanged = (updates.valueType && updates.valueType !== currentPin.valueType) ||
         (updates.countType && updates.countType !== currentPin.countType);
 
-      const newPins = node.pins.map(pin => {
+      // 1. 更新当前 Pin
+      let changedPinNames = new Set<string>();
+      if (isTypeChanged) changedPinNames.add(pinName);
+
+      let newPins = node.pins.map(pin => {
         if (pin.name === pinName) {
           const updatedPin = { ...pin, ...updates };
           if (isTypeChanged) {
-            // 重置绑定为默认常量
             return {
               ...updatedPin,
               binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
@@ -700,62 +769,87 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         return pin;
       });
 
-      const newNodes = new Map(tree.nodes);
-      newNodes.set(nodeId, { ...node, pins: newPins });
-      newTree.nodes = newNodes;
+      // 2. 处理 Group 同步 (类型/数量)
+      const hasVGroup = currentPin.vTypeGroup !== undefined && updates.valueType;
+      const hasCGroup = currentPin.cTypeGroup !== undefined && updates.countType;
 
-      if (isTypeChanged) {
-        // 如果断开了连接，需要移除相关的数据连接
-        newTree.dataConnections = tree.dataConnections.filter(dc =>
-          !((dc.fromNodeId === nodeId && dc.fromPinName === pinName) ||
-            (dc.toNodeId === nodeId && dc.toPinName === pinName))
-        );
-      }
+      if (hasVGroup || hasCGroup) {
+        newPins = newPins.map(pin => {
+          let pinUpdates: Partial<Pin> = {};
+          if (hasVGroup && pin.vTypeGroup === currentPin.vTypeGroup && pin.valueType !== updates.valueType) {
+            pinUpdates.valueType = updates.valueType;
+          }
+          if (hasCGroup && pin.cTypeGroup === currentPin.cTypeGroup && pin.countType !== updates.countType) {
+            pinUpdates.countType = updates.countType;
+          }
 
-      return newTree;
-    });
-    return result || state;
-  }),
-
-  // 类型联动：更新同一 vTypeGroup 的所有 Pin 的 valueType
-  updatePinsByTypeGroup: (nodeId, vTypeGroup, newValueType) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      const node = tree.nodes.get(nodeId);
-      if (!node) return tree;
-
-      let newTree = { ...tree };
-      const changedPinNames: string[] = [];
-
-      const newPins = node.pins.map(pin => {
-        if (pin.vTypeGroup === vTypeGroup) {
-          if (pin.valueType !== newValueType) {
-            changedPinNames.push(pin.name);
+          if (Object.keys(pinUpdates).length > 0) {
+            changedPinNames.add(pin.name);
+            const updatedPin = { ...pin, ...pinUpdates };
             return {
-              ...pin,
-              valueType: newValueType,
-              binding: { type: 'const' as const, value: getDefaultValue(newValueType, pin.countType === 'list') },
+              ...updatedPin,
+              binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
               vectorIndex: undefined
             } as Pin;
           }
-        }
-        return pin;
-      });
+          return pin;
+        });
+      }
 
+      // 3. 处理 TypeMap 规则 (仅当 Enum 值变化且是常量绑定时)
+      const nodeDef = useNodeDefinitionStore.getState().getDefinition(node.type);
+      if (updates.binding?.type === 'const' && nodeDef?.typeMaps) {
+        const srcValue = updates.binding.value;
+        const matchedRules = nodeDef.typeMaps.filter(
+          rule => rule.srcVariable === pinName && rule.srcValue === srcValue
+        );
+
+        if (matchedRules.length > 0) {
+          newPins = newPins.map(pin => {
+            const rule = matchedRules.find(r => r.desVariable === pin.name);
+            if (!rule) return pin;
+
+            const typeStr = rule.desType;
+            const char = typeStr.charAt(0).toUpperCase();
+            const valueMapping: Record<string, import('../types').ValueType> = {
+              'I': 'int', 'F': 'float', 'B': 'bool', 'S': 'string', 'V': 'vector3', 'A': 'entity', 'U': 'ulong', 'E': 'enum'
+            };
+
+            let newValueType = valueMapping[char] || pin.valueType;
+            let newCountType: import('../types').CountType = (typeStr.length >= 2 && typeStr[0] === typeStr[1]) ? 'list' : 'scalar';
+
+            if (pin.valueType === newValueType && pin.countType === newCountType) return pin;
+
+            changedPinNames.add(pin.name);
+            const updatedPin = { ...pin, valueType: newValueType, countType: newCountType };
+            return {
+              ...updatedPin,
+              binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
+              vectorIndex: undefined
+            } as Pin;
+          });
+        }
+      }
+
+      // 4. 更新节点 Pins
       const newNodes = new Map(tree.nodes);
       newNodes.set(nodeId, { ...node, pins: newPins });
       newTree.nodes = newNodes;
 
-      if (changedPinNames.length > 0) {
+      // 5. 清除失效的数据连接
+      if (changedPinNames.size > 0) {
         newTree.dataConnections = tree.dataConnections.filter(dc =>
-          !((dc.fromNodeId === nodeId && changedPinNames.includes(dc.fromPinName)) ||
-            (dc.toNodeId === nodeId && changedPinNames.includes(dc.toPinName)))
+          !((dc.fromNodeId === nodeId && changedPinNames.has(dc.fromPinName)) ||
+            (dc.toNodeId === nodeId && changedPinNames.has(dc.toPinName)))
         );
       }
 
       return newTree;
     });
+
     return result || state;
   }),
+
 
   // 新特性操作
   toggleNodeFold: (nodeId) => set((state) => {
@@ -786,8 +880,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const newNodes = new Map(tree.nodes);
       newNodes.set(nodeId, { ...node, disabled: newDisabled });
 
-      // 如果禁用了节点，断开与其相关的跨状态数据连接（可选）
-      // 但现在我们改为由 save 提示或 UI 阻止，先只保留基本逻辑
       return { ...tree, nodes: newNodes };
     });
     return result || state;
@@ -816,7 +908,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   // 新建文件
   createNewTree: (name) => set((state) => {
-    // 生成唯一名称（如果已存在则加数字后缀）
     let uniqueName = name;
     let counter = 1;
     while (state.openedFiles.some(f => f.path === `${uniqueName}.tree`)) {
@@ -825,7 +916,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     }
     const path = `${uniqueName}.tree`;
 
-    // 创建新树，自动添加 Root 节点
     const rootId = 'node-1';
     const rootNode: TreeNode = {
       id: rootId,
@@ -861,6 +951,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       name,
       tree: newTree,
       isDirty: true,
+      isNew: true,
     };
 
     return {

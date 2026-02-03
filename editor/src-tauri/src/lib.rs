@@ -17,7 +17,11 @@ fn read_file(path: String) -> Result<String, String> {
 
 #[tauri::command]
 fn write_file(path: String, content: String) -> Result<(), String> {
-    fs::write(&path, content).map_err(|e| e.to_string())
+    let path = std::path::Path::new(&path);
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    fs::write(path, content).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -62,6 +66,7 @@ fn collect_files(
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { .. } = event {
                 if window.label() == "main" {

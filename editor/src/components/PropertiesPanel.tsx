@@ -8,12 +8,12 @@ import { logger } from '../utils/logger';
 const TYPE_COLORS: Record<ValueType, string> = {
   int: 'text-blue-400',
   float: 'text-green-400',
-  bool: 'text-yellow-400',
+  bool: 'text-red-400',
   string: 'text-pink-400',
-  vector3: 'text-cyan-400',
-  entity: 'text-orange-400',
+  vector3: 'text-yellow-400',
+  entity: 'text-cyan-400',
   ulong: 'text-purple-400',
-  enum: 'text-red-400',
+  enum: 'text-orange-400',
 };
 
 const VALUE_TYPES: ValueType[] = ['int', 'float', 'bool', 'string', 'vector3', 'entity', 'ulong'];
@@ -325,9 +325,7 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
   const getCurrentTree = useEditorStore((state) => state.getCurrentTree);
   const updatePin = useEditorStore((state) => state.updatePin);
   const updateNodeProperty = useEditorStore((state) => state.updateNodeProperty);
-  const updatePinsByTypeGroup = useEditorStore((state) => state.updatePinsByTypeGroup);
   const currentTree = getCurrentTree();
-
   const node = currentTree?.nodes.get(nodeId);
   if (!node) return <div className="text-xs text-gray-600">Node not found</div>;
 
@@ -339,16 +337,9 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
   const inputPins = node.pins.filter(pin => pin.isInput);
   const outputPins = node.pins.filter(pin => !pin.isInput);
 
-  // 处理类型变化（带类型联动）
+  // 处理 Pin 更新 (内含类型/数量联动及 TypeMap)
   const handlePinUpdate = (pinName: string, updates: Partial<Pin>) => {
-    const pin = node.pins.find(p => p.name === pinName);
-
-    // 如果更新了 valueType 且有 vTypeGroup，触发类型联动
-    if (updates.valueType && pin?.vTypeGroup !== undefined) {
-      updatePinsByTypeGroup(nodeId, pin.vTypeGroup, updates.valueType);
-    } else {
-      updatePin(nodeId, pinName, updates);
-    }
+    updatePin(nodeId, pinName, updates);
   };
 
   const renderPinList = (pins: Pin[], label: string) => {

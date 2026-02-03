@@ -323,6 +323,62 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     [setEdges, addDataConnection, addConnection]
   );
 
+  const isValidConnection: import('@xyflow/react').IsValidConnection = useCallback(
+    (edge) => {
+      const { source, target, sourceHandle, targetHandle } = edge;
+      if (!source || !target || source === target) return false;
+
+      const isDataConnection = sourceHandle?.startsWith('pin-') || targetHandle?.startsWith('pin-');
+      const currentTree = useEditorStore.getState().getCurrentTree();
+      if (!currentTree) return false;
+
+      if (isDataConnection) {
+        // 数据连接已经在 onConnect 中处理了大部分逻辑，这里简单放行
+        return true;
+      }
+
+      // --- 树连接校验 ---
+
+      // 1. 目标节点 (Child) 只能有一个父节点 (Tree Connection)
+      const hasParent = currentTree.connections.some(c => c.childNodeId === target);
+      if (hasParent) return false;
+
+      // 2. 检查源连接器 (Parent Connector) 的 MaxChildren 限制
+      if (sourceHandle) {
+        const sourceNode = currentTree.nodes.get(source);
+        if (sourceNode) {
+          if (sourceHandle === 'condition') {
+            // condition 连接器固定只能有一个子节点
+            const childrenCount = currentTree.connections.filter(c => c.parentNodeId === source && c.parentConnector === 'condition').length;
+            if (childrenCount >= 1) return false;
+          } else {
+            const def = getDefinition(sourceNode.type);
+            const connectorDef = def?.childConnectors.find(c => c.name === sourceHandle);
+            if (connectorDef && connectorDef.maxChildren !== undefined) {
+              const childrenCount = currentTree.connections.filter(c => c.parentNodeId === source && c.parentConnector === sourceHandle).length;
+              if (childrenCount >= connectorDef.maxChildren) return false;
+            }
+          }
+        }
+      }
+
+      // 3. 防止循环引用 (Cycle Detection)
+      const isDescendant = (nodeId: string, potentialAncestorId: string): boolean => {
+        const connections = currentTree.connections.filter(c => c.parentNodeId === nodeId);
+        for (const conn of connections) {
+          if (conn.childNodeId === potentialAncestorId) return true;
+          if (isDescendant(conn.childNodeId, potentialAncestorId)) return true;
+        }
+        return false;
+      };
+
+      if (isDescendant(target, source)) return false;
+
+      return true;
+    },
+    [getDefinition]
+  );
+
   const handleContextMenu = useCallback((e: MouseEvent) => {
     e.preventDefault();
 
@@ -414,6 +470,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        isValidConnection={isValidConnection}
         onPaneClick={() => {
           setContextMenu(prev => ({ ...prev, isOpen: false }));
           onPaneClick?.();
@@ -431,6 +488,8 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
           }
         }}
         fitView
+        snapToGrid={true}
+        snapGrid={[15, 15]}
         panOnDrag={[1, 2]}
         selectionOnDrag
         proOptions={{ hideAttribution: true }}
