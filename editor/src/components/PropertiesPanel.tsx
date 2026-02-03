@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import { useEditorStore } from '../stores/editorStore';
 import type { Variable, ValueType, CountType, Pin } from '../types';
 import { validateValue, getDefaultValue } from '../utils/validation';
@@ -238,12 +238,12 @@ function AddVariableButton({ isLocal, onAdd }: { isLocal: boolean; onAdd: (v: Va
 }
 
 export function PropertiesPanel() {
-  const getCurrentTree = useEditorStore((state) => state.getCurrentTree);
+  // 优化：直接订阅 currentTree
+  const currentTree = useEditorStore((state) => state.getCurrentTree());
   const selectedNodeIds = useEditorStore((state) => state.selectedNodeIds);
   const updateVariable = useEditorStore((state) => state.updateVariable);
   const removeVariable = useEditorStore((state) => state.removeVariable);
   const addVariable = useEditorStore((state) => state.addVariable);
-  const currentTree = getCurrentTree();
 
   const sharedVariables = currentTree?.sharedVariables || [];
   const localVariables = currentTree?.localVariables || [];
@@ -322,25 +322,26 @@ export function PropertiesPanel() {
 
 // 节点属性编辑器
 function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
-  const getCurrentTree = useEditorStore((state) => state.getCurrentTree);
+  // 优化：直接订阅
+  const currentTree = useEditorStore((state) => state.getCurrentTree());
   const updatePin = useEditorStore((state) => state.updatePin);
   const updateNodeProperty = useEditorStore((state) => state.updateNodeProperty);
-  const currentTree = getCurrentTree();
-  const node = currentTree?.nodes.get(nodeId);
+  const node = useMemo(() => currentTree?.nodes.get(nodeId), [currentTree, nodeId]);
   if (!node) return <div className="text-xs text-gray-600">Node not found</div>;
+
 
   const sharedVars = currentTree?.sharedVariables || [];
   const localVars = currentTree?.localVariables || [];
   const dataConnections = currentTree?.dataConnections || [];
 
   // 分组 Pin：输入和输出
-  const inputPins = node.pins.filter(pin => pin.isInput);
-  const outputPins = node.pins.filter(pin => !pin.isInput);
+  const inputPins = useMemo(() => node.pins.filter(pin => pin.isInput), [node.pins]);
+  const outputPins = useMemo(() => node.pins.filter(pin => !pin.isInput), [node.pins]);
 
   // 处理 Pin 更新 (内含类型/数量联动及 TypeMap)
-  const handlePinUpdate = (pinName: string, updates: Partial<Pin>) => {
+  const handlePinUpdate = useCallback((pinName: string, updates: Partial<Pin>) => {
     updatePin(nodeId, pinName, updates);
-  };
+  }, [updatePin, nodeId]);
 
   const renderPinList = (pins: Pin[], label: string) => {
     if (pins.length === 0) return null;
@@ -437,7 +438,7 @@ interface PinEditorProps {
   onUpdate: (updates: Partial<Pin>) => void;
 }
 
-function PinEditor({ pin, nodeUid, nodeType, sharedVars, localVars, dataConnection, onUpdate }: PinEditorProps) {
+const PinEditor = memo(function PinEditor({ pin, nodeUid, nodeType, sharedVars, localVars, dataConnection, onUpdate }: PinEditorProps) {
   const removeDataConnection = useEditorStore((state) => state.removeDataConnection);
   const notify = useNotificationStore(state => state.notify);
   const [isEditing, setIsEditing] = useState(false);
@@ -789,4 +790,4 @@ function PinEditor({ pin, nodeUid, nodeType, sharedVars, localVars, dataConnecti
       )}
     </div>
   );
-}
+});

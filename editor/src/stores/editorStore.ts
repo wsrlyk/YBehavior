@@ -9,12 +9,19 @@ import { useNotificationStore } from './notificationStore';
 import { logger } from '../utils/logger';
 import { useEditorMetaStore } from './editorMetaStore';
 
+interface HistoryState {
+  past: Tree[];
+  future: Tree[];
+}
+
 interface OpenedFile {
   path: string;
   name: string;
   tree: Tree;
+  lastSavedTreeSnapshot: string; // 用于判断 isDirty 的快照
   isDirty: boolean;
   isNew?: boolean; // 是否是新创建未保存的文件
+  history: HistoryState;
 }
 
 interface EditorState {
@@ -81,6 +88,12 @@ interface EditorState {
   saveCurrentFile: () => Promise<void>;
   saveFileAs: () => Promise<void>;
 
+  // 历史操作
+  undo: () => void;
+  redo: () => void;
+  recordHistoryStart: () => void; // 连续操作前记录快照
+  finalizeContinuousAction: () => void; // 连续操作后刷新 UID 和 Dirty
+
   // 新特性操作
   toggleNodeFold: (nodeId: string) => void;
   toggleNodeDisabled: (nodeId: string) => void;
@@ -93,10 +106,25 @@ interface EditorState {
 /**
  * 计算节点的 UID（深度优先遍历）
  * Root 节点从 1 开始，森林中其他树从 1001、2001 等开始
+ * 注意：必须传入可修改的 tree 对象（通常是 updater 返回的新 tree）
+ */
+/**
+ * 计算节点的 UID（深度优先遍历）
+ * 注意：此函数会【直接修改】tree.nodes 中的节点对象。
+ * 调用者必须确保 tree.nodes 是新克隆的副本，以免污染历史记录。
  */
 function recalculateUIDs(tree: Tree): void {
+  const nodeDefStore = useNodeDefinitionStore.getState();
   let uid = 1;
   const visited = new Set<string>();
+
+  // 预先建立父子关系索引
+  const connectionsByParent = new Map<string, TreeConnection[]>();
+  for (const conn of tree.connections) {
+    const list = connectionsByParent.get(conn.parentNodeId) || [];
+    list.push(conn);
+    connectionsByParent.set(conn.parentNodeId, list);
+  }
 
   // 深度优先遍历
   function dfs(nodeId: string, isAncestorDisabled: boolean) {
@@ -107,34 +135,25 @@ function recalculateUIDs(tree: Tree): void {
     if (!node) return;
 
     const effectivelyDisabled = isAncestorDisabled || node.disabled;
+    const childConns = connectionsByParent.get(nodeId) || [];
 
-    // 获取所有子连接
-    const childConns = tree.connections.filter(c => c.parentNodeId === nodeId);
-
-    // 1. 如果有 condition 连接，先递归处理该分支（它是特殊的左侧分支）
+    // 1. 如果有 condition 连接，先递归处理该分支
     const conditionConn = childConns.find(c => c.parentConnector === 'condition');
     if (conditionConn) {
       dfs(conditionConn.childNodeId, effectivelyDisabled);
     }
 
     // 2. 采样当前节点的 UID
-    if (!effectivelyDisabled) {
-      node.uid = uid++;
-    } else {
-      node.uid = undefined;
-    }
+    node.uid = effectivelyDisabled ? undefined : uid++;
 
-    // 3. 处理其他子节点，按连接器定义顺序和水平位置排序
-    const nodeDef = useNodeDefinitionStore.getState().getDefinition(node.type);
+    // 3. 处理其他子节点
+    const nodeDef = nodeDefStore.getDefinition(node.type);
     const connectors = nodeDef?.childConnectors || [];
 
-    // 按定义顺序遍历连接器
     for (const connectorDef of connectors) {
-      // 找出当前连接器下的所有子连接
       const connsForThisType = childConns.filter(c => c.parentConnector === connectorDef.name);
 
-      // 按子节点的水平位置 (x) 从左到右排序
-      const sortedConns = connsForThisType.sort((a, b) => {
+      const sortedConns = [...connsForThisType].sort((a, b) => {
         const nodeA = tree.nodes.get(a.childNodeId);
         const nodeB = tree.nodes.get(b.childNodeId);
         return (nodeA?.position.x || 0) - (nodeB?.position.x || 0);
@@ -145,13 +164,12 @@ function recalculateUIDs(tree: Tree): void {
       }
     }
 
-    // 处理不在定义中的连接器（兜底，通常是 'children' 或者未定义的名称）
+    // 处理不在定义中的连接器
     const knownConnectorNames = new Set(connectors.map(c => c.name));
     knownConnectorNames.add('condition');
 
-    const extraConns = childConns.filter((c: TreeConnection) => !knownConnectorNames.has(c.parentConnector));
-    // 同样按位置排序
-    const sortedExtraConns = extraConns.sort((a, b) => {
+    const extraConns = childConns.filter(c => !knownConnectorNames.has(c.parentConnector));
+    const sortedExtraConns = [...extraConns].sort((a, b) => {
       const nodeA = tree.nodes.get(a.childNodeId);
       const nodeB = tree.nodes.get(b.childNodeId);
       return (nodeA?.position.x || 0) - (nodeB?.position.x || 0);
@@ -162,33 +180,14 @@ function recalculateUIDs(tree: Tree): void {
     }
   }
 
-  // 先清除所有 UID
-  for (const node of tree.nodes.values()) {
-    node.uid = undefined;
-  }
+  tree.nodes.forEach(node => { node.uid = undefined; });
+  if (tree.rootId) dfs(tree.rootId, false);
 
-  // 从主根节点开始
-  if (tree.rootId) {
-    dfs(tree.rootId, false);
-  }
-
-  // 处理森林中的其他树（从 1001、2001 等开始）
   let forestIndex = 1;
-  // 找出所有没有父节点的节点
   const childIds = new Set(tree.connections.map(c => c.childNodeId));
 
   for (const nodeId of tree.nodes.keys()) {
     if (!childIds.has(nodeId) && !visited.has(nodeId)) {
-      // 这是一个未被遍历到的根节点（森林中的其他路径）
-      uid = forestIndex * 1000 + 1;
-      dfs(nodeId, false);
-      forestIndex++;
-    }
-  }
-
-  // 最后兜底：任何循环引用或其他原因未访问到的节点（虽然不应该发生）
-  for (const nodeId of tree.nodes.keys()) {
-    if (!visited.has(nodeId)) {
       uid = forestIndex * 1000 + 1;
       dfs(nodeId, false);
       forestIndex++;
@@ -196,11 +195,12 @@ function recalculateUIDs(tree: Tree): void {
   }
 }
 
-// 辅助函数：更新已打开文件的树（自动重新计算 UID）
+// 辅助函数：更新已打开文件的树（自动重新计算 UID 和处理历史）
 function updateOpenedFileTree(
   openedFiles: OpenedFile[],
   activeFilePath: string | null,
-  updater: (tree: Tree) => Tree
+  updater: (tree: Tree) => Tree,
+  options: { skipHistory?: boolean; isUIChange?: boolean; skipUID?: boolean } = {}
 ): { openedFiles: OpenedFile[] } | null {
   if (!activeFilePath) return null;
 
@@ -208,13 +208,44 @@ function updateOpenedFileTree(
   if (fileIndex === -1) return null;
 
   const file = openedFiles[fileIndex];
-  const newTree = updater(file.tree);
+  const oldTree = file.tree;
+  const newTree = updater(oldTree);
 
   // 重新计算 UID
-  recalculateUIDs(newTree);
+  if (!options.skipUID) {
+    recalculateUIDs(newTree);
+  }
+
+  // 计算新的 Dirty 状态
+  let isDirty = file.isDirty;
+  if (options.isUIChange) {
+    // UI 变化不改变 Dirty 状态
+    isDirty = file.isDirty;
+  } else if (!options.skipHistory) {
+    // 标准操作：通过序列化对比判断
+    const currentSnapshot = serializeTreeForEditor(newTree);
+    isDirty = currentSnapshot !== file.lastSavedTreeSnapshot;
+  } else {
+    // 拖拽等操作：直接设为 dirty
+    isDirty = true;
+  }
+
+  const newFile: OpenedFile = {
+    ...file,
+    tree: newTree,
+    isDirty
+  };
+
+  // 处理历史记录
+  if (!options.skipHistory) {
+    newFile.history = {
+      past: [oldTree, ...file.history.past].slice(0, 50),
+      future: [] // 产生新变化时清空前进栈
+    };
+  }
 
   const newOpenedFiles = [...openedFiles];
-  newOpenedFiles[fileIndex] = { ...file, tree: newTree, isDirty: true };
+  newOpenedFiles[fileIndex] = newFile;
 
   return { openedFiles: newOpenedFiles };
 }
@@ -280,7 +311,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         path,
         name: fileName,
         tree,
+        lastSavedTreeSnapshot: serializeTreeForEditor(tree),
         isDirty: false,
+        history: { past: [], future: [] }
       };
 
       set({
@@ -294,21 +327,39 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     }
   },
 
-  closeFile: (path) => set((state) => {
-    const newOpenedFiles = state.openedFiles.filter(f => f.path !== path);
-    let newActiveFilePath = state.activeFilePath;
+  closeFile: async (path) => {
+    const { openedFiles } = get();
+    const file = openedFiles.find(f => f.path === path);
 
-    // 如果关闭的是当前文件，切换到其他文件
-    if (state.activeFilePath === path) {
-      newActiveFilePath = newOpenedFiles.length > 0 ? newOpenedFiles[0].path : null;
+    if (file && file.isDirty) {
+      try {
+        const { ask } = await import('@tauri-apps/plugin-dialog');
+        const answer = await ask(
+          `The file "${file.name}" has unsaved changes. Do you want to close it?`,
+          { title: 'Confirm Close', kind: 'warning', okLabel: 'Close Without Saving', cancelLabel: 'Cancel' }
+        );
+        if (!answer) return;
+      } catch (e) {
+        console.error('Dialog failed:', e);
+      }
     }
 
-    return {
-      openedFiles: newOpenedFiles,
-      activeFilePath: newActiveFilePath,
-      selectedNodeIds: [],
-    };
-  }),
+    set((state) => {
+      const newOpenedFiles = state.openedFiles.filter(f => f.path !== path);
+      let newActiveFilePath = state.activeFilePath;
+
+      // 如果关闭的是当前文件，切换到其他文件
+      if (state.activeFilePath === path) {
+        newActiveFilePath = newOpenedFiles.length > 0 ? newOpenedFiles[0].path : null;
+      }
+
+      return {
+        openedFiles: newOpenedFiles,
+        activeFilePath: newActiveFilePath,
+        selectedNodeIds: [],
+      };
+    });
+  },
 
   setActiveFile: (path) => set({ activeFilePath: path, selectedNodeIds: [] }),
 
@@ -337,7 +388,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const newNodes = new Map(tree.nodes);
       newNodes.set(nodeId, { ...node, position: { x, y } });
       return { ...tree, nodes: newNodes };
-    });
+    }, { skipHistory: true, skipUID: true }); // 拖拽中跳过历史和 UID 计算
 
     return result || state;
   }),
@@ -588,7 +639,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       // 标记为已保存
       set((state) => ({
         openedFiles: state.openedFiles.map(f =>
-          f.path === activeFilePath ? { ...f, isDirty: false } : f
+          f.path === activeFilePath ? {
+            ...f,
+            isDirty: false,
+            lastSavedTreeSnapshot: editorXml // 更新快照
+          } : f
         ),
       }));
 
@@ -621,6 +676,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
       if (!newPath) return; // 用户取消
 
+      // 验证文件名不能包含空格
+      const fileName = newPath.split(/[/\\]/).pop() || '';
+      const treeName = fileName.replace(/\.tree$/, '');
+      if (treeName.includes(' ')) {
+        useNotificationStore.getState().notify('Tree name cannot contain spaces', 'error');
+        return;
+      }
+
       // 处理新路径，确保它是相对于 editorTreeDir 的相对路径
       let relativePath = newPath;
       const normalizedDir = editorTreeDir.replace(/\\/g, '/');
@@ -635,13 +698,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         relativePath = newPath.split(/[/\\]/).pop() || relativePath;
       }
 
-      const fileName = relativePath.split(/[/\\]/).pop() || relativePath;
-
       // 更新文件信息并执行保存逻辑（这里我们复用 saveCurrentFile 的保存部分，但先更新 store 状态）
       set(state => ({
         openedFiles: state.openedFiles.map(f =>
           f.path === activeFilePath
-            ? { ...f, path: relativePath, name: fileName, isNew: false, tree: { ...f.tree, path: relativePath, name: fileName.replace(/\.tree$/, '') } }
+            ? {
+              ...f,
+              path: relativePath,
+              name: fileName,
+              isNew: false,
+              lastSavedTreeSnapshot: serializeTreeForEditor(f.tree), // 预更新快照，虽然 saveCurrentFile 也会更新
+              tree: { ...f.tree, path: relativePath, name: fileName.replace(/\.tree$/, '') }
+            }
             : f
         ),
         activeFilePath: relativePath,
@@ -657,6 +725,114 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       useNotificationStore.getState().notify(`Save As failed: ${e}`, 'error');
     }
   },
+
+  undo: () => set(state => {
+    const { openedFiles, activeFilePath } = state;
+    if (!activeFilePath) return state;
+
+    const fileIndex = openedFiles.findIndex(f => f.path === activeFilePath);
+    if (fileIndex === -1) return state;
+
+    const file = openedFiles[fileIndex];
+    if (file.history.past.length === 0) return state;
+
+    const [previousTree, ...remainingPast] = file.history.past;
+    const currentTree = file.tree;
+
+    const newFile: OpenedFile = {
+      ...file,
+      tree: previousTree,
+      isDirty: serializeTreeForEditor(previousTree) !== file.lastSavedTreeSnapshot,
+      history: {
+        past: remainingPast,
+        future: [currentTree, ...file.history.future].slice(0, 50)
+      }
+    };
+
+    const newOpenedFiles = [...openedFiles];
+    newOpenedFiles[fileIndex] = newFile;
+    return { openedFiles: newOpenedFiles };
+  }),
+
+  redo: () => set(state => {
+    const { openedFiles, activeFilePath } = state;
+    if (!activeFilePath) return state;
+
+    const fileIndex = openedFiles.findIndex(f => f.path === activeFilePath);
+    if (fileIndex === -1) return state;
+
+    const file = openedFiles[fileIndex];
+    if (file.history.future.length === 0) return state;
+
+    const [nextTree, ...remainingFuture] = file.history.future;
+    const currentTree = file.tree;
+
+    const newFile: OpenedFile = {
+      ...file,
+      tree: nextTree,
+      isDirty: serializeTreeForEditor(nextTree) !== file.lastSavedTreeSnapshot,
+      history: {
+        past: [currentTree, ...file.history.past].slice(0, 50),
+        future: remainingFuture
+      }
+    };
+
+    const newOpenedFiles = [...openedFiles];
+    newOpenedFiles[fileIndex] = newFile;
+    return { openedFiles: newOpenedFiles };
+  }),
+
+  // 用于连续操作（如拖拽）开始前，先拍一个快照存入 past
+  recordHistoryStart: () => set(state => {
+    const { openedFiles, activeFilePath } = state;
+    if (!activeFilePath) return state;
+
+    const fileIndex = openedFiles.findIndex(f => f.path === activeFilePath);
+    if (fileIndex === -1) return state;
+
+    const file = openedFiles[fileIndex];
+
+    const newOpenedFiles = [...openedFiles];
+    newOpenedFiles[fileIndex] = {
+      ...file,
+      history: {
+        past: [file.tree, ...file.history.past].slice(0, 50),
+        future: [] // 新操作开始，清空前进栈
+      }
+    };
+    return { openedFiles: newOpenedFiles };
+  }),
+
+  // 用于连续操作结束后，同步 UID 和 Dirty 状态，但不再次推送 history
+  finalizeContinuousAction: () => set(state => {
+    const { openedFiles, activeFilePath } = state;
+    if (!activeFilePath) return state;
+
+    const fileIndex = openedFiles.findIndex(f => f.path === activeFilePath);
+    if (fileIndex === -1) return state;
+
+    const file = openedFiles[fileIndex];
+
+    // 强制深度克隆一次 Node Map 及其内节点，确保 UID 刷新不污染前一个快照
+    const newNodes = new Map<string, TreeNode>();
+    file.tree.nodes.forEach((node, id) => {
+      newNodes.set(id, { ...node });
+    });
+    const newTree = { ...file.tree, nodes: newNodes };
+
+    recalculateUIDs(newTree);
+
+    const currentSnapshot = serializeTreeForEditor(newTree);
+    const isDirty = currentSnapshot !== file.lastSavedTreeSnapshot;
+
+    const newOpenedFiles = [...openedFiles];
+    newOpenedFiles[fileIndex] = {
+      ...file,
+      tree: newTree,
+      isDirty,
+    };
+    return { openedFiles: newOpenedFiles };
+  }),
 
   // 变量操作
   addVariable: (isLocal, variable) => set((state) => {
@@ -867,7 +1043,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       }
 
       return { ...tree, nodes: newNodes };
-    });
+    }, { skipHistory: true, isUIChange: true });
     return result || state;
   }),
 
@@ -950,8 +1126,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       path,
       name,
       tree: newTree,
-      isDirty: true,
+      lastSavedTreeSnapshot: serializeTreeForEditor(newTree),
+      isDirty: false,
       isNew: true,
+      history: { past: [], future: [] }
     };
 
     return {

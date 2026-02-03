@@ -11,7 +11,7 @@ import { useEditorMetaStore } from "../stores/editorMetaStore";
 import { getAllWindows } from "@tauri-apps/api/window";
 
 export function MainWindow() {
-    const { initSettings, settings, openedFiles, activeFilePath, saveCurrentFile, saveFileAs, createNewTree } = useEditorStore();
+    const { initSettings, settings, openedFiles, activeFilePath, saveCurrentFile, saveFileAs, undo, redo, createNewTree } = useEditorStore();
     const { loadDefinitions, isLoaded } = useNodeDefinitionStore();
     const loadAllMeta = useEditorMetaStore(state => state.loadAllMeta);
 
@@ -37,17 +37,25 @@ export function MainWindow() {
         loadAllMeta();
     }, [settings, initSettings, isLoaded, loadDefinitions, loadAllMeta]);
 
-    // Ctrl+S 保存快捷键
+    // Ctrl+S / Ctrl+Z / Ctrl+Y 快捷键
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                e.preventDefault();
-                saveCurrentFile();
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 's') {
+                    e.preventDefault();
+                    saveCurrentFile();
+                } else if (e.key === 'z') {
+                    e.preventDefault();
+                    undo();
+                } else if (e.key === 'y') {
+                    e.preventDefault();
+                    redo();
+                }
             }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [saveCurrentFile]);
+    }, [saveCurrentFile, undo, redo]);
 
     // Listen for 'terminal-control' messages (from Terminal Window)
     useEffect(() => {
@@ -156,6 +164,23 @@ export function MainWindow() {
                             title="Save As..."
                         >
                             Save As
+                        </button>
+                        <div className="w-px h-5 bg-gray-700 mx-1" />
+                        <button
+                            onClick={undo}
+                            disabled={!activeFile || activeFile.history.past.length === 0}
+                            className="px-3 py-1 text-sm bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Undo (Ctrl+Z)"
+                        >
+                            Undo
+                        </button>
+                        <button
+                            onClick={redo}
+                            disabled={!activeFile || activeFile.history.future.length === 0}
+                            className="px-3 py-1 text-sm bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Redo (Ctrl+Y)"
+                        >
+                            Redo
                         </button>
                         <div className="flex-1" />
                         <span className="text-sm text-gray-400 truncate">

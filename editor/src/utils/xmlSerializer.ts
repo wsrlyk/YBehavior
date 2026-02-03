@@ -234,25 +234,30 @@ function findAllRootNodes(tree: Tree): TreeNode[] {
 function formatXml(xml: string): string {
   let formatted = '';
   let indent = '';
-  const tab = '  '; // 2 空格缩进
+  const tab = '  ';
 
-  // 先处理自闭合标签，确保 /> 前有空格
+  // 处理自闭合标签的空格
   xml = xml.replace(/([^\s])\/>/g, '$1 />');
 
-  xml.split(/>\s*</).forEach((node) => {
-    if (node.match(/^\/\w/)) {
-      // 结束标签，减少缩进
+  // 使用正则表达式匹配标签
+  const parts = xml.split(/(?=<)|(?<=>)/).filter(p => p.trim());
+
+  parts.forEach((part) => {
+    if (part.startsWith('</')) {
+      // 结束标签
       indent = indent.substring(tab.length);
-    }
-    formatted += indent + '<' + node + '>\n';
-    if (node.match(/^<?\w[^>]*[^/]$/) && !node.startsWith('?')) {
-      // 开始标签（非自闭合），增加缩进
+      formatted += indent + part + '\n';
+    } else if (part.startsWith('<') && !part.endsWith('/>') && !part.startsWith('<?') && !part.startsWith('<!')) {
+      // 开始标签（且非自闭合）
+      formatted += indent + part + '\n';
       indent += tab;
+    } else {
+      // 自闭合标签、内容或声明
+      formatted += indent + part + '\n';
     }
   });
 
-  // 清理首尾多余的 < 和 >
-  return formatted.substring(1, formatted.length - 2);
+  return formatted.trim();
 }
 
 /**

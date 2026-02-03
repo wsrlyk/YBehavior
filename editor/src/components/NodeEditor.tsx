@@ -82,15 +82,17 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
   const selectedNodeIds = useEditorStore((state) => state.selectedNodeIds);
 
+  // 优化的节点转换和缓存逻辑，显著提升大树拖拽启动性能
+  const nodeCache = useMemo(() => new Map<string, CustomNodeType>(), []);
+
   const { flowNodes, flowEdges } = useMemo(() => {
     if (!currentTree) {
       return { flowNodes: [], flowEdges: [] };
     }
 
-    const nodes: CustomNodeType[] = [];
     const edges: Edge[] = [];
 
-    // 计算被折叠隐藏的节点 ID 和 有效禁用状态
+    // 1. 计算被折叠隐藏的节点 ID 和 有效禁用状态
     const hiddenNodeIds = new Set<string>();
     const effectiveDisabledIds = new Set<string>();
 
@@ -106,9 +108,13 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       }
 
       const shouldHideChildren = isParentFolded || node.isFolded;
+      // 优化：在此循环中预先构建连接器分组，避免多次 filter
       currentTree.connections
-        .filter(c => c.parentNodeId === id)
-        .forEach(c => processTreeStatesRecursive(c.childNodeId, !!shouldHideChildren, isEffectivelyDisabled));
+        .forEach(c => {
+          if (c.parentNodeId === id) {
+            processTreeStatesRecursive(c.childNodeId, !!shouldHideChildren, isEffectivelyDisabled);
+          }
+        });
     };
 
     // 找到所有顶层节点开始遍历
@@ -119,20 +125,39 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       }
     });
 
+    // 2. 转换节点：利用缓存避免 redundant object creation
+    const newNodes: CustomNodeType[] = [];
     currentTree.nodes.forEach((node: TreeNode) => {
-      nodes.push({
-        ...treeNodeToFlowNode(node, getDefinition),
-        // Root 节点不可删除
-        deletable: node.type !== 'Root',
-        selected: selectedNodeIds.includes(node.id),
-        data: {
-          ...treeNodeToFlowNode(node, getDefinition).data,
-          isEffectivelyDisabled: effectiveDisabledIds.has(node.id),
-        }
-      });
+      if (hiddenNodeIds.has(node.id)) return;
+
+      const isSelected = selectedNodeIds.includes(node.id);
+      const isEffectivelyDisabled = effectiveDisabledIds.has(node.id);
+
+      // 检查缓存
+      const cached = nodeCache.get(node.id);
+      if (cached &&
+        cached.data.treeNode === node &&
+        cached.selected === isSelected &&
+        cached.data.isEffectivelyDisabled === isEffectivelyDisabled &&
+        cached.position.x === node.position.x &&
+        cached.position.y === node.position.y) {
+        newNodes.push(cached);
+      } else {
+        const newNode: CustomNodeType = {
+          ...treeNodeToFlowNode(node, getDefinition),
+          deletable: node.type !== 'Root',
+          selected: isSelected,
+          data: {
+            ...treeNodeToFlowNode(node, getDefinition).data,
+            isEffectivelyDisabled,
+          }
+        };
+        nodeCache.set(node.id, newNode);
+        newNodes.push(newNode);
+      }
     });
 
-    // 按父节点分组连接，收集兄弟节点 ID
+    // 3. 构建边
     const connectionsByParent = new Map<string, typeof currentTree.connections>();
     currentTree.connections.forEach((conn) => {
       const group = connectionsByParent.get(conn.parentNodeId) || [];
@@ -140,45 +165,43 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       connectionsByParent.set(conn.parentNodeId, group);
     });
 
-    // 为每条边传递兄弟节点 ID 列表，用于计算共享的水平线高度
     connectionsByParent.forEach((conns) => {
       const siblingTargetIds = conns.map(c => c.childNodeId);
-
       conns.forEach((conn) => {
-        edges.push({
-          id: conn.id,
-          source: conn.parentNodeId,
-          sourceHandle: conn.parentConnector,
-          target: conn.childNodeId,
-          targetHandle: 'tree-target',
-          type: 'tree',
-          data: { siblingTargetIds },
-        });
+        if (!hiddenNodeIds.has(conn.parentNodeId) && !hiddenNodeIds.has(conn.childNodeId)) {
+          edges.push({
+            id: conn.id,
+            source: conn.parentNodeId,
+            sourceHandle: conn.parentConnector,
+            target: conn.childNodeId,
+            targetHandle: 'tree-target',
+            type: 'tree',
+            data: { siblingTargetIds },
+          });
+        }
       });
     });
 
-    // 添加数据连接的边
+    // 数据连接边
     currentTree.dataConnections.forEach((dataConn) => {
-      edges.push({
-        id: dataConn.id,
-        source: dataConn.fromNodeId,
-        sourceHandle: `pin-out-${dataConn.fromPinName}`,
-        target: dataConn.toNodeId,
-        targetHandle: `pin-in-${dataConn.toPinName}`,
-        type: 'data',
-        data: {
-          fromPinName: dataConn.fromPinName,
-          toPinName: dataConn.toPinName,
-        },
-      });
+      if (!hiddenNodeIds.has(dataConn.fromNodeId) && !hiddenNodeIds.has(dataConn.toNodeId)) {
+        edges.push({
+          id: dataConn.id,
+          source: dataConn.fromNodeId,
+          sourceHandle: `pin-out-${dataConn.fromPinName}`,
+          target: dataConn.toNodeId,
+          targetHandle: `pin-in-${dataConn.toPinName}`,
+          type: 'data',
+          data: {
+            fromPinName: dataConn.fromPinName,
+            toPinName: dataConn.toPinName,
+          },
+        });
+      }
     });
 
-    // 过滤掉被隐藏的节点和边
-    const visibleNodes = nodes.filter(n => !hiddenNodeIds.has(n.id));
-    const visibleEdges = edges.filter(e => !hiddenNodeIds.has(e.source) && !hiddenNodeIds.has(e.target));
-
-    return { flowNodes: visibleNodes, flowEdges: visibleEdges };
-  }, [currentTree, getDefinition, selectedNodeIds]);
+    return { flowNodes: newNodes, flowEdges: edges };
+  }, [currentTree, getDefinition, selectedNodeIds, nodeCache]);
 
   const [nodes, setNodes, onNodesChangeBase] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChangeBase] = useEdgesState<Edge>([]);
@@ -191,22 +214,35 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
   const addDataConnection = useEditorStore((state) => state.addDataConnection);
 
-  // 自定义 onNodesChange：同步节点位置到 store，并处理删除
+  const recordHistoryStart = useEditorStore((state) => state.recordHistoryStart);
+  const finalizeContinuousAction = useEditorStore((state) => state.finalizeContinuousAction);
+
+  // 自定义 onNodesChange：处理删除和选择
   const onNodesChange = useCallback((changes: import('@xyflow/react').NodeChange<Node>[]) => {
+    // 关键优化：位置更新(position)不再通过 onNodesChange 同步到 store
+    // 而是通过 onNodeDragStop 在松手时一次性同步。
     onNodesChangeBase(changes);
 
     changes.forEach((change) => {
-      // 同步位置
-      if (change.type === 'position' && change.position && !change.dragging) {
-        updateNodePosition(change.id, change.position.x, change.position.y);
-      }
-
       // 处理删除
       if (change.type === 'remove') {
         removeNode(change.id);
       }
     });
-  }, [onNodesChangeBase, updateNodePosition, removeNode]);
+  }, [onNodesChangeBase, removeNode]);
+
+  const onNodeDragStart = useCallback(() => {
+    recordHistoryStart();
+  }, [recordHistoryStart]);
+
+  const onNodeDragStop = useCallback((_event: any, node: Node) => {
+    // 松手时吸附到网格
+    const gridSize = 15;
+    const snappedX = Math.round(node.position.x / gridSize) * gridSize;
+    const snappedY = Math.round(node.position.y / gridSize) * gridSize;
+    updateNodePosition(node.id, snappedX, snappedY);
+    finalizeContinuousAction();
+  }, [updateNodePosition, finalizeContinuousAction]);
 
   // 自定义 onEdgesChange：处理连接的删除
   const onEdgesChange = useCallback((changes: import('@xyflow/react').EdgeChange<Edge>[]) => {
@@ -470,7 +506,10 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeDragStart={onNodeDragStart}
+        onNodeDragStop={onNodeDragStop}
         isValidConnection={isValidConnection}
+        selectNodesOnDrag={false}
         onPaneClick={() => {
           setContextMenu(prev => ({ ...prev, isOpen: false }));
           onPaneClick?.();
@@ -488,7 +527,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
           }
         }}
         fitView
-        snapToGrid={true}
+        snapToGrid={false}
         snapGrid={[15, 15]}
         panOnDrag={[1, 2]}
         selectionOnDrag
