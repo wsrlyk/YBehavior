@@ -7,6 +7,7 @@ import { serializeTreeForEditor, serializeTreeForRuntime } from '../utils/xmlSer
 import { validateValue, getDefaultValue } from '../utils/validation';
 import { useNotificationStore } from './notificationStore';
 import { logger } from '../utils/logger';
+import { useEditorMetaStore } from './editorMetaStore';
 
 interface OpenedFile {
   path: string;
@@ -79,6 +80,11 @@ interface EditorState {
   // 保存操作
   saveCurrentFile: () => Promise<void>;
 
+  // 新特性操作
+  toggleNodeFold: (nodeId: string) => void;
+  toggleNodeDisabled: (nodeId: string) => void;
+  toggleConditionConnector: (nodeId: string) => void;
+
   // 新建文件
   createNewTree: (name: string) => void;
 }
@@ -89,18 +95,69 @@ interface EditorState {
  */
 function recalculateUIDs(tree: Tree): void {
   let uid = 1;
+  const visited = new Set<string>();
 
   // 深度优先遍历
-  function dfs(nodeId: string) {
+  function dfs(nodeId: string, isAncestorDisabled: boolean) {
+    if (visited.has(nodeId)) return;
+    visited.add(nodeId);
+
     const node = tree.nodes.get(nodeId);
     if (!node) return;
 
-    node.uid = uid++;
+    const effectivelyDisabled = isAncestorDisabled || node.disabled;
 
-    // 获取子节点（按连接顺序）
+    // 获取所有子连接
     const childConns = tree.connections.filter(c => c.parentNodeId === nodeId);
-    for (const conn of childConns) {
-      dfs(conn.childNodeId);
+
+    // 1. 如果有 condition 连接，先递归处理该分支（它是特殊的左侧分支）
+    const conditionConn = childConns.find(c => c.parentConnector === 'condition');
+    if (conditionConn) {
+      dfs(conditionConn.childNodeId, effectivelyDisabled);
+    }
+
+    // 2. 采样当前节点的 UID
+    if (!effectivelyDisabled) {
+      node.uid = uid++;
+    } else {
+      node.uid = undefined;
+    }
+
+    // 3. 处理其他子节点，按连接器定义顺序和水平位置排序
+    const nodeDef = useNodeDefinitionStore.getState().getDefinition(node.type);
+    const connectors = nodeDef?.childConnectors || [];
+
+    // 按定义顺序遍历连接器
+    for (const connectorDef of connectors) {
+      // 找出当前连接器下的所有子连接
+      const connsForThisType = childConns.filter(c => c.parentConnector === connectorDef.name);
+
+      // 按子节点的水平位置 (x) 从左到右排序
+      const sortedConns = connsForThisType.sort((a, b) => {
+        const nodeA = tree.nodes.get(a.childNodeId);
+        const nodeB = tree.nodes.get(b.childNodeId);
+        return (nodeA?.position.x || 0) - (nodeB?.position.x || 0);
+      });
+
+      for (const conn of sortedConns) {
+        dfs(conn.childNodeId, effectivelyDisabled);
+      }
+    }
+
+    // 处理不在定义中的连接器（兜底，通常是 'children' 或者未定义的名称）
+    const knownConnectorNames = new Set(connectors.map(c => c.name));
+    knownConnectorNames.add('condition');
+
+    const extraConns = childConns.filter((c: TreeConnection) => !knownConnectorNames.has(c.parentConnector));
+    // 同样按位置排序
+    const sortedExtraConns = extraConns.sort((a, b) => {
+      const nodeA = tree.nodes.get(a.childNodeId);
+      const nodeB = tree.nodes.get(b.childNodeId);
+      return (nodeA?.position.x || 0) - (nodeB?.position.x || 0);
+    });
+
+    for (const conn of sortedExtraConns) {
+      dfs(conn.childNodeId, effectivelyDisabled);
     }
   }
 
@@ -111,16 +168,28 @@ function recalculateUIDs(tree: Tree): void {
 
   // 从主根节点开始
   if (tree.rootId) {
-    dfs(tree.rootId);
+    dfs(tree.rootId, false);
   }
 
   // 处理森林中的其他树（从 1001、2001 等开始）
   let forestIndex = 1;
-  for (const [nodeId, node] of tree.nodes) {
-    if (node.uid === undefined) {
-      // 这是一个未被遍历到的根节点（森林中的其他树）
+  // 找出所有没有父节点的节点
+  const childIds = new Set(tree.connections.map(c => c.childNodeId));
+
+  for (const nodeId of tree.nodes.keys()) {
+    if (!childIds.has(nodeId) && !visited.has(nodeId)) {
+      // 这是一个未被遍历到的根节点（森林中的其他路径）
       uid = forestIndex * 1000 + 1;
-      dfs(nodeId);
+      dfs(nodeId, false);
+      forestIndex++;
+    }
+  }
+
+  // 最后兜底：任何循环引用或其他原因未访问到的节点（虽然不应该发生）
+  for (const nodeId of tree.nodes.keys()) {
+    if (!visited.has(nodeId)) {
+      uid = forestIndex * 1000 + 1;
+      dfs(nodeId, false);
       forestIndex++;
     }
   }
@@ -195,6 +264,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const { getDefinition } = useNodeDefinitionStore.getState();
       const tree = await loadTree(fullPath, getDefinition);
       const fileName = path.split('/').pop() || path;
+
+      // 加载本地元数据（如折叠状态）
+      const meta = useEditorMetaStore.getState().getTreeMeta(path);
+      if (meta) {
+        tree.nodes.forEach((node, id) => {
+          if (meta.nodes[id]) {
+            node.isFolded = meta.nodes[id].isFolded;
+          }
+        });
+      }
 
       const newFile: OpenedFile = {
         path,
@@ -333,6 +412,27 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   addDataConnection: (dataConn) => set((state) => {
     const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      // 辅助函数：检查节点是否被任何祖先禁用
+      const isEffectivelyDisabled = (nodeId: string): boolean => {
+        let current = nodeId;
+        while (current) {
+          const n = tree.nodes.get(current);
+          if (n?.disabled) return true;
+          const parentConn = tree.connections.find(c => c.childNodeId === current);
+          if (!parentConn) break;
+          current = parentConn.parentNodeId;
+        }
+        return false;
+      };
+
+      const fromDisabled = isEffectivelyDisabled(dataConn.fromNodeId);
+      const toDisabled = isEffectivelyDisabled(dataConn.toNodeId);
+
+      if (fromDisabled !== toDisabled) {
+        useNotificationStore.getState().notify('Cannot connect enabled node with disabled node', 'error');
+        return tree;
+      }
+
       return {
         ...tree,
         dataConnections: [...tree.dataConnections, dataConn],
@@ -362,11 +462,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
     const tree = file.tree;
 
-    // 辅助函数：获取从某个节点可达的所有节点 ID
-    const getReachableIds = (startId: string): Set<string> => {
+    // 辅助函数：获取从某个节点可达的所有节点 ID (可选择是否跳过禁用分支)
+    const getReachableIds = (startId: string, skipDisabled: boolean): Set<string> => {
       const reachable = new Set<string>();
       const dfs = (id: string) => {
         if (reachable.has(id)) return;
+        const node = tree.nodes.get(id);
+        if (skipDisabled && node?.disabled) return;
+
         reachable.add(id);
         tree.connections.filter(c => c.parentNodeId === id).forEach(c => dfs(c.childNodeId));
       };
@@ -385,7 +488,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       return current;
     };
 
-    const mainTreeIds = getReachableIds(tree.rootId);
+    const mainTreeIds = getReachableIds(tree.rootId, true);
 
     // 全量数据校验
     const errors: string[] = [];
@@ -404,8 +507,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
     // 3. 校验 Root 分支下节点的 Pin
     tree.nodes.forEach(node => {
-      // 只有在 Root 分支下的节点才需要校验
-      if (!mainTreeIds.has(node.id)) return;
+      // 只有在 Root 分支下的节点且未禁用的才需要校验
+      if (!mainTreeIds.has(node.id) || node.disabled) return;
 
       node.pins.forEach(pin => {
         if (pin.binding.type === 'const') {
@@ -418,14 +521,36 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       });
     });
 
-    // 4. 校验数据连接：必须在同一个根节点下
+    // 4. 校验数据连接：必须在同一个根节点下，且不能跨越禁用边界
     tree.dataConnections.forEach(dc => {
+      const fromNode = tree.nodes.get(dc.fromNodeId);
+      const toNode = tree.nodes.get(dc.toNodeId);
+
+      // 注意：这里的 mainTreeIds 是不跳过禁用的（用于同树校验）
       const fromRootId = getNodeRootId(dc.fromNodeId);
       const toRootId = getNodeRootId(dc.toNodeId);
       if (fromRootId !== toRootId) {
-        const fromNode = tree.nodes.get(dc.fromNodeId);
-        const toNode = tree.nodes.get(dc.toNodeId);
         errors.push(`DataConnection [${dc.fromPinName} -> ${dc.toPinName}]: Nodes [${fromNode?.type}:${fromNode?.uid}] and [${toNode?.type}:${toNode?.uid}] must be in the same tree`);
+        return;
+      }
+
+      // 检查有效禁用状态（如果两边一个是有效启用，一个是有效禁用，则报错）
+      // 辅助函数：检查节点是否被任何祖先禁用
+      const isEffectivelyDisabled = (nodeId: string): boolean => {
+        let current = nodeId;
+        while (current) {
+          const n = tree.nodes.get(current);
+          if (n?.disabled) return true;
+          const parentConn = tree.connections.find(c => c.childNodeId === current);
+          current = parentConn?.parentNodeId || '';
+        }
+        return false;
+      };
+
+      const fromDisabled = isEffectivelyDisabled(dc.fromNodeId);
+      const toDisabled = isEffectivelyDisabled(dc.toNodeId);
+      if (fromDisabled !== toDisabled) {
+        errors.push(`DataConnection [${dc.fromPinName} -> ${dc.toPinName}]: Cannot connect enabled node with disabled node`);
       }
     });
 
@@ -454,6 +579,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
           f.path === activeFilePath ? { ...f, isDirty: false } : f
         ),
       }));
+
+      if (errors.length === 0) {
+        useNotificationStore.getState().notify('Save successful', 'success');
+      }
 
       console.log('Saved:', editorPath, runtimePath);
     } catch (e) {
@@ -624,6 +753,63 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       }
 
       return newTree;
+    });
+    return result || state;
+  }),
+
+  // 新特性操作
+  toggleNodeFold: (nodeId) => set((state) => {
+    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      const node = tree.nodes.get(nodeId);
+      if (!node) return tree;
+
+      const newFolded = !node.isFolded;
+      const newNodes = new Map(tree.nodes);
+      newNodes.set(nodeId, { ...node, isFolded: newFolded });
+
+      // 保存到本地元数据
+      if (state.activeFilePath) {
+        useEditorMetaStore.getState().setNodeFolded(state.activeFilePath, nodeId, newFolded);
+      }
+
+      return { ...tree, nodes: newNodes };
+    });
+    return result || state;
+  }),
+
+  toggleNodeDisabled: (nodeId) => set((state) => {
+    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      const node = tree.nodes.get(nodeId);
+      if (!node) return tree;
+
+      const newDisabled = !node.disabled;
+      const newNodes = new Map(tree.nodes);
+      newNodes.set(nodeId, { ...node, disabled: newDisabled });
+
+      // 如果禁用了节点，断开与其相关的跨状态数据连接（可选）
+      // 但现在我们改为由 save 提示或 UI 阻止，先只保留基本逻辑
+      return { ...tree, nodes: newNodes };
+    });
+    return result || state;
+  }),
+
+  toggleConditionConnector: (nodeId) => set((state) => {
+    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      const node = tree.nodes.get(nodeId);
+      if (!node) return tree;
+
+      const hasCondition = !node.hasConditionConnector;
+      const newNodes = new Map(tree.nodes);
+      newNodes.set(nodeId, { ...node, hasConditionConnector: hasCondition });
+
+      let newConnections = [...tree.connections];
+      if (!hasCondition) {
+        newConnections = newConnections.filter(c =>
+          !(c.parentNodeId === nodeId && c.parentConnector === 'condition')
+        );
+      }
+
+      return { ...tree, nodes: newNodes, connections: newConnections };
     });
     return result || state;
   }),

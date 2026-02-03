@@ -266,7 +266,11 @@ function parseXmlNode(
   const nodeDef = getNodeDefinition?.(nodeClass);
 
   // 解析树文件中的 Pin 值
-  const skipAttrs = ['@_Class', '@_GUID', '@_Pos', '@_Connection', '@_Return', 'Shared', 'Local', 'Node'];
+  const skipAttrs = [
+    '@_Class', '@_GUID', '@_Pos', '@_Connection', '@_Return',
+    '@_NickName', '@_Comment', '@_Disabled',
+    'Shared', 'Local', 'Node'
+  ];
   const xmlPinValues = new Map<string, string>();
 
   for (const [key, value] of Object.entries(xmlNode)) {
@@ -276,6 +280,7 @@ function parseXmlNode(
     }
   }
 
+  // ... (pins logic remains same)
   // 基于定义文件合并 Pin 数据
   const pins: Pin[] = [];
 
@@ -291,7 +296,6 @@ function parseXmlNode(
         pins.push(createPinFromDefinition(pinDef));
       }
     }
-    // 注意：树文件中多余的 Pin（不在定义中的）会被丢弃
   } else {
     // 没有定义：直接使用树文件中的所有 Pin
     for (const [pinName, xmlValue] of xmlPinValues) {
@@ -299,10 +303,9 @@ function parseXmlNode(
     }
   }
 
-  // 收集额外属性（Connection, Return 等）
+  // 收集额外属性
   const extraAttrs: Record<string, string> = {};
-  if (xmlNode['@_Connection']) extraAttrs['Connection'] = xmlNode['@_Connection'];
-  if (xmlNode['@_Return']) extraAttrs['Return'] = xmlNode['@_Return'];
+  if (xmlNode['@_Connection']) extraAttrs['Connection'] = xmlNode['@_Connection'] as string;
 
   const node: TreeNode = {
     id,
@@ -310,7 +313,10 @@ function parseXmlNode(
     type: nodeClass,
     category: getNodeCategory(nodeClass),
     position: { x: pos[0], y: pos[1] },
-    disabled: false,
+    nickname: xmlNode['@_NickName'] as string,
+    comment: xmlNode['@_Comment'] as string,
+    disabled: xmlNode['@_Disabled'] === 'true',
+    returnType: (xmlNode['@_Return'] as any) || 'Default',
     pins,
     parentId,
     childrenIds: [],
@@ -331,11 +337,16 @@ function parseXmlNode(
       const parentNode = nodes.get(id);
       const parentDef = parentNode ? getNodeDefinition?.(parentNode.type) : undefined;
       const defaultConnectorName = parentDef?.childConnectors?.[0]?.name || 'default';
+      const connName = child['@_Connection'] || defaultConnectorName;
+
+      if (connName === 'condition') {
+        node.hasConditionConnector = true;
+      }
 
       connections.push({
         id: `conn-${id}-${childId}`,
         parentNodeId: id,
-        parentConnector: child['@_Connection'] || defaultConnectorName,
+        parentConnector: connName,
         childNodeId: childId,
       });
     }

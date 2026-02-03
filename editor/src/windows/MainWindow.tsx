@@ -7,11 +7,13 @@ import { FileTreePopup } from "../components/FileTreePopup";
 import { Terminal } from "../components/Terminal";
 import { useEditorStore } from "../stores/editorStore";
 import { useNodeDefinitionStore } from "../stores/nodeDefinitionStore";
+import { useEditorMetaStore } from "../stores/editorMetaStore";
 import { getAllWindows } from "@tauri-apps/api/window";
 
 export function MainWindow() {
     const { initSettings, settings, openedFiles, activeFilePath, saveCurrentFile, createNewTree } = useEditorStore();
     const { loadDefinitions, isLoaded } = useNodeDefinitionStore();
+    const loadAllMeta = useEditorMetaStore(state => state.loadAllMeta);
 
     const [isFileTreeOpen, setIsFileTreeOpen] = useState(false);
 
@@ -31,7 +33,9 @@ export function MainWindow() {
         if (!isLoaded) {
             loadDefinitions();
         }
-    }, [settings, initSettings, isLoaded, loadDefinitions]);
+        // 加载编辑器元数据
+        loadAllMeta();
+    }, [settings, initSettings, isLoaded, loadDefinitions, loadAllMeta]);
 
     // Ctrl+S 保存快捷键
     useEffect(() => {

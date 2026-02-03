@@ -60,6 +60,9 @@ export interface Pin {
 
 export type NodeCategory = 'composite' | 'decorator' | 'action' | 'condition';
 
+/** 节点返回类型处理 */
+export type ReturnType = 'Default' | 'Invert' | 'Success' | 'Failure';
+
 export interface TreeNode {
   id: string;
   guid: number;  // 文件中保存的唯一标识，不变
@@ -68,12 +71,15 @@ export interface TreeNode {
   category: NodeCategory;
   nickname?: string;
   comment?: string;
+  returnType?: ReturnType;
   position: Position;
   disabled: boolean;
+  isFolded?: boolean;
+  hasConditionConnector?: boolean;
   pins: Pin[];
   parentId?: string;
   childrenIds: string[];
-  // 额外属性（如 Connection, Return 等）
+  // 额外属性（如 Connection 等）
   extraAttrs?: Record<string, string>;
 }
 

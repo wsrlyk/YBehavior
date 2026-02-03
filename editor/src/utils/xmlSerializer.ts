@@ -1,5 +1,4 @@
 import type { Tree, TreeNode, Pin, TreeConnection, ValueType, Variable, DataConnection } from '../types';
-import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 
 /** ValueType 到 XML 字符的映射 */
 const VALUE_TYPE_TO_CHAR: Record<ValueType, string> = {
@@ -59,6 +58,14 @@ function serializePinValue(pin: Pin, forEditor: boolean): string {
     value = pin.binding.value;
   } else {
     value = pin.binding.variableName; // 空变量名表示数据连接状态
+
+    // 如果有 Vector Index，追加序列化
+    if (pin.vectorIndex) {
+      const vi = pin.vectorIndex;
+      const viType = vi.type === 'const' ? 'c' : (vi.isLocal ? 'p' : 'P');
+      const viVal = vi.type === 'const' ? vi.value : vi.variableName;
+      value += ` VI ${viType} ${viVal}`;
+    }
   }
 
   return code + ' ' + value;
@@ -93,7 +100,8 @@ function serializeNodeForEditor(
   nodeMap: Map<string, TreeNode>,
   connections: TreeConnection[],
   sharedVars?: Variable[],
-  localVars?: Variable[]
+  localVars?: Variable[],
+  parentConnector?: string
 ): Element {
   const el = doc.createElement('Node');
   el.setAttribute('Class', node.type);
@@ -101,7 +109,14 @@ function serializeNodeForEditor(
   // GUID (编辑器版需要)
   el.setAttribute('GUID', String(node.guid));
 
-  if (node.extraAttrs?.Return) {
+  // 连接属性 (如果有，则放在 Pos 之前)
+  if (parentConnector) {
+    el.setAttribute('Connection', parentConnector);
+  }
+
+  if (node.returnType && node.returnType !== 'Default') {
+    el.setAttribute('Return', node.returnType);
+  } else if (node.extraAttrs?.Return) {
     el.setAttribute('Return', node.extraAttrs.Return);
   }
 
@@ -111,6 +126,9 @@ function serializeNodeForEditor(
   if (node.nickname) el.setAttribute('NickName', node.nickname);
   if (node.comment) el.setAttribute('Comment', node.comment);
   if (node.disabled) el.setAttribute('Disabled', 'true');
+  if (node.returnType && node.returnType !== 'Default') {
+    el.setAttribute('Return', node.returnType);
+  }
 
   // 如果是 Root 节点，添加 Shared 和 Local 变量
   if (node.type === 'Root') {
@@ -139,20 +157,13 @@ function serializeNodeForEditor(
   // 递归序列化子节点
   const childConnections = connections.filter(c => c.parentNodeId === node.id);
 
-  // 获取当前节点的连接器定义
-  const currentNodeDef = useNodeDefinitionStore.getState().getDefinition(node.type);
-  const defaultConnector = currentNodeDef?.childConnectors?.[0]?.name || 'default';
-
   for (const conn of childConnections) {
     const childNode = nodeMap.get(conn.childNodeId);
     if (childNode) {
-      const childEl = serializeNodeForEditor(childNode, doc, nodeMap, connections);
+      // 传递 connection 名称 (children 是默认，不需要显式保存)
+      const connName = conn.parentConnector === 'children' ? undefined : conn.parentConnector;
 
-      // 如果不是默认连接器，则设置 Connection 属性
-      if (conn.parentConnector && conn.parentConnector !== defaultConnector) {
-        childEl.setAttribute('Connection', conn.parentConnector);
-      }
-
+      const childEl = serializeNodeForEditor(childNode, doc, nodeMap, connections, undefined, undefined, connName);
       el.appendChild(childEl);
     }
   }

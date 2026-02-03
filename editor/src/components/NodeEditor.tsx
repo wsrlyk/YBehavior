@@ -72,10 +72,12 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     isOpen: boolean;
     position: { x: number; y: number };
     screenPosition: { x: number; y: number };
+    nodeId: string | null;
   }>({
     isOpen: false,
     position: { x: 0, y: 0 },
     screenPosition: { x: 0, y: 0 },
+    nodeId: null,
   });
 
   const selectedNodeIds = useEditorStore((state) => state.selectedNodeIds);
@@ -88,12 +90,45 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     const nodes: CustomNodeType[] = [];
     const edges: Edge[] = [];
 
+    // 计算被折叠隐藏的节点 ID 和 有效禁用状态
+    const hiddenNodeIds = new Set<string>();
+    const effectiveDisabledIds = new Set<string>();
+
+    const processTreeStatesRecursive = (id: string, isParentFolded: boolean, isParentDisabled: boolean) => {
+      const node = currentTree.nodes.get(id);
+      if (!node) return;
+
+      const isEffectivelyDisabled = isParentDisabled || node.disabled;
+      if (isEffectivelyDisabled) effectiveDisabledIds.add(id);
+
+      if (isParentFolded) {
+        hiddenNodeIds.add(id);
+      }
+
+      const shouldHideChildren = isParentFolded || node.isFolded;
+      currentTree.connections
+        .filter(c => c.parentNodeId === id)
+        .forEach(c => processTreeStatesRecursive(c.childNodeId, !!shouldHideChildren, isEffectivelyDisabled));
+    };
+
+    // 找到所有顶层节点开始遍历
+    const childIds = new Set(currentTree.connections.map(c => c.childNodeId));
+    currentTree.nodes.forEach((_, id) => {
+      if (!childIds.has(id)) {
+        processTreeStatesRecursive(id, false, false);
+      }
+    });
+
     currentTree.nodes.forEach((node: TreeNode) => {
       nodes.push({
         ...treeNodeToFlowNode(node, getDefinition),
         // Root 节点不可删除
         deletable: node.type !== 'Root',
         selected: selectedNodeIds.includes(node.id),
+        data: {
+          ...treeNodeToFlowNode(node, getDefinition).data,
+          isEffectivelyDisabled: effectiveDisabledIds.has(node.id),
+        }
       });
     });
 
@@ -138,8 +173,12 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       });
     });
 
-    return { flowNodes: nodes, flowEdges: edges };
-  }, [currentTree, getDefinition]);
+    // 过滤掉被隐藏的节点和边
+    const visibleNodes = nodes.filter(n => !hiddenNodeIds.has(n.id));
+    const visibleEdges = edges.filter(e => !hiddenNodeIds.has(e.source) && !hiddenNodeIds.has(e.target));
+
+    return { flowNodes: visibleNodes, flowEdges: visibleEdges };
+  }, [currentTree, getDefinition, selectedNodeIds]);
 
   const [nodes, setNodes, onNodesChangeBase] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChangeBase] = useEdgesState<Edge>([]);
@@ -217,7 +256,29 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
             return;
           }
 
-          // 2. 检查是否在同一棵树下
+          // 3. 检查有效禁用状态匹配
+          const isEffectivelyDisabled = (nodeId: string, tree: import('../types').Tree): boolean => {
+            let current = nodeId;
+            while (current) {
+              const n = tree.nodes.get(current);
+              if (n?.disabled) return true;
+              const parentConn = tree.connections.find(c => c.childNodeId === current);
+              if (!parentConn) break;
+              current = parentConn.parentNodeId;
+            }
+            return false;
+          };
+
+          if (isEffectivelyDisabled(params.source!, currentTree!) !== isEffectivelyDisabled(params.target!, currentTree!)) {
+            const { useNotificationStore } = await import('../stores/notificationStore');
+            const { logger } = await import('../utils/logger');
+            const errorMsg = `Connection failed: Cannot connect enabled node with disabled node`;
+            useNotificationStore.getState().notify(errorMsg, 'error');
+            logger.error(errorMsg);
+            return;
+          }
+
+          // 4. 检查是否在同一棵树下
           const getNodeRootId = (nodeId: string, tree: import('../types').Tree): string => {
             let current = nodeId;
             while (true) {
@@ -228,10 +289,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
             return current;
           };
 
-          const fromRootId = getNodeRootId(params.source!, currentTree!);
-          const toRootId = getNodeRootId(params.target!, currentTree!);
-
-          if (fromRootId !== toRootId) {
+          if (getNodeRootId(params.source!, currentTree!) !== getNodeRootId(params.target!, currentTree!)) {
             const { useNotificationStore } = await import('../stores/notificationStore');
             const { logger } = await import('../utils/logger');
             const errorMsg = `Connection failed: Nodes must be in the same tree`;
@@ -268,7 +326,6 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   const handleContextMenu = useCallback((e: MouseEvent) => {
     e.preventDefault();
 
-    // 获取相对于容器的位置（用于菜单显示）
     const bounds = e.currentTarget.getBoundingClientRect();
     const relativeX = e.clientX - bounds.left;
     const relativeY = e.clientY - bounds.top;
@@ -277,6 +334,25 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       isOpen: true,
       position: { x: relativeX, y: relativeY },
       screenPosition: { x: e.clientX, y: e.clientY },
+      nodeId: null, // 面板右键
+    });
+  }, []);
+
+  const onNodeContextMenu = useCallback((e: React.MouseEvent, node: Node) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const bounds = document.querySelector('.react-flow__renderer')?.getBoundingClientRect();
+    if (!bounds) return;
+
+    const relativeX = e.clientX - bounds.left;
+    const relativeY = e.clientY - bounds.top;
+
+    setContextMenu({
+      isOpen: true,
+      position: { x: relativeX, y: relativeY },
+      screenPosition: { x: e.clientX, y: e.clientY },
+      nodeId: node.id, // 节点右键
     });
   }, []);
 
@@ -341,8 +417,8 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         onPaneClick={() => {
           setContextMenu(prev => ({ ...prev, isOpen: false }));
           onPaneClick?.();
-          // 注意：ReactFlow 默认会在点击面板时清除选择，这会触发 onSelectionChange with []
         }}
+        onNodeContextMenu={onNodeContextMenu}
         onSelectionChange={({ nodes }) => {
           // 同步选中状态到 Store
           const newNodeIds = nodes.map(n => n.id);
@@ -383,6 +459,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       <NodeContextMenu
         isOpen={contextMenu.isOpen}
         position={contextMenu.position}
+        nodeId={contextMenu.nodeId}
         onClose={() => setContextMenu(prev => ({ ...prev, isOpen: false }))}
         onAddNode={handleAddNode}
       />

@@ -389,31 +389,41 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
       {/* 注释 */}
       <div>
         <div className="text-xs text-gray-500 mb-1">Comment</div>
-        <input
-          className="w-full bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded outline-none"
+        <textarea
+          className="w-full bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded outline-none resize-none overflow-hidden"
           value={node.comment || ''}
-          onChange={(e) => updateNodeProperty(nodeId, { comment: e.target.value })}
+          onChange={(e) => {
+            updateNodeProperty(nodeId, { comment: e.target.value });
+            // 自动调整高度
+            e.target.style.height = 'auto';
+            e.target.style.height = e.target.scrollHeight + 'px';
+          }}
+          onFocus={(e) => {
+            // 获焦时也触发一次高度调整，确保初始显示正确
+            e.target.style.height = 'auto';
+            e.target.style.height = e.target.scrollHeight + 'px';
+          }}
           placeholder="Add comment..."
+          spellCheck={false}
+          rows={1}
         />
       </div>
 
-      {/* Return 属性（如果有） */}
-      {node.extraAttrs?.Return !== undefined && (
-        <div>
-          <div className="text-xs text-gray-500 mb-1">Return</div>
-          <select
-            className="w-full bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded outline-none"
-            value={node.extraAttrs.Return}
-            onChange={(e) => updateNodeProperty(nodeId, {
-              extraAttrs: { ...node.extraAttrs, Return: e.target.value }
-            })}
-          >
-            <option value="Success">Success</option>
-            <option value="Failure">Failure</option>
-            <option value="Running">Running</option>
-          </select>
+      {/* Return 属性 */}
+      <div>
+        <div className="text-xs text-gray-500 mb-1">Return</div>
+        <div className="w-full bg-gray-700 rounded px-2 py-1">
+          <AdaptiveSelect
+            value={node.returnType || 'Default'}
+            options={['Default', 'Invert', 'Success', 'Failure']}
+            onChange={(val) => updateNodeProperty(nodeId, { returnType: val as any })}
+            baseClassName="text-xs text-gray-300"
+            triggerClassName="w-full"
+            containerClassName="w-full block"
+            renderLabel={(val) => val === 'Default' ? '(Default)' : val}
+          />
         </div>
-      )}
+      </div>
 
       {/* Pin 列表（分组显示） */}
       <div>
