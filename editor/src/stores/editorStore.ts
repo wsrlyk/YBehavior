@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+﻿import { create } from 'zustand';
 import type { Tree, TreeNode, TreeConnection, DataConnection, Variable, Pin } from '../types';
 import { loadTree, listTreeFiles, saveFile } from '../utils/fileService';
 import { loadSettings, type Settings } from '../utils/settings';
@@ -8,6 +8,7 @@ import { validateValue, getDefaultValue } from '../utils/validation';
 import { useNotificationStore } from './notificationStore';
 import { logger } from '../utils/logger';
 import { useEditorMetaStore } from './editorMetaStore';
+import { SPECIAL_NODE_HANDLERS_IMPL, type ConnectionLabelUpdate } from '../utils/specialNodeLogic';
 
 interface HistoryState {
   past: Tree[];
@@ -307,11 +308,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         });
       }
 
+      // 初始加载时计算所有特殊节点的标签
+      const treeWithLabels = applyLabelUpdatesToTree(tree, Array.from(tree.nodes.keys()));
+
       const newFile: OpenedFile = {
         path,
         name: fileName,
-        tree,
-        lastSavedTreeSnapshot: serializeTreeForEditor(tree),
+        tree: treeWithLabels,
+        lastSavedTreeSnapshot: serializeTreeForEditor(treeWithLabels),
         isDirty: false,
         history: { past: [], future: [] }
       };
@@ -416,7 +420,19 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         (c) => c.parentNodeId !== nodeId && c.childNodeId !== nodeId
       );
 
-      return { ...tree, nodes: newNodes, connections: newConnections };
+      const newTree = { ...tree, nodes: newNodes, connections: newConnections };
+
+      // 删除节点可能影响连线（虽然连线已删除，但如果被删节点是某个特殊节点的子节点... 
+      const parentNodeIdsToRefresh = new Set<string>();
+      tree.connections.forEach(c => {
+        if (c.childNodeId === nodeId && newNodes.has(c.parentNodeId)) {
+          parentNodeIdsToRefresh.add(c.parentNodeId);
+        }
+      });
+
+      const newTreeAfterLabelUpdate = applyLabelUpdatesToTree(newTree, Array.from(parentNodeIdsToRefresh));
+
+      return newTreeAfterLabelUpdate;
     });
 
     if (!result) return state;
@@ -442,10 +458,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   addConnection: (connection) => set((state) => {
     const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      return {
+      const newTreeWithConn = {
         ...tree,
         connections: [...tree.connections, connection],
       };
+
+      const newTreeAfterLabelUpdate = applyLabelUpdatesToTree(newTreeWithConn, [connection.parentNodeId]);
+      return newTreeAfterLabelUpdate;
     });
 
     return result || state;
@@ -453,10 +472,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   removeConnection: (connectionId) => set((state) => {
     const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      return {
+      const newTreeWithConn = {
         ...tree,
         connections: tree.connections.filter((c) => c.id !== connectionId),
       };
+
+      // 删除连接后，需要刷新父节点的标签
+      const parentNodeId = tree.connections.find(c => c.id === connectionId)?.parentNodeId;
+      const newTreeAfterLabelUpdate = parentNodeId
+        ? applyLabelUpdatesToTree(newTreeWithConn, [parentNodeId])
+        : newTreeWithConn;
+
+      return newTreeAfterLabelUpdate;
     });
 
     return result || state;
@@ -582,6 +609,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
           }
         }
       });
+    });
+
+    // 4.1 特殊节点验证 (SwitchCase, HandleEvent 等)
+    tree.nodes.forEach(node => {
+      // 只有在 Root 分支下的节点且未禁用的才需要校验
+      if (!mainTreeIds.has(node.id) || node.disabled) return;
+
+      const handler = (SPECIAL_NODE_HANDLERS_IMPL as any)[node.type];
+      if (handler && handler.validate) {
+        const nodeErrors = handler.validate(node, tree);
+        errors.push(...nodeErrors);
+      }
     });
 
     // 4. 校验数据连接：必须在同一个根节点下，且不能跨越禁用边界
@@ -818,9 +857,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     file.tree.nodes.forEach((node, id) => {
       newNodes.set(id, { ...node });
     });
-    const newTree = { ...file.tree, nodes: newNodes };
+    let newTree = { ...file.tree, nodes: newNodes };
 
     recalculateUIDs(newTree);
+    newTree = applyLabelUpdatesToTree(newTree, Array.from(newTree.nodes.keys())); // Apply label updates after UID recalculation
 
     const currentSnapshot = serializeTreeForEditor(newTree);
     const isDirty = currentSnapshot !== file.lastSavedTreeSnapshot;
@@ -1020,7 +1060,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         );
       }
 
-      return newTree;
+      const newTreeAfterLabelUpdate = applyLabelUpdatesToTree(newTree, [nodeId]);
+      return newTreeAfterLabelUpdate;
     });
 
     return result || state;
@@ -1056,7 +1097,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const newNodes = new Map(tree.nodes);
       newNodes.set(nodeId, { ...node, disabled: newDisabled });
 
-      return { ...tree, nodes: newNodes };
+      const newTreeWithNodes = { ...tree, nodes: newNodes };
+      // 禁用/启用节点会影响标签
+      const newTreeAfterLabelUpdate = applyLabelUpdatesToTree(newTreeWithNodes, [nodeId]);
+      return newTreeAfterLabelUpdate;
     });
     return result || state;
   }),
@@ -1138,3 +1182,55 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     };
   }),
 }));
+
+// ==================== Special Node Logic Helper ====================
+
+/**
+ * 应用特殊节点的标签更新
+ * @param tree 原始树对象
+ * @param nodeIdsToCheck 需要检查的节点 ID 列表
+ * @returns 更新后的树对象（如果没有变化则返回原对象）
+ */
+function applyLabelUpdatesToTree(tree: Tree, nodeIdsToCheck: string[]): Tree {
+  if (nodeIdsToCheck.length === 0) return tree;
+
+  let newConnections = tree.connections;
+  let hasChanges = false;
+  const processedNodeIds = new Set<string>();
+
+  for (const nodeId of nodeIdsToCheck) {
+    if (!nodeId || processedNodeIds.has(nodeId)) continue;
+    processedNodeIds.add(nodeId);
+
+    const node = tree.nodes.get(nodeId);
+    if (!node) continue;
+
+    const handler = (SPECIAL_NODE_HANDLERS_IMPL as any)[node.type];
+    if (handler && handler.refreshLabels) {
+      // 获取更新列表
+      const updates = handler.refreshLabels(nodeId, tree);
+
+      if (updates.length > 0) {
+        // 如果还没有克隆过 connections，先克隆
+        if (!hasChanges) {
+          newConnections = [...tree.connections];
+          hasChanges = true;
+        }
+
+        // 应用更新
+        updates.forEach((update: ConnectionLabelUpdate) => {
+          const index = newConnections.findIndex((c) => c.id === update.id);
+          if (index !== -1) {
+            newConnections[index] = { ...newConnections[index], label: update.label };
+          }
+        });
+      }
+    }
+  }
+
+  if (hasChanges) {
+    return { ...tree, connections: newConnections };
+  }
+
+  return tree;
+}

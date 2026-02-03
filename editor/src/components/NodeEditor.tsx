@@ -176,7 +176,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
             target: conn.childNodeId,
             targetHandle: 'tree-target',
             type: 'tree',
-            data: { siblingTargetIds },
+            data: { siblingTargetIds, label: conn.label },
           });
         }
       });

@@ -91,6 +91,7 @@ export interface TreeConnection {
   parentNodeId: string;
   parentConnector: string;
   childNodeId: string;
+  label?: string;
 }
 
 export interface DataConnection {

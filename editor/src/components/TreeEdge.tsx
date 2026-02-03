@@ -1,8 +1,9 @@
 import { memo } from 'react';
-import { BaseEdge, type EdgeProps, type Edge, useStore } from '@xyflow/react';
+import { BaseEdge, type EdgeProps, type Edge, useStore, EdgeLabelRenderer } from '@xyflow/react';
 
 export interface TreeEdgeData extends Record<string, unknown> {
   siblingTargetIds?: string[];  // 兄弟边的目标节点 ID 列表
+  label?: string;               // 连线标签
 }
 
 export type TreeEdgeType = Edge<TreeEdgeData, 'tree'>;
@@ -26,6 +27,7 @@ function TreeEdge({
 }: EdgeProps) {
   const edgeData = data as TreeEdgeData | undefined;
   const siblingTargetIds = edgeData?.siblingTargetIds || [];
+  const label = edgeData?.label;
 
   // 从 store 获取水平线高度
   const horizontalY = useStore((state) => {
@@ -62,16 +64,42 @@ function TreeEdge({
   const path = `M ${sourceX} ${sourceY} L ${sourceX} ${horizontalY} L ${targetX} ${horizontalY} L ${targetX} ${targetY}`;
 
   return (
-    <BaseEdge
-      id={id}
-      path={path}
-      style={{
-        ...style,
-        stroke: selected ? '#fff' : '#6b7280',
-        strokeWidth: selected ? 3 : 2
-      }}
-      markerEnd={markerEnd}
-    />
+    <>
+      <BaseEdge
+        id={id}
+        path={path}
+        style={{
+          ...style,
+          stroke: selected ? '#fff' : '#6b7280',
+          strokeWidth: selected ? 3 : 2
+        }}
+        markerEnd={markerEnd}
+      />
+      {label && (
+        <EdgeLabelRenderer>
+          <div
+            style={{
+              position: 'absolute',
+              transform: `translate(-50%, -50%) translate(${targetX}px,${(horizontalY + targetY) / 2}px)`,
+              background: '#374151',
+              padding: '2px 6px',
+              borderRadius: '4px',
+              fontSize: '10px',
+              color: '#e5e7eb',
+              pointerEvents: 'none',
+              zIndex: 10,
+              whiteSpace: 'nowrap',
+              maxWidth: '120px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              border: '1px solid #4b5563',
+            }}
+          >
+            {label}
+          </div>
+        </EdgeLabelRenderer>
+      )}
+    </>
   );
 }
 

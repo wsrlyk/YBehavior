@@ -338,9 +338,9 @@ npm run tauri build    # 打包（输出到 src-tauri/target/release/）
 **需要特殊代码的**（UI 行为，TypeMap 无法处理）：
 | 节点 | 特殊逻辑 |
 |------|---------|
-| SwitchCase | Cases 数组长度决定连接器数量 |
-| SubTree | 需要文件选择器列出 .tree 文件 |
-| HandleEvent | 事件配置决定哪些输出 Pin 启用 |
+| SwitchCase | Cases 常量数组长度匹配children连接器下的启用的子节点数量，每个子节点的连线上显示对应数组元素的值，变量数组无数量限制 |
+| SubTree | 需要文件选择器列出 .tree 文件，有额外的子树pin的配置面板 |
+| HandleEvent | Cases 常量数组长度匹配children连接器下的启用的子节点数量，每个子节点的连线上显示对应数组元素的值，允许：一对多，多对一，一一对应三种情况。变量数组无数量限制 |
 
 ### 2026-01-30 UI 布局需求
 
