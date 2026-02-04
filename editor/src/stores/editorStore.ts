@@ -100,6 +100,14 @@ interface EditorState {
   toggleNodeDisabled: (nodeId: string) => void;
   toggleConditionConnector: (nodeId: string) => void;
 
+  // Tree Interface (I/O) 操作
+  addTreeInterfacePin: (isInput: boolean, pin: import('../types').TreeInterfacePin) => void;
+  removeTreeInterfacePin: (isInput: boolean, id: string) => void;
+  updateTreeInterfacePin: (isInput: boolean, id: string, updates: Partial<import('../types').TreeInterfacePin>) => void;
+
+  // SubTree 操作
+  reloadSubTreePins: (nodeId: string) => Promise<void>;
+
   // 新建文件
   createNewTree: (name: string) => void;
 }
@@ -578,7 +586,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       return current;
     };
 
-    const mainTreeIds = getReachableIds(tree.rootId, true);
+    const mainTreeIds = getReachableIds(tree.rootId || '', true);
 
     // 全量数据校验
     const errors: string[] = [];
@@ -604,7 +612,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         if (pin.binding.type === 'const') {
           const res = validateValue(pin.binding.value, pin.valueType, pin.countType);
           if (!res.isValid) {
-            const nodeLabel = `${node.type}:${node.uid || node.id}`;
+            const nodeLabel = `${node.type}:${node.uid || node.id || ''}`;
             errors.push(`Node [${nodeLabel}] Pin [${pin.name}]: ${res.error}`);
           }
         }
@@ -953,6 +961,42 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     return result || state;
   }),
 
+  // Tree Interface (I/O) 操作
+  addTreeInterfacePin: (isInput: boolean, pin: import('../types').TreeInterfacePin) => set((state) => {
+    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      if (isInput) {
+        return { ...tree, inputs: [...tree.inputs, pin] };
+      } else {
+        return { ...tree, outputs: [...tree.outputs, pin] };
+      }
+    });
+    return result || state;
+  }),
+
+  removeTreeInterfacePin: (isInput: boolean, id: string) => set((state) => {
+    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      if (isInput) {
+        return { ...tree, inputs: tree.inputs.filter(p => p.id !== id) };
+      } else {
+        return { ...tree, outputs: tree.outputs.filter(p => p.id !== id) };
+      }
+    });
+    return result || state;
+  }),
+
+  updateTreeInterfacePin: (isInput: boolean, id: string, updates: Partial<import('../types').TreeInterfacePin>) => set((state) => {
+    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      const pins = isInput ? tree.inputs : tree.outputs;
+      const newPins = pins.map(p => p.id === id ? { ...p, ...updates } : p);
+      if (isInput) {
+        return { ...tree, inputs: newPins };
+      } else {
+        return { ...tree, outputs: newPins };
+      }
+    });
+    return result || state;
+  }),
+
   // Pin 操作
   updatePin: (nodeId, pinName, updates) => set((state) => {
     const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
@@ -1126,6 +1170,169 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     return result || state;
   }),
 
+  // SubTree 操作
+  reloadSubTreePins: async (nodeId) => {
+    const { editorTreeDir, openedFiles, activeFilePath } = get();
+    if (!editorTreeDir || !activeFilePath) return;
+
+    const currentTree = openedFiles.find(f => f.path === activeFilePath)?.tree;
+    if (!currentTree) return;
+
+    const node = currentTree.nodes.get(nodeId);
+    if (!node || node.type !== 'SubTree') return;
+
+    const treePin = node.pins.find(p => p.name === 'Tree');
+    const treeFile = treePin?.binding.type === 'const' ? treePin.binding.value : '';
+    // 如果没有路径，清空动态 Pin
+    if (!treeFile) {
+      set((state) => {
+        const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+          const targetNode = tree.nodes.get(nodeId);
+          if (!targetNode) return tree;
+
+          const nodeDef = useNodeDefinitionStore.getState().getDefinition(targetNode.type);
+          if (!nodeDef) return tree;
+
+          // 仅保留基础 Pin
+          const basePins = targetNode.pins.filter(p => nodeDef.pins.some(bp => bp.name === p.name));
+          const newNodes = new Map(tree.nodes);
+          newNodes.set(nodeId, { ...targetNode, pins: basePins });
+
+          return { ...tree, nodes: newNodes };
+        });
+        return result || state;
+      });
+      return;
+    }
+
+    try {
+      // 加载 SubTree 文件 (递归加载其定义)
+      const treeFileWithExt = treeFile.endsWith('.tree') ? treeFile : `${treeFile}.tree`;
+      const fullPath = `${editorTreeDir}/${treeFileWithExt}`;
+      const subTree = await loadTree(fullPath, (className) => useNodeDefinitionStore.getState().getDefinition(className));
+
+      set((state) => {
+        const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+          const targetNode = tree.nodes.get(nodeId);
+          if (!targetNode) return tree;
+
+          const nodeDef = useNodeDefinitionStore.getState().getDefinition(targetNode.type);
+          if (!nodeDef) return tree;
+
+          // 1. 基础 Pins (来自 builtin.xml 定义)
+          const basePins: Pin[] = nodeDef.pins.map(pinDef => {
+            const existing = targetNode.pins.find(p => p.name === pinDef.name);
+            const bindingType = existing ? existing.binding.type : (pinDef.constType === 'pointer' ? 'pointer' : 'const');
+            const countType = pinDef.arrayType === 'list' ? 'list' : 'scalar';
+
+            return {
+              name: pinDef.name,
+              valueType: pinDef.valueType,
+              countType,
+              bindingType,
+              binding: existing ? existing.binding : (bindingType === 'pointer'
+                ? { type: 'pointer', variableName: '', isLocal: false }
+                : { type: 'const', value: pinDef.defaultValue }),
+              enableType: pinDef.enableType,
+              isInput: pinDef.isInput,
+              enumValues: pinDef.enumValues,
+              allowedValueTypes: pinDef.allowedValueTypes || [pinDef.valueType],
+              vTypeGroup: pinDef.vTypeGroup,
+              cTypeGroup: pinDef.cTypeGroup,
+              isCountTypeFixed: pinDef.arrayType !== 'switchable',
+              isBindingTypeFixed: pinDef.constType !== 'switchable',
+              vectorIndex: existing?.vectorIndex,
+            };
+          });
+
+          // 2. 动态 Pins (来自 SubTree 的 Interface 定义)
+          const subTreeInputs: Pin[] = subTree.inputs.map(inPin => ({
+            name: inPin.name,
+            valueType: inPin.valueType,
+            countType: inPin.countType,
+            isInput: true,
+            allowedValueTypes: [inPin.valueType],
+            isCountTypeFixed: true,
+            isBindingTypeFixed: false, // 输入可以绑定常量或变量
+            enableType: 'fixed',
+            bindingType: 'const',
+            binding: { type: 'const', value: getDefaultValue(inPin.valueType, inPin.countType === 'list') }
+          }));
+
+          const subTreeOutputs: Pin[] = subTree.outputs.map(outPin => ({
+            name: outPin.name,
+            valueType: outPin.valueType,
+            countType: outPin.countType,
+            isInput: false,
+            allowedValueTypes: [outPin.valueType],
+            isCountTypeFixed: true,
+            isBindingTypeFixed: true, // 输出必须绑定到变量
+            enableType: 'fixed',
+            bindingType: 'pointer',
+            binding: { type: 'pointer', variableName: '', isLocal: false }
+          }));
+
+          // 3. 合并并尽量保留原有绑定
+          const newPins = [...basePins];
+          const dynamicPins = [...subTreeInputs, ...subTreeOutputs];
+
+          dynamicPins.forEach(dp => {
+            const existing = targetNode.pins.find(p => p.name === dp.name);
+            if (existing) {
+              // 检查类型是否依然兼容
+              const typeCompatible = existing.valueType === dp.valueType && existing.countType === dp.countType;
+              if (typeCompatible) {
+                // 如果是 Output，强制要求是 pointer 类型
+                if (!dp.isInput && existing.binding.type !== 'pointer') {
+                  newPins.push(dp);
+                } else {
+                  newPins.push({ ...dp, binding: existing.binding, vectorIndex: existing.vectorIndex, bindingType: existing.binding.type });
+                }
+              } else {
+                newPins.push(dp);
+              }
+            } else {
+              newPins.push(dp);
+            }
+          });
+
+          // 4. 更新节点
+          const newNodes = new Map(tree.nodes);
+          newNodes.set(nodeId, { ...targetNode, pins: newPins });
+
+          // 5. 清理失效的数据连接
+          const newPinNames = new Set(newPins.map(p => p.name));
+          let newDataConnections = tree.dataConnections.filter(dc => {
+            if (dc.fromNodeId === nodeId && !newPinNames.has(dc.fromPinName)) return false;
+            if (dc.toNodeId === nodeId && !newPinNames.has(dc.toPinName)) return false;
+            // 如果 Pin 存在但类型变了，也应该清理
+            if (dc.fromNodeId === nodeId) {
+              const p = newPins.find(p => p.name === dc.fromPinName);
+              const oldP = targetNode.pins.find(p => p.name === dc.fromPinName);
+              if (p && oldP && (p.valueType !== oldP.valueType || p.countType !== oldP.countType)) return false;
+            }
+            if (dc.toNodeId === nodeId) {
+              const p = newPins.find(p => p.name === dc.toPinName);
+              const oldP = targetNode.pins.find(p => p.name === dc.toPinName);
+              if (p && oldP && (p.valueType !== oldP.valueType || p.countType !== oldP.countType)) return false;
+            }
+            return true;
+          });
+
+          return { ...tree, nodes: newNodes, dataConnections: newDataConnections };
+        });
+        return result || state;
+      });
+
+    } catch (e) {
+      console.error('Failed to reload SubTree pins:', e);
+      useNotificationStore.getState().notify(`Failed to load subtree: ${treeFile}`, 'error');
+    }
+  },
+
+  // 辅助函数: 获取旧节点的 Pin 类型 (用于清理连接)
+  // 这里我们简化一下，如果 Pins 变了直接触发 label 刷新即可，清理逻辑可以更细致点
+
   // 新建文件
   createNewTree: (name) => set((state) => {
     let uniqueName = name;
@@ -1161,9 +1368,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       dataConnections: [],
       sharedVariables: [],
       localVariables: [],
+      inputs: [],
+      outputs: [],
       inputPins: [],
       outputPins: [],
-      comments: [],
     };
 
     const newFile: OpenedFile = {

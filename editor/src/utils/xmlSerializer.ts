@@ -1,4 +1,5 @@
-import type { Tree, TreeNode, Pin, TreeConnection, ValueType, Variable, DataConnection } from '../types';
+import type { Tree, TreeNode, Pin, TreeConnection, ValueType, Variable, DataConnection, TreeInterfacePin } from '../types';
+import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 
 /** ValueType 到 XML 字符的映射 */
 const VALUE_TYPE_TO_CHAR: Record<ValueType, string> = {
@@ -11,6 +12,7 @@ const VALUE_TYPE_TO_CHAR: Record<ValueType, string> = {
   'ulong': 'U',
   'enum': 'E',
 };
+
 
 /**
  * 将 Pin 值序列化为 XML 属性格式
@@ -56,6 +58,10 @@ function serializePinValue(pin: Pin, forEditor: boolean): string {
   let value = '';
   if (pin.binding.type === 'const') {
     value = pin.binding.value;
+    // 如果是 Tree Pin，去除后缀名
+    if (pin.name === 'Tree' && value.endsWith('.tree')) {
+      value = value.substring(0, value.length - 5);
+    }
   } else {
     value = pin.binding.variableName; // 空变量名表示数据连接状态
 
@@ -101,7 +107,8 @@ function serializeNodeForEditor(
   connections: TreeConnection[],
   sharedVars?: Variable[],
   localVars?: Variable[],
-  parentConnector?: string
+  parentConnector?: string,
+  treeInterface?: { inputs: TreeInterfacePin[], outputs: TreeInterfacePin[] }
 ): Element {
   const el = doc.createElement('Node');
   el.setAttribute('Class', node.type);
@@ -149,10 +156,79 @@ function serializeNodeForEditor(
   }
 
   // Pin 值
+  const inputEl = doc.createElement('Input');
+  const outputEl = doc.createElement('Output');
+  let hasInput = false;
+  let hasOutput = false;
+
+  const nodeDef = useNodeDefinitionStore.getState().getDefinition(node.type);
+
   for (const pin of node.pins) {
     const value = serializePinValue(pin, true);
-    if (value) el.setAttribute(pin.name, value);
+    if (!value) continue;
+
+    // 规则：如果在 NodeDefinition 中定义的 Pin，作为属性；否则作为子标签
+    const isBasePin = nodeDef?.pins?.some(p => p.name === pin.name) ?? false;
+
+    if (isBasePin) {
+      el.setAttribute(pin.name, value);
+    } else {
+      if (pin.isInput) {
+        inputEl.setAttribute(pin.name, value);
+        hasInput = true;
+      } else {
+        outputEl.setAttribute(pin.name, value);
+        hasOutput = true;
+      }
+    }
   }
+
+  // 特殊处理 Root 节点的 Interface Pins (从 treeInterface 传入)
+  if (node.type === 'Root' && treeInterface) {
+    treeInterface.inputs.forEach(pin => {
+      // 构造一个临时 Pin 对象进行序列化
+      const tempPin: Pin = {
+        name: pin.name,
+        valueType: pin.valueType,
+        countType: pin.countType,
+        bindingType: pin.binding.type === 'variable' ? 'pointer' : 'const',
+        binding: pin.binding.type === 'variable'
+          ? { type: 'pointer', variableName: pin.binding.value, isLocal: pin.binding.isLocal || false }
+          : { type: 'const', value: pin.binding.value },
+        enableType: 'fixed', // Root Interface Pin 不支持禁用启用
+        isInput: true,
+        allowedValueTypes: [pin.valueType],
+        isCountTypeFixed: true,
+        isBindingTypeFixed: false,
+        vectorIndex: pin.vectorIndex,
+      };
+      inputEl.setAttribute(pin.name, serializePinValue(tempPin, true));
+      hasInput = true;
+    });
+    treeInterface.outputs.forEach(pin => {
+      // 临时构造一个 Pin 对象用于序列化
+      const tempPin: Pin = {
+        name: pin.name,
+        valueType: pin.valueType,
+        countType: pin.countType,
+        bindingType: pin.binding.type === 'variable' ? 'pointer' : 'const',
+        binding: pin.binding.type === 'variable'
+          ? { type: 'pointer', variableName: pin.binding.value, isLocal: pin.binding.isLocal || false }
+          : { type: 'const', value: pin.binding.value },
+        enableType: 'fixed', // Root Interface Pin 不支持禁用启用
+        isInput: false,
+        allowedValueTypes: [pin.valueType],
+        isCountTypeFixed: true,
+        isBindingTypeFixed: false,
+        vectorIndex: pin.vectorIndex,
+      };
+      outputEl.setAttribute(pin.name, serializePinValue(tempPin, true));
+      hasOutput = true;
+    });
+  }
+
+  if (hasInput) el.appendChild(inputEl);
+  if (hasOutput) el.appendChild(outputEl);
 
   // 递归序列化子节点
   const childConnections = connections.filter(c => c.parentNodeId === node.id);
@@ -163,7 +239,7 @@ function serializeNodeForEditor(
       // 传递 connection 名称 (children 是默认，不需要显式保存)
       const connName = conn.parentConnector === 'children' ? undefined : conn.parentConnector;
 
-      const childEl = serializeNodeForEditor(childNode, doc, nodeMap, connections, undefined, undefined, connName);
+      const childEl = serializeNodeForEditor(childNode, doc, nodeMap, connections, undefined, undefined, connName, treeInterface);
       el.appendChild(childEl);
     }
   }
@@ -214,7 +290,7 @@ function findAllRootNodes(tree: Tree): TreeNode[] {
   const roots: TreeNode[] = [];
 
   // 首先添加主根节点
-  const mainRoot = tree.nodes.get(tree.rootId);
+  const mainRoot = tree.rootId ? tree.nodes.get(tree.rootId) : undefined;
   if (mainRoot) roots.push(mainRoot);
 
   // 查找其他没有父节点的节点（森林中的其他树）
@@ -275,7 +351,9 @@ export function serializeTreeForEditor(tree: Tree): string {
     root.appendChild(serializeNodeForEditor(
       rootNode, doc, tree.nodes, tree.connections,
       isMainRoot ? tree.sharedVariables : undefined,
-      isMainRoot ? tree.localVariables : undefined
+      isMainRoot ? tree.localVariables : undefined,
+      undefined,
+      isMainRoot ? { inputs: tree.inputs, outputs: tree.outputs } : undefined
     ));
   }
 
@@ -418,10 +496,34 @@ function serializeNodeForRuntimeWithUID(
   }
 
   // Pin 值（跳过禁用的）
+  const inputEl = doc.createElement('Input');
+  const outputEl = doc.createElement('Output');
+  let hasInput = false;
+  let hasOutput = false;
+
+  const nodeDef = useNodeDefinitionStore.getState().getDefinition(node.type);
+
   for (const pin of node.pins) {
     const value = serializePinValue(pin, false);
-    if (value) el.setAttribute(pin.name, value);
+    if (!value) continue;
+
+    const isBasePin = nodeDef?.pins?.some(p => p.name === pin.name) ?? false;
+
+    if (isBasePin) {
+      el.setAttribute(pin.name, value);
+    } else {
+      if (pin.isInput) {
+        inputEl.setAttribute(pin.name, value);
+        hasInput = true;
+      } else {
+        outputEl.setAttribute(pin.name, value);
+        hasOutput = true;
+      }
+    }
   }
+
+  if (hasInput) el.appendChild(inputEl);
+  if (hasOutput) el.appendChild(outputEl);
 
   // 递归序列化子节点
   const childConnections = connections.filter(c => c.parentNodeId === node.id);
@@ -474,19 +576,20 @@ export function serializeTreeForRuntime(tree: Tree): string {
   const doc = document.implementation.createDocument(null, tree.name, null);
   const root = doc.documentElement;
 
-  // 1. 收集主树中所有节点 ID
-  const mainTreeNodeIds = collectMainTreeNodeIds(tree.rootId, tree.nodes, tree.connections);
+  // 1. 识别并标记主树节点
+  const rootId = tree.rootId || '';
+  const mainTreeNodeIds = collectMainTreeNodeIds(rootId, tree.nodes, tree.connections);
 
   // 2. 计算被引用的变量
   const { sharedRefs, localRefs } = collectReferencedVariables(mainTreeNodeIds, tree.nodes);
   const referencedSharedVars = tree.sharedVariables.filter(v => sharedRefs.has(v.name));
   const referencedLocalVars = tree.localVariables.filter(v => localRefs.has(v.name));
 
-  // 3. 计算运行时 UID
-  const uidMap = calculateRuntimeUIDs(tree.rootId, tree.nodes, tree.connections);
+  // 3. 计算 UID (只针对主树)
+  const uidMap = calculateRuntimeUIDs(rootId, tree.nodes, tree.connections);
 
-  // 4. 序列化主根节点
-  const rootNode = tree.nodes.get(tree.rootId);
+  // 4. 序列化主树根节点
+  const rootNode = tree.nodes.get(rootId);
   if (rootNode) {
     const nodeEl = serializeNodeForRuntimeWithUID(
       rootNode, doc, tree.nodes, tree.connections, uidMap,

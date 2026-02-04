@@ -108,21 +108,47 @@ export interface TreePin extends Pin { }
 
 export interface Comment {
   id: string;
-  content: string;
-  position: Position;
-  size: { width: number; height: number };
+  toNodeId: string;
+  toPinName: string;
 }
+
+// ==================== Tree Interface (I/O) ====================
+
+export interface TreeInterfacePin {
+  id: string; // Unique ID
+  name: string;
+  valueType: ValueType;
+  countType: CountType;
+  // Binding for internal mapping
+  // For Inputs: maps to an internal variable (must be Variable)
+  // For Outputs: maps to an internal variable or constant value
+  binding: {
+    type: 'variable' | 'const';
+    value: string; // Variable name or Constant value
+    isLocal?: boolean;
+  };
+  vectorIndex?: PinBinding;
+}
+
+// ==================== Tree ====================
 
 export interface Tree {
   name: string;
-  path: string;
+  path: string; // Relative path from settings.editorTreeDir
+  rootId?: string;
+
   nodes: Map<string, TreeNode>;
-  rootId: string;
   connections: TreeConnection[];
   dataConnections: DataConnection[];
+
+  // Variables
   sharedVariables: Variable[];
   localVariables: Variable[];
-  inputPins: TreePin[];
-  outputPins: TreePin[];
-  comments: Comment[];
+
+  // Tree Interface
+  inputs: TreeInterfacePin[];
+  outputs: TreeInterfacePin[];
+
+  inputPins: any[]; // Deprecated? Or used for something else? Keeping for now to avoid breaking
+  outputPins: any[]; // Deprecated?
 }

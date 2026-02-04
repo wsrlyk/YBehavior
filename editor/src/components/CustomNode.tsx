@@ -40,13 +40,16 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
     return '';
   };
 
+  const isDataConnection = pin.binding.type === 'pointer' && !pin.binding.variableName;
+
   return (
     <div className={`relative flex items-center gap-1 text-xs py-0.5 ${isInput ? 'pl-2.5' : 'pr-2.5 flex-row-reverse'}`}>
       <Handle
         type={isInput ? 'target' : 'source'}
         position={isInput ? Position.Left : Position.Right}
         id={`pin-${isInput ? 'in' : 'out'}-${pin.name}`}
-        className="!w-2 !h-2 !rounded-full !border-0 hover:!bg-white hover:[--handle-scale:1.5] !cursor-crosshair !transition-[transform,background-color] duration-200 !origin-center z-20"
+        isConnectable={isDataConnection}
+        className={`!w-2 !h-2 !rounded-full !border-0 hover:!bg-white hover:[--handle-scale:1.5] !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20 ${!isDataConnection ? 'opacity-30' : ''}`}
         style={{
           backgroundColor: pinColor,
           [isInput ? 'left' : 'right']: '-4px',
@@ -59,7 +62,7 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
         <span className="text-gray-500 text-[10px] truncate max-w-12">{pin.binding.value || '-'}</span>
       )}
       {pin.binding.type === 'pointer' && pin.binding.variableName && (
-        <span className="text-blue-400 text-[10px] truncate max-w-12">{pin.binding.variableName}{getVectorIndexDisplay()}</span>
+        <span className="text-blue-400 text-[10px] truncate max-w-12">{pin.binding.variableName}{pin.binding.isLocal ? "'" : ""}{getVectorIndexDisplay()}</span>
       )}
     </div>
   );

@@ -229,6 +229,38 @@ function refreshHandleEventLabels(nodeId: string, tree: Tree): ConnectionLabelUp
     return updates;
 }
 
+// ==================== SubTree Logic ====================
+
+function validateSubTreeNode(node: TreeNode, tree: Tree): string[] {
+    const errors: string[] = [];
+
+    // 1. 检查 Tree Pin
+    const treePin = node.pins.find(p => p.name === 'Tree');
+    if (!treePin || treePin.binding.type !== 'const' || !treePin.binding.value) {
+        errors.push(`[SubTree:${node.uid ?? '?'}] Tree file must be selected`);
+    }
+
+    // 2. 检查动态 Pins 绑定
+    const basePinNames = ['Tree', 'Identification'];
+
+    node.pins.forEach(pin => {
+        if (basePinNames.includes(pin.name)) return;
+
+        if (pin.isInput) {
+            // Input 可以是常量也可以是变量，不强制要求非空（由于类型多样性，这里不强制校验具体值）
+        } else {
+            // Output 必须是变量引用 (pointer) 且不能为空
+            if (pin.binding.type === 'const') {
+                errors.push(`[SubTree:${node.uid ?? '?'}] Output Pin [${pin.name}] must be bound to a variable`);
+            } else if (pin.binding.type === 'pointer' && !pin.binding.variableName) {
+                errors.push(`[SubTree:${node.uid ?? '?'}] Output Pin [${pin.name}] transition variable is missing`);
+            }
+        }
+    });
+
+    return errors;
+}
+
 // ==================== Registry ====================
 
 // 注意：这里的类型和 types/specialNodes.ts 中的略有不同（返回值类型），store 中需要处理
@@ -240,5 +272,8 @@ export const SPECIAL_NODE_HANDLERS_IMPL = {
     HandleEvent: {
         validate: validateHandleEventNode,
         refreshLabels: refreshHandleEventLabels,
+    },
+    SubTree: {
+        validate: validateSubTreeNode,
     },
 };

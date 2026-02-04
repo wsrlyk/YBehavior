@@ -89,3 +89,11 @@ export function getDefaultValue(type: ValueType, isList: boolean): string {
         default: return '';
     }
 }
+
+export function validateVariableName(name: string): ValidationResult {
+    if (name.length === 0) return { isValid: false, error: 'Name cannot be empty' };
+    if (name.length > 30) return { isValid: false, error: 'Name too long (max 30)' };
+    if (!/^[a-zA-Z]/.test(name)) return { isValid: false, error: 'Name must start with a letter' };
+    if (!/^[a-zA-Z0-9_]*$/.test(name)) return { isValid: false, error: 'Name contains invalid characters (only letters, numbers, and underscores allowed)' };
+    return { isValid: true };
+}

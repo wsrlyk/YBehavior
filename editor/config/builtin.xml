@@ -14,8 +14,8 @@
     <Connector Name="children" />
   </Node>
   <Node Class="SwitchCase" Category="composite" Note="Switch case based on value">
-    <Variable Name="Switch" ValueType="I" IsInput="True" IsConst="False" />
-    <Variable Name="Cases" ValueType="I" IsArray="True" IsConst="True" />
+    <Variable Name="Switch" ValueType="IFSB" IsArray="False" IsConst="False" />
+    <Variable Name="Cases" ValueType="IFSB" IsArray="True" />
     <Connector Name="children" />
     <Connector Name="default" Label="Default" MaxChildren="1" />
   </Node>
@@ -25,15 +25,15 @@
     <Connector Name="else" Label="Else" MaxChildren="1" />
   </Node>
   <Node Class="HandleEvent" Category="composite" Note="Handle events">
-    <Variable Name="Type" ValueType="E" IsConst="True" Value="Latest" Param="Latest|Every" />
+    <Variable Name="Type" ValueType="E" IsConst="True" IsArray="False" Value="Latest" Param="Latest|Every" />
     <Variable Name="Events" ValueType="S" IsArray="True" IsEnable="True"/>
-    <Variable Name="Int" ValueType="I" IsArray="True" IsInput="False" IsEnable="False" />
-    <Variable Name="Float" ValueType="F" IsArray="True" IsInput="False" IsEnable="False" />
-    <Variable Name="String" ValueType="S" IsArray="True" IsInput="False" IsEnable="False" />
-    <Variable Name="Ulong" ValueType="U" IsArray="True" IsInput="False" IsEnable="False" />
-    <Variable Name="Bool" ValueType="B" IsArray="True" IsInput="False" IsEnable="False" />
-    <Variable Name="Vector3" ValueType="V" IsArray="True" IsInput="False" IsEnable="False" />
-    <Variable Name="Entity" ValueType="A" IsArray="True" IsInput="False" IsEnable="False" />
+    <Variable Name="Int" ValueType="I" IsInput="False" IsEnable="False" />
+    <Variable Name="Float" ValueType="F" IsInput="False" IsEnable="False" />
+    <Variable Name="String" ValueType="S" IsInput="False" IsEnable="False" />
+    <Variable Name="Ulong" ValueType="U" IsInput="False" IsEnable="False" />
+    <Variable Name="Bool" ValueType="B" IsInput="False" IsEnable="False" />
+    <Variable Name="Vector3" ValueType="V" IsInput="False" IsEnable="False" />
+    <Variable Name="Entity" ValueType="A" IsInput="False" IsEnable="False" />
     <Variable Name="Current" ValueType="S" IsInput="False" IsEnable="False" />
     <Connector Name="children" />
   </Node>
@@ -43,19 +43,19 @@
     <Connector Name="children" MaxChildren="1" />
   </Node>
   <Node Class="Loop" Category="decorator" Note="Loop child node">
-    <Variable Name="Count" ValueType="I" IsConst="False" />
-    <Variable Name="Current" ValueType="I" IsInput="False" IsConst="False" />
-    <Variable Name="BreakValue" ValueType="B" IsConst="False" IsEnable="False" />
+    <Variable Name="Count" ValueType="I"  IsArray="False" IsConst="False" />
+    <Variable Name="Current" ValueType="I"  IsArray="False" IsInput="False" IsConst="False" IsEnable="True" />
+    <Variable Name="BreakValue" ValueType="B"  IsArray="False" IsConst="False" IsEnable="False" />
     <Connector Name="children" MaxChildren="1" />
   </Node>
   <Node Class="ForEach" Category="decorator" Note="Iterate over array">
     <Variable Name="Collection" ValueType="I" IsArray="True" IsConst="False" />
-    <Variable Name="Current" ValueType="I" IsInput="False" IsConst="False" />
-    <Variable Name="BreakValue" ValueType="B" IsConst="False" IsEnable="False" />
+    <Variable Name="Current" ValueType="I" IsArray="False" IsInput="False" IsConst="False"  IsEnable="True"/>
+    <Variable Name="BreakValue" ValueType="B" IsArray="False" IsConst="False" IsEnable="False" />
     <Connector Name="children" MaxChildren="1" />
   </Node>
   <Node Class="For" Category="decorator" Note="For loop with index">
-    <Variable Name="BreakValue" ValueType="B" IsConst="False" IsEnable="False" />
+    <Variable Name="BreakValue" ValueType="B" IsArray="False" IsConst="False" IsEnable="False" />
     <Connector Name="init" Label="Init" MaxChildren="1" />
     <Connector Name="cond" Label="Cond" MaxChildren="1" />
     <Connector Name="increment" Label="Incr" MaxChildren="1" />
@@ -71,33 +71,33 @@
     <Connector Name="children" MaxChildren="1" />
   </Node>
   <Node Class="ConvertToBool" Category="decorator" Note="Convert child result to bool">
-    <Variable Name="Output" ValueType="B" IsInput="False" IsConst="False" />
+    <Variable Name="Output" ValueType="B" IsArray="False" IsInput="False" IsConst="False" />
     <Connector Name="children" MaxChildren="1" />
   </Node>
 
   <!-- Action 节点：没有子连接器 -->
   <Node Class="Calculator" Category="action" Note="{1} {0} {2} >> {3}">
-    <Variable Name="Operator" ValueType="E" IsConst="True" Value="+" Param="+|-|*|/" />
+    <Variable Name="Operator" ValueType="E" IsArray="False" IsConst="True" Value="+" Param="+|-|*|/" />
     <Variable Name="Output" ValueType="IFV" IsInput="False" IsConst="False" IsArray="False" vTypeGroup="1" />
     <Variable Name="Input1" ValueType="IFV" IsArray="False" Value="0" vTypeGroup="1" />
     <Variable Name="Input2" ValueType="IFV" IsArray="False" Value="0" vTypeGroup="1" />
   </Node>
   <Node Class="UnaryOperation" Category="action" Note="{0}({1}) >> {2}">
-    <Variable Name="Operator" ValueType="E" IsConst="True" Value="ABS" Param="ABS" />
+    <Variable Name="Operator" ValueType="E" IsArray="False" IsConst="True" Value="ABS" Param="ABS" />
     <Variable Name="Output" ValueType="IF" IsInput="False" IsConst="False" IsArray="False" vTypeGroup="1" />
     <Variable Name="Input" ValueType="IF" IsArray="False" vTypeGroup="1" />
   </Node>
   <Node Class="SetData" Category="action" Note="{1} >> {0}">
-    <Variable Name="Target" ValueType="IFBSVAU" IsConst="False" vTypeGroup="1" />
-    <Variable Name="Source" ValueType="IFBSVAU" vTypeGroup="1" />
+    <Variable Name="Target" ValueType="IFBSVAU" IsConst="False" vTypeGroup="1" cTypeGroup="1"/>
+    <Variable Name="Source" ValueType="IFBSVAU" vTypeGroup="1" cTypeGroup="1"/>
   </Node>
   <Node Class="Convert" Category="action" Note="({2}){1} >> ({3}){0}">
     <Variable Name="Target" ValueType="IFBS" IsInput="False" IsConst="False" IsArray="False" />
     <Variable Name="Source" ValueType="IFBS" IsArray="False" />
   </Node>
   <Node Class="SubTree" Category="action" Note="{0}">
-    <Variable Name="Tree" ValueType="S" IsConst="True" />
-    <Variable Name="Identification" ValueType="S" IsConst="True" />
+    <Variable Name="Tree" ValueType="S" IsArray="False" IsConst="True" />
+    <Variable Name="Identification" ValueType="S" IsArray="False" IsConst="True" />
   </Node>
   <Node Class="Random" Category="action" Note="[{1} ~ {2}) >> {0}">
     <Variable Name="Target" ValueType="IF" IsInput="False" IsConst="False" IsArray="False" vTypeGroup="1" />
@@ -110,12 +110,12 @@
   </Node>
   <Node Class="PiecewiseFunction" Category="action" Note="f({2}) >> {0}">
     <Variable Name="KeyPointX" ValueType="IF" IsArray="True" vTypeGroup="1" />
-    <Variable Name="KeyPointY" ValueType="IF" IsArray="True" vTypeGroup="1" />
+    <Variable Name="KeyPointY" ValueType="IF" IsArray="True" vTypeGroup="2" />
     <Variable Name="Input" ValueType="IF" IsArray="False" vTypeGroup="1" />
-    <Variable Name="Output" ValueType="IF" IsInput="False" IsConst="False" IsArray="False" vTypeGroup="1" />
+    <Variable Name="Output" ValueType="IF" IsInput="False" IsConst="False" IsArray="False" vTypeGroup="2" />
   </Node>
   <Node Class="ArrayOperation" Category="action" Note="{1} {0} {2} >> {3}">
-    <Variable Name="Operator" ValueType="E" IsConst="True" Value="APPEND" Param="APPEND|MERGE|EXCLUDE" />
+    <Variable Name="Operator" ValueType="E" IsArray="False" IsConst="True" Value="APPEND" Param="APPEND|MERGE|EXCLUDE" />
     <Variable Name="Output" ValueType="IFBSVAU" IsArray="True" IsInput="False" IsConst="False" vTypeGroup="1" />
     <Variable Name="Input1" ValueType="IFBSVAU" IsArray="True" vTypeGroup="1" />
     <Variable Name="Input2" ValueType="IFBSVAU" IsArray="True" vTypeGroup="1" />
@@ -153,7 +153,7 @@
     <Variable Name="Index" ValueType="I" IsInput="False" IsConst="False" IsArray="False" IsEnable="False" />
   </Node>
   <Node Class="GenIndexArray" Category="action" Note="{0} >> {1}">
-    <Variable Name="Input" ValueType="IFBSVAU" />
+    <Variable Name="Input" ValueType="IFBSVAU" IsArray="False"/>
     <Variable Name="Output" ValueType="I" IsArray="True" IsInput="False" IsConst="False" />
   </Node>
   <Node Class="Shuffle" Category="action" Note="[{0}] >??> [{1}]">
@@ -161,14 +161,14 @@
     <Variable Name="Output" ValueType="IFBSVAU" IsArray="True" IsInput="False" IsConst="False" vTypeGroup="1" />
   </Node>
   <Node Class="FSMSetCondition" Category="action" Note="Set Conditions {1}: {0}">
-    <Variable Name="Conditions" ValueType="S" vTypeGroup="1" />
-    <Variable Name="Operator" ValueType="E" IsConst="True" Value="On" Param="On|Off" />
+    <Variable Name="Conditions" ValueType="S" />
+    <Variable Name="Operator" ValueType="E" IsConst="True" IsArray="False" Value="On" Param="On|Off" />
   </Node>
   <Node Class="FSMClearConditions" Category="action" Note="Clear all FSM conditions" />
 
   <!-- Condition 节点：没有子连接器 -->
   <Node Class="Comparer" Category="condition" Note="{1} {0} {2} ?">
-    <Variable Name="Operator" ValueType="E" IsConst="True" Value="==" Param="==|!=|&gt;|&lt;|&gt;=|&lt;=" />
+    <Variable Name="Operator" ValueType="E" IsArray="False" IsConst="True" Value="==" Param="==|!=|&gt;|&lt;|&gt;=|&lt;=" />
     <Variable Name="Opl" ValueType="IFBSVAU" IsConst="False" IsArray="False" vTypeGroup="1" />
     <Variable Name="Opr" ValueType="IFBSVAU" IsArray="False" vTypeGroup="1" />
   </Node>

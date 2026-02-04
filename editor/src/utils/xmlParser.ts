@@ -1,7 +1,7 @@
 import { XMLParser } from 'fast-xml-parser';
 import type {
   Tree, TreeNode, Variable, Pin, TreeConnection, DataConnection,
-  ValueType, CountType, PinBinding, NodeCategory
+  ValueType, CountType, PinBinding, NodeCategory, TreeInterfacePin
 } from '../types';
 import type { NodeDefinition, PinDefinition } from '../types/nodeDefinition';
 
@@ -269,7 +269,7 @@ function parseXmlNode(
   const skipAttrs = [
     '@_Class', '@_GUID', '@_Pos', '@_Connection', '@_Return',
     '@_NickName', '@_Comment', '@_Disabled',
-    'Shared', 'Local', 'Node'
+    'Shared', 'Local', 'Node', 'Input', 'Output'
   ];
   const xmlPinValues = new Map<string, string>();
 
@@ -280,7 +280,28 @@ function parseXmlNode(
     }
   }
 
-  // ... (pins logic remains same)
+  // 1.2 处理 <Input> 和 <Output> 子标签中的 Pin (Legacy 格式)
+  // 如果是 Root 节点，这些通常是 Tree Interface，不由 parseXmlNode 存为 node pins
+  if (nodeClass !== 'Root') {
+    const processLegacyPins = (tags: unknown) => {
+      if (!tags) return;
+      const tagList = Array.isArray(tags) ? tags : [tags];
+      tagList.forEach(tag => {
+        if (typeof tag === 'object' && tag !== null) {
+          for (const [key, value] of Object.entries(tag)) {
+            if (key.startsWith('@_') && typeof value === 'string') {
+              const pinName = key.substring(2);
+              xmlPinValues.set(pinName, value);
+            }
+          }
+        }
+      });
+    };
+
+    processLegacyPins(xmlNode.Input);
+    processLegacyPins(xmlNode.Output);
+  }
+
   // 基于定义文件合并 Pin 数据
   const pins: Pin[] = [];
 
@@ -296,10 +317,28 @@ function parseXmlNode(
         pins.push(createPinFromDefinition(pinDef));
       }
     }
+
+    // 处理动态 Pin (不在定义中，但在 XML 子标签中定义的)
+    // 通常出现在 SubTree 节点上
+    for (const [pinName, xmlValue] of xmlPinValues) {
+      if (!nodeDef.pins?.some(p => p.name === pinName)) {
+        const isInput = isPinInTag(xmlNode.Input, pinName);
+        pins.push(createPin(pinName, xmlValue, {
+          name: pinName,
+          isInput: isInput,
+          valueType: 'int',
+          arrayType: 'scalar',
+          constType: 'switchable',
+          enableType: 'fixed',
+          defaultValue: '',
+        } as any));
+      }
+    }
   } else {
     // 没有定义：直接使用树文件中的所有 Pin
     for (const [pinName, xmlValue] of xmlPinValues) {
-      pins.push(createPin(pinName, xmlValue, undefined));
+      const isInput = isPinInTag(xmlNode.Input, pinName);
+      pins.push(createPin(pinName, xmlValue, { name: pinName, isInput, enableType: 'fixed' } as any));
     }
   }
 
@@ -372,6 +411,7 @@ export function parseTreeXml(
   const parsed = parser.parse(xmlContent);
   const treeName = Object.keys(parsed).find(k => k !== '?xml') || 'Unknown';
   const treeData = parsed[treeName];
+  console.log(`Parsing tree: ${treeName}, nodes count: ${JSON.stringify(treeData.Node ? (Array.isArray(treeData.Node) ? treeData.Node.length : 1) : 0)}`);
 
   const nodes = new Map<string, TreeNode>();
   const connections: TreeConnection[] = [];
@@ -379,19 +419,25 @@ export function parseTreeXml(
   const localVariables: Variable[] = [];
   const dataConnections: DataConnection[] = [];
 
-  // 解析节点
+  const inputs: TreeInterfacePin[] = [];
+  const outputs: TreeInterfacePin[] = [];
+
   const rootNodes = treeData.Node;
+  console.log(`rootNodes found: ${!!rootNodes}`);
   let rootId = '';
 
   if (rootNodes) {
     const nodeList = Array.isArray(rootNodes) ? rootNodes : [rootNodes];
+    console.log(`Node list length: ${nodeList.length}`);
 
     for (const xmlNode of nodeList) {
       const nodeId = parseXmlNode(xmlNode, nodes, connections, undefined, getNodeDefinition);
+      console.log(`Parsed node: ${xmlNode['@_Class']}, ID: ${nodeId}`);
 
       // 第一个 Root 节点作为根
       if (xmlNode['@_Class'] === 'Root' && !rootId) {
         rootId = nodeId;
+        console.log(`Root identified: ${rootId}`);
 
         // 解析 Shared 和 Local 变量
         if (xmlNode.Shared) {
@@ -408,6 +454,37 @@ export function parseTreeXml(
             }
           }
         }
+
+        // 解析 Root 节点的 Input 和 Output 作为 Tree Interface
+        const parseRootInterfacePin = (tags: any, isInput: boolean) => {
+          if (!tags) return;
+          const tagList = Array.isArray(tags) ? tags : [tags];
+          tagList.forEach(tag => {
+            for (const [key, value] of Object.entries(tag)) {
+              if (key.startsWith('@_') && typeof value === 'string') {
+                const name = key.substring(2);
+                const parsed = parsePinValue(value);
+                const pin: TreeInterfacePin = {
+                  id: `${isInput ? 'input' : 'output'}-${name}`,
+                  name,
+                  valueType: parsed.valueType,
+                  countType: parsed.countType,
+                  binding: {
+                    type: parsed.isPointer ? 'variable' : 'const',
+                    value: parsed.isPointer ? parsed.variableName : parsed.value,
+                    isLocal: parsed.isPointer ? parsed.isLocal : undefined,
+                  },
+                  vectorIndex: parsed.vectorIndex,
+                };
+                if (isInput) inputs.push(pin);
+                else outputs.push(pin);
+              }
+            }
+          });
+        };
+
+        parseRootInterfacePin(xmlNode.Input, true);
+        parseRootInterfacePin(xmlNode.Output, false);
       }
     }
   }
@@ -428,6 +505,7 @@ export function parseTreeXml(
     }
   }
 
+
   // 计算 UID（深度优先遍历）
   calculateUIDs(nodes, rootId, connections);
 
@@ -440,10 +518,18 @@ export function parseTreeXml(
     dataConnections,
     sharedVariables,
     localVariables,
+    inputs,
+    outputs,
     inputPins: [],
     outputPins: [],
-    comments: [],
   };
+}
+
+function isPinInTag(tags: any, pinName: string): boolean {
+  if (!tags) return false;
+  const tagList = Array.isArray(tags) ? tags : [tags];
+  const attrName = `@_${pinName}`;
+  return tagList.some(tag => tag && typeof tag === 'object' && attrName in tag);
 }
 
 /**
