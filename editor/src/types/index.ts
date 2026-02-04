@@ -152,3 +152,6 @@ export interface Tree {
   inputPins: any[]; // Deprecated? Or used for something else? Keeping for now to avoid breaking
   outputPins: any[]; // Deprecated?
 }
+
+// ==================== FSM Types ====================
+export * from './fsm';

@@ -9,21 +9,15 @@ import { useNotificationStore } from './notificationStore';
 import { logger } from '../utils/logger';
 import { useEditorMetaStore } from './editorMetaStore';
 import { SPECIAL_NODE_HANDLERS_IMPL, type ConnectionLabelUpdate } from '../utils/specialNodeLogic';
+import {
+  type OpenedFile,
+  recalculateUIDs,
+  updateOpenedFileTree
+} from './editorStoreCore';
 
-interface HistoryState {
-  past: Tree[];
-  future: Tree[];
-}
-
-interface OpenedFile {
-  path: string;
-  name: string;
-  tree: Tree;
-  lastSavedTreeSnapshot: string; // 用于判断 isDirty 的快照
-  isDirty: boolean;
-  isNew?: boolean; // 是否是新创建未保存的文件
-  history: HistoryState;
-}
+// Re-export for backward compatibility
+export { getDescendantIds } from './editorStoreCore';
+export type { HistoryState, OpenedFile } from './editorStoreCore';
 
 interface EditorState {
   // 设置
@@ -116,183 +110,6 @@ interface EditorState {
 
   // 新建文件
   createNewTree: (name: string) => void;
-}
-
-/**
- * 获取节点的所有子孙节点 ID
- */
-export function getDescendantIds(tree: Tree, nodeId: string): string[] {
-  const descendantIds: string[] = [];
-  const stack = [nodeId];
-  const visited = new Set<string>();
-
-  while (stack.length > 0) {
-    const currentId = stack.pop()!;
-    if (visited.has(currentId)) continue;
-    visited.add(currentId);
-
-    const children = tree.connections
-      .filter(c => c.parentNodeId === currentId)
-      .map(c => c.childNodeId);
-
-    for (const childId of children) {
-      if (!visited.has(childId)) {
-        descendantIds.push(childId);
-        stack.push(childId);
-      }
-    }
-  }
-  return descendantIds;
-}
-
-/**
- * 计算节点的 UID（深度优先遍历）
- * Root 节点从 1 开始，森林中其他树从 1001、2001 等开始
- * 注意：必须传入可修改的 tree 对象（通常是 updater 返回的新 tree）
- */
-/**
- * 计算节点的 UID（深度优先遍历）
- * 注意：此函数会【直接修改】tree.nodes 中的节点对象。
- * 调用者必须确保 tree.nodes 是新克隆的副本，以免污染历史记录。
- */
-function recalculateUIDs(tree: Tree): void {
-  const nodeDefStore = useNodeDefinitionStore.getState();
-  let uid = 1;
-  const visited = new Set<string>();
-
-  // 预先建立父子关系索引
-  const connectionsByParent = new Map<string, TreeConnection[]>();
-  for (const conn of tree.connections) {
-    const list = connectionsByParent.get(conn.parentNodeId) || [];
-    list.push(conn);
-    connectionsByParent.set(conn.parentNodeId, list);
-  }
-
-  // 深度优先遍历
-  function dfs(nodeId: string, isAncestorDisabled: boolean) {
-    if (visited.has(nodeId)) return;
-    visited.add(nodeId);
-
-    const node = tree.nodes.get(nodeId);
-    if (!node) return;
-
-    const effectivelyDisabled = isAncestorDisabled || node.disabled;
-    const childConns = connectionsByParent.get(nodeId) || [];
-
-    // 1. 如果有 condition 连接，先递归处理该分支
-    const conditionConn = childConns.find(c => c.parentConnector === 'condition');
-    if (conditionConn) {
-      dfs(conditionConn.childNodeId, effectivelyDisabled);
-    }
-
-    // 2. 采样当前节点的 UID
-    node.uid = effectivelyDisabled ? undefined : uid++;
-
-    // 3. 处理其他子节点
-    const nodeDef = nodeDefStore.getDefinition(node.type);
-    const connectors = nodeDef?.childConnectors || [];
-
-    for (const connectorDef of connectors) {
-      const connsForThisType = childConns.filter(c => c.parentConnector === connectorDef.name);
-
-      const sortedConns = [...connsForThisType].sort((a, b) => {
-        const nodeA = tree.nodes.get(a.childNodeId);
-        const nodeB = tree.nodes.get(b.childNodeId);
-        return (nodeA?.position.x || 0) - (nodeB?.position.x || 0);
-      });
-
-      for (const conn of sortedConns) {
-        dfs(conn.childNodeId, effectivelyDisabled);
-      }
-    }
-
-    // 处理不在定义中的连接器
-    const knownConnectorNames = new Set(connectors.map(c => c.name));
-    knownConnectorNames.add('condition');
-
-    const extraConns = childConns.filter(c => !knownConnectorNames.has(c.parentConnector));
-    const sortedExtraConns = [...extraConns].sort((a, b) => {
-      const nodeA = tree.nodes.get(a.childNodeId);
-      const nodeB = tree.nodes.get(b.childNodeId);
-      return (nodeA?.position.x || 0) - (nodeB?.position.x || 0);
-    });
-
-    for (const conn of sortedExtraConns) {
-      dfs(conn.childNodeId, effectivelyDisabled);
-    }
-  }
-
-  tree.nodes.forEach(node => { node.uid = undefined; });
-  if (tree.rootId) dfs(tree.rootId, false);
-
-  let forestIndex = 1;
-  const childIds = new Set(tree.connections.map(c => c.childNodeId));
-
-  for (const nodeId of tree.nodes.keys()) {
-    if (!childIds.has(nodeId) && !visited.has(nodeId)) {
-      uid = forestIndex * 1000 + 1;
-      dfs(nodeId, false);
-      forestIndex++;
-    }
-  }
-}
-
-// 辅助函数：更新已打开文件的树（自动重新计算 UID 和处理历史）
-function updateOpenedFileTree(
-  openedFiles: OpenedFile[],
-  activeFilePath: string | null,
-  updater: (tree: Tree) => Tree,
-  options: { skipHistory?: boolean; isUIChange?: boolean; skipUID?: boolean } = {}
-): { openedFiles: OpenedFile[] } | null {
-  if (!activeFilePath) return null;
-
-  const fileIndex = openedFiles.findIndex(f => f.path === activeFilePath);
-  if (fileIndex === -1) return null;
-
-  const file = openedFiles[fileIndex];
-  const oldTree = file.tree;
-  const newTree = updater(oldTree);
-
-  // 如果没有变化，直接返回 null
-  if (newTree === oldTree) return null;
-
-  // 重新计算 UID
-  if (!options.skipUID) {
-    recalculateUIDs(newTree);
-  }
-
-  // 计算新的 Dirty 状态
-  let isDirty = file.isDirty;
-  if (options.isUIChange) {
-    // UI 变化不改变 Dirty 状态
-    isDirty = file.isDirty;
-  } else if (!options.skipHistory) {
-    // 标准操作：通过序列化对比判断
-    const currentSnapshot = serializeTreeForEditor(newTree);
-    isDirty = currentSnapshot !== file.lastSavedTreeSnapshot;
-  } else {
-    // 拖拽等操作：直接设为 dirty
-    isDirty = true;
-  }
-
-  const newFile: OpenedFile = {
-    ...file,
-    tree: newTree,
-    isDirty
-  };
-
-  // 处理历史记录
-  if (!options.skipHistory) {
-    newFile.history = {
-      past: [oldTree, ...file.history.past].slice(0, 50),
-      future: [] // 产生新变化时清空前进栈
-    };
-  }
-
-  const newOpenedFiles = [...openedFiles];
-  newOpenedFiles[fileIndex] = newFile;
-
-  return { openedFiles: newOpenedFiles };
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({

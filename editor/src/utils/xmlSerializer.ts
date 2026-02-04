@@ -81,7 +81,7 @@ function serializePinValue(pin: Pin, forEditor: boolean): string {
  * 序列化变量为 XML 属性格式
  * 格式规则同 Pin: 单体 _XC, 数组 XXc
  */
-function serializeVariable(v: Variable): string {
+export function serializeVariable(v: Variable): string {
   let code = '';
   const typeChar = VALUE_TYPE_TO_CHAR[v.valueType] || 'I';
 

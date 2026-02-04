@@ -1,21 +1,25 @@
 import { useEffect, useState } from "react";
 // adjust imports since we moved into windows/ folder
 import { Sidebar } from "../components/Sidebar";
-import { NodeEditor } from "../components/NodeEditor";
+import { EditorPane } from "../components/EditorPane";
 import { PropertiesPanel } from "../components/PropertiesPanel";
 import { FileTreePopup } from "../components/FileTreePopup";
 import { Terminal } from "../components/Terminal";
 import { useEditorStore } from "../stores/editorStore";
 import { useNodeDefinitionStore } from "../stores/nodeDefinitionStore";
 import { useEditorMetaStore } from "../stores/editorMetaStore";
+import { useFSMStore } from "../stores/fsmStore";
 import { getAllWindows } from "@tauri-apps/api/window";
 
 export function MainWindow() {
     const { initSettings, settings, openedFiles, activeFilePath, saveCurrentFile, saveFileAs, undo, redo, createNewTree } = useEditorStore();
+    const createNewFSM = useFSMStore(state => state.createNewFSM);
+
     const { loadDefinitions, isLoaded } = useNodeDefinitionStore();
     const loadAllMeta = useEditorMetaStore(state => state.loadAllMeta);
 
     const [isFileTreeOpen, setIsFileTreeOpen] = useState(false);
+    const [isNewMenuOpen, setIsNewMenuOpen] = useState(false);
 
     // Terminal state: true = docked at bottom, false = separate window
     const [isTerminalDocked, setIsTerminalDocked] = useState(true);
@@ -137,13 +141,32 @@ export function MainWindow() {
                         >
                             ☰
                         </button>
-                        <button
-                            onClick={() => createNewTree('NewTree')}
-                            className="px-2 py-1 text-sm text-gray-300 hover:bg-gray-700 rounded"
-                            title="New Tree"
-                        >
-                            +
-                        </button>
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsNewMenuOpen(!isNewMenuOpen)}
+                                className="px-2 py-1 text-sm text-gray-300 hover:bg-gray-700 rounded flex items-center gap-1"
+                                title="New"
+                            >
+                                + <span className="text-xs">▼</span>
+                            </button>
+                            {isNewMenuOpen && (
+                                <div className="absolute top-full left-0 mt-1 bg-gray-800 border border-gray-600 rounded shadow-lg z-50 min-w-[120px]">
+                                    <button
+                                        onClick={() => { createNewTree('NewTree'); setIsNewMenuOpen(false); }}
+                                        className="w-full px-3 py-2 text-sm text-left text-gray-300 hover:bg-gray-700 flex items-center gap-2"
+                                    >
+                                        🌲 New Tree
+                                    </button>
+                                    <button
+                                        onClick={() => { createNewFSM('NewFSM'); setIsNewMenuOpen(false); }}
+                                        className="w-full px-3 py-2 text-sm text-left text-gray-300 hover:bg-gray-700 flex items-center gap-2"
+                                    >
+                                        🔄 New FSM
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
                         <FileTreePopup
                             isOpen={isFileTreeOpen}
                             onClose={() => setIsFileTreeOpen(false)}
@@ -194,10 +217,12 @@ export function MainWindow() {
                         </span>
                     </div>
 
-                    {/* 节点编辑区域 */}
+                    {/* 编辑器区域 */}
                     <div className="flex-1 relative">
-                        <NodeEditor onPaneClick={() => setIsFileTreeOpen(false)} />
+                        <EditorPane onPaneClick={() => { setIsFileTreeOpen(false); setIsNewMenuOpen(false); }} />
                     </div>
+
+
                 </div>
 
                 {/* 底部：Docked Terminal */}

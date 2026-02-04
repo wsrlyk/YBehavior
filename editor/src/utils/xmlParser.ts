@@ -140,7 +140,7 @@ function parsePinValue(raw: string): ParsedPinValue {
   return result;
 }
 
-function parseVariable(name: string, raw: string, isLocal: boolean): Variable {
+export function parseVariable(name: string, raw: string, isLocal: boolean): Variable {
   const parsed = parsePinValue(raw);
   return {
     name,
