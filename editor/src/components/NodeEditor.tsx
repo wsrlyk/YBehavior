@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useEffect, useState, type MouseEvent } from 'react';
+import { useCallback, useMemo, useEffect, useState, useRef, type MouseEvent } from 'react';
 import {
   ReactFlow,
   Background,
@@ -13,7 +13,7 @@ import {
   BackgroundVariant,
   ReactFlowProvider,
 } from '@xyflow/react';
-import { useEditorStore } from '../stores/editorStore';
+import { useEditorStore, getDescendantIds } from '../stores/editorStore';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import { NodeContextMenu } from './NodeContextMenu';
 import CustomNode, { type CustomNodeType } from './CustomNode';
@@ -55,17 +55,19 @@ interface NodeEditorProps {
 function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   const addNode = useEditorStore((state) => state.addNode);
   const selectNodes = useEditorStore((state) => state.selectNodes);
-  const updateNodePosition = useEditorStore((state) => state.updateNodePosition);
-  const removeNode = useEditorStore((state) => state.removeNode);
+  const removeNodes = useEditorStore((state) => state.removeNodes);
+  const removeElements = useEditorStore((state) => state.removeElements);
   const addConnection = useEditorStore((state) => state.addConnection);
-  const removeConnection = useEditorStore((state) => state.removeConnection);
-  const removeDataConnection = useEditorStore((state) => state.removeDataConnection);
+  const removeConnections = useEditorStore((state) => state.removeConnections);
+  const removeDataConnections = useEditorStore((state) => state.removeDataConnections);
+  const addDataConnection = useEditorStore((state) => state.addDataConnection);
+  const duplicateSelectedNodes = useEditorStore((state) => state.duplicateSelectedNodes);
   const { getDefinition } = useNodeDefinitionStore();
 
   // 修正：使用 selector 订阅 currentTree，确保 store 更新时组件重渲染
   const currentTree = useEditorStore((state) => state.getCurrentTree());
 
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, getNodes, getEdges } = useReactFlow();
 
   // 右键菜单状态
   const [contextMenu, setContextMenu] = useState<{
@@ -81,6 +83,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   });
 
   const selectedNodeIds = useEditorStore((state) => state.selectedNodeIds);
+  const isSelecting = useRef(false);
 
   // 优化的节点转换和缓存逻辑，显著提升大树拖拽启动性能
   const nodeCache = useMemo(() => new Map<string, CustomNodeType>(), []);
@@ -143,12 +146,13 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         cached.position.y === node.position.y) {
         newNodes.push(cached);
       } else {
+        const flowNode = treeNodeToFlowNode(node, getDefinition);
         const newNode: CustomNodeType = {
-          ...treeNodeToFlowNode(node, getDefinition),
+          ...flowNode,
           deletable: node.type !== 'Root',
           selected: isSelected,
           data: {
-            ...treeNodeToFlowNode(node, getDefinition).data,
+            ...flowNode.data,
             isEffectivelyDisabled,
           }
         };
@@ -212,52 +216,253 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     setEdges(flowEdges);
   }, [flowNodes, flowEdges, setNodes, setEdges]);
 
-  const addDataConnection = useEditorStore((state) => state.addDataConnection);
+
+  // Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if in input/textarea/select
+      const activeElement = document.activeElement;
+      if (
+        activeElement instanceof HTMLInputElement ||
+        activeElement instanceof HTMLTextAreaElement ||
+        activeElement instanceof HTMLSelectElement
+      ) {
+        return;
+      }
+
+      if (e.ctrlKey && (e.key === 'd' || e.key === 'D')) {
+        e.preventDefault();
+        duplicateSelectedNodes();
+      }
+
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const selectedIds = useEditorStore.getState().selectedNodeIds;
+        const selectedEdges = getEdges().filter(edge => edge.selected);
+        if (selectedIds.length === 0 && selectedEdges.length === 0) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        const tree = useEditorStore.getState().getCurrentTree();
+        if (tree) {
+          const allIdsToRemove = new Set<string>();
+          if (e.shiftKey) {
+            selectedIds.forEach(id => {
+              allIdsToRemove.add(id);
+              getDescendantIds(tree, id).forEach((childId: string) => allIdsToRemove.add(childId));
+            });
+          } else {
+            selectedIds.forEach(id => allIdsToRemove.add(id));
+          }
+
+          const connsToRemove = selectedEdges.filter(edge => !edge.id.startsWith('data-')).map(edge => edge.id);
+          const dataConnsToRemove = selectedEdges.filter(edge => edge.id.startsWith('data-')).map(edge => edge.id);
+
+          removeElements(Array.from(allIdsToRemove), connsToRemove, dataConnsToRemove);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [duplicateSelectedNodes, removeNodes]);
 
   const recordHistoryStart = useEditorStore((state) => state.recordHistoryStart);
   const finalizeContinuousAction = useEditorStore((state) => state.finalizeContinuousAction);
 
   // 自定义 onNodesChange：处理删除和选择
   const onNodesChange = useCallback((changes: import('@xyflow/react').NodeChange<Node>[]) => {
-    // 关键优化：位置更新(position)不再通过 onNodesChange 同步到 store
-    // 而是通过 onNodeDragStop 在松手时一次性同步。
     onNodesChangeBase(changes);
 
+    let selectionChanged = false;
+    const currentSelected = useEditorStore.getState().selectedNodeIds;
+    const newSelected = new Set(currentSelected);
+
+    const idsToRemove: string[] = [];
     changes.forEach((change) => {
       // 处理删除
       if (change.type === 'remove') {
-        removeNode(change.id);
+        idsToRemove.push(change.id);
+      }
+      // 处理选择
+      if (change.type === 'select') {
+        if (change.selected) {
+          newSelected.add(change.id);
+        } else {
+          newSelected.delete(change.id);
+        }
+        selectionChanged = true;
       }
     });
-  }, [onNodesChangeBase, removeNode]);
 
-  const onNodeDragStart = useCallback(() => {
+    if (idsToRemove.length > 0) {
+      removeNodes(idsToRemove);
+    }
+
+    if (selectionChanged && !isSelecting.current) {
+      const newNodeIds = Array.from(newSelected);
+      const isSame = newNodeIds.length === currentSelected.length &&
+        newNodeIds.every(id => currentSelected.includes(id));
+
+      if (!isSame) {
+        selectNodes(newNodeIds);
+      }
+    }
+  }, [onNodesChangeBase, removeNodes, selectNodes]);
+
+  const onSelectionStart = useCallback(() => {
+    isSelecting.current = true;
+  }, []);
+
+  const onSelectionEnd = useCallback(() => {
+    isSelecting.current = false;
+    // 获取当前所有选中的节点 ID
+    const selectedIds = nodes.filter(n => n.selected).map(n => n.id);
+    const currentSelected = useEditorStore.getState().selectedNodeIds;
+    const isSame = selectedIds.length === currentSelected.length &&
+      selectedIds.every(id => currentSelected.includes(id));
+
+    if (!isSame) {
+      selectNodes(selectedIds);
+    }
+  }, [nodes, selectNodes]);
+
+  const updateNodesPositions = useEditorStore((state) => state.updateNodesPositions);
+
+  const dragSession = useRef<{
+    isShiftDrag: boolean;
+    descendantIds: string[];
+    initialPositions: Map<string, { x: number; y: number }>;
+    startPos: { x: number; y: number };
+  } | null>(null);
+
+  const onNodeDragStart = useCallback((event: any, draggedNode: Node) => {
     recordHistoryStart();
-  }, [recordHistoryStart]);
 
-  const onNodeDragStop = useCallback((_event: any, node: Node) => {
+    if (event.shiftKey) {
+      const tree = useEditorStore.getState().getCurrentTree();
+      if (tree) {
+        const descendants = getDescendantIds(tree, draggedNode.id);
+        const initialPositions = new Map<string, { x: number; y: number }>();
+        const currentNodes = getNodes();
+        descendants.forEach(id => {
+          const n = currentNodes.find(fn => fn.id === id);
+          if (n) initialPositions.set(id, { ...n.position });
+        });
+
+        dragSession.current = {
+          isShiftDrag: true,
+          descendantIds: descendants,
+          initialPositions,
+          startPos: { ...draggedNode.position }
+        };
+      }
+    } else {
+      dragSession.current = null;
+    }
+  }, [recordHistoryStart, getNodes]);
+
+  const onNodeDrag = useCallback((_event: any, node: Node) => {
+    if (dragSession.current?.isShiftDrag) {
+      const { descendantIds, initialPositions, startPos } = dragSession.current;
+      const dx = node.position.x - startPos.x;
+      const dy = node.position.y - startPos.y;
+
+      setNodes((prevNodes) =>
+        prevNodes.map((n) => {
+          if (descendantIds.includes(n.id)) {
+            const initPos = initialPositions.get(n.id);
+            if (initPos) {
+              return {
+                ...n,
+                position: {
+                  x: initPos.x + dx,
+                  y: initPos.y + dy
+                }
+              };
+            }
+          }
+          return n;
+        })
+      );
+    }
+  }, [setNodes]);
+
+  const onNodeDragStop = useCallback((_event: any, draggedNode: Node, draggedNodes: Node[]) => {
     // 松手时吸附到网格
     const gridSize = 15;
-    const snappedX = Math.round(node.position.x / gridSize) * gridSize;
-    const snappedY = Math.round(node.position.y / gridSize) * gridSize;
-    updateNodePosition(node.id, snappedX, snappedY);
+    const session = dragSession.current;
+
+    // 使用 Map 收集所有需要更新的节点，避免重复
+    const updateMap = new Map<string, { x: number, y: number }>();
+
+    // 1. 处理 React Flow 自动拖拽的所有节点（多选拖拽、单选拖拽）
+    draggedNodes.forEach(n => {
+      updateMap.set(n.id, {
+        x: Math.round(n.position.x / gridSize) * gridSize,
+        y: Math.round(n.position.y / gridSize) * gridSize
+      });
+    });
+
+    // 2. 如果是 Shift 拖拽，还需要包含手动移动的子孙节点
+    // 这些节点可能没被选中，所以不在 draggedNodes 中
+    if (session?.isShiftDrag) {
+      const currentNodes = getNodes();
+
+      // 确保被拖拽的主节点也被更新（通常在 draggedNodes 中，但这里通过 Map 覆盖确保万一）
+      updateMap.set(draggedNode.id, {
+        x: Math.round(draggedNode.position.x / gridSize) * gridSize,
+        y: Math.round(draggedNode.position.y / gridSize) * gridSize
+      });
+
+      session.descendantIds.forEach(id => {
+        const n = currentNodes.find(fn => fn.id === id);
+        if (n) {
+          updateMap.set(n.id, {
+            x: Math.round(n.position.x / gridSize) * gridSize,
+            y: Math.round(n.position.y / gridSize) * gridSize
+          });
+        }
+      });
+    }
+
+    const updates = Array.from(updateMap.entries()).map(([id, pos]) => ({
+      id,
+      x: pos.x,
+      y: pos.y
+    }));
+
+    if (updates.length > 0) {
+      updateNodesPositions(updates);
+    }
+
     finalizeContinuousAction();
-  }, [updateNodePosition, finalizeContinuousAction]);
+    dragSession.current = null;
+  }, [updateNodesPositions, finalizeContinuousAction, getNodes]);
 
   // 自定义 onEdgesChange：处理连接的删除
   const onEdgesChange = useCallback((changes: import('@xyflow/react').EdgeChange<Edge>[]) => {
     onEdgesChangeBase(changes);
 
+    const connsToRemove: string[] = [];
+    const dataConnsToRemove: string[] = [];
+
     changes.forEach((change) => {
       if (change.type === 'remove') {
         if (change.id.startsWith('data-')) {
-          removeDataConnection(change.id);
+          dataConnsToRemove.push(change.id);
         } else {
-          removeConnection(change.id);
+          connsToRemove.push(change.id);
         }
       }
     });
-  }, [onEdgesChangeBase, removeDataConnection, removeConnection]);
+
+    if (connsToRemove.length > 0) {
+      removeConnections(connsToRemove);
+    }
+    if (dataConnsToRemove.length > 0) {
+      removeDataConnections(dataConnsToRemove);
+    }
+  }, [onEdgesChangeBase, removeDataConnections, removeConnections]);
 
   const onConnect: OnConnect = useCallback(
     async (params) => {
@@ -507,6 +712,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeDragStart={onNodeDragStart}
+        onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
         isValidConnection={isValidConnection}
         selectNodesOnDrag={false}
@@ -515,25 +721,17 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
           onPaneClick?.();
         }}
         onNodeContextMenu={onNodeContextMenu}
-        onSelectionChange={({ nodes }) => {
-          // 同步选中状态到 Store
-          const newNodeIds = nodes.map(n => n.id);
-          const currentSelected = useEditorStore.getState().selectedNodeIds;
-          const isSame = newNodeIds.length === currentSelected.length &&
-            newNodeIds.every(id => currentSelected.includes(id));
-
-          if (!isSame) {
-            selectNodes(newNodeIds);
-          }
-        }}
+        onSelectionStart={onSelectionStart}
+        onSelectionEnd={onSelectionEnd}
         fitView
         snapToGrid={false}
         snapGrid={[15, 15]}
         panOnDrag={[1, 2]}
         selectionOnDrag
+        selectionKeyCode={null}
         proOptions={{ hideAttribution: true }}
         className="bg-gray-900"
-        deleteKeyCode={['Backspace', 'Delete']}
+        deleteKeyCode={null}
       >
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#374151" />
         <Controls

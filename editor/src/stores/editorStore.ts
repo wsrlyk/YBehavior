@@ -59,6 +59,7 @@ interface EditorState {
   selectNodes: (nodeIds: string[]) => void;
   addSelectedNode: (nodeId: string) => void;
   clearSelection: () => void;
+  duplicateSelectedNodes: () => void;
 
   // 获取当前树
   getCurrentTree: () => Tree | null;
@@ -66,16 +67,21 @@ interface EditorState {
   // 节点操作
   addNode: (node: TreeNode) => void;
   removeNode: (nodeId: string) => void;
+  removeNodes: (nodeIds: string[]) => void;
+  removeElements: (nodeIds: string[], connectionIds: string[], dataConnectionIds: string[]) => void;
   updateNodePosition: (nodeId: string, x: number, y: number) => void;
+  updateNodesPositions: (updates: { id: string; x: number; y: number }[]) => void;
   updateNodeProperty: (nodeId: string, updates: Partial<TreeNode>) => void;
 
   // 连接操作
   addConnection: (connection: TreeConnection) => void;
   removeConnection: (connectionId: string) => void;
+  removeConnections: (connectionIds: string[]) => void;
 
   // 数据连接操作
   addDataConnection: (dataConn: DataConnection) => void;
   removeDataConnection: (dataConnId: string) => void;
+  removeDataConnections: (dataConnIds: string[]) => void;
 
   // 变量操作
   addVariable: (isLocal: boolean, variable: Variable) => void;
@@ -110,6 +116,33 @@ interface EditorState {
 
   // 新建文件
   createNewTree: (name: string) => void;
+}
+
+/**
+ * 获取节点的所有子孙节点 ID
+ */
+export function getDescendantIds(tree: Tree, nodeId: string): string[] {
+  const descendantIds: string[] = [];
+  const stack = [nodeId];
+  const visited = new Set<string>();
+
+  while (stack.length > 0) {
+    const currentId = stack.pop()!;
+    if (visited.has(currentId)) continue;
+    visited.add(currentId);
+
+    const children = tree.connections
+      .filter(c => c.parentNodeId === currentId)
+      .map(c => c.childNodeId);
+
+    for (const childId of children) {
+      if (!visited.has(childId)) {
+        descendantIds.push(childId);
+        stack.push(childId);
+      }
+    }
+  }
+  return descendantIds;
 }
 
 /**
@@ -219,6 +252,9 @@ function updateOpenedFileTree(
   const file = openedFiles[fileIndex];
   const oldTree = file.tree;
   const newTree = updater(oldTree);
+
+  // 如果没有变化，直接返回 null
+  if (newTree === oldTree) return null;
 
   // 重新计算 UID
   if (!options.skipUID) {
@@ -405,6 +441,23 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     return result || state;
   }),
 
+  updateNodesPositions: (updates) => set((state) => {
+    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      const newNodes = new Map(tree.nodes);
+      let changed = false;
+      updates.forEach(({ id, x, y }) => {
+        const node = tree.nodes.get(id);
+        if (node) {
+          newNodes.set(id, { ...node, position: { x, y } });
+          changed = true;
+        }
+      });
+      return changed ? { ...tree, nodes: newNodes } : tree;
+    }, { skipHistory: true, skipUID: true });
+
+    return result || state;
+  }),
+
   addNode: (node) => set((state) => {
     const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
       const newNodes = new Map(tree.nodes);
@@ -415,41 +468,82 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     return result || state;
   }),
 
-  removeNode: (nodeId) => set((state) => {
+  removeElements: (nodeIds, connectionIds, dataConnectionIds) => set((state) => {
     const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      // 不允许删除 Root 节点
-      const node = tree.nodes.get(nodeId);
-      if (node?.type === 'Root') return tree;
+      let nodesToActuallyRemove: string[] = [];
+      let newNodes = new Map(tree.nodes);
 
-      const newNodes = new Map(tree.nodes);
-      newNodes.delete(nodeId);
+      // 1. Process nodes
+      if (nodeIds.length > 0) {
+        nodeIds.forEach(id => {
+          const node = tree.nodes.get(id);
+          if (node && node.type !== 'Root') {
+            newNodes.delete(id);
+            nodesToActuallyRemove.push(id);
+          }
+        });
+      }
 
-      const newConnections = tree.connections.filter(
-        (c) => c.parentNodeId !== nodeId && c.childNodeId !== nodeId
-      );
+      const actualNodeIdsToRemove = new Set(nodesToActuallyRemove);
+      const connIdsToRemove = new Set(connectionIds);
+      const dataConnIdsToRemove = new Set(dataConnectionIds);
 
-      const newTree = { ...tree, nodes: newNodes, connections: newConnections };
-
-      // 删除节点可能影响连线（虽然连线已删除，但如果被删节点是某个特殊节点的子节点... 
+      // 2. Filter connections
       const parentNodeIdsToRefresh = new Set<string>();
-      tree.connections.forEach(c => {
-        if (c.childNodeId === nodeId && newNodes.has(c.parentNodeId)) {
+      const newConnections = tree.connections.filter((c) => {
+        // Remove if connection itself is in connectionIds OR if either end node is being removed
+        const shouldRemove = connIdsToRemove.has(c.id) ||
+          actualNodeIdsToRemove.has(c.parentNodeId) ||
+          actualNodeIdsToRemove.has(c.childNodeId);
+        if (shouldRemove) {
           parentNodeIdsToRefresh.add(c.parentNodeId);
+          return false;
         }
+        return true;
       });
 
-      const newTreeAfterLabelUpdate = applyLabelUpdatesToTree(newTree, Array.from(parentNodeIdsToRefresh));
+      // 3. Filter data connections
+      const newDataConnections = tree.dataConnections.filter((dc) => {
+        return !dataConnIdsToRemove.has(dc.id) &&
+          !actualNodeIdsToRemove.has(dc.fromNodeId) &&
+          !actualNodeIdsToRemove.has(dc.toNodeId);
+      });
 
-      return newTreeAfterLabelUpdate;
+      // Check for changes
+      const hasNodeChanges = nodesToActuallyRemove.length > 0;
+      const hasConnChanges = newConnections.length !== tree.connections.length;
+      const hasDataConnChanges = newDataConnections.length !== tree.dataConnections.length;
+
+      if (!hasNodeChanges && !hasConnChanges && !hasDataConnChanges) {
+        return tree;
+      }
+
+      const newTree = {
+        ...tree,
+        nodes: newNodes,
+        connections: newConnections,
+        dataConnections: newDataConnections
+      };
+
+      return applyLabelUpdatesToTree(newTree, Array.from(parentNodeIdsToRefresh));
     });
 
     if (!result) return state;
 
+    const remainingSelected = state.selectedNodeIds.filter(id => !nodeIds.includes(id));
     return {
       ...result,
-      selectedNodeIds: state.selectedNodeIds.filter((id) => id !== nodeId),
+      selectedNodeIds: remainingSelected,
     };
   }),
+
+  removeNode: (nodeId) => get().removeElements([nodeId], [], []),
+
+  removeNodes: (nodeIds) => get().removeElements(nodeIds, [], []),
+
+  removeConnections: (connectionIds) => get().removeElements([], connectionIds, []),
+
+  removeDataConnections: (dataConnIds) => get().removeElements([], [], dataConnIds),
 
   updateNodeProperty: (nodeId, updates) => set((state) => {
     const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
@@ -478,24 +572,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     return result || state;
   }),
 
-  removeConnection: (connectionId) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      const newTreeWithConn = {
-        ...tree,
-        connections: tree.connections.filter((c) => c.id !== connectionId),
-      };
-
-      // 删除连接后，需要刷新父节点的标签
-      const parentNodeId = tree.connections.find(c => c.id === connectionId)?.parentNodeId;
-      const newTreeAfterLabelUpdate = parentNodeId
-        ? applyLabelUpdatesToTree(newTreeWithConn, [parentNodeId])
-        : newTreeWithConn;
-
-      return newTreeAfterLabelUpdate;
-    });
-
-    return result || state;
-  }),
+  removeConnection: (connectionId) => get().removeConnections([connectionId]),
 
   addDataConnection: (dataConn) => set((state) => {
     const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
@@ -529,15 +606,104 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     return result || state;
   }),
 
-  removeDataConnection: (dataConnId) => set((state) => {
+  removeDataConnection: (dataConnId) => get().removeDataConnections([dataConnId]),
+
+  duplicateSelectedNodes: () => set((state) => {
+    if (!state.selectedNodeIds.length || !state.activeFilePath) return state;
+
+    let newDuplicatedIds: string[] = [];
+
     const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      const selectedIds = new Set(state.selectedNodeIds);
+      const nodesToDuplicate = Array.from(selectedIds)
+        .map(id => tree.nodes.get(id))
+        .filter((node): node is TreeNode => !!node && node.type !== 'Root');
+
+      if (nodesToDuplicate.length === 0) return tree;
+
+      const timestamp = Date.now();
+      const oldToNewIdMap = new Map<string, string>();
+      const newNodes = new Map(tree.nodes);
+      const duplicatedIds: string[] = [];
+
+      // 1. Duplicate Nodes
+      nodesToDuplicate.forEach((node, index) => {
+        const newId = `node-${timestamp}-${index}`;
+        const newGuid = timestamp + index;
+        oldToNewIdMap.set(node.id, newId);
+
+        const newNode: TreeNode = {
+          ...node,
+          id: newId,
+          guid: newGuid,
+          uid: undefined,
+          parentId: undefined, // Clear linkage
+          childrenIds: [], // Clear linkage
+          position: {
+            x: node.position.x + 20,
+            y: node.position.y + 20
+          },
+          pins: node.pins.map(p => ({
+            ...p,
+            binding: { ...p.binding },
+            vectorIndex: p.vectorIndex ? { ...p.vectorIndex } : undefined
+          }))
+        };
+
+        newNodes.set(newId, newNode);
+        duplicatedIds.push(newId);
+      });
+
+      newDuplicatedIds = duplicatedIds;
+
+      // 2. Duplicate Tree Connections (only within selection)
+      const newConnections = [...tree.connections];
+      tree.connections.forEach(conn => {
+        if (selectedIds.has(conn.parentNodeId) && selectedIds.has(conn.childNodeId)) {
+          const newParentId = oldToNewIdMap.get(conn.parentNodeId);
+          const newChildId = oldToNewIdMap.get(conn.childNodeId);
+          if (newParentId && newChildId) {
+            newConnections.push({
+              ...conn,
+              id: `conn-${newParentId}-${newChildId}-${conn.parentConnector}-${timestamp}`,
+              parentNodeId: newParentId,
+              childNodeId: newChildId
+            });
+          }
+        }
+      });
+
+      // 3. Duplicate Data Connections (only within selection)
+      const newDataConnections = [...tree.dataConnections];
+      tree.dataConnections.forEach(dc => {
+        if (selectedIds.has(dc.fromNodeId) && selectedIds.has(dc.toNodeId)) {
+          const newFromId = oldToNewIdMap.get(dc.fromNodeId);
+          const newToId = oldToNewIdMap.get(dc.toNodeId);
+          if (newFromId && newToId) {
+            newDataConnections.push({
+              ...dc,
+              id: `data-${newFromId}-${newToId}-${dc.fromPinName}-${dc.toPinName}-${timestamp}`,
+              fromNodeId: newFromId,
+              toNodeId: newToId
+            });
+          }
+        }
+      });
+
       return {
         ...tree,
-        dataConnections: tree.dataConnections.filter((c) => c.id !== dataConnId),
+        nodes: newNodes,
+        connections: newConnections,
+        dataConnections: newDataConnections
       };
     });
 
-    return result || state;
+    if (!result) return state;
+
+    return {
+      ...result,
+      selectedNodeIds: newDuplicatedIds,
+    };
   }),
 
   saveCurrentFile: async () => {
@@ -896,11 +1062,41 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   removeVariable: (isLocal, name) => set((state) => {
     const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+      let newTree = { ...tree };
       if (isLocal) {
-        return { ...tree, localVariables: tree.localVariables.filter(v => v.name !== name) };
+        newTree.localVariables = tree.localVariables.filter(v => v.name !== name);
       } else {
-        return { ...tree, sharedVariables: tree.sharedVariables.filter(v => v.name !== name) };
+        newTree.sharedVariables = tree.sharedVariables.filter(v => v.name !== name);
       }
+
+      // Cleanup all pins referencing this variable
+      const newNodes = new Map(newTree.nodes);
+      let treeChanged = false;
+      for (const [nodeId, node] of newNodes) {
+        let nodeChanged = false;
+        const newPins = node.pins.map(pin => {
+          if (pin.binding.type === 'pointer' && pin.binding.variableName === name && pin.binding.isLocal === isLocal) {
+            nodeChanged = true;
+            return {
+              ...pin,
+              binding: { type: 'pointer' as const, variableName: '', isLocal: false },
+              vectorIndex: undefined
+            };
+          }
+          return pin;
+        });
+
+        if (nodeChanged) {
+          newNodes.set(nodeId, { ...node, pins: newPins });
+          treeChanged = true;
+        }
+      }
+
+      if (treeChanged) {
+        newTree.nodes = newNodes;
+      }
+
+      return newTree;
     });
     return result || state;
   }),
@@ -913,9 +1109,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
       if (!targetVar) return tree;
 
-      // 如果更新了类型，需要检查引用它的 pins 是否失效
       const isTypeChanged = (updates.valueType && updates.valueType !== targetVar.valueType) ||
         (updates.countType && updates.countType !== targetVar.countType);
+      const isNameChanged = updates.name && updates.name !== name;
 
       if (isLocal) {
         newTree.localVariables = tree.localVariables.map(v => v.name === name ? { ...v, ...updates } : v);
@@ -923,27 +1119,37 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         newTree.sharedVariables = tree.sharedVariables.map(v => v.name === name ? { ...v, ...updates } : v);
       }
 
-      if (isTypeChanged) {
+      if (isTypeChanged || isNameChanged) {
         // 更新所有引用该变量的 pin 状态
-        const updatedVar = (isLocal ? newTree.localVariables : newTree.sharedVariables).find(v => v.name === name)!;
+        const updatedVar = (isLocal ? newTree.localVariables : newTree.sharedVariables).find(v => (isNameChanged ? v.name === updates.name : v.name === name))!;
 
         const newNodes = new Map(newTree.nodes);
         for (const [nodeId, node] of newNodes) {
           let nodeChanged = false;
           const newPins = node.pins.map(pin => {
             if (pin.binding.type === 'pointer' && pin.binding.variableName === name && pin.binding.isLocal === isLocal) {
-              // 检查是否依然兼容
-              const typeMatch = updatedVar.valueType === pin.valueType;
-              const countMatch = pin.countType === 'list' ? updatedVar.countType === 'list' : true;
-
-              if (!typeMatch || !countMatch) {
+              // 1. 如果名字变了，更新名字
+              if (isNameChanged) {
                 nodeChanged = true;
-                // 不再兼容，重置为数据连接模式（pointer + empty variableName）
                 return {
                   ...pin,
-                  binding: { type: 'pointer' as const, variableName: '', isLocal: false },
-                  vectorIndex: undefined
-                } as Pin;
+                  binding: { ...pin.binding, variableName: updates.name as string }
+                };
+              }
+              // 2. 如果名字没变但类型变了，检查是否依然兼容
+              else if (isTypeChanged) {
+                const typeMatch = updatedVar.valueType === pin.valueType;
+                const countMatch = pin.countType === 'list' ? updatedVar.countType === 'list' : true;
+
+                if (!typeMatch || !countMatch) {
+                  nodeChanged = true;
+                  // 不再兼容，重置为数据连接模式（pointer + empty variableName）
+                  return {
+                    ...pin,
+                    binding: { type: 'pointer' as const, variableName: '', isLocal: false },
+                    vectorIndex: undefined
+                  } as Pin;
+                }
               }
             }
             return pin;
