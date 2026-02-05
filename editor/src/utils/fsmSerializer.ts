@@ -4,28 +4,54 @@
  * Serializes FSM data model to XML format for saving .fsm files.
  */
 
-import type { Variable } from '../types';
 import type { FSM, FSMMachine, FSMState, FSMTransition } from '../types/fsm';
 import { serializeVariable } from './xmlSerializer';
 
 // ==================== Helper Functions ====================
 
 function formatXml(xml: string): string {
-    let formatted = '';
-    let indent = '';
     const tab = '  ';
+    const lines: string[] = [];
+    let depth = 0;
 
-    xml.split(/>\s*</).forEach((node) => {
-        if (node.match(/^\/\w/)) {
-            indent = indent.substring(tab.length);
-        }
-        formatted += indent + '<' + node + '>\r\n';
-        if (node.match(/^<?\w[^>]*[^\/]$/)) {
-            indent += tab;
-        }
-    });
+    // Split by tag boundaries
+    const parts = xml.split(/(<[^>]+>)/);
 
-    return formatted.substring(1, formatted.length - 3);
+    for (const part of parts) {
+        const trimmed = part.trim();
+        if (!trimmed) continue;
+
+        // XML declaration - no indent, no depth change
+        if (trimmed.startsWith('<?')) {
+            lines.push(trimmed);
+            continue;
+        }
+
+        // Closing tag - decrease depth first, then write
+        if (trimmed.startsWith('</')) {
+            depth = Math.max(0, depth - 1);
+            lines.push(tab.repeat(depth) + trimmed);
+            continue;
+        }
+
+        // Self-closing tag - write at current depth, no depth change
+        if (trimmed.startsWith('<') && trimmed.endsWith('/>')) {
+            lines.push(tab.repeat(depth) + trimmed);
+            continue;
+        }
+
+        // Opening tag - write at current depth, then increase depth
+        if (trimmed.startsWith('<')) {
+            lines.push(tab.repeat(depth) + trimmed);
+            depth++;
+            continue;
+        }
+
+        // Text content (shouldn't happen for FSM, but handle it)
+        lines.push(tab.repeat(depth) + trimmed);
+    }
+
+    return lines.join('\r\n');
 }
 
 function positionToString(pos: { x: number; y: number }): string {
@@ -36,9 +62,10 @@ function positionToString(pos: { x: number; y: number }): string {
 
 function serializeState(
     state: FSMState,
-    machine: FSMMachine,
+    _machine: FSMMachine,
     fsm: FSM,
-    doc: Document
+    doc: Document,
+    forEditor: boolean
 ): Element {
     const el = doc.createElement('State');
 
@@ -59,19 +86,21 @@ function serializeState(
         el.setAttribute('Tree', state.tree);
     }
 
-    // Position
-    el.setAttribute('Pos', positionToString(state.position));
+    if (forEditor) {
+        // Position
+        el.setAttribute('Pos', positionToString(state.position));
 
-    // Comment
-    if (state.comment) {
-        el.setAttribute('Comment', state.comment);
+        // Comment
+        if (state.comment) {
+            el.setAttribute('Comment', state.comment);
+        }
     }
 
     // Handle Meta state (nested machine)
     if (state.type === 'Meta') {
         const subMachine = [...fsm.machines.values()].find(m => m.parentMetaStateId === state.id);
         if (subMachine) {
-            const machineEl = serializeMachine(subMachine, fsm, doc);
+            const machineEl = serializeMachine(subMachine, fsm, doc, forEditor);
             el.appendChild(machineEl);
         }
     }
@@ -81,7 +110,7 @@ function serializeState(
 
 function serializeTransition(
     trans: FSMTransition,
-    machine: FSMMachine,
+    fsm: FSM,
     doc: Document
 ): Element {
     const el = doc.createElement('Trans');
@@ -93,19 +122,31 @@ function serializeTransition(
         el.setAttribute('Type', 'Exit');
     }
 
+    // Helper to find state name globally
+    const findStateName = (stateId: string): string | null => {
+        for (const m of fsm.machines.values()) {
+            const state = m.states.get(stateId);
+            if (state) {
+                if (state.type === 'Normal' || state.type === 'Meta') return state.name;
+                return state.type;
+            }
+        }
+        return null;
+    };
+
     // From state (skip for Entry transitions and Any state)
     if (trans.fromStateId && trans.type !== 'Entry') {
-        const fromState = machine.states.get(trans.fromStateId);
-        if (fromState && fromState.type !== 'Any') {
-            el.setAttribute('From', fromState.type === 'Normal' || fromState.type === 'Meta' ? fromState.name : fromState.type);
+        const fromName = findStateName(trans.fromStateId);
+        if (fromName && fromName !== 'Any') {
+            el.setAttribute('From', fromName);
         }
     }
 
     // To state (skip for Exit transitions)
     if (trans.type !== 'Exit') {
-        const toState = machine.states.get(trans.toStateId);
-        if (toState) {
-            el.setAttribute('To', toState.type === 'Normal' || toState.type === 'Meta' ? toState.name : toState.type);
+        const toName = findStateName(trans.toStateId);
+        if (toName && toName !== 'Exit') {
+            el.setAttribute('To', toName);
         }
     }
 
@@ -121,7 +162,8 @@ function serializeTransition(
 function serializeMachine(
     machine: FSMMachine,
     fsm: FSM,
-    doc: Document
+    doc: Document,
+    forEditor: boolean
 ): Element {
     const el = doc.createElement('Machine');
 
@@ -144,13 +186,23 @@ function serializeMachine(
         return (a.name || '').localeCompare(b.name || '');
     });
 
-    for (const state of sortedStates) {
-        el.appendChild(serializeState(state, machine, fsm, doc));
+    const filteredStates = sortedStates.filter(s => {
+        if (forEditor) return true;
+        // Runtime version doesn't need Any or Upper
+        return s.type !== 'Any' && s.type !== 'Upper';
+    });
+
+    for (const state of filteredStates) {
+        el.appendChild(serializeState(state, machine, fsm, doc, forEditor));
     }
 
-    // Serialize transitions
-    for (const trans of machine.transitions) {
-        el.appendChild(serializeTransition(trans, machine, doc));
+    // Serialize transitions (Normal transitions are only serialized in the root machine in our global model)
+    // Actually, to keep XML hierarchical, we might want to split them, but our current store has them all in rootMachine.
+    // Transition's From/To names will resolve correctly even if they belong to sub-machines.
+    if (machine.id === fsm.rootMachineId) {
+        for (const trans of machine.transitions) {
+            el.appendChild(serializeTransition(trans, fsm, doc));
+        }
     }
 
     return el;
@@ -159,9 +211,13 @@ function serializeMachine(
 /**
  * Serialize FSM to editor XML format
  */
-export function serializeFSMForEditor(fsm: FSM): string {
+export function serializeFSMForEditor(fsm: FSM, forEditor: boolean = true): string {
     const doc = document.implementation.createDocument(null, null, null);
     const root = doc.createElement(fsm.name);
+
+    if (forEditor) {
+        root.setAttribute('IsEditor', '');
+    }
 
     // Shared variables
     if (fsm.sharedVariables.length > 0) {
@@ -184,20 +240,21 @@ export function serializeFSMForEditor(fsm: FSM): string {
     // Root machine
     const rootMachine = fsm.machines.get(fsm.rootMachineId);
     if (rootMachine) {
-        root.appendChild(serializeMachine(rootMachine, fsm, doc));
+        root.appendChild(serializeMachine(rootMachine, fsm, doc, forEditor));
     }
 
     doc.appendChild(root);
     const serializer = new XMLSerializer();
     const xmlStr = '<?xml version="1.0" encoding="utf-8"?>\r\n' + serializer.serializeToString(doc);
 
-    return formatXml(xmlStr);
+    // UTF-8 BOM + formatted XML
+    const BOM = '\uFEFF';
+    return BOM + formatXml(xmlStr);
 }
 
 /**
- * Serialize FSM to runtime XML format (same as editor for FSM)
+ * Serialize FSM to runtime XML format
  */
 export function serializeFSMForRuntime(fsm: FSM): string {
-    // For FSM, runtime format is the same as editor format
-    return serializeFSMForEditor(fsm);
+    return serializeFSMForEditor(fsm, false);
 }

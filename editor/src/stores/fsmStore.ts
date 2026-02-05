@@ -14,7 +14,10 @@ import {
     isSpecialStateType,
 } from '../types/fsm';
 import { parseFSMXml } from '../utils/fsmParser';
-import { serializeFSMForEditor } from '../utils/fsmSerializer';
+import { serializeFSMForEditor, serializeFSMForRuntime } from '../utils/fsmSerializer';
+import { writeFile } from '../utils/fileService';
+import { useEditorStore } from './editorStore';
+import { useNotificationStore } from './notificationStore';
 
 // ==================== Types ====================
 
@@ -38,6 +41,8 @@ interface FSMStoreState {
     openedFSMFiles: OpenedFSMFile[];
     activeFSMPath: string | null;
     isConnecting: boolean;
+    selectedNodeIds: string[];
+    selectedEdgeIds: string[];
 
     // Actions
     setIsConnecting: (isConnecting: boolean) => void;
@@ -69,12 +74,17 @@ interface FSMStoreState {
     navigateToMachine: (machineId: string) => void;
     navigateUp: () => void;
 
+    // Selection actions
+    setSelectedNodes: (nodeIds: string[]) => void;
+    setSelectedEdges: (edgeIds: string[]) => void;
+
     // History
     undo: () => void;
     redo: () => void;
 
     // Save
     saveFSM: () => Promise<string>;
+    saveFSMAs: () => Promise<void>;
     createNewFSM: (name: string) => void;
 }
 
@@ -125,8 +135,13 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
     openedFSMFiles: [],
     activeFSMPath: null,
     isConnecting: false,
+    selectedNodeIds: [],
+    selectedEdgeIds: [],
 
     setIsConnecting: (isConnecting) => set({ isConnecting }),
+
+    setSelectedNodes: (nodeIds) => set({ selectedNodeIds: nodeIds }),
+    setSelectedEdges: (edgeIds) => set({ selectedEdgeIds: edgeIds }),
 
     openFSM: (path, content) => {
         const { openedFSMFiles } = get();
@@ -285,21 +300,19 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
     // Transition actions
     addTransition: (fromStateId, toStateId, events = []) => set((state) => {
         const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
-            if (!file) return fsm;
-
-            const machine = fsm.machines.get(file.currentMachineId);
-            if (!machine) return fsm;
+            // All transitions are stored in the root machine (global storage)
+            const rootMachine = fsm.machines.get(fsm.rootMachineId);
+            if (!rootMachine) return fsm;
 
             const trans = createFSMTransition(fromStateId, toStateId, events);
-            const newMachine: FSMMachine = {
-                ...machine,
-                transitions: [...machine.transitions, trans],
+            const newRootMachine: FSMMachine = {
+                ...rootMachine,
+                transitions: [...rootMachine.transitions, trans],
             };
 
             return {
                 ...fsm,
-                machines: new Map([...fsm.machines, [machine.id, newMachine]]),
+                machines: new Map([...fsm.machines, [fsm.rootMachineId, newRootMachine]]),
             };
         });
         return result || state;
@@ -307,10 +320,16 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
 
     removeTransition: (transitionId) => set((state) => {
         const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
-            if (!file) return fsm;
+            let targetMachineId = '';
+            for (const [mId, m] of fsm.machines) {
+                if (m.transitions.some(t => t.id === transitionId)) {
+                    targetMachineId = mId;
+                    break;
+                }
+            }
 
-            const machine = fsm.machines.get(file.currentMachineId);
+            if (!targetMachineId) return fsm;
+            const machine = fsm.machines.get(targetMachineId);
             if (!machine) return fsm;
 
             const newMachine: FSMMachine = {
@@ -328,23 +347,21 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
 
     addEventToTransition: (transitionId, event) => set((state) => {
         const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
-            if (!file) return fsm;
+            // All transitions are in root machine
+            const rootMachine = fsm.machines.get(fsm.rootMachineId);
+            if (!rootMachine) return fsm;
 
-            const machine = fsm.machines.get(file.currentMachineId);
-            if (!machine) return fsm;
-
-            const newTransitions = machine.transitions.map(t =>
+            const newTransitions = rootMachine.transitions.map(t =>
                 t.id === transitionId
                     ? { ...t, events: [...t.events, event] }
                     : t
             );
 
-            const newMachine: FSMMachine = { ...machine, transitions: newTransitions };
+            const newMachine: FSMMachine = { ...rootMachine, transitions: newTransitions };
 
             return {
                 ...fsm,
-                machines: new Map([...fsm.machines, [machine.id, newMachine]]),
+                machines: new Map([...fsm.machines, [fsm.rootMachineId, newMachine]]),
             };
         });
         return result || state;
@@ -352,23 +369,21 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
 
     removeEventFromTransition: (transitionId, event) => set((state) => {
         const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
-            if (!file) return fsm;
+            // All transitions are in root machine
+            const rootMachine = fsm.machines.get(fsm.rootMachineId);
+            if (!rootMachine) return fsm;
 
-            const machine = fsm.machines.get(file.currentMachineId);
-            if (!machine) return fsm;
-
-            const newTransitions = machine.transitions.map(t =>
+            const newTransitions = rootMachine.transitions.map(t =>
                 t.id === transitionId
                     ? { ...t, events: t.events.filter(e => e !== event) }
                     : t
             );
 
-            const newMachine: FSMMachine = { ...machine, transitions: newTransitions };
+            const newMachine: FSMMachine = { ...rootMachine, transitions: newTransitions };
 
             return {
                 ...fsm,
-                machines: new Map([...fsm.machines, [machine.id, newMachine]]),
+                machines: new Map([...fsm.machines, [fsm.rootMachineId, newMachine]]),
             };
         });
         return result || state;
@@ -500,19 +515,120 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
     saveFSM: async () => {
         const { openedFSMFiles, activeFSMPath } = get();
         const file = openedFSMFiles.find(f => f.path === activeFSMPath);
-        if (!file) throw new Error('No active FSM file');
+        if (!file || !activeFSMPath) throw new Error('No active FSM file');
+
+        // Handle new files (no path or new://)
+        if (file.isNew || activeFSMPath.startsWith('new://')) {
+            // We should probably redirect to saveAs or handle it in MainWindow
+            // For now, let's just serialize and expect MainWindow to handle the path
+            return serializeFSMForEditor(file.fsm);
+        }
+
+        const { editorTreeDir, runtimeTreeDir } = useEditorStore.getState();
+        if (!editorTreeDir || !runtimeTreeDir) throw new Error('Tree directories not set');
 
         const content = serializeFSMForEditor(file.fsm);
+        const fullPath = `${editorTreeDir}/${activeFSMPath}`;
 
-        set({
-            openedFSMFiles: openedFSMFiles.map(f =>
-                f.path === activeFSMPath
-                    ? { ...f, lastSavedSnapshot: content, isDirty: false }
-                    : f
-            ),
-        });
+        const runtimeContent = serializeFSMForRuntime(file.fsm);
+        const runtimePath = `${runtimeTreeDir}/${activeFSMPath}`;
 
-        return content;
+        try {
+            await writeFile(fullPath, content);
+            await writeFile(runtimePath, runtimeContent);
+
+            set({
+                openedFSMFiles: openedFSMFiles.map(f =>
+                    f.path === activeFSMPath
+                        ? { ...f, lastSavedSnapshot: content, isDirty: false }
+                        : f
+                ),
+            });
+
+            // Refresh file list in editorStore to ensure search visibility
+            useEditorStore.getState().refreshFiles();
+
+            useNotificationStore.getState().notify('Save successful', 'success');
+
+            return content;
+        } catch (e) {
+            console.error('Save failed:', e);
+            useNotificationStore.getState().notify(`Save failed: ${e}`, 'error');
+            throw e;
+        }
+    },
+
+    saveFSMAs: async () => {
+        const { openedFSMFiles, activeFSMPath } = get();
+        const editorTreeDir = useEditorStore.getState().editorTreeDir;
+        if (!activeFSMPath || !editorTreeDir) return;
+
+        const file = openedFSMFiles.find(f => f.path === activeFSMPath);
+        if (!file) return;
+
+        try {
+            const { save } = await import('@tauri-apps/plugin-dialog');
+            const newPath = await save({
+                title: 'Save FSM As',
+                defaultPath: editorTreeDir || undefined,
+                filters: [{ name: 'FSM', extensions: ['fsm'] }]
+            });
+
+            if (!newPath) return;
+
+            const fileName = newPath.split(/[/\\]/).pop() || '';
+            const fsmName = fileName.replace(/\.fsm$/, '');
+            if (fsmName.includes(' ')) {
+                useNotificationStore.getState().notify('FSM name cannot contain spaces', 'error');
+                return;
+            }
+
+            const { runtimeTreeDir } = useEditorStore.getState();
+            if (!runtimeTreeDir) return;
+
+            let relativePath = newPath;
+            const normalizedDir = editorTreeDir.replace(/\\/g, '/');
+            const normalizedNewPath = newPath.replace(/\\/g, '/');
+
+            if (normalizedNewPath.startsWith(normalizedDir)) {
+                relativePath = normalizedNewPath.slice(normalizedDir.length).replace(/^\//, '');
+            } else {
+                relativePath = newPath.split(/[/\\]/).pop() || relativePath;
+            }
+
+            const content = serializeFSMForEditor({ ...file.fsm, name: fsmName });
+            const runtimeContent = serializeFSMForRuntime({ ...file.fsm, name: fsmName });
+            const runtimePath = `${runtimeTreeDir}/${relativePath}`;
+
+            await writeFile(newPath, content);
+            await writeFile(runtimePath, runtimeContent);
+
+            set(state => ({
+                openedFSMFiles: state.openedFSMFiles.map(f =>
+                    f.path === activeFSMPath
+                        ? {
+                            ...f,
+                            path: relativePath,
+                            name: fsmName,
+                            fsm: { ...f.fsm, name: fsmName },
+                            lastSavedSnapshot: content,
+                            isDirty: false,
+                            isNew: false
+                        }
+                        : f
+                ),
+                activeFSMPath: relativePath
+            }));
+
+            // Refresh file list in editorStore
+            useEditorStore.getState().refreshFiles();
+
+            useNotificationStore.getState().notify('Save successful', 'success');
+
+        } catch (e) {
+            console.error('Save As failed:', e);
+            useNotificationStore.getState().notify(`Save As failed: ${e}`, 'error');
+        }
     },
 
     createNewFSM: (name) => {

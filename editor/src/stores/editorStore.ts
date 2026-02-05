@@ -1,6 +1,6 @@
 ﻿import { create } from 'zustand';
 import type { Tree, TreeNode, TreeConnection, DataConnection, Variable, Pin } from '../types';
-import { loadTree, listTreeFiles, saveFile } from '../utils/fileService';
+import { loadTree, listFiles, saveFile } from '../utils/fileService';
 import { loadSettings, type Settings } from '../utils/settings';
 import { useNodeDefinitionStore } from './nodeDefinitionStore';
 import { serializeTreeForEditor, serializeTreeForRuntime } from '../utils/xmlSerializer';
@@ -110,6 +110,9 @@ interface EditorState {
 
   // 新建文件
   createNewTree: (name: string) => void;
+
+  // 刷新文件列表
+  refreshFiles: () => Promise<void>;
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
@@ -127,7 +130,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const settings = await loadSettings();
-      const files = await listTreeFiles(settings.editorTreeDir);
+      const files = await listFiles(settings.editorTreeDir, ['tree', 'fsm']);
       set({
         settings,
         editorTreeDir: settings.editorTreeDir,
@@ -137,6 +140,17 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       });
     } catch (e) {
       set({ error: String(e), isLoading: false });
+    }
+  },
+
+  refreshFiles: async () => {
+    const { editorTreeDir } = get();
+    if (!editorTreeDir) return;
+    try {
+      const files = await listFiles(editorTreeDir, ['tree', 'fsm']);
+      set({ treeFiles: files });
+    } catch (e) {
+      console.error('Failed to refresh files:', e);
     }
   },
 

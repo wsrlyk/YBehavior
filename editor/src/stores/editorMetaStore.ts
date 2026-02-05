@@ -20,9 +20,13 @@ interface TreeMeta {
 interface EditorMetaState {
     // filePath -> TreeMeta
     treeMetas: Record<string, TreeMeta>;
+    uiMeta: {
+        sidebarWidth: number;
+    };
 
     // Actions
     setNodeFolded: (filePath: string, nodeId: string, isFolded: boolean) => void;
+    setSidebarWidth: (width: number) => void;
     getTreeMeta: (filePath: string) => TreeMeta | undefined;
     loadAllMeta: () => Promise<void>;
     saveAllMeta: () => Promise<void>;
@@ -32,6 +36,9 @@ const META_FILE_NAME = 'editor_meta.local.json';
 
 export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
     treeMetas: {},
+    uiMeta: {
+        sidebarWidth: 160 // Default 160px (w-40)
+    },
 
     setNodeFolded: (filePath, nodeId, isFolded) => {
         set((state) => {
@@ -59,6 +66,13 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
         get().saveAllMeta();
     },
 
+    setSidebarWidth: (width) => {
+        set((state) => ({
+            uiMeta: { ...state.uiMeta, sidebarWidth: width }
+        }));
+        get().saveAllMeta();
+    },
+
     getTreeMeta: (filePath) => {
         return get().treeMetas[filePath];
     },
@@ -69,7 +83,15 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
             const content = await readFile(path);
             if (content) {
                 const data = JSON.parse(content);
-                set({ treeMetas: data });
+                // Handle legacy format (where data was just treeMetas) or new format
+                if (data.treeMetas || data.uiMeta) {
+                    set({
+                        treeMetas: data.treeMetas || {},
+                        uiMeta: data.uiMeta || { sidebarWidth: 160 }
+                    });
+                } else {
+                    set({ treeMetas: data });
+                }
             }
         } catch (e) {
             console.warn('Failed to load editor metadata:', e);
@@ -79,7 +101,10 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
     saveAllMeta: async () => {
         try {
             const path = await getConfigPath(META_FILE_NAME);
-            const content = JSON.stringify(get().treeMetas, null, 2);
+            const content = JSON.stringify({
+                treeMetas: get().treeMetas,
+                uiMeta: get().uiMeta
+            }, null, 2);
             await writeFile(path, content);
         } catch (e) {
             console.error('Failed to save editor metadata:', e);

@@ -11,7 +11,6 @@ import type {
     FSMMachine,
     FSMState,
     FSMStateType,
-    FSMTransition,
     FSMTransitionType,
 } from '../types/fsm';
 import {
@@ -59,9 +58,11 @@ interface XmlFSMRoot {
 function parsePosition(posStr?: string): { x: number; y: number } {
     if (!posStr) return { x: 200, y: 200 };
     const parts = posStr.split(',');
+    const x = parseFloat(parts[0]);
+    const y = parseFloat(parts[1]);
     return {
-        x: parseInt(parts[0], 10) || 200,
-        y: parseInt(parts[1], 10) || 200,
+        x: isNaN(x) ? 200 : x,
+        y: isNaN(y) ? 200 : y,
     };
 }
 
@@ -87,13 +88,21 @@ function extractEvents(trans: XmlFSMTrans): string[] {
     return events;
 }
 
+interface RawTransitionData {
+    machineId: string;
+    xml: XmlFSMTrans;
+    type: FSMTransitionType;
+}
+
 /**
- * Parse a single FSM machine from XML
+ * Parse a single FSM machine from XML (Pass 1: States and Machines)
  */
 function parseMachine(
     xmlMachine: XmlFSMMachine,
     level: number,
     machines: Map<string, FSMMachine>,
+    globalStateNames: Map<string, string>,
+    allRawTransitions: RawTransitionData[],
     parentMetaStateId?: string
 ): FSMMachine {
     const machine: FSMMachine = {
@@ -124,30 +133,26 @@ function parseMachine(
         ? (Array.isArray(xmlMachine.State) ? xmlMachine.State : [xmlMachine.State])
         : [];
 
-    // Map from state name to state ID (for transitions)
-    const stateNameToId = new Map<string, string>();
+    // Local map for current machine resolution prioritizing local names
+    const localStateNames = new Map<string, string>();
+    // Pre-populate entries/exits/any for this machine
+    for (const s of machine.states.values()) {
+        localStateNames.set(s.type, s.id);
+    }
 
     for (const xmlState of xmlStates) {
         const stateType = getStateType(xmlState['@_Type']);
         const isSpecial = ['Entry', 'Exit', 'Any', 'Upper'].includes(stateType);
 
         if (isSpecial) {
-            // Update existing special state
             const existingState = [...machine.states.values()].find(s => s.type === stateType);
             if (existingState) {
-                if (xmlState['@_Pos']) {
-                    existingState.position = parsePosition(xmlState['@_Pos']);
-                }
-                if (xmlState['@_Tree']) {
-                    existingState.tree = xmlState['@_Tree'];
-                }
-                if (xmlState['@_Comment']) {
-                    existingState.comment = xmlState['@_Comment'];
-                }
-                stateNameToId.set(stateType, existingState.id);
+                if (xmlState['@_Pos']) existingState.position = parsePosition(xmlState['@_Pos']);
+                if (xmlState['@_Tree']) existingState.tree = xmlState['@_Tree'];
+                if (xmlState['@_Comment']) existingState.comment = xmlState['@_Comment'];
+                localStateNames.set(stateType, existingState.id);
             }
         } else {
-            // Create new user state
             const state: FSMState = {
                 id: generateStateId(),
                 type: stateType,
@@ -157,11 +162,16 @@ function parseMachine(
                 comment: xmlState['@_Comment'],
             };
             machine.states.set(state.id, state);
-            stateNameToId.set(state.name, state.id);
+            if (state.name) {
+                localStateNames.set(state.name, state.id);
+                // Also add to global map for cross-layer lookups
+                if (!globalStateNames.has(state.name)) {
+                    globalStateNames.set(state.name, state.id);
+                }
+            }
 
-            // Handle Meta state (nested machine)
             if (stateType === 'Meta' && xmlState.Machine) {
-                const subMachine = parseMachine(xmlState.Machine, level + 1, machines, state.id);
+                const subMachine = parseMachine(xmlState.Machine, level + 1, machines, globalStateNames, allRawTransitions, state.id);
                 machines.set(subMachine.id, subMachine);
             }
         }
@@ -169,88 +179,84 @@ function parseMachine(
 
     // Set default state
     if (xmlMachine['@_Default']) {
-        const defaultStateId = stateNameToId.get(xmlMachine['@_Default']);
+        const defaultStateId = localStateNames.get(xmlMachine['@_Default']) || globalStateNames.get(xmlMachine['@_Default']);
         if (defaultStateId) {
             machine.defaultStateId = defaultStateId;
         }
     }
 
-    // Parse transitions
-    const xmlTrans = xmlMachine.Trans
-        ? (Array.isArray(xmlMachine.Trans) ? xmlMachine.Trans : [xmlMachine.Trans])
-        : [];
-
-    for (const trans of xmlTrans) {
-        const fromName = trans['@_From'];
-        const toName = trans['@_To'];
-        const events = extractEvents(trans);
-
-        // Determine transition type
-        let transType: FSMTransitionType = 'Normal';
-        if (trans['@_Type'] === 'Entry') transType = 'Entry';
-        else if (trans['@_Type'] === 'Exit') transType = 'Exit';
-
-        const fromStateId = fromName ? stateNameToId.get(fromName) || null : null;
-        const toStateId = toName ? stateNameToId.get(toName) : undefined;
-
-        if (toStateId) {
-            const transition: FSMTransition = {
-                id: generateTransitionId(),
-                fromStateId,
-                toStateId,
-                events,
-                type: transType,
-            };
-            machine.transitions.push(transition);
+    // Collect Raw Transitions
+    const collectRaw = (list: XmlFSMTrans | XmlFSMTrans[] | undefined, type: FSMTransitionType) => {
+        if (!list) return;
+        const items = Array.isArray(list) ? list : [list];
+        for (const i of items) {
+            allRawTransitions.push({ machineId: machine.id, xml: i, type });
         }
-    }
+    };
 
-    // Parse Entry transitions
-    const entryTrans = xmlMachine.EntryTrans
-        ? (Array.isArray(xmlMachine.EntryTrans) ? xmlMachine.EntryTrans : [xmlMachine.EntryTrans])
-        : [];
-
-    for (const trans of entryTrans) {
-        const toName = trans['@_To'];
-        const events = extractEvents(trans);
-        const entryState = [...machine.states.values()].find(s => s.type === 'Entry');
-        const toStateId = toName ? stateNameToId.get(toName) : undefined;
-
-        if (entryState && toStateId) {
-            machine.transitions.push({
-                id: generateTransitionId(),
-                fromStateId: entryState.id,
-                toStateId,
-                events,
-                type: 'Entry',
-            });
-        }
-    }
-
-    // Parse Exit transitions
-    const exitTrans = xmlMachine.ExitTrans
-        ? (Array.isArray(xmlMachine.ExitTrans) ? xmlMachine.ExitTrans : [xmlMachine.ExitTrans])
-        : [];
-
-    for (const trans of exitTrans) {
-        const fromName = trans['@_From'];
-        const events = extractEvents(trans);
-        const exitState = [...machine.states.values()].find(s => s.type === 'Exit');
-        const fromStateId = fromName ? stateNameToId.get(fromName) || null : null;
-
-        if (exitState) {
-            machine.transitions.push({
-                id: generateTransitionId(),
-                fromStateId,
-                toStateId: exitState.id,
-                events,
-                type: 'Exit',
-            });
-        }
-    }
+    collectRaw(xmlMachine.Trans, 'Normal');
+    collectRaw(xmlMachine.EntryTrans, 'Entry');
+    collectRaw(xmlMachine.ExitTrans, 'Exit');
 
     machines.set(machine.id, machine);
     return machine;
+}
+
+function resolveTransitions(
+    machines: Map<string, FSMMachine>,
+    allRawTransitions: RawTransitionData[],
+    globalStateNames: Map<string, string>,
+    rootMachineId: string
+) {
+    const rootMachine = machines.get(rootMachineId);
+    if (!rootMachine) return;
+
+    for (const raw of allRawTransitions) {
+        const fromName = raw.xml['@_From'];
+        const toName = raw.xml['@_To'];
+        const events = extractEvents(raw.xml);
+
+        // Detect if this is an Any-sourced transition
+        const explicitType = raw.xml['@_Type'];
+        const isAnySource = (!fromName && !explicitType && raw.type === 'Normal') || explicitType === 'Any';
+        const isEntrySource = raw.type === 'Entry' || explicitType === 'Entry';
+
+        // Resolve From State globally
+        let fromStateId: string | null = null;
+        if (fromName) {
+            fromStateId = globalStateNames.get(fromName) || null;
+        }
+        // If no fromName: null means Any/Entry source (will be projected per-layer in editor)
+
+        // Resolve To State globally
+        let toStateId: string | undefined;
+        if (toName) {
+            toStateId = globalStateNames.get(toName);
+        }
+
+        // Exit transitions target Exit state
+        if (!toStateId && (raw.type === 'Exit' || explicitType === 'Exit')) {
+            // Find any Exit state (they're all equivalent for global storage)
+            for (const m of machines.values()) {
+                const exitState = [...m.states.values()].find(s => s.type === 'Exit');
+                if (exitState) {
+                    toStateId = exitState.id;
+                    break;
+                }
+            }
+        }
+
+        if (toStateId) {
+            // Store all transitions in root machine (global storage)
+            rootMachine.transitions.push({
+                id: generateTransitionId(),
+                fromStateId, // null = Any or Entry source
+                toStateId,
+                events,
+                type: isAnySource ? 'Normal' : (isEntrySource ? 'Entry' : raw.type),
+            });
+        }
+    }
 }
 
 /**
@@ -268,35 +274,32 @@ export function parseFSMXml(xmlContent: string, fileName: string): FSM {
     const rootTagName = Object.keys(parsed).find(k => k !== '?xml') || 'FSM';
     const xmlRoot: XmlFSMRoot = parsed[rootTagName] || {};
 
-    // Parse variables
     const sharedVariables: Variable[] = [];
     const localVariables: Variable[] = [];
 
     if (xmlRoot.Shared) {
         for (const [name, value] of Object.entries(xmlRoot.Shared)) {
-            if (typeof value === 'string') {
-                sharedVariables.push(parseVariableFromXml(name, value, false));
-            }
+            if (typeof value === 'string') sharedVariables.push(parseVariableFromXml(name, value, false));
         }
     }
-
     if (xmlRoot.Local) {
         for (const [name, value] of Object.entries(xmlRoot.Local)) {
-            if (typeof value === 'string') {
-                localVariables.push(parseVariableFromXml(name, value, true));
-            }
+            if (typeof value === 'string') localVariables.push(parseVariableFromXml(name, value, true));
         }
     }
 
-    // Parse machines
     const machines = new Map<string, FSMMachine>();
+    const globalStateNames = new Map<string, string>();
+    const allRawTransitions: RawTransitionData[] = [];
     let rootMachineId = '';
 
     if (xmlRoot.Machine) {
-        const rootMachine = parseMachine(xmlRoot.Machine, 0, machines);
+        const rootMachine = parseMachine(xmlRoot.Machine, 0, machines, globalStateNames, allRawTransitions);
         rootMachineId = rootMachine.id;
+
+        // Pass 2: Resolve all transitions
+        resolveTransitions(machines, allRawTransitions, globalStateNames, rootMachineId);
     } else {
-        // Create empty root machine if none exists
         const emptyMachine: FSMMachine = {
             id: generateMachineId(),
             level: 0,
@@ -304,8 +307,6 @@ export function parseFSMXml(xmlContent: string, fileName: string): FSM {
             states: new Map(),
             transitions: [],
         };
-
-        // Add default special states
         for (const type of ['Entry', 'Exit', 'Any'] as FSMStateType[]) {
             const state: FSMState = {
                 id: generateStateId(),
@@ -315,7 +316,6 @@ export function parseFSMXml(xmlContent: string, fileName: string): FSM {
             };
             emptyMachine.states.set(state.id, state);
         }
-
         machines.set(emptyMachine.id, emptyMachine);
         rootMachineId = emptyMachine.id;
     }
