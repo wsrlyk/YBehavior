@@ -676,6 +676,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         vTypeGroup: pinDef.vTypeGroup,
         isCountTypeFixed: pinDef.arrayType !== 'switchable',
         isBindingTypeFixed: pinDef.constType !== 'switchable',
+        desc: pinDef.desc,
       };
     });
 

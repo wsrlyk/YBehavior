@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import { useEditorStore } from '../stores/editorStore';
+import { useTooltipStore } from '../stores/tooltipStore';
 import type { NodeCategory } from '../types';
 
 interface NodeContextMenuProps {
@@ -19,6 +20,7 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
   const toggleNodeFold = useEditorStore((state) => state.toggleNodeFold);
   const toggleNodeDisabled = useEditorStore((state) => state.toggleNodeDisabled);
   const toggleConditionConnector = useEditorStore((state) => state.toggleConditionConnector);
+  const setTooltip = useTooltipStore((state) => state.setTooltip);
 
   const node = nodeId ? currentTree?.nodes.get(nodeId) : null;
   const [filter, setFilter] = useState('');
@@ -167,9 +169,11 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
                 <div
                   key={node.className}
                   onClick={() => handleNodeClick(node.className)}
+                  onMouseEnter={() => node.desc && setTooltip(node.desc)}
+                  onMouseLeave={() => setTooltip(null)}
                   className={`px-3 py-2 text-sm cursor-pointer flex items-center gap-2 ${index === selectedIndex
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-300 hover:bg-gray-700'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-300 hover:bg-gray-700'
                     }`}
                 >
                   <span className={`w-2 h-2 rounded-full ${CATEGORY_COLORS[node.category]}`} />

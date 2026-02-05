@@ -26,7 +26,7 @@ export function EditorPane({ onPaneClick }: EditorPaneProps) {
     const isTreeActive = activeFilePath !== null && activeTreeFile !== undefined;
 
     if (isFSMActive) {
-        return <FSMEditor />;
+        return <FSMEditor onPaneClick={onPaneClick} />;
     }
 
     if (isTreeActive) {

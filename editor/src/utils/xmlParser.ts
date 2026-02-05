@@ -192,6 +192,7 @@ function createPin(name: string, raw: string, pinDef?: PinDefinition): Pin {
     vTypeGroup: pinDef?.vTypeGroup,  // 类型联动组
     isCountTypeFixed: pinDef ? pinDef.arrayType !== 'switchable' : false,
     isBindingTypeFixed: pinDef ? pinDef.constType !== 'switchable' : false,
+    desc: pinDef?.desc,
   };
 }
 
@@ -220,6 +221,7 @@ function createPinFromDefinition(pinDef: PinDefinition): Pin {
     vTypeGroup: pinDef.vTypeGroup,  // 类型联动组
     isCountTypeFixed: pinDef.arrayType !== 'switchable',
     isBindingTypeFixed: pinDef.constType !== 'switchable',
+    desc: pinDef.desc,
   };
 }
 

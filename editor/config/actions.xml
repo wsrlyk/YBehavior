@@ -1,42 +1,42 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Actions>
 	<Action Class="GetNameAction" Note="{0} has {1} in {2}" Hierachy="21" Icon="🎀">
-		<Variable Name="Var0" ValueType="IF" IsConst="False" Value="" vTypeGroup="1" cTypeGroup="1" />
-		<Variable Name="Var1" ValueType="E" IsArray="False" Value="" Param="Enum0|Enum1|Enum2"/>
-		<Variable Name="Var2" ValueType="S" IsArray="True" Value="1|2|3|4" />
-		<Variable Name="Var3" ValueType="IF" IsConst="True" Value="" vTypeGroup="1" cTypeGroup="1"/>
+		<Pin Name="Var0" ValueType="IF" IsConst="False" Value="" vTypeGroup="1" cTypeGroup="1" />
+		<Pin Name="Var1" ValueType="E" IsArray="False" Value="" Param="Enum0|Enum1|Enum2"/>
+		<Pin Name="Var2" ValueType="S" IsArray="True" Value="1|2|3|4" />
+		<Pin Name="Var3" ValueType="IF" IsConst="True" Value="" vTypeGroup="1" cTypeGroup="1"/>
 		<TypeMap SrcVariable="Var1" SrcValue="Enum0" DesVariable="Var0" DesType="_I" />
 		<TypeMap SrcVariable="Var1" SrcValue="Enum1" DesVariable="Var0" DesType="_F" />
 		<TypeMap SrcVariable="Var1" SrcValue="Enum2" DesVariable="Var0" DesType="FF" />
 	</Action>
 	<Action Class="GetTargetNameAction" Note="{0}" Hierachy="21">
-		<Variable Name="Target" ValueType="A" IsArray="False" IsConst="False" IsEnable="False" Value=""/>
+		<Pin Name="Target" ValueType="A" IsArray="False" IsConst="False" IsEnable="False" Value=""/>
 	</Action>
 	<Action Class="SelectTargetAction" Note="{0}" Hierachy="121">
-		<Variable Name="Target" ValueType="A" IsArray="False" IsConst="False" IsInput="False" Value=""/>
+		<Pin Name="Target" ValueType="A" IsArray="False" IsConst="False" IsInput="False" Value=""/>
 	</Action>
 	<Action Class="SetVector3Action" Note="{0}" Hierachy="121">
-		<Variable Name="Src" ValueType="V" IsArray="False" IsConst="False" Value=""/>
-		<Variable Name="Des" ValueType="V" IsArray="False" IsConst="False" Value=""/>
+		<Pin Name="Src" ValueType="V" IsArray="False" IsConst="False" Value=""/>
+		<Pin Name="Des" ValueType="V" IsArray="False" IsConst="False" Value=""/>
 	</Action>
 	<Action Class="XCustomAction" Note="{0}" Hierachy="121">
-		<Variable Name="Type" ValueType="E" IsArray="False" IsConst="True" Value="" Param="Enum0|Enum1|Enum2"/>
-		<Variable Name="String0" ValueType="S" IsArray="False" IsConst="False" Value="" IsEnable="False" />
-		<Variable Name="Int0" ValueType="I" IsArray="False" IsConst="False" Value="" IsEnable="False" />
-		<Variable Name="Entity0" ValueType="A" IsArray="True" IsConst="False" Value="" IsEnable="False" />
-		<Variable Name="Array0" ValueType="I" IsArray="True" IsConst="False" Value="" IsEnable="False" />
+		<Pin Name="Type" ValueType="E" IsArray="False" IsConst="True" Value="" Param="Enum0|Enum1|Enum2"/>
+		<Pin Name="String0" ValueType="S" IsArray="False" IsConst="False" Value="" IsEnable="False" />
+		<Pin Name="Int0" ValueType="I" IsArray="False" IsConst="False" Value="" IsEnable="False" />
+		<Pin Name="Entity0" ValueType="A" IsArray="True" IsConst="False" Value="" IsEnable="False" />
+		<Pin Name="Array0" ValueType="I" IsArray="True" IsConst="False" Value="" IsEnable="False" />
 	</Action>
 	<Action Class="ProjectVector3" Note="Project {0} to {1} {2} {3}" Hierachy="1">
-		<Variable Name="Input" ValueType="V" IsArray="False" IsConst="False"/>
-		<Variable Name="X" ValueType="F" IsArray="False" IsInput="False" IsConst="False" IsEnable="False" />
-		<Variable Name="Y" ValueType="F" IsArray="False" IsInput="False" IsConst="False" IsEnable="False" />
-		<Variable Name="Z" ValueType="F" IsArray="False" IsInput="False" IsConst="False" IsEnable="False" />
+		<Pin Name="Input" ValueType="V" IsArray="False" IsConst="False"/>
+		<Pin Name="X" ValueType="F" IsArray="False" IsInput="False" IsConst="False" IsEnable="False" />
+		<Pin Name="Y" ValueType="F" IsArray="False" IsInput="False" IsConst="False" IsEnable="False" />
+		<Pin Name="Z" ValueType="F" IsArray="False" IsInput="False" IsConst="False" IsEnable="False" />
 	</Action>
 	<Action Class="SetVector3" Note="Set ({1}, {2}, {3}) to {4}" Hierachy="1">
-		<Variable Name="Input" ValueType="V" IsArray="False" IsEnable="False"/>
-		<Variable Name="X" ValueType="F" IsArray="False" IsEnable="False" />
-		<Variable Name="Y" ValueType="F" IsArray="False" IsEnable="False" />
-		<Variable Name="Z" ValueType="F" IsArray="False" IsEnable="False" />
-		<Variable Name="Output" ValueType="V" IsArray="False" IsInput="False" IsConst="False"/>
+		<Pin Name="Input" ValueType="V" IsArray="False" IsEnable="False"/>
+		<Pin Name="X" ValueType="F" IsArray="False" IsEnable="False" />
+		<Pin Name="Y" ValueType="F" IsArray="False" IsEnable="False" />
+		<Pin Name="Z" ValueType="F" IsArray="False" IsEnable="False" />
+		<Pin Name="Output" ValueType="V" IsArray="False" IsInput="False" IsConst="False"/>
 	</Action>
 </Actions>

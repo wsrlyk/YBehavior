@@ -19,19 +19,31 @@ function parseValueType(typeStr: string): ValueType {
   return VALUE_TYPE_MAP[char] || 'int';
 }
 
+function decodeEntities(str?: string): string | undefined {
+  if (!str) return str;
+  return str
+    .replace(/&#10;/g, '\n')
+    .replace(/&#13;/g, '\r')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, '&');
+}
+
 function parseAllowedValueTypes(typeStr: string): ValueType[] {
   // 解析所有允许的类型，如 "IF" 表示 int 和 float
   // 注意：如果是数组类型如 "II"，第二个字符是重复的，不算多类型
   const types: ValueType[] = [];
   const seen = new Set<string>();
-  
+
   for (const char of typeStr.toUpperCase()) {
     if (VALUE_TYPE_MAP[char] && !seen.has(char)) {
       types.push(VALUE_TYPE_MAP[char]);
       seen.add(char);
     }
   }
-  
+
   return types.length > 0 ? types : ['int'];
 }
 
@@ -44,7 +56,7 @@ function parseCountType(typeStr: string, isArray?: string): CountType {
   return 'scalar';
 }
 
-interface XmlVariable {
+interface XmlPin {
   '@_Name': string;
   '@_ValueType': string;
   '@_IsArray'?: string;
@@ -55,6 +67,7 @@ interface XmlVariable {
   '@_Param'?: string;
   '@_vTypeGroup'?: string;
   '@_cTypeGroup'?: string;
+  '@_Desc'?: string;
 }
 
 interface XmlTypeMap {
@@ -69,31 +82,32 @@ interface XmlAction {
   '@_Note'?: string;
   '@_Hierachy'?: string;
   '@_Icon'?: string;
-  Variable?: XmlVariable | XmlVariable[];
+  '@_Desc'?: string;
+  Pin?: XmlPin | XmlPin[];
   TypeMap?: XmlTypeMap | XmlTypeMap[];
 }
 
-function parseVariable(v: XmlVariable): PinDefinition {
+function parseVariable(v: XmlPin): PinDefinition {
   const valueTypeStr = v['@_ValueType'] || 'I';
-  
+
   // enableType: 没有配置 = fixed, True = enable, False = disable
   let enableType: 'fixed' | 'enable' | 'disable' = 'fixed';
   if (v['@_IsEnable'] !== undefined) {
     enableType = v['@_IsEnable'] === 'True' ? 'enable' : 'disable';
   }
-  
+
   // constType: 没有配置 = switchable, True = const, False = pointer
   let constType: 'const' | 'pointer' | 'switchable' = 'switchable';
   if (v['@_IsConst'] !== undefined) {
     constType = v['@_IsConst'] === 'True' ? 'const' : 'pointer';
   }
-  
+
   // arrayType: 没有配置 = switchable, True = list, False = scalar
   let arrayType: 'scalar' | 'list' | 'switchable' = 'switchable';
   if (v['@_IsArray'] !== undefined) {
     arrayType = v['@_IsArray'] === 'True' ? 'list' : 'scalar';
   }
-  
+
   return {
     name: v['@_Name'],
     valueType: parseValueType(valueTypeStr),
@@ -107,6 +121,7 @@ function parseVariable(v: XmlVariable): PinDefinition {
     vTypeGroup: v['@_vTypeGroup'] ? parseInt(v['@_vTypeGroup']) : undefined,
     cTypeGroup: v['@_cTypeGroup'] ? parseInt(v['@_cTypeGroup']) : undefined,
     allowedValueTypes: parseAllowedValueTypes(valueTypeStr),
+    desc: decodeEntities(v['@_Desc']),
   };
 }
 
@@ -122,27 +137,28 @@ function parseTypeMap(tm: XmlTypeMap): TypeMapRule {
 function parseAction(action: XmlAction): NodeDefinition {
   const pins: PinDefinition[] = [];
   const typeMaps: TypeMapRule[] = [];
-  
-  if (action.Variable) {
-    const vars = Array.isArray(action.Variable) ? action.Variable : [action.Variable];
-    for (const v of vars) {
+
+  if (action.Pin) {
+    const pinsToParse = Array.isArray(action.Pin) ? action.Pin : [action.Pin];
+    for (const v of pinsToParse) {
       pins.push(parseVariable(v));
     }
   }
-  
+
   if (action.TypeMap) {
     const maps = Array.isArray(action.TypeMap) ? action.TypeMap : [action.TypeMap];
     for (const tm of maps) {
       typeMaps.push(parseTypeMap(tm));
     }
   }
-  
+
   return {
     className: action['@_Class'],
     category: 'action',
     note: action['@_Note'] || '',
     hierarchy: action['@_Hierachy'] || '',
     icon: action['@_Icon'],
+    desc: decodeEntities(action['@_Desc']),
     pins,
     typeMaps,
     source: 'external',
@@ -156,12 +172,12 @@ export function parseActionsXml(xmlContent: string): NodeDefinition[] {
     ignoreAttributes: false,
     attributeNamePrefix: '@_',
   });
-  
+
   const parsed = parser.parse(xmlContent);
   const actions = parsed.Actions?.Action;
-  
+
   if (!actions) return [];
-  
+
   const actionList = Array.isArray(actions) ? actions : [actions];
   return actionList.map(parseAction);
 }
@@ -179,7 +195,8 @@ interface XmlBuiltinNode {
   '@_Hierachy'?: string;
   '@_Icon'?: string;
   '@_HasParent'?: string;
-  Variable?: XmlVariable | XmlVariable[];
+  '@_Desc'?: string;
+  Pin?: XmlPin | XmlPin[];
   TypeMap?: XmlTypeMap | XmlTypeMap[];
   Connector?: XmlConnector | XmlConnector[];
 }
@@ -187,24 +204,24 @@ interface XmlBuiltinNode {
 function parseBuiltinNode(node: XmlBuiltinNode): NodeDefinition {
   const pins: PinDefinition[] = [];
   const typeMaps: TypeMapRule[] = [];
-  
-  if (node.Variable) {
-    const vars = Array.isArray(node.Variable) ? node.Variable : [node.Variable];
-    for (const v of vars) {
+
+  if (node.Pin) {
+    const pinsToParse = Array.isArray(node.Pin) ? node.Pin : [node.Pin];
+    for (const v of pinsToParse) {
       pins.push(parseVariable(v));
     }
   }
-  
+
   if (node.TypeMap) {
     const maps = Array.isArray(node.TypeMap) ? node.TypeMap : [node.TypeMap];
     for (const tm of maps) {
       typeMaps.push(parseTypeMap(tm));
     }
   }
-  
+
   const category = node['@_Category'] as NodeCategory;
   const className = node['@_Class'];
-  
+
   // hasParent: Root 没有父连接器
   let hasParent: boolean;
   if (node['@_HasParent'] !== undefined) {
@@ -212,10 +229,10 @@ function parseBuiltinNode(node: XmlBuiltinNode): NodeDefinition {
   } else {
     hasParent = className !== 'Root';
   }
-  
+
   // childConnectors: 解析 Connector 子元素，或根据 category 生成默认值
   let childConnectors: ConnectorDefinition[] = [];
-  
+
   if (node.Connector) {
     // 从配置文件读取连接器定义
     const connectors = Array.isArray(node.Connector) ? node.Connector : [node.Connector];
@@ -231,13 +248,14 @@ function parseBuiltinNode(node: XmlBuiltinNode): NodeDefinition {
     childConnectors = [{ name: 'default' }];
   }
   // action/condition 节点默认没有子连接器（childConnectors 保持空数组）
-  
+
   return {
     className,
     category: category || 'action',
     note: node['@_Note'] || '',
     hierarchy: node['@_Hierachy'] || '',
     icon: node['@_Icon'],
+    desc: decodeEntities(node['@_Desc']),
     pins,
     typeMaps,
     source: 'builtin',
@@ -251,12 +269,12 @@ export function parseBuiltinXml(xmlContent: string): NodeDefinition[] {
     ignoreAttributes: false,
     attributeNamePrefix: '@_',
   });
-  
+
   const parsed = parser.parse(xmlContent);
   const nodes = parsed.Nodes?.Node;
-  
+
   if (!nodes) return [];
-  
+
   const nodeList = Array.isArray(nodes) ? nodes : [nodes];
   return nodeList.map(parseBuiltinNode);
 }

@@ -256,6 +256,7 @@ function convertTransitionsToEdges(machine: FSMMachine, fsm: { machines: Map<str
 
 interface FSMEditorProps {
     machineId?: string;
+    onPaneClick?: () => void;
 }
 
 export default function FSMEditor(props: FSMEditorProps) {
@@ -266,7 +267,7 @@ export default function FSMEditor(props: FSMEditorProps) {
     );
 }
 
-function FSMEditorInner({ }: FSMEditorProps) {
+function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
     const { screenToFlowPosition } = useReactFlow();
     const fsm = useFSMStore(state => {
         const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
@@ -314,7 +315,10 @@ function FSMEditorInner({ }: FSMEditorProps) {
         [setMenu]
     );
 
-    const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
+    const onPaneClick = useCallback(() => {
+        setMenu(null);
+        onPaneClickProp?.();
+    }, [setMenu, onPaneClickProp]);
 
     // Handle connection events for handle visibility
     const onConnectStart = useCallback(() => {

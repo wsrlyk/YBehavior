@@ -1,7 +1,9 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import type { TreeNode, Pin } from '../types';
-import type { NodeDefinition, ConnectorDefinition } from '../types/nodeDefinition';
+import type { NodeDefinition } from '../types/nodeDefinition';
+import { useTooltipStore } from '../stores/tooltipStore';
+import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 
 const NODE_COLORS: Record<string, string> = {
   composite: '#5A8A5E',
@@ -31,6 +33,7 @@ type CustomNodeData = {
 export type CustomNodeType = Node<CustomNodeData, 'custom'>;
 
 function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
+  const setTooltip = useTooltipStore((state) => state.setTooltip);
   const pinColor = PIN_COLORS[pin.valueType] || '#888';
 
   const getVectorIndexDisplay = () => {
@@ -43,7 +46,11 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
   const isDataConnection = pin.binding.type === 'pointer' && !pin.binding.variableName;
 
   return (
-    <div className={`relative flex items-center gap-1 text-xs py-0.5 ${isInput ? 'pl-2.5' : 'pr-2.5 flex-row-reverse'}`}>
+    <div
+      className={`relative flex items-center gap-1 text-xs py-0.5 ${isInput ? 'pl-2.5' : 'pr-2.5 flex-row-reverse'}`}
+      onMouseEnter={() => pin.desc && setTooltip(pin.desc)}
+      onMouseLeave={() => setTooltip(null)}
+    >
       <Handle
         type={isInput ? 'target' : 'source'}
         position={isInput ? Position.Left : Position.Right}
@@ -69,7 +76,12 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
 }
 
 function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
-  const { label, treeNode, nodeDefinition } = data;
+  const setTooltip = useTooltipStore((state) => state.setTooltip);
+  const getDefinition = useNodeDefinitionStore((state) => state.getDefinition);
+  const { label, treeNode } = data;
+
+  const nodeDefinition = useMemo(() => getDefinition(treeNode.type), [treeNode.type, getDefinition]);
+
   const bgColor = NODE_COLORS[treeNode.category] || '#666';
   const hasChildren = (nodeDefinition?.childConnectors?.length || 0) > 0;
   const isEffectivelyDisabled = data.isEffectivelyDisabled;
@@ -105,7 +117,12 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
             boxShadow: selected ? '0 0 0 2px rgba(255,255,255,0.3)' : undefined,
           }}
         >
-          <div className="px-2 py-1 text-xs font-medium text-white rounded-t flex items-center gap-1" style={{ backgroundColor: bgColor }}>
+          <div
+            className="px-2 py-1 text-xs font-medium text-white rounded-t flex items-center gap-1"
+            style={{ backgroundColor: bgColor }}
+            onMouseEnter={() => nodeDefinition?.desc && setTooltip(nodeDefinition.desc)}
+            onMouseLeave={() => setTooltip(null)}
+          >
             <span className="text-white text-[10px]">{treeNode.uid ?? '?'}</span>
             <span className="flex-1 truncate">{treeNode.nickname || label}</span>
             {treeNode.isFolded && <span className="text-[10px] bg-black/30 px-1 rounded">Folded</span>}

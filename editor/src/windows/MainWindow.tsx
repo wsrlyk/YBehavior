@@ -11,6 +11,7 @@ import { useNodeDefinitionStore } from "../stores/nodeDefinitionStore";
 import { useEditorMetaStore } from "../stores/editorMetaStore";
 import { useFSMStore } from "../stores/fsmStore";
 import { getAllWindows } from "@tauri-apps/api/window";
+import Tooltip from "../components/Tooltip";
 
 export function MainWindow() {
     const { initSettings, settings, openedFiles, activeFilePath, saveCurrentFile, saveFileAs, undo, redo, createNewTree } = useEditorStore();
@@ -136,6 +137,7 @@ export function MainWindow() {
 
     return (
         <div className="flex flex-col h-screen bg-gray-900 text-white overflow-hidden select-none font-sans">
+            <Tooltip />
             {/* 顶部区域：侧边栏 + 主编辑区 + 属性面板 */}
             <div className="flex-1 flex overflow-hidden min-h-0">
                 {/* 侧边栏 */}

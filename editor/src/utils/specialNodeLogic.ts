@@ -231,7 +231,7 @@ function refreshHandleEventLabels(nodeId: string, tree: Tree): ConnectionLabelUp
 
 // ==================== SubTree Logic ====================
 
-function validateSubTreeNode(node: TreeNode, tree: Tree): string[] {
+function validateSubTreeNode(node: TreeNode, _tree: Tree): string[] {
     const errors: string[] = [];
 
     // 1. 检查 Tree Pin

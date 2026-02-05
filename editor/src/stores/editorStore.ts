@@ -1279,6 +1279,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
               isCountTypeFixed: pinDef.arrayType !== 'switchable',
               isBindingTypeFixed: pinDef.constType !== 'switchable',
               vectorIndex: existing?.vectorIndex,
+              desc: pinDef.desc,
             };
           });
 
@@ -1293,7 +1294,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
             isBindingTypeFixed: false, // 输入可以绑定常量或变量
             enableType: 'fixed',
             bindingType: 'const',
-            binding: { type: 'const', value: getDefaultValue(inPin.valueType, inPin.countType === 'list') }
+            binding: { type: 'const', value: getDefaultValue(inPin.valueType, inPin.countType === 'list') },
+            desc: inPin.desc,
           }));
 
           const subTreeOutputs: Pin[] = subTree.outputs.map(outPin => ({
@@ -1306,7 +1308,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
             isBindingTypeFixed: true, // 输出必须绑定到变量
             enableType: 'fixed',
             bindingType: 'pointer',
-            binding: { type: 'pointer', variableName: '', isLocal: false }
+            binding: { type: 'pointer', variableName: '', isLocal: false },
+            desc: outPin.desc,
           }));
 
           // 3. 合并并尽量保留原有绑定

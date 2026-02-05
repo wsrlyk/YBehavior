@@ -55,6 +55,7 @@ export interface Pin {
   cTypeGroup?: number;  // 数量联动组，同组 Pin 数组/标量变化时同步
   isCountTypeFixed?: boolean; // 是否固定数量类型（不可切换数组/标量）
   isBindingTypeFixed?: boolean; // 是否固定绑定类型（不可切换常量/引用）
+  desc?: string;
 }
 
 // ==================== Node ====================
@@ -128,6 +129,7 @@ export interface TreeInterfacePin {
     isLocal?: boolean;
   };
   vectorIndex?: PinBinding;
+  desc?: string;
 }
 
 // ==================== Tree ====================

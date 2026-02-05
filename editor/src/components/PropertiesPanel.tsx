@@ -3,6 +3,8 @@ import { useEditorStore } from '../stores/editorStore';
 import type { Variable, ValueType, CountType, Pin } from '../types';
 import { validateValue, getDefaultValue, validateVariableName } from '../utils/validation';
 import { useNotificationStore } from '../stores/notificationStore';
+import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
+import { useTooltipStore } from '../stores/tooltipStore';
 import { logger } from '../utils/logger';
 
 const TYPE_COLORS: Record<ValueType, string> = {
@@ -624,7 +626,10 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
   const updatePin = useEditorStore((state) => state.updatePin);
   const updateNodeProperty = useEditorStore((state) => state.updateNodeProperty);
   const reloadSubTreePins = useEditorStore((state) => state.reloadSubTreePins);
+  const { getDefinition } = useNodeDefinitionStore();
+  const setTooltip = useTooltipStore(state => state.setTooltip);
   const node = useMemo(() => currentTree?.nodes.get(nodeId), [currentTree, nodeId]);
+  const definition = useMemo(() => node ? getDefinition(node.type) : undefined, [node, getDefinition]);
   if (!node) return <div className="text-xs text-gray-600">Node not found</div>;
 
   const handleReloadSubTree = () => {
@@ -679,7 +684,13 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
     <div className="space-y-2">
       {/* 节点类型 */}
       <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-300 font-medium">{node.type}</div>
+        <div
+          className="text-sm text-gray-300 font-medium"
+          onMouseEnter={() => definition?.desc && setTooltip(definition.desc)}
+          onMouseLeave={() => setTooltip(null)}
+        >
+          {node.type}
+        </div>
         {node.type === 'SubTree' && (
           <button
             className="text-[10px] bg-blue-600 hover:bg-blue-500 text-white px-2 py-0.5 rounded transition-colors"
@@ -865,6 +876,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
   const reloadSubTreePins = useEditorStore(state => state.reloadSubTreePins);
   const removeDataConnection = useEditorStore((state) => state.removeDataConnection);
   const notify = useNotificationStore(state => state.notify);
+  const setTooltip = useTooltipStore(state => state.setTooltip);
   const [isEditing, setIsEditing] = useState(false);
   const hasDataConnection = !!dataConnection;
 
@@ -1030,7 +1042,11 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
     : { style: 'bg-blue-600 text-white', text: 'V', title: 'Variable → Click to switch to Constant' };
 
   return (
-    <div className={`text-xs bg-gray-800 rounded p-1.5 ${!isEnabled ? 'opacity-50' : ''}`}>
+    <div
+      className={`text-xs bg-gray-800 rounded p-1.5 ${!isEnabled ? 'opacity-50' : ''}`}
+      onMouseEnter={() => pin.desc && setTooltip(pin.desc)}
+      onMouseLeave={() => setTooltip(null)}
+    >
       <div className="flex items-center gap-0.5 mb-1">
         {canToggleEnable && (
           <button
