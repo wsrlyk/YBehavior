@@ -36,7 +36,7 @@ interface XmlFSMTrans {
     '@_Type'?: string;
     '@_From'?: string;
     '@_To'?: string;
-    [key: string]: unknown; // Event children (e.g., <OnDamage/>)
+    [key: string]: unknown; // Condition children (e.g., <OnDamage/>)
 }
 
 interface XmlFSMMachine {
@@ -78,14 +78,14 @@ function getStateType(typeAttr?: string): FSMStateType {
     }
 }
 
-function extractEvents(trans: XmlFSMTrans): string[] {
-    const events: string[] = [];
+function extractConditions(trans: XmlFSMTrans): string[] {
+    const conditions: string[] = [];
     for (const key of Object.keys(trans)) {
         if (!key.startsWith('@_') && key !== '#text') {
-            events.push(key);
+            conditions.push(key);
         }
     }
-    return events;
+    return conditions;
 }
 
 interface RawTransitionData {
@@ -214,7 +214,7 @@ function resolveTransitions(
     for (const raw of allRawTransitions) {
         const fromName = raw.xml['@_From'];
         const toName = raw.xml['@_To'];
-        const events = extractEvents(raw.xml);
+        const conditions = extractConditions(raw.xml);
 
         // Detect if this is an Any-sourced transition
         const explicitType = raw.xml['@_Type'];
@@ -246,13 +246,22 @@ function resolveTransitions(
             }
         }
 
+        // Upper transitions target local Upper state
+        if (!toStateId && toName === 'Upper') {
+            const localMachine = machines.get(raw.machineId);
+            const upperState = localMachine ? [...localMachine.states.values()].find(s => s.type === 'Upper') : undefined;
+            if (upperState) {
+                toStateId = upperState.id;
+            }
+        }
+
         if (toStateId) {
             // Store all transitions in root machine (global storage)
             rootMachine.transitions.push({
                 id: generateTransitionId(),
                 fromStateId, // null = Any or Entry source
                 toStateId,
-                events,
+                conditions,
                 type: isAnySource ? 'Normal' : (isEntrySource ? 'Entry' : raw.type),
             });
         }

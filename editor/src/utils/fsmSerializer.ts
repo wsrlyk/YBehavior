@@ -150,10 +150,10 @@ function serializeTransition(
         }
     }
 
-    // Events as child elements
-    for (const event of trans.events) {
-        const eventEl = doc.createElement(event);
-        el.appendChild(eventEl);
+    // Conditions as child elements
+    for (const condition of trans.conditions) {
+        const condEl = doc.createElement(condition);
+        el.appendChild(condEl);
     }
 
     return el;

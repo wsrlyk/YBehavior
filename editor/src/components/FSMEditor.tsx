@@ -26,6 +26,7 @@ import '@xyflow/react/dist/style.css';
 import FSMStateNode, { type FSMStateNodeData, type FSMStateNodeType } from './FSMStateNode';
 import FSMTransitionEdge from './FSMTransitionEdge';
 import { useFSMStore } from '../stores/fsmStore';
+import { useEditorMetaStore } from '../stores/editorMetaStore';
 import type { FSMMachine, FSMTransition, FSMState } from '../types/fsm';
 
 // ==================== Node & Edge Types ====================
@@ -240,7 +241,7 @@ function convertTransitionsToEdges(machine: FSMMachine, fsm: { machines: Map<str
             selected: selectedEdgeIds.includes(`edge-${key}`),
             label: group.transitions.length > 1
                 ? `${group.transitions.length} Transitions`
-                : (first.events.length > 0 ? first.events.join(', ') : undefined),
+                : (first.conditions.length > 0 ? first.conditions.join(', ') : undefined),
             data: {
                 transitions: group.transitions,
                 isVirtual: group.isVirtual,
@@ -268,7 +269,16 @@ export default function FSMEditor(props: FSMEditorProps) {
 }
 
 function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
-    const { screenToFlowPosition } = useReactFlow();
+    const { screenToFlowPosition, setCenter } = useReactFlow();
+    const pendingCenterTarget = useEditorMetaStore(state => state.uiMeta.pendingCenterTarget);
+    const setPendingCenterTarget = useEditorMetaStore(state => state.setPendingCenterTarget);
+
+    useEffect(() => {
+        if (pendingCenterTarget) {
+            setCenter(pendingCenterTarget.x, pendingCenterTarget.y, { zoom: pendingCenterTarget.zoom || 1.2, duration: 400 });
+            setPendingCenterTarget(undefined);
+        }
+    }, [pendingCenterTarget, setCenter, setPendingCenterTarget]);
     const fsm = useFSMStore(state => {
         const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
         return file?.fsm || null;

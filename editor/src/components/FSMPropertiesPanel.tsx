@@ -1,6 +1,7 @@
 import { useFSMStore } from '../stores/fsmStore';
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useEditorStore } from '../stores/editorStore';
+import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { validateVariableName } from '../utils/validation';
 
 
@@ -127,16 +128,40 @@ export function FSMPropertiesPanel() {
 
     const updateState = useFSMStore(state => state.updateState);
     const removeTransition = useFSMStore(state => state.removeTransition);
-    const addEvent = useFSMStore(state => state.addEventToTransition);
-    const removeEvent = useFSMStore(state => state.removeEventFromTransition);
+    const addCondition = useFSMStore(state => state.addConditionToTransition);
+    const removeCondition = useFSMStore(state => state.removeConditionFromTransition);
 
     const treeFiles = useEditorStore(state => state.treeFiles || []);
+
+    const focusTarget = useEditorMetaStore(state => state.uiMeta.focusTarget);
+    const setFocusTarget = useEditorMetaStore(state => state.setFocusTarget);
+
+    const focusedStateRef = useRef<HTMLDivElement>(null);
+    const focusedTransRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
     // Determine what to show
     const selectedState = useMemo(() => {
         if (selectedNodeIds.length !== 1) return null;
         return machine?.states.get(selectedNodeIds[0]) || null;
     }, [selectedNodeIds, machine]);
+
+    useEffect(() => {
+        if (focusTarget) {
+            if (focusTarget.type === 'state' && selectedState?.id === focusTarget.id) {
+                focusedStateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                const timer = setTimeout(() => setFocusTarget(undefined), 2000);
+                return () => clearTimeout(timer);
+            }
+            if (focusTarget.type === 'transition') {
+                const el = focusedTransRefs.current.get(focusTarget.id);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    const timer = setTimeout(() => setFocusTarget(undefined), 2000);
+                    return () => clearTimeout(timer);
+                }
+            }
+        }
+    }, [focusTarget, selectedState?.id, setFocusTarget]);
 
     const transitionsForSelectedEdge = useMemo(() => {
         if (selectedEdgeIds.length !== 1 || !fsm) return [];
@@ -269,23 +294,22 @@ export function FSMPropertiesPanel() {
         });
     }, [selectedEdgeIds, fsm]);
 
-    const [isAddingEvent, setIsAddingEvent] = useState<string | null>(null);
-    const [newEventName, setNewEventName] = useState('');
-    const addEventInputRef = useRef<HTMLInputElement>(null);
+    const [isAddingCondition, setIsAddingCondition] = useState<string | null>(null);
+    const [newConditionName, setNewConditionName] = useState('');
+    const addConditionInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (isAddingEvent && addEventInputRef.current) {
-            addEventInputRef.current.focus();
+        if (isAddingCondition && addConditionInputRef.current) {
+            addConditionInputRef.current.focus();
         }
-    }, [isAddingEvent]);
-
-    const handleAddEvent = (transId: string) => {
-        const trimmed = newEventName.trim();
+    }, [isAddingCondition]);
+    const handleAddCondition = (transId: string) => {
+        const trimmed = newConditionName.trim();
         const validation = validateVariableName(trimmed);
         if (trimmed && validation.isValid) {
-            addEvent(transId, trimmed);
-            setNewEventName('');
-            setIsAddingEvent(null);
+            addCondition(transId, trimmed);
+            setNewConditionName('');
+            setIsAddingCondition(null);
         }
     };
 
@@ -314,7 +338,7 @@ export function FSMPropertiesPanel() {
     return (
         <div className="w-64 h-full bg-gray-900 border-l border-gray-700 flex flex-col p-3 overflow-auto scrollbar-thin scrollbar-thumb-gray-700">
             {selectedState && (
-                <div className="space-y-4">
+                <div className={`space-y-4 transition-all duration-500 ${focusTarget?.type === 'state' && focusTarget.id === selectedState.id ? 'ring-2 ring-blue-500/50 ring-offset-2 ring-offset-gray-900 rounded-lg p-1' : ''}`} ref={focusedStateRef}>
                     <div className="text-xs text-gray-500 uppercase tracking-wider font-bold border-b border-gray-800 pb-2">State Properties</div>
 
                     <div>
@@ -380,7 +404,11 @@ export function FSMPropertiesPanel() {
                     <div className="text-xs text-gray-500 uppercase tracking-wider font-bold border-b border-gray-800 pb-2">Transitions</div>
                     <div className="space-y-3">
                         {transitionsForSelectedEdge.map((trans) => (
-                            <div key={trans.id} className="p-3 bg-gray-800/50 rounded border border-gray-700 space-y-3 relative group/trans">
+                            <div
+                                key={trans.id}
+                                ref={el => { if (el) focusedTransRefs.current.set(trans.id, el); else focusedTransRefs.current.delete(trans.id); }}
+                                className={`p-3 bg-gray-800/50 rounded border transition-all duration-500 space-y-3 relative group/trans ${focusTarget?.type === 'transition' && focusTarget.id === trans.id ? 'border-blue-500 ring-1 ring-blue-500/30' : 'border-gray-700'}`}
+                            >
                                 <div className="flex justify-between items-center">
                                     <span className="text-[10px] text-gray-400 font-mono">
                                         {trans.fromStateId ? (() => {
@@ -407,51 +435,51 @@ export function FSMPropertiesPanel() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] text-gray-500 block uppercase tracking-tighter">Events</label>
+                                    <label className="text-[10px] text-gray-500 block uppercase tracking-tighter">Conditions</label>
                                     <div className="flex flex-wrap gap-1.5">
-                                        {trans.events.map(ev => (
-                                            <span key={ev} className="bg-blue-600/30 text-blue-300 text-[11px] px-2 py-0.5 rounded-full border border-blue-600/50 flex items-center gap-1.5 group/ev">
-                                                {ev}
+                                        {trans.conditions.map(c => (
+                                            <span key={c} className="bg-blue-600/30 text-blue-300 text-[11px] px-2 py-0.5 rounded-full border border-blue-600/50 flex items-center gap-1.5 group/ev">
+                                                {c}
                                                 <button
-                                                    onClick={() => removeEvent(trans.id, ev)}
+                                                    onClick={() => removeCondition(trans.id, c)}
                                                     className="hover:text-white text-blue-500 leading-none"
                                                 >×</button>
                                             </span>
                                         ))}
 
-                                        {isAddingEvent === trans.id ? (() => {
-                                            const eventValidation = validateVariableName(newEventName.trim());
-                                            const isEventValid = newEventName.trim().length === 0 || eventValidation.isValid;
+                                        {isAddingCondition === trans.id ? (() => {
+                                            const condValidation = validateVariableName(newConditionName.trim());
+                                            const isCondValid = newConditionName.trim().length === 0 || condValidation.isValid;
                                             return (
-                                                <div className={`flex items-center gap-1 bg-gray-900 rounded-full border p-0.5 pr-2 ${!isEventValid ? 'border-red-500' : 'border-blue-500/50'}`}
-                                                    title={!isEventValid ? eventValidation.error : undefined}>
+                                                <div className={`flex items-center gap-1 bg-gray-900 rounded-full border p-0.5 pr-2 ${!isCondValid ? 'border-red-500' : 'border-blue-500/50'}`}
+                                                    title={!isCondValid ? condValidation.error : undefined}>
                                                     <input
-                                                        ref={addEventInputRef}
+                                                        ref={addConditionInputRef}
                                                         className="bg-transparent text-[11px] text-gray-200 px-2 outline-none w-20"
-                                                        value={newEventName}
-                                                        onChange={e => setNewEventName(e.target.value)}
+                                                        value={newConditionName}
+                                                        onChange={e => setNewConditionName(e.target.value)}
                                                         onKeyDown={e => {
-                                                            if (e.key === 'Enter') handleAddEvent(trans.id);
-                                                            if (e.key === 'Escape') setIsAddingEvent(null);
+                                                            if (e.key === 'Enter') handleAddCondition(trans.id);
+                                                            if (e.key === 'Escape') setIsAddingCondition(null);
                                                         }}
                                                         onBlur={() => {
-                                                            if (!newEventName) setIsAddingEvent(null);
+                                                            if (!newConditionName) setIsAddingCondition(null);
                                                         }}
-                                                        placeholder="Event..."
+                                                        placeholder="Condition..."
                                                     />
                                                     <button
-                                                        onClick={() => handleAddEvent(trans.id)}
-                                                        className={eventValidation.isValid ? 'text-blue-400 hover:text-blue-300' : 'text-gray-600 cursor-not-allowed'}
-                                                        disabled={!eventValidation.isValid}
+                                                        onClick={() => handleAddCondition(trans.id)}
+                                                        className={condValidation.isValid ? 'text-blue-400 hover:text-blue-300' : 'text-gray-600 cursor-not-allowed'}
+                                                        disabled={!condValidation.isValid}
                                                     >✓</button>
-                                                    <button onClick={() => setIsAddingEvent(null)} className="text-gray-500 hover:text-gray-400">✕</button>
+                                                    <button onClick={() => setIsAddingCondition(null)} className="text-gray-500 hover:text-gray-400">✕</button>
                                                 </div>
                                             );
                                         })() : (
                                             <button
-                                                onClick={() => setIsAddingEvent(trans.id)}
+                                                onClick={() => setIsAddingCondition(trans.id)}
                                                 className="text-[11px] px-2 py-0.5 rounded-full border border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-500 transition-colors bg-gray-800"
-                                            >+ Add Event</button>
+                                            >+ Add Condition</button>
                                         )}
                                     </div>
                                 </div>

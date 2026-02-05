@@ -27,7 +27,7 @@ export interface FSMTransition {
     id: string;
     fromStateId: string | null;  // null = 'Any' state
     toStateId: string;
-    events: string[];            // Array of event strings
+    conditions: string[];        // Array of condition strings
     type: FSMTransitionType;
 }
 
@@ -124,10 +124,14 @@ export function createFSMState(
     name: string = '',
     position?: { x: number; y: number }
 ): FSMState {
+    const defaultName = isSpecialStateType(type)
+        ? type
+        : (type === 'Meta' ? 'Meta' : 'State');
+
     return {
         id: generateStateId(),
         type,
-        name: name || (isSpecialStateType(type) ? type : ''),
+        name: name || defaultName,
         position: position || { ...FSM_SPECIAL_STATE_POSITIONS[type] },
     };
 }
@@ -184,14 +188,14 @@ export function createEmptyFSM(name: string): FSM {
 export function createFSMTransition(
     fromStateId: string | null,
     toStateId: string,
-    events: string[] = [],
+    conditions: string[] = [],
     type: FSMTransitionType = 'Normal'
 ): FSMTransition {
     return {
         id: generateTransitionId(),
         fromStateId,
         toStateId,
-        events,
+        conditions,
         type,
     };
 }

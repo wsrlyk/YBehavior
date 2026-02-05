@@ -12,8 +12,13 @@ function App() {
       setRoute(window.location.hash);
     };
 
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
+    const handleContext = (e: MouseEvent) => e.preventDefault();
+    window.addEventListener("contextmenu", handleContext);
+
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+      window.removeEventListener("contextmenu", handleContext);
+    };
   }, []);
 
   return (

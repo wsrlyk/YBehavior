@@ -34,9 +34,23 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
       .map(def => ({ ...def, category: cat }))
   );
 
-  const filteredNodes = allNodes.filter(node =>
-    node.className.toLowerCase().includes(filter.toLowerCase())
-  );
+  const filteredNodes = allNodes.filter(node => {
+    const searchStr = filter.toLowerCase();
+
+    // Check node name
+    if (node.className.toLowerCase().includes(searchStr)) return true;
+
+    // Check node description
+    if (node.desc && node.desc.toLowerCase().includes(searchStr)) return true;
+
+    // Check pins and pin descriptions
+    if (node.pins && node.pins.some(pin =>
+      pin.name.toLowerCase().includes(searchStr) ||
+      (pin.desc && pin.desc.toLowerCase().includes(searchStr))
+    )) return true;
+
+    return false;
+  });
 
   useEffect(() => {
     if (isOpen) {
@@ -153,7 +167,7 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
               type="text"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              placeholder="Search nodes..."
+              placeholder="Search nodes, pins, descriptions..."
               className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
             />
           </div>

@@ -14,6 +14,7 @@ import {
   ReactFlowProvider,
 } from '@xyflow/react';
 import { useEditorStore, getDescendantIds } from '../stores/editorStore';
+import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import { NodeContextMenu } from './NodeContextMenu';
 import CustomNode, { type CustomNodeType } from './CustomNode';
@@ -67,7 +68,16 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   // 修正：使用 selector 订阅 currentTree，确保 store 更新时组件重渲染
   const currentTree = useEditorStore((state) => state.getCurrentTree());
 
-  const { screenToFlowPosition, getNodes, getEdges } = useReactFlow();
+  const { screenToFlowPosition, getNodes, getEdges, setCenter } = useReactFlow();
+  const pendingCenterTarget = useEditorMetaStore(state => state.uiMeta.pendingCenterTarget);
+  const setPendingCenterTarget = useEditorMetaStore(state => state.setPendingCenterTarget);
+
+  useEffect(() => {
+    if (pendingCenterTarget) {
+      setCenter(pendingCenterTarget.x, pendingCenterTarget.y, { zoom: pendingCenterTarget.zoom || 1.2, duration: 400 });
+      setPendingCenterTarget(undefined);
+    }
+  }, [pendingCenterTarget, setCenter, setPendingCenterTarget]);
 
   // 右键菜单状态
   const [contextMenu, setContextMenu] = useState<{

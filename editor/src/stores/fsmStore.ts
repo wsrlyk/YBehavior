@@ -60,10 +60,10 @@ interface FSMStoreState {
     setDefaultState: (stateId: string | null) => void;
 
     // Transition actions
-    addTransition: (fromStateId: string | null, toStateId: string, events?: string[]) => void;
+    addTransition: (fromStateId: string | null, toStateId: string, conditions?: string[]) => void;
     removeTransition: (transitionId: string) => void;
-    addEventToTransition: (transitionId: string, event: string) => void;
-    removeEventFromTransition: (transitionId: string, event: string) => void;
+    addConditionToTransition: (transitionId: string, condition: string) => void;
+    removeConditionFromTransition: (transitionId: string, condition: string) => void;
 
     // Variable actions
     addVariable: (isLocal: boolean, variable: Variable) => void;
@@ -298,13 +298,13 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
     }),
 
     // Transition actions
-    addTransition: (fromStateId, toStateId, events = []) => set((state) => {
+    addTransition: (fromStateId, toStateId, conditions = []) => set((state) => {
         const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
             // All transitions are stored in the root machine (global storage)
             const rootMachine = fsm.machines.get(fsm.rootMachineId);
             if (!rootMachine) return fsm;
 
-            const trans = createFSMTransition(fromStateId, toStateId, events);
+            const trans = createFSMTransition(fromStateId, toStateId, conditions);
             const newRootMachine: FSMMachine = {
                 ...rootMachine,
                 transitions: [...rootMachine.transitions, trans],
@@ -345,7 +345,7 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
         return result || state;
     }),
 
-    addEventToTransition: (transitionId, event) => set((state) => {
+    addConditionToTransition: (transitionId, condition) => set((state) => {
         const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
             // All transitions are in root machine
             const rootMachine = fsm.machines.get(fsm.rootMachineId);
@@ -353,7 +353,7 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
 
             const newTransitions = rootMachine.transitions.map(t =>
                 t.id === transitionId
-                    ? { ...t, events: [...t.events, event] }
+                    ? { ...t, conditions: [...t.conditions, condition] }
                     : t
             );
 
@@ -367,7 +367,7 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
         return result || state;
     }),
 
-    removeEventFromTransition: (transitionId, event) => set((state) => {
+    removeConditionFromTransition: (transitionId, condition) => set((state) => {
         const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
             // All transitions are in root machine
             const rootMachine = fsm.machines.get(fsm.rootMachineId);
@@ -375,7 +375,7 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
 
             const newTransitions = rootMachine.transitions.map(t =>
                 t.id === transitionId
-                    ? { ...t, events: t.events.filter(e => e !== event) }
+                    ? { ...t, conditions: t.conditions.filter(c => c !== condition) }
                     : t
             );
 

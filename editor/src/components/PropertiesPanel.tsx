@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import { useEditorStore } from '../stores/editorStore';
+import { useEditorMetaStore } from '../stores/editorMetaStore';
 import type { Variable, ValueType, CountType, Pin } from '../types';
 import { validateValue, getDefaultValue, validateVariableName } from '../utils/validation';
 import { useNotificationStore } from '../stores/notificationStore';
@@ -135,8 +136,15 @@ function VariableItem({ variable, onUpdate, onDelete }: VariableItemProps) {
     onUpdate(variable.name, { countType: newCountType, defaultValue: getDefaultValue(variable.valueType, newIsArray) });
   };
 
+  const focusTarget = useEditorMetaStore(state => state.uiMeta.focusTarget);
+  const isFocused = focusTarget?.type === 'variable' && focusTarget.id === variable.name;
+
   return (
-    <div className="px-2 py-1 text-sm bg-gray-800 rounded group">
+    <div
+      id={`variable-${variable.name}`}
+      className={`px-2 py-1 text-sm bg-gray-800 rounded group transition-all duration-300 ${isFocused ? 'ring-2 ring-blue-500 shadow-lg shadow-blue-500/20 animate-pulse-subtle' : ''
+        }`}
+    >
       <div className="flex items-center gap-0.5">
         <AdaptiveSelect
           value={variable.valueType}
@@ -215,28 +223,30 @@ function AddVariableButton({ isLocal, onAdd }: { isLocal: boolean; onAdd: (v: Va
   if (isAdding) {
     const validation = validateVariableName(name);
     return (
-      <div className="flex items-center gap-1 mt-1">
+      <div className="flex items-center gap-1 bg-gray-800 rounded px-1 py-0.5 border border-blue-500/50 shadow-lg shadow-blue-500/10">
         <input
-          className={`flex-1 text-gray-300 text-xs px-1 rounded outline-none ${!validation.isValid && name.length > 0 ? 'bg-red-900 border-red-500' : 'bg-gray-700'
-            }`}
-          placeholder="Variable name"
+          className={`w-24 text-gray-200 text-[10px] bg-transparent outline-none ${!validation.isValid && name.length > 0 ? 'text-red-400' : ''}`}
+          placeholder="Name..."
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+          onBlur={() => !name && setIsAdding(false)}
           autoFocus
         />
-        <button className="text-green-400 text-xs" onClick={handleAdd} title={validation.error}>✓</button>
-        <button className="text-gray-500 text-xs" onClick={() => setIsAdding(false)}>✕</button>
+        <button className="text-blue-400 text-[10px] font-bold" onClick={handleAdd}>OK</button>
+        <button className="text-gray-500 text-[10px]" onClick={() => setIsAdding(false)}>✕</button>
       </div>
     );
   }
 
   return (
     <button
-      className="text-xs text-gray-500 hover:text-gray-300 mt-1"
+      className="text-gray-500 hover:text-blue-400 transition-colors flex items-center gap-0.5"
       onClick={() => setIsAdding(true)}
+      title={`Add ${isLocal ? 'Local' : 'Shared'} Variable`}
     >
-      + Add
+      <span className="text-xs">+</span>
+      <span className="text-[10px] uppercase font-bold tracking-tighter">Add</span>
     </button>
   );
 }
@@ -302,8 +312,15 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
   const intSharedVars = sharedVars.filter(v => v.valueType === 'int' && v.countType === 'scalar');
   const intLocalVars = localVars.filter(v => v.valueType === 'int' && v.countType === 'scalar');
 
+  const focusTarget = useEditorMetaStore(state => state.uiMeta.focusTarget);
+  const isFocused = focusTarget?.type === 'io' && focusTarget.id === pin.id;
+
   return (
-    <div className="px-2 py-1 text-sm bg-gray-800 rounded group border border-transparent hover:border-gray-600 transition-colors">
+    <div
+      id={`io-${pin.id}`}
+      className={`px-2 py-1 text-sm bg-gray-800 rounded group border border-transparent transition-all duration-300 ${isFocused ? 'ring-2 ring-blue-500 shadow-lg shadow-blue-500/20 animate-pulse-subtle' : 'hover:border-gray-600'
+        }`}
+    >
       <div className="flex items-center gap-0.5">
         <AdaptiveSelect
           value={pin.valueType}
@@ -466,9 +483,11 @@ function AddInterfacePinButton({ isInput, onAdd }: { isInput: boolean; onAdd: (n
 }
 
 export function PropertiesPanel() {
-  const [activeTab, setActiveTab] = useState<'variables' | 'io'>('variables');
+  const activeTab = useEditorMetaStore(state => state.uiMeta.activePropertiesTab);
+  const setActiveTab = useEditorMetaStore(state => state.setActivePropertiesTab);
+  const focusTarget = useEditorMetaStore(state => state.uiMeta.focusTarget);
+  const setFocusTarget = useEditorMetaStore(state => state.setFocusTarget);
 
-  // 优化：直接订阅 currentTree
   const currentTree = useEditorStore((state) => state.getCurrentTree());
   const selectedNodeIds = useEditorStore((state) => state.selectedNodeIds);
   const updateVariable = useEditorStore((state) => state.updateVariable);
@@ -502,66 +521,91 @@ export function PropertiesPanel() {
     });
   };
 
+  // Ensure active properties tab is valid (not 'properties' anymore in top section)
+  useEffect(() => {
+    if (activeTab === 'properties') {
+      setActiveTab('variables');
+    }
+  }, [activeTab]);
+
+  // 处理聚焦跳转
+  useEffect(() => {
+    if (focusTarget) {
+      if (focusTarget.type === 'variable') setActiveTab('variables');
+      if (focusTarget.type === 'io') setActiveTab('io');
+
+      const elementId = focusTarget.type === 'variable' ? `variable-${focusTarget.id}` :
+        focusTarget.type === 'io' ? `io-${focusTarget.id}` :
+          null;
+
+      if (elementId) {
+        setTimeout(() => {
+          const el = document.getElementById(elementId);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => setFocusTarget(undefined), 2000);
+          }
+        }, 100);
+      }
+    }
+  }, [focusTarget, setFocusTarget]);
+
   return (
     <div className="w-64 h-full bg-gray-900 border-l border-gray-700 flex flex-col">
-      {/* Tabs */}
-      <div className="flex border-b border-gray-800">
-        <button
-          className={`flex-1 py-2 text-[10px] uppercase tracking-wider font-medium transition-colors ${activeTab === 'variables' ? 'text-blue-400 bg-gray-800' : 'text-gray-500 hover:text-gray-300'}`}
-          onClick={() => setActiveTab('variables')}
-        >
-          Variables
-        </button>
-        <button
-          className={`flex-1 py-2 text-[10px] uppercase tracking-wider font-medium transition-colors ${activeTab === 'io' ? 'text-blue-400 bg-gray-800' : 'text-gray-500 hover:text-gray-300'}`}
-          onClick={() => setActiveTab('io')}
-        >
-          Tree I/O
-        </button>
-      </div>
+      {/* Top Section: Data (Vars/IO) */}
+      <div className="flex-1 flex flex-col min-h-0 border-b border-gray-800">
+        <div className="flex border-b border-gray-800 shrink-0">
+          <button
+            className={`flex-1 py-1.5 text-[9px] uppercase tracking-wider font-bold transition-all ${activeTab === 'variables' ? 'text-blue-400 bg-gray-800/50' : 'text-gray-500 hover:text-gray-400'}`}
+            onClick={() => setActiveTab('variables')}
+          >
+            Variables
+          </button>
+          <button
+            className={`flex-1 py-1.5 text-[9px] uppercase tracking-wider font-bold transition-all ${activeTab === 'io' ? 'text-blue-400 bg-gray-800/50' : 'text-gray-500 hover:text-gray-400'}`}
+            onClick={() => setActiveTab('io')}
+          >
+            Interface I/O
+          </button>
+        </div>
 
-      {/* Variables 面板 */}
-      <div className="flex-1 overflow-auto">
-        <div className="p-3">
+        <div className="flex-1 overflow-auto p-2 scrollbar-thin">
           {activeTab === 'variables' ? (
             <>
               {/* Shared Variables */}
               <div className="mb-4">
-                <div className="text-xs text-gray-500 mb-1">Shared</div>
+                <div className="flex items-center justify-between mb-1 px-1">
+                  <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Shared</div>
+                  <AddVariableButton isLocal={false} onAdd={handleAddShared} />
+                </div>
                 <div className="space-y-1">
                   {sharedVariables.map((v) => (
-                    <VariableItem
-                      key={v.name}
-                      variable={v}
-                      onUpdate={handleUpdateShared}
-                      onDelete={handleDeleteShared}
-                    />
+                    <VariableItem key={v.name} variable={v} onUpdate={handleUpdateShared} onDelete={handleDeleteShared} />
                   ))}
                 </div>
-                <AddVariableButton isLocal={false} onAdd={handleAddShared} />
               </div>
 
               {/* Local Variables */}
               <div>
-                <div className="text-xs text-gray-500 mb-1">Local</div>
+                <div className="flex items-center justify-between mb-1 px-1">
+                  <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Local</div>
+                  <AddVariableButton isLocal={true} onAdd={handleAddLocal} />
+                </div>
                 <div className="space-y-1">
                   {localVariables.map((v) => (
-                    <VariableItem
-                      key={v.name}
-                      variable={v}
-                      onUpdate={handleUpdateLocal}
-                      onDelete={handleDeleteLocal}
-                    />
+                    <VariableItem key={v.name} variable={v} onUpdate={handleUpdateLocal} onDelete={handleDeleteLocal} />
                   ))}
                 </div>
-                <AddVariableButton isLocal={true} onAdd={handleAddLocal} />
               </div>
             </>
           ) : (
             <>
               {/* Inputs */}
               <div className="mb-4">
-                <div className="text-xs text-gray-500 mb-1">Inputs</div>
+                <div className="flex items-center justify-between mb-1 px-1">
+                  <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Inputs</div>
+                  <AddInterfacePinButton isInput={true} onAdd={(name) => handleAddInterfacePin(true, name)} />
+                </div>
                 <div className="space-y-1">
                   {inputs.map((pin) => (
                     <InterfacePinItem
@@ -575,12 +619,14 @@ export function PropertiesPanel() {
                     />
                   ))}
                 </div>
-                <AddInterfacePinButton isInput={true} onAdd={(name) => handleAddInterfacePin(true, name)} />
               </div>
 
               {/* Outputs */}
               <div>
-                <div className="text-xs text-gray-500 mb-1">Outputs</div>
+                <div className="flex items-center justify-between mb-1 px-1">
+                  <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Outputs</div>
+                  <AddInterfacePinButton isInput={false} onAdd={(name) => handleAddInterfacePin(false, name)} />
+                </div>
                 <div className="space-y-1">
                   {outputs.map((pin) => (
                     <InterfacePinItem
@@ -594,23 +640,29 @@ export function PropertiesPanel() {
                     />
                   ))}
                 </div>
-                <AddInterfacePinButton isInput={false} onAdd={(name) => handleAddInterfacePin(false, name)} />
               </div>
             </>
           )}
         </div>
       </div>
 
-      {/* Properties 面板 */}
-      <div className="border-t border-gray-700 flex-1 overflow-auto">
-        <div className="p-3">
+      {/* Bottom Section: Node Properties */}
+      <div className="flex-1 flex flex-col min-h-0">
+        <div className="px-3 py-1.5 bg-gray-800/80 text-[9px] uppercase tracking-widest font-black text-gray-400 border-b border-gray-700 shrink-0">
+          Node Properties
+        </div>
+        <div className="flex-1 overflow-auto p-2 scrollbar-thin">
           {selectedNodeIds.length === 0 ? (
-            <div className="text-xs text-gray-600">Select a node</div>
+            <div className="h-full flex flex-col items-center justify-center text-gray-600 text-[10px] text-center px-4 space-y-2">
+              <span className="text-2xl opacity-20">🖱️</span>
+              <span>Select a node to edit properties</span>
+            </div>
           ) : selectedNodeIds.length === 1 ? (
             <NodePropertiesEditor nodeId={selectedNodeIds[0]} />
           ) : (
-            <div className="text-xs text-gray-400">
-              {selectedNodeIds.length} nodes selected
+            <div className="h-full flex flex-col items-center justify-center text-gray-600 text-[10px] text-center px-4 space-y-2">
+              <span className="text-2xl opacity-20">🔲</span>
+              <span>{selectedNodeIds.length} nodes selected</span>
             </div>
           )}
         </div>
