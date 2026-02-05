@@ -13,6 +13,9 @@ export function validateValue(value: string, type: ValueType, countType: CountTy
         }
         const elements = value.split('|');
         for (const element of elements) {
+            // Allow empty string as valid element in array (implies default value)
+            if (element.trim() === '') continue;
+
             const result = validateScalarValue(element, type);
             if (!result.isValid) {
                 return { isValid: false, error: `Array element error: ${result.error}` };

@@ -103,7 +103,7 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
       )}
 
       {treeNode.comment && (
-        <div className={`absolute bg-yellow-900/40 border border-yellow-600/50 p-1 rounded text-[10px] text-yellow-100 max-w-[150px] break-words whitespace-pre-wrap ${hasChildren ? 'left-[calc(100%+8px)] top-0' : 'top-[calc(100%+8px)] left-0 min-w-full'}`}>
+        <div className={`absolute bg-yellow-900/40 border border-yellow-600/50 p-1 rounded text-[10px] text-yellow-100 break-words whitespace-pre-wrap w-full ${hasChildren ? 'left-[calc(100%+8px)] top-0' : 'top-[calc(100%+8px)] left-0'}`}>
           {treeNode.comment}
         </div>
       )}

@@ -210,11 +210,11 @@ export function FileTreePopup({ isOpen, onClose }: FileTreePopupProps) {
   return (
     <div
       ref={popupRef}
-      className="absolute top-12 left-2 z-50 w-80 bg-gray-800 border border-gray-600 rounded-lg shadow-xl overflow-hidden"
+      className="absolute top-12 left-2 z-50 w-96 bg-gray-800 border border-gray-600 rounded-lg shadow-xl overflow-hidden flex flex-col max-h-[80vh]"
       onKeyDown={handleKeyDown}
     >
       {/* 搜索框 */}
-      <div className="p-2 border-b border-gray-700">
+      <div className="p-2 border-b border-gray-700 shrink-0">
         <input
           ref={inputRef}
           type="text"
@@ -226,7 +226,7 @@ export function FileTreePopup({ isOpen, onClose }: FileTreePopupProps) {
       </div>
 
       {/* 文件树 */}
-      <div className="max-h-80 overflow-auto py-1">
+      <div className="flex-1 overflow-auto py-1">
         {fileTree.length === 0 ? (
           <div className="px-3 py-4 text-sm text-gray-500 text-center">
             No files found

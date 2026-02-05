@@ -24,7 +24,7 @@
 ## 二、项目结构
 
 ```
-ybehavior-editor/
+aieditor/
 ├── electron/                    # Electron 主进程
 │   ├── main.ts                  # 主进程入口
 │   ├── preload.ts               # 预加载脚本

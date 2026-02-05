@@ -3,6 +3,7 @@ import type {
   Tree, TreeNode, Variable, Pin, TreeConnection, DataConnection,
   ValueType, CountType, PinBinding, NodeCategory, TreeInterfacePin
 } from '../types';
+import { decodeXmlEntities } from './stringUtils';
 import type { NodeDefinition, PinDefinition } from '../types/nodeDefinition';
 
 // Pin 值格式: "_XY value" 或 "XYZ value"
@@ -267,67 +268,84 @@ function parseXmlNode(
   // 获取节点定义
   const nodeDef = getNodeDefinition?.(nodeClass);
 
-  // 解析树文件中的 Pin 值
+  // 1.1 处理节点属性中的 Pin（用于基础 Pin，来自节点定义）
   const skipAttrs = [
     '@_Class', '@_GUID', '@_Pos', '@_Connection', '@_Return',
     '@_NickName', '@_Comment', '@_Disabled',
     'Shared', 'Local', 'Node', 'Input', 'Output'
   ];
-  const xmlPinValues = new Map<string, string>();
+  const xmlAttrValues = new Map<string, string>();  // 节点属性 → 基础 Pin
+  const xmlInputValues = new Map<string, string>(); // <Input> 标签 → 动态 Input Pin
+  const xmlOutputValues = new Map<string, string>(); // <Output> 标签 → 动态 Output Pin
 
+  // 节点属性存入 xmlAttrValues
   for (const [key, value] of Object.entries(xmlNode)) {
-    if (!skipAttrs.includes(key) && key.startsWith('@_') && typeof value === 'string') {
-      const pinName = key.substring(2); // 去掉 @_
-      xmlPinValues.set(pinName, value);
+    if (!skipAttrs.includes(key) && typeof value === 'string') {
+      const pinName = key.startsWith('@_') ? key.substring(2) : key;
+      xmlAttrValues.set(pinName, value);
     }
   }
 
-  // 1.2 处理 <Input> 和 <Output> 子标签中的 Pin (Legacy 格式)
-  // 如果是 Root 节点，这些通常是 Tree Interface，不由 parseXmlNode 存为 node pins
+  // 1.2 处理 <Input> 和 <Output> 子标签中的 Pin
   if (nodeClass !== 'Root') {
-    const processLegacyPins = (tags: unknown) => {
+    const processLegacyPins = (tags: unknown, map: Map<string, string>) => {
       if (!tags) return;
       const tagList = Array.isArray(tags) ? tags : [tags];
       tagList.forEach(tag => {
         if (typeof tag === 'object' && tag !== null) {
           for (const [key, value] of Object.entries(tag)) {
-            if (key.startsWith('@_') && typeof value === 'string') {
-              const pinName = key.substring(2);
-              xmlPinValues.set(pinName, value);
+            if (typeof value === 'string') {
+              const pinName = key.startsWith('@_') ? key.substring(2) : key;
+              map.set(pinName, value);
             }
           }
         }
       });
     };
 
-    processLegacyPins(xmlNode.Input);
-    processLegacyPins(xmlNode.Output);
+    processLegacyPins(xmlNode.Input, xmlInputValues);
+    processLegacyPins(xmlNode.Output, xmlOutputValues);
   }
 
   // 基于定义文件合并 Pin 数据
   const pins: Pin[] = [];
 
   if (nodeDef) {
-    // 有定义：按定义顺序生成 Pin，使用树文件中的值或默认值
+    // 1. 基础 Pin（来自节点定义）→ 从节点属性中查找
     for (const pinDef of nodeDef.pins) {
-      const xmlValue = xmlPinValues.get(pinDef.name);
+      const xmlValue = xmlAttrValues.get(pinDef.name);
       if (xmlValue !== undefined) {
-        // 树文件中有值，使用树文件的值
         pins.push(createPin(pinDef.name, xmlValue, pinDef));
       } else {
-        // 树文件中没有，使用定义的默认值
         pins.push(createPinFromDefinition(pinDef));
       }
     }
 
-    // 处理动态 Pin (不在定义中，但在 XML 子标签中定义的)
-    // 通常出现在 SubTree 节点上
-    for (const [pinName, xmlValue] of xmlPinValues) {
-      if (!nodeDef.pins?.some(p => p.name === pinName)) {
-        const isInput = isPinInTag(xmlNode.Input, pinName);
-        pins.push(createPin(pinName, xmlValue, {
+    // 2. 处理动态 Pin (不在定义中，但在 XML 中存在的)
+    // 这种情况通常是 SubTree 节点
+    const dynamicInputNames = Array.from(xmlInputValues.keys()).filter(name => !nodeDef.pins?.some(p => p.name === name));
+    const dynamicOutputNames = Array.from(xmlOutputValues.keys()).filter(name => !nodeDef.pins?.some(p => p.name === name));
+    const allDynamicNames = new Set([...dynamicInputNames, ...dynamicOutputNames]);
+
+    allDynamicNames.forEach(pinName => {
+      const inVal = xmlInputValues.get(pinName);
+      const outVal = xmlOutputValues.get(pinName);
+
+      if (inVal !== undefined) {
+        pins.push(createPin(pinName, inVal, {
           name: pinName,
-          isInput: isInput,
+          isInput: true,
+          valueType: 'int', // 基础动态 Pin，默认设为 int
+          arrayType: 'scalar',
+          constType: 'switchable',
+          enableType: 'fixed',
+          defaultValue: '',
+        } as any));
+      }
+      if (outVal !== undefined) {
+        pins.push(createPin(pinName, outVal, {
+          name: pinName,
+          isInput: false,
           valueType: 'int',
           arrayType: 'scalar',
           constType: 'switchable',
@@ -335,13 +353,16 @@ function parseXmlNode(
           defaultValue: '',
         } as any));
       }
-    }
+    });
   } else {
     // 没有定义：直接使用树文件中的所有 Pin
-    for (const [pinName, xmlValue] of xmlPinValues) {
-      const isInput = isPinInTag(xmlNode.Input, pinName);
-      pins.push(createPin(pinName, xmlValue, { name: pinName, isInput, enableType: 'fixed' } as any));
-    }
+    xmlInputValues.forEach((val, name) => {
+      pins.push(createPin(name, val, { name, isInput: true, enableType: 'fixed' } as any));
+    });
+    xmlOutputValues.forEach((val, name) => {
+      // 如果同名且值相同，可能已经在 Input 里了？但为了安全，还是分开存
+      pins.push(createPin(name, val, { name, isInput: false, enableType: 'fixed' } as any));
+    });
   }
 
   // 收集额外属性
@@ -355,7 +376,7 @@ function parseXmlNode(
     category: getNodeCategory(nodeClass),
     position: { x: pos[0], y: pos[1] },
     nickname: xmlNode['@_NickName'] as string,
-    comment: xmlNode['@_Comment'] as string,
+    comment: decodeXmlEntities(xmlNode['@_Comment'] as string),
     disabled: xmlNode['@_Disabled'] === 'true',
     returnType: (xmlNode['@_Return'] as any) || 'Default',
     pins,
@@ -463,8 +484,8 @@ export function parseTreeXml(
           const tagList = Array.isArray(tags) ? tags : [tags];
           tagList.forEach(tag => {
             for (const [key, value] of Object.entries(tag)) {
-              if (key.startsWith('@_') && typeof value === 'string') {
-                const name = key.substring(2);
+              if (typeof value === 'string') {
+                const name = key.startsWith('@_') ? key.substring(2) : key;
                 const parsed = parsePinValue(value);
                 const pin: TreeInterfacePin = {
                   id: `${isInput ? 'input' : 'output'}-${name}`,
@@ -527,12 +548,6 @@ export function parseTreeXml(
   };
 }
 
-function isPinInTag(tags: any, pinName: string): boolean {
-  if (!tags) return false;
-  const tagList = Array.isArray(tags) ? tags : [tags];
-  const attrName = `@_${pinName}`;
-  return tagList.some(tag => tag && typeof tag === 'object' && attrName in tag);
-}
 
 /**
  * 计算节点的 UID（深度优先遍历）

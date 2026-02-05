@@ -606,7 +606,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       if (!mainTreeIds.has(node.id) || node.disabled) return;
 
       node.pins.forEach(pin => {
-        if (pin.binding.type === 'const') {
+        if (pin.binding.type === 'const' && pin.enableType !== 'disable') {
           const res = validateValue(pin.binding.value, pin.valueType, pin.countType);
           if (!res.isValid) {
             const nodeLabel = `${node.type}:${node.uid || node.id || ''}`;
@@ -1317,21 +1317,25 @@ export const useEditorStore = create<EditorState>((set, get) => ({
           const dynamicPins = [...subTreeInputs, ...subTreeOutputs];
 
           dynamicPins.forEach(dp => {
-            const existing = targetNode.pins.find(p => p.name === dp.name);
+            // 在原有的 Pin 列表中查找
+            // 优先匹配 同名且方向一致 的 Pin
+            // 备选匹配 同名 (忽略方向) 的 Pin — 针对那些在 Input/Output 中共享的 Pin
+            const existing = targetNode.pins.find(p => p.name === dp.name && p.isInput === dp.isInput)
+              || targetNode.pins.find(p => p.name === dp.name);
+
             if (existing) {
               // 检查类型是否依然兼容
               const typeCompatible = existing.valueType === dp.valueType && existing.countType === dp.countType;
+
               if (typeCompatible) {
-                // 如果是 Output，强制要求是 pointer 类型
-                if (!dp.isInput && existing.binding.type !== 'pointer') {
-                  newPins.push(dp);
-                } else {
-                  newPins.push({ ...dp, binding: existing.binding, vectorIndex: existing.vectorIndex, bindingType: existing.binding.type });
-                }
+                // 尽量保持原有绑定，无论 const 还是 pointer，也不论方向是否完全一致 (只要名字对上且类型兼容)
+                newPins.push({ ...dp, binding: existing.binding, bindingType: existing.binding.type, vectorIndex: existing.vectorIndex });
               } else {
+                // 类型不兼容，使用新的默认 Pin
                 newPins.push(dp);
               }
             } else {
+              // 全新 Pin
               newPins.push(dp);
             }
           });

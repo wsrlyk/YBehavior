@@ -234,10 +234,15 @@ function refreshHandleEventLabels(nodeId: string, tree: Tree): ConnectionLabelUp
 function validateSubTreeNode(node: TreeNode, _tree: Tree): string[] {
     const errors: string[] = [];
 
-    // 1. 检查 Tree Pin
+    // 1. 检查 Tree Pin 或 Identification Pin
     const treePin = node.pins.find(p => p.name === 'Tree');
-    if (!treePin || treePin.binding.type !== 'const' || !treePin.binding.value) {
-        errors.push(`[SubTree:${node.uid ?? '?'}] Tree file must be selected`);
+    const identPin = node.pins.find(p => p.name === 'Identification');
+
+    const treeValue = (treePin?.binding.type === 'const') ? treePin.binding.value : '';
+    const identValue = (identPin?.binding.type === 'const') ? identPin.binding.value : '';
+
+    if (!treeValue && !identValue) {
+        errors.push(`[SubTree:${node.uid ?? '?'}] Either Tree file or Identification name must be provided`);
     }
 
     // 2. 检查动态 Pins 绑定

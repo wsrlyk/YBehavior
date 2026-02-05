@@ -19,17 +19,7 @@ function parseValueType(typeStr: string): ValueType {
   return VALUE_TYPE_MAP[char] || 'int';
 }
 
-function decodeEntities(str?: string): string | undefined {
-  if (!str) return str;
-  return str
-    .replace(/&#10;/g, '\n')
-    .replace(/&#13;/g, '\r')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&apos;/g, "'")
-    .replace(/&amp;/g, '&');
-}
+import { decodeXmlEntities } from './stringUtils';
 
 function parseAllowedValueTypes(typeStr: string): ValueType[] {
   // 解析所有允许的类型，如 "IF" 表示 int 和 float
@@ -121,7 +111,7 @@ function parseVariable(v: XmlPin): PinDefinition {
     vTypeGroup: v['@_vTypeGroup'] ? parseInt(v['@_vTypeGroup']) : undefined,
     cTypeGroup: v['@_cTypeGroup'] ? parseInt(v['@_cTypeGroup']) : undefined,
     allowedValueTypes: parseAllowedValueTypes(valueTypeStr),
-    desc: decodeEntities(v['@_Desc']),
+    desc: decodeXmlEntities(v['@_Desc']),
   };
 }
 
@@ -158,7 +148,7 @@ function parseAction(action: XmlAction): NodeDefinition {
     note: action['@_Note'] || '',
     hierarchy: action['@_Hierachy'] || '',
     icon: action['@_Icon'],
-    desc: decodeEntities(action['@_Desc']),
+    desc: decodeXmlEntities(action['@_Desc']),
     pins,
     typeMaps,
     source: 'external',
@@ -255,7 +245,7 @@ function parseBuiltinNode(node: XmlBuiltinNode): NodeDefinition {
     note: node['@_Note'] || '',
     hierarchy: node['@_Hierachy'] || '',
     icon: node['@_Icon'],
-    desc: decodeEntities(node['@_Desc']),
+    desc: decodeXmlEntities(node['@_Desc']),
     pins,
     typeMaps,
     source: 'builtin',

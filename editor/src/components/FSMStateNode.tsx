@@ -3,6 +3,7 @@ import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import type { FSMState, FSMStateType } from '../types/fsm';
 import { stateTypeHasParentConnector, stateTypeHasChildrenConnector, stateTypeHasTreeSelector } from '../types/fsm';
 import { useFSMStore } from '../stores/fsmStore';
+import { decodeXmlEntities } from '../utils/stringUtils';
 
 // ==================== Colors ====================
 
@@ -135,8 +136,8 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
 
             {/* Comment */}
             {state.comment && (
-                <div className="px-3 py-1 text-[10px] text-gray-400 italic border-t border-gray-600/30">
-                    {state.comment}
+                <div className="px-3 py-1 text-[10px] text-gray-400 italic border-t border-gray-600/30 whitespace-pre-wrap">
+                    {decodeXmlEntities(state.comment)}
                 </div>
             )}
 

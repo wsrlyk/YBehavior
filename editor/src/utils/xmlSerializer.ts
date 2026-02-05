@@ -333,6 +333,11 @@ function formatXml(xml: string): string {
     }
   });
 
+  // 将十进制实体转换为十六进制格式，保持与原文件一致
+  formatted = formatted.replace(/&#(\d+);/g, (_, dec) => {
+    return '&#x' + parseInt(dec).toString(16).toUpperCase() + ';';
+  });
+
   return formatted.trim();
 }
 
@@ -417,6 +422,15 @@ function collectReferencedVariables(
           sharedRefs.add(pin.binding.variableName);
         }
       }
+
+      // 检查 Vector Index 引用
+      if (pin.vectorIndex && pin.vectorIndex.type === 'pointer') {
+        if (pin.vectorIndex.isLocal) {
+          localRefs.add(pin.vectorIndex.variableName);
+        } else {
+          sharedRefs.add(pin.vectorIndex.variableName);
+        }
+      }
     }
   }
 
@@ -469,11 +483,20 @@ function serializeNodeForRuntimeWithUID(
   const el = doc.createElement('Node');
   el.setAttribute('Class', node.type);
 
-  // 额外属性（Connection, Return 等）
+  // 额外属性 (Connection 等)
   if (node.extraAttrs) {
     for (const [key, value] of Object.entries(node.extraAttrs)) {
-      el.setAttribute(key, value);
+      if (key !== 'Return') {
+        el.setAttribute(key, value);
+      }
     }
+  }
+
+  // Return 属性 (Success/Failure/Invert)
+  if (node.returnType && node.returnType !== 'Default') {
+    el.setAttribute('Return', node.returnType);
+  } else if (node.extraAttrs?.Return) {
+    el.setAttribute('Return', node.extraAttrs.Return);
   }
 
   // 如果是 Root 节点，添加被引用的 Shared 和 Local 变量（只有非空时才添加）
