@@ -10,6 +10,8 @@ import { useFSMStore } from '../stores/fsmStore';
 import { NodeEditor } from './NodeEditor';
 import FSMEditor from './FSMEditor';
 
+import { RunningList } from './RunningList';
+
 interface EditorPaneProps {
     onPaneClick?: () => void;
 }
@@ -25,21 +27,30 @@ export function EditorPane({ onPaneClick }: EditorPaneProps) {
     const isFSMActive = activeFSMPath !== null && activeFSMFile !== undefined;
     const isTreeActive = activeFilePath !== null && activeTreeFile !== undefined;
 
-    if (isFSMActive) {
-        return <FSMEditor onPaneClick={onPaneClick} />;
-    }
+    const renderContent = () => {
+        if (isFSMActive) {
+            return <FSMEditor key={activeFSMPath} onPaneClick={onPaneClick} />;
+        }
 
-    if (isTreeActive) {
-        return <NodeEditor onPaneClick={onPaneClick} />;
-    }
+        if (isTreeActive) {
+            return <NodeEditor key={activeFilePath} onPaneClick={onPaneClick} />;
+        }
 
-    // No file open
-    return (
-        <div className="h-full w-full flex items-center justify-center text-gray-500 bg-gray-900">
-            <div className="text-center">
-                <p className="text-lg">No file open</p>
-                <p className="text-sm mt-2">Open a file from the sidebar or create a new one</p>
+        // No file open
+        return (
+            <div className="h-full w-full flex items-center justify-center text-gray-500 bg-gray-900">
+                <div className="text-center">
+                    <p className="text-lg">No file open</p>
+                    <p className="text-sm mt-2">Open a file from the sidebar or create a new one</p>
+                </div>
             </div>
+        );
+    };
+
+    return (
+        <div className="relative h-full w-full">
+            {renderContent()}
+            <RunningList />
         </div>
     );
 }

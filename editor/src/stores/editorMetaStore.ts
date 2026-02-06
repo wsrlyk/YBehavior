@@ -7,7 +7,7 @@ import { getConfigPath } from '../utils/configPath';
  */
 interface NodeMeta {
     isFolded?: boolean;
-    breakpoints?: any[]; // 预留
+    breakpointType?: number; // 1=Break, -1=Log, undefined/0=None
 }
 
 /**
@@ -27,6 +27,10 @@ interface EditorMetaState {
         focusTarget?: { type: 'node' | 'variable' | 'io' | 'state' | 'transition', id: string };
         pendingCenterTarget?: { x: number, y: number, zoom?: number };
     };
+    debugMeta: {
+        ip: string;
+        port: number;
+    };
 
     // Actions
     setNodeFolded: (filePath: string, nodeId: string, isFolded: boolean) => void;
@@ -35,6 +39,9 @@ interface EditorMetaState {
     setActivePropertiesTab: (tab: 'variables' | 'io' | 'properties') => void;
     setFocusTarget: (target?: { type: 'node' | 'variable' | 'io' | 'state' | 'transition', id: string }) => void;
     setPendingCenterTarget: (target?: { x: number, y: number, zoom?: number }) => void;
+    setDebugIP: (ip: string) => void;
+    setDebugPort: (port: number) => void;
+    setNodeBreakpoint: (filePath: string, nodeId: string, type: number) => void;
     getTreeMeta: (filePath: string) => TreeMeta | undefined;
     loadAllMeta: () => Promise<void>;
     saveAllMeta: () => Promise<void>;
@@ -48,6 +55,10 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
         sidebarWidth: 160,
         isSearchOpen: false,
         activePropertiesTab: 'properties'
+    },
+    debugMeta: {
+        ip: '127.0.0.1',
+        port: 8888
     },
 
     setNodeFolded: (filePath, nodeId, isFolded) => {
@@ -107,6 +118,44 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
         }));
     },
 
+    setDebugIP: (ip) => {
+        set((state) => ({
+            debugMeta: { ...state.debugMeta, ip }
+        }));
+        get().saveAllMeta();
+    },
+
+    setDebugPort: (port) => {
+        set((state) => ({
+            debugMeta: { ...state.debugMeta, port }
+        }));
+        get().saveAllMeta();
+    },
+
+    setNodeBreakpoint: (filePath, nodeId, type) => {
+        set((state) => {
+            const treeMeta = state.treeMetas[filePath] || { nodes: {} };
+            const nodeMeta = treeMeta.nodes[nodeId] || {};
+
+            const newTreeMetas = {
+                ...state.treeMetas,
+                [filePath]: {
+                    ...treeMeta,
+                    nodes: {
+                        ...treeMeta.nodes,
+                        [nodeId]: {
+                            ...nodeMeta,
+                            breakpointType: type
+                        }
+                    }
+                }
+            };
+
+            return { treeMetas: newTreeMetas };
+        });
+        get().saveAllMeta();
+    },
+
     getTreeMeta: (filePath) => {
         return get().treeMetas[filePath];
     },
@@ -117,7 +166,7 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
             const content = await readFile(path);
             if (content) {
                 const data = JSON.parse(content);
-                if (data.treeMetas || data.uiMeta) {
+                if (data.treeMetas || data.uiMeta || data.debugMeta) {
                     set({
                         treeMetas: data.treeMetas || {},
                         uiMeta: {
@@ -125,7 +174,8 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
                             isSearchOpen: false,
                             activePropertiesTab: 'properties',
                             focusTarget: undefined
-                        }
+                        },
+                        debugMeta: data.debugMeta || { ip: '127.0.0.1', port: 8888 }
                     });
                 } else {
                     set({ treeMetas: data });
@@ -141,7 +191,8 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
             const path = await getConfigPath(META_FILE_NAME);
             const content = JSON.stringify({
                 treeMetas: get().treeMetas,
-                uiMeta: get().uiMeta
+                uiMeta: get().uiMeta,
+                debugMeta: get().debugMeta
             }, null, 2);
             await writeFile(path, content);
         } catch (e) {

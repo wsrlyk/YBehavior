@@ -16,6 +16,7 @@ import {
 import { useEditorStore, getDescendantIds } from '../stores/editorStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
+import { useDebugStore } from '../stores/debugStore';
 import { NodeContextMenu } from './NodeContextMenu';
 import CustomNode, { type CustomNodeType } from './CustomNode';
 import TreeEdge from './TreeEdge';
@@ -280,8 +281,14 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   const finalizeContinuousAction = useEditorStore((state) => state.finalizeContinuousAction);
 
   // 自定义 onNodesChange：处理删除和选择
+  const isDebugConnected = useDebugStore((s) => s.isConnected);
   const onNodesChange = useCallback((changes: import('@xyflow/react').NodeChange<Node>[]) => {
-    onNodesChangeBase(changes);
+    // Filter out modification changes when in read-only debug mode
+    const filteredChanges = isDebugConnected
+      ? changes.filter(c => c.type === 'select' || c.type === 'dimensions') // Allow selection and dimension updates
+      : changes;
+
+    onNodesChangeBase(filteredChanges);
 
     let selectionChanged = false;
     const currentSelected = useEditorStore.getState().selectedNodeIds;
@@ -317,7 +324,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         selectNodes(newNodeIds);
       }
     }
-  }, [onNodesChangeBase, removeNodes, selectNodes]);
+  }, [onNodesChangeBase, removeNodes, selectNodes, isDebugConnected]);
 
   const onSelectionStart = useCallback(() => {
     isSelecting.current = true;

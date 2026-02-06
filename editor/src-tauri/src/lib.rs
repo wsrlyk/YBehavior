@@ -3,6 +3,10 @@ use std::path::PathBuf;
 use std::env;
 use tauri::Manager;
 
+mod network;
+
+use network::{debug_connect, debug_disconnect, debug_send, debug_is_connected, DebugConnectionManager};
+
 #[tauri::command]
 fn get_exe_dir() -> Result<String, String> {
     let exe_path = env::current_exe().map_err(|e| e.to_string())?;
@@ -67,6 +71,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .manage(DebugConnectionManager::new())
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { .. } = event {
                 if window.label() == "main" {
@@ -82,7 +87,16 @@ pub fn run() {
                 }
             }
         })
-        .invoke_handler(tauri::generate_handler![get_exe_dir, read_file, write_file, list_files])
+        .invoke_handler(tauri::generate_handler![
+            get_exe_dir, 
+            read_file, 
+            write_file, 
+            list_files,
+            debug_connect,
+            debug_disconnect,
+            debug_send,
+            debug_is_connected
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

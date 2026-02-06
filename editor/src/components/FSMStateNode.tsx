@@ -1,8 +1,12 @@
-import { memo, useState } from 'react';
+import { memo, useState, useEffect } from 'react';
+import { DEBUG_RINGS, TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
+import { NodeState } from '../types/debug';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import type { FSMState, FSMStateType } from '../types/fsm';
 import { stateTypeHasParentConnector, stateTypeHasChildrenConnector, stateTypeHasTreeSelector } from '../types/fsm';
 import { useFSMStore } from '../stores/fsmStore';
+// NodeState imported from types/debug
+import { useDebugStore } from '../stores/debugStore';
 import { decodeXmlEntities } from '../utils/stringUtils';
 
 // ==================== Colors ====================
@@ -42,7 +46,44 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
     const [isHovered, setIsHovered] = useState(false);
     const isGlobalConnecting = useFSMStore(state => state.isConnecting);
 
+    // Debug info
+    const { fsmRunInfo, isConnected, keyframe } = useDebugStore();
+    const runState = (isConnected && state.uid !== undefined) ? fsmRunInfo?.stateInfos?.get(state.uid) : undefined;
+    const isRunning = runState !== undefined;
+
+    const [isTransientVisible, setIsTransientVisible] = useState(false);
+
+    let ringClass = '';
+    if (isRunning) {
+        if (runState === NodeState.Break) ringClass = `ring-4 ${DEBUG_RINGS.BREAK} ring-offset-2 ring-offset-gray-900`;
+        else if (runState === NodeState.Success) ringClass = `ring-4 ${DEBUG_RINGS.SUCCESS} ring-offset-2 ring-offset-gray-900`;
+        else if (runState === NodeState.Failure) ringClass = `ring-4 ${DEBUG_RINGS.FAILURE} ring-offset-2 ring-offset-gray-900`;
+        else ringClass = `ring-4 ${DEBUG_RINGS.RUNNING} ring-offset-2 ring-offset-gray-900`; // Running or Default
+    }
+
+    // Handle transient visibility (0.7s flash for non-break states)
+    useEffect(() => {
+        if (runState === NodeState.Break) {
+            setIsTransientVisible(true);
+        } else if (isRunning) {
+            setIsTransientVisible(true);
+            const timer = setTimeout(() => {
+                setIsTransientVisible(false);
+            }, TRANSIENT_HIGHLIGHT_DURATION);
+            return () => clearTimeout(timer);
+        } else {
+            setIsTransientVisible(false);
+        }
+    }, [runState, isRunning, keyframe]);
+
+    // Hide ring if transient time expired (and not Break)
+    if (isRunning && !isTransientVisible && runState !== NodeState.Break) {
+        ringClass = '';
+    }
+
     const colors = STATE_COLORS[state.type];
+    const styleColors = colors;
+
     const icon = STATE_ICONS[state.type];
     const hasParentHandle = stateTypeHasParentConnector(state.type);
     const hasChildHandle = stateTypeHasChildrenConnector(state.type);
@@ -57,14 +98,15 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
         <div
             className={`
         relative rounded-lg shadow-lg min-w-[120px] transition-all duration-200
-        ${selected ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-gray-900' : ''}
-        ${isDefault ? 'ring-2 ring-yellow-400' : ''}
+        ${(selected && !isRunning) ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-gray-900' : ''}
+        ${(isDefault && !isRunning) ? 'ring-2 ring-yellow-400' : ''}
+        ${ringClass}
         ${isHovered ? 'scale-[1.02]' : ''}
       `}
             style={{
-                backgroundColor: colors.bg,
+                backgroundColor: styleColors.bg,
                 borderWidth: 2,
-                borderColor: colors.border,
+                borderColor: styleColors.border,
             }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -112,9 +154,10 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
             {/* Header */}
             <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-600/50">
                 <span className="text-white/70">{icon}</span>
-                <span className="text-white font-medium text-sm">
-                    {state.name || state.type}
-                </span>
+                <div className="font-bold text-center truncate px-1">
+                    {state.uid !== undefined && <span className="text-gray-400 mr-1">[{state.uid}]</span>}
+                    {state.type === 'Normal' || state.type === 'Meta' ? state.name : state.type}
+                </div>
                 {isDefault && (
                     <span className="ml-auto text-yellow-400 text-xs font-bold">DEFAULT</span>
                 )}

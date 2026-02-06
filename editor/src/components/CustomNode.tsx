@@ -4,6 +4,9 @@ import type { TreeNode, Pin } from '../types';
 import type { NodeDefinition } from '../types/nodeDefinition';
 import { useTooltipStore } from '../stores/tooltipStore';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
+import { useDebugStore, NodeState } from '../stores/debugStore';
+import { useEditorStore } from '../stores/editorStore';
+import { useShallow } from 'zustand/react/shallow';
 
 const NODE_COLORS: Record<string, string> = {
   composite: '#5A8A5E',
@@ -21,6 +24,15 @@ const PIN_COLORS: Record<string, string> = {
   entity: '#6BD9D9',
   ulong: '#9999CC',
   enum: '#CC9966',
+};
+
+// Debug state colors for node visualization
+const DEBUG_STATE_COLORS: Record<NodeState, { border: string; glow: string } | null> = {
+  [NodeState.Invalid]: null,
+  [NodeState.Success]: { border: '#22c55e', glow: '0 0 12px rgba(34, 197, 94, 0.6)' },
+  [NodeState.Failure]: { border: '#3b82f6', glow: '0 0 12px rgba(59, 130, 246, 0.6)' }, // Blue
+  [NodeState.Break]: { border: '#ef4444', glow: '0 0 12px rgba(239, 68, 68, 0.6)' }, // Red
+  [NodeState.Running]: { border: '#ec4899', glow: '0 0 12px rgba(236, 72, 153, 0.6)' }, // Pink
 };
 
 type CustomNodeData = {
@@ -80,6 +92,29 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
   const getDefinition = useNodeDefinitionStore((state) => state.getDefinition);
   const { label, treeNode } = data;
 
+  // Debug state
+  // Debug state
+  const activeFilePath = useEditorStore((s) => s.activeFilePath);
+
+  const fileName = useMemo(() => {
+    if (!activeFilePath) return '';
+    return activeFilePath.split(/[\\/]/).pop()?.replace(/\.tree$/, '') || '';
+  }, [activeFilePath]);
+
+  const { debugState, isPaused, keyframe } = useDebugStore(
+    useShallow(s => {
+      const state = s.isConnected && treeNode.uid !== undefined
+        ? s.getNodeState(fileName, treeNode.uid)
+        : NodeState.Invalid;
+      return {
+        debugState: state,
+        isPaused: s.isPaused,
+        keyframe: s.keyframe
+      };
+    })
+  );
+  const debugColors = DEBUG_STATE_COLORS[debugState];
+
   const nodeDefinition = useMemo(() => getDefinition(treeNode.type), [treeNode.type, getDefinition]);
 
   const bgColor = NODE_COLORS[treeNode.category] || '#666';
@@ -117,6 +152,17 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
             boxShadow: selected ? '0 0 0 2px rgba(255,255,255,0.3)' : undefined,
           }}
         >
+          {/* Debug Overlay */}
+          {debugColors && (
+            <div
+              key={isPaused ? 'paused' : keyframe}
+              className={`absolute inset-0 rounded pointer-events-none z-50 ${!isPaused ? 'animate-debug-flash' : ''}`}
+              style={{
+                boxShadow: `inset 0 0 0 4px ${debugColors.border}, ${debugColors.glow}`
+              }}
+            />
+          )}
+
           <div
             className="px-2 py-1 text-xs font-medium text-white rounded-t flex items-center gap-1"
             style={{ backgroundColor: bgColor }}

@@ -58,7 +58,7 @@
     <Pin Name="BreakValue" ValueType="B" IsArray="False" IsConst="False" IsEnable="False" Desc="子节点返回值和这个相同，则退出循环" />
     <Connector Name="init" Label="Init" MaxChildren="1" />
     <Connector Name="cond" Label="Cond" MaxChildren="1" />
-    <Connector Name="increment" Label="Incr" MaxChildren="1" />
+    <Connector Name="inc" Label="Incr" MaxChildren="1" />
     <Connector Name="children" MaxChildren="1" />
   </Node>
   <Node Class="Not" Category="decorator" Note="Invert child result">

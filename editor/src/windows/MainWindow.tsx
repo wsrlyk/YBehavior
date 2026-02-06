@@ -6,6 +6,7 @@ import { PropertiesPanel } from "../components/PropertiesPanel";
 import { FSMPropertiesPanel } from "../components/FSMPropertiesPanel";
 import { FileTreePopup } from "../components/FileTreePopup";
 import { Terminal } from "../components/Terminal";
+import { DebugToolbar } from "../components/DebugToolbar";
 import { useEditorStore } from "../stores/editorStore";
 import { useNodeDefinitionStore } from "../stores/nodeDefinitionStore";
 import { useEditorMetaStore } from "../stores/editorMetaStore";
@@ -236,16 +237,10 @@ export function MainWindow() {
                                 Redo
                             </button>
                             <div className="flex-1" />
-                            <span className="text-sm text-gray-400 truncate">
-                                {currentFile ? (
-                                    <>
-                                        {activeFSM ? '🔄 ' : activeFile ? '🌴 ' : ''}
-                                        {currentFile.isDirty ? '* ' : ''}
-                                        {currentFile.name.replace(/\.(tree|fsm)$/, '')}
-                                    </>
-                                ) : "No file open"}
-                            </span>
+                            <DebugToolbar />
                         </div>
+
+                        {/* Debug Toolbar moved to header */}
 
                         {/* 编辑器区域 */}
                         <div className="flex-1 relative">

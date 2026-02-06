@@ -15,7 +15,8 @@ import {
 } from '../types/fsm';
 import { parseFSMXml } from '../utils/fsmParser';
 import { serializeFSMForEditor, serializeFSMForRuntime } from '../utils/fsmSerializer';
-import { writeFile } from '../utils/fileService';
+import { recalculateFSMUIDs } from '../utils/fsmUtils';
+import { writeFile, readFile } from '../utils/fileService';
 import { useEditorStore } from './editorStore';
 import { useNotificationStore } from './notificationStore';
 
@@ -47,6 +48,7 @@ interface FSMStoreState {
     // Actions
     setIsConnecting: (isConnecting: boolean) => void;
     openFSM: (path: string, content: string) => void;
+    openFSMFile: (path: string) => Promise<void>;
 
     closeFSM: (path: string) => void;
     setActiveFSM: (path: string) => void;
@@ -143,6 +145,8 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
     setSelectedNodes: (nodeIds) => set({ selectedNodeIds: nodeIds }),
     setSelectedEdges: (edgeIds) => set({ selectedEdgeIds: edgeIds }),
 
+
+
     openFSM: (path, content) => {
         const { openedFSMFiles } = get();
 
@@ -153,7 +157,9 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
         }
 
         const fileName = path.split(/[\\/]/).pop() || 'Unnamed';
-        const fsm = parseFSMXml(content, fileName);
+        let fsm = parseFSMXml(content, fileName);
+        fsm = recalculateFSMUIDs(fsm); // Calculate UIDs matching runtime
+
         const snapshot = serializeFSMForEditor(fsm);
 
         const newFile: OpenedFSMFile = {
@@ -170,6 +176,20 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
             openedFSMFiles: [...openedFSMFiles, newFile],
             activeFSMPath: path,
         });
+    },
+
+    openFSMFile: async (path: string) => {
+        const { editorTreeDir } = useEditorStore.getState();
+        if (!editorTreeDir) return;
+
+        const fullPath = `${editorTreeDir}/${path}`;
+        try {
+            const content = await readFile(fullPath);
+            get().openFSM(path, content);
+        } catch (e) {
+            console.error('Failed to open FSM:', e);
+            useNotificationStore.getState().notify(`Failed to open FSM: ${e}`, 'error');
+        }
     },
 
     closeFSM: (path) => {
@@ -199,7 +219,6 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
 
     // State actions
     addState: (type, position) => set((state) => {
-        console.log('fsmStore.addState called', type, position);
         const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
             const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
             if (!file) return fsm;
@@ -213,10 +232,10 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
                 states: new Map([...machine.states, [newState.id, newState]]),
             };
 
-            return {
+            return recalculateFSMUIDs({
                 ...fsm,
                 machines: new Map([...fsm.machines, [machine.id, newMachine]]),
-            };
+            });
         });
         return result || state;
     }),
@@ -247,10 +266,10 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
                 defaultStateId: machine.defaultStateId === stateId ? null : machine.defaultStateId,
             };
 
-            return {
+            return recalculateFSMUIDs({
                 ...fsm,
                 machines: new Map([...fsm.machines, [machine.id, newMachine]]),
-            };
+            });
         });
         return result || state;
     }),
@@ -271,10 +290,10 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
 
             const newMachine: FSMMachine = { ...machine, states: newStates };
 
-            return {
+            return recalculateFSMUIDs({
                 ...fsm,
                 machines: new Map([...fsm.machines, [machine.id, newMachine]]),
-            };
+            });
         });
         return result || state;
     }),

@@ -7,6 +7,8 @@ import { useNotificationStore } from '../stores/notificationStore';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import { useTooltipStore } from '../stores/tooltipStore';
 import { logger } from '../utils/logger';
+import { useDebugStore } from '../stores/debugStore';
+import { useShallow } from 'zustand/react/shallow';
 
 const TYPE_COLORS: Record<ValueType, string> = {
   int: 'text-blue-400',
@@ -25,6 +27,9 @@ interface VariableItemProps {
   variable: Variable;
   onUpdate: (name: string, updates: Partial<Variable>) => void;
   onDelete: (name: string) => void;
+  debugValue?: string;
+  isChanged?: boolean;
+  isPaused?: boolean;
 }
 
 // 宽度自适应的自定义下拉选择组件 (用于类型选择)
@@ -105,7 +110,7 @@ function AdaptiveSelect({ value, options, onChange, renderLabel, getOptionClass,
   );
 }
 
-function VariableItem({ variable, onUpdate, onDelete }: VariableItemProps) {
+function VariableItem({ variable, onUpdate, onDelete, debugValue, isChanged, isPaused }: VariableItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(variable.defaultValue);
   const colorClass = TYPE_COLORS[variable.valueType] || 'text-gray-400';
@@ -113,13 +118,16 @@ function VariableItem({ variable, onUpdate, onDelete }: VariableItemProps) {
   const notify = useNotificationStore(state => state.notify);
 
   const handleValueSubmit = () => {
-    const result = validateValue(editValue, variable.valueType, variable.countType);
-    if (!result.isValid) {
-      const errorMsg = `Variable [${variable.name}] invalid: ${result.error}`;
-      notify(result.error || 'Invalid value', 'error');
-      logger.error(errorMsg);
+    if (editValue !== variable.defaultValue) {
+      const result = validateValue(editValue, variable.valueType, variable.countType);
+      if (!result.isValid) {
+        const errorMsg = `Variable [${variable.name}] invalid: ${result.error}`;
+        notify(result.error || 'Invalid value', 'error');
+        logger.error(errorMsg);
+      } else {
+        onUpdate(variable.name, { defaultValue: editValue });
+      }
     }
-    onUpdate(variable.name, { defaultValue: editValue });
     setIsEditing(false);
   };
 
@@ -142,9 +150,16 @@ function VariableItem({ variable, onUpdate, onDelete }: VariableItemProps) {
   return (
     <div
       id={`variable-${variable.name}`}
-      className={`px-2 py-1 text-sm bg-gray-800 rounded group transition-all duration-300 ${isFocused ? 'ring-2 ring-blue-500 shadow-lg shadow-blue-500/20 animate-pulse-subtle' : ''
+      className={`px-2 py-1 text-sm bg-gray-800 rounded group transition-all duration-300 relative ${isFocused ? 'ring-2 ring-blue-500 shadow-lg shadow-blue-500/20 animate-pulse-subtle' : ''
         }`}
     >
+      {/* Change Highlight Overlay */}
+      {isChanged && (
+        <div
+          key={isPaused ? 'paused' : debugValue} // Restart animation on value change
+          className={`absolute inset-0 bg-green-500/20 rounded pointer-events-none ${!isPaused ? 'animate-debug-flash' : ''}`}
+        />
+      )}
       <div className="flex items-center gap-0.5">
         <AdaptiveSelect
           value={variable.valueType}
@@ -188,6 +203,13 @@ function VariableItem({ variable, onUpdate, onDelete }: VariableItemProps) {
             onKeyDown={(e) => e.key === 'Enter' && handleValueSubmit()}
             autoFocus
           />
+        ) : debugValue !== undefined ? (
+          <span
+            className="flex-1 text-xs truncate font-mono text-green-400"
+            title={`Runtime Value: ${debugValue}`}
+          >
+            {debugValue}
+          </span>
         ) : (
           <span
             className={`flex-1 text-xs truncate cursor-pointer hover:text-gray-300 ${!isValid ? 'bg-red-900 text-white px-1 rounded' : 'text-gray-400'
@@ -503,6 +525,35 @@ export function PropertiesPanel() {
   const inputs = currentTree?.inputs || [];
   const outputs = currentTree?.outputs || [];
 
+  // Debug state
+  const activeFilePath = useEditorStore(s => s.activeFilePath);
+  const fileName = useMemo(() => activeFilePath?.split(/[\\/]/).pop()?.replace(/\.(tree|fsm)$/, '') || '', [activeFilePath]);
+
+  const { isConnected, treeRunInfos, fsmRunInfo, currentKeyframe, isPaused } = useDebugStore(
+    useShallow(s => ({
+      isConnected: s.isConnected,
+      treeRunInfos: s.treeRunInfos,
+      fsmRunInfo: s.fsmRunInfo,
+      currentKeyframe: s.keyframe,
+      isPaused: s.isPaused
+    }))
+  );
+
+  const debugValues = useMemo(() => {
+    if (!isConnected || !fileName) return null;
+    const treeInfo = treeRunInfos.get(fileName);
+    if (treeInfo) {
+      return {
+        shared: treeInfo.sharedVariables,
+        local: treeInfo.localVariables,
+        sharedTs: treeInfo.sharedVariableTimestamps,
+        localTs: treeInfo.localVariableTimestamps
+      };
+    }
+    // FSM support placeholder
+    return null;
+  }, [isConnected, fileName, treeRunInfos, fsmRunInfo]);
+
   const handleUpdateShared = (name: string, updates: Partial<Variable>) => updateVariable(false, name, updates);
   const handleDeleteShared = (name: string) => removeVariable(false, name);
   const handleAddShared = (v: Variable) => addVariable(false, v);
@@ -580,7 +631,15 @@ export function PropertiesPanel() {
                 </div>
                 <div className="space-y-1">
                   {sharedVariables.map((v) => (
-                    <VariableItem key={v.name} variable={v} onUpdate={handleUpdateShared} onDelete={handleDeleteShared} />
+                    <VariableItem
+                      key={v.name}
+                      variable={v}
+                      onUpdate={handleUpdateShared}
+                      onDelete={handleDeleteShared}
+                      debugValue={debugValues?.shared?.get(v.name)}
+                      isChanged={debugValues?.sharedTs?.get(v.name) === currentKeyframe}
+                      isPaused={isPaused}
+                    />
                   ))}
                 </div>
               </div>
@@ -593,7 +652,15 @@ export function PropertiesPanel() {
                 </div>
                 <div className="space-y-1">
                   {localVariables.map((v) => (
-                    <VariableItem key={v.name} variable={v} onUpdate={handleUpdateLocal} onDelete={handleDeleteLocal} />
+                    <VariableItem
+                      key={v.name}
+                      variable={v}
+                      onUpdate={handleUpdateLocal}
+                      onDelete={handleDeleteLocal}
+                      debugValue={debugValues?.local?.get(v.name)}
+                      isChanged={debugValues?.localTs?.get(v.name) === currentKeyframe}
+                      isPaused={isPaused}
+                    />
                   ))}
                 </div>
               </div>

@@ -27,6 +27,7 @@ import FSMStateNode, { type FSMStateNodeData, type FSMStateNodeType } from './FS
 import FSMTransitionEdge from './FSMTransitionEdge';
 import { useFSMStore } from '../stores/fsmStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
+import { useDebugStore } from '../stores/debugStore';
 import type { FSMMachine, FSMTransition, FSMState } from '../types/fsm';
 
 // ==================== Node & Edge Types ====================
@@ -353,8 +354,21 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
         return convertTransitionsToEdges(machine, fsm, selectedEdgeIds);
     }, [machine, fsm, selectedEdgeIds]);
 
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+    const [nodes, setNodes, onNodesChangeBase] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+    // Read-only mode during debugging
+    const isDebugConnected = useDebugStore((s) => s.isConnected);
+    const onNodesChange = useCallback(
+        (changes: import('@xyflow/react').NodeChange<FSMStateNodeType>[]) => {
+            // Filter out modification changes when in read-only debug mode
+            const filteredChanges = isDebugConnected
+                ? changes.filter(c => c.type === 'select' || c.type === 'dimensions')
+                : changes;
+            onNodesChangeBase(filteredChanges);
+        },
+        [onNodesChangeBase, isDebugConnected]
+    );
 
     // Sync store changes to React Flow
     useEffect(() => {

@@ -12,6 +12,7 @@ export type FSMStateType = 'Normal' | 'Meta' | 'Entry' | 'Exit' | 'Any' | 'Upper
 
 export interface FSMState {
     id: string;
+    uid?: number;               // Runtime UID (calculated)
     type: FSMStateType;
     name: string;               // User-defined name (required for Normal/Meta)
     tree?: string;              // Path to .tree file (Normal/Entry/Exit)
