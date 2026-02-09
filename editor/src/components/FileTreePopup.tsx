@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useEditorStore } from '../stores/editorStore';
 import { useFSMStore } from '../stores/fsmStore';
 import { readFile } from '../utils/fileService';
-import { getFileDisplay } from './Sidebar';
+import { getFileDisplay } from '../utils/fileUtils';
 
 interface FileTreePopupProps {
   isOpen: boolean;

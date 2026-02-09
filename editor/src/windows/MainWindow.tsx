@@ -11,6 +11,7 @@ import { useEditorStore } from "../stores/editorStore";
 import { useNodeDefinitionStore } from "../stores/nodeDefinitionStore";
 import { useEditorMetaStore } from "../stores/editorMetaStore";
 import { useFSMStore } from "../stores/fsmStore";
+import { useDebugStore } from "../stores/debugStore";
 import { getAllWindows } from "@tauri-apps/api/window";
 import Tooltip from "../components/Tooltip";
 import { GlobalSearch } from "../components/GlobalSearch";
@@ -53,7 +54,10 @@ export function MainWindow() {
             loadDefinitions();
         }
         // 加载编辑器元数据
-        loadAllMeta();
+        // 加载编辑器元数据
+        loadAllMeta().then(() => {
+            useDebugStore.getState().syncBreakpointsFromMeta();
+        });
     }, [settings, initSettings, isLoaded, loadDefinitions, loadAllMeta]);
 
     // Ctrl+S / Ctrl+Z / Ctrl+Y / Ctrl+F 快捷键

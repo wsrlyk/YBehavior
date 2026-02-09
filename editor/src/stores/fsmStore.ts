@@ -19,6 +19,7 @@ import { recalculateFSMUIDs } from '../utils/fsmUtils';
 import { writeFile, readFile } from '../utils/fileService';
 import { useEditorStore } from './editorStore';
 import { useNotificationStore } from './notificationStore';
+import { useDebugStore } from './debugStore';
 
 // ==================== Types ====================
 
@@ -218,232 +219,265 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
     },
 
     // State actions
-    addState: (type, position) => set((state) => {
-        const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
-            if (!file) return fsm;
+    addState: (type, position) => {
+        if (useDebugStore.getState().isConnected) return;
+        set((state) => {
+            const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
+                const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
+                if (!file) return fsm;
 
-            const machine = fsm.machines.get(file.currentMachineId);
-            if (!machine) return fsm;
+                const machine = fsm.machines.get(file.currentMachineId);
+                if (!machine) return fsm;
 
-            const newState = createFSMState(type, '', position);
-            const newMachine: FSMMachine = {
-                ...machine,
-                states: new Map([...machine.states, [newState.id, newState]]),
-            };
+                const newState = createFSMState(type, '', position);
+                const newMachine: FSMMachine = {
+                    ...machine,
+                    states: new Map([...machine.states, [newState.id, newState]]),
+                };
 
-            return recalculateFSMUIDs({
-                ...fsm,
-                machines: new Map([...fsm.machines, [machine.id, newMachine]]),
+                return recalculateFSMUIDs({
+                    ...fsm,
+                    machines: new Map([...fsm.machines, [machine.id, newMachine]]),
+                });
             });
+            return result || state;
         });
-        return result || state;
-    }),
+    },
 
-    removeState: (stateId) => set((state) => {
-        const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
-            if (!file) return fsm;
+    removeState: (stateId) => {
+        if (useDebugStore.getState().isConnected) return;
+        set((state) => {
+            const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
+                const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
+                if (!file) return fsm;
 
-            const machine = fsm.machines.get(file.currentMachineId);
-            if (!machine) return fsm;
+                const machine = fsm.machines.get(file.currentMachineId);
+                if (!machine) return fsm;
 
-            const stateToRemove = machine.states.get(stateId);
-            if (!stateToRemove || isSpecialStateType(stateToRemove.type)) return fsm;
+                const stateToRemove = machine.states.get(stateId);
+                if (!stateToRemove || isSpecialStateType(stateToRemove.type)) return fsm;
 
-            const newStates = new Map(machine.states);
-            newStates.delete(stateId);
+                const newStates = new Map(machine.states);
+                newStates.delete(stateId);
 
-            // Remove related transitions
-            const newTransitions = machine.transitions.filter(
-                t => t.fromStateId !== stateId && t.toStateId !== stateId
-            );
+                // Remove related transitions
+                const newTransitions = machine.transitions.filter(
+                    t => t.fromStateId !== stateId && t.toStateId !== stateId
+                );
 
-            const newMachine: FSMMachine = {
-                ...machine,
-                states: newStates,
-                transitions: newTransitions,
-                defaultStateId: machine.defaultStateId === stateId ? null : machine.defaultStateId,
-            };
+                const newMachine: FSMMachine = {
+                    ...machine,
+                    states: newStates,
+                    transitions: newTransitions,
+                    defaultStateId: machine.defaultStateId === stateId ? null : machine.defaultStateId,
+                };
 
-            return recalculateFSMUIDs({
-                ...fsm,
-                machines: new Map([...fsm.machines, [machine.id, newMachine]]),
+                return recalculateFSMUIDs({
+                    ...fsm,
+                    machines: new Map([...fsm.machines, [machine.id, newMachine]]),
+                });
             });
+            return result || state;
         });
-        return result || state;
-    }),
+    },
 
-    updateState: (stateId, updates) => set((state) => {
-        const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
-            if (!file) return fsm;
+    updateState: (stateId, updates) => {
+        if (useDebugStore.getState().isConnected) return;
+        set((state) => {
+            const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
+                const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
+                if (!file) return fsm;
 
-            const machine = fsm.machines.get(file.currentMachineId);
-            if (!machine) return fsm;
+                const machine = fsm.machines.get(file.currentMachineId);
+                if (!machine) return fsm;
 
-            const existingState = machine.states.get(stateId);
-            if (!existingState) return fsm;
+                const existingState = machine.states.get(stateId);
+                if (!existingState) return fsm;
 
-            const newStates = new Map(machine.states);
-            newStates.set(stateId, { ...existingState, ...updates });
+                const newStates = new Map(machine.states);
+                newStates.set(stateId, { ...existingState, ...updates });
 
-            const newMachine: FSMMachine = { ...machine, states: newStates };
+                const newMachine: FSMMachine = { ...machine, states: newStates };
 
-            return recalculateFSMUIDs({
-                ...fsm,
-                machines: new Map([...fsm.machines, [machine.id, newMachine]]),
+                return recalculateFSMUIDs({
+                    ...fsm,
+                    machines: new Map([...fsm.machines, [machine.id, newMachine]]),
+                });
             });
+            return result || state;
         });
-        return result || state;
-    }),
+    },
 
-    setDefaultState: (stateId) => set((state) => {
-        const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
-            if (!file) return fsm;
+    setDefaultState: (stateId) => {
+        if (useDebugStore.getState().isConnected) return;
+        set((state) => {
+            const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
+                const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
+                if (!file) return fsm;
 
-            const machine = fsm.machines.get(file.currentMachineId);
-            if (!machine) return fsm;
+                const machine = fsm.machines.get(file.currentMachineId);
+                if (!machine) return fsm;
 
-            const newMachine: FSMMachine = { ...machine, defaultStateId: stateId };
+                const newMachine: FSMMachine = { ...machine, defaultStateId: stateId };
 
-            return {
-                ...fsm,
-                machines: new Map([...fsm.machines, [machine.id, newMachine]]),
-            };
-        });
-        return result || state;
-    }),
-
-    // Transition actions
-    addTransition: (fromStateId, toStateId, conditions = []) => set((state) => {
-        const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            // All transitions are stored in the root machine (global storage)
-            const rootMachine = fsm.machines.get(fsm.rootMachineId);
-            if (!rootMachine) return fsm;
-
-            const trans = createFSMTransition(fromStateId, toStateId, conditions);
-            const newRootMachine: FSMMachine = {
-                ...rootMachine,
-                transitions: [...rootMachine.transitions, trans],
-            };
-
-            return {
-                ...fsm,
-                machines: new Map([...fsm.machines, [fsm.rootMachineId, newRootMachine]]),
-            };
-        });
-        return result || state;
-    }),
-
-    removeTransition: (transitionId) => set((state) => {
-        const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            let targetMachineId = '';
-            for (const [mId, m] of fsm.machines) {
-                if (m.transitions.some(t => t.id === transitionId)) {
-                    targetMachineId = mId;
-                    break;
-                }
-            }
-
-            if (!targetMachineId) return fsm;
-            const machine = fsm.machines.get(targetMachineId);
-            if (!machine) return fsm;
-
-            const newMachine: FSMMachine = {
-                ...machine,
-                transitions: machine.transitions.filter(t => t.id !== transitionId),
-            };
-
-            return {
-                ...fsm,
-                machines: new Map([...fsm.machines, [machine.id, newMachine]]),
-            };
-        });
-        return result || state;
-    }),
-
-    addConditionToTransition: (transitionId, condition) => set((state) => {
-        const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            // All transitions are in root machine
-            const rootMachine = fsm.machines.get(fsm.rootMachineId);
-            if (!rootMachine) return fsm;
-
-            const newTransitions = rootMachine.transitions.map(t =>
-                t.id === transitionId
-                    ? { ...t, conditions: [...t.conditions, condition] }
-                    : t
-            );
-
-            const newMachine: FSMMachine = { ...rootMachine, transitions: newTransitions };
-
-            return {
-                ...fsm,
-                machines: new Map([...fsm.machines, [fsm.rootMachineId, newMachine]]),
-            };
-        });
-        return result || state;
-    }),
-
-    removeConditionFromTransition: (transitionId, condition) => set((state) => {
-        const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            // All transitions are in root machine
-            const rootMachine = fsm.machines.get(fsm.rootMachineId);
-            if (!rootMachine) return fsm;
-
-            const newTransitions = rootMachine.transitions.map(t =>
-                t.id === transitionId
-                    ? { ...t, conditions: t.conditions.filter(c => c !== condition) }
-                    : t
-            );
-
-            const newMachine: FSMMachine = { ...rootMachine, transitions: newTransitions };
-
-            return {
-                ...fsm,
-                machines: new Map([...fsm.machines, [fsm.rootMachineId, newMachine]]),
-            };
-        });
-        return result || state;
-    }),
-
-    // Variable actions
-    addVariable: (isLocal, variable) => set((state) => {
-        const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            if (isLocal) {
-                return { ...fsm, localVariables: [...fsm.localVariables, variable] };
-            }
-            return { ...fsm, sharedVariables: [...fsm.sharedVariables, variable] };
-        });
-        return result || state;
-    }),
-
-    removeVariable: (isLocal, name) => set((state) => {
-        const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            if (isLocal) {
-                return { ...fsm, localVariables: fsm.localVariables.filter(v => v.name !== name) };
-            }
-            return { ...fsm, sharedVariables: fsm.sharedVariables.filter(v => v.name !== name) };
-        });
-        return result || state;
-    }),
-
-    updateVariable: (isLocal, name, updates) => set((state) => {
-        const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
-            if (isLocal) {
                 return {
                     ...fsm,
-                    localVariables: fsm.localVariables.map(v => v.name === name ? { ...v, ...updates } : v),
+                    machines: new Map([...fsm.machines, [machine.id, newMachine]]),
                 };
-            }
-            return {
-                ...fsm,
-                sharedVariables: fsm.sharedVariables.map(v => v.name === name ? { ...v, ...updates } : v),
-            };
+            });
+            return result || state;
         });
-        return result || state;
-    }),
+    },
+
+    // Transition actions
+    addTransition: (fromStateId, toStateId, conditions = []) => {
+        if (useDebugStore.getState().isConnected) return;
+        set((state) => {
+            const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
+                // All transitions are stored in the root machine (global storage)
+                const rootMachine = fsm.machines.get(fsm.rootMachineId);
+                if (!rootMachine) return fsm;
+
+                const trans = createFSMTransition(fromStateId, toStateId, conditions);
+                const newRootMachine: FSMMachine = {
+                    ...rootMachine,
+                    transitions: [...rootMachine.transitions, trans],
+                };
+
+                return {
+                    ...fsm,
+                    machines: new Map([...fsm.machines, [fsm.rootMachineId, newRootMachine]]),
+                };
+            });
+            return result || state;
+        });
+    },
+
+    removeTransition: (transitionId) => {
+        if (useDebugStore.getState().isConnected) return;
+        set((state) => {
+            const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
+                let targetMachineId = '';
+                for (const [mId, m] of fsm.machines) {
+                    if (m.transitions.some(t => t.id === transitionId)) {
+                        targetMachineId = mId;
+                        break;
+                    }
+                }
+
+                if (!targetMachineId) return fsm;
+                const machine = fsm.machines.get(targetMachineId);
+                if (!machine) return fsm;
+
+                const newMachine: FSMMachine = {
+                    ...machine,
+                    transitions: machine.transitions.filter(t => t.id !== transitionId),
+                };
+
+                return {
+                    ...fsm,
+                    machines: new Map([...fsm.machines, [machine.id, newMachine]]),
+                };
+            });
+            return result || state;
+        });
+    },
+
+    addConditionToTransition: (transitionId, condition) => {
+        if (useDebugStore.getState().isConnected) return;
+        set((state) => {
+            const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
+                // All transitions are in root machine
+                const rootMachine = fsm.machines.get(fsm.rootMachineId);
+                if (!rootMachine) return fsm;
+
+                const newTransitions = rootMachine.transitions.map(t =>
+                    t.id === transitionId
+                        ? { ...t, conditions: [...t.conditions, condition] }
+                        : t
+                );
+
+                const newMachine: FSMMachine = { ...rootMachine, transitions: newTransitions };
+
+                return {
+                    ...fsm,
+                    machines: new Map([...fsm.machines, [fsm.rootMachineId, newMachine]]),
+                };
+            });
+            return result || state;
+        });
+    },
+
+    removeConditionFromTransition: (transitionId, condition) => {
+        if (useDebugStore.getState().isConnected) return;
+        set((state) => {
+            const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
+                // All transitions are in root machine
+                const rootMachine = fsm.machines.get(fsm.rootMachineId);
+                if (!rootMachine) return fsm;
+
+                const newTransitions = rootMachine.transitions.map(t =>
+                    t.id === transitionId
+                        ? { ...t, conditions: t.conditions.filter(c => c !== condition) }
+                        : t
+                );
+
+                const newMachine: FSMMachine = { ...rootMachine, transitions: newTransitions };
+
+                return {
+                    ...fsm,
+                    machines: new Map([...fsm.machines, [fsm.rootMachineId, newMachine]]),
+                };
+            });
+            return result || state;
+        });
+    },
+
+    // Variable actions
+    addVariable: (isLocal, variable) => {
+        if (useDebugStore.getState().isConnected) return;
+        set((state) => {
+            const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
+                if (isLocal) {
+                    return { ...fsm, localVariables: [...fsm.localVariables, variable] };
+                }
+                return { ...fsm, sharedVariables: [...fsm.sharedVariables, variable] };
+            });
+            return result || state;
+        });
+    },
+
+    removeVariable: (isLocal, name) => {
+        if (useDebugStore.getState().isConnected) return;
+        set((state) => {
+            const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
+                if (isLocal) {
+                    return { ...fsm, localVariables: fsm.localVariables.filter(v => v.name !== name) };
+                }
+                return { ...fsm, sharedVariables: fsm.sharedVariables.filter(v => v.name !== name) };
+            });
+            return result || state;
+        });
+    },
+
+    updateVariable: (isLocal, name, updates) => {
+        if (useDebugStore.getState().isConnected) return;
+        set((state) => {
+            const result = updateFSMFile(state.openedFSMFiles, state.activeFSMPath, (fsm) => {
+                if (isLocal) {
+                    return {
+                        ...fsm,
+                        localVariables: fsm.localVariables.map(v => v.name === name ? { ...v, ...updates } : v),
+                    };
+                }
+                return {
+                    ...fsm,
+                    sharedVariables: fsm.sharedVariables.map(v => v.name === name ? { ...v, ...updates } : v),
+                };
+            });
+            return result || state;
+        });
+    },
 
     // Navigation
     navigateToMachine: (machineId) => set((state) => {
@@ -551,6 +585,46 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
 
         const runtimeContent = serializeFSMForRuntime(file.fsm);
         const runtimePath = `${runtimeTreeDir}/${activeFSMPath}`;
+
+        // Cleanup node meta for states that no longer exist
+        const allStateIds: string[] = [];
+        file.fsm.machines.forEach(machine => {
+            machine.states.forEach(state => {
+                if (state.uid) allStateIds.push(state.uid.toString()); // Use UID if available for debugging mapping
+                if (state.id) allStateIds.push(state.id);
+            });
+        });
+        // Note: FSM meta might be keyed by UID or ID depending on usage. 
+        // DebugStore uses UID for runtime mapping, but EditorMetaStore might use ID for folding?
+        // Let's check SetNodeBreakpoint: it uses `nodeId`. 
+        // In FSM, `nodeId` is usually the string ID (e.g. "StateParameters_1").
+        // But DebugStore uses UID (integer).
+        // Let's assume ID for now as that's what `editorMetaStore` generally expects from `tree.nodes`.
+
+        // Actually, let's collect BOTH just in case, or check how setNodeBreakpoint is called in FSM context.
+        // FSMStateNode uses `state.uid` for debug state.
+        // But what about Breakpoints?
+        // useDebugStore.getBreakpoint(activeFilePath, treeNode.uid) -> checks meta.
+        // So meta is keyed by UID for FSM?
+        // editorMetaStore.setNodeBreakpoint(filePath, nodeId, type).
+        // debugStore syncs breakpoints using `meta.nodes`.
+
+        // In `editorMetaStore.ts`, keys are just strings.
+        // If FSM uses UIDs as keys in meta, then we need to pass UIDs.
+        // Let's check `FSMStateNode.tsx`.
+
+        // ... I'll fetch valid IDs from both ID and UID to be safe, or just collect all existing keys from machines.
+        const validIds = new Set<string>();
+        file.fsm.machines.forEach(m => {
+            m.states.forEach(s => {
+                validIds.add(s.id);
+                if (s.uid) validIds.add(s.uid.toString());
+            });
+        });
+
+        const { useEditorMetaStore } = await import('./editorMetaStore');
+        useEditorMetaStore.getState().cleanNodeMeta(activeFSMPath, Array.from(validIds));
+
 
         try {
             await writeFile(fullPath, content);

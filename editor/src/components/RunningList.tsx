@@ -77,7 +77,7 @@ export const RunningList = () => {
                 >
                     <div className="w-2 h-2 rounded-full bg-pink-500 animate-pulse shadow-[0_0_8px_rgba(236,72,153,0.6)]" />
                     <span className="text-xs font-semibold text-gray-200">
-                        Running ({fileNames.length})
+                        Debug List ({fileNames.length})
                     </span>
                     <span className="text-[10px] text-gray-400 ml-1">
                         {isOpen ? '▼' : '▶'}
@@ -107,8 +107,52 @@ function RunningListItem({ fileName, onClick }: any) {
     const [visualState, setVisualState] = useState<{ color: string } | null>(null);
 
     const fileRunState = isConnected ? getFileRunState(fileName) : undefined;
+
     const treeInfo = isConnected ? treeRunInfos.get(fileName) : undefined;
-    const rootFinal = treeInfo?.nodeStates.get(1)?.final;
+
+    // Check FSM info if tree info is missing (or fuzzy match)
+    // Note: fileName in RunningList is usually path-like, but could be basename depending on how it was added.
+    // runningFiles keys are usually relative paths.
+    // fsmRunInfo.fsmName is also relative path.
+    const fsmInfo = isConnected ? useDebugStore.getState().fsmRunInfo : undefined;
+
+    let rootFinal: number | undefined;
+
+    if (treeInfo) {
+        rootFinal = treeInfo.nodeStates.get(1)?.final;
+    }
+
+    // Fallback: Check FSM info if tree info yield nothing (or if it's actually the FSM file)
+    if (rootFinal === undefined && fsmInfo) {
+        // Fuzzy match for FSM name
+        // fileName might be "StateMachine/SimpleFSM"
+        // fsmInfo.fsmName might be "SimpleFSM" or "StateMachine\SimpleFSM"
+        const normalize = (s: string) => s.replace(/\\/g, '/').replace(/\.(fsm|tree)$/, '');
+        const fName = normalize(fileName);
+        const fsmName = normalize(fsmInfo.fsmName);
+
+        // Match if identical or one ends with the other
+        const isMatch = fName === fsmName || fName.endsWith('/' + fsmName) || fsmName.endsWith('/' + fName);
+
+        if (isMatch) {
+            let hasBreak = false;
+            let hasRunning = false;
+            let hasFailure = false;
+            let hasSuccess = false;
+
+            for (const state of fsmInfo.stateInfos.values()) {
+                if (state === NodeState.Break) { hasBreak = true; break; }
+                if (state === NodeState.Running) hasRunning = true;
+                if (state === NodeState.Failure) hasFailure = true;
+                if (state === NodeState.Success) hasSuccess = true;
+            }
+
+            if (hasBreak) rootFinal = NodeState.Break;
+            else if (hasRunning) rootFinal = NodeState.Running;
+            else if (hasFailure) rootFinal = NodeState.Failure;
+            else if (hasSuccess) rootFinal = NodeState.Success;
+        }
+    }
 
     useEffect(() => {
         if (!isConnected) {
@@ -129,6 +173,7 @@ function RunningListItem({ fileName, onClick }: any) {
             if (rootFinal === NodeState.Success) { nextColor = DEBUG_COLORS.SUCCESS; isTransient = true; }
             else if (rootFinal === NodeState.Failure) { nextColor = DEBUG_COLORS.FAILURE; isTransient = true; }
             else if (rootFinal === NodeState.Break) { nextColor = DEBUG_COLORS.BREAK; isTransient = false; }
+            else if (rootFinal === NodeState.Running) { nextColor = DEBUG_COLORS.RUNNING; isTransient = true; }
         }
 
         if (nextColor) {

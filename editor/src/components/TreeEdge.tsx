@@ -1,5 +1,9 @@
 import { memo } from 'react';
 import { BaseEdge, type EdgeProps, type Edge, useStore, EdgeLabelRenderer } from '@xyflow/react';
+import { useEditorStore } from '../stores/editorStore';
+import { useDebugStore } from '../stores/debugStore';
+import { useShallow } from 'zustand/react/shallow';
+import { NodeState } from '../types/debug';
 
 export interface TreeEdgeData extends Record<string, unknown> {
   siblingTargetIds?: string[];  // 兄弟边的目标节点 ID 列表
@@ -20,6 +24,7 @@ function TreeEdge({
   sourceY,
   targetX,
   targetY,
+  target,
   style,
   markerEnd,
   data,
@@ -59,6 +64,43 @@ function TreeEdge({
     );
   });
 
+  // Debug state integration
+  const activeFilePath = useEditorStore((s) => s.activeFilePath);
+  const fileName = activeFilePath?.split(/[\\/]/).pop()?.replace(/\.tree$/, '') || '';
+
+  // Use target node's ID (Child) to get its debug state, representing the flow into/result of that child
+  const { debugState, isPaused } = useDebugStore(
+    useShallow(s => {
+      if (!s.isConnected || !target) return { debugState: NodeState.Invalid, isPaused: false };
+
+      const currentTree = useEditorStore.getState().getCurrentTree();
+      const node = currentTree?.nodes.get(target);
+
+      if (!node || node.uid === undefined) return { debugState: NodeState.Invalid, isPaused: s.isPaused };
+
+      const state = s.getNodeRunState(fileName, node.uid);
+
+      return {
+        debugState: state ? state.final : NodeState.Invalid,
+        isPaused: s.isPaused,
+      };
+    })
+  );
+
+  const getEdgeColor = (state: NodeState) => {
+    switch (state) {
+      case NodeState.Success: return '#22c55e'; // Green
+      case NodeState.Failure: return '#3b82f6'; // Blue
+      case NodeState.Running: return '#ec4899'; // Pink
+      // Break usually doesn't apply to edge flux, but if needed:
+      case NodeState.Break: return '#ef4444';
+      default: return selected ? '#fff' : '#6b7280';
+    }
+  };
+
+  const edgeColor = (debugState !== NodeState.Invalid) ? getEdgeColor(debugState) : (selected ? '#fff' : '#6b7280');
+  const edgeWidth = (selected || debugState !== NodeState.Invalid) ? 3 : 2;
+
   // 绘制路径：直接从连接器位置（sourceX, sourceY）出发
   // 垂直下降到水平线，然后水平移动到目标 X，再垂直下降到目标
   const path = `M ${sourceX} ${sourceY} L ${sourceX} ${horizontalY} L ${targetX} ${horizontalY} L ${targetX} ${targetY}`;
@@ -70,8 +112,10 @@ function TreeEdge({
         path={path}
         style={{
           ...style,
-          stroke: selected ? '#fff' : '#6b7280',
-          strokeWidth: selected ? 3 : 2
+          stroke: edgeColor,
+          strokeWidth: edgeWidth,
+          transition: 'stroke 0.2s, stroke-width 0.2s',
+          opacity: (debugState !== NodeState.Invalid && isPaused) ? 0.6 : 1
         }}
         markerEnd={markerEnd}
       />
@@ -92,7 +136,7 @@ function TreeEdge({
               maxWidth: '120px',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              border: '1px solid #4b5563',
+              border: `1px solid ${edgeColor !== '#6b7280' && edgeColor !== '#fff' ? edgeColor : '#4b5563'}`,
             }}
           >
             {label}

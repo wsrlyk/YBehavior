@@ -43,6 +43,11 @@ interface EditorMetaState {
     setDebugPort: (port: number) => void;
     setNodeBreakpoint: (filePath: string, nodeId: string, type: number) => void;
     getTreeMeta: (filePath: string) => TreeMeta | undefined;
+
+    // Cleanup
+    cleanNodeMeta: (filePath: string, validNodeIds: string[]) => void;
+    cleanOrphanedMeta: (existingFiles: string[]) => void;
+
     loadAllMeta: () => Promise<void>;
     saveAllMeta: () => Promise<void>;
 }
@@ -158,6 +163,51 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
 
     getTreeMeta: (filePath) => {
         return get().treeMetas[filePath];
+    },
+
+    cleanNodeMeta: (filePath, validNodeIds) => {
+        set((state) => {
+            const treeMeta = state.treeMetas[filePath];
+            if (!treeMeta) return state;
+
+            const validSet = new Set(validNodeIds);
+            const currentNodes = treeMeta.nodes;
+            const metaNodeIds = Object.keys(currentNodes);
+
+            // Check if we need to remove anything
+            const toRemove = metaNodeIds.filter(id => !validSet.has(id));
+            if (toRemove.length === 0) return state;
+
+            const newNodes = { ...currentNodes };
+            toRemove.forEach(id => delete newNodes[id]);
+
+            return {
+                treeMetas: {
+                    ...state.treeMetas,
+                    [filePath]: {
+                        ...treeMeta,
+                        nodes: newNodes
+                    }
+                }
+            };
+        });
+        get().saveAllMeta();
+    },
+
+    cleanOrphanedMeta: (existingFiles) => {
+        set((state) => {
+            const metaFiles = Object.keys(state.treeMetas);
+            const validFilesSet = new Set(existingFiles);
+
+            const toRemove = metaFiles.filter(f => !validFilesSet.has(f));
+            if (toRemove.length === 0) return state;
+
+            const newTreeMetas = { ...state.treeMetas };
+            toRemove.forEach(f => delete newTreeMetas[f]);
+
+            return { treeMetas: newTreeMetas };
+        });
+        get().saveAllMeta();
     },
 
     loadAllMeta: async () => {

@@ -4,7 +4,8 @@ import type { TreeNode, Pin } from '../types';
 import type { NodeDefinition } from '../types/nodeDefinition';
 import { useTooltipStore } from '../stores/tooltipStore';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
-import { useDebugStore, NodeState } from '../stores/debugStore';
+import { NodeState, BreakpointType } from '../types/debug';
+import { useDebugStore } from '../stores/debugStore';
 import { useEditorStore } from '../stores/editorStore';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -101,15 +102,23 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
     return activeFilePath.split(/[\\/]/).pop()?.replace(/\.tree$/, '') || '';
   }, [activeFilePath]);
 
-  const { debugState, isPaused, keyframe } = useDebugStore(
+  const { debugState, isPaused, keyframe, bpType } = useDebugStore(
     useShallow(s => {
       const state = s.isConnected && treeNode.uid !== undefined
-        ? s.getNodeState(fileName, treeNode.uid)
-        : NodeState.Invalid;
+        ? s.getNodeRunState(fileName, treeNode.uid)
+        : undefined;
+
+      const debugState = state ? state.self : NodeState.Invalid;
+
+      const bp = activeFilePath && treeNode.uid !== undefined
+        ? s.getBreakpoint(activeFilePath, treeNode.uid)
+        : BreakpointType.None;
+
       return {
-        debugState: state,
+        debugState,
         isPaused: s.isPaused,
-        keyframe: s.keyframe
+        keyframe: s.keyframe,
+        bpType: bp
       };
     })
   );
@@ -135,6 +144,11 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
         <div className={`absolute -top-4 left-0 px-2 py-0.5 rounded-t-sm text-[8px] font-bold text-white uppercase tracking-tighter ${returnTypeColors[returnType]}`}>
           {returnType}
         </div>
+      )}
+
+      {/* Breakpoint/Logpoint Indicator */}
+      {bpType !== BreakpointType.None && (
+        <div className={`absolute top-1 right-1 w-4 h-4 rounded-full z-[60] shadow-sm ${bpType === BreakpointType.Breakpoint ? 'bg-red-600' : 'bg-purple-600'}`} />
       )}
 
       {treeNode.comment && (

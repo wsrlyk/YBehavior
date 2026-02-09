@@ -170,7 +170,7 @@ export function DebugToolbar() {
                         title="连接到运行时"
                     >
                         <ConnectIcon />
-                        <span>{isConnecting ? '连接中...' : '连接'}</span>
+                        <span>{isConnecting ? 'Connecting...' : 'Connect'}</span>
                     </button>
                 </>
             ) : (
@@ -178,7 +178,7 @@ export function DebugToolbar() {
                 <>
                     <div className="flex items-center gap-1 text-green-400">
                         <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                        <span>已连接</span>
+                        <span>Connected</span>
                     </div>
 
                     <div className="w-px h-4 bg-gray-600 mx-1"></div>
@@ -205,7 +205,7 @@ export function DebugToolbar() {
                             className="w-3 h-3"
                             disabled={isDebugging}
                         />
-                        <span>等待初始化</span>
+                        <span>Wait Init</span>
                     </label>
 
                     {/* Start debug button */}
@@ -220,7 +220,7 @@ export function DebugToolbar() {
                         title="开始调试当前文件"
                     >
                         <PlayIcon />
-                        <span>调试</span>
+                        <span>Debug</span>
                     </button>
 
                     <div className="w-px h-4 bg-gray-600 mx-1"></div>
@@ -237,7 +237,7 @@ export function DebugToolbar() {
                         title="继续执行 (F5)"
                     >
                         <ContinueIcon />
-                        <span>继续</span>
+                        <span>Continue</span>
                     </button>
 
                     <button
@@ -251,7 +251,7 @@ export function DebugToolbar() {
                         title="单步跳过 (F10)"
                     >
                         <StepOverIcon />
-                        <span>F10</span>
+                        <span>Step Over</span>
                     </button>
 
                     <button
@@ -265,13 +265,13 @@ export function DebugToolbar() {
                         title="单步进入 (F11)"
                     >
                         <StepIntoIcon />
-                        <span>F11</span>
+                        <span>Step Into</span>
                     </button>
 
                     {/* Paused indicator */}
                     {isPaused && (
                         <span className="px-2 py-0.5 bg-red-600 text-white text-xs rounded animate-pulse">
-                            已暂停
+                            Paused
                         </span>
                     )}
 
@@ -284,7 +284,7 @@ export function DebugToolbar() {
                         title="断开连接"
                     >
                         <DisconnectIcon />
-                        <span>断开</span>
+                        <span>Disconnect</span>
                     </button>
                 </>
             )}

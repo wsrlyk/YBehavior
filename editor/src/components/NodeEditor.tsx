@@ -507,10 +507,8 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
           if (!typeMatch || !countMatch) {
             const { useNotificationStore } = await import('../stores/notificationStore');
-            const { logger } = await import('../utils/logger');
             const errorMsg = `Connection failed: Type mismatch (${fromPin.valueType}${fromPin.countType === 'list' ? '[]' : ''} vs ${toPin.valueType}${toPin.countType === 'list' ? '[]' : ''})`;
             useNotificationStore.getState().notify(errorMsg, 'error');
-            logger.error(errorMsg);
             return;
           }
 
@@ -529,10 +527,8 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
           if (isEffectivelyDisabled(params.source!, currentTree!) !== isEffectivelyDisabled(params.target!, currentTree!)) {
             const { useNotificationStore } = await import('../stores/notificationStore');
-            const { logger } = await import('../utils/logger');
             const errorMsg = `Connection failed: Cannot connect enabled node with disabled node`;
             useNotificationStore.getState().notify(errorMsg, 'error');
-            logger.error(errorMsg);
             return;
           }
 
@@ -549,10 +545,8 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
           if (getNodeRootId(params.source!, currentTree!) !== getNodeRootId(params.target!, currentTree!)) {
             const { useNotificationStore } = await import('../stores/notificationStore');
-            const { logger } = await import('../utils/logger');
             const errorMsg = `Connection failed: Nodes must be in the same tree`;
             useNotificationStore.getState().notify(errorMsg, 'error');
-            logger.error(errorMsg);
             return;
           }
         }

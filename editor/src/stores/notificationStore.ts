@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { logger } from '../utils/logger';
 
 export type NotificationType = 'info' | 'error' | 'success' | 'warning';
 
@@ -17,6 +18,17 @@ interface NotificationState {
 export const useNotificationStore = create<NotificationState>((set) => ({
     notifications: [],
     notify: (message, type = 'info') => {
+        // Log to logger automatically
+        if (type === 'error') {
+            logger.error(message);
+        } else if (type === 'warning') {
+            logger.warn(message);
+        } else if (type === 'success') {
+            logger.success(message);
+        } else {
+            logger.info(message);
+        }
+
         const id = Date.now().toString();
         set((state) => ({
             notifications: [...state.notifications, { id, message, type }],

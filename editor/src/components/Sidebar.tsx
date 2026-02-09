@@ -84,7 +84,41 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
   // Compute current data state
   const fileRunState = isConnected ? getFileRunState(name) : undefined;
   const treeInfo = isConnected ? treeRunInfos.get(name) : undefined;
-  const rootFinal = treeInfo?.nodeStates.get(1)?.final;
+  const fsmInfo = isConnected && file.isFSM ? useDebugStore.getState().fsmRunInfo : undefined;
+
+  // Resolve root/final state
+  let rootFinal: number | undefined;
+  if (file.isFSM) {
+    if (fsmInfo) {
+      const normalize = (s: string) => s.replace(/\\/g, '/').replace(/\.(fsm|tree)$/, '');
+      const fName = normalize(file.name);
+      const fsmName = normalize(fsmInfo.fsmName);
+
+      // Match if identical or one ends with the other
+      const isMatch = fName === fsmName || fName.endsWith('/' + fsmName) || fsmName.endsWith('/' + fName);
+
+      if (isMatch) {
+        let hasBreak = false;
+        let hasRunning = false;
+        let hasFailure = false;
+        let hasSuccess = false;
+
+        for (const state of fsmInfo.stateInfos.values()) {
+          if (state === NodeState.Break) { hasBreak = true; break; }
+          if (state === NodeState.Running) hasRunning = true;
+          if (state === NodeState.Failure) hasFailure = true;
+          if (state === NodeState.Success) hasSuccess = true;
+        }
+
+        if (hasBreak) rootFinal = NodeState.Break;
+        else if (hasRunning) rootFinal = NodeState.Running;
+        else if (hasFailure) rootFinal = NodeState.Failure;
+        else if (hasSuccess) rootFinal = NodeState.Success;
+      }
+    }
+  } else {
+    rootFinal = treeInfo?.nodeStates.get(1)?.final;
+  }
 
   useEffect(() => {
     if (!isConnected) {
@@ -95,21 +129,22 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
     let nextColor: string | null = null;
     let isTransient = false;
 
-    // Priority 1: Break (Persistent)
+    // Priority 1: Break (Persistent) from fileRunState (if matched)
     if (fileRunState === NodeState.Break) {
       nextColor = DEBUG_COLORS.BREAK;
       isTransient = false;
     }
-    // Priority 2: Running (Transient)
+    // Priority 2: Running (Transient) from fileRunState
     else if (fileRunState === NodeState.Running) {
       nextColor = DEBUG_COLORS.RUNNING;
       isTransient = true;
     }
-    // Priority 3: Tree Result (Success/Failure)
+    // Priority 3: Derived Result (Success/Failure/Break/Running from scan)
     else if (rootFinal !== undefined) {
       if (rootFinal === NodeState.Success) { nextColor = DEBUG_COLORS.SUCCESS; isTransient = true; }
       else if (rootFinal === NodeState.Failure) { nextColor = DEBUG_COLORS.FAILURE; isTransient = true; }
       else if (rootFinal === NodeState.Break) { nextColor = DEBUG_COLORS.BREAK; isTransient = false; }
+      else if (rootFinal === NodeState.Running) { nextColor = DEBUG_COLORS.RUNNING; isTransient = true; }
     }
 
     if (nextColor) {
@@ -124,7 +159,7 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
     } else {
       setVisualState(null);
     }
-  }, [isConnected, fileRunState, rootFinal, keyframe]);
+  }, [isConnected, fileRunState, rootFinal, keyframe, file.isFSM]);
 
   return (
     <div

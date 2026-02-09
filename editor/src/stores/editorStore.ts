@@ -14,6 +14,7 @@ import {
   recalculateUIDs,
   updateOpenedFileTree
 } from './editorStoreCore';
+import { useDebugStore } from './debugStore';
 
 // Re-export for backward compatibility
 export { getDescendantIds } from './editorStoreCore';
@@ -138,6 +139,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         treeFiles: files,
         isLoading: false,
       });
+
+      // Cleanup orphaned meta files
+      useEditorMetaStore.getState().cleanOrphanedMeta(files);
     } catch (e) {
       set({ error: String(e), isLoading: false });
     }
@@ -259,114 +263,126 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   clearSelection: () => set({ selectedNodeIds: [] }),
 
-  updateNodePosition: (nodeId, x, y) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      const node = tree.nodes.get(nodeId);
-      if (!node) return tree;
+  updateNodePosition: (nodeId, x, y) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        const node = tree.nodes.get(nodeId);
+        if (!node) return tree;
 
-      const newNodes = new Map(tree.nodes);
-      newNodes.set(nodeId, { ...node, position: { x, y } });
-      return { ...tree, nodes: newNodes };
-    }, { skipHistory: true, skipUID: true }); // 拖拽中跳过历史和 UID 计算
+        const newNodes = new Map(tree.nodes);
+        newNodes.set(nodeId, { ...node, position: { x, y } });
+        return { ...tree, nodes: newNodes };
+      }, { skipHistory: true, skipUID: true }); // 拖拽中跳过历史和 UID 计算
 
-    return result || state;
-  }),
-
-  updateNodesPositions: (updates) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      const newNodes = new Map(tree.nodes);
-      let changed = false;
-      updates.forEach(({ id, x, y }) => {
-        const node = tree.nodes.get(id);
-        if (node) {
-          newNodes.set(id, { ...node, position: { x, y } });
-          changed = true;
-        }
-      });
-      return changed ? { ...tree, nodes: newNodes } : tree;
-    }, { skipHistory: true, skipUID: true });
-
-    return result || state;
-  }),
-
-  addNode: (node) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      const newNodes = new Map(tree.nodes);
-      newNodes.set(node.id, node);
-      return { ...tree, nodes: newNodes };
+      return result || state;
     });
+  },
 
-    return result || state;
-  }),
-
-  removeElements: (nodeIds, connectionIds, dataConnectionIds) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      let nodesToActuallyRemove: string[] = [];
-      let newNodes = new Map(tree.nodes);
-
-      // 1. Process nodes
-      if (nodeIds.length > 0) {
-        nodeIds.forEach(id => {
+  updateNodesPositions: (updates) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        const newNodes = new Map(tree.nodes);
+        let changed = false;
+        updates.forEach(({ id, x, y }) => {
           const node = tree.nodes.get(id);
-          if (node && node.type !== 'Root') {
-            newNodes.delete(id);
-            nodesToActuallyRemove.push(id);
+          if (node) {
+            newNodes.set(id, { ...node, position: { x, y } });
+            changed = true;
           }
         });
-      }
+        return changed ? { ...tree, nodes: newNodes } : tree;
+      }, { skipHistory: true, skipUID: true });
 
-      const actualNodeIdsToRemove = new Set(nodesToActuallyRemove);
-      const connIdsToRemove = new Set(connectionIds);
-      const dataConnIdsToRemove = new Set(dataConnectionIds);
-
-      // 2. Filter connections
-      const parentNodeIdsToRefresh = new Set<string>();
-      const newConnections = tree.connections.filter((c) => {
-        // Remove if connection itself is in connectionIds OR if either end node is being removed
-        const shouldRemove = connIdsToRemove.has(c.id) ||
-          actualNodeIdsToRemove.has(c.parentNodeId) ||
-          actualNodeIdsToRemove.has(c.childNodeId);
-        if (shouldRemove) {
-          parentNodeIdsToRefresh.add(c.parentNodeId);
-          return false;
-        }
-        return true;
-      });
-
-      // 3. Filter data connections
-      const newDataConnections = tree.dataConnections.filter((dc) => {
-        return !dataConnIdsToRemove.has(dc.id) &&
-          !actualNodeIdsToRemove.has(dc.fromNodeId) &&
-          !actualNodeIdsToRemove.has(dc.toNodeId);
-      });
-
-      // Check for changes
-      const hasNodeChanges = nodesToActuallyRemove.length > 0;
-      const hasConnChanges = newConnections.length !== tree.connections.length;
-      const hasDataConnChanges = newDataConnections.length !== tree.dataConnections.length;
-
-      if (!hasNodeChanges && !hasConnChanges && !hasDataConnChanges) {
-        return tree;
-      }
-
-      const newTree = {
-        ...tree,
-        nodes: newNodes,
-        connections: newConnections,
-        dataConnections: newDataConnections
-      };
-
-      return applyLabelUpdatesToTree(newTree, Array.from(parentNodeIdsToRefresh));
+      return result || state;
     });
+  },
 
-    if (!result) return state;
+  addNode: (node) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        const newNodes = new Map(tree.nodes);
+        newNodes.set(node.id, node);
+        return { ...tree, nodes: newNodes };
+      });
 
-    const remainingSelected = state.selectedNodeIds.filter(id => !nodeIds.includes(id));
-    return {
-      ...result,
-      selectedNodeIds: remainingSelected,
-    };
-  }),
+      return result || state;
+    });
+  },
+
+  removeElements: (nodeIds, connectionIds, dataConnectionIds) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        let nodesToActuallyRemove: string[] = [];
+        let newNodes = new Map(tree.nodes);
+
+        // 1. Process nodes
+        if (nodeIds.length > 0) {
+          nodeIds.forEach(id => {
+            const node = tree.nodes.get(id);
+            if (node && node.type !== 'Root') {
+              newNodes.delete(id);
+              nodesToActuallyRemove.push(id);
+            }
+          });
+        }
+
+        const actualNodeIdsToRemove = new Set(nodesToActuallyRemove);
+        const connIdsToRemove = new Set(connectionIds);
+        const dataConnIdsToRemove = new Set(dataConnectionIds);
+
+        // 2. Filter connections
+        const parentNodeIdsToRefresh = new Set<string>();
+        const newConnections = tree.connections.filter((c) => {
+          // Remove if connection itself is in connectionIds OR if either end node is being removed
+          const shouldRemove = connIdsToRemove.has(c.id) ||
+            actualNodeIdsToRemove.has(c.parentNodeId) ||
+            actualNodeIdsToRemove.has(c.childNodeId);
+          if (shouldRemove) {
+            parentNodeIdsToRefresh.add(c.parentNodeId);
+            return false;
+          }
+          return true;
+        });
+
+        // 3. Filter data connections
+        const newDataConnections = tree.dataConnections.filter((dc) => {
+          return !dataConnIdsToRemove.has(dc.id) &&
+            !actualNodeIdsToRemove.has(dc.fromNodeId) &&
+            !actualNodeIdsToRemove.has(dc.toNodeId);
+        });
+
+        // Check for changes
+        const hasNodeChanges = nodesToActuallyRemove.length > 0;
+        const hasConnChanges = newConnections.length !== tree.connections.length;
+        const hasDataConnChanges = newDataConnections.length !== tree.dataConnections.length;
+
+        if (!hasNodeChanges && !hasConnChanges && !hasDataConnChanges) {
+          return tree;
+        }
+
+        const newTree = {
+          ...tree,
+          nodes: newNodes,
+          connections: newConnections,
+          dataConnections: newDataConnections
+        };
+
+        return applyLabelUpdatesToTree(newTree, Array.from(parentNodeIdsToRefresh));
+      });
+
+      if (!result) return state;
+
+      const remainingSelected = state.selectedNodeIds.filter(id => !nodeIds.includes(id));
+      return {
+        ...result,
+        selectedNodeIds: remainingSelected,
+      };
+    });
+  },
 
   removeNode: (nodeId) => get().removeElements([nodeId], [], []),
 
@@ -376,168 +392,191 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   removeDataConnections: (dataConnIds) => get().removeElements([], [], dataConnIds),
 
-  updateNodeProperty: (nodeId, updates) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      const node = tree.nodes.get(nodeId);
-      if (!node) return tree;
+  updateNodeProperty: (nodeId, updates) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        const node = tree.nodes.get(nodeId);
+        if (!node) return tree;
 
-      const newNodes = new Map(tree.nodes);
-      newNodes.set(nodeId, { ...node, ...updates });
-      return { ...tree, nodes: newNodes };
+        const newNodes = new Map(tree.nodes);
+        newNodes.set(nodeId, { ...node, ...updates });
+        return { ...tree, nodes: newNodes };
+      });
+
+      return result || state;
     });
+  },
 
-    return result || state;
-  }),
+  addConnection: (connection) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        const newTreeWithConn = {
+          ...tree,
+          connections: [...tree.connections, connection],
+        };
 
-  addConnection: (connection) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      const newTreeWithConn = {
-        ...tree,
-        connections: [...tree.connections, connection],
-      };
+        const newTreeAfterLabelUpdate = applyLabelUpdatesToTree(newTreeWithConn, [connection.parentNodeId]);
+        return newTreeAfterLabelUpdate;
+      });
 
-      const newTreeAfterLabelUpdate = applyLabelUpdatesToTree(newTreeWithConn, [connection.parentNodeId]);
-      return newTreeAfterLabelUpdate;
+      return result || state;
     });
-
-    return result || state;
-  }),
+  },
 
   removeConnection: (connectionId) => get().removeConnections([connectionId]),
 
-  addDataConnection: (dataConn) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      // 辅助函数：检查节点是否被任何祖先禁用
-      const isEffectivelyDisabled = (nodeId: string): boolean => {
-        let current = nodeId;
-        while (current) {
-          const n = tree.nodes.get(current);
-          if (n?.disabled) return true;
-          const parentConn = tree.connections.find(c => c.childNodeId === current);
-          if (!parentConn) break;
-          current = parentConn.parentNodeId;
+  addDataConnection: (dataConn) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        // 辅助函数：检查节点是否被任何祖先禁用
+        const isEffectivelyDisabled = (nodeId: string): boolean => {
+          let current = nodeId;
+          while (current) {
+            const n = tree.nodes.get(current);
+            if (n?.disabled) return true;
+            const parentConn = tree.connections.find(c => c.childNodeId === current);
+            if (!parentConn) break;
+            current = parentConn.parentNodeId;
+          }
+          return false;
+        };
+
+        const fromDisabled = isEffectivelyDisabled(dataConn.fromNodeId);
+        const toDisabled = isEffectivelyDisabled(dataConn.toNodeId);
+
+        if (fromDisabled !== toDisabled) {
+          useNotificationStore.getState().notify('Cannot connect enabled node with disabled node', 'error');
+          return tree;
         }
-        return false;
-      };
 
-      const fromDisabled = isEffectivelyDisabled(dataConn.fromNodeId);
-      const toDisabled = isEffectivelyDisabled(dataConn.toNodeId);
+        return {
+          ...tree,
+          dataConnections: [...tree.dataConnections, dataConn],
+        };
+      });
 
-      if (fromDisabled !== toDisabled) {
-        useNotificationStore.getState().notify('Cannot connect enabled node with disabled node', 'error');
-        return tree;
-      }
-
-      return {
-        ...tree,
-        dataConnections: [...tree.dataConnections, dataConn],
-      };
+      return result || state;
     });
-
-    return result || state;
-  }),
+  },
 
   removeDataConnection: (dataConnId) => get().removeDataConnections([dataConnId]),
 
-  duplicateSelectedNodes: () => set((state) => {
-    if (!state.selectedNodeIds.length || !state.activeFilePath) return state;
+  duplicateSelectedNodes: () => {
+    // Duplication involves adding nodes/connections, so we should guard it.
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      if (!state.selectedNodeIds.length || !state.activeFilePath) return state;
 
-    let newDuplicatedIds: string[] = [];
+      let newDuplicatedIds: string[] = [];
 
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      const selectedIds = new Set(state.selectedNodeIds);
-      const nodesToDuplicate = Array.from(selectedIds)
-        .map(id => tree.nodes.get(id))
-        .filter((node): node is TreeNode => !!node && node.type !== 'Root');
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        const selectedIds = new Set(state.selectedNodeIds);
+        const nodesToDuplicate = Array.from(selectedIds)
+          .map(id => tree.nodes.get(id))
+          .filter((node): node is TreeNode => !!node && node.type !== 'Root');
 
-      if (nodesToDuplicate.length === 0) return tree;
+        if (nodesToDuplicate.length === 0) return tree;
 
-      const timestamp = Date.now();
-      const oldToNewIdMap = new Map<string, string>();
-      const newNodes = new Map(tree.nodes);
-      const duplicatedIds: string[] = [];
+        const timestamp = Date.now();
+        const oldToNewIdMap = new Map<string, string>();
+        const newNodes = new Map(tree.nodes);
+        const duplicatedIds: string[] = [];
 
-      // 1. Duplicate Nodes
-      nodesToDuplicate.forEach((node, index) => {
-        const newId = `node-${timestamp}-${index}`;
-        const newGuid = timestamp + index;
-        oldToNewIdMap.set(node.id, newId);
+        // 1. Duplicate Nodes
+        nodesToDuplicate.forEach((node, index) => {
+          const newId = `node-${timestamp}-${index}`;
+          const newGuid = timestamp + index;
+          oldToNewIdMap.set(node.id, newId);
 
-        const newNode: TreeNode = {
-          ...node,
-          id: newId,
-          guid: newGuid,
-          uid: undefined,
-          parentId: undefined, // Clear linkage
-          childrenIds: [], // Clear linkage
-          position: {
-            x: node.position.x + 20,
-            y: node.position.y + 20
-          },
-          pins: node.pins.map(p => ({
-            ...p,
-            binding: { ...p.binding },
-            vectorIndex: p.vectorIndex ? { ...p.vectorIndex } : undefined
-          }))
+          const newNode: TreeNode = {
+            ...node,
+            id: newId,
+            guid: newGuid,
+            uid: undefined,
+            parentId: undefined, // Clear linkage
+            childrenIds: [], // Clear linkage
+            position: {
+              x: node.position.x + 20,
+              y: node.position.y + 20
+            },
+            pins: node.pins.map(p => ({
+              ...p,
+              binding: { ...p.binding },
+              vectorIndex: p.vectorIndex ? { ...p.vectorIndex } : undefined
+            }))
+          };
+
+          newNodes.set(newId, newNode);
+          duplicatedIds.push(newId);
+        });
+
+        newDuplicatedIds = duplicatedIds;
+
+        // 2. Duplicate Tree Connections (only within selection)
+        const newConnections = [...tree.connections];
+        tree.connections.forEach(conn => {
+          if (selectedIds.has(conn.parentNodeId) && selectedIds.has(conn.childNodeId)) {
+            const newParentId = oldToNewIdMap.get(conn.parentNodeId);
+            const newChildId = oldToNewIdMap.get(conn.childNodeId);
+            if (newParentId && newChildId) {
+              newConnections.push({
+                ...conn,
+                id: `conn-${newParentId}-${newChildId}-${conn.parentConnector}-${timestamp}`,
+                parentNodeId: newParentId,
+                childNodeId: newChildId
+              });
+            }
+          }
+        });
+
+        // 3. Duplicate Data Connections (only within selection)
+        const newDataConnections = [...tree.dataConnections];
+        tree.dataConnections.forEach(dc => {
+          if (selectedIds.has(dc.fromNodeId) && selectedIds.has(dc.toNodeId)) {
+            const newFromId = oldToNewIdMap.get(dc.fromNodeId);
+            const newToId = oldToNewIdMap.get(dc.toNodeId);
+            if (newFromId && newToId) {
+              newDataConnections.push({
+                ...dc,
+                id: `data-${newFromId}-${newToId}-${dc.fromPinName}-${dc.toPinName}-${timestamp}`,
+                fromNodeId: newFromId,
+                toNodeId: newToId
+              });
+            }
+          }
+        });
+
+        return {
+          ...tree,
+          nodes: newNodes,
+          connections: newConnections,
+          dataConnections: newDataConnections
         };
-
-        newNodes.set(newId, newNode);
-        duplicatedIds.push(newId);
       });
 
-      newDuplicatedIds = duplicatedIds;
-
-      // 2. Duplicate Tree Connections (only within selection)
-      const newConnections = [...tree.connections];
-      tree.connections.forEach(conn => {
-        if (selectedIds.has(conn.parentNodeId) && selectedIds.has(conn.childNodeId)) {
-          const newParentId = oldToNewIdMap.get(conn.parentNodeId);
-          const newChildId = oldToNewIdMap.get(conn.childNodeId);
-          if (newParentId && newChildId) {
-            newConnections.push({
-              ...conn,
-              id: `conn-${newParentId}-${newChildId}-${conn.parentConnector}-${timestamp}`,
-              parentNodeId: newParentId,
-              childNodeId: newChildId
-            });
-          }
-        }
-      });
-
-      // 3. Duplicate Data Connections (only within selection)
-      const newDataConnections = [...tree.dataConnections];
-      tree.dataConnections.forEach(dc => {
-        if (selectedIds.has(dc.fromNodeId) && selectedIds.has(dc.toNodeId)) {
-          const newFromId = oldToNewIdMap.get(dc.fromNodeId);
-          const newToId = oldToNewIdMap.get(dc.toNodeId);
-          if (newFromId && newToId) {
-            newDataConnections.push({
-              ...dc,
-              id: `data-${newFromId}-${newToId}-${dc.fromPinName}-${dc.toPinName}-${timestamp}`,
-              fromNodeId: newFromId,
-              toNodeId: newToId
-            });
-          }
-        }
-      });
+      if (!result) return state;
 
       return {
-        ...tree,
-        nodes: newNodes,
-        connections: newConnections,
-        dataConnections: newDataConnections
+        ...result,
+        selectedNodeIds: newDuplicatedIds,
       };
     });
-
-    if (!result) return state;
-
-    return {
-      ...result,
-      selectedNodeIds: newDuplicatedIds,
-    };
-  }),
+  },
 
   saveCurrentFile: async () => {
+    // Save is checking validation, but does it modify the tree?
+    // It updates `lastSavedTreeSnapshot` and `isDirty`.
+    // It doesn't modify the tree structure essentially, just metadata.
+    // However, it might be weird to save while debugging if files are locked?
+    // User requested "enforce read-only mode". Typically implies no editing.
+    // Saving checks validation.
+    // I will NOT guard save, as user might want to save current state?
+    // Actually, if they can't edit, saving is just saving what's there.
+    // But usually you can't save while debugging in some IDEs.
+    // I'll leave it unguarded for now unless specifically asked.
     const { openedFiles, activeFilePath } = get();
     if (!activeFilePath) return;
 
@@ -584,6 +623,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     };
 
     const mainTreeIds = getReachableIds(tree.rootId || '', true);
+
+    // Cleanup node meta for nodes that no longer exist
+    useEditorMetaStore.getState().cleanNodeMeta(activeFilePath, Array.from(tree.nodes.keys()));
 
     // 全量数据校验
     const errors: string[] = [];
@@ -704,6 +746,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   saveFileAs: async () => {
+    // Similarly, guard if you want to prevent saving during debug?
+    // I'll leave it allowed for now.
     const { openedFiles, activeFilePath, editorTreeDir, runtimeTreeDir } = get();
     if (!activeFilePath || !editorTreeDir || !runtimeTreeDir) return;
 
@@ -771,6 +815,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   undo: () => set(state => {
+    // Undo/Redo should also be blocked during debug?
+    // Yes, generally.
+    if (useDebugStore.getState().isConnected) return state;
+
     const { openedFiles, activeFilePath } = state;
     if (!activeFilePath) return state;
 
@@ -799,6 +847,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   }),
 
   redo: () => set(state => {
+    if (useDebugStore.getState().isConnected) return state;
+
     const { openedFiles, activeFilePath } = state;
     if (!activeFilePath) return state;
 
@@ -828,6 +878,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   // 用于连续操作（如拖拽）开始前，先拍一个快照存入 past
   recordHistoryStart: () => set(state => {
+    if (useDebugStore.getState().isConnected) return state;
     const { openedFiles, activeFilePath } = state;
     if (!activeFilePath) return state;
 
@@ -849,6 +900,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   // 用于连续操作结束后，同步 UID 和 Dirty 状态，但不再次推送 history
   finalizeContinuousAction: () => set(state => {
+    // This is called at the end of drag, etc. 
+    // If we blocked drag, we shouldn't be here?
+    // But if we are here, we should probably check.
+    if (useDebugStore.getState().isConnected) return state;
+
     const { openedFiles, activeFilePath } = state;
     if (!activeFilePath) return state;
 
@@ -880,277 +936,302 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   }),
 
   // 变量操作
-  addVariable: (isLocal, variable) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      if (isLocal) {
-        return { ...tree, localVariables: [...tree.localVariables, variable] };
-      } else {
-        return { ...tree, sharedVariables: [...tree.sharedVariables, variable] };
-      }
-    });
-    return result || state;
-  }),
-
-  removeVariable: (isLocal, name) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      let newTree = { ...tree };
-      if (isLocal) {
-        newTree.localVariables = tree.localVariables.filter(v => v.name !== name);
-      } else {
-        newTree.sharedVariables = tree.sharedVariables.filter(v => v.name !== name);
-      }
-
-      // Cleanup all pins referencing this variable
-      const newNodes = new Map(newTree.nodes);
-      let treeChanged = false;
-      for (const [nodeId, node] of newNodes) {
-        let nodeChanged = false;
-        const newPins = node.pins.map(pin => {
-          if (pin.binding.type === 'pointer' && pin.binding.variableName === name && pin.binding.isLocal === isLocal) {
-            nodeChanged = true;
-            return {
-              ...pin,
-              binding: { type: 'pointer' as const, variableName: '', isLocal: false },
-              vectorIndex: undefined
-            };
-          }
-          return pin;
-        });
-
-        if (nodeChanged) {
-          newNodes.set(nodeId, { ...node, pins: newPins });
-          treeChanged = true;
+  addVariable: (isLocal, variable) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        if (isLocal) {
+          return { ...tree, localVariables: [...tree.localVariables, variable] };
+        } else {
+          return { ...tree, sharedVariables: [...tree.sharedVariables, variable] };
         }
-      }
-
-      if (treeChanged) {
-        newTree.nodes = newNodes;
-      }
-
-      return newTree;
+      });
+      return result || state;
     });
-    return result || state;
-  }),
+  },
 
-  updateVariable: (isLocal, name, updates) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      let newTree = { ...tree };
-      const vars = isLocal ? tree.localVariables : tree.sharedVariables;
-      const targetVar = vars.find(v => v.name === name);
+  removeVariable: (isLocal, name) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        let newTree = { ...tree };
+        if (isLocal) {
+          newTree.localVariables = tree.localVariables.filter(v => v.name !== name);
+        } else {
+          newTree.sharedVariables = tree.sharedVariables.filter(v => v.name !== name);
+        }
 
-      if (!targetVar) return tree;
-
-      const isTypeChanged = (updates.valueType && updates.valueType !== targetVar.valueType) ||
-        (updates.countType && updates.countType !== targetVar.countType);
-      const isNameChanged = updates.name && updates.name !== name;
-
-      if (isLocal) {
-        newTree.localVariables = tree.localVariables.map(v => v.name === name ? { ...v, ...updates } : v);
-      } else {
-        newTree.sharedVariables = tree.sharedVariables.map(v => v.name === name ? { ...v, ...updates } : v);
-      }
-
-      if (isTypeChanged || isNameChanged) {
-        // 更新所有引用该变量的 pin 状态
-        const updatedVar = (isLocal ? newTree.localVariables : newTree.sharedVariables).find(v => (isNameChanged ? v.name === updates.name : v.name === name))!;
-
+        // Cleanup all pins referencing this variable
         const newNodes = new Map(newTree.nodes);
+        let treeChanged = false;
         for (const [nodeId, node] of newNodes) {
           let nodeChanged = false;
           const newPins = node.pins.map(pin => {
             if (pin.binding.type === 'pointer' && pin.binding.variableName === name && pin.binding.isLocal === isLocal) {
-              // 1. 如果名字变了，更新名字
-              if (isNameChanged) {
-                nodeChanged = true;
-                return {
-                  ...pin,
-                  binding: { ...pin.binding, variableName: updates.name as string }
-                };
-              }
-              // 2. 如果名字没变但类型变了，检查是否依然兼容
-              else if (isTypeChanged) {
-                const typeMatch = updatedVar.valueType === pin.valueType;
-                const countMatch = pin.countType === 'list' ? updatedVar.countType === 'list' : true;
-
-                if (!typeMatch || !countMatch) {
-                  nodeChanged = true;
-                  // 不再兼容，重置为数据连接模式（pointer + empty variableName）
-                  return {
-                    ...pin,
-                    binding: { type: 'pointer' as const, variableName: '', isLocal: false },
-                    vectorIndex: undefined
-                  } as Pin;
-                }
-              }
+              nodeChanged = true;
+              return {
+                ...pin,
+                binding: { type: 'pointer' as const, variableName: '', isLocal: false },
+                vectorIndex: undefined
+              };
             }
             return pin;
           });
 
           if (nodeChanged) {
             newNodes.set(nodeId, { ...node, pins: newPins });
+            treeChanged = true;
           }
         }
-        newTree.nodes = newNodes;
-      }
 
-      return newTree;
+        if (treeChanged) {
+          newTree.nodes = newNodes;
+        }
+
+        return newTree;
+      });
+      return result || state;
     });
-    return result || state;
-  }),
+  },
+
+  updateVariable: (isLocal, name, updates) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        let newTree = { ...tree };
+        const vars = isLocal ? tree.localVariables : tree.sharedVariables;
+        const targetVar = vars.find(v => v.name === name);
+
+        if (!targetVar) return tree;
+
+        const isTypeChanged = (updates.valueType && updates.valueType !== targetVar.valueType) ||
+          (updates.countType && updates.countType !== targetVar.countType);
+        const isNameChanged = updates.name && updates.name !== name;
+
+        if (isLocal) {
+          newTree.localVariables = tree.localVariables.map(v => v.name === name ? { ...v, ...updates } : v);
+        } else {
+          newTree.sharedVariables = tree.sharedVariables.map(v => v.name === name ? { ...v, ...updates } : v);
+        }
+
+        if (isTypeChanged || isNameChanged) {
+          // 更新所有引用该变量的 pin 状态
+          const updatedVar = (isLocal ? newTree.localVariables : newTree.sharedVariables).find(v => (isNameChanged ? v.name === updates.name : v.name === name))!;
+
+          const newNodes = new Map(newTree.nodes);
+          for (const [nodeId, node] of newNodes) {
+            let nodeChanged = false;
+            const newPins = node.pins.map(pin => {
+              if (pin.binding.type === 'pointer' && pin.binding.variableName === name && pin.binding.isLocal === isLocal) {
+                // 1. 如果名字变了，更新名字
+                if (isNameChanged) {
+                  nodeChanged = true;
+                  return {
+                    ...pin,
+                    binding: { ...pin.binding, variableName: updates.name as string }
+                  };
+                }
+                // 2. 如果名字没变但类型变了，检查是否依然兼容
+                else if (isTypeChanged) {
+                  const typeMatch = updatedVar.valueType === pin.valueType;
+                  const countMatch = pin.countType === 'list' ? updatedVar.countType === 'list' : true;
+
+                  if (!typeMatch || !countMatch) {
+                    nodeChanged = true;
+                    // 不再兼容，重置为数据连接模式（pointer + empty variableName）
+                    return {
+                      ...pin,
+                      binding: { type: 'pointer' as const, variableName: '', isLocal: false },
+                      vectorIndex: undefined
+                    } as Pin;
+                  }
+                }
+              }
+              return pin;
+            });
+
+            if (nodeChanged) {
+              newNodes.set(nodeId, { ...node, pins: newPins });
+            }
+          }
+          newTree.nodes = newNodes;
+        }
+
+        return newTree;
+      });
+      return result || state;
+    });
+  },
 
   // Tree Interface (I/O) 操作
-  addTreeInterfacePin: (isInput: boolean, pin: import('../types').TreeInterfacePin) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      if (isInput) {
-        return { ...tree, inputs: [...tree.inputs, pin] };
-      } else {
-        return { ...tree, outputs: [...tree.outputs, pin] };
-      }
+  addTreeInterfacePin: (isInput: boolean, pin: import('../types').TreeInterfacePin) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        if (isInput) {
+          return { ...tree, inputs: [...tree.inputs, pin] };
+        } else {
+          return { ...tree, outputs: [...tree.outputs, pin] };
+        }
+      });
+      return result || state;
     });
-    return result || state;
-  }),
+  },
 
-  removeTreeInterfacePin: (isInput: boolean, id: string) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      if (isInput) {
-        return { ...tree, inputs: tree.inputs.filter(p => p.id !== id) };
-      } else {
-        return { ...tree, outputs: tree.outputs.filter(p => p.id !== id) };
-      }
+  removeTreeInterfacePin: (isInput: boolean, id: string) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        if (isInput) {
+          return { ...tree, inputs: tree.inputs.filter(p => p.id !== id) };
+        } else {
+          return { ...tree, outputs: tree.outputs.filter(p => p.id !== id) };
+        }
+      });
+      return result || state;
     });
-    return result || state;
-  }),
+  },
 
-  updateTreeInterfacePin: (isInput: boolean, id: string, updates: Partial<import('../types').TreeInterfacePin>) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      const pins = isInput ? tree.inputs : tree.outputs;
-      const newPins = pins.map(p => p.id === id ? { ...p, ...updates } : p);
-      if (isInput) {
-        return { ...tree, inputs: newPins };
-      } else {
-        return { ...tree, outputs: newPins };
-      }
+  updateTreeInterfacePin: (isInput: boolean, id: string, updates: Partial<import('../types').TreeInterfacePin>) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        const pins = isInput ? tree.inputs : tree.outputs;
+        const newPins = pins.map(p => p.id === id ? { ...p, ...updates } : p);
+        if (isInput) {
+          return { ...tree, inputs: newPins };
+        } else {
+          return { ...tree, outputs: newPins };
+        }
+      });
+      return result || state;
     });
-    return result || state;
-  }),
+  },
 
   // Pin 操作
-  updatePin: (nodeId, pinName, updates) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      const node = tree.nodes.get(nodeId);
-      if (!node) return tree;
+  updatePin: (nodeId, pinName, updates) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        const node = tree.nodes.get(nodeId);
+        if (!node) return tree;
 
-      let newTree = { ...tree };
-      const currentPin = node.pins.find(p => p.name === pinName);
-      if (!currentPin) return tree;
+        let newTree = { ...tree };
+        const currentPin = node.pins.find(p => p.name === pinName);
+        if (!currentPin) return tree;
 
-      const isTypeChanged = (updates.valueType && updates.valueType !== currentPin.valueType) ||
-        (updates.countType && updates.countType !== currentPin.countType);
+        const isTypeChanged = (updates.valueType && updates.valueType !== currentPin.valueType) ||
+          (updates.countType && updates.countType !== currentPin.countType);
 
-      // 1. 更新当前 Pin
-      let changedPinNames = new Set<string>();
-      if (isTypeChanged) changedPinNames.add(pinName);
+        // 1. 更新当前 Pin
+        let changedPinNames = new Set<string>();
+        if (isTypeChanged) changedPinNames.add(pinName);
 
-      let newPins = node.pins.map(pin => {
-        if (pin.name === pinName) {
-          const updatedPin = { ...pin, ...updates };
-          if (isTypeChanged) {
-            return {
-              ...updatedPin,
-              binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
-              vectorIndex: undefined
-            } as Pin;
-          }
-          return updatedPin;
-        }
-        return pin;
-      });
-
-      // 2. 处理 Group 同步 (类型/数量)
-      const hasVGroup = currentPin.vTypeGroup !== undefined && updates.valueType;
-      const hasCGroup = currentPin.cTypeGroup !== undefined && updates.countType;
-
-      if (hasVGroup || hasCGroup) {
-        newPins = newPins.map(pin => {
-          let pinUpdates: Partial<Pin> = {};
-          if (hasVGroup && pin.vTypeGroup === currentPin.vTypeGroup && pin.valueType !== updates.valueType) {
-            pinUpdates.valueType = updates.valueType;
-          }
-          if (hasCGroup && pin.cTypeGroup === currentPin.cTypeGroup && pin.countType !== updates.countType) {
-            pinUpdates.countType = updates.countType;
-          }
-
-          if (Object.keys(pinUpdates).length > 0) {
-            changedPinNames.add(pin.name);
-            const updatedPin = { ...pin, ...pinUpdates };
-            return {
-              ...updatedPin,
-              binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
-              vectorIndex: undefined
-            } as Pin;
+        let newPins = node.pins.map(pin => {
+          if (pin.name === pinName) {
+            const updatedPin = { ...pin, ...updates };
+            if (isTypeChanged) {
+              return {
+                ...updatedPin,
+                binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
+                vectorIndex: undefined
+              } as Pin;
+            }
+            return updatedPin;
           }
           return pin;
         });
-      }
 
-      // 3. 处理 TypeMap 规则 (仅当 Enum 值变化且是常量绑定时)
-      const nodeDef = useNodeDefinitionStore.getState().getDefinition(node.type);
-      if (updates.binding?.type === 'const' && nodeDef?.typeMaps) {
-        const srcValue = updates.binding.value;
-        const matchedRules = nodeDef.typeMaps.filter(
-          rule => rule.srcVariable === pinName && rule.srcValue === srcValue
-        );
+        // 2. 处理 Group 同步 (类型/数量)
+        const hasVGroup = currentPin.vTypeGroup !== undefined && updates.valueType;
+        const hasCGroup = currentPin.cTypeGroup !== undefined && updates.countType;
 
-        if (matchedRules.length > 0) {
+        if (hasVGroup || hasCGroup) {
           newPins = newPins.map(pin => {
-            const rule = matchedRules.find(r => r.desVariable === pin.name);
-            if (!rule) return pin;
+            let pinUpdates: Partial<Pin> = {};
+            if (hasVGroup && pin.vTypeGroup === currentPin.vTypeGroup && pin.valueType !== updates.valueType) {
+              pinUpdates.valueType = updates.valueType;
+            }
+            if (hasCGroup && pin.cTypeGroup === currentPin.cTypeGroup && pin.countType !== updates.countType) {
+              pinUpdates.countType = updates.countType;
+            }
 
-            const typeStr = rule.desType;
-            const char = typeStr.charAt(0).toUpperCase();
-            const valueMapping: Record<string, import('../types').ValueType> = {
-              'I': 'int', 'F': 'float', 'B': 'bool', 'S': 'string', 'V': 'vector3', 'A': 'entity', 'U': 'ulong', 'E': 'enum'
-            };
-
-            let newValueType = valueMapping[char] || pin.valueType;
-            let newCountType: import('../types').CountType = (typeStr.length >= 2 && typeStr[0] === typeStr[1]) ? 'list' : 'scalar';
-
-            if (pin.valueType === newValueType && pin.countType === newCountType) return pin;
-
-            changedPinNames.add(pin.name);
-            const updatedPin = { ...pin, valueType: newValueType, countType: newCountType };
-            return {
-              ...updatedPin,
-              binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
-              vectorIndex: undefined
-            } as Pin;
+            if (Object.keys(pinUpdates).length > 0) {
+              changedPinNames.add(pin.name);
+              const updatedPin = { ...pin, ...pinUpdates };
+              return {
+                ...updatedPin,
+                binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
+                vectorIndex: undefined
+              } as Pin;
+            }
+            return pin;
           });
         }
-      }
 
-      // 4. 更新节点 Pins
-      const newNodes = new Map(tree.nodes);
-      newNodes.set(nodeId, { ...node, pins: newPins });
-      newTree.nodes = newNodes;
+        // 3. 处理 TypeMap 规则 (仅当 Enum 值变化且是常量绑定时)
+        const nodeDef = useNodeDefinitionStore.getState().getDefinition(node.type);
+        if (updates.binding?.type === 'const' && nodeDef?.typeMaps) {
+          const srcValue = updates.binding.value;
+          const matchedRules = nodeDef.typeMaps.filter(
+            rule => rule.srcVariable === pinName && rule.srcValue === srcValue
+          );
 
-      // 5. 清除失效的数据连接
-      if (changedPinNames.size > 0) {
-        newTree.dataConnections = tree.dataConnections.filter(dc =>
-          !((dc.fromNodeId === nodeId && changedPinNames.has(dc.fromPinName)) ||
-            (dc.toNodeId === nodeId && changedPinNames.has(dc.toPinName)))
-        );
-      }
+          if (matchedRules.length > 0) {
+            newPins = newPins.map(pin => {
+              const rule = matchedRules.find(r => r.desVariable === pin.name);
+              if (!rule) return pin;
 
-      const newTreeAfterLabelUpdate = applyLabelUpdatesToTree(newTree, [nodeId]);
-      return newTreeAfterLabelUpdate;
+              const typeStr = rule.desType;
+              const char = typeStr.charAt(0).toUpperCase();
+              const valueMapping: Record<string, import('../types').ValueType> = {
+                'I': 'int', 'F': 'float', 'B': 'bool', 'S': 'string', 'V': 'vector3', 'A': 'entity', 'U': 'ulong', 'E': 'enum'
+              };
+
+              let newValueType = valueMapping[char] || pin.valueType;
+              let newCountType: import('../types').CountType = (typeStr.length >= 2 && typeStr[0] === typeStr[1]) ? 'list' : 'scalar';
+
+              if (pin.valueType === newValueType && pin.countType === newCountType) return pin;
+
+              changedPinNames.add(pin.name);
+              const updatedPin = { ...pin, valueType: newValueType, countType: newCountType };
+              return {
+                ...updatedPin,
+                binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
+                vectorIndex: undefined
+              } as Pin;
+            });
+          }
+        }
+
+        // 4. 更新节点 Pins
+        const newNodes = new Map(tree.nodes);
+        newNodes.set(nodeId, { ...node, pins: newPins });
+        newTree.nodes = newNodes;
+
+        // 5. 清除失效的数据连接
+        if (changedPinNames.size > 0) {
+          newTree.dataConnections = tree.dataConnections.filter(dc =>
+            !((dc.fromNodeId === nodeId && changedPinNames.has(dc.fromPinName)) ||
+              (dc.toNodeId === nodeId && changedPinNames.has(dc.toPinName)))
+          );
+        }
+
+        const newTreeAfterLabelUpdate = applyLabelUpdatesToTree(newTree, [nodeId]);
+        return newTreeAfterLabelUpdate;
+      });
+
+      return result || state;
     });
-
-    return result || state;
-  }),
+  },
 
 
   // 新特性操作
   toggleNodeFold: (nodeId) => set((state) => {
+    // Folding is UI only, probably fine to allow during debug?
+    // It doesn't change logic.
+    // The previous implementation used `isUIChange: true`.
+    // So I will NOT guard this one.
     const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
       const node = tree.nodes.get(nodeId);
       if (!node) return tree;
@@ -1169,46 +1250,53 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     return result || state;
   }),
 
-  toggleNodeDisabled: (nodeId) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      const node = tree.nodes.get(nodeId);
-      if (!node) return tree;
+  toggleNodeDisabled: (nodeId) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        const node = tree.nodes.get(nodeId);
+        if (!node) return tree;
 
-      const newDisabled = !node.disabled;
-      const newNodes = new Map(tree.nodes);
-      newNodes.set(nodeId, { ...node, disabled: newDisabled });
+        const newDisabled = !node.disabled;
+        const newNodes = new Map(tree.nodes);
+        newNodes.set(nodeId, { ...node, disabled: newDisabled });
 
-      const newTreeWithNodes = { ...tree, nodes: newNodes };
-      // 禁用/启用节点会影响标签
-      const newTreeAfterLabelUpdate = applyLabelUpdatesToTree(newTreeWithNodes, [nodeId]);
-      return newTreeAfterLabelUpdate;
+        const newTreeWithNodes = { ...tree, nodes: newNodes };
+        // 禁用/启用节点会影响标签
+        const newTreeAfterLabelUpdate = applyLabelUpdatesToTree(newTreeWithNodes, [nodeId]);
+        return newTreeAfterLabelUpdate;
+      });
+      return result || state;
     });
-    return result || state;
-  }),
+  },
 
-  toggleConditionConnector: (nodeId) => set((state) => {
-    const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
-      const node = tree.nodes.get(nodeId);
-      if (!node) return tree;
+  toggleConditionConnector: (nodeId) => {
+    if (useDebugStore.getState().isConnected) return;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        const node = tree.nodes.get(nodeId);
+        if (!node) return tree;
 
-      const hasCondition = !node.hasConditionConnector;
-      const newNodes = new Map(tree.nodes);
-      newNodes.set(nodeId, { ...node, hasConditionConnector: hasCondition });
+        const hasCondition = !node.hasConditionConnector;
+        const newNodes = new Map(tree.nodes);
+        newNodes.set(nodeId, { ...node, hasConditionConnector: hasCondition });
 
-      let newConnections = [...tree.connections];
-      if (!hasCondition) {
-        newConnections = newConnections.filter(c =>
-          !(c.parentNodeId === nodeId && c.parentConnector === 'condition')
-        );
-      }
+        let newConnections = [...tree.connections];
+        if (!hasCondition) {
+          newConnections = newConnections.filter(c =>
+            !(c.parentNodeId === nodeId && c.parentConnector === 'condition')
+          );
+        }
 
-      return { ...tree, nodes: newNodes, connections: newConnections };
+        return { ...tree, nodes: newNodes, connections: newConnections };
+      });
+      return result || state;
     });
-    return result || state;
-  }),
+  },
 
   // SubTree 操作
   reloadSubTreePins: async (nodeId) => {
+    if (useDebugStore.getState().isConnected) return;
     const { editorTreeDir, openedFiles, activeFilePath } = get();
     if (!editorTreeDir || !activeFilePath) return;
 

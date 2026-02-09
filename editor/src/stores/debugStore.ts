@@ -11,7 +11,8 @@
 
 import { create } from 'zustand';
 import { invoke } from '@tauri-apps/api/core';
-import { listen, UnlistenFn } from '@tauri-apps/api/event';
+import { getCurrentWindow } from '@tauri-apps/api/window';
+import { listen, emit, UnlistenFn } from '@tauri-apps/api/event';
 import { useEditorMetaStore } from './editorMetaStore';
 import { useEditorStore } from './editorStore';
 import { useNotificationStore } from './notificationStore';
@@ -20,14 +21,15 @@ import { bkdrHash } from '../utils/hashUtils';
 import {
     NodeState,
     BreakpointType,
+    type NodeRunState,
     type TreeRunInfo,
     type FSMRunInfo,
     type DebugMessage,
     type TickResultData
 } from '../types/debug';
+import { logger } from '../utils/logger';
 import {
     FIELD_DELIMITER,
-    SECTION_DELIMITER,
     SEQUENCE_DELIMITER,
     LIST_DELIMITER
 } from '../config/constants';
@@ -56,7 +58,9 @@ interface DebugState {
     // Debug state
     isDebugging: boolean;
     isPaused: boolean;
+    isProcessingSubTree: boolean; // Mutex for handshake
     debugTarget: string | null;
+    currentSessionId: string | null; // For multi-window mutual exclusion
 
     // Run info
     treeRunInfos: Map<string, TreeRunInfo>;
@@ -81,6 +85,7 @@ interface DebugState {
     // Actions
     init: () => Promise<void>;
     cleanup: () => void;
+    syncBreakpointsFromMeta: () => void;
     connect: (ip: string, port: number) => Promise<void>;
     disconnect: () => Promise<void>;
     send: (message: string) => Promise<void>;
@@ -98,6 +103,7 @@ interface DebugState {
 
     // State queries
     getNodeState: (fileName: string, uid: number) => NodeState;
+    getNodeRunState: (fileName: string, uid: number) => NodeRunState | undefined;
     getFileRunState: (fileName: string) => NodeState | undefined;
     isFileRunning: (fileName: string) => boolean;
 
@@ -108,12 +114,16 @@ interface DebugState {
     handleSubTrees: (content: string) => void;
     handlePaused: () => void;
     handleLogPoint: (content: string) => void;
+    handleSessionStart: (sessionId: string) => void;
 
     // Keyframe
     displayKeyframe: () => void;
 }
 
 // ==================== Store Implementation ====================
+
+// Module-level generation counter for cleanup synchronization
+let initGeneration = 0;
 
 export const useDebugStore = create<DebugState>((set, get) => ({
     // Initial state
@@ -122,7 +132,9 @@ export const useDebugStore = create<DebugState>((set, get) => ({
     connectionPort: 8888,
     isDebugging: false,
     isPaused: false,
+    isProcessingSubTree: false,
     debugTarget: null,
+    currentSessionId: null,
     treeRunInfos: new Map(),
     fsmRunInfo: null,
     runningFiles: new Map(),
@@ -139,13 +151,34 @@ export const useDebugStore = create<DebugState>((set, get) => ({
 
     // Initialize event listeners
     init: async () => {
+        get().cleanup(); // Prevent duplicate listeners
+        initGeneration++; // Increment generation to invalidate previous pending inits
+        const currentGen = initGeneration;
+
         const unlistenConnection = await listen<{ connected: boolean }>('debug:connection', (event) => {
             get().handleConnectionEvent(event.payload.connected);
         });
 
+        if (currentGen !== initGeneration) {
+            unlistenConnection();
+            return;
+        }
+
         const unlistenMessage = await listen<DebugMessage>('debug:message', (event) => {
             get().handleMessage(event.payload);
         });
+
+        const unlistenSession = await listen<{ sessionId: string }>('debug:session_start', (event) => {
+            get().handleSessionStart(event.payload.sessionId);
+        });
+
+        // Check again
+        if (currentGen !== initGeneration) {
+            unlistenConnection();
+            unlistenMessage();
+            unlistenSession();
+            return;
+        }
 
         // Start display timer (1fps)
         const timer = setInterval(() => {
@@ -153,14 +186,19 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         }, 1000);
 
         set(state => ({
-            unlistenFns: [unlistenConnection, unlistenMessage],
+            unlistenFns: [unlistenConnection, unlistenMessage, unlistenSession],
             keyframeState: {
                 ...state.keyframeState,
                 displayTimer: timer
             }
         }));
 
-        // Load breakpoints from meta
+        // Initial sync
+        get().syncBreakpointsFromMeta();
+    },
+
+    // Sync breakpoints from editorMetaStore
+    syncBreakpointsFromMeta: () => {
         const { treeMetas } = useEditorMetaStore.getState();
         const initialBreakpoints = new Map<string, Map<number, BreakpointType>>();
 
@@ -210,7 +248,9 @@ export const useDebugStore = create<DebugState>((set, get) => ({
     // Send raw message
     send: async (message: string) => {
         try {
-            await invoke('debug_send', { message });
+            // Append delimiter to separate messages (runtime expects specific splitting)
+            const finalMessage = message.endsWith(FIELD_DELIMITER) ? message : message + FIELD_DELIMITER;
+            await invoke('debug_send', { message: finalMessage });
         } catch (e) {
             console.error('Send error:', e);
         }
@@ -218,21 +258,46 @@ export const useDebugStore = create<DebugState>((set, get) => ({
 
     // Start debugging
     startDebug: (fileName, fileType, agentUID, waitForBegin = false) => {
-        set({ debugTarget: fileName });
-        const { send } = get();
-        let header: string;
-        let content: string;
+        let target = fileName;
+        if (!target && agentUID) target = `Agent:${agentUID}`;
 
-        if (agentUID !== undefined && agentUID !== BigInt(0)) {
-            header = '[DebugAgent]';
-            content = agentUID.toString();
-        } else {
-            header = fileType === 'tree' ? '[DebugTree]' : '[DebugFSM]';
-            content = fileName;
+        const sessionId = crypto.randomUUID();
+        // console.log(`[debugStore] startDebug target=${target} sessionId=${sessionId}`);
+
+        set({ debugTarget: target, currentSessionId: sessionId });
+
+        // Broadcast session start to other windows to clear their state
+        emit('debug:session_start', { sessionId });
+
+        // Small delay to ensure other windows receive the event and clear their state
+        setTimeout(() => {
+            const { send } = get();
+            let header: string;
+            let content: string;
+
+            if (agentUID !== undefined && agentUID !== BigInt(0)) {
+                header = '[DebugAgent]';
+                content = agentUID.toString();
+            } else {
+                header = fileType === 'tree' ? '[DebugTree]' : '[DebugFSM]';
+                content = fileName;
+            }
+
+            const message = `${header}${FIELD_DELIMITER}${content}${FIELD_DELIMITER}${waitForBegin ? 1 : 0}`;
+            send(message);
+        }, 50);
+    },
+
+    // Handle session start from other windows
+    handleSessionStart: (sessionId) => {
+        const { currentSessionId } = get();
+        if (currentSessionId !== sessionId) {
+            set({
+                debugTarget: null,
+                currentSessionId: null,
+                isDebugging: false
+            });
         }
-
-        const message = `${header}${FIELD_DELIMITER}${content}${FIELD_DELIMITER}${waitForBegin ? 1 : 0}`;
-        send(message);
     },
 
     // Continue from breakpoint
@@ -304,7 +369,9 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         // Send to runtime if connected
         if (isConnected) {
             const count = newType === BreakpointType.Breakpoint ? 1 : 0;
-            send(`[DebugTreePoint]${FIELD_DELIMITER}${fileName}${FIELD_DELIMITER}${uid}${FIELD_DELIMITER}${count}`);
+            // Runtime expects Tree Name (Basename)
+            const treeName = fileName.split(/[\\/]/).pop()?.replace(/\.tree$/, '') || fileName;
+            send(`[DebugTreePoint]${FIELD_DELIMITER}${treeName}${FIELD_DELIMITER}${uid}${FIELD_DELIMITER}${count}`);
         }
     },
 
@@ -337,7 +404,8 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         // Send to runtime if connected
         if (isConnected) {
             const count = newType === BreakpointType.Logpoint ? -1 : 0;
-            send(`[DebugTreePoint]${FIELD_DELIMITER}${fileName}${FIELD_DELIMITER}${uid}${FIELD_DELIMITER}${count}`);
+            const treeName = fileName.split(/[\\/]/).pop()?.replace(/\.tree$/, '') || fileName;
+            send(`[DebugTreePoint]${FIELD_DELIMITER}${treeName}${FIELD_DELIMITER}${uid}${FIELD_DELIMITER}${count}`);
         }
     },
 
@@ -347,7 +415,7 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         return breakpoints.get(fileName)?.get(uid) || BreakpointType.None;
     },
 
-    // Get node run state
+    // Get node run state (simple, for backward compatibility or simple status)
     getNodeState: (fileName, uid) => {
         const { treeRunInfos, fsmRunInfo } = get();
 
@@ -363,6 +431,16 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         }
 
         return NodeState.Invalid;
+    },
+
+    // Get detailed node run state (self + final)
+    getNodeRunState: (fileName: string, uid: number): NodeRunState | undefined => {
+        const { treeRunInfos } = get();
+        const treeInfo = treeRunInfos.get(fileName);
+        if (treeInfo) {
+            return treeInfo.nodeStates.get(uid);
+        }
+        return undefined;
     },
 
     // Check if file has running nodes
@@ -488,6 +566,13 @@ export const useDebugStore = create<DebugState>((set, get) => ({
 
         // If paused, display immediately
         if (isPaused) {
+            set({
+                keyframeState: {
+                    ...keyframeState,
+                    pendingFrame: data,
+                    pendingDiffScore: Infinity, // Force update
+                },
+            });
             get().displayKeyframe();
             return;
         }
@@ -508,7 +593,7 @@ export const useDebugStore = create<DebugState>((set, get) => ({
 
     // Display the pending keyframe
     displayKeyframe: () => {
-        const { keyframeState, treeRunInfos, fsmRunInfo } = get();
+        const { keyframeState, treeRunInfos, fsmRunInfo, isPaused } = get();
 
         if (!keyframeState.pendingFrame) return;
 
@@ -516,6 +601,10 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         const newTreeRunInfos = new Map(treeRunInfos);
         const newRunningFiles = new Map<string, NodeState>();
         const currentKeyframe = get().keyframe + 1;
+
+        if (isPaused) {
+            console.log('[debugStore] Paused - displaying keyframe data:', data);
+        }
 
         // Process tree run data
         for (const [treeName, treeData] of data.treeRunDatas) {
@@ -600,7 +689,7 @@ export const useDebugStore = create<DebugState>((set, get) => ({
                         const uid = parseInt(parts[0], 10);
                         const state = parseInt(parts[1], 10);
                         newFsmRunInfo.stateInfos.set(uid, state);
-                        // console.log(`[DebugStore] FSM ${newFsmRunInfo.fsmName} State: ${uid} -> ${state}`);
+                        newFsmRunInfo.stateInfos.set(uid, state);
 
                         if (state === NodeState.Running || state === NodeState.Break) {
                             const current = newRunningFiles.get(newFsmRunInfo.fsmName);
@@ -630,6 +719,11 @@ export const useDebugStore = create<DebugState>((set, get) => ({
 
     // Handle SubTrees message
     handleSubTrees: (content) => {
+        const label = getCurrentWindow().label;
+        console.log(`[debugStore ${label}] handleSubTrees. CurrentTarget=${get().debugTarget}. Content=${content.substring(0, 50)}...`);
+        // Only handle if this instance initiated debugging
+        if (!get().debugTarget) return;
+
         // Format: name\x06hash\x07name\x06hash...
         const items = content.split(LIST_DELIMITER);
         const fileHashes: Array<{ name: string; hash: number }> = [];
@@ -645,16 +739,34 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         }
 
         if (fileHashes.length > 0) {
+            // Deduplicate: If we are already debugging this target, ignore
+            // This prevents duplicate DebugBegin messages if runtime sends multiple SubTrees
+            const newTarget = fileHashes[0].name;
+            const currentTarget = get().debugTarget;
+
+            // Deduplication logic:
+            // 1. Direct match: target is the same as the new file.
+            // 2. Agent match: we are debugging an agent and already have data for this file.
+            const isMatch = (currentTarget === newTarget) ||
+                (currentTarget?.startsWith('Agent:') && (get().treeRunInfos.has(newTarget) || get().fsmRunInfo?.fsmName === newTarget));
+
+            console.log(`[debugStore] Dedupe Check: '${currentTarget}' vs '${newTarget}' (${isMatch ? 'MATCH' : 'DIFF'})`);
+
+            if (isMatch) {
+                console.log('[debugStore] Deduplication hit. Ignoring.');
+                return;
+            }
             // Verify hashes
-            const { editorTreeDir } = useEditorStore.getState();
-            if (editorTreeDir) {
+            const { editorTreeDir, runtimeTreeDir } = useEditorStore.getState();
+            const checkDir = runtimeTreeDir || editorTreeDir;
+            if (checkDir) {
                 // Verify async but don't block
                 (async () => {
                     const mismatches: string[] = [];
                     for (const file of fileHashes) {
                         try {
                             // Try tree file first
-                            const treePath = `${editorTreeDir}/${file.name}.tree`;
+                            const treePath = `${checkDir}/${file.name}.tree`;
                             // If not exists, maybe .fsm? 
                             // But protocol says name includes full rel path usually?
                             // Actually file.name usually lacks extension in old editor? 
@@ -669,26 +781,45 @@ export const useDebugStore = create<DebugState>((set, get) => ({
                                 content = await readFile(treePath);
                             } catch {
                                 try {
-                                    content = await readFile(`${editorTreeDir}/${file.name}.fsm`);
+                                    content = await readFile(`${checkDir}/${file.name}.fsm`);
                                 } catch {
                                     try {
-                                        content = await readFile(`${editorTreeDir}/${file.name}`);
+                                        content = await readFile(`${checkDir}/${file.name}`);
                                     } catch {
-                                        console.warn(`Could not find file for hash check: ${file.name}`);
+                                        console.warn(`Could not find file for hash check: ${file.name} in ${checkDir}`);
                                         continue;
                                     }
                                 }
                             }
 
                             if (content) {
-                                const localHash = bkdrHash(content);
-                                // JS integers are signed for bitwise, unsigned for logic?
-                                // Our bkdrHash returns unsigned >>> 0.
-                                // Protocol hash is parsed as int.
-                                // We should compare them carefully.
-                                if (localHash !== (file.hash >>> 0)) {
+                                const remoteHash = file.hash >>> 0;
+                                let localHash = 0;
+
+                                try {
+                                    const parser = new DOMParser();
+                                    // Strip BOM for parser
+                                    const xmlString = content.replace(/^\uFEFF/, '');
+                                    const doc = parser.parseFromString(xmlString, 'text/xml');
+
+                                    if (!doc.querySelector('parsererror')) {
+                                        // Runtime hashes the root element's outer XML without any whitespace
+                                        const serializer = new XMLSerializer();
+                                        const rootXml = serializer.serializeToString(doc.documentElement);
+                                        const minifiedXml = rootXml.replace(/\s/g, '');
+                                        localHash = bkdrHash(minifiedXml);
+                                    } else {
+                                        // Fallback to raw string if XML parse fails
+                                        localHash = bkdrHash(xmlString.replace(/\r\n/g, '\n'));
+                                    }
+                                } catch (e) {
+                                    console.error('Failed to parse XML for hash check:', e);
+                                    localHash = bkdrHash(content.replace(/\r\n/g, '\n'));
+                                }
+
+                                if (localHash !== remoteHash) {
                                     mismatches.push(file.name);
-                                    console.warn(`Hash mismatch for ${file.name}: Local=${localHash}, Remote=${file.hash}`);
+                                    console.warn(`Hash mismatch for ${file.name}: Local=${localHash}, Remote=${remoteHash}`);
                                 }
                             }
                         } catch (e) {
@@ -705,11 +836,20 @@ export const useDebugStore = create<DebugState>((set, get) => ({
                 })();
             }
 
-            // For now, just mark as debugging
-            set({
+            // Mark as debugging
+            set(state => ({
                 isDebugging: true,
-                debugTarget: fileHashes[0].name,
-            });
+                // Keep Agent: target if it exists, otherwise use the first file name
+                debugTarget: (state.debugTarget && state.debugTarget.startsWith('Agent:'))
+                    ? state.debugTarget
+                    : fileHashes[0].name,
+                // Initialize FSM run info with the first file (which is the FSM/Root)
+                // This ensures handleTickResult uses the correct filename for runningFiles matching
+                fsmRunInfo: {
+                    fsmName: fileHashes[0].name,
+                    stateInfos: new Map()
+                }
+            }));
 
             // Build run info for all files
             const newTreeRunInfos = new Map<string, TreeRunInfo>();
@@ -734,7 +874,27 @@ export const useDebugStore = create<DebugState>((set, get) => ({
             for (const file of fileHashes) {
                 message += FIELD_DELIMITER + file.name;
 
-                const fileBreakpoints = breakpoints.get(file.name);
+                // Fuzzy lookup for breakpoints (handle Path/File vs File.ext)
+                let fileBreakpoints: Map<number, BreakpointType> | undefined;
+
+                // 1. Try exact match
+                if (breakpoints.has(file.name)) {
+                    fileBreakpoints = breakpoints.get(file.name);
+                } else {
+                    // 2. Try fuzzy match
+                    // Runtime file: "StateMachine/SimpleFSM" or "SimpleFSM"
+                    // Store key: "e:/.../SimpleFSM.fsm" or "SimpleFSM"
+                    const runtimeBase = file.name.split(/[\\/]/).pop()?.replace(/\.(tree|fsm)$/, '') || file.name;
+
+                    for (const [key, bps] of breakpoints) {
+                        const keyBase = key.split(/[\\/]/).pop()?.replace(/\.(tree|fsm)$/, '') || key;
+                        if (keyBase === runtimeBase) {
+                            fileBreakpoints = bps;
+                            break;
+                        }
+                    }
+                }
+
                 if (fileBreakpoints) {
                     for (const [uid, type] of fileBreakpoints) {
                         message += SEQUENCE_DELIMITER + uid + SEQUENCE_DELIMITER + type;
@@ -755,11 +915,73 @@ export const useDebugStore = create<DebugState>((set, get) => ({
 
     // Handle LogPoint message
     handleLogPoint: (content) => {
-        // Parse and log the content
+        // Only main window handles logging to prevent duplicates
+        if (getCurrentWindow().label !== 'main') return;
+
+        // Parse and log the content: Message(0) RawState(1) FinalState(2) [Detail...]
         const parts = content.split(FIELD_DELIMITER);
         if (parts.length > 0) {
-            console.log('[LogPoint]', parts[0]);
-            // TODO: Display in a log panel UI
+            const message = parts[0];
+            const segments: { text: string, color?: string }[] = [];
+
+            // Header: Orange bracket, White content, Orange bracket
+            segments.push({ text: `-------<LogPoint `, color: 'text-orange-500' });
+            segments.push({ text: `${message}`, color: 'text-white' });
+            segments.push({ text: `>-------\n`, color: 'text-orange-500' });
+
+            let index = 1;
+            // Parse states
+            let rawState = NodeState.Invalid;
+            let finalState = NodeState.Invalid;
+
+            if (index < parts.length) {
+                rawState = parseInt(parts[index++], 10) as NodeState;
+            }
+            if (index < parts.length) {
+                finalState = parseInt(parts[index++], 10) as NodeState;
+            }
+
+            // Parse details (BEFORE/AFTER)
+            while (index < parts.length) {
+                const section = parts[index++];
+                if (section === 'BEFORE' || section === 'AFTER') {
+                    segments.push({ text: `\n${section}:\n`, color: 'text-yellow-500' });
+                    if (index < parts.length) {
+                        const count = parseInt(parts[index++], 10);
+                        if (!isNaN(count)) {
+                            for (let i = 0; i < count && index < parts.length; i++) {
+                                // Variable: Value
+                                segments.push({ text: `  ${parts[index++]}\n`, color: 'text-gray-300' });
+                            }
+                        }
+                    }
+                } else {
+                    // Try to handle unexpected tokens gracefully
+                    segments.push({ text: `${section}\n`, color: 'text-gray-400' });
+                }
+            }
+
+            // Footer with state
+            segments.push({ text: `\nResult: `, color: 'text-gray-400' });
+
+            const getStateColor = (s: NodeState) => {
+                switch (s) {
+                    case NodeState.Success: return 'text-green-500';
+                    case NodeState.Failure: return 'text-cyan-500'; // Match C# Cyan (using tailwind equivalent if available, or blue-400)
+                    case NodeState.Running: return 'text-purple-500';
+                    case NodeState.Break: return 'text-red-500';
+                    default: return 'text-gray-500';
+                }
+            };
+
+            segments.push({ text: `${NodeState[finalState]}`, color: getStateColor(finalState) });
+            segments.push({ text: ` (Raw: `, color: 'text-gray-500' });
+            segments.push({ text: `${NodeState[rawState]}`, color: getStateColor(rawState) });
+            segments.push({ text: `)\n`, color: 'text-gray-500' });
+
+            segments.push({ text: `-------</LogPoint>-------`, color: 'text-orange-500' });
+
+            logger.info(segments);
         }
     },
 }));
@@ -809,4 +1031,12 @@ function calculateDiffScore(prev: TickResultData | null, curr: TickResultData): 
     }
 
     return score;
+}
+
+// HMR Cleanup
+if (import.meta.hot) {
+    import.meta.hot.dispose(() => {
+        console.log('[debugStore] HMR Dispose. Cleaning up listeners.');
+        useDebugStore.getState().cleanup();
+    });
 }

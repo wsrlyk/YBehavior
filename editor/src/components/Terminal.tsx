@@ -59,12 +59,25 @@ export function Terminal({ isDocked, onToggleMode }: TerminalProps) {
             <div className="flex-1 overflow-y-auto p-2 space-y-1" ref={scrollRef}>
                 {logs.map((log, i) => (
                     <div key={i} className="break-words flex">
-                        <span className="text-gray-600 mr-2 text-xs w-16 shrink-0">
-                            {new Date(log.timestamp).toLocaleTimeString()}
+                        <span className="text-gray-500 mr-2 text-xs w-24 shrink-0 select-none font-mono">
+                            {(() => {
+                                const d = new Date(log.timestamp);
+                                return `${d.toLocaleTimeString('en-GB', { hour12: false })}.${d.getMilliseconds().toString().padStart(3, '0')}`;
+                            })()}
                         </span>
-                        <span className={`${getColor(log.level)}`}>
-                            {log.message}
-                        </span>
+                        {typeof log.message === 'string' ? (
+                            <span className={`${getColor(log.level)} whitespace-pre-wrap font-mono`}>
+                                {log.message}
+                            </span>
+                        ) : (
+                            <span className="whitespace-pre-wrap font-mono">
+                                {log.message.map((seg, j) => (
+                                    <span key={j} className={seg.color || getColor(log.level)}>
+                                        {seg.text}
+                                    </span>
+                                ))}
+                            </span>
+                        )}
                     </div>
                 ))}
             </div>

@@ -1,8 +1,14 @@
 export type LogLevel = 'info' | 'warn' | 'error' | 'success';
 
+export interface LogSegment {
+    text: string;
+    color?: string; // Hex code or Tailwind class
+    newline?: boolean;
+}
+
 export interface LogMessage {
     level: LogLevel;
-    message: string;
+    message: string | LogSegment[];
     timestamp: number;
 }
 
@@ -15,7 +21,7 @@ class Logger {
         this.channel = new BroadcastChannel(CHANNEL_NAME);
     }
 
-    private send(level: LogLevel, message: string) {
+    private send(level: LogLevel, message: string | LogSegment[]) {
         const log: LogMessage = {
             level,
             message,
@@ -23,14 +29,19 @@ class Logger {
         };
         this.channel.postMessage(log);
 
-        // Optional: Also log to console for debugging in main window
-        console.log(`[Logger][${level}]`, message);
+        // Optional: Also log to console for debugging in main window (Commented out for production)
+        // if (typeof message === 'string') {
+        //     console.log(`[Logger][${level}]`, message);
+        // } else {
+        //     console.log(`[Logger][${level}]`, message.map(s => s.text).join(''));
+        // }
     }
 
-    info(message: string) {
+    info(message: string | LogSegment[]) {
         this.send('info', message);
     }
 
+    // ... rest same ...
     warn(message: string) {
         this.send('warn', message);
     }

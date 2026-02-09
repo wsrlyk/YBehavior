@@ -3,6 +3,8 @@ import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import { useEditorStore } from '../stores/editorStore';
 import { useTooltipStore } from '../stores/tooltipStore';
 import type { NodeCategory } from '../types';
+import { useDebugStore } from '../stores/debugStore';
+import { BreakpointType } from '../types/debug';
 
 interface NodeContextMenuProps {
   isOpen: boolean;
@@ -122,39 +124,102 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
       onKeyDown={handleKeyDown}
     >
       {node && (
-        <div className="p-1 border-b border-gray-700 bg-gray-900/50">
-          <div className="px-3 py-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Node Actions</div>
+        <>
+          <div className="p-1 border-b border-gray-700 bg-gray-900/50">
+            <div className="px-3 py-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Node Actions</div>
 
-          <div
-            className="px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer flex items-center justify-between group"
-            onClick={() => { toggleConditionConnector(node.id); onClose(); }}
-          >
-            <span>Condition Connector</span>
-            <span className={`text-[10px] px-1.5 rounded ${node.hasConditionConnector ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-400 group-hover:bg-gray-600'}`}>
-              {node.hasConditionConnector ? 'ON' : 'OFF'}
-            </span>
+            <div
+              className="px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer flex items-center justify-between group"
+              onClick={() => { toggleConditionConnector(node.id); onClose(); }}
+            >
+              <span>Condition Connector</span>
+              <span className={`text-[10px] px-1.5 rounded ${node.hasConditionConnector ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-400 group-hover:bg-gray-600'}`}>
+                {node.hasConditionConnector ? 'ON' : 'OFF'}
+              </span>
+            </div>
+
+            <div
+              className="px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer flex items-center justify-between group"
+              onClick={() => { toggleNodeDisabled(node.id); onClose(); }}
+            >
+              <span>Node State</span>
+              <span className={`text-[10px] px-1.5 rounded ${node.disabled ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-400 group-hover:bg-gray-600'}`}>
+                {node.disabled ? 'DISABLED' : 'ENABLED'}
+              </span>
+            </div>
+
+            <div
+              className="px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer flex items-center justify-between group"
+              onClick={() => { toggleNodeFold(node.id); onClose(); }}
+            >
+              <span>Folding</span>
+              <span className={`text-[10px] px-1.5 rounded ${node.isFolded ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400 group-hover:bg-gray-600'}`}>
+                {node.isFolded ? 'FOLDED' : 'NORMAL'}
+              </span>
+            </div>
           </div>
 
-          <div
-            className="px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer flex items-center justify-between group"
-            onClick={() => { toggleNodeDisabled(node.id); onClose(); }}
-          >
-            <span>Node State</span>
-            <span className={`text-[10px] px-1.5 rounded ${node.disabled ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-400 group-hover:bg-gray-600'}`}>
-              {node.disabled ? 'DISABLED' : 'ENABLED'}
-            </span>
-          </div>
+          <div className="p-1 border-b border-gray-700 bg-gray-900/50">
+            <div className="px-3 py-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Debug</div>
 
-          <div
-            className="px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer flex items-center justify-between group"
-            onClick={() => { toggleNodeFold(node.id); onClose(); }}
-          >
-            <span>Folding</span>
-            <span className={`text-[10px] px-1.5 rounded ${node.isFolded ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400 group-hover:bg-gray-600'}`}>
-              {node.isFolded ? 'FOLDED' : 'NORMAL'}
-            </span>
+            <div
+              className="px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer flex items-center justify-between group"
+              onClick={() => {
+                const { activeFilePath } = useEditorStore.getState();
+                if (activeFilePath && node && node.uid !== undefined) {
+                  // Use basename for breakpoints to match runtime
+                  const fileName = activeFilePath.split(/[\\/]/).pop()?.replace(/\.tree$/, '').replace(/\.fsm$/, '') || '';
+                  useDebugStore.getState().toggleBreakpoint(fileName, node.uid);
+                }
+                onClose();
+              }}
+            >
+              <span>Breakpoint</span>
+              {(() => {
+                const { activeFilePath } = useEditorStore.getState();
+                let fileName = '';
+                if (activeFilePath) {
+                  fileName = activeFilePath.split(/[\\/]/).pop()?.replace(/\.tree$/, '').replace(/\.fsm$/, '') || '';
+                }
+                const bpType = fileName && node && node.uid !== undefined ? useDebugStore.getState().getBreakpoint(fileName, node.uid) : BreakpointType.None;
+                const isBp = bpType === BreakpointType.Breakpoint;
+                return (
+                  <span className={`text-[10px] px-1.5 rounded ${isBp ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-400 group-hover:bg-gray-600'}`}>
+                    {isBp ? 'ON' : 'OFF'}
+                  </span>
+                );
+              })()}
+            </div>
+
+            <div
+              className="px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer flex items-center justify-between group"
+              onClick={() => {
+                const { activeFilePath } = useEditorStore.getState();
+                if (activeFilePath && node && node.uid !== undefined) {
+                  const fileName = activeFilePath.split(/[\\/]/).pop()?.replace(/\.tree$/, '').replace(/\.fsm$/, '') || '';
+                  useDebugStore.getState().toggleLogpoint(fileName, node.uid);
+                }
+                onClose();
+              }}
+            >
+              <span>Logpoint</span>
+              {(() => {
+                const { activeFilePath } = useEditorStore.getState();
+                let fileName = '';
+                if (activeFilePath) {
+                  fileName = activeFilePath.split(/[\\/]/).pop()?.replace(/\.tree$/, '').replace(/\.fsm$/, '') || '';
+                }
+                const bpType = fileName && node && node.uid !== undefined ? useDebugStore.getState().getBreakpoint(fileName, node.uid) : BreakpointType.None;
+                const isLp = bpType === BreakpointType.Logpoint;
+                return (
+                  <span className={`text-[10px] px-1.5 rounded ${isLp ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-400 group-hover:bg-gray-600'}`}>
+                    {isLp ? 'ON' : 'OFF'}
+                  </span>
+                );
+              })()}
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* 搜索框 (如果选了节点，就不显示添加节点内容) */}

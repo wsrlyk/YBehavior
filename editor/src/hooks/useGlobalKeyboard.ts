@@ -49,36 +49,59 @@ export function useGlobalKeyboard() {
                 return;
             }
 
+            // Helper for path comparison
+            const normalizePath = (p: string) => p.replace(/\\/g, '/').toLowerCase();
+
             // F8 - Toggle Logpoint
             if (e.key === 'F8') {
+                console.log('F8 Pressed. ActiveFile:', activeFilePath, 'SelectedNodes:', selectedNodeIds);
                 e.preventDefault();
                 e.stopPropagation();
                 if (activeFilePath && selectedNodeIds.length > 0) {
-                    const file = openedFiles.find(f => f.path === activeFilePath);
+                    const normActive = normalizePath(activeFilePath);
+                    const file = openedFiles.find(f => normalizePath(f.path) === normActive);
+
                     if (file) {
                         const nodeId = selectedNodeIds[0];
                         const node = file.tree.nodes.get(nodeId);
                         if (node && node.uid !== undefined) {
+                            console.log('Toggling Logpoint for:', nodeId, node.uid);
                             toggleLogpoint(activeFilePath, node.uid);
+                        } else {
+                            console.warn('Node not found or no UID:', nodeId);
                         }
+                    } else {
+                        console.warn('File not found in openedFiles. Path:', activeFilePath);
                     }
+                } else {
+                    console.warn('No Active File or No Selection');
                 }
                 return;
             }
 
             // F9 - Toggle Breakpoint
             if (e.key === 'F9') {
+                console.log('F9 Pressed. ActiveFile:', activeFilePath, 'SelectedNodes:', selectedNodeIds);
                 e.preventDefault();
                 e.stopPropagation();
                 if (activeFilePath && selectedNodeIds.length > 0) {
-                    const file = openedFiles.find(f => f.path === activeFilePath);
+                    const normActive = normalizePath(activeFilePath);
+                    const file = openedFiles.find(f => normalizePath(f.path) === normActive);
+
                     if (file) {
                         const nodeId = selectedNodeIds[0];
                         const node = file.tree.nodes.get(nodeId);
                         if (node && node.uid !== undefined) {
+                            console.log('Toggling Breakpoint for:', nodeId, node.uid);
                             toggleBreakpoint(activeFilePath, node.uid);
+                        } else {
+                            console.warn('Node not found or no UID:', nodeId);
                         }
+                    } else {
+                        console.warn('File not found in openedFiles. Path:', activeFilePath);
                     }
+                } else {
+                    console.warn('No Active File or No Selection');
                 }
                 return;
             }

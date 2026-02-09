@@ -7,11 +7,12 @@
  * Matches Utility.Hash in C# editor
  */
 export function bkdrHash(s: string): number {
+    const bytes = new TextEncoder().encode(s);
     let hash = 0;
-    for (let i = 0; i < s.length; ++i) {
-        // hash = (hash << 5) + hash + s[i]
-        // Which is hash * 33 + s[i]
-        hash = ((hash << 5) + hash + s.charCodeAt(i)) >>> 0;
+    for (let i = 0; i < bytes.length; ++i) {
+        // hash = (hash << 5) + hash + bytes[i]
+        // Matches runtime's Utility::Hash(const char*)
+        hash = ((hash << 5) + hash + bytes[i]) >>> 0;
     }
     return hash;
 }
