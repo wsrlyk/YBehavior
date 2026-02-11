@@ -2,6 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 use std::env;
 use tauri::Manager;
+use tauri::Emitter;
 
 mod network;
 
@@ -72,6 +73,11 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .manage(DebugConnectionManager::new())
+        .setup(|app| {
+            // Start source exe watcher if configured
+            start_source_watcher(app.handle().clone());
+            Ok(())
+        })
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { .. } = event {
                 if window.label() == "main" {
@@ -100,3 +106,73 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
+/// Start a background thread that watches the source exe for changes.
+/// Reads `sourceExePath` from settings.json. If not configured, does nothing.
+fn start_source_watcher(handle: tauri::AppHandle) {
+    let exe_path = match env::current_exe() {
+        Ok(p) => p,
+        Err(_) => return,
+    };
+    let exe_dir = match exe_path.parent() {
+        Some(d) => d.to_path_buf(),
+        None => { println!("[Watcher] Error: Could not get exe parent dir."); return; },
+    };
+
+    // Read settings.json
+    let settings_path = exe_dir.join("config").join("settings.json");
+    let content = match fs::read_to_string(&settings_path) {
+        Ok(c) => c,
+        Err(e) => { println!("[Watcher] Skip: Could not read {:?}: {}", settings_path, e); return; },
+    };
+    let raw: serde_json::Value = match serde_json::from_str(&content) {
+        Ok(v) => v,
+        Err(e) => { println!("[Watcher] Error: settings.json parse failed: {}", e); return; },
+    };
+
+    let source_rel = match raw.get("sourceExePath").and_then(|v| v.as_str()) {
+        Some(s) if !s.is_empty() => s.to_string(),
+        _ => { println!("[Watcher] Skip: sourceExePath not configured in settings.json."); return; },
+    };
+
+    let source_path = match exe_dir.join(&source_rel).canonicalize() {
+        Ok(p) if p.exists() => p,
+        _ => { println!("[Watcher] Error: sourceExePath does not exist or is invalid: {}", source_rel); return; },
+    };
+
+    // Skip watcher if source path is the same as the current exe
+    if let Ok(current_canonical) = exe_path.canonicalize() {
+        if current_canonical == source_path {
+            return;
+        }
+    }
+
+    // Get initial file stats
+    let initial_stats = fs::metadata(&source_path).ok().and_then(|m| {
+        Some((m.len(), m.modified().ok()?))
+    });
+    
+    if initial_stats.is_none() {
+        return;
+    }
+    let initial_stats = initial_stats.unwrap();
+
+    // Spawn watcher thread
+    std::thread::spawn(move || {
+        loop {
+            std::thread::sleep(std::time::Duration::from_secs(3));
+
+            if let Ok(metadata) = fs::metadata(&source_path) {
+                if let Ok(modified) = metadata.modified() {
+                    let current_stats = (metadata.len(), modified);
+                    if current_stats != initial_stats {
+                        // Source exe has changed
+                        let _ = handle.emit("update-available", ());
+                        break; // Only notify once
+                    }
+                }
+            }
+        }
+    });
+}
+

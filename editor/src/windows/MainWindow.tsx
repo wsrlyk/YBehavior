@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { listen } from '@tauri-apps/api/event';
 // adjust imports since we moved into windows/ folder
 import { Sidebar } from "../components/Sidebar";
 import { EditorPane } from "../components/EditorPane";
@@ -37,6 +38,15 @@ export function MainWindow() {
     const [terminalHeight, setTerminalHeight] = useState(200);
     const [isResizingTerminal, setIsResizingTerminal] = useState(false);
     const [isResizingSidebar, setIsResizingSidebar] = useState(false);
+    const [updateAvailable, setUpdateAvailable] = useState(false);
+
+    // Listen for update-available event from Rust backend
+    useEffect(() => {
+        const unlisten = listen('update-available', () => {
+            setUpdateAvailable(true);
+        });
+        return () => { unlisten.then(fn => fn()); };
+    }, []);
 
     const activeFile = openedFiles.find(f => f.path === activeFilePath);
     const activeFSM = openedFSMFiles.find(f => f.path === activeFSMPath);
@@ -249,6 +259,14 @@ export function MainWindow() {
                         {/* 编辑器区域 */}
                         <div className="flex-1 relative">
                             <EditorPane onPaneClick={() => { setIsFileTreeOpen(false); setIsNewMenuOpen(false); }} />
+                            {/* Update watermark */}
+                            {updateAvailable && (
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[50]">
+                                    <div className="w-full text-center text-3xl font-bold text-blue-400/50 select-none tracking-wide drop-shadow-lg">
+                                        🔄 新版本已就绪，请关闭本程序后重新启动
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 
