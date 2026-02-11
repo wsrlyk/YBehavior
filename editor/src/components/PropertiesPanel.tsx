@@ -27,6 +27,8 @@ interface VariableItemProps {
   variable: Variable;
   onUpdate: (name: string, updates: Partial<Variable>) => void;
   onDelete: (name: string) => void;
+  onToggleScope: (name: string) => void;
+  siblingNames: string[]; // names of other variables in the same scope, for duplicate check
   debugValue?: string;
   isChanged?: boolean;
   isPaused?: boolean;
@@ -110,12 +112,19 @@ function AdaptiveSelect({ value, options, onChange, renderLabel, getOptionClass,
   );
 }
 
-function VariableItem({ variable, onUpdate, onDelete, debugValue, isChanged, isPaused }: VariableItemProps) {
+// Action modes for VariableItem
+type VarAction = 'none' | 'renaming' | 'toggling' | 'deleting';
+
+function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingNames, debugValue, isChanged, isPaused }: VariableItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(variable.defaultValue);
   const colorClass = TYPE_COLORS[variable.valueType] || 'text-gray-400';
   const isArray = variable.countType === 'list';
   const notify = useNotificationStore(state => state.notify);
+
+  // Unified action state
+  const [action, setAction] = useState<VarAction>('none');
+  const [renameName, setRenameName] = useState('');
 
   const handleValueSubmit = () => {
     if (editValue !== variable.defaultValue) {
@@ -144,8 +153,101 @@ function VariableItem({ variable, onUpdate, onDelete, debugValue, isChanged, isP
     onUpdate(variable.name, { countType: newCountType, defaultValue: getDefaultValue(variable.valueType, newIsArray) });
   };
 
+  // Click-to-Copy
+  const handleCopyName = () => {
+    navigator.clipboard.writeText(variable.name).then(() => {
+      notify(`Copied "${variable.name}"`, 'info');
+    }).catch(() => {
+      notify('Copy failed', 'error');
+    });
+  };
+
+  // Rename handlers
+  const handleStartRename = () => {
+    setRenameName(variable.name);
+    setAction('renaming');
+  };
+  const handleConfirmRename = () => {
+    const trimmed = renameName.trim();
+    if (!trimmed || trimmed === variable.name) {
+      setAction('none');
+      return;
+    }
+    const nameCheck = validateVariableName(trimmed);
+    if (!nameCheck.isValid) {
+      notify(nameCheck.error || 'Invalid variable name', 'error');
+      return;
+    }
+    if (siblingNames.includes(trimmed)) {
+      notify(`Variable "${trimmed}" already exists`, 'error');
+      return;
+    }
+    onUpdate(variable.name, { name: trimmed });
+    notify(`Renamed "${variable.name}" → "${trimmed}"`, 'info');
+    setAction('none');
+  };
+
   const focusTarget = useEditorMetaStore(state => state.uiMeta.focusTarget);
   const isFocused = focusTarget?.type === 'variable' && focusTarget.id === variable.name;
+
+  // Render action buttons area
+  const renderActionButtons = () => {
+    if (action === 'renaming') return null; // name area is replaced by input
+    if (action === 'toggling') {
+      return (
+        <div className="flex items-center bg-gray-900 rounded px-1 gap-1">
+          <span className="text-[10px] text-yellow-400 font-bold">Move?</span>
+          <button
+            onClick={() => { onToggleScope(variable.name); setAction('none'); }}
+            className="text-green-400 hover:text-green-300 px-1 py-0.5 text-[10px]"
+            title="Confirm"
+          >✓</button>
+          <button
+            onClick={() => setAction('none')}
+            className="text-gray-500 hover:text-gray-300 px-1 py-0.5 text-[10px]"
+            title="Cancel"
+          >✕</button>
+        </div>
+      );
+    }
+    if (action === 'deleting') {
+      return (
+        <div className="flex items-center bg-gray-900 rounded px-1 gap-1">
+          <span className="text-[10px] text-red-400 font-bold">Del?</span>
+          <button
+            onClick={() => onDelete(variable.name)}
+            className="text-green-400 hover:text-green-300 px-1 py-0.5 text-[10px]"
+            title="Confirm Delete"
+          >✓</button>
+          <button
+            onClick={() => setAction('none')}
+            className="text-gray-500 hover:text-gray-300 px-1 py-0.5 text-[10px]"
+            title="Cancel"
+          >✕</button>
+        </div>
+      );
+    }
+    // Default: show action buttons on hover
+    return (
+      <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          className="text-gray-600 hover:text-blue-400 text-[10px] px-0.5"
+          onClick={handleStartRename}
+          title="Rename variable"
+        >✎</button>
+        <button
+          className="text-gray-600 hover:text-yellow-400 text-[10px] px-0.5"
+          onClick={() => setAction('toggling')}
+          title={variable.isLocal ? 'Move to Shared' : 'Move to Local'}
+        >{variable.isLocal ? '↑' : '↓'}</button>
+        <button
+          className="text-gray-600 hover:text-red-400 text-[10px] px-0.5"
+          onClick={() => setAction('deleting')}
+          title="Delete variable"
+        >✕</button>
+      </div>
+    );
+  };
 
   return (
     <div
@@ -160,7 +262,7 @@ function VariableItem({ variable, onUpdate, onDelete, debugValue, isChanged, isP
           className={`absolute inset-0 bg-green-500/20 rounded pointer-events-none ${!isPaused ? 'animate-debug-flash' : ''}`}
         />
       )}
-      <div className="flex items-center gap-0.5">
+      <div className="flex items-center gap-0.5 min-w-0">
         <AdaptiveSelect
           value={variable.valueType}
           options={VALUE_TYPES}
@@ -171,22 +273,35 @@ function VariableItem({ variable, onUpdate, onDelete, debugValue, isChanged, isP
         />
 
         <button
-          className={`text-xs hover:bg-gray-700 ${colorClass} text-center px-0.5 rounded transition-colors min-w-[14px]`}
+          className={`text-xs hover:bg-gray-700 ${colorClass} text-center px-0.5 rounded transition-colors min-w-[14px] flex-shrink-0`}
           onClick={handleCountTypeToggle}
           title={isArray ? 'Switch to scalar' : 'Switch to array'}
         >
           {isArray ? '[]' : '·'}
         </button>
 
-        <span className="text-gray-300 flex-1 truncate">{variable.name}{variable.isLocal ? "'" : ""}</span>
-
-        <button
-          className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 text-xs"
-          onClick={() => onDelete(variable.name)}
-          title="Delete variable"
-        >
-          ✕
-        </button>
+        {action === 'renaming' ? (
+          <div className="flex items-center flex-1 min-w-0 gap-1">
+            <input
+              className="flex-1 min-w-0 text-xs bg-gray-700 text-gray-200 px-1 py-0.5 rounded outline-none border border-blue-500"
+              value={renameName}
+              onChange={(e) => setRenameName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmRename(); if (e.key === 'Escape') setAction('none'); }}
+              autoFocus
+            />
+            <button onClick={handleConfirmRename} className="text-green-400 hover:text-green-300 text-[10px] px-0.5 flex-shrink-0" title="Confirm">✓</button>
+            <button onClick={() => setAction('none')} className="text-gray-500 hover:text-gray-300 text-[10px] px-0.5 flex-shrink-0" title="Cancel">✕</button>
+          </div>
+        ) : (
+          <>
+            <span
+              className="text-gray-300 flex-1 truncate cursor-pointer hover:text-blue-300"
+              onClick={handleCopyName}
+              title="Click to copy name"
+            >{variable.name}{variable.isLocal ? "'" : ""}</span>
+            {renderActionButtons()}
+          </>
+        )}
       </div>
 
       <div className="flex items-center gap-1 mt-1">
@@ -287,6 +402,7 @@ interface InterfacePinItemProps {
 function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localVars }: InterfacePinItemProps) {
   const colorClass = TYPE_COLORS[pin.valueType] || 'text-gray-400';
   const isArray = pin.countType === 'list';
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleBindingChange = (val: string, type: 'variable' | 'const', isLocal?: boolean) => {
     let vectorIndex = pin.vectorIndex;
@@ -370,13 +486,33 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
 
         <span className="text-white flex-1 truncate font-medium">{pin.name}</span>
 
-        <button
-          className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 text-xs transition-opacity"
-          onClick={() => onDelete(pin.id)}
-          title="Delete pin"
-        >
-          ✕
-        </button>
+        {isDeleting ? (
+          <div className="flex items-center bg-gray-900 rounded px-1 gap-1">
+            <span className="text-[10px] text-red-400 font-bold">Del?</span>
+            <button
+              onClick={() => onDelete(pin.id)}
+              className="text-green-400 hover:text-green-300 px-1 py-0.5 text-[10px]"
+              title="Confirm Delete"
+            >
+              ✓
+            </button>
+            <button
+              onClick={() => setIsDeleting(false)}
+              className="text-gray-500 hover:text-gray-300 px-1 py-0.5 text-[10px]"
+              title="Cancel"
+            >
+              ✕
+            </button>
+          </div>
+        ) : (
+          <button
+            className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 text-xs transition-opacity"
+            onClick={() => setIsDeleting(true)}
+            title="Delete pin"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col gap-1 mt-1 pb-0.5">
@@ -519,6 +655,7 @@ export function PropertiesPanel() {
   const addTreeInterfacePin = useEditorStore((state) => state.addTreeInterfacePin);
   const updateTreeInterfacePin = useEditorStore((state) => state.updateTreeInterfacePin);
   const removeTreeInterfacePin = useEditorStore((state) => state.removeTreeInterfacePin);
+  const toggleVariableScope = useEditorStore((state) => state.toggleVariableScope);
 
   const sharedVariables = currentTree?.sharedVariables || [];
   const localVariables = currentTree?.localVariables || [];
@@ -554,12 +691,25 @@ export function PropertiesPanel() {
     return null;
   }, [isConnected, fileName, treeRunInfos, fsmRunInfo]);
 
+  const notify = useNotificationStore(state => state.notify);
+
   const handleUpdateShared = (name: string, updates: Partial<Variable>) => updateVariable(false, name, updates);
   const handleDeleteShared = (name: string) => removeVariable(false, name);
-  const handleAddShared = (v: Variable) => addVariable(false, v);
 
   const handleUpdateLocal = (name: string, updates: Partial<Variable>) => updateVariable(true, name, updates);
+
   const handleDeleteLocal = (name: string) => removeVariable(true, name);
+
+  const handleToggleScope = (name: string, isLocal: boolean) => {
+    const error = toggleVariableScope(name, isLocal);
+    if (error) {
+      notify(error, 'error');
+    } else {
+      notify(`Moved "${name}" to ${isLocal ? 'Shared' : 'Local'}`, 'info');
+    }
+  };
+
+  const handleAddShared = (v: Variable) => addVariable(false, v);
   const handleAddLocal = (v: Variable) => addVariable(true, v);
 
   const handleAddInterfacePin = (isInput: boolean, name: string) => {
@@ -571,6 +721,8 @@ export function PropertiesPanel() {
       binding: { type: isInput ? 'variable' : 'const', value: isInput ? '' : '0' }
     });
   };
+
+  const handleDeleteInterfacePin = (isInput: boolean, id: string) => removeTreeInterfacePin(isInput, id);
 
   // Ensure active properties tab is valid (not 'properties' anymore in top section)
   useEffect(() => {
@@ -636,6 +788,8 @@ export function PropertiesPanel() {
                       variable={v}
                       onUpdate={handleUpdateShared}
                       onDelete={handleDeleteShared}
+                      onToggleScope={(name) => handleToggleScope(name, false)}
+                      siblingNames={sharedVariables.filter(sv => sv.name !== v.name).map(sv => sv.name)}
                       debugValue={debugValues?.shared?.get(v.name)}
                       isChanged={debugValues?.sharedTs?.get(v.name) === currentKeyframe}
                       isPaused={isPaused}
@@ -657,6 +811,8 @@ export function PropertiesPanel() {
                       variable={v}
                       onUpdate={handleUpdateLocal}
                       onDelete={handleDeleteLocal}
+                      onToggleScope={(name) => handleToggleScope(name, true)}
+                      siblingNames={localVariables.filter(lv => lv.name !== v.name).map(lv => lv.name)}
                       debugValue={debugValues?.local?.get(v.name)}
                       isChanged={debugValues?.localTs?.get(v.name) === currentKeyframe}
                       isPaused={isPaused}
@@ -680,7 +836,7 @@ export function PropertiesPanel() {
                       pin={pin}
                       isInput={true}
                       onUpdate={(id, updates) => updateTreeInterfacePin(true, id, updates)}
-                      onDelete={(id) => removeTreeInterfacePin(true, id)}
+                      onDelete={(id) => handleDeleteInterfacePin(true, id)}
                       sharedVars={sharedVariables}
                       localVars={localVariables}
                     />
@@ -701,7 +857,7 @@ export function PropertiesPanel() {
                       pin={pin}
                       isInput={false}
                       onUpdate={(id, updates) => updateTreeInterfacePin(false, id, updates)}
-                      onDelete={(id) => removeTreeInterfacePin(false, id)}
+                      onDelete={(id) => handleDeleteInterfacePin(false, id)}
                       sharedVars={sharedVariables}
                       localVars={localVariables}
                     />
@@ -749,25 +905,27 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
   const setTooltip = useTooltipStore(state => state.setTooltip);
   const node = useMemo(() => currentTree?.nodes.get(nodeId), [currentTree, nodeId]);
   const definition = useMemo(() => node ? getDefinition(node.type) : undefined, [node, getDefinition]);
-  if (!node) return <div className="text-xs text-gray-600">Node not found</div>;
 
   const handleReloadSubTree = () => {
     reloadSubTreePins(nodeId);
   };
 
-
   const sharedVars = currentTree?.sharedVariables || [];
   const localVars = currentTree?.localVariables || [];
   const dataConnections = currentTree?.dataConnections || [];
 
+  const safePins = node?.pins || [];
+
   // 分组 Pin：输入和输出
-  const inputPins = useMemo(() => node.pins.filter(pin => pin.isInput), [node.pins]);
-  const outputPins = useMemo(() => node.pins.filter(pin => !pin.isInput), [node.pins]);
+  const inputPins = useMemo(() => safePins.filter(pin => pin.isInput), [safePins]);
+  const outputPins = useMemo(() => safePins.filter(pin => !pin.isInput), [safePins]);
 
   // 处理 Pin 更新 (内含类型/数量联动及 TypeMap)
   const handlePinUpdate = useCallback((pinName: string, updates: Partial<Pin>) => {
     updatePin(nodeId, pinName, updates);
   }, [updatePin, nodeId]);
+
+  if (!node) return <div className="text-xs text-gray-600">Node not found</div>;
 
   const renderPinList = (pins: Pin[]) => {
     if (pins.length === 0) return null;

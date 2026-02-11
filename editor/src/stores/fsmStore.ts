@@ -196,9 +196,21 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
     closeFSM: (path) => {
         const { openedFSMFiles, activeFSMPath } = get();
         const newFiles = openedFSMFiles.filter(f => f.path !== path);
-        const newActive = activeFSMPath === path
-            ? (newFiles.length > 0 ? newFiles[0].path : null)
-            : activeFSMPath;
+        let newActive = activeFSMPath;
+
+        if (activeFSMPath === path) {
+            if (newFiles.length > 0) {
+                // Select another FSM
+                newActive = newFiles[0].path;
+            } else {
+                // No more FSMs open, fallback to a Tree file if available
+                newActive = null;
+                const editorState = useEditorStore.getState();
+                if (editorState.openedFiles.length > 0) {
+                    editorState.setActiveFile(editorState.openedFiles[0].path);
+                }
+            }
+        }
 
         set({ openedFSMFiles: newFiles, activeFSMPath: newActive });
     },
@@ -725,13 +737,22 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
     },
 
     createNewFSM: (name) => {
-        const fsm = createEmptyFSM(name);
-        const path = `new://${name}.fsm`;
+        // Generate unique name
+        const { openedFSMFiles } = get();
+        let uniqueName = name;
+        let counter = 1;
+        while (openedFSMFiles.some(f => f.path === `new://${uniqueName}.fsm`)) {
+            uniqueName = `${name}${counter}`;
+            counter++;
+        }
+
+        const fsm = createEmptyFSM(uniqueName);
+        const path = `new://${uniqueName}.fsm`;
         const snapshot = serializeFSMForEditor(fsm);
 
         const newFile: OpenedFSMFile = {
             path,
-            name,
+            name: `${uniqueName}.fsm`,
             fsm,
             lastSavedSnapshot: snapshot,
             isDirty: false,
@@ -739,6 +760,9 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
             history: { past: [], future: [] },
             currentMachineId: fsm.rootMachineId,
         };
+
+        // Deactivate any active tree file
+        useEditorStore.getState().setActiveFile(null as any);
 
         set((state) => ({
             openedFSMFiles: [...state.openedFSMFiles, newFile],

@@ -15,6 +15,7 @@ import {
   updateOpenedFileTree
 } from './editorStoreCore';
 import { useDebugStore } from './debugStore';
+import { useFSMStore } from './fsmStore';
 
 // Re-export for backward compatibility
 export { getDescendantIds } from './editorStoreCore';
@@ -82,6 +83,7 @@ interface EditorState {
   addVariable: (isLocal: boolean, variable: Variable) => void;
   removeVariable: (isLocal: boolean, name: string) => void;
   updateVariable: (isLocal: boolean, name: string, updates: Partial<Variable>) => void;
+  toggleVariableScope: (name: string, currentIsLocal: boolean) => string | null; // returns error message or null on success
 
   // Pin 操作
   updatePin: (nodeId: string, pinName: string, updates: Partial<Pin>) => void;
@@ -233,7 +235,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
       // 如果关闭的是当前文件，切换到其他文件
       if (state.activeFilePath === path) {
-        newActiveFilePath = newOpenedFiles.length > 0 ? newOpenedFiles[0].path : null;
+        if (newOpenedFiles.length > 0) {
+          newActiveFilePath = newOpenedFiles[0].path;
+        } else {
+          // No more trees open, fallback to an FSM file if available
+          newActiveFilePath = null;
+          const fsmState = useFSMStore.getState();
+          if (fsmState.openedFSMFiles.length > 0) {
+            fsmState.setActiveFSM(fsmState.openedFSMFiles[0].path);
+          }
+        }
       }
 
       return {
@@ -1063,6 +1074,89 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     });
   },
 
+  toggleVariableScope: (name, currentIsLocal) => {
+    if (useDebugStore.getState().isConnected) return 'Cannot modify while connected';
+    let error: string | null = null;
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        const sourceList = currentIsLocal ? tree.localVariables : tree.sharedVariables;
+        const targetList = currentIsLocal ? tree.sharedVariables : tree.localVariables;
+        const variable = sourceList.find(v => v.name === name);
+        if (!variable) { error = `Variable "${name}" not found`; return tree; }
+        if (targetList.some(v => v.name === name)) {
+          error = `Variable "${name}" already exists in ${currentIsLocal ? 'Shared' : 'Local'} variables`;
+          return tree;
+        }
+
+        const newIsLocal = !currentIsLocal;
+        const movedVar = { ...variable, isLocal: newIsLocal };
+        let newTree = { ...tree };
+        if (currentIsLocal) {
+          newTree.localVariables = tree.localVariables.filter(v => v.name !== name);
+          newTree.sharedVariables = [...tree.sharedVariables, movedVar];
+        } else {
+          newTree.sharedVariables = tree.sharedVariables.filter(v => v.name !== name);
+          newTree.localVariables = [...tree.localVariables, movedVar];
+        }
+
+        // Update all node pin references
+        const newNodes = new Map(newTree.nodes);
+        for (const [nodeId, node] of newNodes) {
+          const newPins = node.pins.map(pin => {
+            let pinChanged = false;
+            let newPin = { ...pin };
+            if (pin.binding.type === 'pointer' && pin.binding.variableName === name && pin.binding.isLocal === currentIsLocal) {
+              newPin = { ...newPin, binding: { ...pin.binding, isLocal: newIsLocal } };
+              pinChanged = true;
+            }
+            if (pin.vectorIndex && pin.vectorIndex.type === 'pointer' && pin.vectorIndex.variableName === name && pin.vectorIndex.isLocal === currentIsLocal) {
+              newPin = { ...newPin, vectorIndex: { ...pin.vectorIndex, isLocal: newIsLocal } };
+              pinChanged = true;
+            }
+            return pinChanged ? newPin : pin;
+          });
+          const changed = newPins.some((p, i) => p !== node.pins[i]);
+          if (changed) {
+            newNodes.set(nodeId, { ...node, pins: newPins });
+          }
+        }
+        newTree.nodes = newNodes;
+
+        // Update tree interface pin bindings
+        newTree.inputs = tree.inputs.map(pin => {
+          let changed = false;
+          let newPin = { ...pin };
+          if (pin.binding.type === 'variable' && pin.binding.value === name && pin.binding.isLocal === currentIsLocal) {
+            newPin = { ...newPin, binding: { ...pin.binding, isLocal: newIsLocal } };
+            changed = true;
+          }
+          if (pin.vectorIndex && pin.vectorIndex.type === 'pointer' && pin.vectorIndex.variableName === name && pin.vectorIndex.isLocal === currentIsLocal) {
+            newPin = { ...newPin, vectorIndex: { ...pin.vectorIndex, isLocal: newIsLocal } };
+            changed = true;
+          }
+          return changed ? newPin : pin;
+        });
+        newTree.outputs = tree.outputs.map(pin => {
+          let changed = false;
+          let newPin = { ...pin };
+          if (pin.binding.type === 'variable' && pin.binding.value === name && pin.binding.isLocal === currentIsLocal) {
+            newPin = { ...newPin, binding: { ...pin.binding, isLocal: newIsLocal } };
+            changed = true;
+          }
+          if (pin.vectorIndex && pin.vectorIndex.type === 'pointer' && pin.vectorIndex.variableName === name && pin.vectorIndex.isLocal === currentIsLocal) {
+            newPin = { ...newPin, vectorIndex: { ...pin.vectorIndex, isLocal: newIsLocal } };
+            changed = true;
+          }
+          return changed ? newPin : pin;
+        });
+
+        return newTree;
+      });
+      return result || state;
+    });
+    return error;
+  },
+
   // Tree Interface (I/O) 操作
   addTreeInterfacePin: (isInput: boolean, pin: import('../types').TreeInterfacePin) => {
     if (useDebugStore.getState().isConnected) return;
@@ -1508,13 +1602,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
     const newFile: OpenedFile = {
       path,
-      name,
+      name: `${uniqueName}.tree`,
       tree: newTree,
       lastSavedTreeSnapshot: serializeTreeForEditor(newTree),
       isDirty: false,
       isNew: true,
       history: { past: [], future: [] }
     };
+
+    // Deactivate any active FSM file
+    useFSMStore.getState().setActiveFSM(null as any);
 
     return {
       openedFiles: [...state.openedFiles, newFile],
