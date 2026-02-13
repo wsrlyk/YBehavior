@@ -233,6 +233,16 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   }, [flowNodes, flowEdges, setNodes, setEdges]);
 
 
+  // Track mouse position for pasting
+  const mousePosRef = useRef({ x: 0, y: 0 });
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mousePosRef.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener('mousemove', handleMouseMove as any);
+    return () => window.removeEventListener('mousemove', handleMouseMove as any);
+  }, []);
+
   // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -250,6 +260,20 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         e.preventDefault();
         duplicateSelectedNodes();
       }
+
+      if (e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
+        e.preventDefault();
+        useEditorStore.getState().copySelectedNodes();
+      }
+
+      if (e.ctrlKey && (e.key === 'v' || e.key === 'V')) {
+        e.preventDefault();
+        const flowPos = screenToFlowPosition(mousePosRef.current);
+        useEditorStore.getState().pasteNodes(flowPos);
+      }
+
+      // Debug Shortcuts
+
 
       if (e.key === 'Delete' || e.key === 'Backspace') {
         const selectedIds = useEditorStore.getState().selectedNodeIds;

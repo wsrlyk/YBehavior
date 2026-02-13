@@ -173,20 +173,19 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
               }}
             >
               <span>Breakpoint</span>
-              {(() => {
-                const { activeFilePath } = useEditorStore.getState();
-                let fileName = '';
-                if (activeFilePath) {
-                  fileName = activeFilePath.split(/[\\/]/).pop()?.replace(/\.tree$/, '').replace(/\.fsm$/, '') || '';
-                }
-                const bpType = fileName && node && node.uid !== undefined ? useDebugStore.getState().getBreakpoint(fileName, node.uid) : BreakpointType.None;
-                const isBp = bpType === BreakpointType.Breakpoint;
-                return (
-                  <span className={`text-[10px] px-1.5 rounded ${isBp ? 'bg-red-600 text-white' : 'bg-[#404040] text-[#a3a3a3] group-hover:bg-[#525252]'}`}>
-                    {isBp ? 'ON' : 'OFF'}
-                  </span>
-                );
-              })()}
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-[#737373]">F9</span>
+                {(() => {
+                  const { activeFilePath } = useEditorStore.getState();
+                  const bpType = activeFilePath && node && node.uid !== undefined ? useDebugStore.getState().getBreakpoint(activeFilePath, node.uid) : BreakpointType.None;
+                  const isBp = bpType === BreakpointType.Breakpoint;
+                  return (
+                    <span className={`text-[10px] px-1.5 rounded ${isBp ? 'bg-red-600 text-white' : 'bg-[#404040] text-[#a3a3a3] group-hover:bg-[#525252]'}`}>
+                      {isBp ? 'ON' : 'OFF'}
+                    </span>
+                  );
+                })()}
+              </div>
             </div>
 
             <div
@@ -194,27 +193,25 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
               onClick={() => {
                 const { activeFilePath } = useEditorStore.getState();
                 if (activeFilePath && node && node.uid !== undefined) {
-                  const fileName = activeFilePath.split(/[\\/]/).pop()?.replace(/\.tree$/, '').replace(/\.fsm$/, '') || '';
-                  useDebugStore.getState().toggleLogpoint(fileName, node.uid);
+                  useDebugStore.getState().toggleLogpoint(activeFilePath, node.uid);
                 }
                 onClose();
               }}
             >
               <span>Logpoint</span>
-              {(() => {
-                const { activeFilePath } = useEditorStore.getState();
-                let fileName = '';
-                if (activeFilePath) {
-                  fileName = activeFilePath.split(/[\\/]/).pop()?.replace(/\.tree$/, '').replace(/\.fsm$/, '') || '';
-                }
-                const bpType = fileName && node && node.uid !== undefined ? useDebugStore.getState().getBreakpoint(fileName, node.uid) : BreakpointType.None;
-                const isLp = bpType === BreakpointType.Logpoint;
-                return (
-                  <span className={`text-[10px] px-1.5 rounded ${isLp ? 'bg-purple-600 text-white' : 'bg-[#404040] text-[#a3a3a3] group-hover:bg-[#525252]'}`}>
-                    {isLp ? 'ON' : 'OFF'}
-                  </span>
-                );
-              })()}
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-[#737373]">F8</span>
+                {(() => {
+                  const { activeFilePath } = useEditorStore.getState();
+                  const bpType = activeFilePath && node && node.uid !== undefined ? useDebugStore.getState().getBreakpoint(activeFilePath, node.uid) : BreakpointType.None;
+                  const isLp = bpType === BreakpointType.Logpoint;
+                  return (
+                    <span className={`text-[10px] px-1.5 rounded ${isLp ? 'bg-purple-600 text-white' : 'bg-[#404040] text-[#a3a3a3] group-hover:bg-[#525252]'}`}>
+                      {isLp ? 'ON' : 'OFF'}
+                    </span>
+                  );
+                })()}
+              </div>
             </div>
           </div>
         </>

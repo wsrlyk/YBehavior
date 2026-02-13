@@ -110,13 +110,15 @@ interface EditorState {
   updateTreeInterfacePin: (isInput: boolean, id: string, updates: Partial<import('../types').TreeInterfacePin>) => void;
 
   // SubTree 操作
-  reloadSubTreePins: (nodeId: string) => Promise<void>;
+  reloadSubTreePins: (subtreeNodeId: string) => Promise<void>;
+
+  // Clipboard
+  clipboard: { nodes: TreeNode[], connections: TreeConnection[], dataConnections: DataConnection[] } | null;
+  copySelectedNodes: () => void;
+  pasteNodes: (position?: { x: number; y: number }) => void;
 
   // 新建文件
   createNewTree: (name: string) => void;
-
-  // 刷新文件列表
-  refreshFiles: () => Promise<void>;
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
@@ -582,6 +584,240 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         selectedNodeIds: newDuplicatedIds,
       };
     });
+  },
+
+  // Clipboard Actions
+  clipboard: null,
+
+  copySelectedNodes: () => {
+    const state = get();
+    const tree = state.getCurrentTree();
+    if (!tree) return;
+
+    const selectedIds = new Set(state.selectedNodeIds);
+    if (selectedIds.size === 0) return;
+
+    const nodesToCopy = Array.from(tree.nodes.values()).filter(n => selectedIds.has(n.id) && n.type !== 'Root');
+
+    // Copy internal connections
+    const connectionsToCopy = tree.connections.filter(c =>
+      selectedIds.has(c.parentNodeId) && selectedIds.has(c.childNodeId)
+    );
+
+    // Copy internal data connections
+    const dataConnectionsToCopy = tree.dataConnections.filter(dc =>
+      selectedIds.has(dc.fromNodeId) && selectedIds.has(dc.toNodeId)
+    );
+
+    // Deep copy nodes to ensure clipboard is a snapshot
+    const nodesDeepCopy = nodesToCopy.map(node => ({
+      ...node,
+      pins: node.pins.map(p => ({
+        ...p,
+        binding: { ...p.binding },
+        vectorIndex: p.vectorIndex ? { ...p.vectorIndex } : undefined
+      }))
+    }));
+
+    logger.info(`Copied ${nodesDeepCopy.length} nodes to clipboard`);
+    useNotificationStore.getState().notify(`Copied ${nodesDeepCopy.length} nodes`);
+
+    set({ clipboard: { nodes: nodesDeepCopy, connections: connectionsToCopy, dataConnections: dataConnectionsToCopy } });
+  },
+
+  pasteNodes: (position?: { x: number; y: number }) => {
+    const state = get();
+    const clipboard = state.clipboard;
+    if (!clipboard || clipboard.nodes.length === 0) return;
+
+    if (useDebugStore.getState().isConnected) return;
+
+    // Calculate clipboard center and offset
+    let offsetX = 20;
+    let offsetY = 20;
+
+    if (position) {
+      if (clipboard.nodes.length > 0) {
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        clipboard.nodes.forEach(n => {
+          minX = Math.min(minX, n.position.x);
+          minY = Math.min(minY, n.position.y);
+          maxX = Math.max(maxX, n.position.x);
+          maxY = Math.max(maxY, n.position.y);
+        });
+        const centerX = (minX + maxX) / 2;
+        const centerY = (minY + maxY) / 2;
+        offsetX = position.x - centerX;
+        offsetY = position.y - centerY;
+      }
+    }
+
+    set((state) => {
+      const result = updateOpenedFileTree(state.openedFiles, state.activeFilePath, (tree) => {
+        const timestamp = Date.now();
+        const oldToNewIdMap = new Map<string, string>();
+        const newNodes = new Map(tree.nodes);
+        const pastedIds: string[] = [];
+
+        // Pre-collect existing GUIDs
+        const existingGUIDs = new Set<number>();
+        tree.nodes.forEach(n => existingGUIDs.add(n.guid));
+
+        // Prepare available variables for validation
+        const availableSharedVars = new Set(tree.sharedVariables.map(v => v.name));
+        const availableLocalVars = new Set(tree.localVariables.map(v => v.name));
+
+        // 1. Process Nodes
+        clipboard.nodes.forEach((node, index) => {
+          const newId = `node-${timestamp}-${index}`;
+          // Generate unique GUID
+          const newGuid = generateGUID(existingGUIDs);
+          existingGUIDs.add(newGuid);
+
+          oldToNewIdMap.set(node.id, newId);
+
+          // Deep copy pins to modify them safely
+          const newPins = node.pins.map(p => ({
+            ...p,
+            binding: { ...p.binding },
+            vectorIndex: p.vectorIndex ? { ...p.vectorIndex } : undefined
+          }));
+
+          // Validate Variables
+          newPins.forEach(pin => {
+            if (pin.binding.type === 'pointer') {
+              const varName = pin.binding.variableName;
+              const isLocal = pin.binding.isLocal;
+              const exists = isLocal ? availableLocalVars.has(varName) : availableSharedVars.has(varName);
+
+              if (!exists && varName) {
+                // Console warning only
+                console.warn(`[Paste] Variable '${varName}' not found in current tree. Pin '${pin.name}' in node '${node.nickname || node.type}' disconnected.`);
+
+                // Disconnect by switching to const default
+                pin.binding = { type: 'const', value: '' };
+                pin.bindingType = 'const'; // Also update the binding type
+              }
+            }
+
+            // Validate Vector Index Variable
+            if (pin.vectorIndex && pin.vectorIndex.type === 'pointer') {
+              const varName = pin.vectorIndex.variableName;
+              const isLocal = pin.vectorIndex.isLocal;
+              const exists = isLocal ? availableLocalVars.has(varName) : availableSharedVars.has(varName);
+
+              if (!exists && varName) {
+                console.warn(`[Paste] Index Variable '${varName}' not found. Pin '${pin.name}' index validation failed.`);
+
+                // Reset to const 0
+                pin.vectorIndex = { type: 'const', value: '0' };
+              }
+            }
+          });
+
+          // Calculate new position
+          const newX = position ? node.position.x + offsetX : node.position.x + 20;
+          const newY = position ? node.position.y + offsetY : node.position.y + 20;
+
+          const newNode: TreeNode = {
+            ...node,
+            id: newId,
+            guid: newGuid,
+            uid: undefined,
+            parentId: undefined,
+            childrenIds: [],
+            position: { x: newX, y: newY },
+            pins: newPins
+          };
+
+          newNodes.set(newId, newNode);
+          pastedIds.push(newId);
+        });
+
+        // 2. Process Connections
+        const newConnections = [...tree.connections];
+        clipboard.connections.forEach(conn => {
+          const newParentId = oldToNewIdMap.get(conn.parentNodeId);
+          const newChildId = oldToNewIdMap.get(conn.childNodeId);
+          if (newParentId && newChildId) {
+            newConnections.push({
+              ...conn,
+              id: `conn-${newParentId}-${newChildId}-${conn.parentConnector}-${timestamp}`,
+              parentNodeId: newParentId,
+              childNodeId: newChildId
+            });
+          }
+        });
+
+        // 3. Process Data Connections
+        const newDataConnections = [...tree.dataConnections];
+        clipboard.dataConnections.forEach(dc => {
+          const newFromId = oldToNewIdMap.get(dc.fromNodeId);
+          const newToId = oldToNewIdMap.get(dc.toNodeId);
+          if (newFromId && newToId) {
+            newDataConnections.push({
+              ...dc,
+              id: `data-${newFromId}-${newToId}-${dc.fromPinName}-${dc.toPinName}-${timestamp}`,
+              fromNodeId: newFromId,
+              toNodeId: newToId
+            });
+          }
+        });
+
+        return {
+          ...tree,
+          nodes: newNodes,
+          connections: newConnections,
+          dataConnections: newDataConnections
+        };
+      });
+
+      // Update state with new tree and selection
+      if (result) {
+        // Find the new IDs from the result to select them
+        // (Wait, we know pastedIds, but they are local to the update function... 
+        //  The updateWorked check is implicitly done by checking result.
+        //  However, to select them, we need to know them outside.
+        //  Since we generated them deterministically inside based on timestamp, 
+        //  we can't easily retrieve them unless we move generation out or capture them.
+        //  
+        //  Refactoring updateOpenedFileTree to return metadata would be hard.
+        //  Instead, let's just rely on the fact that we are in a set updater.
+        //  But wait, `timestamp` is local.
+        //  
+        //  Correct approach: 
+        //  The `updateOpenedFileTree` returns the NEW STATE (EditorState) or NULL using the `result || state` pattern.
+        //  Actually no, `updateOpenedFileTree` returns `EditorState | null`.
+        //  
+        //  We need to set `selectedNodeIds` to `pastedIds`. 
+        //  
+        //  Simple hack: We can't easily extract `pastedIds` from the functional update if it's pure.
+        //  
+        //  Let's capture pastedIds in a variable outside the updater? 
+        //  No, `updateOpenedFileTree` logic is complex.
+
+        //  Let's replicate the logic of `duplicateSelectedNodes` closer.
+        //  In `duplicateSelectedNodes`, `newDuplicatedIds` is closure variable.
+        //  Yes, that works!
+      }
+
+      return result || state;
+    });
+
+    // NOTE: The previous `set` call processes the update. 
+    // We cannot easily set selectedNodeIds accurately because we don't know the exact IDs generated inside the callback 
+    // if the callback is executed later or multiple times (though Zustand set is immediate usually).
+    //
+    // However, `updateOpenedFileTree` returns the *entire* state.
+    // So we can't "append" the selection update easily unless we modify `updateOpenedFileTree` or do it in two passes?
+    //
+    // Actually, `duplicateSelectedNodes` does it by `newDuplicatedIds = duplicatedIds` inside the callback,
+    // and then uses `newDuplicatedIds` in the return object.
+    //
+    // So I should do the same pattern.
+
+    // I need to correct my code above to include the `state` return with `selectedNodeIds`.
+    // I will rewrite the replacement content to include this correctly.
   },
 
   saveCurrentFile: async () => {

@@ -100,17 +100,18 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
 
   const fileName = useMemo(() => {
     if (!activeFilePath) return '';
-    return activeFilePath.split(/[\\/]/).pop()?.replace(/\.tree$/, '') || '';
+    return activeFilePath.split(/[\\/]/).pop()?.replace(/\.tree$/, '').replace(/\.fsm$/, '') || '';
   }, [activeFilePath]);
 
   const { debugState, isPaused, keyframe, bpType } = useDebugStore(
     useShallow(s => {
       const state = s.isConnected && treeNode.uid !== undefined
-        ? s.getNodeRunState(fileName, treeNode.uid)
+        ? s.getNodeRunState(fileName, treeNode.uid) // RunState uses fileName (basename) from Runtime
         : undefined;
 
       const debugState = state ? state.self : NodeState.Invalid;
 
+      // Breakpoints use activeFilePath (Full Path) as key, matching useGlobalKeyboard.ts
       const bp = activeFilePath && treeNode.uid !== undefined
         ? s.getBreakpoint(activeFilePath, treeNode.uid)
         : BreakpointType.None;
@@ -149,7 +150,7 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
 
       {/* Breakpoint/Logpoint Indicator */}
       {bpType !== BreakpointType.None && (
-        <div className={`absolute top-1 right-1 w-4 h-4 rounded-full z-[60] shadow-sm ${bpType === BreakpointType.Breakpoint ? 'bg-red-600' : 'bg-purple-600'}`} />
+        <div className={`absolute top-1 right-1 w-4 h-4 rounded-full z-[60] shadow-sm border-2 border-white ${bpType === BreakpointType.Breakpoint ? 'bg-red-600' : 'bg-purple-600'}`} />
       )}
 
       {treeNode.comment && (
