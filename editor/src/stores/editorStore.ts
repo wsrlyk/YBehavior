@@ -119,6 +119,9 @@ interface EditorState {
 
   // 新建文件
   createNewTree: (name: string) => void;
+
+  // Refresh file list
+  refreshFiles: () => Promise<void>;
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
@@ -155,13 +158,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   refreshFiles: async () => {
     const { editorTreeDir } = get();
     if (!editorTreeDir) return;
+
     try {
       const files = await listFiles(editorTreeDir, ['tree', 'fsm']);
       set({ treeFiles: files });
+      // Cleanup orphaned meta files
+      useEditorMetaStore.getState().cleanOrphanedMeta(files);
     } catch (e) {
       console.error('Failed to refresh files:', e);
     }
   },
+
+
 
   openTree: async (path) => {
     const { editorTreeDir, openedFiles } = get();

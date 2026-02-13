@@ -186,19 +186,30 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     });
 
     connectionsByParent.forEach((conns) => {
-      const siblingTargetIds = conns.map(c => c.childNodeId);
-      conns.forEach((conn) => {
-        if (!hiddenNodeIds.has(conn.parentNodeId) && !hiddenNodeIds.has(conn.childNodeId)) {
-          edges.push({
-            id: conn.id,
-            source: conn.parentNodeId,
-            sourceHandle: conn.parentConnector,
-            target: conn.childNodeId,
-            targetHandle: 'tree-target',
-            type: 'tree',
-            data: { siblingTargetIds, label: conn.label },
-          });
-        }
+      // Group connections by parentConnector (source handle)
+      const visibleConns = conns.filter(c => !hiddenNodeIds.has(c.parentNodeId) && !hiddenNodeIds.has(c.childNodeId));
+
+      const connsByHandle = new Map<string, string[]>();
+      visibleConns.forEach(c => {
+        const handle = c.parentConnector || 'default';
+        const group = connsByHandle.get(handle) || [];
+        group.push(c.childNodeId);
+        connsByHandle.set(handle, group);
+      });
+
+      visibleConns.forEach((conn) => {
+        const handle = conn.parentConnector || 'default';
+        const siblingTargetIds = connsByHandle.get(handle) || [];
+
+        edges.push({
+          id: conn.id,
+          source: conn.parentNodeId,
+          sourceHandle: conn.parentConnector,
+          target: conn.childNodeId,
+          targetHandle: 'tree-target',
+          type: 'tree',
+          data: { siblingTargetIds, label: conn.label },
+        });
       });
     });
 

@@ -168,7 +168,7 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
 
       <div className="relative">
         <div
-          className={`rounded shadow-lg min-w-32 cursor-move hover:brightness-110 transition-[filter,border-color,box-shadow] duration-200 ${isEffectivelyDisabled ? 'grayscale opacity-60' : ''}`}
+          className={`rounded shadow-lg min-w-32 cursor-grab resize-none hover:brightness-110 transition-[filter,border-color,box-shadow] duration-200 ${isEffectivelyDisabled ? 'grayscale opacity-60' : ''}`}
           style={{
             backgroundColor: theme.ui.panelBg,
             border: `1px solid ${selected ? '#fff' : theme.ui.border}`,

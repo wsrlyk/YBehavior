@@ -5,6 +5,8 @@ import { useDebugStore } from '../stores/debugStore';
 import { useShallow } from 'zustand/react/shallow';
 import { NodeState } from '../types/debug';
 import { getTheme } from '../theme/theme';
+import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
+import type { TreeNode } from '../types';
 
 const theme = getTheme();
 
@@ -28,6 +30,7 @@ function TreeEdge({
   targetX,
   targetY,
   target,
+  sourceHandleId,
   style,
   markerEnd,
   data,
@@ -37,6 +40,9 @@ function TreeEdge({
   const siblingTargetIds = edgeData?.siblingTargetIds || [];
   const label = edgeData?.label;
 
+  // Import definition store
+  const { getDefinition } = useNodeDefinitionStore();
+
   // 从 store 获取水平线高度
   const horizontalY = useStore((state) => {
     // 1. 获取父节点的位置和尺寸
@@ -44,6 +50,26 @@ function TreeEdge({
     if (!sourceNode) {
       return sourceY + 30;
     }
+
+    // Determine handle index for vertical offset
+    // Determine handle index for vertical offset
+    let handleIndex = 0;
+    const treeNode = sourceNode.data.treeNode as TreeNode | undefined;
+    const nodeDef = getDefinition(treeNode?.type || '');
+
+    if (sourceHandleId === 'condition') {
+      handleIndex = -1;
+    } else if (nodeDef && nodeDef.childConnectors && nodeDef.childConnectors.length > 0) {
+      if (sourceHandleId) {
+        const index = nodeDef.childConnectors.findIndex(c => c.name === sourceHandleId);
+        if (index !== -1) {
+          handleIndex = index;
+        }
+      }
+    }
+
+    // Base vertical offset per handle index (e.g., 20px per index)
+    const baseOffset = (handleIndex * 20);
 
     const height = sourceNode.measured?.height ?? 60;
     const parentBottomY = sourceNode.position.y + height;
@@ -61,9 +87,10 @@ function TreeEdge({
     }
 
     // 3. 计算水平线高度
+    // Add baseOffset to the calculation to separate lines
     return Math.max(
-      parentBottomY + 10,
-      (parentBottomY + minChildY) / 2
+      parentBottomY + 10 + baseOffset,
+      ((parentBottomY + minChildY) / 2) + baseOffset
     );
   });
 
