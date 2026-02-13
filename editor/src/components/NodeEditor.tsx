@@ -37,6 +37,8 @@ const edgeTypes = {
   data: DataEdge,
 };
 
+import { generateGUID } from '../utils/guidUtils';
+
 function treeNodeToFlowNode(
   node: TreeNode,
   getDefinition: (className: string) => import('../types/nodeDefinition').NodeDefinition | undefined
@@ -694,9 +696,17 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       };
     });
 
+    const existingGUIDs = new Set<number>();
+    if (currentTree) {
+      currentTree.nodes.forEach(n => existingGUIDs.add(n.guid));
+    }
+
+    const newGuid = generateGUID(existingGUIDs);
+    const timestamp = Date.now();
+
     const newNode: TreeNode = {
-      id: `node-${Date.now()}`,
-      guid: Date.now(),
+      id: `node-${timestamp}`,
+      guid: newGuid,
       type: nodeClass,
       category: def.category as NodeCategory,
       position: screenToFlowPosition(contextMenu.screenPosition),
@@ -706,7 +716,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     };
 
     addNode(newNode);
-  }, [getDefinition, addNode, contextMenu.screenPosition, screenToFlowPosition]);
+  }, [getDefinition, addNode, contextMenu.screenPosition, screenToFlowPosition, currentTree]);
 
   if (!currentTree) {
     return (

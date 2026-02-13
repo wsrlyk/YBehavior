@@ -2,6 +2,7 @@
 import type { Tree, TreeNode, TreeConnection, DataConnection, Variable, Pin } from '../types';
 import { loadTree, listFiles, saveFile } from '../utils/fileService';
 import { loadSettings, type Settings } from '../utils/settings';
+import { generateGUID } from '../utils/guidUtils';
 import { useNodeDefinitionStore } from './nodeDefinitionStore';
 import { serializeTreeForEditor, serializeTreeForRuntime } from '../utils/xmlSerializer';
 import { validateValue, getDefaultValue } from '../utils/validation';
@@ -496,10 +497,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         const newNodes = new Map(tree.nodes);
         const duplicatedIds: string[] = [];
 
+        // Pre-collect existing GUIDs
+        const existingGUIDs = new Set<number>();
+        tree.nodes.forEach(n => existingGUIDs.add(n.guid));
+
         // 1. Duplicate Nodes
         nodesToDuplicate.forEach((node, index) => {
           const newId = `node-${timestamp}-${index}`;
-          const newGuid = timestamp + index;
+          const newGuid = generateGUID(existingGUIDs);
+          existingGUIDs.add(newGuid);
+
           oldToNewIdMap.set(node.id, newId);
 
           const newNode: TreeNode = {

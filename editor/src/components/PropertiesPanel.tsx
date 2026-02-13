@@ -317,7 +317,22 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
             <span className="text-gray-500 text-xs shrink-0">=</span>
 
             <div className="flex-1 min-w-0">
-              {isEditing ? (
+              {variable.valueType === 'bool' && variable.countType !== 'list' ? (
+                <button
+                  className={`px-2 py-0.5 rounded text-xs font-bold transition-colors ${variable.defaultValue === 'T'
+                    ? 'bg-green-700 text-green-100 hover:bg-green-600'
+                    : 'bg-red-900/50 text-red-200 hover:bg-red-800/50'
+                    }`}
+                  onClick={() => onUpdate(variable.name, { defaultValue: variable.defaultValue === 'T' ? 'F' : 'T' })}
+                  title="Click to toggle (True/False)"
+                >
+                  {variable.defaultValue === 'T' ? 'TRUE' : 'FALSE'}
+                </button>
+              ) : variable.valueType === 'entity' && variable.countType !== 'list' ? (
+                <span className="block w-full text-xs truncate text-gray-500 italic cursor-not-allowed">
+                  (Entity: Read-only)
+                </span>
+              ) : isEditing ? (
                 <input
                   className={`w-full text-xs px-1 rounded outline-none ${!validateValue(editValue, variable.valueType, variable.countType).isValid
                     ? 'bg-red-900 text-white'
@@ -470,6 +485,9 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
   const focusTarget = useEditorMetaStore(state => state.uiMeta.focusTarget);
   const isFocused = focusTarget?.type === 'io' && focusTarget.id === pin.id;
 
+  const compatibleShared = sharedVars.filter(v => v.valueType === pin.valueType && (pin.countType === 'scalar' || v.countType === 'list'));
+  const compatibleLocal = localVars.filter(v => v.valueType === pin.valueType && (pin.countType === 'scalar' || v.countType === 'list'));
+
   return (
     <div
       id={`io-${pin.id}`}
@@ -549,16 +567,16 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
               }}
             >
               <option value="">(None)</option>
-              {sharedVars.length > 0 && (
+              {compatibleShared.length > 0 && (
                 <optgroup label="Shared">
-                  {sharedVars.map(v => (
+                  {compatibleShared.map(v => (
                     <option key={`s-${v.name}`} value={`shared:${v.name}`}>{v.name}{v.countType === 'list' ? '[]' : ''}</option>
                   ))}
                 </optgroup>
               )}
-              {localVars.length > 0 && (
+              {compatibleLocal.length > 0 && (
                 <optgroup label="Local">
-                  {localVars.map(v => (
+                  {compatibleLocal.map(v => (
                     <option key={`l-${v.name}`} value={`local:${v.name}`}>{v.name}'{v.countType === 'list' ? '[]' : ''}</option>
                   ))}
                 </optgroup>
@@ -1456,6 +1474,26 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-purple-500 pointer-events-none" title="Connected" />
               )}
             </div>
+          ) : pin.valueType === 'bool' && pin.countType !== 'list' ? (
+            <button
+              className={`w-full text-xs px-1 py-0.5 rounded font-bold transition-colors ${pin.binding.type === 'const' && pin.binding.value === 'T'
+                ? 'bg-green-700 text-green-100 hover:bg-green-600'
+                : 'bg-red-900/50 text-red-200 hover:bg-red-800/50'
+                }`}
+              onClick={() => {
+                const currentVal = pin.binding.type === 'const' ? pin.binding.value : 'F';
+                const newValue = currentVal === 'T' ? 'F' : 'T';
+                onUpdate({ binding: { type: 'const', value: newValue } });
+                setEditValue(newValue);
+              }}
+              title="Click to toggle (True/False)"
+            >
+              {pin.binding.type === 'const' && pin.binding.value === 'T' ? 'TRUE' : 'FALSE'}
+            </button>
+          ) : pin.valueType === 'entity' && pin.countType !== 'list' ? (
+            <span className="block w-full text-xs text-gray-500 italic px-1 py-0.5 cursor-not-allowed border border-transparent">
+              (Entity: Read-only)
+            </span>
           ) : (
             // Constant Mode
             isEditing ? (
@@ -1528,9 +1566,10 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
                 </div>
               </span>
             )
+
           )}
-        </div>
-      </div>
+        </div >
+      </div >
 
       {(needsVectorIndex || hasVectorIndex) && bindingType === 'pointer' && (
         <div className="mt-1 flex items-center gap-1 pl-4">
@@ -1577,6 +1616,6 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
           )}
         </div>
       )}
-    </div>
+    </div >
   );
 });
