@@ -1,4 +1,10 @@
 import { BaseEdge, EdgeLabelRenderer, getStraightPath, useInternalNode, type EdgeProps, type Edge } from '@xyflow/react';
+import { getTheme } from '../theme/theme';
+
+import { useEditorStore } from '../stores/editorStore';
+import { useShallow } from 'zustand/react/shallow';
+
+const theme = getTheme();
 
 export type FSMTransitionEdgeData = {
     transitions?: any[];
@@ -17,6 +23,10 @@ export default function FSMTransitionEdge({
 }: EdgeProps<FSMTransitionEdgeType>) {
     const sourceNode = useInternalNode(source);
     const targetNode = useInternalNode(target);
+
+    const isConnectedToSelected = useEditorStore(useShallow((s) =>
+        s.selectedNodeIds.includes(source) || s.selectedNodeIds.includes(target)
+    ));
 
     if (!sourceNode || !targetNode) return null;
 
@@ -65,7 +75,13 @@ export default function FSMTransitionEdge({
     const transitionCount = data?.transitions?.length || 1;
     const showCount = transitionCount > 1;
     const arrowSize = showCount ? 14 : 10;
-    const color = selected ? '#63b3ed' : '#718096';
+
+    let color = theme.edge.fsmTransition.default;
+    if (selected) {
+        color = theme.edge.fsmTransition.selected;
+    } else if (isConnectedToSelected) {
+        color = theme.edge.fsmTransition.selected + '80'; // Dim highlight
+    }
 
     const textX = -arrowSize * 0.9;
 

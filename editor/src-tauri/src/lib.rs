@@ -30,6 +30,11 @@ fn write_file(path: String, content: String) -> Result<(), String> {
 }
 
 #[tauri::command]
+fn exit_app(app: tauri::AppHandle) {
+    app.exit(0);
+}
+
+#[tauri::command]
 fn list_files(dir: String, extensions: Vec<String>) -> Result<Vec<String>, String> {
     let path = PathBuf::from(&dir);
     if !path.is_dir() {
@@ -101,7 +106,8 @@ pub fn run() {
             debug_connect,
             debug_disconnect,
             debug_send,
-            debug_is_connected
+            debug_is_connected,
+            exit_app
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -160,7 +166,7 @@ fn start_source_watcher(handle: tauri::AppHandle) {
     // Spawn watcher thread
     std::thread::spawn(move || {
         loop {
-            std::thread::sleep(std::time::Duration::from_secs(3));
+            std::thread::sleep(std::time::Duration::from_secs(300));
 
             if let Ok(metadata) = fs::metadata(&source_path) {
                 if let Ok(modified) = metadata.modified() {

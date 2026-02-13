@@ -17,7 +17,10 @@ import { useEditorStore, getDescendantIds } from '../stores/editorStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import { useDebugStore } from '../stores/debugStore';
+import { getTheme } from '../theme/theme';
 import { NodeContextMenu } from './NodeContextMenu';
+
+const theme = getTheme();
 import CustomNode, { type CustomNodeType } from './CustomNode';
 import TreeEdge from './TreeEdge';
 import DataEdge from './DataEdge';
@@ -742,14 +745,15 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         selectionOnDrag
         selectionKeyCode={null}
         proOptions={{ hideAttribution: true }}
-        className="bg-gray-900"
+        style={{ backgroundColor: theme.ui.background }}
         deleteKeyCode={null}
       >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#374151" />
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color={theme.ui.gridDots} />
         <Controls
           style={{
-            backgroundColor: '#1f2937',
-            border: '1px solid #374151',
+            backgroundColor: theme.ui.panelBg,
+            borderColor: theme.ui.border,
+            fill: theme.ui.textMain
           }}
         />
         <MiniMap
@@ -757,8 +761,8 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
           zoomable
           pannable
           style={{
-            backgroundColor: '#1f2937',
-            border: '1px solid #374151',
+            backgroundColor: theme.ui.panelBg,
+            borderColor: theme.ui.border,
           }}
           maskColor="rgba(0, 0, 0, 0.6)"
         />

@@ -38,6 +38,9 @@ export function MainWindow() {
     const [terminalHeight, setTerminalHeight] = useState(200);
     const [isResizingTerminal, setIsResizingTerminal] = useState(false);
     const [isResizingSidebar, setIsResizingSidebar] = useState(false);
+    const [isResizingProperties, setIsResizingProperties] = useState(false);
+    const propertiesPanelWidth = useEditorMetaStore(state => state.uiMeta.propertiesPanelWidth || 300);
+    const setPropertiesPanelWidth = useEditorMetaStore(state => state.setPropertiesPanelWidth);
     const [updateAvailable, setUpdateAvailable] = useState(false);
 
     // Listen for update-available event from Rust backend
@@ -130,14 +133,19 @@ export function MainWindow() {
                 const newWidth = e.clientX;
                 setSidebarWidth(Math.max(100, Math.min(newWidth, 500)));
             }
+            if (isResizingProperties) {
+                const newWidth = window.innerWidth - e.clientX;
+                setPropertiesPanelWidth(Math.max(200, Math.min(newWidth, 800)));
+            }
         };
 
         const handleMouseUp = () => {
             setIsResizingTerminal(false);
             setIsResizingSidebar(false);
+            setIsResizingProperties(false);
         };
 
-        if (isResizingTerminal || isResizingSidebar) {
+        if (isResizingTerminal || isResizingSidebar || isResizingProperties) {
             window.addEventListener('mousemove', handleMouseMove);
             window.addEventListener('mouseup', handleMouseUp);
         }
@@ -145,7 +153,7 @@ export function MainWindow() {
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('mouseup', handleMouseUp);
         };
-    }, [isResizingTerminal, isResizingSidebar, setSidebarWidth]);
+    }, [isResizingTerminal, isResizingSidebar, isResizingProperties, setSidebarWidth, setPropertiesPanelWidth]);
 
     const handlePopOut = async () => {
         const windows = await getAllWindows();
@@ -176,7 +184,7 @@ export function MainWindow() {
                     )}
 
                     {/* 主编辑区 */}
-                    <div className="flex-1 flex flex-col min-h-0">
+                    <div className="flex-1 flex flex-col min-h-0 min-w-0">
                         {/* 工具栏 */}
                         <div className="h-10 bg-gray-800 border-b border-gray-700 flex items-center px-4 gap-2 flex-shrink-0">
                             <button
@@ -270,12 +278,22 @@ export function MainWindow() {
                         </div>
                     </div>
 
+                    {/* Resize Handle for Properties Panel */}
+                    {(activeFile?.name.endsWith('.tree') || (activeFSMPath && activeFSMPath.endsWith('.fsm'))) && (
+                        <div
+                            className="w-1 bg-gray-800 hover:bg-blue-500 cursor-col-resize transition-colors flex-shrink-0"
+                            onMouseDown={() => setIsResizingProperties(true)}
+                        />
+                    )}
+
                     {/* 属性面板区域 (FSM 面板现在常驻以防止布局跳动) */}
-                    {activeFile?.name.endsWith('.tree') ? (
-                        <PropertiesPanel />
-                    ) : (activeFSMPath && activeFSMPath.endsWith('.fsm')) ? (
-                        <FSMPropertiesPanel />
-                    ) : null}
+                    <div style={{ width: propertiesPanelWidth }} className="flex-shrink-0 flex flex-col overflow-hidden">
+                        {activeFile?.name.endsWith('.tree') ? (
+                            <PropertiesPanel />
+                        ) : (activeFSMPath && activeFSMPath.endsWith('.fsm')) ? (
+                            <FSMPropertiesPanel />
+                        ) : null}
+                    </div>
                 </div>
 
                 {/* 底部：Docked Terminal */}

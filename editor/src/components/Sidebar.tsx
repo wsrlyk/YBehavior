@@ -7,6 +7,10 @@ import { NodeState } from '../types/debug';
 import { getFileDisplay } from '../utils/fileUtils';
 import { DEBUG_COLORS, TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
 
+import { getTheme } from '../theme/theme';
+
+const theme = getTheme();
+
 export function Sidebar() {
   const { openedFiles, activeFilePath, setActiveFile, closeFile, isLoading } = useEditorStore();
   const { openedFSMFiles, activeFSMPath, setActiveFSM, closeFSM } = useFSMStore();
@@ -46,12 +50,16 @@ export function Sidebar() {
 
   return (
     <div
-      className="h-full bg-gray-900 border-r border-gray-700 flex flex-col flex-shrink-0"
-      style={{ width: sidebarWidth }}
+      className="h-full flex flex-col flex-shrink-0"
+      style={{
+        width: sidebarWidth,
+        backgroundColor: theme.ui.background,
+        borderRight: `1px solid ${theme.ui.border}`
+      }}
     >
       {/* 已打开文件列表 */}
       <div className="flex-1 overflow-auto custom-scrollbar">
-        <div className="p-2 text-[10px] text-gray-500 uppercase tracking-wider font-semibold">
+        <div className="p-2 text-[10px] text-[#737373] uppercase tracking-wider font-semibold">
           Open Files
         </div>
         {isLoading ? (
@@ -165,8 +173,8 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
     <div
       onClick={onClick}
       className={`group relative flex items-center px-1.5 py-1 text-[11px] cursor-pointer ${isActive
-        ? 'bg-gray-700 text-white'
-        : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+        ? 'bg-[#404040] text-white'
+        : 'text-[#a3a3a3] hover:bg-[#262626] hover:text-[#e5e5e5]'
         }`}
       title={file.name}
     >
@@ -184,7 +192,7 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
           e.stopPropagation();
           onClose();
         }}
-        className="absolute right-0.5 opacity-0 group-hover:opacity-100 hover:bg-gray-600 rounded px-0.5 text-gray-400 hover:text-white transition-all"
+        className="absolute right-0.5 opacity-0 group-hover:opacity-100 hover:bg-[#404040] rounded px-0.5 text-[#a3a3a3] hover:text-white transition-all"
         title="Close"
       >
         ×

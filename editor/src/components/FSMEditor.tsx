@@ -29,6 +29,9 @@ import { useFSMStore } from '../stores/fsmStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useDebugStore } from '../stores/debugStore';
 import type { FSMMachine, FSMTransition, FSMState } from '../types/fsm';
+import { getTheme } from '../theme/theme';
+
+const theme = getTheme();
 
 // ==================== Node & Edge Types ====================
 
@@ -566,12 +569,12 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                 fitView
                 snapToGrid
                 snapGrid={[20, 20]}
-                className="bg-gray-900"
+                style={{ backgroundColor: theme.ui.background }}
             >
-                <Background color="#333" gap={20} />
-                <Controls className="!bg-gray-800 !border-gray-700" />
+                <Background color={theme.ui.gridDots} gap={20} />
+                <Controls style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border, fill: theme.ui.textMain }} />
                 <MiniMap
-                    className="!bg-gray-800 !border-gray-700"
+                    style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}
                     nodeColor={(node) => {
                         const data = node.data as FSMStateNodeData;
                         const colors: Record<string, string> = {
@@ -588,7 +591,7 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
 
                 {/* Navigation breadcrumb */}
                 {fsm && (
-                    <Panel position="top-left" className="bg-gray-800 p-2 rounded shadow-lg">
+                    <Panel position="top-left" style={{ backgroundColor: theme.ui.panelBg, color: theme.ui.textMain }} className="p-2 rounded shadow-lg">
                         <div className="flex items-center gap-1 text-sm">
                             {(() => {
                                 // Build breadcrumb path from root to current machine
@@ -631,13 +634,14 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
 
                                 return breadcrumbs.map((bc, idx) => (
                                     <span key={bc.machineId} className="flex items-center gap-1">
-                                        {idx > 0 && <span className="text-gray-500">›</span>}
+                                        {idx > 0 && <span style={{ color: theme.ui.textDim }}>›</span>}
                                         {bc.machineId === machine.id ? (
                                             <span className="text-white font-medium">{bc.name}</span>
                                         ) : (
                                             <button
                                                 onClick={() => navigateToMachine(bc.machineId)}
-                                                className="text-gray-400 hover:text-blue-400 hover:underline transition-colors"
+                                                className="hover:underline transition-colors"
+                                                style={{ color: theme.ui.textDim }}
                                             >
                                                 {bc.name}
                                             </button>
@@ -650,10 +654,11 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                 )}
 
                 {/* Add state buttons */}
-                <Panel position="top-right" className="bg-gray-800 p-2 rounded shadow-lg flex gap-2">
+                <Panel position="top-right" style={{ backgroundColor: theme.ui.panelBg, color: theme.ui.textMain }} className="p-2 rounded shadow-lg flex gap-2">
                     <button
                         onClick={() => handleAddState('Normal')}
-                        className="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded"
+                        className="px-3 py-1 text-sm text-white rounded hover:opacity-80 transition-opacity"
+                        style={{ backgroundColor: theme.ui.border }}
                     >
                         + State
                     </button>
@@ -667,11 +672,12 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                 {/* Context Menu */}
                 {menu && (
                     <div
-                        style={{ top: menu.top, left: menu.left }}
-                        className="absolute z-50 bg-gray-800 border border-gray-700 rounded shadow-xl py-1 min-w-[120px]"
+                        style={{ top: menu.top, left: menu.left, backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}
+                        className="absolute z-50 border rounded shadow-xl py-1 min-w-[120px]"
                     >
                         <button
-                            className="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-blue-600 transition-colors"
+                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-blue-600 transition-colors"
+                            style={{ color: theme.ui.textMain }}
                             onClick={() => {
                                 setDefaultState(menu.id);
                                 setMenu(null);
@@ -679,7 +685,7 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                         >
                             Set as Default
                         </button>
-                        <div className="border-t border-gray-700 my-1" />
+                        <div className="border-t my-1" style={{ borderColor: theme.ui.border }} />
                         <button
                             className="w-full text-left px-3 py-1.5 text-xs text-red-400 hover:bg-red-600 hover:text-white transition-colors"
                             onClick={() => {
@@ -695,10 +701,10 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                 {/* State Picker Modal */}
                 {pickerData && (
                     <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-8">
-                        <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-2xl w-full max-w-md flex flex-col max-h-full">
-                            <div className="p-4 border-b border-gray-700 flex justify-between items-center">
-                                <h3 className="text-lg font-semibold text-white">Select Target State</h3>
-                                <button onClick={() => setPickerData(null)} className="text-gray-400 hover:text-white text-xl">✕</button>
+                        <div className="border rounded-lg shadow-2xl w-full max-w-md flex flex-col max-h-full" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
+                            <div className="p-4 border-b flex justify-between items-center" style={{ borderColor: theme.ui.border }}>
+                                <h3 className="text-lg font-semibold" style={{ color: theme.ui.textMain }}>Select Target State</h3>
+                                <button onClick={() => setPickerData(null)} className="hover:text-white text-xl" style={{ color: theme.ui.textDim }}>✕</button>
                             </div>
                             <div className="flex-1 overflow-auto p-2 scrollbar-thin scrollbar-thumb-gray-700">
                                 {pickerData.states.map(s => (
@@ -710,17 +716,19 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                                             }
                                             setPickerData(null);
                                         }}
-                                        className="w-full text-left p-3 hover:bg-gray-700 rounded-md group transition-colors flex flex-col"
+                                        className="w-full text-left p-3 rounded-md group transition-colors flex flex-col hover:bg-[#404040]"
+                                        style={{ color: theme.ui.textMain }}
                                     >
-                                        <div className="text-sm font-medium text-white group-hover:text-blue-400">{s.name}</div>
-                                        <div className="text-xs text-gray-500">{s.machineName}</div>
+                                        <div className="text-sm font-medium group-hover:text-blue-400">{s.name}</div>
+                                        <div className="text-xs" style={{ color: theme.ui.textDim }}>{s.machineName}</div>
                                     </button>
                                 ))}
                             </div>
-                            <div className="p-3 border-t border-gray-700 text-right">
+                            <div className="p-3 border-t text-right" style={{ borderColor: theme.ui.border }}>
                                 <button
                                     onClick={() => setPickerData(null)}
-                                    className="px-4 py-2 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded"
+                                    className="px-4 py-2 text-sm text-white rounded hover:opacity-80 transition-opacity"
+                                    style={{ backgroundColor: theme.ui.border }}
                                 >
                                     Cancel
                                 </button>

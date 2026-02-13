@@ -22,6 +22,7 @@ interface EditorMetaState {
     treeMetas: Record<string, TreeMeta>;
     uiMeta: {
         sidebarWidth: number;
+        propertiesPanelWidth: number;
         isSearchOpen: boolean;
         activePropertiesTab: 'variables' | 'io' | 'properties';
         focusTarget?: { type: 'node' | 'variable' | 'io' | 'state' | 'transition', id: string };
@@ -35,6 +36,7 @@ interface EditorMetaState {
     // Actions
     setNodeFolded: (filePath: string, nodeId: string, isFolded: boolean) => void;
     setSidebarWidth: (width: number) => void;
+    setPropertiesPanelWidth: (width: number) => void;
     setSearchOpen: (open: boolean) => void;
     setActivePropertiesTab: (tab: 'variables' | 'io' | 'properties') => void;
     setFocusTarget: (target?: { type: 'node' | 'variable' | 'io' | 'state' | 'transition', id: string }) => void;
@@ -58,6 +60,7 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
     treeMetas: {},
     uiMeta: {
         sidebarWidth: 160,
+        propertiesPanelWidth: 300,
         isSearchOpen: false,
         activePropertiesTab: 'properties'
     },
@@ -95,6 +98,13 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
     setSidebarWidth: (width) => {
         set((state) => ({
             uiMeta: { ...state.uiMeta, sidebarWidth: width }
+        }));
+        get().saveAllMeta();
+    },
+
+    setPropertiesPanelWidth: (width) => {
+        set((state) => ({
+            uiMeta: { ...state.uiMeta, propertiesPanelWidth: width }
         }));
         get().saveAllMeta();
     },
@@ -220,7 +230,7 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
                     set({
                         treeMetas: data.treeMetas || {},
                         uiMeta: {
-                            ...(data.uiMeta || { sidebarWidth: 160 }),
+                            ...(data.uiMeta || { sidebarWidth: 160, propertiesPanelWidth: 300 }),
                             isSearchOpen: false,
                             activePropertiesTab: 'properties',
                             focusTarget: undefined

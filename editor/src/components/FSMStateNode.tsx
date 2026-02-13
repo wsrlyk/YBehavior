@@ -8,17 +8,13 @@ import { useFSMStore } from '../stores/fsmStore';
 // NodeState imported from types/debug
 import { useDebugStore } from '../stores/debugStore';
 import { decodeXmlEntities } from '../utils/stringUtils';
+import { getTheme } from '../theme/theme';
+
+const theme = getTheme();
 
 // ==================== Colors ====================
 
-const STATE_COLORS: Record<FSMStateType, { bg: string; border: string }> = {
-    Normal: { bg: '#4A5568', border: '#718096' },
-    Meta: { bg: '#553C9A', border: '#805AD5' },
-    Entry: { bg: '#276749', border: '#48BB78' },
-    Exit: { bg: '#9B2C2C', border: '#FC8181' },
-    Any: { bg: '#744210', border: '#D69E2E' },
-    Upper: { bg: '#2C5282', border: '#63B3ED' },
-};
+const STATE_COLORS: Record<FSMStateType, { bg: string; border: string }> = theme.fsmState as any;
 
 const STATE_ICONS: Record<FSMStateType, string> = {
     Normal: '●',
@@ -179,7 +175,14 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
 
             {/* Comment */}
             {state.comment && (
-                <div className="px-3 py-1 text-[10px] text-gray-400 italic border-t border-gray-600/30 whitespace-pre-wrap">
+                <div
+                    className="px-3 py-1 text-[10px] italic border-t whitespace-pre-wrap"
+                    style={{
+                        backgroundColor: theme.comment.bg,
+                        borderColor: theme.comment.border,
+                        color: theme.comment.text,
+                    }}
+                >
                     {decodeXmlEntities(state.comment)}
                 </div>
             )}

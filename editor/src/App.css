@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+@theme {
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #e5e5e5;
+  --color-gray-300: #d4d4d4;
+  --color-gray-400: #a3a3a3;
+  --color-gray-500: #737373;
+  --color-gray-600: #525252;
+  --color-gray-700: #404040;
+  --color-gray-800: #262626;
+  --color-gray-900: #171717;
+  --color-gray-950: #0a0a0a;
+}
+
 /* React Flow 样式 */
 @import "@xyflow/react/dist/style.css";
 
@@ -22,25 +36,25 @@
 
 /* ReactFlow Controls 深色主题 */
 .react-flow__controls {
-  background-color: #1f2937 !important;
-  border: 1px solid #374151 !important;
+  background-color: #262626 !important;
+  border: 1px solid #404040 !important;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
 }
 
 .react-flow__controls-button {
-  background-color: #1f2937 !important;
-  border-color: #374151 !important;
-  fill: #9ca3af !important;
+  background-color: #262626 !important;
+  border-color: #404040 !important;
+  fill: #a3a3a3 !important;
 }
 
 .react-flow__controls-button:hover {
-  background-color: #374151 !important;
+  background-color: #404040 !important;
 }
 
 /* ReactFlow MiniMap 深色主题 */
 .react-flow__minimap {
-  background-color: #1f2937 !important;
-  border: 1px solid #374151 !important;
+  background-color: #262626 !important;
+  border: 1px solid #404040 !important;
 }
 
 /* 画布默认光标为普通指针，中键拖动时变为抓手 */
@@ -54,7 +68,7 @@
 
 /* 连线悬停效果 */
 .react-flow__edge:hover path {
-  stroke: #9ca3af !important;
+  stroke: #a3a3a3 !important;
 }
 
 /* 搜索跳转高亮动画 */

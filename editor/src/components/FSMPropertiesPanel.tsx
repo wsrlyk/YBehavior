@@ -323,7 +323,7 @@ export function FSMPropertiesPanel() {
 
     if (!selectedState && transitionsForSelectedEdge.length === 0) {
         return (
-            <div className="w-64 h-full bg-gray-900 border-l border-gray-700 flex flex-col p-4 items-center justify-center text-center">
+            <div className="h-full bg-gray-900 border-l border-gray-700 flex flex-col p-4 items-center justify-center text-center">
                 <div className="text-gray-600 mb-2">
                     <svg className="w-12 h-12 mx-auto opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
@@ -336,7 +336,7 @@ export function FSMPropertiesPanel() {
     }
 
     return (
-        <div className="w-64 h-full bg-gray-900 border-l border-gray-700 flex flex-col p-3 overflow-auto scrollbar-thin scrollbar-thumb-gray-700">
+        <div className="h-full bg-gray-900 border-l border-gray-700 flex flex-col p-3 overflow-auto scrollbar-thin scrollbar-thumb-gray-700">
             {selectedState && (
                 <div className={`space-y-4 transition-all duration-500 ${focusTarget?.type === 'state' && focusTarget.id === selectedState.id ? 'ring-2 ring-blue-500/50 ring-offset-2 ring-offset-gray-900 rounded-lg p-1' : ''}`} ref={focusedStateRef}>
                     <div className="text-xs text-gray-500 uppercase tracking-wider font-bold border-b border-gray-800 pb-2">State Properties</div>

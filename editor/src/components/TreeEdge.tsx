@@ -4,6 +4,9 @@ import { useEditorStore } from '../stores/editorStore';
 import { useDebugStore } from '../stores/debugStore';
 import { useShallow } from 'zustand/react/shallow';
 import { NodeState } from '../types/debug';
+import { getTheme } from '../theme/theme';
+
+const theme = getTheme();
 
 export interface TreeEdgeData extends Record<string, unknown> {
   siblingTargetIds?: string[];  // 兄弟边的目标节点 ID 列表
@@ -87,19 +90,25 @@ function TreeEdge({
     })
   );
 
+  const isConnectedToSelected = useEditorStore(useShallow((s) =>
+    s.selectedNodeIds.includes(source) || s.selectedNodeIds.includes(target)
+  ));
+
   const getEdgeColor = (state: NodeState) => {
     switch (state) {
-      case NodeState.Success: return '#22c55e'; // Green
-      case NodeState.Failure: return '#3b82f6'; // Blue
-      case NodeState.Running: return '#ec4899'; // Pink
-      // Break usually doesn't apply to edge flux, but if needed:
-      case NodeState.Break: return '#ef4444';
-      default: return selected ? '#fff' : '#6b7280';
+      case NodeState.Success: return theme.debug.success.edge;
+      case NodeState.Failure: return theme.debug.failure.edge;
+      case NodeState.Running: return theme.debug.running.edge;
+      case NodeState.Break: return theme.debug.break.edge;
+      default:
+        if (selected) return theme.edge.tree.selected;
+        if (isConnectedToSelected) return theme.edge.tree.selected + '80'; // Dim highlight (50% opacity)
+        return theme.edge.tree.default;
     }
   };
 
-  const edgeColor = (debugState !== NodeState.Invalid) ? getEdgeColor(debugState) : (selected ? '#fff' : '#6b7280');
-  const edgeWidth = (selected || debugState !== NodeState.Invalid) ? 3 : 2;
+  const edgeColor = (debugState !== NodeState.Invalid) ? getEdgeColor(debugState) : getEdgeColor(NodeState.Invalid);
+  const edgeWidth = (selected || isConnectedToSelected || debugState !== NodeState.Invalid) ? 3 : 2;
 
   // 绘制路径：直接从连接器位置（sourceX, sourceY）出发
   // 垂直下降到水平线，然后水平移动到目标 X，再垂直下降到目标
@@ -136,7 +145,7 @@ function TreeEdge({
               maxWidth: '120px',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              border: `1px solid ${edgeColor !== '#6b7280' && edgeColor !== '#fff' ? edgeColor : '#4b5563'}`,
+              border: `1px solid ${edgeColor !== theme.edge.tree.default && edgeColor !== theme.edge.tree.selected ? edgeColor : theme.edge.label.border}`,
             }}
           >
             {label}

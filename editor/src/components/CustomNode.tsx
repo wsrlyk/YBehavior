@@ -8,32 +8,20 @@ import { NodeState, BreakpointType } from '../types/debug';
 import { useDebugStore } from '../stores/debugStore';
 import { useEditorStore } from '../stores/editorStore';
 import { useShallow } from 'zustand/react/shallow';
+import { getTheme } from '../theme/theme';
 
-const NODE_COLORS: Record<string, string> = {
-  composite: '#5A8A5E',
-  decorator: '#5A7A9A',
-  action: '#B08050',
-  condition: '#7A5A8A',
-};
+const theme = getTheme();
 
-const PIN_COLORS: Record<string, string> = {
-  int: '#6B9BD2',
-  float: '#7BC96F',
-  bool: '#CC6666',
-  string: '#D4A5D9',
-  vector3: '#D9C76B',
-  entity: '#6BD9D9',
-  ulong: '#9999CC',
-  enum: '#CC9966',
-};
+const NODE_COLORS = theme.node;
+const PIN_COLORS = theme.pin;
 
 // Debug state colors for node visualization
 const DEBUG_STATE_COLORS: Record<NodeState, { border: string; glow: string } | null> = {
   [NodeState.Invalid]: null,
-  [NodeState.Success]: { border: '#22c55e', glow: '0 0 12px rgba(34, 197, 94, 0.6)' },
-  [NodeState.Failure]: { border: '#3b82f6', glow: '0 0 12px rgba(59, 130, 246, 0.6)' }, // Blue
-  [NodeState.Break]: { border: '#ef4444', glow: '0 0 12px rgba(239, 68, 68, 0.6)' }, // Red
-  [NodeState.Running]: { border: '#ec4899', glow: '0 0 12px rgba(236, 72, 153, 0.6)' }, // Pink
+  [NodeState.Success]: theme.debug.success,
+  [NodeState.Failure]: theme.debug.failure,
+  [NodeState.Break]: theme.debug.break,
+  [NodeState.Running]: theme.debug.running,
 };
 
 type CustomNodeData = {
@@ -47,7 +35,8 @@ export type CustomNodeType = Node<CustomNodeData, 'custom'>;
 
 function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
   const setTooltip = useTooltipStore((state) => state.setTooltip);
-  const pinColor = PIN_COLORS[pin.valueType] || '#888';
+  const pinColor = PIN_COLORS[pin.valueType] || PIN_COLORS.default || '#888';
+  const binding = pin.binding;
 
   const getVectorIndexDisplay = () => {
     if (!pin.vectorIndex) return '';
@@ -56,12 +45,12 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
     return '';
   };
 
-  const isDataConnection = pin.binding.type === 'pointer' && !pin.binding.variableName;
+  const isDataConnection = binding.type === 'pointer' && !binding.variableName;
+  const variableName = (binding.type === 'pointer' && binding.variableName) ? binding.variableName : null;
 
   return (
     <div
       className={`relative flex items-center gap-1 text-xs py-0.5 ${isInput ? 'pl-2.5' : 'pr-2.5 flex-row-reverse'}`}
-      onMouseEnter={() => pin.desc && setTooltip(pin.desc)}
       onMouseLeave={() => setTooltip(null)}
     >
       <Handle
@@ -77,12 +66,24 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
           transform: 'translateY(-50%) scale(var(--handle-scale, 1))'
         }}
       />
-      <span className="text-gray-300 truncate max-w-20">{pin.name}</span>
-      {pin.binding.type === 'const' && (
-        <span className="text-gray-500 text-[10px] truncate max-w-12">{pin.binding.value || '-'}</span>
+      <span
+        className="truncate max-w-32 cursor-help"
+        style={{ color: theme.text.pinName }}
+        onMouseEnter={() => setTooltip(pin.desc || pin.name)}
+      >{pin.name}</span>
+      {binding.type === 'const' && (
+        <span
+          className="text-[10px] truncate max-w-40 cursor-help"
+          style={{ color: theme.text.constant }}
+          onMouseEnter={() => setTooltip(binding.value || '-')}
+        >{binding.value || '-'}</span>
       )}
-      {pin.binding.type === 'pointer' && pin.binding.variableName && (
-        <span className="text-blue-400 text-[10px] truncate max-w-12">{pin.binding.variableName}{pin.binding.isLocal ? "'" : ""}{getVectorIndexDisplay()}</span>
+      {variableName && (
+        <span
+          className="text-[10px] truncate max-w-40 cursor-help"
+          style={{ color: theme.text.variable }}
+          onMouseEnter={() => setTooltip(variableName)}
+        >{variableName}{binding.type === 'pointer' && binding.isLocal ? "'" : ""}{getVectorIndexDisplay()}</span>
       )}
     </div>
   );
@@ -126,22 +127,22 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
 
   const nodeDefinition = useMemo(() => getDefinition(treeNode.type), [treeNode.type, getDefinition]);
 
-  const bgColor = NODE_COLORS[treeNode.category] || '#666';
+  const bgColor = NODE_COLORS[treeNode.category] || NODE_COLORS.default || '#666';
   const hasChildren = (nodeDefinition?.childConnectors?.length || 0) > 0;
   const isEffectivelyDisabled = data.isEffectivelyDisabled;
 
   const returnType = treeNode.returnType || 'Default';
   const hasReturnType = returnType !== 'Default';
-  const returnTypeColors: Record<string, string> = {
-    Invert: 'bg-orange-500',
-    Success: 'bg-green-600',
-    Failure: 'bg-red-600',
-  };
+  // Use theme colors
+  const returnTypeColor = theme.returnType[returnType] || theme.returnType['Invert']; // Default fallback
 
   return (
     <div className="relative">
       {hasReturnType && (
-        <div className={`absolute -top-4 left-0 px-2 py-0.5 rounded-t-sm text-[8px] font-bold text-white uppercase tracking-tighter ${returnTypeColors[returnType]}`}>
+        <div
+          className="absolute -top-4 left-0 px-2 py-0.5 rounded-t-sm text-[8px] font-bold text-white uppercase tracking-tighter"
+          style={{ backgroundColor: returnTypeColor }}
+        >
           {returnType}
         </div>
       )}
@@ -152,7 +153,14 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
       )}
 
       {treeNode.comment && (
-        <div className={`absolute bg-yellow-900/40 border border-yellow-600/50 p-1 rounded text-[10px] text-yellow-100 break-words whitespace-pre-wrap w-full ${hasChildren ? 'left-[calc(100%+8px)] top-0' : 'top-[calc(100%+8px)] left-0'}`}>
+        <div
+          className={`absolute p-1 rounded text-[10px] break-words whitespace-pre-wrap w-full ${hasChildren ? 'left-[calc(100%+8px)] top-0' : 'top-[calc(100%+8px)] left-0'}`}
+          style={{
+            backgroundColor: theme.comment.bg,
+            border: `1px solid ${theme.comment.border}`,
+            color: theme.comment.text,
+          }}
+        >
           {treeNode.comment}
         </div>
       )}
@@ -161,8 +169,8 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
         <div
           className={`rounded shadow-lg min-w-32 cursor-move hover:brightness-110 transition-[filter,border-color,box-shadow] duration-200 ${isEffectivelyDisabled ? 'grayscale opacity-60' : ''}`}
           style={{
-            backgroundColor: '#1f2937',
-            border: `2px solid ${selected ? '#fff' : bgColor}`,
+            backgroundColor: theme.ui.panelBg,
+            border: `1px solid ${selected ? '#fff' : theme.ui.border}`,
             boxShadow: selected ? '0 0 0 2px rgba(255,255,255,0.3)' : undefined,
           }}
         >

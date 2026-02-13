@@ -1,3 +1,5 @@
+import { invoke } from '@tauri-apps/api/core';
+import { message } from '@tauri-apps/plugin-dialog';
 import { getConfigPath, getExeDir } from './configPath';
 import { readFile } from './fileService';
 
@@ -47,15 +49,20 @@ export async function loadSettings(): Promise<Settings> {
       return cachedSettings;
     } catch (e) {
       console.error('Failed to load settings:', e);
-      // 返回默认值
-      const exeDir = await getExeDir();
-      cachedSettings = {
-        editorTreeDir: exeDir,
-        runtimeTreeDir: exeDir,
-      };
-      return cachedSettings;
+
+      const errorMessage = `Could not load settings from:\n${settingsPath}\n\nError: ${e instanceof Error ? e.message : String(e)}`;
+
+      await message(errorMessage, {
+        title: 'Configuration Error',
+        kind: 'error',
+      });
+
+      await invoke('exit_app');
+
+      // Return a never-resolving promise to prevent app from continuing while exiting
+      return new Promise<Settings>(() => { });
     } finally {
-      loadingPromise = null;
+      // loadingPromise = null; // Don't clear promise if we are exiting
     }
   })();
 
