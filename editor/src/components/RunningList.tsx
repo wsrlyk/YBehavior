@@ -7,15 +7,16 @@ import { NodeState } from '../types/debug';
 import { DEBUG_COLORS, TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
 
 export const RunningList = () => {
-    const { treeRunInfos, isConnected } = useDebugStore();
+    const { treeRunInfos, fsmRunInfo, isConnected } = useDebugStore();
     const { treeFiles, openTree, setActiveFile } = useEditorStore();
     const { openFSMFile, setActiveFSM } = useFSMStore();
     const [isOpen, setIsOpen] = useState(true);
 
-    if (!isConnected || treeRunInfos.size === 0) return null;
+    if (!isConnected || (!fsmRunInfo && treeRunInfos.size === 0)) return null;
 
-    const fileNames = Array.from(treeRunInfos.keys()).filter(k => k && k.trim().length > 0);
-    if (fileNames.length === 0) return null;
+    const treeNames = Array.from(treeRunInfos.keys()).filter(k => k && k.trim().length > 0);
+    const totalCount = (fsmRunInfo ? 1 : 0) + treeNames.length;
+    if (totalCount === 0) return null;
 
     const handleOpen = (fileName: string) => {
         const normalize = (path: string) => path.replace(/\\/g, '/');
@@ -30,7 +31,6 @@ export const RunningList = () => {
             if (pNorm === fNorm) return true;
 
             // 2. Path match (ends with /fileName)
-            // Ensure we match a whole segment by checking for preceding slash or start of string
             if (pNorm.endsWith('/' + fNorm) || pNorm === fNorm) return true;
 
             // 3. Extension match
@@ -77,7 +77,7 @@ export const RunningList = () => {
                 >
                     <div className="w-2 h-2 rounded-full bg-pink-500 animate-pulse shadow-[0_0_8px_rgba(236,72,153,0.6)]" />
                     <span className="text-xs font-semibold text-gray-200">
-                        Debug List ({fileNames.length})
+                        Debug List ({totalCount})
                     </span>
                     <span className="text-[10px] text-gray-400 ml-1">
                         {isOpen ? '▼' : '▶'}
@@ -85,11 +85,22 @@ export const RunningList = () => {
                 </div>
 
                 {isOpen && (
-                    <div className="max-h-64 overflow-y-auto min-w-[160px] max-w-[240px] border-t border-gray-700">
-                        {fileNames.map(fileName => (
+                    <div className="max-h-[min(80vh,calc(100vh-120px))] overflow-y-auto min-w-[160px] max-w-[240px] border-t border-gray-700">
+                        {/* FSM entry first */}
+                        {fsmRunInfo && (
+                            <RunningListItem
+                                key={fsmRunInfo.fsmName}
+                                fileName={fsmRunInfo.fsmName}
+                                isFsm={true}
+                                onClick={() => handleOpen(fsmRunInfo.fsmName)}
+                            />
+                        )}
+                        {/* Tree entries */}
+                        {treeNames.map(fileName => (
                             <RunningListItem
                                 key={fileName}
                                 fileName={fileName}
+                                isFsm={false}
                                 onClick={() => handleOpen(fileName)}
                             />
                         ))}
@@ -100,58 +111,37 @@ export const RunningList = () => {
     );
 };
 
-function RunningListItem({ fileName, onClick }: any) {
-    const { isConnected, getFileRunState, treeRunInfos, keyframe } = useDebugStore();
-    const { icon, name: displayName } = getFileDisplay(fileName);
+function RunningListItem({ fileName, isFsm, onClick }: { fileName: string; isFsm: boolean; onClick: () => void }) {
+    const { isConnected, getFileRunState, treeRunInfos, fsmRunInfo, keyframe } = useDebugStore();
+
+    // Icon determined by the caller (FSM from fsmRunInfo, Tree from treeRunInfos)
+    const { icon, name: displayName } = getFileDisplay(fileName, isFsm, !isFsm);
 
     const [visualState, setVisualState] = useState<{ color: string } | null>(null);
 
     const fileRunState = isConnected ? getFileRunState(fileName) : undefined;
 
-    const treeInfo = isConnected ? treeRunInfos.get(fileName) : undefined;
-
-    // Check FSM info if tree info is missing (or fuzzy match)
-    // Note: fileName in RunningList is usually path-like, but could be basename depending on how it was added.
-    // runningFiles keys are usually relative paths.
-    // fsmRunInfo.fsmName is also relative path.
-    const fsmInfo = isConnected ? useDebugStore.getState().fsmRunInfo : undefined;
-
     let rootFinal: number | undefined;
 
-    if (treeInfo) {
-        rootFinal = treeInfo.nodeStates.get(1)?.final;
-    }
-
-    // Fallback: Check FSM info if tree info yield nothing (or if it's actually the FSM file)
-    if (rootFinal === undefined && fsmInfo) {
-        // Fuzzy match for FSM name
-        // fileName might be "StateMachine/SimpleFSM"
-        // fsmInfo.fsmName might be "SimpleFSM" or "StateMachine\SimpleFSM"
-        const normalize = (s: string) => s.replace(/\\/g, '/').replace(/\.(fsm|tree)$/, '');
-        const fName = normalize(fileName);
-        const fsmName = normalize(fsmInfo.fsmName);
-
-        // Match if identical or one ends with the other
-        const isMatch = fName === fsmName || fName.endsWith('/' + fsmName) || fsmName.endsWith('/' + fName);
-
-        if (isMatch) {
-            let hasBreak = false;
-            let hasRunning = false;
-            let hasFailure = false;
-            let hasSuccess = false;
-
-            for (const state of fsmInfo.stateInfos.values()) {
+    if (isFsm) {
+        // FSM: derive rootFinal from fsmRunInfo.stateInfos
+        if (isConnected && fsmRunInfo) {
+            let hasBreak = false, hasRunning = false, hasFailure = false, hasSuccess = false;
+            for (const state of fsmRunInfo.stateInfos.values()) {
                 if (state === NodeState.Break) { hasBreak = true; break; }
                 if (state === NodeState.Running) hasRunning = true;
                 if (state === NodeState.Failure) hasFailure = true;
                 if (state === NodeState.Success) hasSuccess = true;
             }
-
             if (hasBreak) rootFinal = NodeState.Break;
             else if (hasRunning) rootFinal = NodeState.Running;
             else if (hasFailure) rootFinal = NodeState.Failure;
             else if (hasSuccess) rootFinal = NodeState.Success;
         }
+    } else {
+        // Tree: get root node (uid=1) final state from treeRunInfos
+        const treeInfo = isConnected ? treeRunInfos.get(fileName) : undefined;
+        rootFinal = treeInfo?.nodeStates.get(1)?.final;
     }
 
     useEffect(() => {
@@ -201,7 +191,7 @@ function RunningListItem({ fileName, onClick }: any) {
             <span className={`w-1.5 h-1.5 rounded-full ${activeColor}`} />
 
             <span className="opacity-70">{icon}</span>
-            <span className="truncate">{displayName}</span>
+            <span className="flex-1 filename-ellipsis">{displayName}</span>
         </div>
     );
 }

@@ -554,8 +554,12 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         // Parse tree data (format: treeName, localData, runData, ...)
         for (let i = 2; i < parts.length; i += 3) {
             if (i + 2 < parts.length) {
-                data.treeRunDatas.set(parts[i], {
-                    name: parts[i],
+                const treeName = parts[i];
+                // Ignore empty or obviously corrupted tree names
+                if (!treeName || treeName.length < 2) continue;
+
+                data.treeRunDatas.set(treeName, {
+                    name: treeName,
                     localData: parts[i + 1],
                     runData: parts[i + 2],
                 });
@@ -608,7 +612,25 @@ export const useDebugStore = create<DebugState>((set, get) => ({
 
         // Process tree run data
         for (const [treeName, treeData] of data.treeRunDatas) {
-            const info = newTreeRunInfos.get(treeName) || {
+            // Exact key lookup first
+            let existing = newTreeRunInfos.get(treeName);
+            let effectiveKey = treeName;
+
+            // Fuzzy fallback: if not found by exact key, find a key that ends with the same path segment.
+            // This handles mismatches between full relative paths (SubTrees) and basenames (keyframe).
+            if (!existing) {
+                const normName = treeName.replace(/\\/g, '/');
+                for (const [key, val] of newTreeRunInfos) {
+                    const normKey = key.replace(/\\/g, '/');
+                    if (normKey.endsWith('/' + normName) || normName.endsWith('/' + normKey) || normKey === normName) {
+                        existing = val;
+                        effectiveKey = key;
+                        break;
+                    }
+                }
+            }
+
+            const info = existing || {
                 treeName,
                 nodeStates: new Map(),
                 sharedVariables: new Map(),
@@ -630,11 +652,11 @@ export const useDebugStore = create<DebugState>((set, get) => ({
                     info.nodeStates.set(uid, { self: selfState, final: finalState });
 
                     if (finalState === NodeState.Running || finalState === NodeState.Break) {
-                        const current = newRunningFiles.get(treeName);
+                        const current = newRunningFiles.get(effectiveKey);
                         // Priority: Break > Running
                         if (current !== NodeState.Break) {
-                            if (finalState === NodeState.Break) newRunningFiles.set(treeName, NodeState.Break);
-                            else if (!current) newRunningFiles.set(treeName, NodeState.Running);
+                            if (finalState === NodeState.Break) newRunningFiles.set(effectiveKey, NodeState.Break);
+                            else if (!current) newRunningFiles.set(effectiveKey, NodeState.Running);
                         }
                     }
                 }
@@ -670,7 +692,7 @@ export const useDebugStore = create<DebugState>((set, get) => ({
                 }
             }
 
-            newTreeRunInfos.set(treeName, info);
+            newTreeRunInfos.set(effectiveKey, info);
         }
 
         // Process FSM run data
@@ -731,8 +753,11 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         for (const item of items) {
             const parts = item.split(SEQUENCE_DELIMITER);
             if (parts.length >= 2) {
+                const name = parts[0];
+                if (!name || name.length < 2) continue; // Ignore empty/invalid tree names
+
                 fileHashes.push({
-                    name: parts[0],
+                    name: name,
                     hash: parseInt(parts[1], 10),
                 });
             }
@@ -748,11 +773,12 @@ export const useDebugStore = create<DebugState>((set, get) => ({
             // 1. Direct match: target is the same as the new file.
             // 2. Agent match: we are debugging an agent and already have data for this file.
             const isMatch = (currentTarget === newTarget) ||
+                (currentTarget?.replace(/\\/g, '/') === newTarget.replace(/\\/g, '/')) || // Normalized match
                 (currentTarget?.startsWith('Agent:') && (get().treeRunInfos.has(newTarget) || get().fsmRunInfo?.fsmName === newTarget));
 
             console.log(`[debugStore] Dedupe Check: '${currentTarget}' vs '${newTarget}' (${isMatch ? 'MATCH' : 'DIFF'})`);
 
-            if (isMatch) {
+            if (isMatch && get().isDebugging) {
                 console.log('[debugStore] Deduplication hit. Ignoring.');
                 return;
             }
@@ -836,25 +862,27 @@ export const useDebugStore = create<DebugState>((set, get) => ({
                 })();
             }
 
-            // Mark as debugging
+            // The first entry in SubTrees is always the FSM, the rest are Trees.
+            const fsmName = fileHashes[0].name;
+
+            // Mark as debugging and record the FSM filename definitively
             set(state => ({
                 isDebugging: true,
                 // Keep Agent: target if it exists, otherwise use the first file name
                 debugTarget: (state.debugTarget && state.debugTarget.startsWith('Agent:'))
                     ? state.debugTarget
-                    : fileHashes[0].name,
+                    : fsmName,
                 // Initialize FSM run info with the first file (which is the FSM/Root)
-                // This ensures handleTickResult uses the correct filename for runningFiles matching
                 fsmRunInfo: {
-                    fsmName: fileHashes[0].name,
+                    fsmName: fsmName,
                     stateInfos: new Map()
                 }
             }));
 
-            // Build run info for all files
+            // Only trees (index 1+) go into treeRunInfos; the FSM (index 0) lives in fsmRunInfo
             const newTreeRunInfos = new Map<string, TreeRunInfo>();
-            for (const file of fileHashes) {
-                // Skip first file if it's FSM (determined by caller)
+            for (let i = 1; i < fileHashes.length; i++) {
+                const file = fileHashes[i];
                 newTreeRunInfos.set(file.name, {
                     treeName: file.name,
                     nodeStates: new Map(),

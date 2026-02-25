@@ -6,6 +6,7 @@
 
 import type { FSM, FSMMachine, FSMState, FSMTransition } from '../types/fsm';
 import { serializeVariable } from './xmlSerializer';
+import { stripExtension } from './fileUtils';
 
 // ==================== Helper Functions ====================
 
@@ -83,7 +84,7 @@ function serializeState(
 
     // Tree for states that support it
     if (state.tree) {
-        el.setAttribute('Tree', state.tree);
+        el.setAttribute('Tree', stripExtension(state.tree));
     }
 
     if (forEditor) {

@@ -8,6 +8,7 @@ import { useFSMStore } from '../stores/fsmStore';
 // NodeState imported from types/debug
 import { useDebugStore } from '../stores/debugStore';
 import { decodeXmlEntities } from '../utils/stringUtils';
+import { stripExtension } from '../utils/fileUtils';
 import { getTheme } from '../theme/theme';
 
 const theme = getTheme();
@@ -161,8 +162,11 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
 
             {/* Tree reference */}
             {hasTree && state.tree && (
-                <div className="px-3 py-1 text-xs text-gray-300 bg-gray-800/50">
-                    🌲 {state.tree}
+                <div
+                    className="px-3 py-1 text-xs text-gray-300 bg-gray-800/50 filename-ellipsis max-w-[200px]"
+                    title={state.tree}
+                >
+                    🌲 {stripExtension(state.tree)}
                 </div>
             )}
 

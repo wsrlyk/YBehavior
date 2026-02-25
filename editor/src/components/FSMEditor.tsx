@@ -4,7 +4,7 @@
  * Main React Flow-based editor for FSM state machines.
  */
 
-import { useCallback, useMemo, useEffect, useState } from 'react';
+import { useCallback, useMemo, useEffect, useState, useRef } from 'react';
 import {
     ReactFlow,
     Background,
@@ -28,6 +28,7 @@ import FSMTransitionEdge from './FSMTransitionEdge';
 import { useFSMStore } from '../stores/fsmStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useDebugStore } from '../stores/debugStore';
+import { useShallow } from 'zustand/react/shallow';
 import type { FSMMachine, FSMTransition, FSMState } from '../types/fsm';
 import { getTheme } from '../theme/theme';
 
@@ -283,27 +284,43 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
             setPendingCenterTarget(undefined);
         }
     }, [pendingCenterTarget, setCenter, setPendingCenterTarget]);
-    const fsm = useFSMStore(state => {
+    const {
+        fsm,
+        machine,
+        addState,
+        updateState,
+        removeState,
+        addTransition,
+        removeTransition,
+        navigateToMachine,
+        setIsConnecting,
+        setSelectedNodes,
+        setSelectedEdges,
+        setDefaultState,
+        selectedNodeIds,
+        selectedEdgeIds
+    } = useFSMStore(useShallow(state => {
         const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
-        return file?.fsm || null;
-    });
+        return {
+            fsm: file?.fsm || null,
+            machine: file ? file.fsm.machines.get(file.currentMachineId) || null : null,
+            addState: state.addState,
+            updateState: state.updateState,
+            removeState: state.removeState,
+            addTransition: state.addTransition,
+            removeTransition: state.removeTransition,
+            navigateToMachine: state.navigateToMachine,
+            setIsConnecting: state.setIsConnecting,
+            setSelectedNodes: state.setSelectedNodes,
+            setSelectedEdges: state.setSelectedEdges,
+            setDefaultState: state.setDefaultState,
+            selectedNodeIds: state.selectedNodeIds,
+            selectedEdgeIds: state.selectedEdgeIds,
+        };
+    }));
 
-    const machine = useFSMStore(state => {
-        const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
-        if (!file) return null;
-        return file.fsm.machines.get(file.currentMachineId) || null;
-    });
-
-    const addState = useFSMStore(state => state.addState);
-    const updateState = useFSMStore(state => state.updateState);
-    const removeState = useFSMStore(state => state.removeState);
-    const addTransition = useFSMStore(state => state.addTransition);
-    const removeTransition = useFSMStore(state => state.removeTransition);
-    const navigateToMachine = useFSMStore(state => state.navigateToMachine);
-    const setIsConnecting = useFSMStore(state => state.setIsConnecting);
-    const setSelectedNodes = useFSMStore(state => state.setSelectedNodes);
-    const setSelectedEdges = useFSMStore(state => state.setSelectedEdges);
-    const setDefaultState = useFSMStore(state => state.setDefaultState);
+    const lastSelectedNodesRef = useRef<string[]>([]);
+    const lastSelectedEdgesRef = useRef<string[]>([]);
 
     const [pickerData, setPickerData] = useState<{
         sourceId: string;
@@ -343,8 +360,6 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
         setIsConnecting(false);
     }, [setIsConnecting]);
 
-    const selectedNodeIds = useFSMStore(state => state.selectedNodeIds);
-    const selectedEdgeIds = useFSMStore(state => state.selectedEdgeIds);
 
     // Convert FSM data to React Flow format
     const initialNodes = useMemo(() => {
@@ -472,10 +487,35 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
     // Handle selection changes
     const onSelectionChange = useCallback(
         ({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
-            setSelectedNodes(nodes.map(n => n.id));
-            setSelectedEdges(edges.map(e => e.id));
+            const newNodeIds = nodes.map(n => n.id).sort();
+            const newEdgeIds = edges.map(e => e.id).sort();
+
+            const currentNodesSorted = [...selectedNodeIds].sort();
+            const currentEdgesSorted = [...selectedEdgeIds].sort();
+
+            const isNodesSame = newNodeIds.length === currentNodesSorted.length &&
+                newNodeIds.every((id, idx) => id === currentNodesSorted[idx]);
+            const isEdgesSame = newEdgeIds.length === currentEdgesSorted.length &&
+                newEdgeIds.every((id, idx) => id === currentEdgesSorted[idx]);
+
+            const lastNodesSorted = [...lastSelectedNodesRef.current].sort();
+            const lastEdgesSorted = [...lastSelectedEdgesRef.current].sort();
+
+            const isLastNodesSame = newNodeIds.length === lastNodesSorted.length &&
+                newNodeIds.every((id, idx) => id === lastNodesSorted[idx]);
+            const isLastEdgesSame = newEdgeIds.length === lastEdgesSorted.length &&
+                newEdgeIds.every((id, idx) => id === lastEdgesSorted[idx]);
+
+            if (!isNodesSame && !isLastNodesSame) {
+                lastSelectedNodesRef.current = newNodeIds;
+                setSelectedNodes(newNodeIds);
+            }
+            if (!isEdgesSame && !isLastEdgesSame) {
+                lastSelectedEdgesRef.current = newEdgeIds;
+                setSelectedEdges(newEdgeIds);
+            }
         },
-        [setSelectedNodes, setSelectedEdges]
+        [setSelectedNodes, setSelectedEdges, selectedNodeIds, selectedEdgeIds]
     );
 
     // Handle node position changes

@@ -15,6 +15,8 @@ const theme = getTheme();
 const NODE_COLORS = theme.node;
 const PIN_COLORS = theme.pin;
 
+import { stripExtension } from '../utils/fileUtils';
+
 // Debug state colors for node visualization
 const DEBUG_STATE_COLORS: Record<NodeState, { border: string; glow: string } | null> = {
   [NodeState.Invalid]: null,
@@ -73,10 +75,15 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
       >{pin.name}</span>
       {binding.type === 'const' && (
         <span
-          className="text-[10px] truncate max-w-40 cursor-help"
+          className={`text-[10px] max-w-40 cursor-help ${['Tree', 'Reference', 'treeNode.Reference'].includes(pin.name)
+              ? 'filename-ellipsis'  // 文件路径需要 RTL 末尾省略
+              : 'truncate'           // 普通值（enum/数字等）不能用 RTL
+            }`}
           style={{ color: theme.text.constant }}
           onMouseEnter={() => setTooltip(binding.value || '-')}
-        >{binding.value || '-'}</span>
+        >
+          {['Tree', 'Reference', 'treeNode.Reference'].includes(pin.name) ? stripExtension(binding.value || '-') : (binding.value || '-')}
+        </span>
       )}
       {variableName && (
         <span

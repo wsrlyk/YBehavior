@@ -436,10 +436,10 @@ export function GlobalSearch() {
                                         </span>
                                         <span className="text-sm font-medium text-white truncate">{res.title}</span>
                                     </div>
-                                    <div className="text-xs text-gray-400 truncate">{res.subtitle}</div>
+                                    <div className="text-xs text-gray-400 filename-ellipsis">{res.subtitle}</div>
                                 </div>
                                 {res.value && (
-                                    <div className="ml-4 px-2 py-1 bg-gray-900 rounded text-xs text-gray-300 border border-gray-700 max-w-[150px] truncate">
+                                    <div className="ml-4 px-2 py-1 bg-gray-900 rounded text-xs text-gray-300 border border-gray-700 max-w-[150px] filename-ellipsis">
                                         {res.value}
                                     </div>
                                 )}

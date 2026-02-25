@@ -114,7 +114,7 @@ function FileTreeNode({
     );
   }
 
-  // 根据文件类型显示不同图标，隐藏后缀
+  // 根据文件类型显示不同图标，隐藏后缀 (处理由getFileDisplay完成)
   const { icon, name: displayName } = getFileDisplay(node.name);
 
   return (
@@ -122,9 +122,10 @@ function FileTreeNode({
       onClick={() => onFileClick(node.path)}
       className="flex items-center px-2 py-1 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer"
       style={{ paddingLeft: `${depth * 16 + 8}px` }}
+      title={node.path}
     >
       <span className="mr-1.5">{icon}</span>
-      {displayName}
+      <span className="flex-1 filename-ellipsis">{displayName}</span>
     </div>
   );
 }

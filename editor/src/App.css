@@ -66,6 +66,17 @@
   cursor: grabbing !important;
 }
 
+/* Start-ellipsis for file names (shows end of string, clips beginning).
+   Safe for pure filenames without path separators. */
+.filename-ellipsis {
+  direction: rtl;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+
 /* 连线悬停效果 */
 .react-flow__edge:hover path {
   stroke: #a3a3a3 !important;

@@ -3,6 +3,7 @@ import { useMemo, useState, useRef, useEffect } from 'react';
 import { useEditorStore } from '../stores/editorStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { validateVariableName } from '../utils/validation';
+import { stripExtension } from '../utils/fileUtils';
 
 
 // ==================== Tree File Picker (Adapted) ====================
@@ -42,7 +43,7 @@ function TreeFilePicker({ value, onChange, options }: TreeFilePickerProps) {
                     if (!isOpen) setSearch('');
                 }}
             >
-                <span className="truncate flex-1">{value ? value.replace(/\.tree$/, '') : 'Select a tree...'}</span>
+                <span className="filename-ellipsis flex-1" title={value}>{value ? stripExtension(value) : 'Select a tree...'}</span>
                 <div className="flex items-center">
                     {value && (
                         <>
@@ -92,13 +93,14 @@ function TreeFilePicker({ value, onChange, options }: TreeFilePickerProps) {
                             filteredOptions.map(opt => (
                                 <div
                                     key={opt}
-                                    className={`px-2 py-1.5 text-[10px] cursor-pointer hover:bg-gray-700 transition-colors ${value === opt ? 'text-blue-400 bg-gray-750' : 'text-gray-300'}`}
+                                    className={`px-2 py-1.5 text-[10px] cursor-pointer hover:bg-gray-700 transition-colors filename-ellipsis ${value === opt ? 'text-blue-400 bg-gray-750' : 'text-gray-300'}`}
+                                    title={opt}
                                     onClick={() => {
                                         onChange(opt);
                                         setIsOpen(false);
                                     }}
                                 >
-                                    {opt.replace(/\.tree$/, '')}
+                                    {stripExtension(opt)}
                                 </div>
                             ))
                         )}

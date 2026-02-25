@@ -17,6 +17,7 @@ import { useEditorStore, getDescendantIds } from '../stores/editorStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import { useDebugStore } from '../stores/debugStore';
+import { useShallow } from 'zustand/react/shallow';
 import { getTheme } from '../theme/theme';
 import { NodeContextMenu } from './NodeContextMenu';
 
@@ -60,15 +61,33 @@ interface NodeEditorProps {
 }
 
 function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
-  const addNode = useEditorStore((state) => state.addNode);
-  const selectNodes = useEditorStore((state) => state.selectNodes);
-  const removeNodes = useEditorStore((state) => state.removeNodes);
-  const removeElements = useEditorStore((state) => state.removeElements);
-  const addConnection = useEditorStore((state) => state.addConnection);
-  const removeConnections = useEditorStore((state) => state.removeConnections);
-  const removeDataConnections = useEditorStore((state) => state.removeDataConnections);
-  const addDataConnection = useEditorStore((state) => state.addDataConnection);
-  const duplicateSelectedNodes = useEditorStore((state) => state.duplicateSelectedNodes);
+  const {
+    addNode,
+    selectNodes,
+    removeNodes,
+    removeElements,
+    addConnection,
+    removeConnections,
+    removeDataConnections,
+    addDataConnection,
+    duplicateSelectedNodes,
+    selectedNodeIds,
+    recordHistoryStart,
+    finalizeContinuousAction,
+  } = useEditorStore(useShallow(state => ({
+    addNode: state.addNode,
+    selectNodes: state.selectNodes,
+    removeNodes: state.removeNodes,
+    removeElements: state.removeElements,
+    addConnection: state.addConnection,
+    removeConnections: state.removeConnections,
+    removeDataConnections: state.removeDataConnections,
+    addDataConnection: state.addDataConnection,
+    duplicateSelectedNodes: state.duplicateSelectedNodes,
+    selectedNodeIds: state.selectedNodeIds,
+    recordHistoryStart: state.recordHistoryStart,
+    finalizeContinuousAction: state.finalizeContinuousAction,
+  })));
   const { getDefinition } = useNodeDefinitionStore();
 
   // 修正：使用 selector 订阅 currentTree，确保 store 更新时组件重渲染
@@ -98,8 +117,8 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     nodeId: null,
   });
 
-  const selectedNodeIds = useEditorStore((state) => state.selectedNodeIds);
   const isSelecting = useRef(false);
+  const lastSelectNodesIdsRef = useRef<string[]>([]);
 
   // 优化的节点转换和缓存逻辑，显著提升大树拖拽启动性能
   const nodeCache = useMemo(() => new Map<string, CustomNodeType>(), []);
@@ -317,8 +336,6 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [duplicateSelectedNodes, removeNodes]);
 
-  const recordHistoryStart = useEditorStore((state) => state.recordHistoryStart);
-  const finalizeContinuousAction = useEditorStore((state) => state.finalizeContinuousAction);
 
   // 自定义 onNodesChange：处理删除和选择
   const isDebugConnected = useDebugStore((s) => s.isConnected);
@@ -356,11 +373,17 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     }
 
     if (selectionChanged && !isSelecting.current) {
-      const newNodeIds = Array.from(newSelected);
-      const isSame = newNodeIds.length === currentSelected.length &&
-        newNodeIds.every(id => currentSelected.includes(id));
+      const newNodeIds = Array.from(newSelected).sort();
+      const currentSelectedSorted = [...currentSelected].sort();
+      const isSame = newNodeIds.length === currentSelectedSorted.length &&
+        newNodeIds.every((id, idx) => id === currentSelectedSorted[idx]);
 
-      if (!isSame) {
+      const lastSelectedSorted = [...lastSelectNodesIdsRef.current].sort();
+      const isLastSame = newNodeIds.length === lastSelectedSorted.length &&
+        newNodeIds.every((id, idx) => id === lastSelectedSorted[idx]);
+
+      if (!isSame && !isLastSame) {
+        lastSelectNodesIdsRef.current = newNodeIds;
         selectNodes(newNodeIds);
       }
     }

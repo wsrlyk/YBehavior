@@ -184,7 +184,7 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
       )}
 
       <span className="mr-1.5 flex-shrink-0">{icon}</span>
-      <span className="flex-1 truncate pr-2">
+      <span className="flex-1 filename-ellipsis pr-2">
         {file.isDirty ? '* ' : ''}{name}
       </span>
       <button

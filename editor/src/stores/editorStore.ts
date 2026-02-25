@@ -175,10 +175,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const { editorTreeDir, openedFiles } = get();
     if (!editorTreeDir) return;
 
+    // Normalize path for comparison
+    const normalizedPath = path.replace(/\\/g, '/');
+
     // 如果已经打开，直接切换
-    const existing = openedFiles.find(f => f.path === path);
+    const existing = openedFiles.find(f => f.path.replace(/\\/g, '/') === normalizedPath);
     if (existing) {
-      set({ activeFilePath: path, selectedNodeIds: [] });
+      set({ activeFilePath: existing.path, selectedNodeIds: [] });
       return;
     }
 
@@ -1471,6 +1474,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         // 1. 更新当前 Pin
         let changedPinNames = new Set<string>();
         if (isTypeChanged) changedPinNames.add(pinName);
+        // When a pin is disabled, its data connections must be removed too
+        if (updates.enableType === 'disable') changedPinNames.add(pinName);
 
         let newPins = node.pins.map(pin => {
           if (pin.name === pinName) {

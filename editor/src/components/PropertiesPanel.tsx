@@ -10,6 +10,7 @@ import { logger } from '../utils/logger';
 import { useDebugStore } from '../stores/debugStore';
 import { useShallow } from 'zustand/react/shallow';
 import { getTheme } from '../theme/theme';
+import { stripExtension } from '../utils/fileUtils';
 
 const theme = getTheme();
 
@@ -237,7 +238,7 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
     }
     // Default: show action buttons on hover
     return (
-      <div className="absolute left-full top-1/2 -translate-y-1/2 ml-1 flex items-center bg-gray-800 shadow-md border border-gray-700 rounded px-1 py-0.5 opacity-0 group-hover/name:opacity-100 transition-opacity z-10 pointer-events-none group-hover/name:pointer-events-auto">
+      <div className="absolute left-full top-1/2 -translate-y-1/2 ml-1 flex items-center bg-gray-800 shadow-md border border-gray-700 rounded px-1 py-0.5 opacity-0 group-hover/name:opacity-100 transition-opacity z-10 pointer-events-none group-hover/name:pointer-events-auto before:content-[''] before:absolute before:right-full before:top-0 before:bottom-0 before:w-2">
         <button
           className="text-gray-400 hover:text-blue-400 text-[10px] px-1 transition-colors"
           onClick={(e) => { e.stopPropagation(); handleStartRename(); }}
@@ -362,8 +363,6 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
                 </span>
               )}
             </div>
-
-            {renderActionButtons()}
           </div>
         )}
       </div>
@@ -1113,7 +1112,7 @@ function TreeFilePicker({ value, onChange, options }: TreeFilePickerProps) {
           if (!isOpen) setSearch('');
         }}
       >
-        <span className="truncate flex-1">{value ? value.replace(/\.tree$/, '') : 'Select a tree...'}</span>
+        <span className="filename-ellipsis flex-1" title={value}>{value ? stripExtension(value) : 'Select a tree...'}</span>
         <div className="flex items-center">
           {value && (
             <button
@@ -1157,14 +1156,14 @@ function TreeFilePicker({ value, onChange, options }: TreeFilePickerProps) {
               filteredOptions.map(opt => (
                 <div
                   key={opt}
-                  className={`px-2 py-1.5 text-[10px] cursor-pointer hover:bg-blue-600 hover:text-white transition-colors truncate ${opt === value ? 'bg-blue-900 text-blue-200' : 'text-gray-300'}`}
+                  className={`px-2 py-1.5 text-[10px] cursor-pointer hover:bg-gray-700 transition-colors filename-ellipsis ${value === opt ? 'text-blue-400 bg-gray-750' : 'text-gray-300'}`}
+                  title={opt}
                   onClick={() => {
                     onChange(opt);
                     setIsOpen(false);
                   }}
-                  title={opt}
                 >
-                  {opt.replace(/\.tree$/, '')}
+                  {stripExtension(opt)}
                 </div>
               ))
             ) : (

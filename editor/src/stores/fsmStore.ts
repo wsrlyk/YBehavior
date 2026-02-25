@@ -150,10 +150,12 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
 
     openFSM: (path, content) => {
         const { openedFSMFiles } = get();
+        const normalizedPath = path.replace(/\\/g, '/');
 
         // Check if already open
-        if (openedFSMFiles.some(f => f.path === path)) {
-            set({ activeFSMPath: path });
+        const existing = openedFSMFiles.find(f => f.path.replace(/\\/g, '/') === normalizedPath);
+        if (existing) {
+            set({ activeFSMPath: existing.path });
             return;
         }
 

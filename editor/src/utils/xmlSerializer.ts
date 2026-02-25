@@ -1,4 +1,5 @@
 import type { Tree, TreeNode, Pin, TreeConnection, ValueType, Variable, DataConnection, TreeInterfacePin } from '../types';
+import { stripExtension } from './fileUtils';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 
 /** ValueType 到 XML 字符的映射 */
@@ -58,9 +59,9 @@ function serializePinValue(pin: Pin, forEditor: boolean): string {
   let value = '';
   if (pin.binding.type === 'const') {
     value = pin.binding.value;
-    // 如果是 Tree Pin，去除后缀名
-    if (pin.name === 'Tree' && value.endsWith('.tree')) {
-      value = value.substring(0, value.length - 5);
+    // 如果是引用了其他树或FSM的文件路径，去除后缀名
+    if ((pin.name === 'Tree' || pin.name === 'Reference' || pin.name === 'treeNode.Reference') && (value.endsWith('.tree') || value.endsWith('.fsm'))) {
+      value = stripExtension(value);
     }
   } else {
     value = pin.binding.variableName; // 空变量名表示数据连接状态
