@@ -264,7 +264,16 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         const sessionId = crypto.randomUUID();
         // console.log(`[debugStore] startDebug target=${target} sessionId=${sessionId}`);
 
-        set({ debugTarget: target, currentSessionId: sessionId });
+        // Reset debug session state so handleSubTrees dedup won't treat the
+        // incoming [SubTrees] for the new target as a duplicate of the old one.
+        set({
+            debugTarget: target,
+            currentSessionId: sessionId,
+            isDebugging: false,
+            treeRunInfos: new Map(),
+            fsmRunInfo: null,
+            runningFiles: new Map(),
+        });
 
         // Broadcast session start to other windows to clear their state
         emit('debug:session_start', { sessionId });
@@ -878,6 +887,15 @@ export const useDebugStore = create<DebugState>((set, get) => ({
                     stateInfos: new Map()
                 }
             }));
+
+            // Notify user that debugging has truly started
+            {
+                const target = get().debugTarget;
+                const msg = (target && target.startsWith('Agent:'))
+                    ? `开始调试 (UID: ${target.slice(6)})`
+                    : `开始调试: ${fsmName}`;
+                useNotificationStore.getState().notify(msg, 'success');
+            }
 
             // Only trees (index 1+) go into treeRunInfos; the FSM (index 0) lives in fsmRunInfo
             const newTreeRunInfos = new Map<string, TreeRunInfo>();

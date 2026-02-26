@@ -131,7 +131,7 @@ export function DebugToolbar() {
         }
 
         startDebug(fileName, fileType as 'tree' | 'fsm', uid, waitForBegin);
-        notify(fileName ? `开始调试: ${fileName}` : `开始调试 (UID: ${agentUID})`, 'info');
+        notify(uid ? `等待调试 (UID: ${agentUID})` : `等待调试: ${fileName}`, 'info');
     };
 
     return (
@@ -192,7 +192,6 @@ export function DebugToolbar() {
                             onChange={(e) => setAgentUID(e.target.value)}
                             className="w-20 px-1.5 py-0.5 bg-[#404040] border border-[#525252] rounded text-white text-xs focus:outline-none focus:border-blue-500"
                             placeholder="UID"
-                            disabled={isDebugging}
                         />
                     </div>
 
@@ -203,7 +202,6 @@ export function DebugToolbar() {
                             checked={waitForBegin}
                             onChange={(e) => setWaitForBegin(e.target.checked)}
                             className="w-3 h-3"
-                            disabled={isDebugging}
                         />
                         <span>Wait Init</span>
                     </label>
@@ -211,10 +209,9 @@ export function DebugToolbar() {
                     {/* Start debug button */}
                     <button
                         onClick={handleStartDebug}
-                        disabled={isDebugging}
                         className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors
               ${isDebugging
-                                ? 'bg-[#525252] text-[#a3a3a3] cursor-not-allowed'
+                                ? 'bg-orange-600 hover:bg-orange-700 text-white'
                                 : 'bg-blue-600 hover:bg-blue-700 text-white'
                             }`}
                         title="开始调试当前文件"
