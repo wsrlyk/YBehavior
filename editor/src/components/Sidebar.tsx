@@ -91,7 +91,6 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
 
   // Compute current data state
   const fileRunState = isConnected ? getFileRunState(name) : undefined;
-  const treeInfo = isConnected ? treeRunInfos.get(name) : undefined;
   const fsmInfo = isConnected && file.isFSM ? useDebugStore.getState().fsmRunInfo : undefined;
 
   // Resolve root/final state
@@ -125,7 +124,26 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
       }
     }
   } else {
-    rootFinal = treeInfo?.nodeStates.get(1)?.final;
+    // Tree: fuzzy-match treeRunInfos (key may be full relative path, name is basename)
+    // then aggregate all node states (same priority as FSM/RunningList)
+    const normName = name.replace(/\\/g, '/');
+    for (const [key, info] of treeRunInfos) {
+      const normKey = key.replace(/\\/g, '/');
+      if (normKey === normName || normKey.endsWith('/' + normName) || normName.endsWith('/' + normKey)) {
+        let hasBreak = false, hasRunning = false, hasFailure = false, hasSuccess = false;
+        for (const ns of info.nodeStates.values()) {
+          if (ns.final === NodeState.Break) { hasBreak = true; break; }
+          if (ns.final === NodeState.Running) hasRunning = true;
+          else if (ns.final === NodeState.Failure) hasFailure = true;
+          else if (ns.final === NodeState.Success) hasSuccess = true;
+        }
+        if (hasBreak) rootFinal = NodeState.Break;
+        else if (hasRunning) rootFinal = NodeState.Running;
+        else if (hasFailure) rootFinal = NodeState.Failure;
+        else if (hasSuccess) rootFinal = NodeState.Success;
+        break;
+      }
+    }
   }
 
   useEffect(() => {

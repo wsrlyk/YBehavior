@@ -180,18 +180,11 @@ export const useDebugStore = create<DebugState>((set, get) => ({
             return;
         }
 
-        // Start display timer (1fps)
-        const timer = setInterval(() => {
-            get().displayKeyframe();
-        }, 1000);
-
-        set(state => ({
+        // NOTE: display timer is created in handleConnectionEvent(true), not here,
+        // to avoid double-timer interference that would make transient highlights permanent.
+        set({
             unlistenFns: [unlistenConnection, unlistenMessage, unlistenSession],
-            keyframeState: {
-                ...state.keyframeState,
-                displayTimer: timer
-            }
-        }));
+        });
 
         // Initial sync
         get().syncBreakpointsFromMeta();
@@ -258,22 +251,31 @@ export const useDebugStore = create<DebugState>((set, get) => ({
 
     // Start debugging
     startDebug: (fileName, fileType, agentUID, waitForBegin = false) => {
-        let target = fileName;
-        if (!target && agentUID) target = `Agent:${agentUID}`;
+        const target = (agentUID !== undefined && agentUID !== BigInt(0))
+            ? `Agent:${agentUID}`
+            : fileName;
 
         const sessionId = crypto.randomUUID();
         // console.log(`[debugStore] startDebug target=${target} sessionId=${sessionId}`);
 
         // Reset debug session state so handleSubTrees dedup won't treat the
         // incoming [SubTrees] for the new target as a duplicate of the old one.
-        set({
+        set(state => ({
             debugTarget: target,
             currentSessionId: sessionId,
             isDebugging: false,
             treeRunInfos: new Map(),
             fsmRunInfo: null,
             runningFiles: new Map(),
-        });
+            // Clear stale frame data so old pendingDiffScore doesn't block new frames.
+            // Keep displayTimer so the display loop keeps running.
+            keyframeState: {
+                ...state.keyframeState,
+                pendingFrame: null,
+                lastDisplayedFrame: null,
+                pendingDiffScore: 0,
+            },
+        }));
 
         // Broadcast session start to other windows to clear their state
         emit('debug:session_start', { sessionId });
@@ -289,7 +291,8 @@ export const useDebugStore = create<DebugState>((set, get) => ({
                 content = agentUID.toString();
             } else {
                 header = fileType === 'tree' ? '[DebugTree]' : '[DebugFSM]';
-                content = fileName;
+                // Runtime expects pure filename (no path, no extension)
+                content = fileName.split(/[\\/]/).pop()?.replace(/\.(tree|fsm)$/, '') || fileName;
             }
 
             const message = `${header}${FIELD_DELIMITER}${content}${FIELD_DELIMITER}${waitForBegin ? 1 : 0}`;
@@ -378,8 +381,8 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         // Send to runtime if connected
         if (isConnected) {
             const count = newType === BreakpointType.Breakpoint ? 1 : 0;
-            // Runtime expects Tree Name (Basename)
-            const treeName = fileName.split(/[\\/]/).pop()?.replace(/\.tree$/, '') || fileName;
+            // Runtime expects pure filename (no path, no extension)
+            const treeName = fileName.split(/[\\/]/).pop()?.replace(/\.(tree|fsm)$/, '') || fileName;
             send(`[DebugTreePoint]${FIELD_DELIMITER}${treeName}${FIELD_DELIMITER}${uid}${FIELD_DELIMITER}${count}`);
         }
     },
@@ -413,7 +416,8 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         // Send to runtime if connected
         if (isConnected) {
             const count = newType === BreakpointType.Logpoint ? -1 : 0;
-            const treeName = fileName.split(/[\\/]/).pop()?.replace(/\.tree$/, '') || fileName;
+            // Runtime expects pure filename (no path, no extension)
+            const treeName = fileName.split(/[\\/]/).pop()?.replace(/\.(tree|fsm)$/, '') || fileName;
             send(`[DebugTreePoint]${FIELD_DELIMITER}${treeName}${FIELD_DELIMITER}${uid}${FIELD_DELIMITER}${count}`);
         }
     },
@@ -445,10 +449,23 @@ export const useDebugStore = create<DebugState>((set, get) => ({
     // Get detailed node run state (self + final)
     getNodeRunState: (fileName: string, uid: number): NodeRunState | undefined => {
         const { treeRunInfos } = get();
-        const treeInfo = treeRunInfos.get(fileName);
-        if (treeInfo) {
-            return treeInfo.nodeStates.get(uid);
+
+        // Exact match first
+        const exactInfo = treeRunInfos.get(fileName);
+        if (exactInfo) {
+            return exactInfo.nodeStates.get(uid);
         }
+
+        // Fuzzy match: basename vs full relative path
+        // e.g. query "combat_subtree_forcastskill" matches key "Game/combat_subtree_forcastskill"
+        const normQuery = fileName.replace(/\\/g, '/');
+        for (const [key, info] of treeRunInfos) {
+            const normKey = key.replace(/\\/g, '/');
+            if (normKey.endsWith('/' + normQuery) || normQuery.endsWith('/' + normKey)) {
+                return info.nodeStates.get(uid);
+            }
+        }
+
         return undefined;
     },
 
@@ -564,8 +581,8 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         for (let i = 2; i < parts.length; i += 3) {
             if (i + 2 < parts.length) {
                 const treeName = parts[i];
-                // Ignore empty or obviously corrupted tree names
-                if (!treeName || treeName.length < 2) continue;
+                // Ignore empty tree names
+                if (!treeName) continue;
 
                 data.treeRunDatas.set(treeName, {
                     name: treeName,
@@ -763,7 +780,7 @@ export const useDebugStore = create<DebugState>((set, get) => ({
             const parts = item.split(SEQUENCE_DELIMITER);
             if (parts.length >= 2) {
                 const name = parts[0];
-                if (!name || name.length < 2) continue; // Ignore empty/invalid tree names
+                if (!name) continue; // Ignore empty tree names
 
                 fileHashes.push({
                     name: name,
@@ -872,7 +889,8 @@ export const useDebugStore = create<DebugState>((set, get) => ({
             }
 
             // The first entry in SubTrees is always the FSM, the rest are Trees.
-            const fsmName = fileHashes[0].name;
+            // Use pure basename (no path, no extension) to match runtime protocol
+            const fsmName = fileHashes[0].name.split(/[\\/]/).pop() || fileHashes[0].name;
 
             // Mark as debugging and record the FSM filename definitively
             set(state => ({
@@ -901,8 +919,10 @@ export const useDebugStore = create<DebugState>((set, get) => ({
             const newTreeRunInfos = new Map<string, TreeRunInfo>();
             for (let i = 1; i < fileHashes.length; i++) {
                 const file = fileHashes[i];
-                newTreeRunInfos.set(file.name, {
-                    treeName: file.name,
+                // Use pure basename (no path, no extension) as key - matches [TickResult] format
+                const normName = file.name.split(/[\\/]/).pop() || file.name;
+                newTreeRunInfos.set(normName, {
+                    treeName: normName,
                     nodeStates: new Map(),
                     sharedVariables: new Map(),
                     localVariables: new Map(),
@@ -918,7 +938,8 @@ export const useDebugStore = create<DebugState>((set, get) => ({
             let message = '[DebugBegin]';
 
             for (const file of fileHashes) {
-                message += FIELD_DELIMITER + file.name;
+                // Runtime expects pure filename (no path, no extension)
+                message += FIELD_DELIMITER + (file.name.split(/[\\/]/).pop() || file.name);
 
                 // Fuzzy lookup for breakpoints (handle Path/File vs File.ext)
                 let fileBreakpoints: Map<number, BreakpointType> | undefined;

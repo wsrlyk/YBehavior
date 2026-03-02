@@ -139,9 +139,21 @@ function RunningListItem({ fileName, isFsm, onClick }: { fileName: string; isFsm
             else if (hasSuccess) rootFinal = NodeState.Success;
         }
     } else {
-        // Tree: get root node (uid=1) final state from treeRunInfos
+        // Tree: aggregate state from all node states (same priority as FSM: Break > Running > Failure > Success)
         const treeInfo = isConnected ? treeRunInfos.get(fileName) : undefined;
-        rootFinal = treeInfo?.nodeStates.get(1)?.final;
+        if (treeInfo) {
+            let hasBreak = false, hasRunning = false, hasFailure = false, hasSuccess = false;
+            for (const ns of treeInfo.nodeStates.values()) {
+                if (ns.final === NodeState.Break) { hasBreak = true; break; }
+                if (ns.final === NodeState.Running) hasRunning = true;
+                else if (ns.final === NodeState.Failure) hasFailure = true;
+                else if (ns.final === NodeState.Success) hasSuccess = true;
+            }
+            if (hasBreak) rootFinal = NodeState.Break;
+            else if (hasRunning) rootFinal = NodeState.Running;
+            else if (hasFailure) rootFinal = NodeState.Failure;
+            else if (hasSuccess) rootFinal = NodeState.Success;
+        }
     }
 
     useEffect(() => {

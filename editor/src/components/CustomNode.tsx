@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState, useEffect } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import type { TreeNode, Pin } from '../types';
 import type { NodeDefinition } from '../types/nodeDefinition';
@@ -16,6 +16,7 @@ const NODE_COLORS = theme.node;
 const PIN_COLORS = theme.pin;
 
 import { stripExtension } from '../utils/fileUtils';
+import { TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
 
 // Debug state colors for node visualization
 const DEBUG_STATE_COLORS: Record<NodeState, { border: string; glow: string } | null> = {
@@ -76,8 +77,8 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
       {binding.type === 'const' && (
         <span
           className={`text-[10px] max-w-40 cursor-help ${['Tree', 'Reference', 'treeNode.Reference'].includes(pin.name)
-              ? 'filename-ellipsis'  // 文件路径需要 RTL 末尾省略
-              : 'truncate'           // 普通值（enum/数字等）不能用 RTL
+            ? 'filename-ellipsis'  // 文件路径需要 RTL 末尾省略
+            : 'truncate'           // 普通值（enum/数字等）不能用 RTL
             }`}
           style={{ color: theme.text.constant }}
           onMouseEnter={() => setTooltip(binding.value || '-')}
@@ -133,6 +134,26 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
   );
   const debugColors = DEBUG_STATE_COLORS[debugState];
 
+  // Transient highlight: Break = always on, others fade out after TRANSIENT_HIGHLIGHT_DURATION
+  const [isTransientVisible, setIsTransientVisible] = useState(false);
+  useEffect(() => {
+    if (isPaused) {
+      setIsTransientVisible(debugState !== NodeState.Invalid);
+      return;
+    }
+    if (debugState === NodeState.Break) {
+      setIsTransientVisible(true);
+    } else if (debugState !== NodeState.Invalid) {
+      setIsTransientVisible(true);
+      const timer = setTimeout(() => setIsTransientVisible(false), TRANSIENT_HIGHLIGHT_DURATION);
+      return () => clearTimeout(timer);
+    } else {
+      setIsTransientVisible(false);
+    }
+  }, [debugState, keyframe, isPaused]);
+
+  const showDebugOverlay = debugColors !== null && (isPaused || isTransientVisible);
+
   const nodeDefinition = useMemo(() => getDefinition(treeNode.type), [treeNode.type, getDefinition]);
 
   const bgColor = NODE_COLORS[treeNode.category] || NODE_COLORS.default || '#666';
@@ -183,12 +204,11 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
           }}
         >
           {/* Debug Overlay */}
-          {debugColors && (
+          {showDebugOverlay && (
             <div
-              key={isPaused ? 'paused' : keyframe}
-              className={`absolute inset-0 rounded pointer-events-none z-50 ${!isPaused ? 'animate-debug-flash' : ''}`}
+              className="absolute inset-0 rounded pointer-events-none z-50"
               style={{
-                boxShadow: `inset 0 0 0 4px ${debugColors.border}, ${debugColors.glow}`
+                boxShadow: `inset 0 0 0 4px ${debugColors!.border}, ${debugColors!.glow}`
               }}
             />
           )}
