@@ -60,7 +60,7 @@ function serializePinValue(pin: Pin, forEditor: boolean): string {
   if (pin.binding.type === 'const') {
     value = pin.binding.value;
     // 如果是引用了其他树或FSM的文件路径，去除后缀名
-    if ((pin.name === 'Tree' || pin.name === 'Reference' || pin.name === 'treeNode.Reference') && (value.endsWith('.tree') || value.endsWith('.fsm'))) {
+    if ((pin.name === 'Tree' || pin.name === 'Reference' || pin.name === 'treeNode.Reference') && (value.endsWith('.tree') || value.endsWith('.fsm') || value.includes('\\'))) {
       value = stripExtension(value);
     }
   } else {

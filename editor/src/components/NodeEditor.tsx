@@ -105,7 +105,9 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
   useEffect(() => {
     if (pendingCenterTarget) {
-      setCenter(pendingCenterTarget.x, pendingCenterTarget.y, { zoom: pendingCenterTarget.zoom || 1.2, duration: 400 });
+      setTimeout(() => {
+        setCenter(pendingCenterTarget.x, pendingCenterTarget.y, { zoom: pendingCenterTarget.zoom || 1.2, duration: 0 });
+      }, 100);
       setPendingCenterTarget(undefined);
     }
   }, [pendingCenterTarget, setCenter, setPendingCenterTarget]);
@@ -141,6 +143,11 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
   const isSelecting = useRef(false);
   const lastSelectNodesIdsRef = useRef<string[]>([]);
+
+  // 同步 lastSelectNodesIdsRef 与 store 中的选中状态
+  useEffect(() => {
+    lastSelectNodesIdsRef.current = selectedNodeIds;
+  }, [selectedNodeIds]);
 
   // 优化的节点转换和缓存逻辑，显著提升大树拖拽启动性能
   const nodeCache = useMemo(() => new Map<string, CustomNodeType>(), []);
@@ -424,6 +431,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       selectedIds.every(id => currentSelected.includes(id));
 
     if (!isSame) {
+      lastSelectNodesIdsRef.current = selectedIds;
       selectNodes(selectedIds);
     }
   }, [nodes, selectNodes]);

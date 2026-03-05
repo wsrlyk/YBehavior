@@ -280,7 +280,9 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
 
     useEffect(() => {
         if (pendingCenterTarget) {
-            setCenter(pendingCenterTarget.x, pendingCenterTarget.y, { zoom: pendingCenterTarget.zoom || 1.2, duration: 400 });
+            setTimeout(() => {
+                setCenter(pendingCenterTarget.x, pendingCenterTarget.y, { zoom: pendingCenterTarget.zoom || 1.2, duration: 0 });
+            }, 100);
             setPendingCenterTarget(undefined);
         }
     }, [pendingCenterTarget, setCenter, setPendingCenterTarget]);

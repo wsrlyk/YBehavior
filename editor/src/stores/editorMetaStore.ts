@@ -207,9 +207,9 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
     cleanOrphanedMeta: (existingFiles) => {
         set((state) => {
             const metaFiles = Object.keys(state.treeMetas);
-            const validFilesSet = new Set(existingFiles);
+            const normalizedExisting = new Set(existingFiles.map(f => f.replace(/\\/g, '/')));
 
-            const toRemove = metaFiles.filter(f => !validFilesSet.has(f));
+            const toRemove = metaFiles.filter(f => !normalizedExisting.has(f.replace(/\\/g, '/')));
             if (toRemove.length === 0) return state;
 
             const newTreeMetas = { ...state.treeMetas };
@@ -226,9 +226,16 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
             const content = await readFile(path);
             if (content) {
                 const data = JSON.parse(content);
+                const rawTreeMetas = data.treeMetas || (data.nodes ? undefined : data) || {};
+                const normalizedTreeMetas: any = {};
+
+                Object.entries(rawTreeMetas).forEach(([k, v]) => {
+                    normalizedTreeMetas[k.replace(/\\/g, '/')] = v;
+                });
+
                 if (data.treeMetas || data.uiMeta || data.debugMeta) {
                     set({
-                        treeMetas: data.treeMetas || {},
+                        treeMetas: normalizedTreeMetas,
                         uiMeta: {
                             ...(data.uiMeta || { sidebarWidth: 160, propertiesPanelWidth: 300 }),
                             isSearchOpen: false,
@@ -238,7 +245,7 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
                         debugMeta: data.debugMeta || { ip: '127.0.0.1', port: 8888 }
                     });
                 } else {
-                    set({ treeMetas: data });
+                    set({ treeMetas: normalizedTreeMetas });
                 }
             }
         } catch (e) {

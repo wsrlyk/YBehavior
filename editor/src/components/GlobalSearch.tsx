@@ -260,13 +260,17 @@ export function GlobalSearch() {
     }, [currentTree, activeFSM, query, scopes, getDefinition]);
 
     const handleJump = (result: SearchResult) => {
-
         // setSearchOpen(false);
 
         if (result.type === 'node' && currentTree) {
             const node = currentTree.nodes.get(result.id);
             if (node) {
-                selectNodes([node.id]);
+                // Ensure tree mode is active
+                const activeFile = useEditorStore.getState().openedFiles.find(f => f.path === useEditorStore.getState().activeFilePath);
+                if (!activeFile || useFSMStore.getState().activeFSMPath) {
+                    useEditorStore.getState().setActiveFile(useEditorStore.getState().activeFilePath!);
+                }
+
                 selectNodes([node.id]);
                 setActivePropertiesTab('properties');
 
@@ -280,6 +284,12 @@ export function GlobalSearch() {
         } else if (result.type === 'pin' && currentTree) {
             const node = currentTree.nodes.get(result.nodeId!);
             if (node) {
+                // Ensure tree mode is active
+                const activeFile = useEditorStore.getState().openedFiles.find(f => f.path === useEditorStore.getState().activeFilePath);
+                if (!activeFile || useFSMStore.getState().activeFSMPath) {
+                    useEditorStore.getState().setActiveFile(useEditorStore.getState().activeFilePath!);
+                }
+
                 selectNodes([node.id]);
                 // 使用 store 触发 NodeEditor 内的 setCenter
                 setPendingCenterTarget({
@@ -301,6 +311,11 @@ export function GlobalSearch() {
             const machine = activeFSM.machines.get(result.machineId!);
             const state = machine?.states.get(result.id);
             if (state) {
+                // Ensure FSM mode is active
+                if (!activeFSMPath || useEditorStore.getState().activeFilePath) {
+                    useFSMStore.getState().setActiveFSM(useFSMStore.getState().activeFSMPath!);
+                }
+
                 navigateToMachine(result.machineId!);
                 setSelectedFSMNodes([state.id]);
                 setPendingCenterTarget({
@@ -315,6 +330,11 @@ export function GlobalSearch() {
             const machine = machineId ? activeFSM.machines.get(machineId) : undefined;
             const trans = machine?.transitions.find(t => t.id === result.id);
             if (trans && machine) {
+                // Ensure FSM mode is active
+                if (!activeFSMPath || useEditorStore.getState().activeFilePath) {
+                    useFSMStore.getState().setActiveFSM(useFSMStore.getState().activeFSMPath!);
+                }
+
                 navigateToMachine(machineId!);
                 setSelectedFSMEdges([trans.id]);
                 // Center on the transition (midpoint or toState)

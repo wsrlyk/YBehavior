@@ -5,6 +5,7 @@ import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import type { FSMState, FSMStateType } from '../types/fsm';
 import { stateTypeHasParentConnector, stateTypeHasChildrenConnector, stateTypeHasTreeSelector } from '../types/fsm';
 import { useFSMStore } from '../stores/fsmStore';
+import { useEditorStore } from '../stores/editorStore';
 // NodeState imported from types/debug
 import { useDebugStore } from '../stores/debugStore';
 import { decodeXmlEntities } from '../utils/stringUtils';
@@ -163,10 +164,19 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
             {/* Tree reference */}
             {hasTree && state.tree && (
                 <div
-                    className="px-3 py-1 text-xs text-gray-300 bg-gray-800/50 filename-ellipsis max-w-[200px]"
+                    className="flex items-center justify-between px-3 py-1 text-xs text-gray-300 bg-gray-800/50 filename-ellipsis max-w-[200px] border-t border-gray-600/30 group/tree"
                     title={state.tree}
                 >
-                    🌲 {stripExtension(state.tree)}
+                    <span className="truncate">🌲 {stripExtension(state.tree)}</span>
+                    <button
+                        className="opacity-0 group-hover/tree:opacity-100 text-gray-500 hover:text-blue-400 transition-opacity ml-1"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            useEditorStore.getState().openTree(state.tree!);
+                        }}
+                    >
+                        ↗
+                    </button>
                 </div>
             )}
 

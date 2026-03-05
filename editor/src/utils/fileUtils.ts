@@ -1,7 +1,11 @@
+// Normalize path to use forward slashes
+export function normalizePath(path: string): string {
+    return path.replace(/\\/g, '/');
+}
 
-// Strip .tree or .fsm extension
+// Strip .tree or .fsm extension and normalize slashes
 export function stripExtension(filename: string): string {
-    return filename.replace(/\.(tree|fsm)$/i, '');
+    return normalizePath(filename).replace(/\.(tree|fsm)$/i, '');
 }
 
 // Get just the filename from a full path

@@ -159,7 +159,8 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
         // Check if already open
         const existing = openedFSMFiles.find(f => f.path.replace(/\\/g, '/') === normalizedPath);
         if (existing) {
-            set({ activeFSMPath: existing.path });
+            useEditorStore.getState().setActiveFile(null as any);
+            set({ activeFSMPath: normalizedPath });
             return;
         }
 
@@ -181,8 +182,9 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
 
         set({
             openedFSMFiles: [...openedFSMFiles, newFile],
-            activeFSMPath: path,
+            activeFSMPath: normalizedPath,
         });
+        useEditorStore.getState().setActiveFile(null as any);
     },
 
     openFSMFile: async (path: string) => {
@@ -221,7 +223,11 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
         set({ openedFSMFiles: newFiles, activeFSMPath: newActive });
     },
 
-    setActiveFSM: (path) => set({ activeFSMPath: path }),
+    setActiveFSM: (path) => {
+        const normalized = path ? path.replace(/\\/g, '/') : path;
+        if (normalized) useEditorStore.getState().setActiveFile(null as any);
+        set({ activeFSMPath: normalized });
+    },
 
     setViewport: (path, viewport) => set((state) => {
         const fileIndex = state.openedFSMFiles.findIndex(f => f.path === path);

@@ -8,6 +8,7 @@ import { serializeTreeForEditor, serializeTreeForRuntime } from '../utils/xmlSer
 import { validateValue, getDefaultValue } from '../utils/validation';
 import { useNotificationStore } from './notificationStore';
 import { logger } from '../utils/logger';
+import { stripExtension } from '../utils/fileUtils';
 import { useEditorMetaStore } from './editorMetaStore';
 import { SPECIAL_NODE_HANDLERS_IMPL, type ConnectionLabelUpdate } from '../utils/specialNodeLogic';
 import {
@@ -113,7 +114,7 @@ interface EditorState {
   reloadSubTreePins: (subtreeNodeId: string) => Promise<void>;
 
   // Clipboard
-  clipboard: { nodes: TreeNode[], connections: TreeConnection[], dataConnections: DataConnection[] } | null;
+  clipboard: { nodes: TreeNode[], connections: TreeConnection[], dataConnections: DataConnection[], variables: Variable[] } | null;
   copySelectedNodes: () => void;
   pasteNodes: (position?: { x: number; y: number }) => void;
 
@@ -143,11 +144,19 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     try {
       const settings = await loadSettings();
       const files = await listFiles(settings.editorTreeDir, ['tree', 'fsm']);
+      const normalizedTreeDir = settings.editorTreeDir.replace(/\\/g, '/');
+      const normalizedRuntimeDir = settings.runtimeTreeDir.replace(/\\/g, '/');
+      const normalizedFiles = files.map(f => f.replace(/\\/g, '/'));
+
       set({
-        settings,
-        editorTreeDir: settings.editorTreeDir,
-        runtimeTreeDir: settings.runtimeTreeDir,
-        treeFiles: files,
+        settings: {
+          ...settings,
+          editorTreeDir: normalizedTreeDir,
+          runtimeTreeDir: normalizedRuntimeDir
+        },
+        editorTreeDir: normalizedTreeDir,
+        runtimeTreeDir: normalizedRuntimeDir,
+        treeFiles: normalizedFiles,
         isLoading: false,
       });
 
@@ -164,9 +173,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
     try {
       const files = await listFiles(editorTreeDir, ['tree', 'fsm']);
-      set({ treeFiles: files });
+      const normalizedFiles = files.map(f => f.replace(/\\/g, '/'));
+      set({ treeFiles: normalizedFiles });
       // Cleanup orphaned meta files
-      useEditorMetaStore.getState().cleanOrphanedMeta(files);
+      useEditorMetaStore.getState().cleanOrphanedMeta(normalizedFiles);
     } catch (e) {
       console.error('Failed to refresh files:', e);
     }
@@ -176,28 +186,93 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   openTree: async (path) => {
     const { editorTreeDir, openedFiles } = get();
-    if (!editorTreeDir) return;
-
-    // Normalize path for comparison
-    const normalizedPath = path.replace(/\\/g, '/');
-
-    // 如果已经打开，直接切换
-    const existing = openedFiles.find(f => f.path.replace(/\\/g, '/') === normalizedPath);
-    if (existing) {
-      set({ activeFilePath: existing.path, selectedNodeIds: [] });
+    if (!editorTreeDir) {
+      console.error('openTree failed: editorTreeDir is not set');
       return;
     }
 
+    // Normalize path for comparison
+    const normalizedPath = path.replace(/\\/g, '/');
+    console.log(`openTree called with path: "${path}", normalized: "${normalizedPath}"`);
+
+    // 1. 如果已经打开，直接切换
+    const existing = openedFiles.find(f => f.path.replace(/\\/g, '/') === normalizedPath);
+    if (existing) {
+      console.log(`Found already opened file: "${existing.path}", activating...`);
+      get().setActiveFile(existing.path);
+      return;
+    }
+
+    // 2. 如果未打开，尝试在已知文件列表中查找（处理不完整的相对路径，例如 FSM 中只存了文件名）
+    const { treeFiles } = get();
+    const normalizedNoExt = stripExtension(normalizedPath);
+    console.log(`Searching for match in ${treeFiles.length} treeFiles... (NormalizedNoExt: "${normalizedNoExt}")`);
+
+    // Find the best match in available tree files
+    const matchedFile = treeFiles.find(f => {
+      const nf = f.replace(/\\/g, '/');
+      const nfNoExt = stripExtension(nf);
+
+      // Try exact match, suffix match, and extensionless versions of both
+      // We add a leading / to both for consistent suffix matching
+      const vnf = nf.startsWith('/') ? nf : '/' + nf;
+      const vnfNoExt = nfNoExt.startsWith('/') ? nfNoExt : '/' + nfNoExt;
+      const vpath = normalizedPath.startsWith('/') ? normalizedPath : '/' + normalizedPath;
+      const vpathNoExt = normalizedNoExt.startsWith('/') ? normalizedNoExt : '/' + normalizedNoExt;
+
+      const isExact = nf.toLowerCase() === normalizedPath.toLowerCase() ||
+        (nf.toLowerCase() === (normalizedPath + '.tree').toLowerCase()) ||
+        nfNoExt.toLowerCase() === normalizedNoExt.toLowerCase();
+
+      const isSuffix = vnf.toLowerCase().endsWith(vpath.toLowerCase()) ||
+        vnf.toLowerCase().endsWith((vpath + '.tree').toLowerCase()) ||
+        vnfNoExt.toLowerCase().endsWith(vpathNoExt.toLowerCase());
+
+      if (isExact || isSuffix) {
+        console.log(`Match found! Exact: ${isExact}, Suffix: ${isSuffix}. File: ${nf}`);
+        return true;
+      }
+      return false;
+    });
+
+    if (matchedFile) {
+      console.log(`Matched known file: "${matchedFile}"`);
+    } else {
+      console.warn(`No match found for "${normalizedPath}" in treeFiles. Will try direct load.`);
+    }
+
+    const finalPath = matchedFile || (normalizedPath.endsWith('.tree') ? normalizedPath : `${normalizedPath}.tree`);
+    const normalizedFinal = finalPath.replace(/\\/g, '/');
+
+    // 再次检查匹配后的路径是否已打开
+    const existingAgain = openedFiles.find(f => f.path.replace(/\\/g, '/') === normalizedFinal);
+    if (existingAgain) {
+      console.log(`Final path "${normalizedFinal}" is already open as "${existingAgain.path}", activating...`);
+      get().setActiveFile(existingAgain.path);
+      return;
+    }
+
+    console.log(`Loading tree from final path: "${normalizedFinal}"`);
     set({ isLoading: true, error: null });
     try {
-      const fullPath = `${editorTreeDir}/${path}`;
+      // Use full path with directory prefix
+      // Ensure no double slashes and correct separator
+      let fullPathForLoad = normalizedFinal.includes(':') ? normalizedFinal : `${editorTreeDir}/${normalizedFinal}`;
+      fullPathForLoad = fullPathForLoad.replace(/\\/g, '/').replace(/\/+/g, '/');
+      if (fullPathForLoad.match(/^[A-Za-z]:\//)) {
+        // Keep Windows drive letter format
+      } else if (!fullPathForLoad.startsWith('/')) {
+        // ... (keep as is)
+      }
+      console.log(`Full path for loading: "${fullPathForLoad}"`);
+
       // 获取节点定义查找函数
       const { getDefinition } = useNodeDefinitionStore.getState();
-      const tree = await loadTree(fullPath, getDefinition);
-      const fileName = path.split('/').pop() || path;
+      const tree = await loadTree(fullPathForLoad, getDefinition);
+      const fileName = normalizedFinal.split('/').pop() || normalizedFinal;
 
       // 加载本地元数据（如折叠状态）
-      const meta = useEditorMetaStore.getState().getTreeMeta(path);
+      const meta = useEditorMetaStore.getState().getTreeMeta(normalizedFinal);
       if (meta) {
         tree.nodes.forEach((node, id) => {
           if (meta.nodes[id]) {
@@ -210,7 +285,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const treeWithLabels = applyLabelUpdatesToTree(tree, Array.from(tree.nodes.keys()));
 
       const newFile: OpenedFile = {
-        path,
+        path: normalizedFinal,
         name: fileName,
         tree: treeWithLabels,
         lastSavedTreeSnapshot: serializeTreeForEditor(treeWithLabels),
@@ -220,11 +295,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
       set({
         openedFiles: [...openedFiles, newFile],
-        activeFilePath: path,
+        activeFilePath: normalizedFinal,
         isLoading: false,
         selectedNodeIds: [],
       });
-    } catch (e) {
+      useFSMStore.getState().setActiveFSM(null as any);
+    } catch (e: any) {
+      console.error(`Failed to load tree "${normalizedFinal}": ${e}`);
       set({ error: String(e), isLoading: false });
     }
   },
@@ -272,7 +349,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     });
   },
 
-  setActiveFile: (path) => set({ activeFilePath: path, selectedNodeIds: [] }),
+  setActiveFile: (path) => {
+    const normalized = path ? path.replace(/\\/g, '/') : path;
+    if (normalized) useFSMStore.getState().setActiveFSM(null as any);
+    set({ activeFilePath: normalized, selectedNodeIds: [] });
+  },
 
   setViewport: (path, viewport) => {
     set((state) => {
@@ -647,10 +728,49 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       }))
     }));
 
-    logger.info(`Copied ${nodesDeepCopy.length} nodes to clipboard`);
+    // 收集引用的变量
+    const referencedVars: Variable[] = [];
+    const varNames = new Set<string>(); // "scope-name" to avoid duplicates
+
+    nodesDeepCopy.forEach(node => {
+      node.pins.forEach(pin => {
+        // Pin 绑定变量
+        const binding = pin.binding;
+        if (binding.type === 'pointer' && binding.variableName) {
+          const varName = binding.variableName;
+          const isLocal = binding.isLocal;
+          const key = `${isLocal ? 'local' : 'shared'}-${varName}`;
+          if (!varNames.has(key)) {
+            const v = (isLocal ? tree.localVariables : tree.sharedVariables)
+              .find(v => v.name === varName);
+            if (v) {
+              referencedVars.push({ ...v });
+              varNames.add(key);
+            }
+          }
+        }
+        // VectorIndex 绑定变量
+        const vi = pin.vectorIndex;
+        if (vi && vi.type === 'pointer' && vi.variableName) {
+          const varName = vi.variableName;
+          const isLocal = vi.isLocal;
+          const key = `${isLocal ? 'local' : 'shared'}-${varName}`;
+          if (!varNames.has(key)) {
+            const v = (isLocal ? tree.localVariables : tree.sharedVariables)
+              .find(v => v.name === varName);
+            if (v) {
+              referencedVars.push({ ...v });
+              varNames.add(key);
+            }
+          }
+        }
+      });
+    });
+
+    logger.info(`Copied ${nodesDeepCopy.length} nodes and ${referencedVars.length} referenced variables to clipboard`);
     useNotificationStore.getState().notify(`Copied ${nodesDeepCopy.length} nodes`);
 
-    set({ clipboard: { nodes: nodesDeepCopy, connections: connectionsToCopy, dataConnections: dataConnectionsToCopy } });
+    set({ clipboard: { nodes: nodesDeepCopy, connections: connectionsToCopy, dataConnections: dataConnectionsToCopy, variables: referencedVars } });
   },
 
   pasteNodes: (position?: { x: number; y: number }) => {
@@ -691,10 +811,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         const existingGUIDs = new Set<number>();
         tree.nodes.forEach(n => existingGUIDs.add(n.guid));
 
-        // Prepare available variables for validation
-        const availableSharedVars = new Set(tree.sharedVariables.map(v => v.name));
-        const availableLocalVars = new Set(tree.localVariables.map(v => v.name));
-
         // 1. Process Nodes
         clipboard.nodes.forEach((node, index) => {
           const newId = `node-${timestamp}-${index}`;
@@ -711,34 +827,70 @@ export const useEditorStore = create<EditorState>((set, get) => ({
             vectorIndex: p.vectorIndex ? { ...p.vectorIndex } : undefined
           }));
 
-          // Validate Variables
+          // Validate & Auto-create Variables
           newPins.forEach(pin => {
-            if (pin.binding.type === 'pointer') {
-              const varName = pin.binding.variableName;
-              const isLocal = pin.binding.isLocal;
-              const exists = isLocal ? availableLocalVars.has(varName) : availableSharedVars.has(varName);
+            const binding = pin.binding;
+            if (binding.type === 'pointer' && binding.variableName) {
+              const varName = binding.variableName;
+              const isLocal = binding.isLocal;
 
-              if (!exists && varName) {
-                // Console warning only
-                console.warn(`[Paste] Variable '${varName}' not found in current tree. Pin '${pin.name}' in node '${node.nickname || node.type}' disconnected.`);
+              const existingVar = (isLocal ? tree.localVariables : tree.sharedVariables).find(v => v.name === varName);
 
-                // Disconnect by switching to const default
-                pin.binding = { type: 'const', value: '' };
-                pin.bindingType = 'const'; // Also update the binding type
+              if (!existingVar) {
+                // 1. Variable doesn't exist: Auto-create it from clipboard
+                const originalVar = clipboard.variables?.find(v => v.name === varName && v.isLocal === isLocal);
+                if (originalVar) {
+                  const targetList = isLocal ? tree.localVariables : tree.sharedVariables;
+                  targetList.push({ ...originalVar });
+                  logger.info(`[Paste] Auto-created missing ${isLocal ? 'Local' : 'Shared'} variable: ${varName}`);
+                } else {
+                  // Fallback: No definition in clipboard, keep as disconnected pointer
+                  pin.binding = { type: 'pointer', variableName: '', isLocal: false };
+                  pin.bindingType = 'pointer';
+                }
+              } else {
+                // 2. Variable exists: Check compatibility
+                const valueTypeMatch = existingVar.valueType === pin.valueType;
+                let countTypeMatch = false;
+
+                if (pin.vectorIndex) {
+                  // If pin has vectorIndex, it MUST reference a list variable
+                  countTypeMatch = existingVar.countType === 'list';
+                } else {
+                  // If no vectorIndex, countType must match exactly
+                  countTypeMatch = existingVar.countType === pin.countType;
+                }
+
+                if (!valueTypeMatch || !countTypeMatch) {
+                  const expectedStr = `${pin.valueType}${pin.vectorIndex ? '[] (with index)' : (pin.countType === 'list' ? '[]' : '')}`;
+                  const foundStr = `${existingVar.valueType}${existingVar.countType === 'list' ? '[]' : ''}`;
+
+                  logger.warn(`[Paste] Incompatible variable '${varName}' found. Expected ${expectedStr}, found ${foundStr}. Pin '${pin.name}' in node '${node.nickname || node.type}' disconnected.`);
+
+                  // Disconnect by clearing variableName but keep as pointer
+                  pin.binding = { type: 'pointer', variableName: '', isLocal: false };
+                  pin.bindingType = 'pointer';
+                }
               }
             }
 
             // Validate Vector Index Variable
-            if (pin.vectorIndex && pin.vectorIndex.type === 'pointer') {
-              const varName = pin.vectorIndex.variableName;
-              const isLocal = pin.vectorIndex.isLocal;
-              const exists = isLocal ? availableLocalVars.has(varName) : availableSharedVars.has(varName);
+            const vi = pin.vectorIndex;
+            if (vi && vi.type === 'pointer' && vi.variableName) {
+              const varName = vi.variableName;
+              const isLocal = vi.isLocal;
+              const existingVar = (isLocal ? tree.localVariables : tree.sharedVariables).find(v => v.name === varName);
 
-              if (!exists && varName) {
-                console.warn(`[Paste] Index Variable '${varName}' not found. Pin '${pin.name}' index validation failed.`);
-
-                // Reset to const 0
+              // For vectorIndex, we only accept int scalar and WE DON'T auto-create if missing (as per request)
+              if (!existingVar) {
+                logger.warn(`[Paste] Index Variable '${varName}' not found. Pin '${pin.name}' index reset to constant 0.`);
                 pin.vectorIndex = { type: 'const', value: '0' };
+              } else {
+                const isCompatible = existingVar.valueType === 'int' && existingVar.countType === 'scalar';
+                if (!isCompatible) {
+                  logger.warn(`[Paste] Incompatible Index variable '${varName}'. Expected int scalar, found ${existingVar.valueType}${existingVar.countType === 'list' ? '[]' : ''}. Reset to constant 0.`);
+                  pin.vectorIndex = { type: 'const', value: '0' };
+                }
               }
             }
           });
