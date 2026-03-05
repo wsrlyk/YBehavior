@@ -117,6 +117,9 @@ interface EditorState {
   copySelectedNodes: () => void;
   pasteNodes: (position?: { x: number; y: number }) => void;
 
+  // New feature: Viewport state
+  setViewport: (workspacePath: string, viewport: import('./editorStoreCore').Viewport) => void;
+
   // 新建文件
   createNewTree: (name: string) => void;
 
@@ -270,6 +273,20 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   setActiveFile: (path) => set({ activeFilePath: path, selectedNodeIds: [] }),
+
+  setViewport: (path, viewport) => {
+    set((state) => {
+      const fileIndex = state.openedFiles.findIndex(f => f.path === path);
+      if (fileIndex === -1) return state;
+
+      const newOpenedFiles = [...state.openedFiles];
+      newOpenedFiles[fileIndex] = {
+        ...newOpenedFiles[fileIndex],
+        viewport
+      };
+      return { openedFiles: newOpenedFiles };
+    });
+  },
 
   getCurrentTree: () => {
     const { openedFiles, activeFilePath } = get();
@@ -1468,8 +1485,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         const currentPin = node.pins.find(p => p.name === pinName);
         if (!currentPin) return tree;
 
-        const isTypeChanged = (updates.valueType && updates.valueType !== currentPin.valueType) ||
-          (updates.countType && updates.countType !== currentPin.countType);
+        const isValueTypeChanged = !!(updates.valueType && updates.valueType !== currentPin.valueType);
+        const isCountTypeChanged = !!(updates.countType && updates.countType !== currentPin.countType);
+        const isTypeChanged = isValueTypeChanged || isCountTypeChanged;
 
         // 1. 更新当前 Pin
         let changedPinNames = new Set<string>();
@@ -1480,12 +1498,22 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         let newPins = node.pins.map(pin => {
           if (pin.name === pinName) {
             const updatedPin = { ...pin, ...updates };
-            if (isTypeChanged) {
-              return {
-                ...updatedPin,
-                binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
-                vectorIndex: undefined
-              } as Pin;
+            if (isValueTypeChanged || isCountTypeChanged) {
+              if (pin.binding.type === 'const') {
+                // const binding: update to new default value
+                return {
+                  ...updatedPin,
+                  binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
+                  vectorIndex: undefined
+                } as Pin;
+              } else {
+                // pointer binding: reset to disconnected state (empty variable name), clear vectorIndex
+                return {
+                  ...updatedPin,
+                  binding: { type: 'pointer' as const, variableName: '', isLocal: false },
+                  vectorIndex: undefined
+                } as Pin;
+              }
             }
             return updatedPin;
           }
@@ -1499,21 +1527,38 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         if (hasVGroup || hasCGroup) {
           newPins = newPins.map(pin => {
             let pinUpdates: Partial<Pin> = {};
+            let pinVTypeChanged = false;
+            let pinCTypeChanged = false;
             if (hasVGroup && pin.vTypeGroup === currentPin.vTypeGroup && pin.valueType !== updates.valueType) {
               pinUpdates.valueType = updates.valueType;
+              pinVTypeChanged = true;
             }
             if (hasCGroup && pin.cTypeGroup === currentPin.cTypeGroup && pin.countType !== updates.countType) {
               pinUpdates.countType = updates.countType;
+              pinCTypeChanged = true;
             }
 
             if (Object.keys(pinUpdates).length > 0) {
               changedPinNames.add(pin.name);
               const updatedPin = { ...pin, ...pinUpdates };
-              return {
-                ...updatedPin,
-                binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
-                vectorIndex: undefined
-              } as Pin;
+              if (pinVTypeChanged || pinCTypeChanged) {
+                if (pin.binding.type === 'const') {
+                  // const binding: update to new default value
+                  return {
+                    ...updatedPin,
+                    binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
+                    vectorIndex: undefined
+                  } as Pin;
+                } else {
+                  // pointer binding: reset to disconnected state, clear vectorIndex
+                  return {
+                    ...updatedPin,
+                    binding: { type: 'pointer' as const, variableName: '', isLocal: false },
+                    vectorIndex: undefined
+                  } as Pin;
+                }
+              }
+              return updatedPin;
             }
             return pin;
           });

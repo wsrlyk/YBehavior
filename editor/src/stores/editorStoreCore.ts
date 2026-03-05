@@ -11,6 +11,12 @@ import { useNodeDefinitionStore } from './nodeDefinitionStore';
 
 // ==================== Shared Types ====================
 
+export interface Viewport {
+    x: number;
+    y: number;
+    zoom: number;
+}
+
 export interface HistoryState {
     past: Tree[];
     future: Tree[];
@@ -24,6 +30,7 @@ export interface OpenedFile {
     isDirty: boolean;
     isNew?: boolean;
     history: HistoryState;
+    viewport?: Viewport;
 }
 
 // ==================== Shared Helper Functions ====================

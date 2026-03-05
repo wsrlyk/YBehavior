@@ -560,16 +560,29 @@ function calculateUIDs(
 ): void {
   let uid = 1;
 
-  // 深度优先遍历
+  // Build parent->children index for performance
+  const connectionsByParent = new Map<string, TreeConnection[]>();
+  for (const conn of connections) {
+    const list = connectionsByParent.get(conn.parentNodeId) || [];
+    list.push(conn);
+    connectionsByParent.set(conn.parentNodeId, list);
+  }
+
+  // 深度优先遍历，子节点按 X 坐标从左到右排序
   function dfs(nodeId: string) {
     const node = nodes.get(nodeId);
     if (!node) return;
 
     node.uid = uid++;
 
-    // 获取子节点（按连接顺序）
-    const childConns = connections.filter(c => c.parentNodeId === nodeId);
-    for (const conn of childConns) {
+    // 获取子节点，按 X 坐标从左到右排序
+    const childConns = connectionsByParent.get(nodeId) || [];
+    const sortedConns = [...childConns].sort((a, b) => {
+      const nodeA = nodes.get(a.childNodeId);
+      const nodeB = nodes.get(b.childNodeId);
+      return (nodeA?.position.x ?? 0) - (nodeB?.position.x ?? 0);
+    });
+    for (const conn of sortedConns) {
       dfs(conn.childNodeId);
     }
   }

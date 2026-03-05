@@ -37,6 +37,7 @@ interface OpenedFSMFile {
     isNew?: boolean;
     history: FSMHistoryState;
     currentMachineId: string; // For navigating nested machines
+    viewport?: import('./editorStoreCore').Viewport;
 }
 
 interface FSMStoreState {
@@ -89,6 +90,9 @@ interface FSMStoreState {
     saveFSM: () => Promise<string>;
     saveFSMAs: () => Promise<void>;
     createNewFSM: (name: string) => void;
+
+    // Viewport
+    setViewport: (path: string, viewport: import('./editorStoreCore').Viewport) => void;
 }
 
 // ==================== Helper Functions ====================
@@ -218,6 +222,15 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
     },
 
     setActiveFSM: (path) => set({ activeFSMPath: path }),
+
+    setViewport: (path, viewport) => set((state) => {
+        const fileIndex = state.openedFSMFiles.findIndex(f => f.path === path);
+        if (fileIndex === -1) return state;
+
+        const newFiles = [...state.openedFSMFiles];
+        newFiles[fileIndex] = { ...newFiles[fileIndex], viewport };
+        return { openedFSMFiles: newFiles };
+    }),
 
     getCurrentFSM: () => {
         const { openedFSMFiles, activeFSMPath } = get();

@@ -231,10 +231,15 @@ function serializeNodeForEditor(
   if (hasInput) el.appendChild(inputEl);
   if (hasOutput) el.appendChild(outputEl);
 
-  // 递归序列化子节点
+  // 递归序列化子节点（按 X 坐标从左到右排序）
   const childConnections = connections.filter(c => c.parentNodeId === node.id);
+  const sortedChildConns = [...childConnections].sort((a, b) => {
+    const nodeA = nodeMap.get(a.childNodeId);
+    const nodeB = nodeMap.get(b.childNodeId);
+    return (nodeA?.position.x ?? 0) - (nodeB?.position.x ?? 0);
+  });
 
-  for (const conn of childConnections) {
+  for (const conn of sortedChildConns) {
     const childNode = nodeMap.get(conn.childNodeId);
     if (childNode) {
       // 传递 connection 名称 (children 是默认，不需要显式保存)
@@ -450,15 +455,28 @@ function calculateRuntimeUIDs(
   const uidMap = new Map<string, number>();
   let uid = 1;
 
+  // Build parent->children index for performance
+  const connectionsByParent = new Map<string, TreeConnection[]>();
+  for (const conn of connections) {
+    const list = connectionsByParent.get(conn.parentNodeId) || [];
+    list.push(conn);
+    connectionsByParent.set(conn.parentNodeId, list);
+  }
+
+  // 深度优先遍历，子节点按 X 坐标从左到右排序（与编辑器显示 UID 一致）
   function traverse(nodeId: string) {
     const node = nodeMap.get(nodeId);
     if (!node || node.disabled) return;
 
     uidMap.set(nodeId, uid++);
 
-    // 深度优先遍历子节点
-    const childConns = connections.filter(c => c.parentNodeId === nodeId);
-    for (const conn of childConns) {
+    const childConns = connectionsByParent.get(nodeId) || [];
+    const sortedConns = [...childConns].sort((a, b) => {
+      const nodeA = nodeMap.get(a.childNodeId);
+      const nodeB = nodeMap.get(b.childNodeId);
+      return (nodeA?.position.x ?? 0) - (nodeB?.position.x ?? 0);
+    });
+    for (const conn of sortedConns) {
       traverse(conn.childNodeId);
     }
   }
@@ -549,9 +567,14 @@ function serializeNodeForRuntimeWithUID(
   if (hasInput) el.appendChild(inputEl);
   if (hasOutput) el.appendChild(outputEl);
 
-  // 递归序列化子节点
+  // 递归序列化子节点（按 X 坐标从左到右排序）
   const childConnections = connections.filter(c => c.parentNodeId === node.id);
-  for (const conn of childConnections) {
+  const sortedChildConns = [...childConnections].sort((a, b) => {
+    const nodeA = nodeMap.get(a.childNodeId);
+    const nodeB = nodeMap.get(b.childNodeId);
+    return (nodeA?.position.x ?? 0) - (nodeB?.position.x ?? 0);
+  });
+  for (const conn of sortedChildConns) {
     const childNode = nodeMap.get(conn.childNodeId);
     if (childNode) {
       const childEl = serializeNodeForRuntimeWithUID(childNode, doc, nodeMap, connections, uidMap);

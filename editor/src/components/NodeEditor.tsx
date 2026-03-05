@@ -74,6 +74,9 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     selectedNodeIds,
     recordHistoryStart,
     finalizeContinuousAction,
+    activeFilePath,
+    setViewport,
+    openedFiles,
   } = useEditorStore(useShallow(state => ({
     addNode: state.addNode,
     selectNodes: state.selectNodes,
@@ -87,6 +90,9 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     selectedNodeIds: state.selectedNodeIds,
     recordHistoryStart: state.recordHistoryStart,
     finalizeContinuousAction: state.finalizeContinuousAction,
+    activeFilePath: state.activeFilePath,
+    setViewport: state.setViewport,
+    openedFiles: state.openedFiles,
   })));
   const { getDefinition } = useNodeDefinitionStore();
 
@@ -103,6 +109,22 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       setPendingCenterTarget(undefined);
     }
   }, [pendingCenterTarget, setCenter, setPendingCenterTarget]);
+
+  // Restore viewport on mount
+  const { setViewport: flowSetViewport } = useReactFlow();
+  const activeFile = useMemo(() => openedFiles.find(f => f.path === activeFilePath), [openedFiles, activeFilePath]);
+
+  useEffect(() => {
+    if (activeFile?.viewport) {
+      flowSetViewport(activeFile.viewport);
+    }
+  }, [flowSetViewport, activeFile]);
+
+  const onMoveEnd = useCallback((_: any, viewport: any) => {
+    if (activeFilePath) {
+      setViewport(activeFilePath, viewport);
+    }
+  }, [activeFilePath, setViewport]);
 
   // 右键菜单状态
   const [contextMenu, setContextMenu] = useState<{
@@ -797,6 +819,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         onNodeDragStart={onNodeDragStart}
         onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
+        onMoveEnd={onMoveEnd}
         isValidConnection={isValidConnection}
         selectNodesOnDrag={false}
         onPaneClick={() => {
@@ -806,7 +829,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         onNodeContextMenu={onNodeContextMenu}
         onSelectionStart={onSelectionStart}
         onSelectionEnd={onSelectionEnd}
-        fitView
+        fitView={!activeFile?.viewport}
         snapToGrid={false}
         snapGrid={[15, 15]}
         panOnDrag={[1, 2]}

@@ -298,7 +298,10 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
         setSelectedEdges,
         setDefaultState,
         selectedNodeIds,
-        selectedEdgeIds
+        selectedEdgeIds,
+        activeFSMPath,
+        activeFile,
+        setViewport,
     } = useFSMStore(useShallow(state => {
         const file = state.openedFSMFiles.find(f => f.path === state.activeFSMPath);
         return {
@@ -316,8 +319,24 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
             setDefaultState: state.setDefaultState,
             selectedNodeIds: state.selectedNodeIds,
             selectedEdgeIds: state.selectedEdgeIds,
+            activeFSMPath: state.activeFSMPath,
+            activeFile: file,
+            setViewport: state.setViewport,
         };
     }));
+
+    const { setViewport: flowSetViewport } = useReactFlow();
+    useEffect(() => {
+        if (activeFile?.viewport) {
+            flowSetViewport(activeFile.viewport);
+        }
+    }, [flowSetViewport, activeFile]);
+
+    const onMoveEnd = useCallback((_: any, viewport: any) => {
+        if (activeFSMPath) {
+            setViewport(activeFSMPath, viewport);
+        }
+    }, [activeFSMPath, setViewport]);
 
     const lastSelectedNodesRef = useRef<string[]>([]);
     const lastSelectedEdgesRef = useRef<string[]>([]);
@@ -599,6 +618,7 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                 onConnectStart={onConnectStart}
                 onConnectEnd={onConnectEnd}
                 onNodeDragStop={onNodeDragStop}
+                onMoveEnd={onMoveEnd}
                 onSelectionChange={onSelectionChange}
                 onNodeContextMenu={onNodeContextMenu}
                 onPaneClick={onPaneClick}
@@ -606,7 +626,7 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                 onNodeDoubleClick={onNodeDoubleClick}
                 nodeTypes={nodeTypes}
                 edgeTypes={edgeTypes}
-                fitView
+                fitView={!activeFile?.viewport}
                 snapToGrid
                 snapGrid={[20, 20]}
                 style={{ backgroundColor: theme.ui.background }}

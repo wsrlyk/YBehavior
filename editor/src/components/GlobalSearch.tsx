@@ -255,7 +255,8 @@ export function GlobalSearch() {
             });
         }
 
-        return res.slice(0, 20); // Limit results
+        return res;
+
     }, [currentTree, activeFSM, query, scopes, getDefinition]);
 
     const handleJump = (result: SearchResult) => {
