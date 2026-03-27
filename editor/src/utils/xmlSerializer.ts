@@ -14,6 +14,56 @@ const VALUE_TYPE_TO_CHAR: Record<ValueType, string> = {
   'enum': 'E',
 };
 
+/**
+ * 获取连接器的物理排布顺序
+ * Condition 永远排在最前面，接下来是定义中的 Connector，最后是默认的 children
+ */
+function getConnectorOrder(nodeType: string): string[] {
+  const nodeDef = useNodeDefinitionStore.getState().getDefinition(nodeType);
+  const order = ['condition'];
+  if (nodeDef?.childConnectors) {
+    nodeDef.childConnectors.forEach(c => {
+      if (c.name !== 'condition') order.push(c.name);
+    });
+  }
+  // 确保 children 和 default 也在列表中
+  if (!order.includes('children')) order.push('children');
+  if (!order.includes('default')) order.push('default');
+  return order;
+}
+
+/**
+ * 子节点排序逻辑：
+ * 1. 按 Connection 定义顺序排（Condition 最优先）
+ * 2. 同一个 Connection 内部按 X 坐标排
+ */
+function sortConnections(
+  nodeId: string,
+  nodeType: string,
+  connections: TreeConnection[],
+  nodeMap: Map<string, TreeNode>
+): TreeConnection[] {
+  const childConns = connections.filter(c => c.parentNodeId === nodeId);
+  const order = getConnectorOrder(nodeType);
+
+  return [...childConns].sort((a, b) => {
+    const connA = a.parentConnector || 'children';
+    const connB = b.parentConnector || 'children';
+
+    if (connA !== connB) {
+      let idxA = order.indexOf(connA);
+      let idxB = order.indexOf(connB);
+      if (idxA === -1) idxA = 999;
+      if (idxB === -1) idxB = 999;
+      if (idxA !== idxB) return idxA - idxB;
+    }
+
+    const nodeA = nodeMap.get(a.childNodeId);
+    const nodeB = nodeMap.get(b.childNodeId);
+    return (nodeA?.position.x ?? 0) - (nodeB?.position.x ?? 0);
+  });
+}
+
 
 /**
  * 将 Pin 值序列化为 XML 属性格式
@@ -231,13 +281,8 @@ function serializeNodeForEditor(
   if (hasInput) el.appendChild(inputEl);
   if (hasOutput) el.appendChild(outputEl);
 
-  // 递归序列化子节点（按 X 坐标从左到右排序）
-  const childConnections = connections.filter(c => c.parentNodeId === node.id);
-  const sortedChildConns = [...childConnections].sort((a, b) => {
-    const nodeA = nodeMap.get(a.childNodeId);
-    const nodeB = nodeMap.get(b.childNodeId);
-    return (nodeA?.position.x ?? 0) - (nodeB?.position.x ?? 0);
-  });
+  // 递归序列化子节点
+  const sortedChildConns = sortConnections(node.id, node.type, connections, nodeMap);
 
   for (const conn of sortedChildConns) {
     const childNode = nodeMap.get(conn.childNodeId);
@@ -421,6 +466,9 @@ function collectReferencedVariables(
     if (!node) continue;
 
     for (const pin of node.pins) {
+      // 运行时版不导出禁用的 Pin，因此也不计入变量引用
+      if (pin.enableType === 'disable') continue;
+
       if (pin.binding.type === 'pointer') {
         if (pin.binding.isLocal) {
           localRefs.add(pin.binding.variableName);
@@ -470,12 +518,7 @@ function calculateRuntimeUIDs(
 
     uidMap.set(nodeId, uid++);
 
-    const childConns = connectionsByParent.get(nodeId) || [];
-    const sortedConns = [...childConns].sort((a, b) => {
-      const nodeA = nodeMap.get(a.childNodeId);
-      const nodeB = nodeMap.get(b.childNodeId);
-      return (nodeA?.position.x ?? 0) - (nodeB?.position.x ?? 0);
-    });
+    const sortedConns = sortConnections(nodeId, node.type, connections, nodeMap);
     for (const conn of sortedConns) {
       traverse(conn.childNodeId);
     }
@@ -495,17 +538,24 @@ function serializeNodeForRuntimeWithUID(
   connections: TreeConnection[],
   uidMap: Map<string, number>,
   sharedVars?: Variable[],
-  localVars?: Variable[]
+  localVars?: Variable[],
+  parentConnector?: string,
+  treeInterface?: { inputs: TreeInterfacePin[], outputs: TreeInterfacePin[] }
 ): Element | null {
   if (node.disabled) return null;
 
   const el = doc.createElement('Node');
   el.setAttribute('Class', node.type);
 
-  // 额外属性 (Connection 等)
+  // Connection 属性 (如果有)
+  if (parentConnector) {
+    el.setAttribute('Connection', parentConnector);
+  }
+
+  // 额外属性 (除了 Return 和 Connection/UID，因为已经处理)
   if (node.extraAttrs) {
     for (const [key, value] of Object.entries(node.extraAttrs)) {
-      if (key !== 'Return') {
+      if (key !== 'Return' && key !== 'Connection' && key !== 'UID' && key !== 'Pos' && key !== 'GUID') {
         el.setAttribute(key, value);
       }
     }
@@ -564,20 +614,65 @@ function serializeNodeForRuntimeWithUID(
     }
   }
 
+  // 特殊处理 Root 节点的 Interface Pins (从 treeInterface 传入)
+  if (node.type === 'Root' && treeInterface) {
+    treeInterface.inputs.forEach(pin => {
+      const tempPin: Pin = {
+        name: pin.name,
+        valueType: pin.valueType,
+        countType: pin.countType,
+        bindingType: pin.binding.type === 'variable' ? 'pointer' : 'const',
+        binding: pin.binding.type === 'variable'
+          ? { type: 'pointer', variableName: pin.binding.value, isLocal: pin.binding.isLocal || false }
+          : { type: 'const', value: pin.binding.value },
+        enableType: 'fixed',
+        isInput: true,
+        allowedValueTypes: [pin.valueType],
+        isCountTypeFixed: true,
+        isBindingTypeFixed: false,
+        vectorIndex: pin.vectorIndex,
+      };
+      const val = serializePinValue(tempPin, false);
+      if (val) {
+        inputEl.setAttribute(pin.name, val);
+        hasInput = true;
+      }
+    });
+    treeInterface.outputs.forEach(pin => {
+      const tempPin: Pin = {
+        name: pin.name,
+        valueType: pin.valueType,
+        countType: pin.countType,
+        bindingType: pin.binding.type === 'variable' ? 'pointer' : 'const',
+        binding: pin.binding.type === 'variable'
+          ? { type: 'pointer', variableName: pin.binding.value, isLocal: pin.binding.isLocal || false }
+          : { type: 'const', value: pin.binding.value },
+        enableType: 'fixed',
+        isInput: false,
+        allowedValueTypes: [pin.valueType],
+        isCountTypeFixed: true,
+        isBindingTypeFixed: false,
+        vectorIndex: pin.vectorIndex,
+      };
+      const val = serializePinValue(tempPin, false);
+      if (val) {
+        outputEl.setAttribute(pin.name, val);
+        hasOutput = true;
+      }
+    });
+  }
+
   if (hasInput) el.appendChild(inputEl);
   if (hasOutput) el.appendChild(outputEl);
 
-  // 递归序列化子节点（按 X 坐标从左到右排序）
-  const childConnections = connections.filter(c => c.parentNodeId === node.id);
-  const sortedChildConns = [...childConnections].sort((a, b) => {
-    const nodeA = nodeMap.get(a.childNodeId);
-    const nodeB = nodeMap.get(b.childNodeId);
-    return (nodeA?.position.x ?? 0) - (nodeB?.position.x ?? 0);
-  });
+  // 递归序列化子节点
+  const sortedChildConns = sortConnections(node.id, node.type, connections, nodeMap);
+
   for (const conn of sortedChildConns) {
     const childNode = nodeMap.get(conn.childNodeId);
     if (childNode) {
-      const childEl = serializeNodeForRuntimeWithUID(childNode, doc, nodeMap, connections, uidMap);
+      const connName = conn.parentConnector === 'children' ? undefined : conn.parentConnector;
+      const childEl = serializeNodeForRuntimeWithUID(childNode, doc, nodeMap, connections, uidMap, undefined, undefined, connName, treeInterface);
       if (childEl) el.appendChild(childEl);
     }
   }
@@ -640,7 +735,9 @@ export function serializeTreeForRuntime(tree: Tree): string {
   if (rootNode) {
     const nodeEl = serializeNodeForRuntimeWithUID(
       rootNode, doc, tree.nodes, tree.connections, uidMap,
-      referencedSharedVars, referencedLocalVars
+      referencedSharedVars, referencedLocalVars,
+      undefined,
+      { inputs: tree.inputs, outputs: tree.outputs }
     );
     if (nodeEl) root.appendChild(nodeEl);
   }

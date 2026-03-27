@@ -32,9 +32,26 @@ function validateSwitchCaseNode(node: TreeNode, tree: Tree): string[] {
         // 解析 Cases 数组
         const caseValues = casesPin.binding.value.split('|').map(v => v.trim()).filter(v => v !== '');
 
-        if (caseValues.length !== enabledChildren.length) {
+        if (caseValues.length !== enabledChildren.length && enabledChildren.length !== 1) {
             errors.push(
-                `[${node.nickname || node.type}:${node.uid}] Cases array length (${caseValues.length}) must match enabled children count (${enabledChildren.length})`
+                `[${node.nickname || node.type}:${node.uid}] Cases array length (${caseValues.length}) must match enabled children count (${enabledChildren.length}), or have exactly 1 child`
+            );
+        }
+    }
+    // 2. 变量数组或其他模式
+    else {
+        // 规则：只能有1个子节点
+        const childrenConns = tree.connections.filter(
+            c => c.parentNodeId === node.id && c.parentConnector === 'children'
+        );
+        const enabledChildren = childrenConns.filter(conn => {
+            const child = tree.nodes.get(conn.childNodeId);
+            return child && !child.disabled;
+        });
+
+        if (enabledChildren.length !== 1) {
+            errors.push(
+                `[${node.nickname || node.type}:${node.uid}] When Cases is variable or disabled, children count must be 1 (got ${enabledChildren.length})`
             );
         }
     }
@@ -56,38 +73,63 @@ function refreshSwitchCaseLabels(nodeId: string, tree: Tree): ConnectionLabelUpd
 
     // 1. 常量数组模式
     if (casesPin.binding.type === 'const' && casesPin.countType === 'list') {
-        const caseValues = casesPin.binding.value.split('|').map(v => v.trim());
+        const caseValues = casesPin.binding.value.split('|').map(v => v.trim()).filter(v => v !== '');
 
-        // 按 X 坐标排序子节点连接
-        const sortedConns = [...childrenConns].sort((a, b) => {
-            const nodeA = tree.nodes.get(a.childNodeId);
-            const nodeB = tree.nodes.get(b.childNodeId);
-            return (nodeA?.position.x || 0) - (nodeB?.position.x || 0);
-        });
-
-        // 为每个启用的子节点分配标签
-        let caseIndex = 0;
-        sortedConns.forEach(conn => {
+        const enabledChildren = childrenConns.filter(conn => {
             const child = tree.nodes.get(conn.childNodeId);
-            const isEnabled = child && !child.disabled;
-
-            let newLabel = '';
-            if (isEnabled) {
-                if (caseIndex < caseValues.length) {
-                    newLabel = caseValues[caseIndex];
-                    caseIndex++;
-                } else {
-                    newLabel = `No.${caseIndex}`; // 超出数组范围
-                    caseIndex++;
-                }
-            } else {
-                newLabel = ''; // 禁用的节点不显示
-            }
-
-            if (conn.label !== newLabel) {
-                updates.push({ id: conn.id, label: newLabel });
-            }
+            return child && !child.disabled;
         });
+
+        // 情况 A: 只有 1 个子节点 -> 显示所有 Case
+        if (enabledChildren.length === 1) {
+            const targetConn = childrenConns.find(c => c.childNodeId === enabledChildren[0].childNodeId);
+            if (targetConn) {
+                const newLabel = caseValues.join(' | ');
+                if (targetConn.label !== newLabel) {
+                    updates.push({ id: targetConn.id, label: newLabel });
+                }
+            }
+
+            // 确保其他（禁用的）连接没有标签
+            childrenConns.forEach(conn => {
+                if (conn.childNodeId !== enabledChildren[0].childNodeId && conn.label !== '') {
+                    updates.push({ id: conn.id, label: '' });
+                }
+            });
+        }
+        // 情况 B: 多个子节点 -> 一一对应
+        else {
+            // 按 X 坐标排序子节点连接
+            const sortedConns = [...childrenConns].sort((a, b) => {
+                const nodeA = tree.nodes.get(a.childNodeId);
+                const nodeB = tree.nodes.get(b.childNodeId);
+                return (nodeA?.position.x || 0) - (nodeB?.position.x || 0);
+            });
+
+            // 为每个启用的子节点分配标签
+            let caseIndex = 0;
+            sortedConns.forEach(conn => {
+                const child = tree.nodes.get(conn.childNodeId);
+                const isEnabled = child && !child.disabled;
+
+                let newLabel = '';
+                if (isEnabled) {
+                    if (caseIndex < caseValues.length) {
+                        newLabel = caseValues[caseIndex];
+                        caseIndex++;
+                    } else {
+                        newLabel = `No.${caseIndex}`; // 超出数组范围
+                        caseIndex++;
+                    }
+                } else {
+                    newLabel = ''; // 禁用的节点不显示
+                }
+
+                if (conn.label !== newLabel) {
+                    updates.push({ id: conn.id, label: newLabel });
+                }
+            });
+        }
     }
     // 2. 变量数组或其他模式
     else {
