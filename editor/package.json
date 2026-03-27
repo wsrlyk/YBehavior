@@ -20,7 +20,7 @@
     "@types/dagre": "^0.7.53",
     "@xyflow/react": "^12.10.0",
     "dagre": "^0.8.5",
-    "fast-xml-parser": "^5.3.4",
+    "fast-xml-parser": "^5.5.7",
     "ico-endec": "^0.1.6",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
