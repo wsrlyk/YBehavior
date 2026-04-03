@@ -8,7 +8,6 @@ import { useCallback, useMemo, useEffect, useState, useRef } from 'react';
 import {
     ReactFlow,
     Background,
-    Controls,
     MiniMap,
     useNodesState,
     useEdgesState,
@@ -634,7 +633,6 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                 style={{ backgroundColor: theme.ui.background }}
             >
                 <Background color={theme.ui.gridDots} gap={20} />
-                <Controls style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border, fill: theme.ui.textMain }} />
                 <MiniMap
                     style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}
                     nodeColor={(node) => {

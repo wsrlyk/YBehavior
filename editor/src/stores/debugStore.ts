@@ -633,7 +633,19 @@ export const useDebugStore = create<DebugState>((set, get) => ({
         const currentKeyframe = get().keyframe + 1;
 
         if (isPaused) {
-            console.log('[debugStore] Paused - displaying keyframe data:', data);
+            // paused mode keeps latest frame visible; avoid heavy logging per frame
+        }
+
+        // Parse shared variables once per frame (was repeatedly split for every tree)
+        const sharedPairs: Array<[string, string]> = [];
+        if (data.mainData) {
+            const sharedItems = data.mainData.split(LIST_DELIMITER);
+            for (const item of sharedItems) {
+                const parts = item.split(SEQUENCE_DELIMITER);
+                if (parts.length >= 2) {
+                    sharedPairs.push([parts[0], parts[1]]);
+                }
+            }
         }
 
         // Process tree run data
@@ -703,19 +715,13 @@ export const useDebugStore = create<DebugState>((set, get) => ({
                 }
             }
 
-            // Parse shared variables from mainData
-            const sharedItems = data.mainData.split(LIST_DELIMITER);
-            for (const item of sharedItems) {
-                const parts = item.split(SEQUENCE_DELIMITER);
-                if (parts.length >= 2) {
-                    const name = parts[0];
-                    const value = parts[1];
-                    const oldValue = info.sharedVariables.get(name);
-                    if (oldValue !== value) {
-                        info.sharedVariableTimestamps.set(name, currentKeyframe);
-                    }
-                    info.sharedVariables.set(name, value);
+            // Apply shared variables parsed once for this frame
+            for (const [name, value] of sharedPairs) {
+                const oldValue = info.sharedVariables.get(name);
+                if (oldValue !== value) {
+                    info.sharedVariableTimestamps.set(name, currentKeyframe);
                 }
+                info.sharedVariables.set(name, value);
             }
 
             newTreeRunInfos.set(effectiveKey, info);
@@ -736,7 +742,6 @@ export const useDebugStore = create<DebugState>((set, get) => ({
                     if (parts.length >= 2) {
                         const uid = parseInt(parts[0], 10);
                         const state = parseInt(parts[1], 10);
-                        newFsmRunInfo.stateInfos.set(uid, state);
                         newFsmRunInfo.stateInfos.set(uid, state);
 
                         if (state === NodeState.Running || state === NodeState.Break) {

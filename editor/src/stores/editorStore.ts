@@ -290,7 +290,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         tree: treeWithLabels,
         lastSavedTreeSnapshot: serializeTreeForEditor(treeWithLabels),
         isDirty: false,
-        history: { past: [], future: [] }
+        history: { past: [], future: [] },
+        viewport: meta?.viewport
       };
 
       set({
@@ -367,6 +368,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       };
       return { openedFiles: newOpenedFiles };
     });
+
+    useEditorMetaStore.getState().setTreeViewport(path, viewport);
   },
 
   getCurrentTree: () => {
@@ -1220,22 +1223,34 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         relativePath = newPath.split(/[/\\]/).pop() || relativePath;
       }
 
+      const normalizedRelativePath = relativePath.replace(/\\/g, '/');
+      const hasOpenedPathConflict = openedFiles.some(
+        f => f.path === normalizedRelativePath && f.path !== activeFilePath
+      );
+      if (hasOpenedPathConflict) {
+        useNotificationStore.getState().notify(
+          `Save As failed: "${normalizedRelativePath}" is already opened. Please close that tab first.`,
+          'error'
+        );
+        return;
+      }
+
       // 更新文件信息并执行保存逻辑（这里我们复用 saveCurrentFile 的保存部分，但先更新 store 状态）
       set(state => ({
         openedFiles: state.openedFiles.map(f =>
           f.path === activeFilePath
             ? {
               ...f,
-              path: relativePath,
+              path: normalizedRelativePath,
               name: fileName,
               isNew: false,
               lastSavedTreeSnapshot: serializeTreeForEditor(f.tree), // 预更新快照，虽然 saveCurrentFile 也会更新
-              tree: { ...f.tree, path: relativePath, name: fileName.replace(/\.tree$/, '') }
+              tree: { ...f.tree, path: normalizedRelativePath, name: fileName.replace(/\.tree$/, '') }
             }
             : f
         ),
-        activeFilePath: relativePath,
-        treeFiles: state.treeFiles.includes(relativePath) ? state.treeFiles : [...state.treeFiles, relativePath]
+        activeFilePath: normalizedRelativePath,
+        treeFiles: state.treeFiles.includes(normalizedRelativePath) ? state.treeFiles : [...state.treeFiles, normalizedRelativePath]
       }));
 
       // 执行实际保存

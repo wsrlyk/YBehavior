@@ -529,8 +529,9 @@ export function parseTreeXml(
   }
 
 
-  // 计算 UID（深度优先遍历）
-  calculateUIDs(nodes, rootId, connections);
+  // 读取后先规范内存中的子节点/连接顺序，再计算 UID，确保结果稳定
+  normalizeTreeTraversalOrder(nodes, rootId, connections, getNodeDefinition);
+  calculateUIDs(nodes, rootId, connections, getNodeDefinition);
 
   return {
     name: treeName,
@@ -553,10 +554,120 @@ export function parseTreeXml(
  * 计算节点的 UID（深度优先遍历）
  * Root 节点从 1 开始，森林中其他树从 1001、2001 等开始
  */
+function getConnectorOrder(
+  nodeType: string,
+  getNodeDefinition?: (className: string) => NodeDefinition | undefined
+): string[] {
+  const nodeDef = getNodeDefinition?.(nodeType);
+  const order = ['condition'];
+
+  if (nodeDef?.childConnectors) {
+    for (const c of nodeDef.childConnectors) {
+      if (c.name !== 'condition' && !order.includes(c.name)) {
+        order.push(c.name);
+      }
+    }
+  }
+
+  if (!order.includes('children')) order.push('children');
+  if (!order.includes('default')) order.push('default');
+  return order;
+}
+
+function sortChildConnections(
+  nodeId: string,
+  nodeType: string,
+  nodes: Map<string, TreeNode>,
+  connectionsByParent: Map<string, TreeConnection[]>,
+  getNodeDefinition?: (className: string) => NodeDefinition | undefined
+): TreeConnection[] {
+  const childConns = connectionsByParent.get(nodeId) || [];
+  const order = getConnectorOrder(nodeType, getNodeDefinition);
+
+  return [...childConns].sort((a, b) => {
+    const connA = a.parentConnector || 'children';
+    const connB = b.parentConnector || 'children';
+
+    if (connA !== connB) {
+      let idxA = order.indexOf(connA);
+      let idxB = order.indexOf(connB);
+      if (idxA === -1) idxA = 999;
+      if (idxB === -1) idxB = 999;
+      if (idxA !== idxB) return idxA - idxB;
+    }
+
+    const nodeA = nodes.get(a.childNodeId);
+    const nodeB = nodes.get(b.childNodeId);
+    return (nodeA?.position.x ?? 0) - (nodeB?.position.x ?? 0);
+  });
+}
+
+function normalizeTreeTraversalOrder(
+  nodes: Map<string, TreeNode>,
+  rootId: string,
+  connections: TreeConnection[],
+  getNodeDefinition?: (className: string) => NodeDefinition | undefined
+): void {
+  const connectionsByParent = new Map<string, TreeConnection[]>();
+  for (const conn of connections) {
+    const list = connectionsByParent.get(conn.parentNodeId) || [];
+    list.push(conn);
+    connectionsByParent.set(conn.parentNodeId, list);
+  }
+
+  const orderedConnections: TreeConnection[] = [];
+  const addedConnectionIds = new Set<string>();
+  const visited = new Set<string>();
+
+  nodes.forEach((node) => {
+    node.childrenIds = [];
+  });
+
+  function traverse(nodeId: string) {
+    if (visited.has(nodeId)) return;
+    visited.add(nodeId);
+
+    const node = nodes.get(nodeId);
+    if (!node) return;
+
+    const sortedConns = sortChildConnections(nodeId, node.type, nodes, connectionsByParent, getNodeDefinition);
+    node.childrenIds = sortedConns.map(conn => conn.childNodeId);
+
+    for (const conn of sortedConns) {
+      if (!addedConnectionIds.has(conn.id)) {
+        orderedConnections.push(conn);
+        addedConnectionIds.add(conn.id);
+      }
+      traverse(conn.childNodeId);
+    }
+  }
+
+  if (rootId) {
+    traverse(rootId);
+  }
+
+  const childIds = new Set(connections.map(c => c.childNodeId));
+  for (const nodeId of nodes.keys()) {
+    if (!childIds.has(nodeId) && !visited.has(nodeId)) {
+      traverse(nodeId);
+    }
+  }
+
+  for (const conn of connections) {
+    if (!addedConnectionIds.has(conn.id)) {
+      orderedConnections.push(conn);
+      addedConnectionIds.add(conn.id);
+    }
+  }
+
+  connections.splice(0, connections.length, ...orderedConnections);
+}
+
 function calculateUIDs(
   nodes: Map<string, TreeNode>,
   rootId: string,
-  connections: TreeConnection[]
+  connections: TreeConnection[],
+  getNodeDefinition?: (className: string) => NodeDefinition | undefined
 ): void {
   let uid = 1;
 
@@ -568,20 +679,15 @@ function calculateUIDs(
     connectionsByParent.set(conn.parentNodeId, list);
   }
 
-  // 深度优先遍历，子节点按 X 坐标从左到右排序
+  // 深度优先先序遍历（父节点优先）
   function dfs(nodeId: string) {
     const node = nodes.get(nodeId);
     if (!node) return;
 
     node.uid = uid++;
 
-    // 获取子节点，按 X 坐标从左到右排序
-    const childConns = connectionsByParent.get(nodeId) || [];
-    const sortedConns = [...childConns].sort((a, b) => {
-      const nodeA = nodes.get(a.childNodeId);
-      const nodeB = nodes.get(b.childNodeId);
-      return (nodeA?.position.x ?? 0) - (nodeB?.position.x ?? 0);
-    });
+    // 子节点：先按 connection 顺序，再在同 connection 内按 x 坐标
+    const sortedConns = sortChildConnections(nodeId, node.type, nodes, connectionsByParent, getNodeDefinition);
     for (const conn of sortedConns) {
       dfs(conn.childNodeId);
     }

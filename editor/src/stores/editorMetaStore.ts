@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { writeFile, readFile } from '../utils/fileService';
 import { getConfigPath } from '../utils/configPath';
+import type { Viewport } from './editorStoreCore';
 
 /**
  * 节点元数据（不保存在 .tree 文件中）
@@ -15,6 +16,7 @@ interface NodeMeta {
  */
 interface TreeMeta {
     nodes: Record<string, NodeMeta>; // nodeId -> meta
+    viewport?: Viewport;
 }
 
 interface EditorMetaState {
@@ -44,6 +46,7 @@ interface EditorMetaState {
     setDebugIP: (ip: string) => void;
     setDebugPort: (port: number) => void;
     setNodeBreakpoint: (filePath: string, nodeId: string, type: number) => void;
+    setTreeViewport: (filePath: string, viewport: Viewport) => void;
     getTreeMeta: (filePath: string) => TreeMeta | undefined;
 
     // Cleanup
@@ -167,6 +170,24 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
             };
 
             return { treeMetas: newTreeMetas };
+        });
+        get().saveAllMeta();
+    },
+
+    setTreeViewport: (filePath, viewport) => {
+        set((state) => {
+            const normalizedPath = filePath.replace(/\\/g, '/');
+            const treeMeta = state.treeMetas[normalizedPath] || { nodes: {} };
+
+            return {
+                treeMetas: {
+                    ...state.treeMetas,
+                    [normalizedPath]: {
+                        ...treeMeta,
+                        viewport
+                    }
+                }
+            };
         });
         get().saveAllMeta();
     },

@@ -2,7 +2,6 @@ import { useCallback, useMemo, useEffect, useState, useRef, type MouseEvent } fr
 import {
   ReactFlow,
   Background,
-  Controls,
   MiniMap,
   useNodesState,
   useEdgesState,
@@ -99,7 +98,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   // 修正：使用 selector 订阅 currentTree，确保 store 更新时组件重渲染
   const currentTree = useEditorStore((state) => state.getCurrentTree());
 
-  const { screenToFlowPosition, getNodes, getEdges, setCenter } = useReactFlow();
+  const { screenToFlowPosition, getNodes, getEdges, setCenter, fitView, getViewport } = useReactFlow();
   const pendingCenterTarget = useEditorMetaStore(state => state.uiMeta.pendingCenterTarget);
   const setPendingCenterTarget = useEditorMetaStore(state => state.setPendingCenterTarget);
 
@@ -117,10 +116,18 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   const activeFile = useMemo(() => openedFiles.find(f => f.path === activeFilePath), [openedFiles, activeFilePath]);
 
   useEffect(() => {
+    if (!activeFilePath) return;
+
     if (activeFile?.viewport) {
       flowSetViewport(activeFile.viewport);
+      return;
     }
-  }, [flowSetViewport, activeFile]);
+
+    requestAnimationFrame(() => {
+      fitView({ duration: 0, padding: 0.2 });
+      setViewport(activeFilePath, getViewport());
+    });
+  }, [flowSetViewport, fitView, getViewport, activeFile, activeFilePath, setViewport]);
 
   const onMoveEnd = useCallback((_: any, viewport: any) => {
     if (activeFilePath) {
@@ -441,6 +448,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   const dragSession = useRef<{
     isShiftDrag: boolean;
     descendantIds: string[];
+    descendantIdSet: Set<string>;
     initialPositions: Map<string, { x: number; y: number }>;
     startPos: { x: number; y: number };
   } | null>(null);
@@ -452,16 +460,19 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       const tree = useEditorStore.getState().getCurrentTree();
       if (tree) {
         const descendants = getDescendantIds(tree, draggedNode.id);
+        const descendantIdSet = new Set(descendants);
         const initialPositions = new Map<string, { x: number; y: number }>();
         const currentNodes = getNodes();
+        const currentNodeMap = new Map(currentNodes.map(n => [n.id, n]));
         descendants.forEach(id => {
-          const n = currentNodes.find(fn => fn.id === id);
+          const n = currentNodeMap.get(id);
           if (n) initialPositions.set(id, { ...n.position });
         });
 
         dragSession.current = {
           isShiftDrag: true,
           descendantIds: descendants,
+          descendantIdSet,
           initialPositions,
           startPos: { ...draggedNode.position }
         };
@@ -473,13 +484,13 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
   const onNodeDrag = useCallback((_event: any, node: Node) => {
     if (dragSession.current?.isShiftDrag) {
-      const { descendantIds, initialPositions, startPos } = dragSession.current;
+      const { descendantIdSet, initialPositions, startPos } = dragSession.current;
       const dx = node.position.x - startPos.x;
       const dy = node.position.y - startPos.y;
 
       setNodes((prevNodes) =>
         prevNodes.map((n) => {
-          if (descendantIds.includes(n.id)) {
+          if (descendantIdSet.has(n.id)) {
             const initPos = initialPositions.get(n.id);
             if (initPos) {
               return {
@@ -517,6 +528,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     // 这些节点可能没被选中，所以不在 draggedNodes 中
     if (session?.isShiftDrag) {
       const currentNodes = getNodes();
+      const currentNodeMap = new Map(currentNodes.map(n => [n.id, n]));
 
       // 确保被拖拽的主节点也被更新（通常在 draggedNodes 中，但这里通过 Map 覆盖确保万一）
       updateMap.set(draggedNode.id, {
@@ -525,7 +537,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       });
 
       session.descendantIds.forEach(id => {
-        const n = currentNodes.find(fn => fn.id === id);
+        const n = currentNodeMap.get(id);
         if (n) {
           updateMap.set(n.id, {
             x: Math.round(n.position.x / gridSize) * gridSize,
@@ -838,28 +850,26 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         onSelectionStart={onSelectionStart}
         onSelectionEnd={onSelectionEnd}
         fitView={!activeFile?.viewport}
+        minZoom={0.08}
+        maxZoom={2.5}
         snapToGrid={false}
         snapGrid={[15, 15]}
         panOnDrag={[1, 2]}
         selectionOnDrag
         selectionKeyCode={null}
+        onlyRenderVisibleElements
         proOptions={{ hideAttribution: true }}
         style={{ backgroundColor: theme.ui.background }}
         deleteKeyCode={null}
       >
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color={theme.ui.gridDots} />
-        <Controls
-          style={{
-            backgroundColor: theme.ui.panelBg,
-            borderColor: theme.ui.border,
-            fill: theme.ui.textMain
-          }}
-        />
         <MiniMap
           nodeStrokeWidth={3}
           zoomable
           pannable
           style={{
+            width: 140,
+            height: 90,
             backgroundColor: theme.ui.panelBg,
             borderColor: theme.ui.border,
           }}

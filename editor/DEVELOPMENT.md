@@ -476,3 +476,61 @@ npm run tauri build    # 打包（输出到 src-tauri/target/release/）
 4. `Return` - 如果有
 5. `Pos` - 位置
 6. Pin 属性按定义顺序
+
+### 2026-04-01 序号计算规则统一
+
+- 统一 `UID` 计算与读取后内存顺序：父子关系按先序遍历（父节点优先）。
+- 同一父节点下：不同 connection 按定义顺序（`condition` 永远最前）；同一 connection 内按子节点 `x` 坐标从左到右排序。
+- 保存 XML 时沿用同一 connection 排序规则；读取后会先规范 `connections` 与 `childrenIds`，保证内存与保存/UID 结果一致。
+- 修改文件：`src/utils/xmlParser.ts`、`src/stores/editorStoreCore.ts`。
+
+### 2026-04-01 WebView2 性能调优（CPU/拖拽/调试）
+
+- `CustomNode` 去除对全局 `keyframe` 的订阅，避免每个调试帧触发全节点重渲染；保留按节点状态变化的高亮刷新。
+- `NodeEditor` 的 Shift 拖拽路径改为 `Set/Map` 查找，避免 `includes/find` 的 O(n*m) 扫描导致拖拽卡顿。
+- `NodeEditor` 开启 `onlyRenderVisibleElements`，降低大树静止与拖动画布时的渲染负载。
+- `debugStore` 的 `displayKeyframe` 改为每帧只解析一次 shared 变量，并移除暂停状态下的高频日志输出。
+- 修改文件：`src/components/CustomNode.tsx`、`src/components/NodeEditor.tsx`、`src/stores/debugStore.ts`。
+
+### 2026-04-01 Tooltip 截断修复
+
+- `Tooltip` 增加尺寸测量与视口边界裁剪：靠近窗口右/下边缘时自动翻转或回退到可见区域。
+- 保持 `createPortal(document.body)` + `position: fixed`，避免被编辑区容器裁剪。
+- 修改文件：`src/components/Tooltip.tsx`。
+
+### 2026-04-01 画布缩放与小地图尺寸调整
+
+- `NodeEditor` 调整缩放范围：支持更远距离缩小查看（`minZoom=0.08`，`maxZoom=2.5`）。
+- `NodeEditor` 缩小小地图显示面积（`MiniMap` 设为 `140x90`）。
+- 修改文件：`src/components/NodeEditor.tsx`。
+
+### 2026-04-01 画布控件与视口记忆
+
+- 移除树编辑器画布左下角 ReactFlow 默认控制按钮（`Controls`）。
+- 切换树文件时恢复该文件上次视口（位置+缩放）；若首次无视口则 `fitView` 后写入并记忆。
+- 修改文件：`src/components/NodeEditor.tsx`。
+
+### 2026-04-01 树视口持久化（跨重启）
+
+- `setViewport` 在更新内存态 `openedFiles` 的同时，将视口落盘到 `editor_meta.local.json`（`treeMetas[filePath].viewport`）。
+- `openTree` 打开树时读取并恢复该文件保存过的 `viewport`，实现“关闭编辑器/关闭文件后，下次打开仍保持位置和缩放”。
+- 修改文件：`src/stores/editorStore.ts`。
+
+### 2026-04-01 FSM 画布控件调整
+
+- 移除 FSM 编辑器画布左下角 ReactFlow 默认控制按钮（`Controls`）。
+- 按需求不新增 FSM 的 viewport 专门持久化逻辑。
+- 修改文件：`src/components/FSMEditor.tsx`。
+
+### 2026-04-01 Save As 重名打开文件冲突修复
+
+- 修复场景：A 树已打开时，将另一棵树 `Save As` 为同名路径会导致 `openedFiles` 出现路径冲突，进而出现空白标签与无法关闭。
+- 在 `saveFileAs` 中增加已打开路径冲突检测：若目标路径已被其它已打开标签占用，则阻止保存并提示先关闭对应标签。
+- 同时统一 `Save As` 路径为标准化路径（斜杠归一），避免路径比较不一致。
+- 修改文件：`src/stores/editorStore.ts`。
+
+### 2026-04-01 节点 Note 显示与占位符替换
+
+- 在节点标题下方增加 `Note` 显示区域。
+- 支持 `Note` 中的 `{index}` 占位符按 Pin 序号替换为对应 Pin 当前值（常量/变量名/向量下标），禁用 Pin 替换为空。
+- 修改文件：`src/components/CustomNode.tsx`。

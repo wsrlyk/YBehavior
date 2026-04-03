@@ -72,6 +72,45 @@ export function recalculateUIDs(tree: Tree): void {
     let uid = 1;
     const visited = new Set<string>();
 
+    const getConnectorOrder = (nodeType: string): string[] => {
+        const nodeDef = nodeDefStore.getDefinition(nodeType);
+        const order = ['condition'];
+
+        if (nodeDef?.childConnectors) {
+            for (const c of nodeDef.childConnectors) {
+                if (c.name !== 'condition' && !order.includes(c.name)) {
+                    order.push(c.name);
+                }
+            }
+        }
+
+        if (!order.includes('children')) order.push('children');
+        if (!order.includes('default')) order.push('default');
+        return order;
+    };
+
+    const sortChildConns = (nodeId: string, nodeType: string): TreeConnection[] => {
+        const childConns = connectionsByParent.get(nodeId) || [];
+        const order = getConnectorOrder(nodeType);
+
+        return [...childConns].sort((a, b) => {
+            const connA = a.parentConnector || 'children';
+            const connB = b.parentConnector || 'children';
+
+            if (connA !== connB) {
+                let idxA = order.indexOf(connA);
+                let idxB = order.indexOf(connB);
+                if (idxA === -1) idxA = 999;
+                if (idxB === -1) idxB = 999;
+                if (idxA !== idxB) return idxA - idxB;
+            }
+
+            const nodeA = tree.nodes.get(a.childNodeId);
+            const nodeB = tree.nodes.get(b.childNodeId);
+            return (nodeA?.position.x || 0) - (nodeB?.position.x || 0);
+        });
+    };
+
     // Build parent->children index
     const connectionsByParent = new Map<string, TreeConnection[]>();
     for (const conn of tree.connections) {
@@ -88,46 +127,13 @@ export function recalculateUIDs(tree: Tree): void {
         if (!node) return;
 
         const effectivelyDisabled = isAncestorDisabled || node.disabled;
-        const childConns = connectionsByParent.get(nodeId) || [];
 
-        // 1. Process condition connector first
-        const conditionConn = childConns.find(c => c.parentConnector === 'condition');
-        if (conditionConn) {
-            dfs(conditionConn.childNodeId, effectivelyDisabled);
-        }
-
-        // 2. Assign UID to current node
+        // 1. Assign UID to current node (pre-order)
         node.uid = effectivelyDisabled ? undefined : uid++;
 
-        // 3. Process other children by connector order
-        const nodeDef = nodeDefStore.getDefinition(node.type);
-        const connectors = nodeDef?.childConnectors || [];
-
-        for (const connectorDef of connectors) {
-            const connsForThisType = childConns.filter(c => c.parentConnector === connectorDef.name);
-            const sortedConns = [...connsForThisType].sort((a, b) => {
-                const nodeA = tree.nodes.get(a.childNodeId);
-                const nodeB = tree.nodes.get(b.childNodeId);
-                return (nodeA?.position.x || 0) - (nodeB?.position.x || 0);
-            });
-
-            for (const conn of sortedConns) {
-                dfs(conn.childNodeId, effectivelyDisabled);
-            }
-        }
-
-        // Handle connectors not in definition
-        const knownConnectorNames = new Set(connectors.map(c => c.name));
-        knownConnectorNames.add('condition');
-
-        const extraConns = childConns.filter(c => !knownConnectorNames.has(c.parentConnector));
-        const sortedExtraConns = [...extraConns].sort((a, b) => {
-            const nodeA = tree.nodes.get(a.childNodeId);
-            const nodeB = tree.nodes.get(b.childNodeId);
-            return (nodeA?.position.x || 0) - (nodeB?.position.x || 0);
-        });
-
-        for (const conn of sortedExtraConns) {
+        // 2. Process children by connector order; within same connector by x
+        const sortedConns = sortChildConns(nodeId, node.type);
+        for (const conn of sortedConns) {
             dfs(conn.childNodeId, effectivelyDisabled);
         }
     }

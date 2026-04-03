@@ -36,6 +36,24 @@ type CustomNodeData = {
 
 export type CustomNodeType = Node<CustomNodeData, 'custom'>;
 
+function getVectorIndexDisplay(pin: Pin): string {
+  if (!pin.vectorIndex) return '';
+  if (pin.vectorIndex.type === 'const') return `[${pin.vectorIndex.value}]`;
+  return `[${pin.vectorIndex.variableName}]`;
+}
+
+function getPinNoteValue(pin: Pin): string {
+  if (pin.enableType === 'disable') return '';
+
+  if (pin.binding.type === 'const') {
+    return `${pin.binding.value || ''}${getVectorIndexDisplay(pin)}`;
+  }
+
+  const base = pin.binding.variableName || pin.name;
+  const localSuffix = pin.binding.variableName && pin.binding.isLocal ? "'" : '';
+  return `${base}${localSuffix}${getVectorIndexDisplay(pin)}`;
+}
+
 function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
   const setTooltip = useTooltipStore((state) => state.setTooltip);
   const pinColor = PIN_COLORS[pin.valueType] || PIN_COLORS.default || '#888';
@@ -111,7 +129,7 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
     return activeFilePath.split(/[\\/]/).pop()?.replace(/\.tree$/, '').replace(/\.fsm$/, '') || '';
   }, [activeFilePath]);
 
-  const { debugState, isPaused, keyframe, bpType } = useDebugStore(
+  const { debugState, isPaused, flashTick, bpType } = useDebugStore(
     useShallow(s => {
       const state = s.isConnected && treeNode.uid !== undefined
         ? s.getNodeRunState(fileName, treeNode.uid) // RunState uses fileName (basename) from Runtime
@@ -127,7 +145,7 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
       return {
         debugState,
         isPaused: s.isPaused,
-        keyframe: s.keyframe,
+        flashTick: (state && state.self !== NodeState.Invalid) ? s.keyframe : 0,
         bpType: bp
       };
     })
@@ -150,7 +168,7 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
     } else {
       setIsTransientVisible(false);
     }
-  }, [debugState, keyframe, isPaused]);
+  }, [debugState, isPaused, flashTick]);
 
   const showDebugOverlay = debugColors !== null && (isPaused || isTransientVisible);
 
@@ -164,6 +182,16 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
   const hasReturnType = returnType !== 'Default';
   // Use theme colors
   const returnTypeColor = theme.returnType[returnType] || theme.returnType['Invert']; // Default fallback
+  const nodeNote = useMemo(() => {
+    const note = nodeDefinition?.note?.trim();
+    if (!note) return '';
+
+    return note.replace(/\{(\d+)\}/g, (_match, indexText) => {
+      const index = Number(indexText);
+      if (Number.isNaN(index) || index < 0 || index >= treeNode.pins.length) return '';
+      return getPinNoteValue(treeNode.pins[index]);
+    });
+  }, [nodeDefinition?.note, treeNode.pins]);
 
   return (
     <div className="relative">
@@ -224,6 +252,12 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
             {treeNode.isFolded && <span className="text-[10px] bg-black/30 px-1 rounded">Folded</span>}
             {treeNode.disabled && <span className="text-red-300 text-[10px]">Disabled</span>}
           </div>
+
+          {nodeNote && (
+            <div className="px-2 py-1 text-[10px] leading-snug border-b border-black/20 text-gray-200 break-words whitespace-pre-wrap">
+              {nodeNote}
+            </div>
+          )}
 
           {(treeNode.pins.filter(p => (p.isInput || !p.isInput) && p.enableType !== 'disable').length > 0) && (
             <div className="flex justify-between px-2 py-1 gap-4">
