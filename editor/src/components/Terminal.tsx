@@ -108,10 +108,10 @@ export function Terminal({ isDocked, onToggleMode }: TerminalProps) {
 
             {/* Input Area */}
             <div className="h-10 border-t flex items-center px-2" style={{ backgroundColor: theme.ui.terminalInputBg, borderColor: theme.ui.terminalBorder }}>
-                <span className="text-green-500 mr-2">$</span>
+                <span className="mr-2" style={{ color: theme.ui.terminalLogSuccess }}>$</span>
                 <input
                     type="text"
-                    className="flex-1 bg-transparent border-none outline-none text-white"
+                    className="flex-1 bg-transparent border-none outline-none"
                     style={{ color: theme.ui.terminalText }}
                     placeholder="Enter command (e.g. help, clear)..."
                     onKeyDown={(e) => {

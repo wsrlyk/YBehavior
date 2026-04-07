@@ -1085,6 +1085,19 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       if (!mainTreeIds.has(node.id) || node.disabled) return;
 
       node.pins.forEach(pin => {
+        // 数据连接模式（pointer + 空变量名）必须有真实数据连线
+        if (pin.binding.type === 'pointer' && !pin.binding.variableName && pin.enableType !== 'disable') {
+          const hasDataConnection = tree.dataConnections.some(dc =>
+            (dc.fromNodeId === node.id && dc.fromPinName === pin.name) ||
+            (dc.toNodeId === node.id && dc.toPinName === pin.name)
+          );
+
+          if (!hasDataConnection) {
+            const nodeLabel = `${node.type}:${node.uid || node.id || ''}`;
+            errors.push(`Node [${nodeLabel}] Pin [${pin.name}]: Data connection is not connected`);
+          }
+        }
+
         if (pin.binding.type === 'const' && pin.enableType !== 'disable') {
           const res = validateValue(pin.binding.value, pin.valueType, pin.countType);
           if (!res.isValid) {

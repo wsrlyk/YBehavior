@@ -4,6 +4,7 @@ import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useFSMStore } from '../stores/fsmStore';
 import { isSpecialStateType } from '../types/fsm';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
+import { getTheme } from '../theme/theme';
 
 interface SearchResult {
     type: 'node' | 'pin' | 'variable' | 'io' | 'fsm-state' | 'fsm-transition';
@@ -17,6 +18,7 @@ interface SearchResult {
 }
 
 export function GlobalSearch() {
+    const theme = getTheme();
     const isSearchOpen = useEditorMetaStore(state => state.uiMeta.isSearchOpen);
     const setSearchOpen = useEditorMetaStore(state => state.setSearchOpen);
     const setActivePropertiesTab = useEditorMetaStore(state => state.setActivePropertiesTab);
@@ -372,21 +374,31 @@ export function GlobalSearch() {
 
     return (
         <div
-            className="fixed z-[100] w-[640px] bg-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden shadow-black/60 flex flex-col"
-            style={{ left: position.x, top: position.y }}
+            className="fixed z-[100] w-[640px] border rounded-xl shadow-2xl overflow-hidden flex flex-col"
+            style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border, color: theme.ui.textMain, left: position.x, top: position.y }}
             onKeyDown={handleKeyDown}
         >
             {/* Draggable Title Bar */}
             <div
-                className="bg-gray-900/40 flex items-center justify-between px-4 py-2 border-b border-gray-700/50 cursor-move select-none"
+                className="flex items-center justify-between px-4 py-2 border-b cursor-move select-none"
+                style={{ backgroundColor: theme.ui.background, borderColor: theme.ui.border }}
                 onMouseDown={handleMouseDown}
             >
                 <div className="flex items-center gap-2">
-                    <span className="text-gray-300 text-sm">🔍</span>
-                    <span className="text-gray-400 text-[10px] uppercase font-bold tracking-[0.2em]">Global Search</span>
+                    <span className="text-sm" style={{ color: theme.ui.textMain }}>🔍</span>
+                    <span className="text-[10px] uppercase font-bold tracking-[0.2em]" style={{ color: theme.ui.textDim }}>Global Search</span>
                 </div>
                 <button
-                    className="w-6 h-6 flex items-center justify-center rounded-full text-gray-500 hover:bg-red-500/20 hover:text-red-400 transition-all duration-200"
+                    className="w-6 h-6 flex items-center justify-center rounded-full transition-all duration-200"
+                    style={{ color: theme.ui.textDim }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = theme.ui.danger;
+                        e.currentTarget.style.color = theme.ui.tabActiveText;
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = theme.ui.textDim;
+                    }}
                     onClick={() => setSearchOpen(false)}
                 >
                     <span className="text-sm">✕</span>
@@ -402,7 +414,8 @@ export function GlobalSearch() {
                         value={query}
                         onChange={e => setQuery(e.target.value)}
                         placeholder="Search nodes, UIDs, pins, values, variables..."
-                        className="w-full pl-4 pr-10 py-2.5 bg-gray-900/80 border border-gray-600 rounded-lg text-white text-sm outline-none focus:border-gray-500/70 focus:ring-1 focus:ring-gray-500/30 transition-all"
+                        className="w-full pl-4 pr-10 py-2.5 border rounded-lg text-sm outline-none transition-all"
+                        style={{ backgroundColor: theme.ui.inputBg, borderColor: theme.ui.border, color: theme.ui.textMain }}
                     />
                 </div>
 
@@ -413,9 +426,10 @@ export function GlobalSearch() {
                                 type="checkbox"
                                 checked={scopes[s]}
                                 onChange={() => setScopes(prev => ({ ...prev, [s]: !prev[s] }))}
-                                className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-gray-500 focus:ring-gray-500"
+                                className="w-4 h-4 rounded"
+                                style={{ accentColor: theme.ui.accent }}
                             />
-                            <span className={`text-xs capitalize transition-colors ${scopes[s] ? 'text-gray-200' : 'text-gray-500'}`}>
+                            <span className="text-xs capitalize transition-colors" style={{ color: scopes[s] ? theme.ui.textMain : theme.ui.textDim }}>
                                 {s}
                             </span>
                         </label>
@@ -426,11 +440,11 @@ export function GlobalSearch() {
             {/* Results */}
             <div className="max-h-[400px] overflow-y-auto">
                 {query.length === 0 ? (
-                    <div className="p-8 text-center text-gray-500 text-sm">
+                    <div className="p-8 text-center text-sm" style={{ color: theme.ui.textDim }}>
                         Type to search for anything in the tree...
                     </div>
                 ) : results.length === 0 ? (
-                    <div className="p-8 text-center text-gray-500 text-sm">
+                    <div className="p-8 text-center text-sm" style={{ color: theme.ui.textDim }}>
                         No results found for "{query}"
                     </div>
                 ) : (
@@ -438,28 +452,25 @@ export function GlobalSearch() {
                         {results.map((res, index) => (
                             <div
                                 key={`${res.type}-${res.id}`}
-                                className={`px-4 py-3 cursor-pointer flex items-center justify-between transition-colors ${index === selectedIndex ? 'bg-gray-700/60 border-l-4 border-gray-500' : 'hover:bg-gray-700/50 border-l-4 border-transparent'
-                                    }`}
+                                className="px-4 py-3 cursor-pointer flex items-center justify-between transition-colors border-l-4"
+                                style={{
+                                    backgroundColor: index === selectedIndex ? theme.ui.accentSoft : 'transparent',
+                                    borderLeftColor: index === selectedIndex ? theme.ui.accent : 'transparent'
+                                }}
                                 onClick={() => handleJump(res)}
                                 onMouseEnter={() => setSelectedIndex(index)}
                             >
                                 <div className="flex flex-col gap-0.5 min-w-0">
                                     <div className="flex items-center gap-2">
-                                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${res.type === 'node' ? 'bg-gray-700 text-gray-100' :
-                                            res.type === 'pin' ? 'bg-gray-700 text-gray-100' :
-                                                res.type === 'variable' ? 'bg-gray-700 text-gray-100' :
-                                                    res.type === 'fsm-state' ? 'bg-gray-700 text-gray-100' :
-                                                        res.type === 'fsm-transition' ? 'bg-gray-700 text-gray-100' :
-                                                            'bg-gray-700 text-gray-100'
-                                            }`}>
+                                        <span className="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase" style={{ backgroundColor: theme.ui.buttonBg, color: theme.ui.textMain }}>
                                             {res.type}
                                         </span>
-                                        <span className="text-sm font-medium text-white truncate">{res.title}</span>
+                                        <span className="text-sm font-medium truncate" style={{ color: theme.ui.textMain }}>{res.title}</span>
                                     </div>
-                                    <div className="text-xs text-gray-400 filename-ellipsis">{res.subtitle}</div>
+                                    <div className="text-xs filename-ellipsis" style={{ color: theme.ui.textDim }}>{res.subtitle}</div>
                                 </div>
                                 {res.value && (
-                                    <div className="ml-4 px-2 py-1 bg-gray-900 rounded text-xs text-gray-300 border border-gray-700 max-w-[150px] filename-ellipsis">
+                                    <div className="ml-4 px-2 py-1 rounded text-xs border max-w-[150px] filename-ellipsis" style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}>
                                         {res.value}
                                     </div>
                                 )}
@@ -470,7 +481,7 @@ export function GlobalSearch() {
             </div>
 
             {/* Footer */}
-            <div className="px-4 py-2 bg-gray-900 border-t border-gray-700 flex justify-between items-center text-[10px] text-gray-500">
+            <div className="px-4 py-2 border-t flex justify-between items-center text-[10px]" style={{ backgroundColor: theme.ui.background, borderColor: theme.ui.border, color: theme.ui.textDim }}>
                 <div>
                     ↑↓ to navigate · Enter to jump · Esc to close
                 </div>

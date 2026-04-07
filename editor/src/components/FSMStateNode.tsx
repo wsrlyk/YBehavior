@@ -1,5 +1,5 @@
 import { memo, useState, useEffect } from 'react';
-import { DEBUG_RINGS, TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
+import { TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
 import { NodeState } from '../types/debug';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import type { FSMState, FSMStateType } from '../types/fsm';
@@ -53,12 +53,12 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
 
     const [isTransientVisible, setIsTransientVisible] = useState(false);
 
-    let ringClass = '';
+    let runRingColor = '';
     if (isRunning) {
-        if (runState === NodeState.Break) ringClass = `ring-4 ${DEBUG_RINGS.BREAK} ring-offset-2 ring-offset-gray-900`;
-        else if (runState === NodeState.Success) ringClass = `ring-4 ${DEBUG_RINGS.SUCCESS} ring-offset-2 ring-offset-gray-900`;
-        else if (runState === NodeState.Failure) ringClass = `ring-4 ${DEBUG_RINGS.FAILURE} ring-offset-2 ring-offset-gray-900`;
-        else ringClass = `ring-4 ${DEBUG_RINGS.RUNNING} ring-offset-2 ring-offset-gray-900`; // Running or Default
+        if (runState === NodeState.Break) runRingColor = theme.ui.danger;
+        else if (runState === NodeState.Success) runRingColor = theme.ui.success;
+        else if (runState === NodeState.Failure) runRingColor = theme.ui.warning;
+        else runRingColor = theme.ui.accent;
     }
 
     // Handle transient visibility (0.7s flash for non-break states)
@@ -78,7 +78,7 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
 
     // Hide ring if transient time expired (and not Break)
     if (isRunning && !isTransientVisible && runState !== NodeState.Break) {
-        ringClass = '';
+        runRingColor = '';
     }
 
     const colors = STATE_COLORS[state.type];
@@ -95,13 +95,13 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
     const isSourceVisible = hasChildHandle && isHovered && !isGlobalConnecting;
     const highlightBorder = selected && !isRunning ? `0 0 0 2px ${theme.text.variable}` : undefined;
     const defaultBorder = isDefault && !isRunning ? `0 0 0 2px ${theme.returnType.Invert}` : undefined;
-    const combinedOuterGlow = [highlightBorder, defaultBorder].filter(Boolean).join(', ');
+    const runRing = runRingColor ? `0 0 0 4px ${runRingColor}, 0 0 0 6px ${theme.ui.background}` : undefined;
+    const combinedOuterGlow = [highlightBorder, defaultBorder, runRing].filter(Boolean).join(', ');
 
     return (
         <div
             className={`
         relative rounded-lg shadow-lg min-w-[120px] transition-all duration-200
-        ${ringClass}
         ${isHovered ? 'scale-[1.02]' : ''}
       `}
             style={{

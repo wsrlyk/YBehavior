@@ -9,6 +9,7 @@ import { useEditorStore } from '../stores/editorStore';
 import { useFSMStore } from '../stores/fsmStore';
 import { NodeEditor } from './NodeEditor';
 import FSMEditor from './FSMEditor';
+import { getTheme } from '../theme/theme';
 
 import { RunningList } from './RunningList';
 
@@ -17,6 +18,7 @@ interface EditorPaneProps {
 }
 
 export function EditorPane({ onPaneClick }: EditorPaneProps) {
+    const theme = getTheme();
     const { openedFiles, activeFilePath } = useEditorStore();
     const { openedFSMFiles, activeFSMPath } = useFSMStore();
 
@@ -38,7 +40,7 @@ export function EditorPane({ onPaneClick }: EditorPaneProps) {
 
         // No file open
         return (
-            <div className="h-full w-full flex items-center justify-center text-gray-500 bg-gray-900">
+            <div className="h-full w-full flex items-center justify-center" style={{ color: theme.ui.textDim, backgroundColor: theme.ui.background }}>
                 <div className="text-center">
                     <p className="text-lg">No file open</p>
                     <p className="text-sm mt-2">Open a file from the sidebar or create a new one</p>

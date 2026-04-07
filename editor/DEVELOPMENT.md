@@ -572,6 +572,48 @@ npm run tauri build    # 打包（输出到 src-tauri/target/release/）
 - 验证：执行 `npm run build` 通过。
 - 修改文件：`src/theme/theme.ts`。
 
+### 2026-04-07 右侧面板亮度与 SubTree 选择交互修复
+
+- 背景：用户反馈右侧面板需比画布更亮；`Return` 值框文字超出底框；`SubTree` 的 `Tree` 选择器需要点两次才能开始选。
+- 处理：
+  - `PropertiesPanel` 根容器背景从 `theme.ui.background` 调整为 `theme.ui.panelBg`，确保右侧面板整体亮于画布。
+  - `NodePropertiesEditor` 的 `Return` 区域改为与 `Nickname` 同类输入高度策略（移除固定 `h-5` 盒约束，统一 `px/py` 与触发文本行高）。
+  - `TreeFilePicker` 增加 `defaultOpen` 参数；在 `SubTree` 的 `Tree` 编辑场景传入 `defaultOpen`，进入编辑即展开下拉，实现单击开始选择。
+- 修改文件：`src/components/PropertiesPanel.tsx`、`src/components/TreeFilePicker.tsx`。
+
+### 2026-04-07 变量/引脚行密度与标签页选中态一致性调整
+
+- 背景：用户反馈变量与引脚项边框不明显、行间观感偏松；并要求顶部 `VARIABLES/INTERFACE I/O` 选中态与下方面板背景保持一致。
+- 处理：
+  - `VariableItem`、`InterfacePinItem`、`PinEditor` 恢复常显边框（`borderColor: theme.ui.border`），并将项内垂直内边距从 `py-1` 收紧为 `py-0.5`，让 1px 项间距可见。
+  - 顶部标签页选中态背景改为 `theme.ui.panelBg`（与内容面板同底色），未选中态继续使用 `theme.ui.tabInactiveBg`。
+- 修改文件：`src/components/PropertiesPanel.tsx`。
+
+### 2026-04-07 节点标题颜色改为直接使用提亮后的主题色
+
+- 背景：用户要求移除 `CustomNode` 内部的 `lightenHexColor`，改为直接在 `theme.node` 配置中提亮节点颜色。
+- 处理：
+  - 删除 `CustomNode.tsx` 中 `lightenHexColor` 函数与 `titleBgColor` 派生逻辑。
+  - 节点标题背景改为直接使用 `theme.node` 对应分类色。
+  - 在 `theme.ts` 中直接提高 `node.composite/decorator/action/condition/default` 亮度。
+- 修改文件：`src/components/CustomNode.tsx`、`src/theme/theme.ts`。
+
+### 2026-04-07 分隔线补全与弱化
+
+- 背景：用户反馈 Node Properties 中 `Input2` 与 `Output` 之间缺少分隔线，且分隔线希望更淡。
+- 处理：
+  - 在输入/输出两个 Pin 分组之间增加单独的 1px 分隔线。
+  - 变量列表、I/O 列表、Pin 列表及分组间分隔线统一降低不透明度（`opacity: 0.45`）。
+- 修改文件：`src/components/PropertiesPanel.tsx`。
+
+### 2026-04-07 变量/引脚分隔样式微调（去常显边框）
+
+- 背景：用户反馈常显边框让列表观感过于拥挤。
+- 处理：
+  - 去除 `VariableItem`、`InterfacePinItem`、`PinEditor` 的常显边框。
+  - 在变量、I/O、节点 Pin 列表中改为“仅两项之间渲染 1px 分隔线”（`theme.ui.border`），保留层次同时减轻拥挤感。
+- 修改文件：`src/components/PropertiesPanel.tsx`。
+
 ### 2026-04-07 亮色主题可读性增强（类型色/白底/输入框）
 
 - 背景：用户反馈亮色主题下类型颜色不明显，`TRUE/FALSE` 无颜色，输入框底色偏灰。
@@ -596,6 +638,67 @@ npm run tauri build    # 打包（输出到 src-tauri/target/release/）
 - 结果：`src` 非主题文件中的十六进制硬编码颜色扫描结果为 0。
 - 验证：执行 `npm run build` 通过。
 - 修改文件：`src/theme/theme.ts`、`src/components/Terminal.tsx`、`src/components/Sidebar.tsx`、`src/components/NotificationBubble.tsx`。
+
+### 2026-04-07 主题语义化继续推进（PropertiesPanel 第一轮）
+
+- 背景：用户要求继续推进“颜色可主题化”，减少组件内灰阶硬编码语义。
+- 处理：
+  - `PropertiesPanel`（变量区域）将一批 `bg-gray/text-gray/border-gray` 视觉色替换为 `theme.ui.panelBg/inputBg/border/textMain/textDim`。
+  - `AdaptiveSelect` 下拉选中/hover 背景从硬编码十六进制改为主题 token（`theme.ui.accentSoft`）。
+  - 保持布局与交互不变，仅替换颜色来源为主题语义 token。
+- 结果：再次扫描 `src`（排除 `theme.ts`）中的十六进制硬编码颜色为 0。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/components/PropertiesPanel.tsx`、`src/DEVELOPMENT.md`。
+
+### 2026-04-07 主题语义化继续推进（PropertiesPanel 第二轮）
+
+- 背景：继续减少组件内灰阶语义类，确保主题切换只依赖语义 token。
+- 处理：
+  - `PropertiesPanel.tsx` 中所有 `gray-*` 颜色类替换为 `theme.ui.*`（包含容器、分组标题、Node Properties 区、Node 编辑输入、Pin 编辑输入/按钮、向量索引、下拉触发 hover 等）。
+  - 保留结构与交互逻辑，仅调整颜色来源，避免布局与功能回归。
+- 结果：`PropertiesPanel.tsx` 内 `gray-` 颜色类扫描结果为 0。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/components/PropertiesPanel.tsx`、`src/DEVELOPMENT.md`。
+
+### 2026-04-07 主题语义化收尾（剩余组件全量清理）
+
+- 背景：继续处理“剩下所有颜色灰阶写死”的收口工作。
+- 处理：
+  - 组件层面继续清理 `gray-*` 颜色类并改为 `theme.ui.*`：
+    - `GlobalSearch.tsx`
+    - `FSMPropertiesPanel.tsx`
+    - `DebugToolbar.tsx`
+    - `TreeFilePicker.tsx`
+    - `FileTreePopup.tsx`
+    - `RunningList.tsx`
+    - `EditorPane.tsx`
+    - `NodeEditor.tsx`
+    - `FSMEditor.tsx`
+    - `Terminal.tsx`
+    - `NotificationBubble.tsx`
+    - `MainWindow.tsx`
+  - `FSMStateNode.tsx` 去除 `ring-offset-gray-*` 依赖，改为基于主题色的内联 ring/shadow。
+  - `config/constants.ts` 调试色常量从 Tailwind 颜色类改为显式颜色值，避免样式类耦合。
+- 结果：`src` 内 `gray-*` 仅剩主题映射与日志 token 兼容字符串（`theme.ts`/`debugStore.ts`/`Terminal.tsx`），UI 组件样式层已完成主题 token 化。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/components/*` 多文件、`src/config/constants.ts`、`src/windows/MainWindow.tsx`、`src/DEVELOPMENT.md`。
+
+### 2026-04-07 面板密度与 ReturnType 输入高度微调
+
+- 背景：用户反馈“引脚/变量底框间距过大”，以及 ReturnType 值框高度明显高于其它输入。
+- 处理（仅样式，不改交互逻辑）：
+  - `PropertiesPanel.tsx` 中变量、接口 I/O、节点 Pin 列表容器由 `space-y-1` 调整为 `gap-px`，使项间距统一为 1px。
+  - `NodePropertiesEditor` 的 ReturnType 区域容器统一为 `h-5` + 边框，并让下拉触发文本使用 `leading-5` 对齐，和旁边输入高度一致。
+- 修改文件：`src/components/PropertiesPanel.tsx`、`src/DEVELOPMENT.md`。
+
+### 2026-04-07 节点标题底色提亮（Sequence/Selector 可读性）
+
+- 背景：用户反馈 Sequence、Selector 等节点标题条底色过灰，标题不够清晰。
+- 处理：
+  - 在 `CustomNode.tsx` 增加 `lightenHexColor`，仅对节点标题条背景做提亮混合（约 35% toward white）。
+  - 节点主体面板背景、边框、交互与调试态保持不变，只提升标题条可读性。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/components/CustomNode.tsx`、`src/DEVELOPMENT.md`。
 
 ### 2026-04-03 中性灰回调 + bool 对比度修复
 

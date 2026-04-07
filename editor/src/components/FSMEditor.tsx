@@ -602,7 +602,7 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
 
     if (!machine) {
         return (
-            <div className="h-full flex items-center justify-center text-gray-500">
+            <div className="h-full flex items-center justify-center" style={{ color: theme.ui.textDim }}>
                 No FSM loaded
             </div>
         );
@@ -778,7 +778,7 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                                 <h3 className="text-lg font-semibold" style={{ color: theme.ui.textMain }}>Select Target State</h3>
                                 <button onClick={() => setPickerData(null)} className="hover:text-white text-xl" style={{ color: theme.ui.textDim }}>✕</button>
                             </div>
-                            <div className="flex-1 overflow-auto p-2 scrollbar-thin scrollbar-thumb-gray-700">
+                            <div className="flex-1 overflow-auto p-2 scrollbar-thin">
                                 {pickerData.states.map(s => (
                                     <button
                                         key={s.id}

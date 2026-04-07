@@ -820,7 +820,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
   if (!currentTree) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-900 text-gray-500">
+      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: theme.ui.background, color: theme.ui.textDim }}>
         Select a tree file to open
       </div>
     );

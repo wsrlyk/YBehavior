@@ -104,11 +104,11 @@ export const DefaultTheme: GraphTheme = {
     // --- BT Node Categories ---
     // --- BT Node Categories ---
     node: {
-        composite: '#9F9F9F',
-        decorator: '#9F9F9F',
-        action: '#B9A07D',
-        condition: '#A58DA8',
-        default: '#9F9F9F',
+        composite: '#BFBFBF',
+        decorator: '#BFBFBF',
+        action: '#CDB79A',
+        condition: '#BBA8BE',
+        default: '#BFBFBF',
     },
 
     // --- Pin Dot Colors ---
@@ -120,7 +120,7 @@ export const DefaultTheme: GraphTheme = {
         vector3: '#B38A1E',
         entity: '#6C7E2E',
         ulong: '#5550AE',
-        enum: '#B26524',
+        enum: '#A63A00',
         default: '#6F6F6F',
     },
 
@@ -137,7 +137,7 @@ export const DefaultTheme: GraphTheme = {
             vector3: '#8A6A13',
             entity: '#4E6120',
             ulong: '#3E3A8A',
-            enum: '#8A4F1D',
+            enum: '#7A2A00',
         },
     },
 
@@ -227,7 +227,7 @@ export const DefaultTheme: GraphTheme = {
         border: '#6E6E6E',
         textMain: '#0A0A0A',
         textDim: '#2F2F2F',
-        inputBg: '#F7F7F7',
+        inputBg: '#FFFFFF',
         gridDots: '#8A8A8A',
         accent: '#696969',
         accentSoft: '#DADADA',

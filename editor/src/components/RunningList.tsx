@@ -6,8 +6,10 @@ import { useTooltipStore } from '../stores/tooltipStore';
 import { getFileDisplay } from '../utils/fileUtils';
 import { NodeState } from '../types/debug';
 import { DEBUG_COLORS, TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
+import { getTheme } from '../theme/theme';
 
 export const RunningList = () => {
+    const theme = getTheme();
     const { treeRunInfos, fsmRunInfo, isConnected } = useDebugStore();
     const { treeFiles, openTree, setActiveFile } = useEditorStore();
     const { openFSMFile, setActiveFSM } = useFSMStore();
@@ -70,23 +72,27 @@ export const RunningList = () => {
     return (
         <div className="absolute top-2 left-2 z-50 flex flex-col items-start font-sans">
             <div
-                className="bg-gray-800/90 border border-gray-600 rounded shadow-lg backdrop-blur-sm overflow-hidden"
+                className="border rounded shadow-lg backdrop-blur-sm overflow-hidden"
+                style={{ backgroundColor: `${theme.ui.panelBg}E6`, borderColor: theme.ui.border }}
             >
                 <div
-                    className="px-3 py-1.5 flex items-center gap-2 cursor-pointer hover:bg-gray-700/80 transition-colors select-none"
+                    className="px-3 py-1.5 flex items-center gap-2 cursor-pointer transition-colors select-none"
+                    style={{ color: theme.ui.textMain }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${theme.ui.accentSoft}CC`; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                     onClick={() => setIsOpen(!isOpen)}
                 >
                     <div className="w-2 h-2 rounded-full bg-pink-500 animate-pulse shadow-[0_0_8px_rgba(236,72,153,0.6)]" />
-                    <span className="text-xs font-semibold text-gray-200">
+                    <span className="text-xs font-semibold" style={{ color: theme.ui.textMain }}>
                         Debug List ({totalCount})
                     </span>
-                    <span className="text-[10px] text-gray-400 ml-1">
+                    <span className="text-[10px] ml-1" style={{ color: theme.ui.textDim }}>
                         {isOpen ? '▼' : '▶'}
                     </span>
                 </div>
 
                 {isOpen && (
-                    <div className="max-h-[min(80vh,calc(100vh-120px))] overflow-y-auto min-w-[160px] max-w-[240px] border-t border-gray-700">
+                    <div className="max-h-[min(80vh,calc(100vh-120px))] overflow-y-auto min-w-[160px] max-w-[240px] border-t" style={{ borderColor: theme.ui.border }}>
                         {/* FSM entry first */}
                         {fsmRunInfo && (
                             <RunningListItem
@@ -113,6 +119,7 @@ export const RunningList = () => {
 };
 
 function RunningListItem({ fileName, isFsm, onClick }: { fileName: string; isFsm: boolean; onClick: () => void }) {
+    const theme = getTheme();
     const { isConnected, getFileRunState, treeRunInfos, fsmRunInfo, keyframe } = useDebugStore();
     const setTooltip = useTooltipStore((state) => state.setTooltip);
 
@@ -193,17 +200,26 @@ function RunningListItem({ fileName, isFsm, onClick }: { fileName: string; isFsm
         }
     }, [isConnected, fileRunState, rootFinal, keyframe]);
 
-    const activeColor = visualState?.color || 'bg-gray-500';
+    const activeColor = visualState?.color || theme.ui.textDim;
 
     return (
         <div
-            className="px-3 py-1.5 text-xs text-gray-300 hover:bg-gray-700 cursor-pointer flex items-center gap-2 border-l-2 border-transparent hover:border-pink-500 transition-all"
+            className="px-3 py-1.5 text-xs cursor-pointer flex items-center gap-2 border-l-2 border-transparent transition-all"
+            style={{ color: theme.ui.textMain }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = theme.ui.accentSoft;
+                e.currentTarget.style.borderLeftColor = theme.ui.accent;
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.borderLeftColor = 'transparent';
+            }}
             onClick={onClick}
-            onMouseEnter={() => setTooltip(fileName)}
-            onMouseLeave={() => setTooltip(null)}
+            onMouseOver={() => setTooltip(fileName)}
+            onMouseOut={() => setTooltip(null)}
         >
             {/* Status Dot */}
-            <span className={`w-1.5 h-1.5 rounded-full ${activeColor}`} />
+            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: activeColor }} />
 
             <span className="opacity-70">{icon}</span>
             <span className="flex-1 filename-ellipsis">{displayName}</span>

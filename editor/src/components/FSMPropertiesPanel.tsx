@@ -4,6 +4,7 @@ import { useEditorStore } from '../stores/editorStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { validateVariableName } from '../utils/validation';
 import { TreeFilePicker } from './TreeFilePicker';
+import { getTheme } from '../theme/theme';
 
 
 // TreeFilePicker extracted to separate file
@@ -11,6 +12,7 @@ import { TreeFilePicker } from './TreeFilePicker';
 // ==================== Main Panel ====================
 
 export function FSMPropertiesPanel() {
+    const theme = getTheme();
     const selectedNodeIds = useFSMStore(state => state.selectedNodeIds);
     const selectedEdgeIds = useFSMStore(state => state.selectedEdgeIds);
 
@@ -222,27 +224,27 @@ export function FSMPropertiesPanel() {
 
     if (!selectedState && transitionsForSelectedEdge.length === 0) {
         return (
-            <div className="h-full bg-gray-900 border-l border-gray-700 flex flex-col p-4 items-center justify-center text-center">
-                <div className="text-gray-600 mb-2">
+            <div className="h-full border-l flex flex-col p-4 items-center justify-center text-center" style={{ backgroundColor: theme.ui.background, borderColor: theme.ui.border }}>
+                <div className="mb-2" style={{ color: theme.ui.textDim }}>
                     <svg className="w-12 h-12 mx-auto opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
                     </svg>
                 </div>
-                <div className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Selection</div>
-                <div className="text-xs text-gray-600">Select a state or transition to view and edit its properties.</div>
+                <div className="text-sm font-medium uppercase tracking-wider mb-1" style={{ color: theme.ui.textDim }}>Selection</div>
+                <div className="text-xs" style={{ color: theme.ui.textDim }}>Select a state or transition to view and edit its properties.</div>
             </div>
         );
     }
 
     return (
-        <div className="h-full bg-gray-900 border-l border-gray-700 flex flex-col p-3 overflow-auto scrollbar-thin scrollbar-thumb-gray-700">
+        <div className="h-full border-l flex flex-col p-3 overflow-auto scrollbar-thin" style={{ backgroundColor: theme.ui.background, borderColor: theme.ui.border }}>
             {selectedState && (
-                <div className={`space-y-4 transition-all duration-500 ${focusTarget?.type === 'state' && focusTarget.id === selectedState.id ? 'ring-2 ring-gray-500/60 ring-offset-2 ring-offset-gray-900 rounded-lg p-1' : ''}`} ref={focusedStateRef}>
-                    <div className="text-xs text-gray-500 uppercase tracking-wider font-bold border-b border-gray-800 pb-2">State Properties</div>
+                <div className={`space-y-4 transition-all duration-500 ${focusTarget?.type === 'state' && focusTarget.id === selectedState.id ? 'rounded-lg p-1' : ''}`} style={focusTarget?.type === 'state' && focusTarget.id === selectedState.id ? { boxShadow: `0 0 0 2px ${theme.ui.border}` } : undefined} ref={focusedStateRef}>
+                    <div className="text-xs uppercase tracking-wider font-bold border-b pb-2" style={{ color: theme.ui.textDim, borderColor: theme.ui.border }}>State Properties</div>
 
                     <div>
-                        <label className="text-[10px] text-gray-500 block mb-1">Type</label>
-                        <div className="text-xs text-purple-400 font-medium bg-purple-900/20 px-2 py-1 rounded inline-block">
+                        <label className="text-[10px] block mb-1" style={{ color: theme.ui.textDim }}>Type</label>
+                        <div className="text-xs font-medium px-2 py-1 rounded inline-block" style={{ color: theme.ui.textMain, backgroundColor: theme.ui.accentSoft }}>
                             {selectedState.type}
                         </div>
                     </div>
@@ -252,10 +254,11 @@ export function FSMPropertiesPanel() {
                         const isValid = localName.length === 0 || nameValidation.isValid;
                         return (
                             <div>
-                                <label className="text-[10px] text-gray-500 block mb-1">Name</label>
+                                <label className="text-[10px] block mb-1" style={{ color: theme.ui.textDim }}>Name</label>
                                 <input
-                                    className={`w-full bg-gray-800 text-gray-200 text-sm px-2 py-1.5 rounded border outline-none transition-colors ${!isValid ? 'border-red-500 focus:border-red-400' : 'border-gray-700 focus:border-gray-500'
+                                    className={`w-full text-sm px-2 py-1.5 rounded border outline-none transition-colors ${!isValid ? 'border-red-500 focus:border-red-400' : ''
                                         }`}
+                                    style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: !isValid ? undefined : theme.ui.border }}
                                     value={localName}
                                     onChange={(e) => setLocalName(e.target.value)}
                                     onBlur={() => {
@@ -274,7 +277,7 @@ export function FSMPropertiesPanel() {
 
                     {(selectedState.type === 'Normal' || selectedState.type === 'Entry' || selectedState.type === 'Exit') && (
                         <div>
-                            <label className="text-[10px] text-gray-500 block mb-1">Linked Tree</label>
+                            <label className="text-[10px] block mb-1" style={{ color: theme.ui.textDim }}>Linked Tree</label>
                             <TreeFilePicker
                                 value={selectedState.tree || ''}
                                 options={treeFiles}
@@ -284,9 +287,10 @@ export function FSMPropertiesPanel() {
                     )}
 
                     <div>
-                        <label className="text-[10px] text-gray-500 block mb-1">Comment</label>
+                        <label className="text-[10px] block mb-1" style={{ color: theme.ui.textDim }}>Comment</label>
                         <textarea
-                            className="w-full bg-gray-800 text-gray-200 text-sm px-2 py-1.5 rounded border border-gray-700 focus:border-gray-500 outline-none resize-none transition-colors"
+                            className="w-full text-sm px-2 py-1.5 rounded border outline-none resize-none transition-colors"
+                            style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
                             rows={4}
                             value={localComment}
                             onChange={(e) => setLocalComment(e.target.value)}
@@ -299,16 +303,21 @@ export function FSMPropertiesPanel() {
 
             {transitionsForSelectedEdge.length > 0 && (
                 <div className="space-y-4">
-                    <div className="text-xs text-gray-500 uppercase tracking-wider font-bold border-b border-gray-800 pb-2">Transitions</div>
+                    <div className="text-xs uppercase tracking-wider font-bold border-b pb-2" style={{ color: theme.ui.textDim, borderColor: theme.ui.border }}>Transitions</div>
                     <div className="space-y-3">
                         {transitionsForSelectedEdge.map((trans) => (
                             <div
                                 key={trans.id}
                                 ref={el => { if (el) focusedTransRefs.current.set(trans.id, el); else focusedTransRefs.current.delete(trans.id); }}
-                                className={`p-3 bg-gray-800/50 rounded border transition-all duration-500 space-y-3 relative group/trans ${focusTarget?.type === 'transition' && focusTarget.id === trans.id ? 'border-gray-500 ring-1 ring-gray-500/30' : 'border-gray-700'}`}
+                                className="p-3 rounded border transition-all duration-500 space-y-3 relative group/trans"
+                                style={{
+                                    backgroundColor: theme.ui.panelBg,
+                                    borderColor: focusTarget?.type === 'transition' && focusTarget.id === trans.id ? theme.ui.accent : theme.ui.border,
+                                    boxShadow: focusTarget?.type === 'transition' && focusTarget.id === trans.id ? `0 0 0 1px ${theme.ui.accent}` : undefined
+                                }}
                             >
                                 <div className="flex justify-between items-center">
-                                    <span className="text-[10px] text-gray-400 font-mono">
+                                    <span className="text-[10px] font-mono" style={{ color: theme.ui.textDim }}>
                                         {trans.fromStateId ? (() => {
                                             for (const m of fsm!.machines.values()) {
                                                 const s = m.states.get(trans.fromStateId!);
@@ -327,19 +336,21 @@ export function FSMPropertiesPanel() {
                                     </span>
                                     <button
                                         onClick={() => removeTransition(trans.id)}
-                                        className="text-gray-600 hover:text-red-400 text-xs transition-colors"
+                                        className="text-xs transition-colors"
+                                        style={{ color: theme.ui.textDim }}
                                     >✕</button>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] text-gray-500 block uppercase tracking-tighter">Conditions</label>
+                                    <label className="text-[10px] block uppercase tracking-tighter" style={{ color: theme.ui.textDim }}>Conditions</label>
                                     <div className="flex flex-wrap gap-1.5">
                                         {trans.conditions.map(c => (
-                                            <span key={c} className="bg-gray-700 text-gray-200 text-[11px] px-2 py-0.5 rounded-full border border-gray-500/60 flex items-center gap-1.5 group/ev">
+                                            <span key={c} className="text-[11px] px-2 py-0.5 rounded-full border flex items-center gap-1.5 group/ev" style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}>
                                                 {c}
                                                 <button
                                                     onClick={() => removeCondition(trans.id, c)}
-                                                    className="hover:text-white text-gray-300 leading-none"
+                                                    className="leading-none"
+                                                    style={{ color: theme.ui.textDim }}
                                                 >×</button>
                                             </span>
                                         ))}
@@ -348,11 +359,13 @@ export function FSMPropertiesPanel() {
                                             const condValidation = validateVariableName(newConditionName.trim());
                                             const isCondValid = newConditionName.trim().length === 0 || condValidation.isValid;
                                             return (
-                                                <div className={`flex items-center gap-1 bg-gray-900 rounded-full border p-0.5 pr-2 ${!isCondValid ? 'border-red-500' : 'border-gray-500/60'}`}
+                                                <div className={`flex items-center gap-1 rounded-full border p-0.5 pr-2 ${!isCondValid ? 'border-red-500' : ''}`}
+                                                    style={{ backgroundColor: theme.ui.background, borderColor: !isCondValid ? undefined : theme.ui.border }}
                                                 >
                                                     <input
                                                         ref={addConditionInputRef}
-                                                        className="bg-transparent text-[11px] text-gray-200 px-2 outline-none w-20"
+                                                        className="bg-transparent text-[11px] px-2 outline-none w-20"
+                                                        style={{ color: theme.ui.textMain }}
                                                         value={newConditionName}
                                                         onChange={e => setNewConditionName(e.target.value)}
                                                         onKeyDown={e => {
@@ -366,16 +379,18 @@ export function FSMPropertiesPanel() {
                                                     />
                                                     <button
                                                         onClick={() => handleAddCondition(trans.id)}
-                                                        className={condValidation.isValid ? 'text-gray-200 hover:text-white' : 'text-gray-600 cursor-not-allowed'}
+                                                        className={condValidation.isValid ? '' : 'cursor-not-allowed'}
+                                                        style={{ color: condValidation.isValid ? theme.ui.textMain : theme.ui.textDim }}
                                                         disabled={!condValidation.isValid}
                                                     >✓</button>
-                                                    <button onClick={() => setIsAddingCondition(null)} className="text-gray-500 hover:text-gray-400">✕</button>
+                                                    <button onClick={() => setIsAddingCondition(null)} style={{ color: theme.ui.textDim }}>✕</button>
                                                 </div>
                                             );
                                         })() : (
                                             <button
                                                 onClick={() => setIsAddingCondition(trans.id)}
-                                                className="text-[11px] px-2 py-0.5 rounded-full border border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-500 transition-colors bg-gray-800"
+                                                className="text-[11px] px-2 py-0.5 rounded-full border transition-colors"
+                                                style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border, color: theme.ui.textDim }}
                                             >+ Add Condition</button>
                                         )}
                                     </div>
@@ -384,7 +399,7 @@ export function FSMPropertiesPanel() {
                         ))}
                     </div>
 
-                    <div className="text-[10px] text-gray-600 italic leading-tight mt-4">
+                    <div className="text-[10px] italic leading-tight mt-4" style={{ color: theme.ui.textDim }}>
                         * Multiple transitions in the same direction are collapsed into a single edge.
                     </div>
                 </div>

@@ -14,6 +14,7 @@ import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useEditorStore } from '../stores/editorStore';
 import { useFSMStore } from '../stores/fsmStore';
 import { useNotificationStore } from '../stores/notificationStore';
+import { getTheme } from '../theme/theme';
 
 // Icons as simple SVG components
 const PlayIcon = () => (
@@ -54,6 +55,7 @@ const DisconnectIcon = () => (
 );
 
 export function DebugToolbar() {
+    const theme = getTheme();
     const { isConnected, isPaused, isDebugging, connect, disconnect, startDebug, continueDebug, stepInto, stepOver } = useDebugStore();
     const { debugMeta, setDebugIP, setDebugPort } = useEditorMetaStore();
     const { notify } = useNotificationStore();
@@ -140,33 +142,35 @@ export function DebugToolbar() {
                 // Connection form
                 <>
                     <div className="flex items-center gap-1">
-                        <span className="text-gray-400">IP:</span>
+                        <span style={{ color: theme.ui.textDim }}>IP:</span>
                         <input
                             type="text"
                             value={localIP}
                             onChange={(e) => setLocalIP(e.target.value)}
-                            className="w-24 px-1.5 py-0.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:border-gray-500"
+                            className="w-24 px-1.5 py-0.5 border rounded text-xs focus:outline-none"
+                            style={{ backgroundColor: theme.ui.inputBg, borderColor: theme.ui.border, color: theme.ui.textMain }}
                             placeholder="127.0.0.1"
                         />
                     </div>
                     <div className="flex items-center gap-1">
-                        <span className="text-gray-400">Port:</span>
+                        <span style={{ color: theme.ui.textDim }}>Port:</span>
                         <input
                             type="text"
                             value={localPort}
                             onChange={(e) => setLocalPort(e.target.value)}
-                            className="w-14 px-1.5 py-0.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:border-gray-500"
+                            className="w-14 px-1.5 py-0.5 border rounded text-xs focus:outline-none"
+                            style={{ backgroundColor: theme.ui.inputBg, borderColor: theme.ui.border, color: theme.ui.textMain }}
                             placeholder="8888"
                         />
                     </div>
                     <button
                         onClick={handleConnect}
                         disabled={isConnecting}
-                        className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors
-              ${isConnecting
-                                ? 'bg-gray-600 text-gray-400 cursor-wait'
-                                : 'bg-green-600 hover:bg-green-700 text-white'
-                            }`}
+                        className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${isConnecting ? 'cursor-wait' : ''}`}
+                        style={{
+                            backgroundColor: isConnecting ? theme.ui.buttonBg : theme.ui.success,
+                            color: isConnecting ? theme.ui.textDim : theme.ui.tabActiveText
+                        }}
                     >
                         <ConnectIcon />
                         <span>{isConnecting ? 'Connecting...' : 'Connect'}</span>
@@ -175,32 +179,34 @@ export function DebugToolbar() {
             ) : (
                 // Connected controls
                 <>
-                    <div className="flex items-center gap-1 text-green-400">
-                        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                    <div className="flex items-center gap-1" style={{ color: theme.ui.success }}>
+                        <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: theme.ui.success }}></span>
                         <span>Connected</span>
                     </div>
 
-                    <div className="w-px h-4 bg-gray-600 mx-1"></div>
+                    <div className="w-px h-4 mx-1" style={{ backgroundColor: theme.ui.border }}></div>
 
                     {/* Agent UID input */}
                     <div className="flex items-center gap-1">
-                        <span className="text-gray-400">Agent:</span>
+                        <span style={{ color: theme.ui.textDim }}>Agent:</span>
                         <input
                             type="text"
                             value={agentUID}
                             onChange={(e) => setAgentUID(e.target.value)}
-                            className="w-20 px-1.5 py-0.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:border-gray-500"
+                            className="w-20 px-1.5 py-0.5 border rounded text-xs focus:outline-none"
+                            style={{ backgroundColor: theme.ui.inputBg, borderColor: theme.ui.border, color: theme.ui.textMain }}
                             placeholder="UID"
                         />
                     </div>
 
                     {/* Wait for begin checkbox */}
-                    <label className="flex items-center gap-1 text-gray-400 cursor-pointer">
+                    <label className="flex items-center gap-1 cursor-pointer" style={{ color: theme.ui.textDim }}>
                         <input
                             type="checkbox"
                             checked={waitForBegin}
                             onChange={(e) => setWaitForBegin(e.target.checked)}
                             className="w-3 h-3"
+                            style={{ accentColor: theme.ui.accent }}
                         />
                         <span>Wait Init</span>
                     </label>
@@ -208,27 +214,21 @@ export function DebugToolbar() {
                     {/* Start debug button */}
                     <button
                         onClick={handleStartDebug}
-                        className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors
-              ${isDebugging
-                                ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                                : 'bg-gray-600 hover:bg-gray-500 text-white'
-                            }`}
+                        className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors"
+                        style={{ backgroundColor: isDebugging ? theme.ui.warning : theme.ui.buttonBg, color: theme.ui.tabActiveText }}
                     >
                         <PlayIcon />
                         <span>Debug</span>
                     </button>
 
-                    <div className="w-px h-4 bg-gray-600 mx-1"></div>
+                    <div className="w-px h-4 mx-1" style={{ backgroundColor: theme.ui.border }}></div>
 
                     {/* Debug control buttons - only enabled when paused */}
                     <button
                         onClick={continueDebug}
                         disabled={!isPaused}
-                        className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors
-              ${isPaused
-                                ? 'bg-green-600 hover:bg-green-700 text-white'
-                                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                            }`}
+                        className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${!isPaused ? 'cursor-not-allowed' : ''}`}
+                        style={{ backgroundColor: isPaused ? theme.ui.success : theme.ui.inputBg, color: isPaused ? theme.ui.tabActiveText : theme.ui.textDim }}
                     >
                         <ContinueIcon />
                         <span>Continue</span>
@@ -237,11 +237,8 @@ export function DebugToolbar() {
                     <button
                         onClick={stepOver}
                         disabled={!isPaused}
-                        className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors
-              ${isPaused
-                                ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
-                                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                            }`}
+                        className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${!isPaused ? 'cursor-not-allowed' : ''}`}
+                        style={{ backgroundColor: isPaused ? theme.ui.warning : theme.ui.inputBg, color: isPaused ? theme.ui.tabActiveText : theme.ui.textDim }}
                     >
                         <StepOverIcon />
                         <span>Step Over</span>
@@ -250,11 +247,8 @@ export function DebugToolbar() {
                     <button
                         onClick={stepInto}
                         disabled={!isPaused}
-                        className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors
-              ${isPaused
-                                ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                            }`}
+                        className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${!isPaused ? 'cursor-not-allowed' : ''}`}
+                        style={{ backgroundColor: isPaused ? theme.ui.warning : theme.ui.inputBg, color: isPaused ? theme.ui.tabActiveText : theme.ui.textDim }}
                     >
                         <StepIntoIcon />
                         <span>Step Into</span>
@@ -262,7 +256,7 @@ export function DebugToolbar() {
 
                     {/* Paused indicator */}
                     {isPaused && (
-                        <span className="px-2 py-0.5 bg-red-600 text-white text-xs rounded animate-pulse">
+                        <span className="px-2 py-0.5 text-xs rounded animate-pulse" style={{ backgroundColor: theme.ui.danger, color: theme.ui.tabActiveText }}>
                             Paused
                         </span>
                     )}
@@ -272,7 +266,8 @@ export function DebugToolbar() {
                     {/* Disconnect button */}
                     <button
                         onClick={handleDisconnect}
-                        className="flex items-center gap-1 px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-medium transition-colors"
+                        className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors"
+                        style={{ backgroundColor: theme.ui.danger, color: theme.ui.tabActiveText }}
                     >
                         <DisconnectIcon />
                         <span>Disconnect</span>

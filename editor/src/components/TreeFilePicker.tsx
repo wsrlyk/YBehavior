@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useEditorStore } from '../stores/editorStore';
 import { useTooltipStore } from '../stores/tooltipStore';
 import { stripExtension } from '../utils/fileUtils';
+import { getTheme } from '../theme/theme';
 
 interface TreeFilePickerProps {
     value: string;
@@ -9,14 +10,23 @@ interface TreeFilePickerProps {
     options: string[];
     placeholder?: string;
     allowJump?: boolean;
+    defaultOpen?: boolean;
 }
 
-export function TreeFilePicker({ value, onChange, options, placeholder = 'Select a tree...', allowJump = true }: TreeFilePickerProps) {
-    const [isOpen, setIsOpen] = useState(false);
+export function TreeFilePicker({ value, onChange, options, placeholder = 'Select a tree...', allowJump = true, defaultOpen = false }: TreeFilePickerProps) {
+    const theme = getTheme();
+    const [isOpen, setIsOpen] = useState(defaultOpen);
     const [search, setSearch] = useState('');
     const containerRef = useRef<HTMLDivElement>(null);
     const openTree = useEditorStore(state => state.openTree);
     const setTooltip = useTooltipStore(state => state.setTooltip);
+
+    useEffect(() => {
+        setIsOpen(defaultOpen);
+        if (defaultOpen) {
+            setSearch('');
+        }
+    }, [defaultOpen]);
 
     const filteredOptions = options.filter(opt =>
         opt.toLowerCase().includes(search.toLowerCase())
@@ -35,7 +45,10 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
     return (
         <div className="relative w-full" ref={containerRef}>
             <div
-                className="w-full bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded cursor-pointer border border-gray-600 hover:border-gray-500 flex justify-between items-center group"
+                className="w-full text-xs px-2 py-1 rounded cursor-pointer border flex justify-between items-center group"
+                style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = theme.ui.accent; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = theme.ui.border; }}
                 onClick={() => {
                     setIsOpen(!isOpen);
                     if (!isOpen) setSearch('');
@@ -51,7 +64,8 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                 <div className="flex items-center gap-1">
                     {allowJump && value && (
                         <button
-                            className="text-[10px] text-gray-500 hover:text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
+                            style={{ color: theme.ui.textDim }}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 openTree(value);
@@ -62,7 +76,8 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                     )}
                     {value && (
                         <button
-                            className="text-[10px] text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
+                            style={{ color: theme.ui.textDim }}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onChange('');
@@ -72,15 +87,16 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                             ✕
                         </button>
                     )}
-                    <span className="text-[10px] text-gray-500">▼</span>
+                    <span className="text-[10px]" style={{ color: theme.ui.textDim }}>▼</span>
                 </div>
             </div>
 
             {isOpen && (
-                <div className="absolute z-50 mt-1 w-full bg-gray-800 border border-gray-700 rounded shadow-xl max-h-48 overflow-hidden flex flex-col">
-                    <div className="p-1 border-b border-gray-700">
+                <div className="absolute z-50 mt-1 w-full border rounded shadow-xl max-h-48 overflow-hidden flex flex-col" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
+                    <div className="p-1 border-b" style={{ borderColor: theme.ui.border }}>
                         <input
-                            className="w-full bg-gray-900 text-gray-300 text-[10px] px-2 py-1 rounded outline-none border border-gray-600 focus:border-gray-500"
+                            className="w-full text-[10px] px-2 py-1 rounded outline-none border"
+                            style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
                             placeholder="Search trees..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
@@ -89,7 +105,13 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                     </div>
                     <div className="overflow-y-auto flex-1 custom-scrollbar">
                         <div
-                            className={`px-2 py-1.5 text-[10px] cursor-pointer hover:bg-gray-700 hover:text-gray-100 transition-colors truncate ${!value ? 'bg-gray-700 text-gray-200' : 'text-gray-500 italic'}`}
+                            className={`px-2 py-1.5 text-[10px] cursor-pointer transition-colors truncate ${!value ? '' : 'italic'}`}
+                            style={{
+                                backgroundColor: !value ? theme.ui.accentSoft : 'transparent',
+                                color: !value ? theme.ui.textMain : theme.ui.textDim
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.ui.accentSoft; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = !value ? theme.ui.accentSoft : 'transparent'; }}
                             onClick={() => {
                                 onChange('');
                                 setIsOpen(false);
@@ -101,9 +123,18 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                             filteredOptions.map(opt => (
                                 <div
                                     key={opt}
-                                    className={`px-2 py-1.5 text-[10px] cursor-pointer hover:bg-gray-700 transition-colors filename-ellipsis ${value === opt || stripExtension(value) === stripExtension(opt) ? 'text-gray-100 bg-gray-750' : 'text-gray-300'}`}
+                                    className="px-2 py-1.5 text-[10px] cursor-pointer transition-colors filename-ellipsis"
+                                    style={{
+                                        color: value === opt || stripExtension(value) === stripExtension(opt) ? theme.ui.textMain : theme.ui.textDim,
+                                        backgroundColor: value === opt || stripExtension(value) === stripExtension(opt) ? theme.ui.accentSoft : 'transparent'
+                                    }}
                                     onMouseEnter={() => setTooltip(opt)}
                                     onMouseLeave={() => setTooltip(null)}
+                                    onMouseOver={(e) => { e.currentTarget.style.backgroundColor = theme.ui.accentSoft; }}
+                                    onMouseOut={(e) => {
+                                        const selected = value === opt || stripExtension(value) === stripExtension(opt);
+                                        e.currentTarget.style.backgroundColor = selected ? theme.ui.accentSoft : 'transparent';
+                                    }}
                                     onClick={() => {
                                         // Always store extensionless path in the model for consistency
                                         // and use forward slashes
@@ -116,7 +147,7 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                                 </div>
                             ))
                         ) : (
-                            <div className="px-2 py-2 text-[10px] text-gray-500 italic">No trees found</div>
+                            <div className="px-2 py-2 text-[10px] italic" style={{ color: theme.ui.textDim }}>No trees found</div>
                         )}
                     </div>
                 </div>

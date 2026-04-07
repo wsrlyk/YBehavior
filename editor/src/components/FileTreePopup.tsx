@@ -4,6 +4,7 @@ import { useFSMStore } from '../stores/fsmStore';
 import { useTooltipStore } from '../stores/tooltipStore';
 import { readFile } from '../utils/fileService';
 import { getFileDisplay } from '../utils/fileUtils';
+import { getTheme } from '../theme/theme';
 
 interface FileTreePopupProps {
   isOpen: boolean;
@@ -76,6 +77,7 @@ function FileTreeNode({
   filter: string;
   setTooltip: (content: string | null) => void;
 }) {
+  const theme = getTheme();
   const isExpanded = expandedDirs.has(node.path);
   const matchesFilter = !filter || node.path.toLowerCase().includes(filter.toLowerCase());
 
@@ -95,12 +97,14 @@ function FileTreeNode({
       <div>
         <div
           onClick={() => toggleDir(node.path)}
-          className="flex items-center px-2 py-1 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer"
+          className="flex items-center px-2 py-1 text-sm cursor-pointer"
           style={{ paddingLeft: `${depth * 16 + 8}px` }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.ui.accentSoft; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
         >
-          <span className="mr-1 text-xs text-gray-500">{shouldExpand ? '▼' : '▶'}</span>
+          <span className="mr-1 text-xs" style={{ color: theme.ui.textDim }}>{shouldExpand ? '▼' : '▶'}</span>
           <span className="text-yellow-500 mr-1">📁</span>
-          {node.name}
+          <span style={{ color: theme.ui.textMain }}>{node.name}</span>
         </div>
         {shouldExpand && node.children.map(child => (
           <FileTreeNode
@@ -124,8 +128,10 @@ function FileTreeNode({
   return (
     <div
       onClick={() => onFileClick(node.path)}
-      className="flex items-center px-2 py-1 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer"
+      className="flex items-center px-2 py-1 text-sm cursor-pointer"
       style={{ paddingLeft: `${depth * 16 + 8}px` }}
+      onMouseOver={(e) => { e.currentTarget.style.backgroundColor = theme.ui.accentSoft; }}
+      onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
       onMouseEnter={() => setTooltip(node.path)}
       onMouseLeave={() => setTooltip(null)}
     >
@@ -143,6 +149,7 @@ function hasMatchingDescendants(node: TreeNode, filter: string): boolean {
 }
 
 export function FileTreePopup({ isOpen, onClose }: FileTreePopupProps) {
+  const theme = getTheme();
   const { treeFiles, openTree, setActiveFile } = useEditorStore();
   const { openFSM, setActiveFSM } = useFSMStore();
   const [filter, setFilter] = useState('');
@@ -217,25 +224,27 @@ export function FileTreePopup({ isOpen, onClose }: FileTreePopupProps) {
   return (
     <div
       ref={popupRef}
-      className="absolute top-12 left-2 z-50 w-96 bg-gray-800 border border-gray-600 rounded-lg shadow-xl overflow-hidden flex flex-col max-h-[80vh]"
+      className="absolute top-12 left-2 z-50 w-96 border rounded-lg shadow-xl overflow-hidden flex flex-col max-h-[80vh]"
+      style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}
       onKeyDown={handleKeyDown}
     >
       {/* 搜索框 */}
-      <div className="p-2 border-b border-gray-700 shrink-0">
+      <div className="p-2 border-b shrink-0" style={{ borderColor: theme.ui.border }}>
         <input
           ref={inputRef}
           type="text"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Search files..."
-          className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-gray-500"
+          className="w-full px-3 py-2 border rounded text-sm focus:outline-none"
+          style={{ backgroundColor: theme.ui.inputBg, borderColor: theme.ui.border, color: theme.ui.textMain }}
         />
       </div>
 
       {/* 文件树 */}
       <div className="flex-1 overflow-auto py-1">
         {fileTree.length === 0 ? (
-          <div className="px-3 py-4 text-sm text-gray-500 text-center">
+          <div className="px-3 py-4 text-sm text-center" style={{ color: theme.ui.textDim }}>
             No files found
           </div>
         ) : (
@@ -255,7 +264,7 @@ export function FileTreePopup({ isOpen, onClose }: FileTreePopupProps) {
       </div>
 
       {/* 底部提示 */}
-      <div className="px-3 py-2 border-t border-gray-700 text-xs text-gray-500">
+      <div className="px-3 py-2 border-t text-xs" style={{ borderColor: theme.ui.border, color: theme.ui.textDim }}>
         Click to expand/open · Esc Close
       </div>
     </div>
