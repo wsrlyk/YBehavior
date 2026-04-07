@@ -101,7 +101,7 @@ function convertTransitionsToEdges(machine: FSMMachine, fsm: { machines: Map<str
                 target: machine.defaultStateId,
                 type: 'straight',
                 animated: false,
-                style: { stroke: '#F6E05E', strokeWidth: 2 },
+                style: { stroke: theme.ui.warning, strokeWidth: 2 },
                 selectable: false,
                 focusable: false,
                 deletable: false,
@@ -638,14 +638,14 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                     nodeColor={(node) => {
                         const data = node.data as FSMStateNodeData;
                         const colors: Record<string, string> = {
-                            Normal: '#4A5568',
-                            Meta: '#553C9A',
-                            Entry: '#276749',
-                            Exit: '#9B2C2C',
-                            Any: '#744210',
-                            Upper: '#2C5282',
+                            Normal: theme.fsmState.Normal?.bg,
+                            Meta: theme.fsmState.Meta?.bg,
+                            Entry: theme.fsmState.Entry?.bg,
+                            Exit: theme.fsmState.Exit?.bg,
+                            Any: theme.fsmState.Any?.bg,
+                            Upper: theme.fsmState.Upper?.bg,
                         };
-                        return colors[data.state.type] || '#666';
+                        return colors[data.state.type] || theme.ui.border;
                     }}
                 />
 
@@ -696,7 +696,7 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                                     <span key={bc.machineId} className="flex items-center gap-1">
                                         {idx > 0 && <span style={{ color: theme.ui.textDim }}>›</span>}
                                         {bc.machineId === machine.id ? (
-                                            <span className="text-white font-medium">{bc.name}</span>
+                                            <span className="font-medium" style={{ color: theme.ui.textMain }}>{bc.name}</span>
                                         ) : (
                                             <button
                                                 onClick={() => navigateToMachine(bc.machineId)}
@@ -717,14 +717,15 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                 <Panel position="top-right" style={{ backgroundColor: theme.ui.panelBg, color: theme.ui.textMain }} className="p-2 rounded shadow-lg flex gap-2">
                     <button
                         onClick={() => handleAddState('Normal')}
-                        className="px-3 py-1 text-sm text-white rounded hover:opacity-80 transition-opacity"
-                        style={{ backgroundColor: theme.ui.border }}
+                        className="px-3 py-1 text-sm rounded transition-opacity"
+                        style={{ backgroundColor: theme.ui.buttonBg, color: theme.ui.textMain }}
                     >
                         + State
                     </button>
                     <button
                         onClick={() => handleAddState('Meta')}
-                        className="px-3 py-1 text-sm bg-purple-700 hover:bg-purple-600 text-white rounded"
+                        className="px-3 py-1 text-sm rounded"
+                        style={{ backgroundColor: theme.ui.accent, color: theme.ui.textMain }}
                     >
                         + Meta
                     </button>
@@ -736,8 +737,10 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                         className="absolute z-50 border rounded shadow-xl py-1 min-w-[120px]"
                     >
                         <button
-                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-blue-600 transition-colors"
+                            className="w-full text-left px-3 py-1.5 text-xs transition-colors"
                             style={{ color: theme.ui.textMain }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.ui.accentSoft; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                             onClick={() => {
                                 setDefaultState(menu.id);
                                 setMenu(null);
@@ -747,7 +750,16 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                         </button>
                         <div className="border-t my-1" style={{ borderColor: theme.ui.border }} />
                         <button
-                            className="w-full text-left px-3 py-1.5 text-xs text-red-400 hover:bg-red-600 hover:text-white transition-colors"
+                            className="w-full text-left px-3 py-1.5 text-xs transition-colors"
+                            style={{ color: theme.ui.danger }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = theme.ui.danger;
+                                e.currentTarget.style.color = theme.ui.textMain;
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                                e.currentTarget.style.color = theme.ui.danger;
+                            }}
                             onClick={() => {
                                 removeState(menu.id);
                                 setMenu(null);
@@ -776,10 +788,12 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                                             }
                                             setPickerData(null);
                                         }}
-                                        className="w-full text-left p-3 rounded-md group transition-colors flex flex-col hover:bg-[#404040]"
+                                        className="w-full text-left p-3 rounded-md group transition-colors flex flex-col"
                                         style={{ color: theme.ui.textMain }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.ui.border; }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                                     >
-                                        <div className="text-sm font-medium group-hover:text-blue-400">{s.name}</div>
+                                        <div className="text-sm font-medium" style={{ color: theme.ui.textMain }}>{s.name}</div>
                                         <div className="text-xs" style={{ color: theme.ui.textDim }}>{s.machineName}</div>
                                     </button>
                                 ))}

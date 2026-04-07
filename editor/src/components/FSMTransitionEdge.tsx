@@ -101,7 +101,7 @@ export default function FSMTransitionEdge({
                 <polygon
                     points={`0,0 -${arrowSize * 1.6},-${arrowSize} -${arrowSize * 1.6},${arrowSize}`}
                     fill={color}
-                    stroke={selected ? '#fff' : 'none'}
+                    stroke={selected ? theme.ui.textMain : 'none'}
                     strokeWidth={1}
                 />
                 {showCount && (
@@ -109,7 +109,7 @@ export default function FSMTransitionEdge({
                         x={textX}
                         y={0}
                         transform={`rotate(${-angle}, ${textX}, 0)`}
-                        fill="white"
+                        fill={theme.ui.textMain}
                         fontSize="11px"
                         fontWeight="bold"
                         textAnchor="middle"
@@ -127,13 +127,13 @@ export default function FSMTransitionEdge({
                         style={{
                             position: 'absolute',
                             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-                            background: '#1a202c',
+                            background: theme.edge.label.bg,
                             padding: '2px 4px',
                             borderRadius: '4px',
                             fontSize: '10px',
-                            color: 'white',
+                            color: theme.edge.label.text,
                             fontWeight: 'bold',
-                            border: '1px solid #4a5568',
+                            border: `1px solid ${theme.edge.label.border}`,
                             pointerEvents: 'all',
                             marginTop: '15px',
                         }}

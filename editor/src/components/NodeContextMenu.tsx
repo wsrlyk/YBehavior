@@ -113,6 +113,11 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
   if (!isOpen || !isLoaded) return null;
 
   const CATEGORY_COLORS = theme.contextMenu.categoryDots;
+  const sectionBg = theme.ui.background;
+  const itemHoverBg = theme.ui.border;
+  const itemText = theme.ui.textMain;
+  const mutedText = theme.ui.textDim;
+  const activeAccent = theme.text.variable;
 
   return (
     <div
@@ -123,45 +128,72 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
     >
       {node && (
         <>
-          <div className="p-1 border-b border-[#404040] bg-[#171717]/50">
-            <div className="px-3 py-1 text-[10px] font-bold text-[#737373] uppercase tracking-wider">Node Actions</div>
+          <div className="p-1 border-b" style={{ borderColor: theme.ui.border, backgroundColor: sectionBg }}>
+            <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: mutedText }}>Node Actions</div>
 
             <div
-              className="px-3 py-2 text-sm text-[#d4d4d4] hover:bg-[#404040] cursor-pointer flex items-center justify-between group"
+              className="px-3 py-2 text-sm cursor-pointer flex items-center justify-between group"
+              style={{ color: itemText }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = itemHoverBg; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
               onClick={() => { toggleConditionConnector(node.id); onClose(); }}
             >
               <span>Condition Connector</span>
-              <span className={`text-[10px] px-1.5 rounded ${node.hasConditionConnector ? 'bg-purple-600 text-white' : 'bg-[#404040] text-[#a3a3a3] group-hover:bg-[#525252]'}`}>
+              <span
+                className="text-[10px] px-1.5 rounded"
+                style={node.hasConditionConnector
+                  ? { backgroundColor: theme.returnType.Invert, color: theme.ui.textMain }
+                  : { backgroundColor: theme.ui.border, color: mutedText }}
+              >
                 {node.hasConditionConnector ? 'ON' : 'OFF'}
               </span>
             </div>
 
             <div
-              className="px-3 py-2 text-sm text-[#d4d4d4] hover:bg-[#404040] cursor-pointer flex items-center justify-between group"
+              className="px-3 py-2 text-sm cursor-pointer flex items-center justify-between group"
+              style={{ color: itemText }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = itemHoverBg; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
               onClick={() => { toggleNodeDisabled(node.id); onClose(); }}
             >
               <span>Node State</span>
-              <span className={`text-[10px] px-1.5 rounded ${node.disabled ? 'bg-red-600 text-white' : 'bg-[#404040] text-[#a3a3a3] group-hover:bg-[#525252]'}`}>
+              <span
+                className="text-[10px] px-1.5 rounded"
+                style={node.disabled
+                  ? { backgroundColor: theme.debug.break.border, color: theme.ui.textMain }
+                  : { backgroundColor: theme.ui.border, color: mutedText }}
+              >
                 {node.disabled ? 'DISABLED' : 'ENABLED'}
               </span>
             </div>
 
             <div
-              className="px-3 py-2 text-sm text-[#d4d4d4] hover:bg-[#404040] cursor-pointer flex items-center justify-between group"
+              className="px-3 py-2 text-sm cursor-pointer flex items-center justify-between group"
+              style={{ color: itemText }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = itemHoverBg; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
               onClick={() => { toggleNodeFold(node.id); onClose(); }}
             >
               <span>Folding</span>
-              <span className={`text-[10px] px-1.5 rounded ${node.isFolded ? 'bg-blue-600 text-white' : 'bg-[#404040] text-[#a3a3a3] group-hover:bg-[#525252]'}`}>
+              <span
+                className="text-[10px] px-1.5 rounded"
+                style={node.isFolded
+                  ? { backgroundColor: activeAccent, color: theme.ui.textMain }
+                  : { backgroundColor: theme.ui.border, color: mutedText }}
+              >
                 {node.isFolded ? 'FOLDED' : 'NORMAL'}
               </span>
             </div>
           </div>
 
-          <div className="p-1 border-b border-[#404040] bg-[#171717]/50">
-            <div className="px-3 py-1 text-[10px] font-bold text-[#737373] uppercase tracking-wider">Debug</div>
+          <div className="p-1 border-b" style={{ borderColor: theme.ui.border, backgroundColor: sectionBg }}>
+            <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: mutedText }}>Debug</div>
 
             <div
-              className="px-3 py-2 text-sm text-[#d4d4d4] hover:bg-[#404040] cursor-pointer flex items-center justify-between group"
+              className="px-3 py-2 text-sm cursor-pointer flex items-center justify-between group"
+              style={{ color: itemText }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = itemHoverBg; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
               onClick={() => {
                 const { activeFilePath } = useEditorStore.getState();
                 if (activeFilePath && node && node.uid !== undefined) {
@@ -174,13 +206,18 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
             >
               <span>Breakpoint</span>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-[#737373]">F9</span>
+                <span className="text-[10px]" style={{ color: mutedText }}>F9</span>
                 {(() => {
                   const { activeFilePath } = useEditorStore.getState();
                   const bpType = activeFilePath && node && node.uid !== undefined ? useDebugStore.getState().getBreakpoint(activeFilePath, node.uid) : BreakpointType.None;
                   const isBp = bpType === BreakpointType.Breakpoint;
                   return (
-                    <span className={`text-[10px] px-1.5 rounded ${isBp ? 'bg-red-600 text-white' : 'bg-[#404040] text-[#a3a3a3] group-hover:bg-[#525252]'}`}>
+                    <span
+                      className="text-[10px] px-1.5 rounded"
+                      style={isBp
+                        ? { backgroundColor: theme.debug.break.border, color: theme.ui.textMain }
+                        : { backgroundColor: theme.ui.border, color: mutedText }}
+                    >
                       {isBp ? 'ON' : 'OFF'}
                     </span>
                   );
@@ -189,7 +226,10 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
             </div>
 
             <div
-              className="px-3 py-2 text-sm text-[#d4d4d4] hover:bg-[#404040] cursor-pointer flex items-center justify-between group"
+              className="px-3 py-2 text-sm cursor-pointer flex items-center justify-between group"
+              style={{ color: itemText }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = itemHoverBg; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
               onClick={() => {
                 const { activeFilePath } = useEditorStore.getState();
                 if (activeFilePath && node && node.uid !== undefined) {
@@ -200,13 +240,18 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
             >
               <span>Logpoint</span>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-[#737373]">F8</span>
+                <span className="text-[10px]" style={{ color: mutedText }}>F8</span>
                 {(() => {
                   const { activeFilePath } = useEditorStore.getState();
                   const bpType = activeFilePath && node && node.uid !== undefined ? useDebugStore.getState().getBreakpoint(activeFilePath, node.uid) : BreakpointType.None;
                   const isLp = bpType === BreakpointType.Logpoint;
                   return (
-                    <span className={`text-[10px] px-1.5 rounded ${isLp ? 'bg-purple-600 text-white' : 'bg-[#404040] text-[#a3a3a3] group-hover:bg-[#525252]'}`}>
+                    <span
+                      className="text-[10px] px-1.5 rounded"
+                      style={isLp
+                        ? { backgroundColor: theme.debug.running.border, color: theme.ui.textMain }
+                        : { backgroundColor: theme.ui.border, color: mutedText }}
+                    >
                       {isLp ? 'ON' : 'OFF'}
                     </span>
                   );
@@ -220,22 +265,27 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
       {/* 搜索框 (如果选了节点，就不显示添加节点内容) */}
       {!node && (
         <>
-          <div className="p-2 border-b border-[#404040]">
-            <div className="px-1 mb-1 text-[10px] font-bold text-[#737373] uppercase tracking-wider">Add Node</div>
+          <div className="p-2 border-b" style={{ borderColor: theme.ui.border }}>
+            <div className="px-1 mb-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: mutedText }}>Add Node</div>
             <input
               ref={inputRef}
               type="text"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               placeholder="Search nodes, pins, descriptions..."
-              className="w-full px-3 py-2 bg-[#171717] border border-[#525252] rounded text-sm text-white placeholder-[#737373] focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 border rounded text-sm focus:outline-none"
+              style={{
+                backgroundColor: theme.ui.inputBg,
+                borderColor: theme.ui.border,
+                color: theme.ui.textMain,
+              }}
             />
           </div>
 
           {/* 节点列表 */}
           <div className="max-h-80 overflow-auto">
             {filteredNodes.length === 0 ? (
-              <div className="px-3 py-4 text-sm text-[#737373] text-center">
+              <div className="px-3 py-4 text-sm text-center" style={{ color: mutedText }}>
                 No nodes found
               </div>
             ) : (
@@ -245,14 +295,15 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
                   onClick={() => handleNodeClick(node.className)}
                   onMouseEnter={() => node.desc && setTooltip(node.desc)}
                   onMouseLeave={() => setTooltip(null)}
-                  className={`px-3 py-2 text-sm cursor-pointer flex items-center gap-2 ${index === selectedIndex
-                    ? 'bg-blue-600 text-white'
-                    : 'text-[#d4d4d4] hover:bg-[#404040]'
-                    }`}
+                  className="px-3 py-2 text-sm cursor-pointer flex items-center gap-2"
+                  style={{
+                    backgroundColor: index === selectedIndex ? activeAccent : 'transparent',
+                    color: itemText,
+                  }}
                 >
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[node.category] || '#888' }} />
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[node.category] || theme.ui.border }} />
                   <span className="flex-1">{node.className}</span>
-                  <span className="text-xs text-gray-500 capitalize">{node.category}</span>
+                  <span className="text-xs capitalize" style={{ color: mutedText }}>{node.category}</span>
                 </div>
               ))
             )}

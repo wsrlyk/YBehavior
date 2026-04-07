@@ -66,6 +66,35 @@ export interface GraphTheme {
         textDim: string;
         inputBg: string;      // Input field background
         gridDots: string;     // Canvas dot pattern
+        accent: string;       // Primary interactive accent
+        accentSoft: string;   // Soft accent background
+        buttonBg: string;     // Neutral button background
+        buttonHoverBg: string;
+        tabBarBg: string;
+        tabActiveBg: string;
+        tabInactiveBg: string;
+        tabActiveText: string;
+        tabInactiveText: string;
+        tabBorder: string;
+        splitterHover: string;
+        terminalBg: string;
+        terminalText: string;
+        terminalHeaderBg: string;
+        terminalInputBg: string;
+        terminalBorder: string;
+        terminalButtonBg: string;
+        terminalButtonText: string;
+        terminalTimestamp: string;
+        terminalLogInfo: string;
+        terminalLogSuccess: string;
+        terminalLogWarn: string;
+        terminalLogError: string;
+        terminalLogPurple: string;
+        terminalLogOrange: string;
+        terminalLogDim: string;
+        success: string;
+        danger: string;
+        warning: string;
     };
 }
 
@@ -75,132 +104,160 @@ export const DefaultTheme: GraphTheme = {
     // --- BT Node Categories ---
     // --- BT Node Categories ---
     node: {
-        composite: '#4F7F55',   // Muted Forest Green
-        decorator: '#525252',   // Neutral-600
-        action: '#A0734A',   // Muted Bronze
-        condition: '#6B4D78',   // Muted Plum
-        default: '#525252',  // Neutral-600 (was #555555)
+        composite: '#9F9F9F',
+        decorator: '#9F9F9F',
+        action: '#B9A07D',
+        condition: '#A58DA8',
+        default: '#9F9F9F',
     },
 
     // --- Pin Dot Colors ---
     pin: {
-        int: '#6B8EAD',   // Steel Blue
-        float: '#759E6B',   // Moss Green
-        bool: '#B55C5C',   // Brick Red
-        string: '#BFA0C4',   // Mauve
-        vector3: '#BDB066',   // Ochre
-        entity: '#66BDBD',   // Teal
-        ulong: '#8888B5',   // Slate
-        enum: '#BA8B5D',   // Leather
-        default: '#777777',
+        int: '#A35F1E',
+        float: '#5F8A2F',
+        bool: '#C23A3A',
+        string: '#6A46B8',
+        vector3: '#B38A1E',
+        entity: '#6C7E2E',
+        ulong: '#5550AE',
+        enum: '#B26524',
+        default: '#6F6F6F',
     },
 
     // --- Text Colors (hex) ---
     text: {
-        pinName: '#9ca3af',   // gray-400
-        variable: '#89b4fa',   // Catppuccin Blue (soft)
-        constant: '#9ca3af',   // gray-400
+        pinName: '#2F2F2F',
+        variable: '#2F2F2F',
+        constant: '#2F2F2F',
         typeColors: {
-            int: '#6B8EAD',
-            float: '#759E6B',
-            bool: '#B55C5C',
-            string: '#BFA0C4',
-            vector3: '#BDB066',
-            entity: '#66BDBD',
-            ulong: '#8888B5',
-            enum: '#BA8B5D',
+            int: '#8A4D14',
+            float: '#3F6D1F',
+            bool: '#A62222',
+            string: '#4F3192',
+            vector3: '#8A6A13',
+            entity: '#4E6120',
+            ulong: '#3E3A8A',
+            enum: '#8A4F1D',
         },
     },
 
     // --- Edge Colors ---
     edge: {
         tree: {
-            default: '#737373',  // Neutral-500 (was #6b7280 which is Gray-500/Cool)
-            selected: '#ffffff',
+            default: '#8B8B8B',
+            selected: '#1D1D1D',
         },
         data: {
-            default: '#7AABDE',  // Softer blue (was #60a5fa)
-            selected: '#ffffff',
+            default: '#7A7A7A',
+            selected: '#1D1D1D',
         },
         fsmTransition: {
-            default: '#737373',  // Neutral-500 (was #718096 Slate-500)
-            selected: '#7AABDE',  // Keep blue for selection
+            default: '#8B8B8B',
+            selected: '#6A6A6A',
         },
         label: {
-            bg: '#404040',    // Neutral-700 (was #374151 Gray-700)
-            border: '#525252',// Neutral-600 (was #4b5563 Gray-600)
-            text: '#e5e5e5',  // Neutral-200 (was #e5e7eb Gray-200)
+            bg: '#D6D6D6',
+            border: '#9A9A9A',
+            text: '#111111',
         },
     },
 
     // --- FSM State Colors ---
     fsmState: {
-        Normal: { bg: '#404040', border: '#737373' }, // Neutral-700 / Neutral-500
-        Meta: { bg: '#553C9A', border: '#805AD5' },
-        Entry: { bg: '#276749', border: '#48BB78' },
-        Exit: { bg: '#9B2C2C', border: '#FC8181' },
-        Any: { bg: '#744210', border: '#D69E2E' },
-        Upper: { bg: '#1E3A8A', border: '#3B82F6' }, // Dark Blue / Blue
+        Normal: { bg: '#B9B9B9', border: '#888888' },
+        Meta: { bg: '#B2A9B6', border: '#7F6D86' },
+        Entry: { bg: '#B6B7A9', border: '#7E7F6F' },
+        Exit: { bg: '#C4A4A4', border: '#8F6666' },
+        Any: { bg: '#C1B59D', border: '#8D7B5C' },
+        Upper: { bg: '#B7B0A6', border: '#857A6F' },
     },
 
     // --- Debug Colors ---
     debug: {
         success: {
-            border: '#4ade80',
-            glow: '0 0 12px rgba(74, 222, 128, 0.5)',
-            edge: '#4ade80',
+            border: '#5D8F5D',
+            glow: '0 0 10px rgba(93, 143, 93, 0.45)',
+            edge: '#5D8F5D',
         },
         failure: {
-            border: '#60a5fa',
-            glow: '0 0 12px rgba(96, 165, 250, 0.5)',
-            edge: '#60a5fa',
+            border: '#8A6A6A',
+            glow: '0 0 10px rgba(138, 106, 106, 0.45)',
+            edge: '#8A6A6A',
         },
         running: {
-            border: '#f472b6',
-            glow: '0 0 12px rgba(244, 114, 182, 0.5)',
-            edge: '#f472b6',
+            border: '#9A6B8F',
+            glow: '0 0 10px rgba(154, 107, 143, 0.45)',
+            edge: '#9A6B8F',
         },
         break: {
-            border: '#ef4444',
-            glow: '0 0 12px rgba(239, 68, 68, 0.5)',
-            edge: '#ef4444',
+            border: '#AA5A5A',
+            glow: '0 0 10px rgba(170, 90, 90, 0.45)',
+            edge: '#AA5A5A',
         },
     },
 
     // --- Context Menu ---
     contextMenu: {
         categoryDots: {
-            composite: '#4F7F55',
-            decorator: '#525252', // Neutral-600
-            action: '#A0734A',
-            condition: '#6B4D78',
+            composite: '#8A9A7A',
+            decorator: '#8F8F8F',
+            action: '#A98663',
+            condition: '#9676A1',
         },
     },
 
     // --- ReturnType Colors ---
     returnType: {
-        Invert: '#c05621',  // Muted Orange (was bg-orange-500)
-        Success: '#2f855a', // Muted Green (was bg-green-600)
-        Failure: '#c53030', // Muted Red (was bg-red-600)
+        Invert: '#8F6A3F',
+        Success: '#5D8F5D',
+        Failure: '#9A4A4A',
     },
 
     // --- Comment Colors ---
-    // Low saturation warm tones to blend with dark neutral theme
     comment: {
-        bg: '#25221b',      // Very dark warm gray (was #422006)
-        border: '#454030',  // Muted olive/gold (was #ca8a04)
-        text: '#d1cdc4',    // Muted beige (was #fef3c7)
+        bg: '#D8D2C2',
+        border: '#9F9481',
+        text: '#2B2B2B',
     },
 
     // --- UI Chrome ---
     ui: {
-        background: '#171717',    // Neutral-900 (Main Canvas)
-        panelBg: '#262626',       // Neutral-800 (Panels)
-        border: '#404040',        // Neutral-700 (Borders)
-        textMain: '#e5e5e5',      // Neutral-200
-        textDim: '#a3a3a3',       // Neutral-400
-        inputBg: '#171717',       // Neutral-900 (Inputs)
-        gridDots: '#404040',      // Neutral-700 (Dots)
+        background: '#747474',
+        panelBg: '#C8C8C8',
+        border: '#6E6E6E',
+        textMain: '#0A0A0A',
+        textDim: '#2F2F2F',
+        inputBg: '#F7F7F7',
+        gridDots: '#8A8A8A',
+        accent: '#696969',
+        accentSoft: '#DADADA',
+        buttonBg: '#E3E3E3',
+        buttonHoverBg: '#EFEFEF',
+        tabBarBg: '#7F7F7F',
+        tabActiveBg: '#ACACAC',
+        tabInactiveBg: '#7F7F7F',
+        tabActiveText: '#111111',
+        tabInactiveText: '#F2F2F2',
+        tabBorder: '#8A8A8A',
+        splitterHover: '#696969',
+        terminalBg: '#121212',
+        terminalText: '#F5F5F5',
+        terminalHeaderBg: '#2A2A2A',
+        terminalInputBg: '#222222',
+        terminalBorder: '#4A4A4A',
+        terminalButtonBg: '#3A3A3A',
+        terminalButtonText: '#FFFFFF',
+        terminalTimestamp: '#D0D0D0',
+        terminalLogInfo: '#F5F5F5',
+        terminalLogSuccess: '#6DFF7A',
+        terminalLogWarn: '#FFD84D',
+        terminalLogError: '#FF6B6B',
+        terminalLogPurple: '#C77DFF',
+        terminalLogOrange: '#FFB454',
+        terminalLogDim: '#E6E6E6',
+        success: '#6DA56B',
+        danger: '#C56A6A',
+        warning: '#9E7537',
     },
 };
 
@@ -215,4 +272,87 @@ export function getTheme(): GraphTheme {
 
 export function setTheme(theme: GraphTheme) {
     activeTheme = theme;
+}
+
+export function applyThemeCssVariables(theme: GraphTheme = activeTheme) {
+    if (typeof document === 'undefined') return;
+
+    const root = document.documentElement;
+
+    const vars: Record<string, string> = {
+        '--tb-ui-background': theme.ui.background,
+        '--tb-ui-panel': theme.ui.panelBg,
+        '--tb-ui-border': theme.ui.border,
+        '--tb-ui-text-main': theme.ui.textMain,
+        '--tb-ui-text-dim': theme.ui.textDim,
+        '--tb-ui-input': theme.ui.inputBg,
+        '--tb-ui-grid': theme.ui.gridDots,
+        '--tb-ui-accent': theme.ui.accent,
+        '--tb-ui-accent-soft': theme.ui.accentSoft,
+        '--tb-ui-button': theme.ui.buttonBg,
+        '--tb-ui-button-hover': theme.ui.buttonHoverBg,
+        '--tb-ui-splitter-hover': theme.ui.splitterHover,
+        '--tb-ui-terminal': theme.ui.terminalBg,
+        '--tb-ui-success': theme.ui.success,
+        '--tb-ui-danger': theme.ui.danger,
+        '--tb-ui-warning': theme.ui.warning,
+
+        '--tb-color-gray-50': '#f7f7f7',
+        '--tb-color-gray-100': '#ececec',
+        '--tb-color-gray-200': theme.ui.inputBg,
+        '--tb-color-gray-300': theme.ui.panelBg,
+        '--tb-color-gray-400': '#A6A6A6',
+        '--tb-color-gray-500': theme.ui.border,
+        '--tb-color-gray-600': theme.ui.background,
+        '--tb-color-gray-700': '#D0D0D0',
+        '--tb-color-gray-750': '#C4C4C4',
+        '--tb-color-gray-800': '#B8B8B8',
+        '--tb-color-gray-900': '#ACACAC',
+
+        '--tb-color-blue-300': theme.ui.accentSoft,
+        '--tb-color-blue-200': theme.ui.accentSoft,
+        '--tb-color-blue-400': theme.ui.accent,
+        '--tb-color-blue-500': theme.ui.accent,
+        '--tb-color-blue-600': theme.ui.accent,
+        '--tb-color-blue-700': theme.ui.accent,
+        '--tb-color-blue-900': theme.ui.accent,
+        '--tb-color-green-100': theme.ui.success,
+        '--tb-color-green-300': theme.ui.success,
+        '--tb-color-green-400': theme.ui.success,
+        '--tb-color-green-500': theme.ui.success,
+        '--tb-color-green-600': theme.ui.success,
+        '--tb-color-green-700': theme.ui.success,
+        '--tb-color-red-200': theme.ui.danger,
+        '--tb-color-red-300': theme.ui.danger,
+        '--tb-color-red-400': theme.ui.danger,
+        '--tb-color-red-500': theme.ui.danger,
+        '--tb-color-red-600': theme.ui.danger,
+        '--tb-color-red-700': theme.ui.danger,
+        '--tb-color-red-800': theme.ui.danger,
+        '--tb-color-red-900': theme.ui.danger,
+        '--tb-color-yellow-300': theme.ui.warning,
+        '--tb-color-yellow-400': theme.ui.warning,
+        '--tb-color-yellow-500': theme.ui.warning,
+        '--tb-color-yellow-600': theme.ui.warning,
+        '--tb-color-yellow-700': theme.ui.warning,
+        '--tb-color-purple-300': '#9676A1',
+        '--tb-color-purple-500': '#9676A1',
+        '--tb-color-purple-600': '#9676A1',
+        '--tb-color-purple-700': '#9676A1',
+        '--tb-color-purple-900': '#9676A1',
+        '--tb-color-orange-500': '#A98663',
+        '--tb-color-orange-600': '#A98663',
+        '--tb-color-orange-700': '#A98663',
+        '--tb-color-orange-900': '#A98663',
+        '--tb-color-orange-300': '#A98663',
+        '--tb-color-pink-300': '#A58DA8',
+        '--tb-color-pink-500': '#A58DA8',
+        '--tb-color-cyan-500': theme.ui.accent,
+        '--tb-color-black': theme.ui.background,
+        '--tb-color-white': '#FFFFFF',
+    };
+
+    Object.entries(vars).forEach(([key, value]) => {
+        root.style.setProperty(key, value);
+    });
 }

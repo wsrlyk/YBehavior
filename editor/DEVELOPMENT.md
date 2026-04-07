@@ -534,3 +534,154 @@ npm run tauri build    # 打包（输出到 src-tauri/target/release/）
 - 在节点标题下方增加 `Note` 显示区域。
 - 支持 `Note` 中的 `{index}` 占位符按 Pin 序号替换为对应 Pin 当前值（常量/变量名/向量下标），禁用 Pin 替换为空。
 - 修改文件：`src/components/CustomNode.tsx`。
+
+### 2026-04-03 编辑器视觉改造（经典灰色工业风）
+
+- 目标：将新版 Tauri 编辑器视觉风格向旧版 WPF 编辑器靠拢，采用“深灰画布 + 浅灰面板 + 黑色文字 + 低饱和强调色”的经典工具风格。
+- 主题色板重做：统一调整节点类别色、Pin 类型色、边颜色、FSM 状态色、调试高亮色、注释色与 UI chrome 色。
+- 全局样式调整：主字体改为 `Tahoma/Verdana/Segoe UI`，ReactFlow Controls 与 MiniMap 改为浅灰边框和浅底按钮风格。
+- 主窗口样式调整：工具栏、按钮、下拉菜单、分割条、底部 terminal 容器统一灰色体系；分割条 hover 强调色调整为青蓝色。
+- 验证：执行 `npm run build` 通过（`tsc && vite build`）。
+- 修改文件：`src/theme/theme.ts`、`src/App.css`、`src/windows/MainWindow.tsx`。
+
+### 2026-04-03 节点标题可读性与节点颜色主题化（续）
+
+- 行为树节点：标题栏文字改为深色，解决浅色标题栏下白字不清晰问题。
+- `CustomNode`：清理硬编码颜色（白色标题字、白色选中框、紫色 IF 连接器、灰色 handle、断点点颜色等），统一改为主题引用。
+- `NodeContextMenu`：节点动作/调试区域的硬编码颜色改为主题引用，状态胶囊与选中项使用主题色。
+- `FSMStateNode`：标题、树引用条、Meta 提示条、连接点等硬编码颜色改为主题引用，保持与全局灰色风格一致。
+- 验证：执行 `npm run build` 通过（`tsc && vite build`）。
+- 修改文件：`src/components/CustomNode.tsx`、`src/components/NodeContextMenu.tsx`、`src/components/FSMStateNode.tsx`。
+
+### 2026-04-03 全量主题化改造（主题商店准备）
+
+- 目标：将编辑器 UI 颜色能力从“组件内写死”升级为“主题变量驱动”，为后续主题商店/运行时切换打基础。
+- 主题系统扩展：`GraphTheme.ui` 增补交互色与状态色（`accent/accentSoft/buttonBg/buttonHoverBg/splitterHover/terminalBg/success/danger/warning`）。
+- 运行时主题注入：新增 `applyThemeCssVariables()`，统一把主题值写入 CSS Variables（`--tb-ui-*` + `--tb-color-*`）。
+- 应用启动接入：`App` 启动时应用主题变量，保证 Tailwind 颜色 utility（如 `text-gray-*`、`bg-blue-*`、`ring-red-*`）也受主题控制。
+- Tailwind token 映射：`App.css` 的 `@theme` 改为引用 `--tb-color-*`，并补齐项目中使用到的常见色阶（gray/blue/green/red/yellow/purple/orange/pink/cyan/black/white）。
+- 组件去硬编码：清理 `MainWindow`、`Sidebar`、`TreeEdge`、`PropertiesPanel`、`FSMEditor`、`FSMTransitionEdge`、`DebugToolbar` 中十六进制/固定色值，改为主题 token 或主题映射 utility class。
+- 校验：全局检索 `src` 中 `tsx/ts/css` 的十六进制颜色（排除主题定义文件）已清零；执行 `npm run build` 通过。
+- 修改文件：`src/theme/theme.ts`、`src/App.tsx`、`src/App.css`、`src/windows/MainWindow.tsx`、`src/components/Sidebar.tsx`、`src/components/TreeEdge.tsx`、`src/components/PropertiesPanel.tsx`、`src/components/FSMEditor.tsx`、`src/components/FSMTransitionEdge.tsx`、`src/components/DebugToolbar.tsx`。
+
+### 2026-04-03 属性面板残余深色修正
+
+- 问题：`PropertiesPanel` 仍有大量 `bg-gray-900/800/700` 等 utility class，导致视觉仍偏深色。
+- 处理：将运行时 `--tb-color-gray-*` token 改为浅灰映射（基于 `theme.ui`），让遗留 gray utility class 自动跟随浅色主题。
+- 修复：移除主题变量注入中的重复 key（`--tb-color-gray-750`）并通过构建校验。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/theme/theme.ts`。
+
+### 2026-04-07 亮色主题可读性增强（类型色/白底/输入框）
+
+- 背景：用户反馈亮色主题下类型颜色不明显，`TRUE/FALSE` 无颜色，输入框底色偏灰。
+- 处理：
+  - 类型色增强：恢复并提升 `theme.pin` 与 `theme.text.typeColors` 的饱和度（避开青绿色），增强类型区分。
+  - 类型白底：`PropertiesPanel` 的 `AdaptiveSelect`（含禁用态）增加白底+边框，让彩色类型字在浅灰面板上更清楚。
+  - bool 状态色：变量区与引脚区 `TRUE/FALSE` 按钮恢复为绿/红状态色。
+  - 输入框提白：`theme.ui.inputBg` 提升到更白，并在 `App.css` 对 `input/select/textarea` 统一应用 `--tb-ui-input` 背景。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/theme/theme.ts`、`src/components/PropertiesPanel.tsx`、`src/App.css`。
+
+### 2026-04-07 终端与通知颜色硬编码清理（主题化）
+
+- 背景：用户指出终端改色过程中出现硬编码颜色，要求统一排查并改为主题驱动。
+- 处理：
+  - 全局扫描：检索 `src`（排除 `theme.ts`）中的十六进制色值，定位残留集中在 `Terminal.tsx`、`Sidebar.tsx`、`NotificationBubble.tsx`。
+  - 主题扩展：在 `theme.ui` 增加终端专用 token（`terminalText/header/input/border/button/timestamp/log-*`），统一由主题配置提供。
+  - 组件替换：
+    - `Terminal.tsx` 全部硬编码十六进制改为 `theme.ui.terminal*`；保留日志分段颜色映射但映射目标改为主题 token。
+    - `Sidebar.tsx` 选中文件名白色由硬编码改为主题 token（`theme.ui.terminalButtonText`）。
+    - `NotificationBubble.tsx` warning 文字色由硬编码改为 `theme.ui.textMain`。
+- 结果：`src` 非主题文件中的十六进制硬编码颜色扫描结果为 0。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/theme/theme.ts`、`src/components/Terminal.tsx`、`src/components/Sidebar.tsx`、`src/components/NotificationBubble.tsx`。
+
+### 2026-04-03 中性灰回调 + bool 对比度修复
+
+- 背景：用户反馈“太暖了，要严格中性灰”，并指出 `bool` 文本不清晰。
+- 处理：
+  - 严格中性灰：`theme.ts` 中最近一轮偏暖改动回调为纯中性灰（`pin`、`text.typeColors`、`gray-50/100/400/700/750/800/900`）。
+  - bool 可读性：`PropertiesPanel` 中变量区与引脚区的 `TRUE/FALSE` 按钮从红绿样式改为灰阶高对比（深灰底白字 / 浅灰底深字+边框）。
+  - bool 类型字重色：`typeColors.bool` 统一为更深中性灰（`#1F1F1F`），避免浅底下发灰发虚。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/theme/theme.ts`、`src/components/PropertiesPanel.tsx`。
+
+### 2026-04-03 偏青观感二次修正（偏暖中性灰）
+
+- 背景：用户反馈“还是青青的感觉”，截图中主要体现在大面积灰底与节点/类型辅助色的整体观感偏冷。
+- 处理：
+  - 主题灰阶映射：`applyThemeCssVariables` 中 `--tb-color-gray-50/100/400/700/750/800/900` 调整为偏暖中性灰，避免蓝灰底色。
+  - 类型与引脚色：`pin` 与 `text.typeColors` 中 `int/entity/ulong` 等偏蓝青项改为棕灰/橄榄灰/暖紫灰系，保留区分但去青色。
+  - FSM 色块去青：`fsmState.Entry` 与 `fsmState.Upper` 从绿青/蓝灰调整为暖灰土色。
+  - 节点主色微调：`node.composite` 从偏绿灰改为暖灰。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/theme/theme.ts`。
+
+### 2026-04-03 青绿色残留专项排查（截图反馈）
+
+- 背景：用户反馈界面仍有青绿色残留（重点在工具栏/文件树弹窗/输入框焦点与选中态）。
+- 处理：
+  - 交互态去蓝化：`TreeFilePicker`、`FileTreePopup`、`DebugToolbar`、`GlobalSearch`、`FSMPropertiesPanel`、`PropertiesPanel` 的 `blue-*` 焦点/hover/选中样式统一改为灰色系。
+  - 视觉杂色清理：`MainWindow` 更新水印、`NotificationBubble` info 态、`DEBUG_COLORS/DEBUG_RINGS` 中 failure 态、`debugStore` 的 failure 文本色去除蓝青色。
+  - 主题中和：进一步把 `theme.ui`（`panelBg/inputBg/button/accent/splitter`）调整为更中性的工业灰；`edge.data` 与 `fsmTransition.selected` 从偏蓝改为中灰。
+  - 回退链路修正：`App.css` 中 `--tb-ui-accent`/`accent-soft`/`splitter-hover` 的 root fallback 从 `--color-blue-*` 改为 `--color-gray-*`，避免变量注入失败时回落到蓝色。
+- 结果：全局 `blue/cyan/teal` 检索仅剩 `App.css/theme.ts` 的 token 名称映射（非实际蓝青色值）；组件层已无蓝青交互类。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/components/TreeFilePicker.tsx`、`src/components/FileTreePopup.tsx`、`src/components/DebugToolbar.tsx`、`src/components/GlobalSearch.tsx`、`src/components/FSMPropertiesPanel.tsx`、`src/components/PropertiesPanel.tsx`、`src/components/NotificationBubble.tsx`、`src/windows/MainWindow.tsx`、`src/config/constants.ts`、`src/stores/debugStore.ts`、`src/App.css`、`src/theme/theme.ts`。
+
+### 2026-04-03 悬停提示统一修复 + 去青绿色回调
+
+- 背景：用户要求移除青绿色，仅保留中性高对比；并修正引脚悬停语义（引脚名显示注释、引脚值显示值），同时统一清理黑底白字原生 Tooltip。
+- 处理：
+  - 主题回调：`theme.ui.accent/accentSoft/splitterHover` 从青蓝改为中性工业灰蓝，保留层次但去掉青绿色观感。
+  - Pin 语义修复：`PropertiesPanel` 与 `CustomNode` 的引脚名悬停统一显示 `pin.desc`；值区域悬停显示完整值（长值可查看）。
+  - Tooltip 统一：全局清理 `src` 内所有 `title=`（扫描结果由 24 处降到 0），改为 `useTooltipStore` 或直接移除。
+- 覆盖文件：`MainWindow`、`DebugToolbar`、`TreeFilePicker`、`RunningList`、`FileTreePopup`、`FSMStateNode`、`FSMPropertiesPanel`、`GlobalSearch`、`PropertiesPanel`、`CustomNode`。
+- 验证：执行 `npm run build` 通过。
+
+### 2026-04-03 可读性热修（文字对比度）
+
+- 问题：浅灰背景下，遗留 `text-gray-300/400/500/600` 在多个面板中对比度不足，文字不清晰。
+- 处理：在 `App.css` 增加对这些 utility class 的统一对比度覆盖，全部映射到 `--tb-ui-text-main` / `--tb-ui-text-dim`。
+- 结果：不改结构、不改功能，仅提升文字可读性，尤其是右侧属性区和文件树弹层。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/App.css`。
+
+### 2026-04-03 可读性二次修复（截图反馈）
+
+- 问题：`Open Files`、`VARIABLES/INTERFACE`、`State Properties` 与节点 Tooltip 仍存在低对比文字。
+- 处理：
+  - `Sidebar` 标题/列表文字统一提升为 `theme.ui.textMain`，并将背景恢复为 `theme.ui.panelBg` 提高前景对比。
+  - `Tooltip` 改为显式主题样式（`panelBg/border/textMain`），不再依赖灰阶 utility 组合。
+  - `App.css` 扩展全局对比度覆盖：`text-gray-100~600` 统一映射到高对比文本色，并提升 placeholder 可见性。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/components/Sidebar.tsx`、`src/components/Tooltip.tsx`、`src/App.css`。
+
+### 2026-04-03 可读性三次修复（原生 Tooltip + 引脚参数）
+
+- 问题：文件项与引脚名悬停仍触发浏览器原生 `title` 提示（黑底白字）；`Node Properties` 中引脚 `int`/`[]` 参数对比度不足。
+- 处理：
+  - `SidebarItem`：移除 `title`，改用 `useTooltipStore` 驱动自定义 Tooltip，避免原生黑底白字。
+  - `PinEditor`：移除引脚名 `title`，改用主题 Tooltip；提高方向标识与数组标记可读性（`in/out`、`[]` 字重/透明度）。
+  - 主题增强：`theme.text.typeColors.int` 从 `#3F6F8F` 调整为 `#1F5C7A`，提升 `Int` 标签和相关标记对比度。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/components/Sidebar.tsx`、`src/components/PropertiesPanel.tsx`、`src/theme/theme.ts`。
+
+### 2026-04-03 类型颜色统一高对比调整
+
+- 背景：用户反馈 `int` 只是示例，`enum` 等其它类型在浅色面板中同样不清晰。
+- 处理：统一调整 `theme.text.typeColors` 全类型文本色（`int/float/bool/string/vector3/entity/ulong/enum`），整体加深并保持类型区分。
+- 结果：`PropertiesPanel`/`PinEditor` 中类型标签与 `[]` 计数标记可读性同步提升，不再只优化单一类型。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/theme/theme.ts`。
+
+### 2026-04-03 旧编辑器风格回调（整体去灰）
+
+- 背景：用户反馈“整体太灰看不清”，要求参考旧编辑器配色层次。
+- 处理：
+  - 统一调整 `DefaultTheme.ui`：加深主背景、提亮面板与输入框、加深主文字/次文字，提升前后景分离度。
+  - 强化工业风蓝青点缀：调整 `accent/accentSoft/button` 等交互色，减少纯灰雾感。
+  - 同步重设 `--tb-color-gray-*` 映射，让遗留 `bg-gray-*`/`border-gray-*` 在不重写组件的前提下自动获得更清晰层次。
+- 验证：执行 `npm run build` 通过。
+- 修改文件：`src/theme/theme.ts`。

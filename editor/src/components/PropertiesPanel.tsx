@@ -18,16 +18,21 @@ const theme = getTheme();
 const TYPE_COLORS: Record<ValueType, string> = (() => {
   const tc = theme.text.typeColors;
   return {
-    int: tc.int || '#6B8EAD',
-    float: tc.float || '#759E6B',
-    bool: tc.bool || '#B55C5C',
-    string: tc.string || '#BFA0C4',
-    vector3: tc.vector3 || '#BDB066',
-    entity: tc.entity || '#66BDBD',
-    ulong: tc.ulong || '#8888B5',
-    enum: tc.enum || '#BA8B5D',
+    int: tc.int || theme.ui.accent,
+    float: tc.float || theme.ui.success,
+    bool: tc.bool || theme.ui.danger,
+    string: tc.string || theme.ui.warning,
+    vector3: tc.vector3 || theme.ui.warning,
+    entity: tc.entity || theme.ui.accent,
+    ulong: tc.ulong || theme.ui.textDim,
+    enum: tc.enum || theme.ui.warning,
   };
 })();
+
+function resolveTypeColor(valueType: string): string {
+  const normalized = valueType.toLowerCase() as ValueType;
+  return TYPE_COLORS[normalized] || TYPE_COLORS[valueType as ValueType] || theme.ui.textDim;
+}
 
 const VALUE_TYPES: ValueType[] = ['int', 'float', 'bool', 'string', 'vector3', 'entity', 'ulong'];
 
@@ -86,24 +91,23 @@ function AdaptiveSelect({ value, options, onChange, renderLabel, getOptionColor,
     <div className={`relative inline-block align-middle ${containerClassName || ''}`} ref={containerRef}>
       {/* Trigger */}
       <span
-        className={`${baseClassName} cursor-pointer hover:bg-[#404040] px-0.5 rounded transition-colors select-none whitespace-nowrap inline-block`}
+        className={`${baseClassName} cursor-pointer hover:bg-gray-700 px-0.5 rounded transition-colors select-none whitespace-nowrap inline-block`}
         style={{ color: triggerColor }}
         onClick={() => setIsOpen(!isOpen)}
-        title="Click to change"
       >
         {displayValue}
       </span>
 
       {/* Custom Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 z-50 bg-[#262626] border border-[#525252] rounded shadow-xl py-1 min-w-[80px] max-h-60 overflow-y-auto">
+        <div className="absolute top-full left-0 mt-1 z-50 bg-gray-800 border border-gray-600 rounded shadow-xl py-1 min-w-[80px] max-h-60 overflow-y-auto">
           {options.map(opt => {
-            const optColor = getOptionColor ? getOptionColor(opt) : '#d1d5db';
+            const optColor = getOptionColor ? getOptionColor(opt) : theme.ui.textMain;
             const optLabel = renderLabel ? renderLabel(opt) : (opt.charAt(0).toUpperCase() + opt.slice(1));
             return (
               <div
                 key={opt}
-                className={`${baseClassName} px-2 py-1.5 hover:bg-[#404040] cursor-pointer whitespace-nowrap flex items-center`}
+                className={`${baseClassName} px-2 py-1.5 hover:bg-gray-700 cursor-pointer whitespace-nowrap flex items-center`}
                 style={{ color: optColor }}
                 onClick={() => {
                   onChange(opt);
@@ -128,7 +132,7 @@ type VarAction = 'none' | 'renaming' | 'toggling' | 'deleting';
 function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingNames, debugValue, isChanged, isPaused }: VariableItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(variable.defaultValue);
-  const colorClass = TYPE_COLORS[variable.valueType] || '#9ca3af';
+  const colorClass = resolveTypeColor(variable.valueType);
   const isArray = variable.countType === 'list';
   const notify = useNotificationStore(state => state.notify);
 
@@ -210,12 +214,10 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
           <button
             onClick={() => { onToggleScope(variable.name); setAction('none'); }}
             className="text-green-400 hover:text-green-300 px-1 py-0.5 text-[10px]"
-            title="Confirm"
           >✓</button>
           <button
             onClick={() => setAction('none')}
             className="text-gray-500 hover:text-gray-300 px-1 py-0.5 text-[10px]"
-            title="Cancel"
           >✕</button>
         </div>
       );
@@ -227,12 +229,10 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
           <button
             onClick={() => onDelete(variable.name)}
             className="text-green-400 hover:text-green-300 px-1 py-0.5 text-[10px]"
-            title="Confirm Delete"
           >✓</button>
           <button
             onClick={() => setAction('none')}
             className="text-gray-500 hover:text-gray-300 px-1 py-0.5 text-[10px]"
-            title="Cancel"
           >✕</button>
         </div>
       );
@@ -241,19 +241,16 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
     return (
       <div className="absolute left-full top-1/2 -translate-y-1/2 ml-1 flex items-center bg-gray-800 shadow-md border border-gray-700 rounded px-1 py-0.5 opacity-0 group-hover/name:opacity-100 transition-opacity z-10 pointer-events-none group-hover/name:pointer-events-auto before:content-[''] before:absolute before:right-full before:top-0 before:bottom-0 before:w-2">
         <button
-          className="text-gray-400 hover:text-blue-400 text-[10px] px-1 transition-colors"
+          className="text-gray-400 hover:text-gray-300 text-[10px] px-1 transition-colors"
           onClick={(e) => { e.stopPropagation(); handleStartRename(); }}
-          title="Rename variable"
         >✎</button>
         <button
           className="text-gray-400 hover:text-yellow-400 text-[10px] px-1 transition-colors border-l border-gray-700 ml-1 pl-1"
           onClick={(e) => { e.stopPropagation(); setAction('toggling'); }}
-          title={variable.isLocal ? 'Move to Shared' : 'Move to Local'}
         >{variable.isLocal ? '↑' : '↓'}</button>
         <button
           className="text-gray-400 hover:text-red-400 text-[10px] px-1 transition-colors border-l border-gray-700 ml-1 pl-1"
           onClick={(e) => { e.stopPropagation(); setAction('deleting'); }}
-          title="Delete variable"
         >✕</button>
       </div>
     );
@@ -262,7 +259,7 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
   return (
     <div
       id={`variable-${variable.name}`}
-      className={`px-2 py-1 text-sm rounded group transition-all duration-300 relative ${isFocused ? 'ring-2 ring-blue-500 shadow-lg shadow-blue-500/20 animate-pulse-subtle' : ''
+      className={`px-2 py-1 text-sm rounded group transition-all duration-300 relative ${isFocused ? 'ring-2 ring-gray-500 shadow-lg shadow-gray-500/20 animate-pulse-subtle' : ''
         }`}
       style={{ backgroundColor: theme.ui.panelBg }}
     >
@@ -280,14 +277,13 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
           onChange={(val) => handleTypeChange(val as ValueType)}
           baseClassName="text-xs"
           triggerColor={colorClass}
-          getOptionColor={(opt: string) => TYPE_COLORS[opt as ValueType] || '#d1d5db'}
+          getOptionColor={(opt: string) => resolveTypeColor(opt)}
         />
 
         <button
-          className="text-xs hover:bg-[#404040] text-center px-0.5 rounded transition-colors min-w-[14px] flex-shrink-0"
+          className="text-xs hover:bg-gray-700 text-center px-0.5 rounded transition-colors min-w-[14px] flex-shrink-0"
           style={{ color: colorClass }}
           onClick={handleCountTypeToggle}
-          title={isArray ? 'Switch to scalar' : 'Switch to array'}
         >
           {isArray ? '[]' : '·'}
         </button>
@@ -295,23 +291,22 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
         {action === 'renaming' ? (
           <div className="flex items-center flex-1 min-w-0 gap-1">
             <input
-              className="flex-1 min-w-0 text-xs text-gray-200 px-1 py-0.5 rounded outline-none border border-blue-500"
+              className="flex-1 min-w-0 text-xs text-gray-200 px-1 py-0.5 rounded outline-none border border-gray-500"
               style={{ backgroundColor: theme.ui.border }}
               value={renameName}
               onChange={(e) => setRenameName(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmRename(); if (e.key === 'Escape') setAction('none'); }}
               autoFocus
             />
-            <button onClick={handleConfirmRename} className="text-green-400 hover:text-green-300 text-[10px] px-0.5 flex-shrink-0" title="Confirm">✓</button>
-            <button onClick={() => setAction('none')} className="text-gray-500 hover:text-gray-300 text-[10px] px-0.5 flex-shrink-0" title="Cancel">✕</button>
+            <button onClick={handleConfirmRename} className="text-green-400 hover:text-green-300 text-[10px] px-0.5 flex-shrink-0">✓</button>
+            <button onClick={() => setAction('none')} className="text-gray-500 hover:text-gray-300 text-[10px] px-0.5 flex-shrink-0">✕</button>
           </div>
         ) : (
           <div className="flex-1 min-w-0 flex items-center gap-1">
             <div className="relative flex items-center group/name min-w-[60px] max-w-full">
               <span
-                className="text-gray-300 truncate cursor-pointer hover:text-blue-300 w-full block"
+                className="text-gray-300 truncate cursor-pointer hover:text-gray-100 w-full block"
                 onClick={handleCopyName}
-                title="Click to copy name"
               >{variable.name}{variable.isLocal ? "'" : ""}</span>
               {renderActionButtons()}
             </div>
@@ -322,11 +317,10 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
               {variable.valueType === 'bool' && variable.countType !== 'list' ? (
                 <button
                   className={`px-2 py-0.5 rounded text-xs font-bold transition-colors ${variable.defaultValue === 'T'
-                    ? 'bg-green-700 text-green-100 hover:bg-green-600'
-                    : 'bg-red-900/50 text-red-200 hover:bg-red-800/50'
+                    ? 'bg-green-700 text-white hover:bg-green-600'
+                    : 'bg-red-800 text-white hover:bg-red-700 border border-red-700'
                     }`}
                   onClick={() => onUpdate(variable.name, { defaultValue: variable.defaultValue === 'T' ? 'F' : 'T' })}
-                  title="Click to toggle (True/False)"
                 >
                   {variable.defaultValue === 'T' ? 'TRUE' : 'FALSE'}
                 </button>
@@ -350,7 +344,6 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
               ) : debugValue !== undefined ? (
                 <span
                   className="block w-full text-xs truncate font-mono text-green-400"
-                  title={`Runtime Value: ${debugValue}`}
                 >
                   {debugValue}
                 </span>
@@ -392,7 +385,7 @@ function AddVariableButton({ isLocal, onAdd }: { isLocal: boolean; onAdd: (v: Va
   if (isAdding) {
     const validation = validateVariableName(name);
     return (
-      <div className="flex items-center gap-1 rounded px-1 py-0.5 border border-blue-500/50 shadow-lg shadow-blue-500/10" style={{ backgroundColor: theme.ui.panelBg }}>
+      <div className="flex items-center gap-1 rounded px-1 py-0.5 border border-gray-500/60 shadow-lg shadow-gray-500/20" style={{ backgroundColor: theme.ui.panelBg }}>
         <input
           className={`w-24 text-gray-200 text-[10px] bg-transparent outline-none ${!validation.isValid && name.length > 0 ? 'text-red-400' : ''}`}
           placeholder="Name..."
@@ -402,7 +395,7 @@ function AddVariableButton({ isLocal, onAdd }: { isLocal: boolean; onAdd: (v: Va
           onBlur={() => !name && setIsAdding(false)}
           autoFocus
         />
-        <button className="text-blue-400 text-[10px] font-bold" onClick={handleAdd}>OK</button>
+        <button className="text-gray-200 text-[10px] font-bold" onClick={handleAdd}>OK</button>
         <button className="text-gray-500 text-[10px]" onClick={() => setIsAdding(false)}>✕</button>
       </div>
     );
@@ -410,9 +403,8 @@ function AddVariableButton({ isLocal, onAdd }: { isLocal: boolean; onAdd: (v: Va
 
   return (
     <button
-      className="text-gray-500 hover:text-blue-400 transition-colors flex items-center gap-0.5"
+      className="text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-0.5"
       onClick={() => setIsAdding(true)}
-      title={`Add ${isLocal ? 'Local' : 'Shared'} Variable`}
     >
       <span className="text-xs">+</span>
       <span className="text-[10px] uppercase font-bold tracking-tighter">Add</span>
@@ -432,7 +424,7 @@ interface InterfacePinItemProps {
 }
 
 function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localVars }: InterfacePinItemProps) {
-  const colorClass = TYPE_COLORS[pin.valueType] || '#a3a3a3';
+  const colorClass = resolveTypeColor(pin.valueType);
   const isArray = pin.countType === 'list';
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -491,7 +483,7 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
   return (
     <div
       id={`io-${pin.id}`}
-      className={`px-2 py-1 text-sm rounded group border border-transparent transition-all duration-300 ${isFocused ? 'ring-2 ring-blue-500 shadow-lg shadow-blue-500/20 animate-pulse-subtle' : 'hover:border-gray-600'
+      className={`px-2 py-1 text-sm rounded group border border-transparent transition-all duration-300 ${isFocused ? 'ring-2 ring-gray-500 shadow-lg shadow-gray-500/20 animate-pulse-subtle' : 'hover:border-gray-600'
         }`}
       style={{ backgroundColor: theme.ui.panelBg }}
     >
@@ -509,14 +501,13 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
           })}
           baseClassName="text-xs"
           triggerColor={colorClass}
-          getOptionColor={(opt: string) => TYPE_COLORS[opt as ValueType] || '#d1d5db'}
+          getOptionColor={(opt: string) => resolveTypeColor(opt)}
         />
 
         <button
           className="text-xs hover:bg-gray-700 text-center px-0.5 rounded transition-colors min-w-[14px]"
           style={{ color: colorClass }}
           onClick={() => onUpdate(pin.id, { countType: isArray ? 'scalar' : 'list' })}
-          title={isArray ? 'Switch to scalar' : 'Switch to array'}
         >
           {isArray ? '[]' : '·'}
         </button>
@@ -529,14 +520,12 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
             <button
               onClick={() => onDelete(pin.id)}
               className="text-green-400 hover:text-green-300 px-1 py-0.5 text-[10px]"
-              title="Confirm Delete"
             >
               ✓
             </button>
             <button
               onClick={() => setIsDeleting(false)}
               className="text-gray-500 hover:text-gray-300 px-1 py-0.5 text-[10px]"
-              title="Cancel"
             >
               ✕
             </button>
@@ -545,7 +534,6 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
           <button
             className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 text-xs transition-opacity"
             onClick={() => setIsDeleting(true)}
-            title="Delete pin"
           >
             ✕
           </button>
@@ -558,7 +546,7 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
 
           {isInput || pin.binding.type === 'variable' ? (
             <select
-              className="flex-1 text-gray-200 text-[10px] px-1 py-0.5 rounded outline-none border border-gray-600 focus:border-blue-500"
+              className="flex-1 text-gray-200 text-[10px] px-1 py-0.5 rounded outline-none border border-gray-600 focus:border-gray-500"
               style={{ backgroundColor: theme.ui.border }}
               value={pin.binding.value ? `${pin.binding.isLocal ? 'local' : 'shared'}:${pin.binding.value}` : ''}
               onChange={(e) => {
@@ -584,7 +572,7 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
             </select>
           ) : (
             <input
-              className={`flex-1 text-gray-200 text-[10px] px-1 py-0.5 rounded outline-none border ${!validateValue(pin.binding.value, pin.valueType, pin.countType).isValid ? 'border-red-500' : 'border-gray-600 focus:border-blue-500'
+              className={`flex-1 text-gray-200 text-[10px] px-1 py-0.5 rounded outline-none border ${!validateValue(pin.binding.value, pin.valueType, pin.countType).isValid ? 'border-red-500' : 'border-gray-600 focus:border-gray-500'
                 }`}
               style={{ backgroundColor: theme.ui.border }}
               value={pin.binding.value}
@@ -595,9 +583,8 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
 
           {!isInput && (
             <button
-              className={`text-[10px] px-1 py-0.5 rounded leading-tight transition-colors ${pin.binding.type === 'const' ? 'bg-gray-600 text-gray-300' : 'bg-blue-600 text-white'}`}
+              className={`text-[10px] px-1 py-0.5 rounded leading-tight transition-colors ${pin.binding.type === 'const' ? 'bg-gray-600 text-gray-300' : 'bg-gray-500 text-white'}`}
               onClick={() => handleBindingChange('', pin.binding.type === 'const' ? 'variable' : 'const', false)}
-              title={pin.binding.type === 'const' ? 'Switch to Variable binding' : 'Switch to Constant binding'}
             >
               {pin.binding.type === 'const' ? 'C' : 'V'}
             </button>
@@ -608,7 +595,7 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
           <div className="flex items-center gap-1 pl-12">
             <span className="text-gray-500 text-[10px]">Index:</span>
             <button
-              className={`text-[10px] px-1 rounded ${pin.vectorIndex?.type === 'const' ? 'bg-gray-600 text-gray-300' : 'bg-blue-600 text-white'}`}
+              className={`text-[10px] px-1 rounded ${pin.vectorIndex?.type === 'const' ? 'bg-gray-600 text-gray-300' : 'bg-gray-500 text-white'}`}
               onClick={handleVectorIndexTypeToggle}
             >
               {pin.vectorIndex?.type === 'const' ? 'C' : 'V'}
@@ -657,7 +644,7 @@ function AddInterfacePinButton({ isInput, onAdd }: { isInput: boolean; onAdd: (n
     return (
       <div className="flex items-center gap-1 mt-2 p-1.5 rounded border border-gray-700" style={{ backgroundColor: theme.ui.panelBg }}>
         <input
-          className="flex-1 text-gray-300 text-xs px-2 py-1 rounded outline-none border border-gray-600 focus:border-blue-500"
+          className="flex-1 text-gray-300 text-xs px-2 py-1 rounded outline-none border border-gray-600 focus:border-gray-500"
           style={{ backgroundColor: theme.ui.background }}
           placeholder="Pin name"
           value={name}
@@ -665,15 +652,15 @@ function AddInterfacePinButton({ isInput, onAdd }: { isInput: boolean; onAdd: (n
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
           autoFocus
         />
-        <button className="text-green-400 hover:text-green-300 px-1 py-1" onClick={handleAdd} title="Confirm">✓</button>
-        <button className="text-gray-500 hover:text-gray-400 px-1 py-1" onClick={() => setIsAdding(false)} title="Cancel">✕</button>
+        <button className="text-green-400 hover:text-green-300 px-1 py-1" onClick={handleAdd}>✓</button>
+        <button className="text-gray-500 hover:text-gray-400 px-1 py-1" onClick={() => setIsAdding(false)}>✕</button>
       </div>
     );
   }
 
   return (
     <button
-      className="text-[11px] text-gray-500 hover:text-blue-400 mt-2 flex items-center gap-1 transition-colors px-1"
+      className="text-[11px] text-gray-500 hover:text-gray-300 mt-2 flex items-center gap-1 transition-colors px-1"
       onClick={() => setIsAdding(true)}
     >
       <span className="text-base leading-none underline-none">+</span>
@@ -799,15 +786,25 @@ export function PropertiesPanel() {
     <div className="h-full bg-gray-900 border-l border-gray-700 flex flex-col">
       {/* Top Section: Data (Vars/IO) */}
       <div className="flex-1 flex flex-col min-h-0 border-b border-gray-800">
-        <div className="flex border-b border-gray-800 shrink-0">
+        <div className="flex shrink-0" style={{ backgroundColor: theme.ui.tabBarBg }}>
           <button
-            className={`flex-1 py-1.5 text-[9px] uppercase tracking-wider font-bold transition-all ${activeTab === 'variables' ? 'text-blue-400 bg-gray-800/50' : 'text-gray-500 hover:text-gray-400'}`}
+            className="flex-1 py-1.5 text-[9px] uppercase tracking-wider font-bold transition-all"
+            style={{
+              color: activeTab === 'variables' ? theme.ui.tabActiveText : theme.ui.tabInactiveText,
+              backgroundColor: activeTab === 'variables' ? theme.ui.tabActiveBg : theme.ui.tabInactiveBg,
+              border: 'none'
+            }}
             onClick={() => setActiveTab('variables')}
           >
             Variables
           </button>
           <button
-            className={`flex-1 py-1.5 text-[9px] uppercase tracking-wider font-bold transition-all ${activeTab === 'io' ? 'text-blue-400 bg-gray-800/50' : 'text-gray-500 hover:text-gray-400'}`}
+            className="flex-1 py-1.5 text-[9px] uppercase tracking-wider font-bold transition-all"
+            style={{
+              color: activeTab === 'io' ? theme.ui.tabActiveText : theme.ui.tabInactiveText,
+              backgroundColor: activeTab === 'io' ? theme.ui.tabActiveBg : theme.ui.tabInactiveBg,
+              border: 'none'
+            }}
             onClick={() => setActiveTab('io')}
           >
             Interface I/O
@@ -1012,9 +1009,8 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
         </div>
         {node.type === 'SubTree' && (
           <button
-            className="text-[10px] bg-blue-600 hover:bg-blue-500 text-white px-2 py-0.5 rounded transition-colors"
+            className="text-[10px] bg-gray-600 hover:bg-gray-500 text-white px-2 py-0.5 rounded transition-colors"
             onClick={handleReloadSubTree}
-            title="Reload Input/Output pins from subtree file"
           >
             Reload Pins
           </button>
@@ -1039,7 +1035,7 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
       {/* Nickname */}
       <div className="flex items-center gap-1">
         <input
-          className="flex-1 bg-gray-700 text-gray-300 text-xs px-1 py-0.5 rounded outline-none border border-transparent focus:border-blue-500"
+          className="flex-1 bg-gray-700 text-gray-300 text-xs px-1 py-0.5 rounded outline-none border border-transparent focus:border-gray-500"
           value={node.nickname || ''}
           onChange={(e) => updateNodeProperty(nodeId, { nickname: e.target.value })}
           placeholder="Nickname..."
@@ -1118,7 +1114,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
     setVectorIndexValue(pin.vectorIndex?.type === 'const' ? pin.vectorIndex.value : '');
   }, [pin.name, pin.binding, pin.vectorIndex, isEditing]);
 
-  const colorClass = TYPE_COLORS[pin.valueType] || '#a3a3a3';
+  const colorClass = resolveTypeColor(pin.valueType);
   const bindingType = pin.binding.type;  // 'const' | 'pointer'
   const isEnabled = pin.enableType !== 'disable';
   const canToggleEnable = pin.enableType !== 'fixed';
@@ -1271,7 +1267,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
 
   const bindingBtnInfo = bindingType === 'const'
     ? { style: 'bg-gray-600 text-gray-300', text: 'C', title: 'Constant → Click to switch to Variable' }
-    : { style: 'bg-blue-600 text-white', text: 'V', title: 'Variable → Click to switch to Constant' };
+    : { style: 'bg-gray-500 text-white', text: 'V', title: 'Variable → Click to switch to Constant' };
 
   return (
     <div
@@ -1285,12 +1281,18 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
             <button
               className={`w-3 h-3 rounded-sm border ${isEnabled ? 'bg-green-600 border-green-500' : 'bg-gray-600 border-gray-500'}`}
               onClick={handleEnableToggle}
-              title={isEnabled ? 'Disable' : 'Enable'}
             />
           )}
 
-          <span className="text-white font-medium truncate min-w-[40px]" title={pin.name}>{pin.name}</span>
-          <span className="text-gray-600 text-[10px]">{pin.isInput ? 'in' : 'out'}</span>
+          <span
+            className="font-medium truncate min-w-[40px]"
+            style={{ color: theme.ui.textMain }}
+            onMouseEnter={() => setTooltip(pin.desc || null)}
+            onMouseLeave={() => setTooltip(null)}
+          >
+            {pin.name}
+          </span>
+          <span className="text-[10px] font-semibold" style={{ color: theme.ui.textDim }}>{pin.isInput ? 'in' : 'out'}</span>
         </div>
 
         <AdaptiveSelect
@@ -1307,23 +1309,22 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
           }}
           baseClassName="text-[10px]"
           triggerColor={colorClass}
-          getOptionColor={(opt: string) => TYPE_COLORS[opt as ValueType] || '#d1d5db'}
+          getOptionColor={(opt: string) => resolveTypeColor(opt)}
           disabled={pin.allowedValueTypes.length <= 1}
         />
 
         {!pin.isCountTypeFixed && (
           <button
-            className="text-[10px] hover:bg-gray-700 text-center px-0.5 rounded transition-colors min-w-[12px]"
+            className="text-[10px] hover:bg-gray-700 text-center px-0.5 rounded transition-colors min-w-[12px] font-bold"
             style={{ color: colorClass }}
             onClick={toggleCountType}
-            title={pin.countType === 'list' ? 'Switch to scalar' : 'Switch to array'}
           >
             {pin.countType === 'list' ? '[]' : '·'}
           </button>
         )}
 
         {pin.isCountTypeFixed && (
-          <span className="text-[10px] opacity-50 min-w-3 text-center cursor-default" style={{ color: colorClass }} title="Fixed count type">
+          <span className="text-[10px] opacity-80 min-w-3 text-center cursor-default font-bold" style={{ color: colorClass }}>
             {pin.countType === 'list' ? '[]' : '·'}
           </span>
         )}
@@ -1332,7 +1333,6 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
         {pin.isBindingTypeFixed ? (
           <span
             className={`text-[10px] px-1 rounded ${bindingBtnInfo.style} opacity-50 cursor-default shrink-0`}
-            title="Fixed binding type"
           >
             {bindingBtnInfo.text}
           </span>
@@ -1340,7 +1340,6 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
           <button
             className={`text-[10px] px-1 rounded ${bindingBtnInfo.style} shrink-0`}
             onClick={handleBindingToggle}
-            title={bindingBtnInfo.title}
           >
             {bindingBtnInfo.text}
           </button>
@@ -1385,14 +1384,14 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
                 )}
               </select>
               {isDataConnection && hasDataConnection && (
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-purple-500 pointer-events-none" title="Connected" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-purple-500 pointer-events-none" />
               )}
             </div>
           ) : pin.valueType === 'bool' && pin.countType !== 'list' ? (
             <button
               className={`w-full text-xs px-1 py-0.5 rounded font-bold transition-colors ${pin.binding.type === 'const' && pin.binding.value === 'T'
-                ? 'bg-green-700 text-green-100 hover:bg-green-600'
-                : 'bg-red-900/50 text-red-200 hover:bg-red-800/50'
+                ? 'bg-green-700 text-white hover:bg-green-600'
+                : 'bg-red-800 text-white hover:bg-red-700 border border-red-700'
                 }`}
               onClick={() => {
                 const currentVal = pin.binding.type === 'const' ? pin.binding.value : 'F';
@@ -1400,7 +1399,6 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
                 onUpdate({ binding: { type: 'const', value: newValue } });
                 setEditValue(newValue);
               }}
-              title="Click to toggle (True/False)"
             >
               {pin.binding.type === 'const' && pin.binding.value === 'T' ? 'TRUE' : 'FALSE'}
             </button>
@@ -1427,9 +1425,9 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
                       value={editValue || pin.enumValues[0]}
                       options={pin.enumValues || []}
                       onChange={(val) => { handleValueChange(val); handleValueSubmit(); }}
-                      baseClassName="text-xs text-[#d4d4d4] w-full"
+                      baseClassName="text-xs text-gray-200 w-full"
                       containerClassName="w-full block"
-                      getOptionColor={() => '#d4d4d4'}
+                      getOptionColor={() => theme.ui.textMain}
                       renderLabel={(val) => val}
                     />
                   </div>
@@ -1452,6 +1450,12 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
               <span
                 className={`block w-full text-xs truncate cursor-pointer hover:text-gray-300 transition-opacity ${!currentPinValidation.isValid ? 'bg-red-900 text-white px-1 rounded' : 'text-gray-400'
                   }`}
+                onMouseEnter={() => {
+                  if (pin.binding.type === 'const') {
+                    setTooltip(pin.binding.value || '-');
+                  }
+                }}
+                onMouseLeave={() => setTooltip(null)}
                 onClick={() => { setEditValue(pin.binding.type === 'const' ? pin.binding.value : ''); setIsEditing(true); }}
               >
                 <div className="flex items-center gap-1 group/value">
@@ -1463,13 +1467,12 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
                   </span>
                   {nodeType === 'SubTree' && pin.name === 'Tree' && pin.binding.type === 'const' && pin.binding.value && (
                     <button
-                      className="opacity-0 group-hover/value:opacity-100 text-gray-500 hover:text-blue-400 transition-opacity"
+                      className="opacity-0 group-hover/value:opacity-100 text-gray-500 hover:text-gray-300 transition-opacity"
                       onClick={(e) => {
                         e.stopPropagation();
                         const b = pin.binding as { type: 'const'; value: string };
                         useEditorStore.getState().openTree(b.value);
                       }}
-                      title="Open this tree"
                     >
                       ↗
                     </button>
@@ -1486,9 +1489,8 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
         <div className="mt-1 flex items-center gap-1 pl-4">
           <span className="text-gray-500 text-[10px]">Index:</span>
           <button
-            className={`text-[10px] px-1 rounded ${pin.vectorIndex?.type === 'const' ? 'bg-gray-600 text-gray-300' : 'bg-blue-600 text-white'}`}
+            className={`text-[10px] px-1 rounded ${pin.vectorIndex?.type === 'const' ? 'bg-gray-600 text-gray-300' : 'bg-gray-500 text-white'}`}
             onClick={handleVectorIndexTypeToggle}
-            title={pin.vectorIndex?.type === 'const' ? 'Switch to variable' : 'Switch to constant'}
           >
             {pin.vectorIndex?.type === 'const' ? 'C' : 'V'}
           </button>

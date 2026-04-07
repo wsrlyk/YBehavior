@@ -1,6 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTooltipStore } from '../stores/tooltipStore';
 import { createPortal } from 'react-dom';
+import { getTheme } from '../theme/theme';
+
+const theme = getTheme();
 
 export default function Tooltip() {
     const { content, position } = useTooltipStore();
@@ -67,7 +70,14 @@ export default function Tooltip() {
                 opacity: content ? 1 : 0,
             }}
         >
-            <div className="bg-gray-900/90 backdrop-blur-md border border-gray-700/50 text-gray-100 px-3 py-2 rounded-lg shadow-2xl max-w-sm text-xs leading-relaxed whitespace-pre-wrap animate-in fade-in zoom-in-95 duration-200">
+            <div
+                className="backdrop-blur-md px-3 py-2 rounded-lg shadow-2xl max-w-sm text-xs leading-relaxed whitespace-pre-wrap animate-in fade-in zoom-in-95 duration-200"
+                style={{
+                    backgroundColor: theme.ui.panelBg,
+                    border: `1px solid ${theme.ui.border}`,
+                    color: theme.ui.textMain,
+                }}
+            >
                 {content}
             </div>
         </div>,

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDebugStore } from '../stores/debugStore';
 import { useEditorStore } from '../stores/editorStore';
 import { useFSMStore } from '../stores/fsmStore';
+import { useTooltipStore } from '../stores/tooltipStore';
 import { getFileDisplay } from '../utils/fileUtils';
 import { NodeState } from '../types/debug';
 import { DEBUG_COLORS, TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
@@ -113,6 +114,7 @@ export const RunningList = () => {
 
 function RunningListItem({ fileName, isFsm, onClick }: { fileName: string; isFsm: boolean; onClick: () => void }) {
     const { isConnected, getFileRunState, treeRunInfos, fsmRunInfo, keyframe } = useDebugStore();
+    const setTooltip = useTooltipStore((state) => state.setTooltip);
 
     // Icon determined by the caller (FSM from fsmRunInfo, Tree from treeRunInfos)
     const { icon, name: displayName } = getFileDisplay(fileName, isFsm, !isFsm);
@@ -197,7 +199,8 @@ function RunningListItem({ fileName, isFsm, onClick }: { fileName: string; isFsm
         <div
             className="px-3 py-1.5 text-xs text-gray-300 hover:bg-gray-700 cursor-pointer flex items-center gap-2 border-l-2 border-transparent hover:border-pink-500 transition-all"
             onClick={onClick}
-            title={fileName}
+            onMouseEnter={() => setTooltip(fileName)}
+            onMouseLeave={() => setTooltip(null)}
         >
             {/* Status Dot */}
             <span className={`w-1.5 h-1.5 rounded-full ${activeColor}`} />

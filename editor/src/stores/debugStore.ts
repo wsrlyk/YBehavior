@@ -1039,7 +1039,7 @@ export const useDebugStore = create<DebugState>((set, get) => ({
             const getStateColor = (s: NodeState) => {
                 switch (s) {
                     case NodeState.Success: return 'text-green-500';
-                    case NodeState.Failure: return 'text-cyan-500'; // Match C# Cyan (using tailwind equivalent if available, or blue-400)
+                    case NodeState.Failure: return 'text-gray-400';
                     case NodeState.Running: return 'text-purple-500';
                     case NodeState.Break: return 'text-red-500';
                     default: return 'text-gray-500';

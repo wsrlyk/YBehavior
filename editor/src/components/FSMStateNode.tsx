@@ -6,6 +6,7 @@ import type { FSMState, FSMStateType } from '../types/fsm';
 import { stateTypeHasParentConnector, stateTypeHasChildrenConnector, stateTypeHasTreeSelector } from '../types/fsm';
 import { useFSMStore } from '../stores/fsmStore';
 import { useEditorStore } from '../stores/editorStore';
+import { useTooltipStore } from '../stores/tooltipStore';
 // NodeState imported from types/debug
 import { useDebugStore } from '../stores/debugStore';
 import { decodeXmlEntities } from '../utils/stringUtils';
@@ -42,6 +43,7 @@ export type FSMStateNodeType = Node<FSMStateNodeData, 'fsmState'>;
 function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
     const { state, isDefault } = data;
     const [isHovered, setIsHovered] = useState(false);
+    const setTooltip = useTooltipStore((state) => state.setTooltip);
     const isGlobalConnecting = useFSMStore(state => state.isConnecting);
 
     // Debug info
@@ -91,13 +93,14 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
     // Always render handles so React Flow can find them, but hide via CSS
     const isTargetVisible = hasParentHandle && isGlobalConnecting;
     const isSourceVisible = hasChildHandle && isHovered && !isGlobalConnecting;
+    const highlightBorder = selected && !isRunning ? `0 0 0 2px ${theme.text.variable}` : undefined;
+    const defaultBorder = isDefault && !isRunning ? `0 0 0 2px ${theme.returnType.Invert}` : undefined;
+    const combinedOuterGlow = [highlightBorder, defaultBorder].filter(Boolean).join(', ');
 
     return (
         <div
             className={`
         relative rounded-lg shadow-lg min-w-[120px] transition-all duration-200
-        ${(selected && !isRunning) ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-gray-900' : ''}
-        ${(isDefault && !isRunning) ? 'ring-2 ring-yellow-400' : ''}
         ${ringClass}
         ${isHovered ? 'scale-[1.02]' : ''}
       `}
@@ -105,6 +108,7 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
                 backgroundColor: styleColors.bg,
                 borderWidth: 2,
                 borderColor: styleColors.border,
+                boxShadow: combinedOuterGlow || undefined,
             }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -134,13 +138,15 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
                     position={Position.Bottom}
                     id="child"
                     className={`
-                        !rounded-full !bg-white/40 !border-4 !border-white/20 hover:!bg-white/60 !transition-all z-50 !cursor-crosshair shadow-lg
+                        !rounded-full !border-4 !transition-all z-50 !cursor-crosshair shadow-lg
                         ${isSourceVisible ? '!opacity-100 !pointer-events-auto' : '!opacity-0 !pointer-events-none'}
                     `}
                     style={{
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
+                        backgroundColor: theme.ui.border,
+                        borderColor: theme.ui.panelBg,
                         // Small visual nub, but anchor is center
                         width: '32px',
                         height: '32px',
@@ -150,26 +156,35 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
 
 
             {/* Header */}
-            <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-600/50">
-                <span className="text-white/70">{icon}</span>
-                <div className="font-bold text-center truncate px-1">
-                    {state.uid !== undefined && <span className="text-gray-400 mr-1">[{state.uid}]</span>}
+            <div className="flex items-center gap-2 px-3 py-2 border-b" style={{ borderColor: theme.ui.border, color: theme.ui.textMain }}>
+                <span style={{ color: theme.ui.textDim }}>{icon}</span>
+                <div className="font-bold text-center truncate px-1" style={{ color: theme.ui.textMain }}>
+                    {state.uid !== undefined && <span className="mr-1" style={{ color: theme.ui.textDim }}>[{state.uid}]</span>}
                     {state.type === 'Normal' || state.type === 'Meta' ? state.name : state.type}
                 </div>
                 {isDefault && (
-                    <span className="ml-auto text-yellow-400 text-xs font-bold">DEFAULT</span>
+                    <span className="ml-auto text-xs font-bold" style={{ color: theme.returnType.Invert }}>DEFAULT</span>
                 )}
             </div>
 
             {/* Tree reference */}
             {hasTree && state.tree && (
                 <div
-                    className="flex items-center justify-between px-3 py-1 text-xs text-gray-300 bg-gray-800/50 filename-ellipsis max-w-[200px] border-t border-gray-600/30 group/tree"
-                    title={state.tree}
+                    className="flex items-center justify-between px-3 py-1 text-xs filename-ellipsis max-w-[200px] border-t group/tree"
+                    style={{
+                        color: theme.ui.textMain,
+                        backgroundColor: theme.ui.background,
+                        borderColor: theme.ui.border,
+                    }}
+                    onMouseEnter={() => setTooltip(state.tree || null)}
+                    onMouseLeave={() => setTooltip(null)}
                 >
                     <span className="truncate">🌲 {stripExtension(state.tree)}</span>
                     <button
-                        className="opacity-0 group-hover/tree:opacity-100 text-gray-500 hover:text-blue-400 transition-opacity ml-1"
+                        className="opacity-0 group-hover/tree:opacity-100 transition-opacity ml-1"
+                        style={{ color: theme.ui.textDim }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = theme.text.variable; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = theme.ui.textDim; }}
                         onClick={(e) => {
                             e.stopPropagation();
                             useEditorStore.getState().openTree(state.tree!);
@@ -182,7 +197,13 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
 
             {/* Meta state indicator */}
             {state.type === 'Meta' && (
-                <div className="px-3 py-1 text-xs text-purple-300 bg-purple-900/30 cursor-pointer hover:bg-purple-900/50">
+                <div
+                    className="px-3 py-1 text-xs cursor-pointer"
+                    style={{
+                        color: theme.ui.textMain,
+                        backgroundColor: theme.ui.border,
+                    }}
+                >
                     ◇ Double-click to enter
                 </div>
             )}

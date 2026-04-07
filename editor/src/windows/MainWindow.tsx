@@ -17,8 +17,10 @@ import { getAllWindows } from "@tauri-apps/api/window";
 import Tooltip from "../components/Tooltip";
 import { GlobalSearch } from "../components/GlobalSearch";
 import { ReactFlowProvider } from '@xyflow/react';
+import { getTheme } from '../theme/theme';
 
 export function MainWindow() {
+    const theme = getTheme();
     const { initSettings, settings, openedFiles, activeFilePath, saveCurrentFile, saveFileAs, undo, redo, createNewTree } = useEditorStore();
     const { openedFSMFiles, activeFSMPath, saveFSM, saveFSMAs, undo: undoFSM, redo: redoFSM, createNewFSM } = useFSMStore();
 
@@ -167,7 +169,14 @@ export function MainWindow() {
 
     return (
         <ReactFlowProvider>
-            <div className="flex flex-col h-screen bg-gray-900 text-white overflow-hidden select-none font-sans">
+            <div
+                className="flex flex-col h-screen overflow-hidden select-none"
+                style={{
+                    backgroundColor: theme.ui.background,
+                    color: theme.ui.textMain,
+                    fontFamily: 'Tahoma, Verdana, Segoe UI, sans-serif'
+                }}
+            >
                 <Tooltip />
                 <GlobalSearch />
                 {/* 顶部区域：侧边栏 + 主编辑区 + 属性面板 */}
@@ -178,7 +187,10 @@ export function MainWindow() {
                     {/* Sidebar Resize Handle */}
                     {(openedFiles.length > 0 || openedFSMFiles.length > 0) && (
                         <div
-                            className="w-1 bg-gray-800 hover:bg-blue-500 cursor-col-resize transition-colors flex-shrink-0"
+                            className="w-1 cursor-col-resize transition-colors flex-shrink-0"
+                            style={{ backgroundColor: theme.ui.border }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.ui.splitterHover; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = theme.ui.border; }}
                             onMouseDown={() => setIsResizingSidebar(true)}
                         />
                     )}
@@ -186,33 +198,49 @@ export function MainWindow() {
                     {/* 主编辑区 */}
                     <div className="flex-1 flex flex-col min-h-0 min-w-0">
                         {/* 工具栏 */}
-                        <div className="h-10 bg-gray-800 border-b border-gray-700 flex items-center px-4 gap-2 flex-shrink-0">
+                        <div
+                            className="h-10 border-b flex items-center px-4 gap-2 flex-shrink-0"
+                            style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}
+                        >
                             <button
                                 onClick={() => setIsFileTreeOpen(!isFileTreeOpen)}
-                                className="px-2 py-1 text-sm text-gray-300 hover:bg-gray-700 rounded"
-                                title="Open File"
+                                className="px-2 py-1 text-sm rounded border"
+                                style={{ color: theme.ui.textMain, borderColor: theme.ui.border, backgroundColor: theme.ui.buttonBg }}
+                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.ui.buttonHoverBg; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = theme.ui.buttonBg; }}
                             >
                                 ☰
                             </button>
                             <div className="relative">
                                 <button
                                     onClick={() => setIsNewMenuOpen(!isNewMenuOpen)}
-                                    className="px-2 py-1 text-sm text-gray-300 hover:bg-gray-700 rounded flex items-center gap-1"
-                                    title="New"
+                                    className="px-2 py-1 text-sm rounded border flex items-center gap-1"
+                                    style={{ color: theme.ui.textMain, borderColor: theme.ui.border, backgroundColor: theme.ui.buttonBg }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.ui.buttonHoverBg; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = theme.ui.buttonBg; }}
                                 >
                                     + <span className="text-xs">▼</span>
                                 </button>
                                 {isNewMenuOpen && (
-                                    <div className="absolute top-full left-0 mt-1 bg-gray-800 border border-gray-600 rounded shadow-lg z-50 min-w-[120px]">
+                                    <div
+                                        className="absolute top-full left-0 mt-1 border rounded shadow-lg z-50 min-w-[120px]"
+                                        style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}
+                                    >
                                         <button
                                             onClick={() => { createNewTree('NewTree'); setIsNewMenuOpen(false); }}
-                                            className="w-full px-3 py-2 text-sm text-left text-gray-300 hover:bg-gray-700 flex items-center gap-2"
+                                            className="w-full px-3 py-2 text-sm text-left flex items-center gap-2"
+                                            style={{ color: theme.ui.textMain }}
+                                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.ui.accentSoft; }}
+                                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                                         >
                                             🌴 New Tree
                                         </button>
                                         <button
                                             onClick={() => { createNewFSM('NewFSM'); setIsNewMenuOpen(false); }}
-                                            className="w-full px-3 py-2 text-sm text-left text-gray-300 hover:bg-gray-700 flex items-center gap-2"
+                                            className="w-full px-3 py-2 text-sm text-left flex items-center gap-2"
+                                            style={{ color: theme.ui.textMain }}
+                                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.ui.accentSoft; }}
+                                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                                         >
                                             🔄 New FSM
                                         </button>
@@ -224,37 +252,45 @@ export function MainWindow() {
                                 isOpen={isFileTreeOpen}
                                 onClose={() => setIsFileTreeOpen(false)}
                             />
-                            <div className="w-px h-5 bg-gray-700 mx-1" />
+                            <div className="w-px h-5 mx-1" style={{ backgroundColor: theme.ui.border }} />
                             <button
                                 onClick={activeFSMPath ? saveFSM : saveCurrentFile}
                                 disabled={!currentFile}
-                                className="px-3 py-1 text-sm bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                                title="Ctrl+S"
+                                className="px-3 py-1 text-sm rounded border disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={{ color: theme.ui.textMain, borderColor: theme.ui.border, backgroundColor: theme.ui.buttonBg }}
+                                onMouseEnter={(e) => { if (!currentFile) return; e.currentTarget.style.backgroundColor = theme.ui.buttonHoverBg; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = theme.ui.buttonBg; }}
                             >
                                 Save
                             </button>
                             <button
                                 onClick={activeFSMPath ? saveFSMAs : saveFileAs}
                                 disabled={!currentFile}
-                                className="px-3 py-1 text-sm bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                                title="Save As..."
+                                className="px-3 py-1 text-sm rounded border disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={{ color: theme.ui.textMain, borderColor: theme.ui.border, backgroundColor: theme.ui.buttonBg }}
+                                onMouseEnter={(e) => { if (!currentFile) return; e.currentTarget.style.backgroundColor = theme.ui.buttonHoverBg; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = theme.ui.buttonBg; }}
                             >
                                 Save As
                             </button>
-                            <div className="w-px h-5 bg-gray-700 mx-1" />
+                            <div className="w-px h-5 mx-1" style={{ backgroundColor: theme.ui.border }} />
                             <button
                                 onClick={activeFSMPath ? undoFSM : undo}
                                 disabled={!currentFile || !canUndo}
-                                className="px-3 py-1 text-sm bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                                title="Undo (Ctrl+Z)"
+                                className="px-3 py-1 text-sm rounded border disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={{ color: theme.ui.textMain, borderColor: theme.ui.border, backgroundColor: theme.ui.buttonBg }}
+                                onMouseEnter={(e) => { if (!currentFile || !canUndo) return; e.currentTarget.style.backgroundColor = theme.ui.buttonHoverBg; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = theme.ui.buttonBg; }}
                             >
                                 Undo
                             </button>
                             <button
                                 onClick={activeFSMPath ? redoFSM : redo}
                                 disabled={!currentFile || !canRedo}
-                                className="px-3 py-1 text-sm bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                                title="Redo (Ctrl+Y)"
+                                className="px-3 py-1 text-sm rounded border disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={{ color: theme.ui.textMain, borderColor: theme.ui.border, backgroundColor: theme.ui.buttonBg }}
+                                onMouseEnter={(e) => { if (!currentFile || !canRedo) return; e.currentTarget.style.backgroundColor = theme.ui.buttonHoverBg; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = theme.ui.buttonBg; }}
                             >
                                 Redo
                             </button>
@@ -270,7 +306,7 @@ export function MainWindow() {
                             {/* Update watermark */}
                             {updateAvailable && (
                                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[50]">
-                                    <div className="w-full text-center text-3xl font-bold text-blue-400/50 select-none tracking-wide drop-shadow-lg">
+                                    <div className="w-full text-center text-3xl font-bold text-gray-300/60 select-none tracking-wide drop-shadow-lg">
                                         🔄 新版本已就绪，请关闭本程序后重新启动
                                     </div>
                                 </div>
@@ -281,7 +317,10 @@ export function MainWindow() {
                     {/* Resize Handle for Properties Panel */}
                     {(activeFile?.name.endsWith('.tree') || (activeFSMPath && activeFSMPath.endsWith('.fsm'))) && (
                         <div
-                            className="w-1 bg-gray-800 hover:bg-blue-500 cursor-col-resize transition-colors flex-shrink-0"
+                            className="w-1 cursor-col-resize transition-colors flex-shrink-0"
+                            style={{ backgroundColor: theme.ui.border }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.ui.splitterHover; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = theme.ui.border; }}
                             onMouseDown={() => setIsResizingProperties(true)}
                         />
                     )}
@@ -299,12 +338,15 @@ export function MainWindow() {
                 {/* 底部：Docked Terminal */}
                 {isTerminalDocked && (
                     <div
-                        className="flex-shrink-0 bg-black flex flex-col"
-                        style={{ height: terminalHeight }}
+                        className="flex-shrink-0 flex flex-col border-t"
+                        style={{ backgroundColor: theme.ui.terminalBg, borderColor: theme.ui.border, height: terminalHeight }}
                     >
                         {/* 调整高度的手柄 */}
                         <div
-                            className="h-1 bg-gray-800 hover:bg-blue-500 cursor-ns-resize transition-colors"
+                            className="h-1 cursor-ns-resize transition-colors"
+                            style={{ backgroundColor: theme.ui.border }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.ui.splitterHover; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = theme.ui.border; }}
                             onMouseDown={() => setIsResizingTerminal(true)}
                         />
                         <div className="flex-1 relative overflow-hidden">

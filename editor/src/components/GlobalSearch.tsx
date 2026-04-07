@@ -382,13 +382,12 @@ export function GlobalSearch() {
                 onMouseDown={handleMouseDown}
             >
                 <div className="flex items-center gap-2">
-                    <span className="text-blue-400 text-sm">🔍</span>
+                    <span className="text-gray-300 text-sm">🔍</span>
                     <span className="text-gray-400 text-[10px] uppercase font-bold tracking-[0.2em]">Global Search</span>
                 </div>
                 <button
                     className="w-6 h-6 flex items-center justify-center rounded-full text-gray-500 hover:bg-red-500/20 hover:text-red-400 transition-all duration-200"
                     onClick={() => setSearchOpen(false)}
-                    title="Close (Esc)"
                 >
                     <span className="text-sm">✕</span>
                 </button>
@@ -403,7 +402,7 @@ export function GlobalSearch() {
                         value={query}
                         onChange={e => setQuery(e.target.value)}
                         placeholder="Search nodes, UIDs, pins, values, variables..."
-                        className="w-full pl-4 pr-10 py-2.5 bg-gray-900/80 border border-gray-600 rounded-lg text-white text-sm outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 transition-all"
+                        className="w-full pl-4 pr-10 py-2.5 bg-gray-900/80 border border-gray-600 rounded-lg text-white text-sm outline-none focus:border-gray-500/70 focus:ring-1 focus:ring-gray-500/30 transition-all"
                     />
                 </div>
 
@@ -414,7 +413,7 @@ export function GlobalSearch() {
                                 type="checkbox"
                                 checked={scopes[s]}
                                 onChange={() => setScopes(prev => ({ ...prev, [s]: !prev[s] }))}
-                                className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500"
+                                className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-gray-500 focus:ring-gray-500"
                             />
                             <span className={`text-xs capitalize transition-colors ${scopes[s] ? 'text-gray-200' : 'text-gray-500'}`}>
                                 {s}
@@ -439,19 +438,19 @@ export function GlobalSearch() {
                         {results.map((res, index) => (
                             <div
                                 key={`${res.type}-${res.id}`}
-                                className={`px-4 py-3 cursor-pointer flex items-center justify-between transition-colors ${index === selectedIndex ? 'bg-blue-600/20 border-l-4 border-blue-500' : 'hover:bg-gray-700/50 border-l-4 border-transparent'
+                                className={`px-4 py-3 cursor-pointer flex items-center justify-between transition-colors ${index === selectedIndex ? 'bg-gray-700/60 border-l-4 border-gray-500' : 'hover:bg-gray-700/50 border-l-4 border-transparent'
                                     }`}
                                 onClick={() => handleJump(res)}
                                 onMouseEnter={() => setSelectedIndex(index)}
                             >
                                 <div className="flex flex-col gap-0.5 min-w-0">
                                     <div className="flex items-center gap-2">
-                                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${res.type === 'node' ? 'bg-blue-900/50 text-blue-300' :
-                                            res.type === 'pin' ? 'bg-green-900/50 text-green-300' :
-                                                res.type === 'variable' ? 'bg-purple-900/50 text-purple-300' :
-                                                    res.type === 'fsm-state' ? 'bg-orange-900/50 text-orange-300' :
-                                                        res.type === 'fsm-transition' ? 'bg-pink-900/50 text-pink-300' :
-                                                            'bg-yellow-900/50 text-yellow-300'
+                                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${res.type === 'node' ? 'bg-gray-700 text-gray-100' :
+                                            res.type === 'pin' ? 'bg-gray-700 text-gray-100' :
+                                                res.type === 'variable' ? 'bg-gray-700 text-gray-100' :
+                                                    res.type === 'fsm-state' ? 'bg-gray-700 text-gray-100' :
+                                                        res.type === 'fsm-transition' ? 'bg-gray-700 text-gray-100' :
+                                                            'bg-gray-700 text-gray-100'
                                             }`}>
                                             {res.type}
                                         </span>

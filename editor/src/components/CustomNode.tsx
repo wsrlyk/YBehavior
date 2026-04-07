@@ -56,7 +56,7 @@ function getPinNoteValue(pin: Pin): string {
 
 function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
   const setTooltip = useTooltipStore((state) => state.setTooltip);
-  const pinColor = PIN_COLORS[pin.valueType] || PIN_COLORS.default || '#888';
+  const pinColor = PIN_COLORS[pin.valueType] || PIN_COLORS.default || theme.ui.border;
   const binding = pin.binding;
 
   const getVectorIndexDisplay = () => {
@@ -79,7 +79,7 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
         position={isInput ? Position.Left : Position.Right}
         id={`pin-${isInput ? 'in' : 'out'}-${pin.name}`}
         isConnectable={isDataConnection}
-        className={`!w-2 !h-2 !rounded-full !border-0 hover:!bg-white hover:[--handle-scale:1.5] !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20 ${!isDataConnection ? 'opacity-30' : ''}`}
+        className={`!w-2 !h-2 !rounded-full !border-0 hover:[--handle-scale:1.5] hover:!opacity-100 !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20 ${!isDataConnection ? 'opacity-30' : ''}`}
         style={{
           backgroundColor: pinColor,
           [isInput ? 'left' : 'right']: '-4px',
@@ -90,7 +90,7 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
       <span
         className="truncate max-w-32 cursor-help"
         style={{ color: theme.text.pinName }}
-        onMouseEnter={() => setTooltip(pin.desc || pin.name)}
+        onMouseEnter={() => setTooltip(pin.desc || null)}
       >{pin.name}</span>
       {binding.type === 'const' && (
         <span
@@ -174,7 +174,9 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
 
   const nodeDefinition = useMemo(() => getDefinition(treeNode.type), [treeNode.type, getDefinition]);
 
-  const bgColor = NODE_COLORS[treeNode.category] || NODE_COLORS.default || '#666';
+  const bgColor = NODE_COLORS[treeNode.category] || NODE_COLORS.default || theme.ui.border;
+  const selectedColor = theme.text.variable;
+  const selectedGlow = `${selectedColor}55`;
   const hasChildren = (nodeDefinition?.childConnectors?.length || 0) > 0;
   const isEffectivelyDisabled = data.isEffectivelyDisabled;
 
@@ -197,8 +199,8 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
     <div className="relative">
       {hasReturnType && (
         <div
-          className="absolute -top-4 left-0 px-2 py-0.5 rounded-t-sm text-[8px] font-bold text-white uppercase tracking-tighter"
-          style={{ backgroundColor: returnTypeColor }}
+          className="absolute -top-4 left-0 px-2 py-0.5 rounded-t-sm text-[8px] font-bold uppercase tracking-tighter"
+          style={{ backgroundColor: returnTypeColor, color: theme.ui.textMain }}
         >
           {returnType}
         </div>
@@ -206,7 +208,13 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
 
       {/* Breakpoint/Logpoint Indicator */}
       {bpType !== BreakpointType.None && (
-        <div className={`absolute top-1 right-1 w-4 h-4 rounded-full z-[60] shadow-sm border-2 border-white ${bpType === BreakpointType.Breakpoint ? 'bg-red-600' : 'bg-purple-600'}`} />
+        <div
+          className="absolute top-1 right-1 w-4 h-4 rounded-full z-[60] shadow-sm border-2"
+          style={{
+            borderColor: theme.ui.panelBg,
+            backgroundColor: bpType === BreakpointType.Breakpoint ? theme.debug.break.border : theme.debug.running.border,
+          }}
+        />
       )}
 
       {treeNode.comment && (
@@ -227,8 +235,8 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
           className={`rounded shadow-lg min-w-32 cursor-grab resize-none hover:brightness-110 transition-[filter,border-color,box-shadow] duration-200 ${isEffectivelyDisabled ? 'grayscale opacity-60' : ''}`}
           style={{
             backgroundColor: theme.ui.panelBg,
-            border: `1px solid ${selected ? '#fff' : theme.ui.border}`,
-            boxShadow: selected ? '0 0 0 2px rgba(255,255,255,0.3)' : undefined,
+            border: `1px solid ${selected ? selectedColor : theme.ui.border}`,
+            boxShadow: selected ? `0 0 0 2px ${selectedGlow}` : undefined,
           }}
         >
           {/* Debug Overlay */}
@@ -242,19 +250,26 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
           )}
 
           <div
-            className="px-2 py-1 text-xs font-medium text-white rounded-t flex items-center gap-1"
-            style={{ backgroundColor: bgColor }}
+            className="px-2 py-1 text-xs font-medium rounded-t flex items-center gap-1"
+            style={{ backgroundColor: bgColor, color: theme.ui.textMain }}
             onMouseEnter={() => nodeDefinition?.desc && setTooltip(nodeDefinition.desc)}
             onMouseLeave={() => setTooltip(null)}
           >
-            <span className="text-white text-[10px]">{treeNode.uid ?? '?'}</span>
+            <span className="text-[10px]" style={{ color: theme.ui.textMain }}>{treeNode.uid ?? '?'}</span>
             <span className="flex-1 truncate">{treeNode.nickname || label}</span>
-            {treeNode.isFolded && <span className="text-[10px] bg-black/30 px-1 rounded">Folded</span>}
-            {treeNode.disabled && <span className="text-red-300 text-[10px]">Disabled</span>}
+            {treeNode.isFolded && (
+              <span className="text-[10px] px-1 rounded" style={{ backgroundColor: theme.ui.border, color: theme.ui.textMain }}>
+                Folded
+              </span>
+            )}
+            {treeNode.disabled && <span className="text-[10px]" style={{ color: theme.debug.break.border }}>Disabled</span>}
           </div>
 
           {nodeNote && (
-            <div className="px-2 py-1 text-[10px] leading-snug border-b border-black/20 text-gray-200 break-words whitespace-pre-wrap">
+            <div
+              className="px-2 py-1 text-[10px] leading-snug border-b break-words whitespace-pre-wrap"
+              style={{ borderColor: theme.ui.border, color: theme.ui.textMain }}
+            >
               {nodeNote}
             </div>
           )}
@@ -271,7 +286,7 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
           )}
 
           {(nodeDefinition?.childConnectors?.length || 0) > 1 && (
-            <div className="flex justify-around px-1 pb-1 text-[9px] text-gray-400">
+            <div className="flex justify-around px-1 pb-1 text-[9px]" style={{ color: theme.ui.textDim }}>
               {nodeDefinition?.childConnectors?.map((conn, i) => <span key={i}>{conn.label || conn.name}</span>)}
             </div>
           )}
@@ -282,8 +297,9 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
             type="target"
             position={Position.Top}
             id="tree-target"
-            className="!bg-gray-400 !w-3 !h-2 !rounded-sm !border-0 hover:!bg-white hover:[--handle-scale:1.5] !cursor-crosshair !transition-[transform,background-color] duration-200 !origin-center z-20"
+            className="!w-3 !h-2 !rounded-sm !border-0 hover:[--handle-scale:1.5] hover:!opacity-100 !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20"
             style={{
+              backgroundColor: theme.ui.border,
               top: 0,
               left: '50%',
               transform: 'translate(-50%, -50%) scale(var(--handle-scale, 1))'
@@ -296,8 +312,9 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
             type="source"
             position={Position.Bottom}
             id={nodeDefinition.childConnectors[0].name}
-            className="!bg-gray-400 !w-3 !h-2 !rounded-sm !border-0 hover:!bg-white hover:[--handle-scale:1.5] !cursor-crosshair !transition-[transform,background-color] duration-200 !origin-center z-20"
+            className="!w-3 !h-2 !rounded-sm !border-0 hover:[--handle-scale:1.5] hover:!opacity-100 !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20"
             style={{
+              backgroundColor: theme.ui.border,
               bottom: 0,
               left: '50%',
               transform: 'translate(-50%, 50%) scale(var(--handle-scale, 1))'
@@ -311,8 +328,9 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
             type="source"
             position={Position.Bottom}
             id={conn.name}
-            className="!bg-gray-400 !w-3 !h-2 !rounded-sm !border-0 hover:!bg-white hover:[--handle-scale:1.5] !cursor-crosshair !transition-[transform,background-color] duration-200 !origin-center z-20"
+            className="!w-3 !h-2 !rounded-sm !border-0 hover:[--handle-scale:1.5] hover:!opacity-100 !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20"
             style={{
+              backgroundColor: theme.ui.border,
               bottom: 0,
               left: `${((i + 1) / ((nodeDefinition?.childConnectors?.length || 0) + 1)) * 100}%`,
               transform: 'translate(-50%, 50%) scale(var(--handle-scale, 1))'
@@ -322,17 +340,21 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
 
         {treeNode.hasConditionConnector && (
           <div
-            className="absolute top-[24px] w-[16px] h-5 bg-purple-600 border border-purple-400 border-r-0 rounded-l flex flex-col items-center justify-center hover:bg-purple-500 hover:scale-110 transition-[transform,background-color,scale] duration-200 cursor-crosshair z-20 shadow-[-1px_0_1px_rgba(0,0,0,0.3)] origin-right"
-            style={{ left: '-15px' }}
-            title="Condition Connector"
+            className="w-3 h-3 rounded-sm border flex items-center justify-center"
+            style={{
+              backgroundColor: theme.ui.background,
+              borderColor: theme.ui.border,
+              boxShadow: `-1px 0 1px ${theme.ui.border}`,
+            }}
           >
-            <span className="text-[9px] text-white font-black select-none leading-none">IF</span>
+            <span className="text-[9px] font-black select-none leading-none" style={{ color: theme.ui.textMain }}>IF</span>
             <Handle
               type="source"
               position={Position.Bottom}
               id="condition"
-              className="!bg-purple-400 !w-3 !h-2 !rounded-none !border-0 !absolute !bottom-0 !left-1/2 !cursor-crosshair hover:!bg-white hover:[--handle-scale:1.5] !transition-[transform,background-color] duration-200 !origin-center z-20"
+              className="!w-3 !h-2 !rounded-none !border-0 !absolute !bottom-0 !left-1/2 !cursor-crosshair hover:[--handle-scale:1.5] hover:!opacity-100 !transition-[transform,background-color,opacity] duration-200 !origin-center z-20"
               style={{
+                backgroundColor: theme.ui.border,
                 bottom: 0,
                 left: '50%',
                 transform: 'translate(-50%, 50%) scale(var(--handle-scale, 1))'

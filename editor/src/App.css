@@ -1,17 +1,65 @@
 @import "tailwindcss";
 
 @theme {
-  --color-gray-50: #fafafa;
-  --color-gray-100: #f5f5f5;
-  --color-gray-200: #e5e5e5;
-  --color-gray-300: #d4d4d4;
-  --color-gray-400: #a3a3a3;
-  --color-gray-500: #737373;
-  --color-gray-600: #525252;
-  --color-gray-700: #404040;
-  --color-gray-800: #262626;
-  --color-gray-900: #171717;
-  --color-gray-950: #0a0a0a;
+  --color-gray-50: var(--tb-color-gray-50);
+  --color-gray-100: var(--tb-color-gray-100);
+  --color-gray-200: var(--tb-color-gray-200);
+  --color-gray-300: var(--tb-color-gray-300);
+  --color-gray-400: var(--tb-color-gray-400);
+  --color-gray-500: var(--tb-color-gray-500);
+  --color-gray-600: var(--tb-color-gray-600);
+  --color-gray-700: var(--tb-color-gray-700);
+  --color-gray-750: var(--tb-color-gray-750);
+  --color-gray-800: var(--tb-color-gray-800);
+  --color-gray-900: var(--tb-color-gray-900);
+
+  --color-blue-200: var(--tb-color-blue-200);
+  --color-blue-300: var(--tb-color-blue-300);
+  --color-blue-400: var(--tb-color-blue-400);
+  --color-blue-500: var(--tb-color-blue-500);
+  --color-blue-600: var(--tb-color-blue-600);
+  --color-blue-700: var(--tb-color-blue-700);
+  --color-blue-900: var(--tb-color-blue-900);
+
+  --color-green-100: var(--tb-color-green-100);
+  --color-green-300: var(--tb-color-green-300);
+  --color-green-400: var(--tb-color-green-400);
+  --color-green-500: var(--tb-color-green-500);
+  --color-green-600: var(--tb-color-green-600);
+  --color-green-700: var(--tb-color-green-700);
+
+  --color-red-200: var(--tb-color-red-200);
+  --color-red-300: var(--tb-color-red-300);
+  --color-red-400: var(--tb-color-red-400);
+  --color-red-500: var(--tb-color-red-500);
+  --color-red-600: var(--tb-color-red-600);
+  --color-red-700: var(--tb-color-red-700);
+  --color-red-800: var(--tb-color-red-800);
+  --color-red-900: var(--tb-color-red-900);
+
+  --color-yellow-300: var(--tb-color-yellow-300);
+  --color-yellow-400: var(--tb-color-yellow-400);
+  --color-yellow-500: var(--tb-color-yellow-500);
+  --color-yellow-600: var(--tb-color-yellow-600);
+  --color-yellow-700: var(--tb-color-yellow-700);
+
+  --color-purple-300: var(--tb-color-purple-300);
+  --color-purple-500: var(--tb-color-purple-500);
+  --color-purple-600: var(--tb-color-purple-600);
+  --color-purple-700: var(--tb-color-purple-700);
+  --color-purple-900: var(--tb-color-purple-900);
+
+  --color-orange-300: var(--tb-color-orange-300);
+  --color-orange-500: var(--tb-color-orange-500);
+  --color-orange-600: var(--tb-color-orange-600);
+  --color-orange-700: var(--tb-color-orange-700);
+  --color-orange-900: var(--tb-color-orange-900);
+  --color-pink-300: var(--tb-color-pink-300);
+  --color-pink-500: var(--tb-color-pink-500);
+  --color-cyan-500: var(--tb-color-cyan-500);
+
+  --color-black: var(--tb-color-black);
+  --color-white: var(--tb-color-white);
 }
 
 /* React Flow 样式 */
@@ -19,42 +67,76 @@
 
 /* 全局样式 */
 :root {
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  --tb-ui-background: var(--color-gray-600);
+  --tb-ui-panel: var(--color-gray-300);
+  --tb-ui-border: var(--color-gray-500);
+  --tb-ui-text-main: var(--color-black);
+  --tb-ui-text-dim: var(--color-gray-700);
+  --tb-ui-input: var(--color-gray-200);
+  --tb-ui-grid: var(--color-gray-400);
+  --tb-ui-accent: var(--color-gray-500);
+  --tb-ui-accent-soft: var(--color-gray-300);
+  --tb-ui-button: var(--color-gray-200);
+  --tb-ui-button-hover: var(--color-gray-300);
+  --tb-ui-splitter-hover: var(--color-gray-500);
+  --tb-ui-terminal: var(--color-black);
+
+  --tb-ui-success: var(--color-green-500);
+  --tb-ui-danger: var(--color-red-500);
+  --tb-ui-warning: var(--color-yellow-500);
+
+  font-family: Tahoma, Verdana, Segoe UI, sans-serif;
   font-size: 14px;
   line-height: 1.5;
-  color: #1a1a1a;
-  background-color: #f5f5f5;
+
+  color: var(--tb-ui-text-main);
+  background-color: var(--tb-ui-background);
 }
 
-/* 暗色模式 */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #e5e5e5;
-    background-color: #1a1a1a;
-  }
+/* Contrast fixes for legacy utility classes on light theme */
+.text-gray-100,
+.text-gray-200,
+.text-gray-300,
+.text-gray-400,
+.text-gray-500,
+.text-gray-600 {
+  color: var(--tb-ui-text-main) !important;
 }
 
-/* ReactFlow Controls 深色主题 */
+::placeholder {
+  color: var(--tb-ui-text-main);
+  opacity: 0.6;
+}
+
+input,
+select,
+textarea {
+  background-color: var(--tb-ui-input) !important;
+  color: var(--tb-ui-text-main) !important;
+  border-color: var(--tb-ui-border) !important;
+}
+
+/* ReactFlow Controls 经典灰色主题 */
 .react-flow__controls {
-  background-color: #262626 !important;
-  border: 1px solid #404040 !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+  background-color: var(--tb-ui-panel) !important;
+  border: 1px solid var(--tb-ui-border) !important;
+  box-shadow: none !important;
 }
 
 .react-flow__controls-button {
-  background-color: #262626 !important;
-  border-color: #404040 !important;
-  fill: #a3a3a3 !important;
+  background-color: var(--tb-ui-button) !important;
+  border-color: var(--tb-ui-border) !important;
+  fill: var(--tb-ui-text-main) !important;
 }
 
 .react-flow__controls-button:hover {
-  background-color: #404040 !important;
+  background-color: var(--tb-ui-button-hover) !important;
 }
 
-/* ReactFlow MiniMap 深色主题 */
+/* ReactFlow MiniMap 经典灰色主题 */
 .react-flow__minimap {
-  background-color: #262626 !important;
-  border: 1px solid #404040 !important;
+  background-color: var(--tb-ui-panel) !important;
+  border: 1px solid var(--tb-ui-border) !important;
 }
 
 /* 画布默认光标为普通指针，中键拖动时变为抓手 */
@@ -76,10 +158,9 @@
   text-align: left;
 }
 
-
 /* 连线悬停效果 */
 .react-flow__edge:hover path {
-  stroke: #a3a3a3 !important;
+  stroke: var(--tb-ui-accent) !important;
 }
 
 /* 搜索跳转高亮动画 */

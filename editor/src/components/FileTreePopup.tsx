@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useEditorStore } from '../stores/editorStore';
 import { useFSMStore } from '../stores/fsmStore';
+import { useTooltipStore } from '../stores/tooltipStore';
 import { readFile } from '../utils/fileService';
 import { getFileDisplay } from '../utils/fileUtils';
 
@@ -65,6 +66,7 @@ function FileTreeNode({
   toggleDir,
   onFileClick,
   filter,
+  setTooltip,
 }: {
   node: TreeNode;
   depth: number;
@@ -72,6 +74,7 @@ function FileTreeNode({
   toggleDir: (path: string) => void;
   onFileClick: (path: string) => void;
   filter: string;
+  setTooltip: (content: string | null) => void;
 }) {
   const isExpanded = expandedDirs.has(node.path);
   const matchesFilter = !filter || node.path.toLowerCase().includes(filter.toLowerCase());
@@ -108,6 +111,7 @@ function FileTreeNode({
             toggleDir={toggleDir}
             onFileClick={onFileClick}
             filter={filter}
+            setTooltip={setTooltip}
           />
         ))}
       </div>
@@ -122,7 +126,8 @@ function FileTreeNode({
       onClick={() => onFileClick(node.path)}
       className="flex items-center px-2 py-1 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer"
       style={{ paddingLeft: `${depth * 16 + 8}px` }}
-      title={node.path}
+      onMouseEnter={() => setTooltip(node.path)}
+      onMouseLeave={() => setTooltip(null)}
     >
       <span className="mr-1.5">{icon}</span>
       <span className="flex-1 filename-ellipsis">{displayName}</span>
@@ -142,6 +147,7 @@ export function FileTreePopup({ isOpen, onClose }: FileTreePopupProps) {
   const { openFSM, setActiveFSM } = useFSMStore();
   const [filter, setFilter] = useState('');
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set());
+  const setTooltip = useTooltipStore(state => state.setTooltip);
   const inputRef = useRef<HTMLInputElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -222,7 +228,7 @@ export function FileTreePopup({ isOpen, onClose }: FileTreePopupProps) {
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Search files..."
-          className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+          className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-gray-500"
         />
       </div>
 
@@ -242,6 +248,7 @@ export function FileTreePopup({ isOpen, onClose }: FileTreePopupProps) {
               toggleDir={toggleDir}
               onFileClick={handleFileClick}
               filter={filter}
+              setTooltip={setTooltip}
             />
           ))
         )}

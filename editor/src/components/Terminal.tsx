@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { LogMessage, LOG_CHANNEL_NAME } from "../utils/logger";
+import { getTheme } from "../theme/theme";
 
 interface TerminalProps {
     isDocked: boolean;
@@ -7,6 +8,7 @@ interface TerminalProps {
 }
 
 export function Terminal({ isDocked, onToggleMode }: TerminalProps) {
+    const theme = getTheme();
     const [logs, setLogs] = useState<LogMessage[]>([]);
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -35,21 +37,43 @@ export function Terminal({ isDocked, onToggleMode }: TerminalProps) {
 
     const getColor = (level: string) => {
         switch (level) {
-            case 'error': return 'text-red-500';
-            case 'warn': return 'text-yellow-500';
-            case 'success': return 'text-green-500';
-            default: return 'text-gray-300';
+            case 'error': return theme.ui.terminalLogError;
+            case 'warn': return theme.ui.terminalLogWarn;
+            case 'success': return theme.ui.terminalLogSuccess;
+            default: return theme.ui.terminalLogInfo;
+        }
+    };
+
+    const getSegmentColor = (token: string | undefined, fallback: string) => {
+        if (!token) return fallback;
+        if (token.startsWith('#')) return token;
+        switch (token) {
+            case 'text-red-500': return theme.ui.terminalLogError;
+            case 'text-yellow-500': return theme.ui.terminalLogWarn;
+            case 'text-green-500': return theme.ui.terminalLogSuccess;
+            case 'text-purple-500': return theme.ui.terminalLogPurple;
+            case 'text-orange-500': return theme.ui.terminalLogOrange;
+            case 'text-gray-300':
+            case 'text-gray-400':
+            case 'text-gray-500':
+                return theme.ui.terminalLogDim;
+            default:
+                return fallback;
         }
     };
 
     return (
-        <div className={`flex flex-col w-full bg-black text-gray-300 font-mono text-sm overflow-hidden ${isDocked ? 'h-full border-t border-gray-700' : 'h-screen'}`}>
+        <div
+            className={`flex flex-col w-full font-mono text-sm overflow-hidden ${isDocked ? 'h-full border-t' : 'h-screen'}`}
+            style={{ backgroundColor: theme.ui.terminalBg, color: theme.ui.terminalText, borderColor: theme.ui.terminalBorder }}
+        >
             {/* Header */}
-            <div className="h-8 bg-gray-800 flex items-center px-4 border-b border-gray-700 select-none justify-between" data-tauri-drag-region={!isDocked}>
+            <div className="h-8 flex items-center px-4 border-b select-none justify-between" style={{ backgroundColor: theme.ui.terminalHeaderBg, borderColor: theme.ui.terminalBorder }} data-tauri-drag-region={!isDocked}>
                 <span className="font-bold text-xs uppercase tracking-wider">Terminal</span>
                 <button
                     onClick={onToggleMode}
-                    className="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-gray-300 transition-colors"
+                    className="text-xs px-2 py-1 rounded transition-colors"
+                    style={{ backgroundColor: theme.ui.terminalButtonBg, color: theme.ui.terminalButtonText }}
                 >
                     {isDocked ? "Pop Out [↗]" : "Pop In [↙]"}
                 </button>
@@ -59,20 +83,20 @@ export function Terminal({ isDocked, onToggleMode }: TerminalProps) {
             <div className="flex-1 overflow-y-auto p-2 space-y-1" ref={scrollRef}>
                 {logs.map((log, i) => (
                     <div key={i} className="break-words flex">
-                        <span className="text-gray-500 mr-2 text-xs w-24 shrink-0 select-none font-mono">
+                        <span className="mr-2 text-xs w-24 shrink-0 select-none font-mono" style={{ color: theme.ui.terminalTimestamp }}>
                             {(() => {
                                 const d = new Date(log.timestamp);
                                 return `${d.toLocaleTimeString('en-GB', { hour12: false })}.${d.getMilliseconds().toString().padStart(3, '0')}`;
                             })()}
                         </span>
                         {typeof log.message === 'string' ? (
-                            <span className={`${getColor(log.level)} whitespace-pre-wrap font-mono`}>
+                            <span className="whitespace-pre-wrap font-mono" style={{ color: getColor(log.level) }}>
                                 {log.message}
                             </span>
                         ) : (
                             <span className="whitespace-pre-wrap font-mono">
                                 {log.message.map((seg, j) => (
-                                    <span key={j} className={seg.color || getColor(log.level)}>
+                                    <span key={j} style={{ color: getSegmentColor(seg.color, getColor(log.level)) }}>
                                         {seg.text}
                                     </span>
                                 ))}
@@ -83,11 +107,12 @@ export function Terminal({ isDocked, onToggleMode }: TerminalProps) {
             </div>
 
             {/* Input Area */}
-            <div className="h-10 border-t border-gray-700 flex items-center px-2 bg-gray-900">
+            <div className="h-10 border-t flex items-center px-2" style={{ backgroundColor: theme.ui.terminalInputBg, borderColor: theme.ui.terminalBorder }}>
                 <span className="text-green-500 mr-2">$</span>
                 <input
                     type="text"
-                    className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-600"
+                    className="flex-1 bg-transparent border-none outline-none text-white"
+                    style={{ color: theme.ui.terminalText }}
                     placeholder="Enter command (e.g. help, clear)..."
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {

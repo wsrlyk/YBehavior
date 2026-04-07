@@ -237,7 +237,7 @@ export function FSMPropertiesPanel() {
     return (
         <div className="h-full bg-gray-900 border-l border-gray-700 flex flex-col p-3 overflow-auto scrollbar-thin scrollbar-thumb-gray-700">
             {selectedState && (
-                <div className={`space-y-4 transition-all duration-500 ${focusTarget?.type === 'state' && focusTarget.id === selectedState.id ? 'ring-2 ring-blue-500/50 ring-offset-2 ring-offset-gray-900 rounded-lg p-1' : ''}`} ref={focusedStateRef}>
+                <div className={`space-y-4 transition-all duration-500 ${focusTarget?.type === 'state' && focusTarget.id === selectedState.id ? 'ring-2 ring-gray-500/60 ring-offset-2 ring-offset-gray-900 rounded-lg p-1' : ''}`} ref={focusedStateRef}>
                     <div className="text-xs text-gray-500 uppercase tracking-wider font-bold border-b border-gray-800 pb-2">State Properties</div>
 
                     <div>
@@ -254,7 +254,7 @@ export function FSMPropertiesPanel() {
                             <div>
                                 <label className="text-[10px] text-gray-500 block mb-1">Name</label>
                                 <input
-                                    className={`w-full bg-gray-800 text-gray-200 text-sm px-2 py-1.5 rounded border outline-none transition-colors ${!isValid ? 'border-red-500 focus:border-red-400' : 'border-gray-700 focus:border-blue-500'
+                                    className={`w-full bg-gray-800 text-gray-200 text-sm px-2 py-1.5 rounded border outline-none transition-colors ${!isValid ? 'border-red-500 focus:border-red-400' : 'border-gray-700 focus:border-gray-500'
                                         }`}
                                     value={localName}
                                     onChange={(e) => setLocalName(e.target.value)}
@@ -264,7 +264,6 @@ export function FSMPropertiesPanel() {
                                         }
                                     }}
                                     placeholder="State name..."
-                                    title={!isValid ? nameValidation.error : undefined}
                                 />
                                 {!isValid && (
                                     <div className="text-[10px] text-red-400 mt-1">{nameValidation.error}</div>
@@ -287,7 +286,7 @@ export function FSMPropertiesPanel() {
                     <div>
                         <label className="text-[10px] text-gray-500 block mb-1">Comment</label>
                         <textarea
-                            className="w-full bg-gray-800 text-gray-200 text-sm px-2 py-1.5 rounded border border-gray-700 focus:border-blue-500 outline-none resize-none transition-colors"
+                            className="w-full bg-gray-800 text-gray-200 text-sm px-2 py-1.5 rounded border border-gray-700 focus:border-gray-500 outline-none resize-none transition-colors"
                             rows={4}
                             value={localComment}
                             onChange={(e) => setLocalComment(e.target.value)}
@@ -306,7 +305,7 @@ export function FSMPropertiesPanel() {
                             <div
                                 key={trans.id}
                                 ref={el => { if (el) focusedTransRefs.current.set(trans.id, el); else focusedTransRefs.current.delete(trans.id); }}
-                                className={`p-3 bg-gray-800/50 rounded border transition-all duration-500 space-y-3 relative group/trans ${focusTarget?.type === 'transition' && focusTarget.id === trans.id ? 'border-blue-500 ring-1 ring-blue-500/30' : 'border-gray-700'}`}
+                                className={`p-3 bg-gray-800/50 rounded border transition-all duration-500 space-y-3 relative group/trans ${focusTarget?.type === 'transition' && focusTarget.id === trans.id ? 'border-gray-500 ring-1 ring-gray-500/30' : 'border-gray-700'}`}
                             >
                                 <div className="flex justify-between items-center">
                                     <span className="text-[10px] text-gray-400 font-mono">
@@ -329,7 +328,6 @@ export function FSMPropertiesPanel() {
                                     <button
                                         onClick={() => removeTransition(trans.id)}
                                         className="text-gray-600 hover:text-red-400 text-xs transition-colors"
-                                        title="Remove transition"
                                     >✕</button>
                                 </div>
 
@@ -337,11 +335,11 @@ export function FSMPropertiesPanel() {
                                     <label className="text-[10px] text-gray-500 block uppercase tracking-tighter">Conditions</label>
                                     <div className="flex flex-wrap gap-1.5">
                                         {trans.conditions.map(c => (
-                                            <span key={c} className="bg-blue-600/30 text-blue-300 text-[11px] px-2 py-0.5 rounded-full border border-blue-600/50 flex items-center gap-1.5 group/ev">
+                                            <span key={c} className="bg-gray-700 text-gray-200 text-[11px] px-2 py-0.5 rounded-full border border-gray-500/60 flex items-center gap-1.5 group/ev">
                                                 {c}
                                                 <button
                                                     onClick={() => removeCondition(trans.id, c)}
-                                                    className="hover:text-white text-blue-500 leading-none"
+                                                    className="hover:text-white text-gray-300 leading-none"
                                                 >×</button>
                                             </span>
                                         ))}
@@ -350,8 +348,8 @@ export function FSMPropertiesPanel() {
                                             const condValidation = validateVariableName(newConditionName.trim());
                                             const isCondValid = newConditionName.trim().length === 0 || condValidation.isValid;
                                             return (
-                                                <div className={`flex items-center gap-1 bg-gray-900 rounded-full border p-0.5 pr-2 ${!isCondValid ? 'border-red-500' : 'border-blue-500/50'}`}
-                                                    title={!isCondValid ? condValidation.error : undefined}>
+                                                <div className={`flex items-center gap-1 bg-gray-900 rounded-full border p-0.5 pr-2 ${!isCondValid ? 'border-red-500' : 'border-gray-500/60'}`}
+                                                >
                                                     <input
                                                         ref={addConditionInputRef}
                                                         className="bg-transparent text-[11px] text-gray-200 px-2 outline-none w-20"
@@ -368,7 +366,7 @@ export function FSMPropertiesPanel() {
                                                     />
                                                     <button
                                                         onClick={() => handleAddCondition(trans.id)}
-                                                        className={condValidation.isValid ? 'text-blue-400 hover:text-blue-300' : 'text-gray-600 cursor-not-allowed'}
+                                                        className={condValidation.isValid ? 'text-gray-200 hover:text-white' : 'text-gray-600 cursor-not-allowed'}
                                                         disabled={!condValidation.isValid}
                                                     >✓</button>
                                                     <button onClick={() => setIsAddingCondition(null)} className="text-gray-500 hover:text-gray-400">✕</button>

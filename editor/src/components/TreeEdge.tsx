@@ -161,11 +161,11 @@ function TreeEdge({
             style={{
               position: 'absolute',
               transform: `translate(-50%, -50%) translate(${targetX}px,${(horizontalY + targetY) / 2}px)`,
-              background: '#374151',
+              background: theme.edge.label.bg,
               padding: '2px 6px',
               borderRadius: '4px',
               fontSize: '10px',
-              color: '#e5e7eb',
+              color: theme.edge.label.text,
               pointerEvents: 'none',
               zIndex: 10,
               whiteSpace: 'nowrap',

@@ -140,22 +140,22 @@ export function DebugToolbar() {
                 // Connection form
                 <>
                     <div className="flex items-center gap-1">
-                        <span className="text-[#a3a3a3]">IP:</span>
+                        <span className="text-gray-400">IP:</span>
                         <input
                             type="text"
                             value={localIP}
                             onChange={(e) => setLocalIP(e.target.value)}
-                            className="w-24 px-1.5 py-0.5 bg-[#404040] border border-[#525252] rounded text-white text-xs focus:outline-none focus:border-blue-500"
+                            className="w-24 px-1.5 py-0.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:border-gray-500"
                             placeholder="127.0.0.1"
                         />
                     </div>
                     <div className="flex items-center gap-1">
-                        <span className="text-[#a3a3a3]">Port:</span>
+                        <span className="text-gray-400">Port:</span>
                         <input
                             type="text"
                             value={localPort}
                             onChange={(e) => setLocalPort(e.target.value)}
-                            className="w-14 px-1.5 py-0.5 bg-[#404040] border border-[#525252] rounded text-white text-xs focus:outline-none focus:border-blue-500"
+                            className="w-14 px-1.5 py-0.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:border-gray-500"
                             placeholder="8888"
                         />
                     </div>
@@ -164,10 +164,9 @@ export function DebugToolbar() {
                         disabled={isConnecting}
                         className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors
               ${isConnecting
-                                ? 'bg-[#525252] text-[#a3a3a3] cursor-wait'
+                                ? 'bg-gray-600 text-gray-400 cursor-wait'
                                 : 'bg-green-600 hover:bg-green-700 text-white'
                             }`}
-                        title="连接到运行时"
                     >
                         <ConnectIcon />
                         <span>{isConnecting ? 'Connecting...' : 'Connect'}</span>
@@ -181,22 +180,22 @@ export function DebugToolbar() {
                         <span>Connected</span>
                     </div>
 
-                    <div className="w-px h-4 bg-[#525252] mx-1"></div>
+                    <div className="w-px h-4 bg-gray-600 mx-1"></div>
 
                     {/* Agent UID input */}
                     <div className="flex items-center gap-1">
-                        <span className="text-[#a3a3a3]">Agent:</span>
+                        <span className="text-gray-400">Agent:</span>
                         <input
                             type="text"
                             value={agentUID}
                             onChange={(e) => setAgentUID(e.target.value)}
-                            className="w-20 px-1.5 py-0.5 bg-[#404040] border border-[#525252] rounded text-white text-xs focus:outline-none focus:border-blue-500"
+                            className="w-20 px-1.5 py-0.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:border-gray-500"
                             placeholder="UID"
                         />
                     </div>
 
                     {/* Wait for begin checkbox */}
-                    <label className="flex items-center gap-1 text-[#a3a3a3] cursor-pointer">
+                    <label className="flex items-center gap-1 text-gray-400 cursor-pointer">
                         <input
                             type="checkbox"
                             checked={waitForBegin}
@@ -212,15 +211,14 @@ export function DebugToolbar() {
                         className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors
               ${isDebugging
                                 ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                : 'bg-gray-600 hover:bg-gray-500 text-white'
                             }`}
-                        title="开始调试当前文件"
                     >
                         <PlayIcon />
                         <span>Debug</span>
                     </button>
 
-                    <div className="w-px h-4 bg-[#525252] mx-1"></div>
+                    <div className="w-px h-4 bg-gray-600 mx-1"></div>
 
                     {/* Debug control buttons - only enabled when paused */}
                     <button
@@ -229,9 +227,8 @@ export function DebugToolbar() {
                         className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors
               ${isPaused
                                 ? 'bg-green-600 hover:bg-green-700 text-white'
-                                : 'bg-[#404040] text-[#737373] cursor-not-allowed'
+                                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                             }`}
-                        title="继续执行 (F5)"
                     >
                         <ContinueIcon />
                         <span>Continue</span>
@@ -243,9 +240,8 @@ export function DebugToolbar() {
                         className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors
               ${isPaused
                                 ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
-                                : 'bg-[#404040] text-[#737373] cursor-not-allowed'
+                                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                             }`}
-                        title="单步跳过 (F10)"
                     >
                         <StepOverIcon />
                         <span>Step Over</span>
@@ -257,9 +253,8 @@ export function DebugToolbar() {
                         className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors
               ${isPaused
                                 ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                                : 'bg-[#404040] text-[#737373] cursor-not-allowed'
+                                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                             }`}
-                        title="单步进入 (F11)"
                     >
                         <StepIntoIcon />
                         <span>Step Into</span>
@@ -278,7 +273,6 @@ export function DebugToolbar() {
                     <button
                         onClick={handleDisconnect}
                         className="flex items-center gap-1 px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-medium transition-colors"
-                        title="断开连接"
                     >
                         <DisconnectIcon />
                         <span>Disconnect</span>

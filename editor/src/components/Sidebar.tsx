@@ -3,6 +3,7 @@ import { useEditorStore } from '../stores/editorStore';
 import { useFSMStore } from '../stores/fsmStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useDebugStore } from '../stores/debugStore';
+import { useTooltipStore } from '../stores/tooltipStore';
 import { NodeState } from '../types/debug';
 import { getFileDisplay } from '../utils/fileUtils';
 import { DEBUG_COLORS, TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
@@ -53,17 +54,17 @@ export function Sidebar() {
       className="h-full flex flex-col flex-shrink-0"
       style={{
         width: sidebarWidth,
-        backgroundColor: theme.ui.background,
+        backgroundColor: theme.ui.panelBg,
         borderRight: `1px solid ${theme.ui.border}`
       }}
     >
       {/* 已打开文件列表 */}
       <div className="flex-1 overflow-auto custom-scrollbar">
-        <div className="p-2 text-[10px] text-[#737373] uppercase tracking-wider font-semibold">
+        <div className="p-2 text-[10px] uppercase tracking-wider font-semibold" style={{ color: theme.ui.textMain }}>
           Open Files
         </div>
         {isLoading ? (
-          <div className="px-2 text-sm text-gray-500">Loading...</div>
+          <div className="px-2 text-sm" style={{ color: theme.ui.textMain }}>Loading...</div>
         ) : (
           <div className="space-y-0.5">
             {allFiles.map((file) => (
@@ -84,6 +85,7 @@ export function Sidebar() {
 
 function SidebarItem({ file, isActive, onClick, onClose }: any) {
   const { isConnected, getFileRunState, treeRunInfos, keyframe } = useDebugStore();
+  const setTooltip = useTooltipStore((state) => state.setTooltip);
   const { icon, name } = getFileDisplay(file.name, file.isFSM);
 
   // Visual state for transient indicators
@@ -190,11 +192,23 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
   return (
     <div
       onClick={onClick}
-      className={`group relative flex items-center px-1.5 py-1 text-[11px] cursor-pointer ${isActive
-        ? 'bg-[#404040] text-white'
-        : 'text-[#a3a3a3] hover:bg-[#262626] hover:text-[#e5e5e5]'
-        }`}
-      title={file.name}
+      className="group relative flex items-center px-1.5 py-1 text-[11px] cursor-pointer"
+      style={{
+        backgroundColor: isActive ? theme.ui.border : 'transparent',
+        color: isActive ? theme.ui.textMain : theme.ui.textMain,
+      }}
+      onMouseEnter={(e) => {
+        if (isActive) return;
+        e.currentTarget.style.backgroundColor = theme.ui.panelBg;
+        e.currentTarget.style.color = theme.ui.textMain;
+        setTooltip(file.name);
+      }}
+      onMouseLeave={(e) => {
+        if (isActive) return;
+        e.currentTarget.style.backgroundColor = 'transparent';
+        e.currentTarget.style.color = theme.ui.textMain;
+        setTooltip(null);
+      }}
     >
       {/* Status indicator */}
       {visualState && (
@@ -202,7 +216,7 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
       )}
 
       <span className="mr-1.5 flex-shrink-0">{icon}</span>
-      <span className="flex-1 filename-ellipsis pr-2">
+      <span className="flex-1 filename-ellipsis pr-2" style={{ color: isActive ? theme.ui.terminalButtonText : theme.ui.textMain }}>
         {file.isDirty ? '* ' : ''}{name}
       </span>
       <button
@@ -210,8 +224,16 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
           e.stopPropagation();
           onClose();
         }}
-        className="absolute right-0.5 opacity-0 group-hover:opacity-100 hover:bg-[#404040] rounded px-0.5 text-[#a3a3a3] hover:text-white transition-all"
-        title="Close"
+        className="absolute right-0.5 opacity-0 group-hover:opacity-100 rounded px-0.5 transition-all"
+        style={{ color: theme.ui.textDim }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = theme.ui.border;
+          e.currentTarget.style.color = theme.ui.textMain;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent';
+          e.currentTarget.style.color = theme.ui.textDim;
+        }}
       >
         ×
       </button>

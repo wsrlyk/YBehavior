@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useEditorStore } from '../stores/editorStore';
+import { useTooltipStore } from '../stores/tooltipStore';
 import { stripExtension } from '../utils/fileUtils';
 
 interface TreeFilePickerProps {
@@ -15,6 +16,7 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
     const [search, setSearch] = useState('');
     const containerRef = useRef<HTMLDivElement>(null);
     const openTree = useEditorStore(state => state.openTree);
+    const setTooltip = useTooltipStore(state => state.setTooltip);
 
     const filteredOptions = options.filter(opt =>
         opt.toLowerCase().includes(search.toLowerCase())
@@ -33,24 +35,27 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
     return (
         <div className="relative w-full" ref={containerRef}>
             <div
-                className="w-full bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded cursor-pointer border border-gray-600 hover:border-blue-500 flex justify-between items-center group"
+                className="w-full bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded cursor-pointer border border-gray-600 hover:border-gray-500 flex justify-between items-center group"
                 onClick={() => {
                     setIsOpen(!isOpen);
                     if (!isOpen) setSearch('');
                 }}
             >
-                <span className="filename-ellipsis flex-1" title={value}>
+                <span
+                    className="filename-ellipsis flex-1"
+                    onMouseEnter={() => value && setTooltip(value)}
+                    onMouseLeave={() => setTooltip(null)}
+                >
                     {value ? stripExtension(value) : placeholder}
                 </span>
                 <div className="flex items-center gap-1">
                     {allowJump && value && (
                         <button
-                            className="text-[10px] text-gray-500 hover:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="text-[10px] text-gray-500 hover:text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 openTree(value);
                             }}
-                            title="Open this tree"
                         >
                             ↗
                         </button>
@@ -63,7 +68,6 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                                 onChange('');
                                 setIsOpen(false);
                             }}
-                            title="Clear selection"
                         >
                             ✕
                         </button>
@@ -76,7 +80,7 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                 <div className="absolute z-50 mt-1 w-full bg-gray-800 border border-gray-700 rounded shadow-xl max-h-48 overflow-hidden flex flex-col">
                     <div className="p-1 border-b border-gray-700">
                         <input
-                            className="w-full bg-gray-900 text-gray-300 text-[10px] px-2 py-1 rounded outline-none border border-gray-600 focus:border-blue-500"
+                            className="w-full bg-gray-900 text-gray-300 text-[10px] px-2 py-1 rounded outline-none border border-gray-600 focus:border-gray-500"
                             placeholder="Search trees..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
@@ -85,7 +89,7 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                     </div>
                     <div className="overflow-y-auto flex-1 custom-scrollbar">
                         <div
-                            className={`px-2 py-1.5 text-[10px] cursor-pointer hover:bg-blue-600 hover:text-white transition-colors truncate ${!value ? 'bg-blue-900 text-blue-200' : 'text-gray-500 italic'}`}
+                            className={`px-2 py-1.5 text-[10px] cursor-pointer hover:bg-gray-700 hover:text-gray-100 transition-colors truncate ${!value ? 'bg-gray-700 text-gray-200' : 'text-gray-500 italic'}`}
                             onClick={() => {
                                 onChange('');
                                 setIsOpen(false);
@@ -97,8 +101,9 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                             filteredOptions.map(opt => (
                                 <div
                                     key={opt}
-                                    className={`px-2 py-1.5 text-[10px] cursor-pointer hover:bg-gray-700 transition-colors filename-ellipsis ${value === opt || stripExtension(value) === stripExtension(opt) ? 'text-blue-400 bg-gray-750' : 'text-gray-300'}`}
-                                    title={opt}
+                                    className={`px-2 py-1.5 text-[10px] cursor-pointer hover:bg-gray-700 transition-colors filename-ellipsis ${value === opt || stripExtension(value) === stripExtension(opt) ? 'text-gray-100 bg-gray-750' : 'text-gray-300'}`}
+                                    onMouseEnter={() => setTooltip(opt)}
+                                    onMouseLeave={() => setTooltip(null)}
                                     onClick={() => {
                                         // Always store extensionless path in the model for consistency
                                         // and use forward slashes

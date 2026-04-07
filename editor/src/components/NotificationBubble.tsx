@@ -1,4 +1,7 @@
 import { useNotificationStore } from '../stores/notificationStore';
+import { getTheme } from '../theme/theme';
+
+const theme = getTheme();
 
 export function NotificationBubble() {
     const notifications = useNotificationStore((state) => state.notifications);
@@ -15,9 +18,10 @@ export function NotificationBubble() {
                             : n.type === 'success'
                                 ? 'bg-green-500/90 border-green-400 text-white'
                                 : n.type === 'warning'
-                                    ? 'bg-yellow-500/90 border-yellow-400 text-black'
-                                    : 'bg-blue-500/90 border-blue-400 text-white'
+                                    ? 'bg-yellow-500/90 border-yellow-400'
+                                    : 'bg-gray-600/90 border-gray-500 text-white'
                         }`}
+                    style={{ color: n.type === 'warning' ? theme.ui.textMain : undefined }}
                 >
                     <div className="text-lg font-bold text-center whitespace-nowrap">
                         {n.message}
