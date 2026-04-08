@@ -175,24 +175,24 @@ export const DefaultTheme: GraphTheme = {
     // --- Debug Colors ---
     debug: {
         success: {
-            border: '#5D8F5D',
-            glow: '0 0 10px rgba(93, 143, 93, 0.45)',
-            edge: '#5D8F5D',
+            border: '#22C55E',
+            glow: '0 0 12px rgba(34, 197, 94, 0.65)',
+            edge: '#16A34A',
         },
         failure: {
-            border: '#8A6A6A',
-            glow: '0 0 10px rgba(138, 106, 106, 0.45)',
-            edge: '#8A6A6A',
+            border: '#3B82F6',
+            glow: '0 0 12px rgba(59, 130, 246, 0.65)',
+            edge: '#2563EB',
         },
         running: {
-            border: '#9A6B8F',
-            glow: '0 0 10px rgba(154, 107, 143, 0.45)',
-            edge: '#9A6B8F',
+            border: '#EC4899',
+            glow: '0 0 12px rgba(236, 72, 153, 0.65)',
+            edge: '#DB2777',
         },
         break: {
-            border: '#AA5A5A',
-            glow: '0 0 10px rgba(170, 90, 90, 0.45)',
-            edge: '#AA5A5A',
+            border: '#EF4444',
+            glow: '0 0 12px rgba(239, 68, 68, 0.7)',
+            edge: '#DC2626',
         },
     },
 

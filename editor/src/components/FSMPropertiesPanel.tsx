@@ -256,9 +256,8 @@ export function FSMPropertiesPanel() {
                             <div>
                                 <label className="text-[10px] block mb-1" style={{ color: theme.ui.textDim }}>Name</label>
                                 <input
-                                    className={`w-full text-sm px-2 py-1.5 rounded border outline-none transition-colors ${!isValid ? 'border-red-500 focus:border-red-400' : ''
-                                        }`}
-                                    style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: !isValid ? undefined : theme.ui.border }}
+                                    className="w-full text-sm px-2 py-1.5 rounded border outline-none transition-colors"
+                                    style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: !isValid ? theme.ui.danger : theme.ui.border }}
                                     value={localName}
                                     onChange={(e) => setLocalName(e.target.value)}
                                     onBlur={() => {
@@ -269,7 +268,7 @@ export function FSMPropertiesPanel() {
                                     placeholder="State name..."
                                 />
                                 {!isValid && (
-                                    <div className="text-[10px] text-red-400 mt-1">{nameValidation.error}</div>
+                                    <div className="text-[10px] mt-1" style={{ color: theme.ui.danger }}>{nameValidation.error}</div>
                                 )}
                             </div>
                         );
@@ -359,8 +358,8 @@ export function FSMPropertiesPanel() {
                                             const condValidation = validateVariableName(newConditionName.trim());
                                             const isCondValid = newConditionName.trim().length === 0 || condValidation.isValid;
                                             return (
-                                                <div className={`flex items-center gap-1 rounded-full border p-0.5 pr-2 ${!isCondValid ? 'border-red-500' : ''}`}
-                                                    style={{ backgroundColor: theme.ui.background, borderColor: !isCondValid ? undefined : theme.ui.border }}
+                                                <div className="flex items-center gap-1 rounded-full border p-0.5 pr-2"
+                                                    style={{ backgroundColor: theme.ui.background, borderColor: !isCondValid ? theme.ui.danger : theme.ui.border }}
                                                 >
                                                     <input
                                                         ref={addConditionInputRef}

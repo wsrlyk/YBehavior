@@ -103,7 +103,7 @@ function FileTreeNode({
           onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
         >
           <span className="mr-1 text-xs" style={{ color: theme.ui.textDim }}>{shouldExpand ? '▼' : '▶'}</span>
-          <span className="text-yellow-500 mr-1">📁</span>
+          <span className="mr-1" style={{ color: theme.ui.warning }}>📁</span>
           <span style={{ color: theme.ui.textMain }}>{node.name}</span>
         </div>
         {shouldExpand && node.children.map(child => (

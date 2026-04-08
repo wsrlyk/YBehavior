@@ -48,15 +48,15 @@ export function Terminal({ isDocked, onToggleMode }: TerminalProps) {
         if (!token) return fallback;
         if (token.startsWith('#')) return token;
         switch (token) {
-            case 'text-red-500': return theme.ui.terminalLogError;
-            case 'text-yellow-500': return theme.ui.terminalLogWarn;
-            case 'text-green-500': return theme.ui.terminalLogSuccess;
-            case 'text-purple-500': return theme.ui.terminalLogPurple;
-            case 'text-orange-500': return theme.ui.terminalLogOrange;
-            case 'text-gray-300':
-            case 'text-gray-400':
-            case 'text-gray-500':
-                return theme.ui.terminalLogDim;
+            case 'log-error': return theme.ui.terminalLogError;
+            case 'log-warn': return theme.ui.terminalLogWarn;
+            case 'log-success': return theme.debug.success.border;
+            case 'log-failure': return theme.debug.failure.border;
+            case 'log-running': return theme.debug.running.border;
+            case 'log-break': return theme.debug.break.border;
+            case 'log-accent': return theme.ui.terminalLogOrange;
+            case 'log-bright': return theme.ui.terminalButtonText;
+            case 'log-dim': return theme.ui.terminalLogDim;
             default:
                 return fallback;
         }

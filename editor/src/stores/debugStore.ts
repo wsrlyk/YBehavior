@@ -996,10 +996,10 @@ export const useDebugStore = create<DebugState>((set, get) => ({
             const message = parts[0];
             const segments: { text: string, color?: string }[] = [];
 
-            // Header: Orange bracket, White content, Orange bracket
-            segments.push({ text: `-------<LogPoint `, color: 'text-orange-500' });
-            segments.push({ text: `${message}`, color: 'text-white' });
-            segments.push({ text: `>-------\n`, color: 'text-orange-500' });
+            // Header: Accent bracket, bright content, Accent bracket
+            segments.push({ text: `-------<LogPoint `, color: 'log-accent' });
+            segments.push({ text: `${message}`, color: 'log-bright' });
+            segments.push({ text: `>-------\n`, color: 'log-accent' });
 
             let index = 1;
             // Parse states
@@ -1017,41 +1017,41 @@ export const useDebugStore = create<DebugState>((set, get) => ({
             while (index < parts.length) {
                 const section = parts[index++];
                 if (section === 'BEFORE' || section === 'AFTER') {
-                    segments.push({ text: `\n${section}:\n`, color: 'text-yellow-500' });
+                    segments.push({ text: `\n${section}:\n`, color: 'log-warn' });
                     if (index < parts.length) {
                         const count = parseInt(parts[index++], 10);
                         if (!isNaN(count)) {
                             for (let i = 0; i < count && index < parts.length; i++) {
                                 // Variable: Value
-                                segments.push({ text: `  ${parts[index++]}\n`, color: 'text-gray-300' });
+                                segments.push({ text: `  ${parts[index++]}\n`, color: 'log-dim' });
                             }
                         }
                     }
                 } else {
                     // Try to handle unexpected tokens gracefully
-                    segments.push({ text: `${section}\n`, color: 'text-gray-400' });
+                    segments.push({ text: `${section}\n`, color: 'log-dim' });
                 }
             }
 
             // Footer with state
-            segments.push({ text: `\nResult: `, color: 'text-gray-400' });
+            segments.push({ text: `\nResult: `, color: 'log-dim' });
 
             const getStateColor = (s: NodeState) => {
                 switch (s) {
-                    case NodeState.Success: return 'text-green-500';
-                    case NodeState.Failure: return 'text-gray-400';
-                    case NodeState.Running: return 'text-purple-500';
-                    case NodeState.Break: return 'text-red-500';
-                    default: return 'text-gray-500';
+                    case NodeState.Success: return 'log-success';
+                    case NodeState.Failure: return 'log-failure';
+                    case NodeState.Running: return 'log-running';
+                    case NodeState.Break: return 'log-break';
+                    default: return 'log-dim';
                 }
             };
 
             segments.push({ text: `${NodeState[finalState]}`, color: getStateColor(finalState) });
-            segments.push({ text: ` (Raw: `, color: 'text-gray-500' });
+            segments.push({ text: ` (Raw: `, color: 'log-dim' });
             segments.push({ text: `${NodeState[rawState]}`, color: getStateColor(rawState) });
-            segments.push({ text: `)\n`, color: 'text-gray-500' });
+            segments.push({ text: `)\n`, color: 'log-dim' });
 
-            segments.push({ text: `-------</LogPoint>-------`, color: 'text-orange-500' });
+            segments.push({ text: `-------</LogPoint>-------`, color: 'log-accent' });
 
             logger.info(segments);
         }

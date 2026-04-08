@@ -598,6 +598,36 @@ npm run tauri build    # 打包（输出到 src-tauri/target/release/）
   - 在 `theme.ts` 中直接提高 `node.composite/decorator/action/condition/default` 亮度。
 - 修改文件：`src/components/CustomNode.tsx`、`src/theme/theme.ts`。
 
+### 2026-04-08 调试状态颜色增强与 Open Files 圆点可见性修复
+
+- 背景：用户反馈调试状态颜色偏灰不明显，且调试时 `Open Files` 左侧状态圆点不可见。
+- 处理：
+  - 提高调试状态色饱和度与对比度：`success/failure/running/break` 统一改为更鲜明配色，并增强 glow 强度。
+  - 同步更新 `DEBUG_COLORS/DEBUG_RINGS`，保持 `Sidebar` 与 `RunningList` 的状态色一致。
+  - 修复 `Sidebar` 圆点渲染：将错误的动态 `className` 颜色拼接改为内联 `backgroundColor`，并增加描边与发光，确保浅灰背景下可见。
+- 修改文件：`src/theme/theme.ts`、`src/config/constants.ts`、`src/components/Sidebar.tsx`。
+
+### 2026-04-08 OpenFiles/DebugList 圆点逻辑统一 + 调试色主题化
+
+- 背景：用户要求 `Open Files` 与 `Debug List` 的圆点显示逻辑保持一致，并确认调试颜色是否支持换主题。
+- 处理：
+  - `Sidebar` 与 `RunningList` 的状态色获取统一改为同一套 `getDebugColor`（`theme.debug.*.border`），判定优先级与瞬态逻辑保持一致。
+  - `Open Files` 圆点改为“连接时始终显示”，无状态时使用 `theme.ui.textDim`，有状态时增加 glow，行为对齐 `Debug List`。
+  - 移除 `constants.ts` 中 `DEBUG_COLORS/DEBUG_RINGS`，避免与主题 token 双轨并存；调试颜色完全由主题驱动，支持主题切换。
+- 修改文件：`src/components/Sidebar.tsx`、`src/components/RunningList.tsx`、`src/config/constants.ts`。
+
+### 2026-04-08 硬编码颜色全量复查与清理（补漏）
+
+- 背景：用户要求再次全量排查并清理所有硬编码颜色，避免后续再出现组件内写死颜色。
+- 处理：
+  - 全量扫描 `src`（排除 `theme.ts`）中的十六进制/rgb/hsl 与颜色 utility class。
+  - 清理 `PropertiesPanel` 残留的 `text-*/bg-*/border-*` 颜色类与错误态硬编码，全部改为 `theme.ui.*` / `theme.debug.*`。
+  - 清理 `RunningList` 头部粉色点硬编码，改为 `theme.debug.running.border`。
+  - 清理 `FSMEditor` 模态遮罩与按钮文字硬编码颜色，改为主题驱动。
+  - `debugStore` 的日志分段颜色 token 从 Tailwind 类名（`text-*`）改为语义 token（`log-*`），`Terminal` 同步仅按语义 token 映射主题色。
+- 复查结果：`src`（不含 `theme.ts`）中未发现十六进制/rgb/hsl 硬编码颜色；颜色 utility class 仅剩 `App.css` 的兼容选择器名（其颜色值已由 CSS 变量驱动，不含写死色值）。
+- 修改文件：`src/components/PropertiesPanel.tsx`、`src/components/RunningList.tsx`、`src/components/FSMEditor.tsx`、`src/components/FileTreePopup.tsx`、`src/components/NodeEditor.tsx`、`src/components/Terminal.tsx`、`src/stores/debugStore.ts`。
+
 ### 2026-04-07 分隔线补全与弱化
 
 - 背景：用户反馈 Node Properties 中 `Input2` 与 `Output` 之间缺少分隔线，且分隔线希望更淡。

@@ -225,10 +225,11 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
     if (action === 'toggling') {
       return (
         <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center rounded px-1 gap-1 z-10 shadow-md border" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
-          <span className="text-[10px] text-yellow-400 font-bold">Move?</span>
+          <span className="text-[10px] font-bold" style={{ color: theme.ui.warning }}>Move?</span>
           <button
             onClick={() => { onToggleScope(variable.name); setAction('none'); }}
-            className="text-green-400 hover:text-green-300 px-1 py-0.5 text-[10px]"
+            className="px-1 py-0.5 text-[10px]"
+            style={{ color: theme.ui.success }}
           >✓</button>
           <button
             onClick={() => setAction('none')}
@@ -241,10 +242,11 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
     if (action === 'deleting') {
       return (
         <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center rounded px-1 gap-1 z-10 shadow-md border" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
-          <span className="text-[10px] text-red-400 font-bold">Del?</span>
+          <span className="text-[10px] font-bold" style={{ color: theme.ui.danger }}>Del?</span>
           <button
             onClick={() => onDelete(variable.name)}
-            className="text-green-400 hover:text-green-300 px-1 py-0.5 text-[10px]"
+            className="px-1 py-0.5 text-[10px]"
+            style={{ color: theme.ui.success }}
           >✓</button>
           <button
             onClick={() => setAction('none')}
@@ -292,7 +294,8 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
       {isChanged && (
         <div
           key={isPaused ? 'paused' : debugValue} // Restart animation on value change
-          className={`absolute inset-0 bg-green-500/20 rounded pointer-events-none ${!isPaused ? 'animate-debug-flash' : ''}`}
+          className={`absolute inset-0 rounded pointer-events-none ${!isPaused ? 'animate-debug-flash' : ''}`}
+          style={{ backgroundColor: `${theme.ui.success}33` }}
         />
       )}
       <div className="flex items-center gap-1 min-w-0">
@@ -325,7 +328,7 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
               onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmRename(); if (e.key === 'Escape') setAction('none'); }}
               autoFocus
             />
-            <button onClick={handleConfirmRename} className="text-green-400 hover:text-green-300 text-[10px] px-0.5 flex-shrink-0">✓</button>
+            <button onClick={handleConfirmRename} className="text-[10px] px-0.5 flex-shrink-0" style={{ color: theme.ui.success }}>✓</button>
             <button onClick={() => setAction('none')} className="text-[10px] px-0.5 flex-shrink-0" style={{ color: theme.ui.textDim }}>✕</button>
           </div>
         ) : (
@@ -344,10 +347,12 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
             <div className="flex-1 min-w-0">
               {variable.valueType === 'bool' && variable.countType !== 'list' ? (
                 <button
-                  className={`px-2 py-0.5 rounded text-xs font-bold transition-colors ${variable.defaultValue === 'T'
-                    ? 'bg-green-700 text-white hover:bg-green-600'
-                    : 'bg-red-800 text-white hover:bg-red-700 border border-red-700'
-                    }`}
+                  className="px-2 py-0.5 rounded text-xs font-bold transition-colors"
+                  style={{
+                    backgroundColor: variable.defaultValue === 'T' ? theme.ui.success : theme.ui.danger,
+                    color: theme.ui.terminalButtonText,
+                    border: variable.defaultValue === 'T' ? 'none' : `1px solid ${theme.ui.danger}`,
+                  }}
                   onClick={() => onUpdate(variable.name, { defaultValue: variable.defaultValue === 'T' ? 'F' : 'T' })}
                 >
                   {variable.defaultValue === 'T' ? 'TRUE' : 'FALSE'}
@@ -358,11 +363,10 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
                 </span>
               ) : isEditing ? (
                 <input
-                  className={`w-full text-xs px-1 py-0.5 rounded border outline-none ${!validateValue(editValue, variable.valueType, variable.countType).isValid
-                    ? 'bg-red-900 text-white border-red-700'
-                    : ''
-                    }`}
-                  style={validateValue(editValue, variable.valueType, variable.countType).isValid ? { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border } : {}}
+                  className="w-full text-xs px-1 py-0.5 rounded border outline-none"
+                  style={validateValue(editValue, variable.valueType, variable.countType).isValid
+                    ? { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }
+                    : { backgroundColor: theme.ui.danger, color: theme.ui.terminalButtonText, borderColor: theme.ui.danger }}
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   onBlur={handleValueSubmit}
@@ -371,15 +375,17 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
                 />
               ) : debugValue !== undefined ? (
                 <span
-                  className="block w-full text-xs truncate font-mono text-green-400"
+                  className="block w-full text-xs truncate font-mono"
+                  style={{ color: theme.ui.success }}
                 >
                   {debugValue}
                 </span>
               ) : (
                 <span
-                  className={`block w-full text-xs truncate cursor-pointer px-1 py-0.5 rounded border ${!isValid ? 'bg-red-900 text-white border-red-700' : ''
-                    }`}
-                  style={!isValid ? undefined : { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
+                  className="block w-full text-xs truncate cursor-pointer px-1 py-0.5 rounded border"
+                  style={isValid
+                    ? { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }
+                    : { backgroundColor: theme.ui.danger, color: theme.ui.terminalButtonText, borderColor: theme.ui.danger }}
                   onClick={() => { setEditValue(variable.defaultValue); setIsEditing(true); }}
                 >
                   {variable.defaultValue || (variable.valueType === 'string' ? '""' : '(empty)')}
@@ -416,8 +422,8 @@ function AddVariableButton({ isLocal, onAdd }: { isLocal: boolean; onAdd: (v: Va
     return (
       <div className="flex items-center gap-1 rounded px-1 py-0.5 border" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
         <input
-          className={`w-24 text-[10px] bg-transparent outline-none ${!validation.isValid && name.length > 0 ? 'text-red-400' : ''}`}
-          style={{ color: theme.ui.textMain }}
+          className="w-24 text-[10px] bg-transparent outline-none"
+          style={{ color: !validation.isValid && name.length > 0 ? theme.ui.danger : theme.ui.textMain }}
           placeholder="Name..."
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -551,10 +557,11 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
 
         {isDeleting ? (
           <div className="flex items-center rounded px-1 gap-1" style={{ backgroundColor: theme.ui.background }}>
-            <span className="text-[10px] text-red-400 font-bold">Del?</span>
+            <span className="text-[10px] font-bold" style={{ color: theme.ui.danger }}>Del?</span>
             <button
               onClick={() => onDelete(pin.id)}
-              className="text-green-400 hover:text-green-300 px-1 py-0.5 text-[10px]"
+              className="px-1 py-0.5 text-[10px]"
+              style={{ color: theme.ui.success }}
             >
               ✓
             </button>
@@ -609,9 +616,12 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
             </select>
           ) : (
             <input
-              className={`flex-1 text-[10px] px-1 py-0.5 rounded outline-none border ${!validateValue(pin.binding.value, pin.valueType, pin.countType).isValid ? 'border-red-500' : ''
-                }`}
-              style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: validateValue(pin.binding.value, pin.valueType, pin.countType).isValid ? theme.ui.border : undefined }}
+              className="flex-1 text-[10px] px-1 py-0.5 rounded outline-none border"
+              style={{
+                backgroundColor: theme.ui.inputBg,
+                color: theme.ui.textMain,
+                borderColor: validateValue(pin.binding.value, pin.valueType, pin.countType).isValid ? theme.ui.border : theme.ui.danger
+              }}
               value={pin.binding.value}
               onChange={(e) => handleBindingChange(e.target.value, 'const')}
               placeholder="Constant value"
@@ -697,7 +707,7 @@ function AddInterfacePinButton({ isInput, onAdd }: { isInput: boolean; onAdd: (n
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
           autoFocus
         />
-        <button className="text-green-400 hover:text-green-300 px-1 py-1" onClick={handleAdd}>✓</button>
+        <button className="px-1 py-1" style={{ color: theme.ui.success }} onClick={handleAdd}>✓</button>
         <button className="px-1 py-1" style={{ color: theme.ui.textDim }} onClick={() => setIsAdding(false)}>✕</button>
       </div>
     );
@@ -1458,15 +1468,17 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
                 )}
               </select>
               {isDataConnection && hasDataConnection && (
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-purple-500 pointer-events-none" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full pointer-events-none" style={{ backgroundColor: theme.debug.running.border }} />
               )}
             </div>
           ) : pin.valueType === 'bool' && pin.countType !== 'list' ? (
             <button
-              className={`w-full text-xs px-1 py-0.5 rounded font-bold transition-colors ${pin.binding.type === 'const' && pin.binding.value === 'T'
-                ? 'bg-green-700 text-white hover:bg-green-600'
-                : 'bg-red-800 text-white hover:bg-red-700 border border-red-700'
-                }`}
+              className="w-full text-xs px-1 py-0.5 rounded font-bold transition-colors"
+              style={{
+                backgroundColor: pin.binding.type === 'const' && pin.binding.value === 'T' ? theme.ui.success : theme.ui.danger,
+                color: theme.ui.terminalButtonText,
+                border: pin.binding.type === 'const' && pin.binding.value === 'T' ? 'none' : `1px solid ${theme.ui.danger}`,
+              }}
               onClick={() => {
                 const currentVal = pin.binding.type === 'const' ? pin.binding.value : 'F';
                 const newValue = currentVal === 'T' ? 'F' : 'T';
@@ -1509,11 +1521,10 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
                   />
                 ) : (
                   <input
-                    className={`w-full h-5 leading-5 text-xs px-1 rounded border outline-none ${!validateValue(editValue, pin.valueType, pin.countType).isValid
-                      ? 'bg-red-900 text-white border-red-700'
-                      : ''
-                      }`}
-                    style={!validateValue(editValue, pin.valueType, pin.countType).isValid ? undefined : { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
+                    className="w-full h-5 leading-5 text-xs px-1 rounded border outline-none"
+                    style={validateValue(editValue, pin.valueType, pin.countType).isValid
+                      ? { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }
+                      : { backgroundColor: theme.ui.danger, color: theme.ui.terminalButtonText, borderColor: theme.ui.danger }}
                     value={editValue}
                     onChange={(e) => handleValueChange(e.target.value)}
                     onBlur={() => handleValueSubmit()}
@@ -1525,9 +1536,10 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
               </div>
             ) : (
               <span
-                className={`block w-full h-5 leading-5 text-xs truncate cursor-pointer transition-opacity px-1 rounded border ${!currentPinValidation.isValid ? 'bg-red-900 text-white border-red-700' : ''
-                  }`}
-                style={!currentPinValidation.isValid ? undefined : { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
+                className="block w-full h-5 leading-5 text-xs truncate cursor-pointer transition-opacity px-1 rounded border"
+                style={currentPinValidation.isValid
+                  ? { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }
+                  : { backgroundColor: theme.ui.danger, color: theme.ui.terminalButtonText, borderColor: theme.ui.danger }}
                 onMouseEnter={() => {
                   if (pin.binding.type === 'const') {
                     setTooltip(pin.binding.value || '-');

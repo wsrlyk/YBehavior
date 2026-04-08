@@ -873,7 +873,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
             backgroundColor: theme.ui.panelBg,
             borderColor: theme.ui.border,
           }}
-          maskColor="rgba(0, 0, 0, 0.6)"
+          maskColor={`${theme.ui.background}99`}
         />
       </ReactFlow>
 

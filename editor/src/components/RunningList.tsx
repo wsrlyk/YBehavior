@@ -5,7 +5,7 @@ import { useFSMStore } from '../stores/fsmStore';
 import { useTooltipStore } from '../stores/tooltipStore';
 import { getFileDisplay } from '../utils/fileUtils';
 import { NodeState } from '../types/debug';
-import { DEBUG_COLORS, TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
+import { TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
 import { getTheme } from '../theme/theme';
 
 export const RunningList = () => {
@@ -82,7 +82,13 @@ export const RunningList = () => {
                     onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                     onClick={() => setIsOpen(!isOpen)}
                 >
-                    <div className="w-2 h-2 rounded-full bg-pink-500 animate-pulse shadow-[0_0_8px_rgba(236,72,153,0.6)]" />
+                    <div
+                        className="w-2 h-2 rounded-full animate-pulse"
+                        style={{
+                            backgroundColor: theme.debug.running.border,
+                            boxShadow: `0 0 8px ${theme.debug.running.border}`,
+                        }}
+                    />
                     <span className="text-xs font-semibold" style={{ color: theme.ui.textMain }}>
                         Debug List ({totalCount})
                     </span>
@@ -122,6 +128,16 @@ function RunningListItem({ fileName, isFsm, onClick }: { fileName: string; isFsm
     const theme = getTheme();
     const { isConnected, getFileRunState, treeRunInfos, fsmRunInfo, keyframe } = useDebugStore();
     const setTooltip = useTooltipStore((state) => state.setTooltip);
+
+    const getDebugColor = (state: NodeState): string => {
+        switch (state) {
+            case NodeState.Running: return theme.debug.running.border;
+            case NodeState.Success: return theme.debug.success.border;
+            case NodeState.Failure: return theme.debug.failure.border;
+            case NodeState.Break: return theme.debug.break.border;
+            default: return theme.ui.textDim;
+        }
+    };
 
     // Icon determined by the caller (FSM from fsmRunInfo, Tree from treeRunInfos)
     const { icon, name: displayName } = getFileDisplay(fileName, isFsm, !isFsm);
@@ -175,16 +191,16 @@ function RunningListItem({ fileName, isFsm, onClick }: { fileName: string; isFsm
         let isTransient = false;
 
         if (fileRunState === NodeState.Break) {
-            nextColor = DEBUG_COLORS.BREAK;
+            nextColor = getDebugColor(NodeState.Break);
             isTransient = false;
         } else if (fileRunState === NodeState.Running) {
-            nextColor = DEBUG_COLORS.RUNNING;
+            nextColor = getDebugColor(NodeState.Running);
             isTransient = true;
         } else if (rootFinal !== undefined) {
-            if (rootFinal === NodeState.Success) { nextColor = DEBUG_COLORS.SUCCESS; isTransient = true; }
-            else if (rootFinal === NodeState.Failure) { nextColor = DEBUG_COLORS.FAILURE; isTransient = true; }
-            else if (rootFinal === NodeState.Break) { nextColor = DEBUG_COLORS.BREAK; isTransient = false; }
-            else if (rootFinal === NodeState.Running) { nextColor = DEBUG_COLORS.RUNNING; isTransient = true; }
+            if (rootFinal === NodeState.Success) { nextColor = getDebugColor(NodeState.Success); isTransient = true; }
+            else if (rootFinal === NodeState.Failure) { nextColor = getDebugColor(NodeState.Failure); isTransient = true; }
+            else if (rootFinal === NodeState.Break) { nextColor = getDebugColor(NodeState.Break); isTransient = false; }
+            else if (rootFinal === NodeState.Running) { nextColor = getDebugColor(NodeState.Running); isTransient = true; }
         }
 
         if (nextColor) {

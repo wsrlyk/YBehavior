@@ -772,11 +772,11 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
 
                 {/* State Picker Modal */}
                 {pickerData && (
-                    <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-8">
+                    <div className="absolute inset-0 z-[100] flex items-center justify-center backdrop-blur-sm p-8" style={{ backgroundColor: `${theme.ui.background}99` }}>
                         <div className="border rounded-lg shadow-2xl w-full max-w-md flex flex-col max-h-full" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
                             <div className="p-4 border-b flex justify-between items-center" style={{ borderColor: theme.ui.border }}>
                                 <h3 className="text-lg font-semibold" style={{ color: theme.ui.textMain }}>Select Target State</h3>
-                                <button onClick={() => setPickerData(null)} className="hover:text-white text-xl" style={{ color: theme.ui.textDim }}>✕</button>
+                                <button onClick={() => setPickerData(null)} className="text-xl" style={{ color: theme.ui.textDim }}>✕</button>
                             </div>
                             <div className="flex-1 overflow-auto p-2 scrollbar-thin">
                                 {pickerData.states.map(s => (
@@ -801,8 +801,8 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                             <div className="p-3 border-t text-right" style={{ borderColor: theme.ui.border }}>
                                 <button
                                     onClick={() => setPickerData(null)}
-                                    className="px-4 py-2 text-sm text-white rounded hover:opacity-80 transition-opacity"
-                                    style={{ backgroundColor: theme.ui.border }}
+                                    className="px-4 py-2 text-sm rounded hover:opacity-80 transition-opacity"
+                                    style={{ backgroundColor: theme.ui.border, color: theme.ui.textMain }}
                                 >
                                     Cancel
                                 </button>

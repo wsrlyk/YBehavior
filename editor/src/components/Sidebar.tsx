@@ -6,7 +6,7 @@ import { useDebugStore } from '../stores/debugStore';
 import { useTooltipStore } from '../stores/tooltipStore';
 import { NodeState } from '../types/debug';
 import { getFileDisplay } from '../utils/fileUtils';
-import { DEBUG_COLORS, TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
+import { TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
 
 import { getTheme } from '../theme/theme';
 
@@ -91,6 +91,16 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
   // Visual state for transient indicators
   const [visualState, setVisualState] = useState<{ color: string } | null>(null);
 
+  const getDebugColor = (state: NodeState): string => {
+    switch (state) {
+      case NodeState.Running: return theme.debug.running.border;
+      case NodeState.Success: return theme.debug.success.border;
+      case NodeState.Failure: return theme.debug.failure.border;
+      case NodeState.Break: return theme.debug.break.border;
+      default: return theme.ui.textDim;
+    }
+  };
+
   // Compute current data state
   const fileRunState = isConnected ? getFileRunState(name) : undefined;
   const fsmInfo = isConnected && file.isFSM ? useDebugStore.getState().fsmRunInfo : undefined;
@@ -159,20 +169,20 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
 
     // Priority 1: Break (Persistent) from fileRunState (if matched)
     if (fileRunState === NodeState.Break) {
-      nextColor = DEBUG_COLORS.BREAK;
+      nextColor = getDebugColor(NodeState.Break);
       isTransient = false;
     }
     // Priority 2: Running (Transient) from fileRunState
     else if (fileRunState === NodeState.Running) {
-      nextColor = DEBUG_COLORS.RUNNING;
+      nextColor = getDebugColor(NodeState.Running);
       isTransient = true;
     }
     // Priority 3: Derived Result (Success/Failure/Break/Running from scan)
     else if (rootFinal !== undefined) {
-      if (rootFinal === NodeState.Success) { nextColor = DEBUG_COLORS.SUCCESS; isTransient = true; }
-      else if (rootFinal === NodeState.Failure) { nextColor = DEBUG_COLORS.FAILURE; isTransient = true; }
-      else if (rootFinal === NodeState.Break) { nextColor = DEBUG_COLORS.BREAK; isTransient = false; }
-      else if (rootFinal === NodeState.Running) { nextColor = DEBUG_COLORS.RUNNING; isTransient = true; }
+      if (rootFinal === NodeState.Success) { nextColor = getDebugColor(NodeState.Success); isTransient = true; }
+      else if (rootFinal === NodeState.Failure) { nextColor = getDebugColor(NodeState.Failure); isTransient = true; }
+      else if (rootFinal === NodeState.Break) { nextColor = getDebugColor(NodeState.Break); isTransient = false; }
+      else if (rootFinal === NodeState.Running) { nextColor = getDebugColor(NodeState.Running); isTransient = true; }
     }
 
     if (nextColor) {
@@ -188,6 +198,8 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
       setVisualState(null);
     }
   }, [isConnected, fileRunState, rootFinal, keyframe, file.isFSM]);
+
+  const activeColor = visualState?.color || theme.ui.textDim;
 
   return (
     <div
@@ -210,9 +222,17 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
         setTooltip(null);
       }}
     >
-      {/* Status indicator */}
-      {visualState && (
-        <span className={`w-2 h-2 rounded-full mr-1 ${visualState.color}`} />
+      {/* Status indicator (keep behavior aligned with DebugList) */}
+      {isConnected && (
+        <span
+          className="w-2 h-2 rounded-full mr-1"
+          style={{
+            backgroundColor: activeColor,
+            boxShadow: visualState
+              ? `0 0 0 1px ${theme.ui.panelBg}, 0 0 6px ${activeColor}`
+              : `0 0 0 1px ${theme.ui.panelBg}`,
+          }}
+        />
       )}
 
       <span className="mr-1.5 flex-shrink-0">{icon}</span>
