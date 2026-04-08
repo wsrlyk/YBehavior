@@ -224,7 +224,7 @@ export function FSMPropertiesPanel() {
 
     if (!selectedState && transitionsForSelectedEdge.length === 0) {
         return (
-            <div className="h-full border-l flex flex-col p-4 items-center justify-center text-center" style={{ backgroundColor: theme.ui.background, borderColor: theme.ui.border }}>
+            <div className="h-full border-l flex flex-col p-4 items-center justify-center text-center" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
                 <div className="mb-2" style={{ color: theme.ui.textDim }}>
                     <svg className="w-12 h-12 mx-auto opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
@@ -237,7 +237,7 @@ export function FSMPropertiesPanel() {
     }
 
     return (
-        <div className="h-full border-l flex flex-col p-3 overflow-auto scrollbar-thin" style={{ backgroundColor: theme.ui.background, borderColor: theme.ui.border }}>
+        <div className="h-full border-l flex flex-col p-3 overflow-auto scrollbar-thin" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
             {selectedState && (
                 <div className={`space-y-4 transition-all duration-500 ${focusTarget?.type === 'state' && focusTarget.id === selectedState.id ? 'rounded-lg p-1' : ''}`} style={focusTarget?.type === 'state' && focusTarget.id === selectedState.id ? { boxShadow: `0 0 0 2px ${theme.ui.border}` } : undefined} ref={focusedStateRef}>
                     <div className="text-xs uppercase tracking-wider font-bold border-b pb-2" style={{ color: theme.ui.textDim, borderColor: theme.ui.border }}>State Properties</div>
@@ -358,13 +358,17 @@ export function FSMPropertiesPanel() {
                                             const condValidation = validateVariableName(newConditionName.trim());
                                             const isCondValid = newConditionName.trim().length === 0 || condValidation.isValid;
                                             return (
-                                                <div className="flex items-center gap-1 rounded-full border p-0.5 pr-2"
-                                                    style={{ backgroundColor: theme.ui.background, borderColor: !isCondValid ? theme.ui.danger : theme.ui.border }}
+                                                <div className="flex items-center gap-1.5 rounded border px-1.5 py-1"
+                                                    style={{ backgroundColor: theme.ui.panelBg, borderColor: !isCondValid ? theme.ui.danger : theme.ui.border }}
                                                 >
                                                     <input
                                                         ref={addConditionInputRef}
-                                                        className="bg-transparent text-[11px] px-2 outline-none w-20"
-                                                        style={{ color: theme.ui.textMain }}
+                                                        className="text-[11px] px-2 py-1 rounded outline-none border w-28"
+                                                        style={{
+                                                            backgroundColor: theme.ui.inputBg,
+                                                            color: theme.ui.textMain,
+                                                            borderColor: !isCondValid && newConditionName.trim().length > 0 ? theme.ui.danger : theme.ui.border,
+                                                        }}
                                                         value={newConditionName}
                                                         onChange={e => setNewConditionName(e.target.value)}
                                                         onKeyDown={e => {
@@ -378,11 +382,25 @@ export function FSMPropertiesPanel() {
                                                     />
                                                     <button
                                                         onClick={() => handleAddCondition(trans.id)}
-                                                        className={condValidation.isValid ? '' : 'cursor-not-allowed'}
-                                                        style={{ color: condValidation.isValid ? theme.ui.textMain : theme.ui.textDim }}
+                                                        className={`w-5 h-5 rounded text-[11px] leading-none ${condValidation.isValid ? '' : 'cursor-not-allowed'}`}
+                                                        style={{
+                                                            backgroundColor: condValidation.isValid ? theme.ui.accentSoft : theme.ui.buttonBg,
+                                                            color: condValidation.isValid ? theme.ui.textMain : theme.ui.textDim,
+                                                            border: `1px solid ${theme.ui.border}`,
+                                                        }}
                                                         disabled={!condValidation.isValid}
+                                                        title="Confirm"
                                                     >✓</button>
-                                                    <button onClick={() => setIsAddingCondition(null)} style={{ color: theme.ui.textDim }}>✕</button>
+                                                    <button
+                                                        onClick={() => setIsAddingCondition(null)}
+                                                        className="w-5 h-5 rounded text-[11px] leading-none"
+                                                        style={{
+                                                            backgroundColor: theme.ui.buttonBg,
+                                                            color: theme.ui.textDim,
+                                                            border: `1px solid ${theme.ui.border}`,
+                                                        }}
+                                                        title="Cancel"
+                                                    >✕</button>
                                                 </div>
                                             );
                                         })() : (

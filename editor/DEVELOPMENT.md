@@ -628,6 +628,46 @@ npm run tauri build    # 打包（输出到 src-tauri/target/release/）
 - 复查结果：`src`（不含 `theme.ts`）中未发现十六进制/rgb/hsl 硬编码颜色；颜色 utility class 仅剩 `App.css` 的兼容选择器名（其颜色值已由 CSS 变量驱动，不含写死色值）。
 - 修改文件：`src/components/PropertiesPanel.tsx`、`src/components/RunningList.tsx`、`src/components/FSMEditor.tsx`、`src/components/FileTreePopup.tsx`、`src/components/NodeEditor.tsx`、`src/components/Terminal.tsx`、`src/stores/debugStore.ts`。
 
+### 2026-04-08 外部主题配置支持（themes.json 多主题 + editor_meta 当前主题）
+
+- 背景：用户要求发布后的 `exe` 可通过配置切换颜色，并支持多个主题。
+- 处理：
+  - 新增 `config/themes.json`，支持 `themes` 数组配置多个主题（按 `name` 区分）。
+  - 新增 `src/theme/themeConfig.ts`：
+    - 启动时读取 `themes.json`；
+    - 读取 `editor_meta.local.json` 中 `currentTheme`（兼容根级和 `uiMeta.currentTheme`）；
+    - 按名称选择主题，找不到时回退 `themes.json` 第一个；
+    - 再回退到内置 `DefaultTheme`；
+    - 采用深合并，允许主题仅覆盖部分字段。
+  - `App.tsx` 改为启动时先执行 `initializeThemeFromConfig()`，加载成功后再渲染主界面。
+  - `editorMetaStore` 的 `uiMeta` 类型补充 `currentTheme?: string`，确保该字段可被加载/保存。
+- 修改文件：`src/theme/themeConfig.ts`、`src/App.tsx`、`src/stores/editorMetaStore.ts`、`config/themes.json`。
+
+### 2026-04-08 本地用户主题支持（themes.local.json）
+
+- 背景：用户要求 `themes.json` 作为内置主题，同时允许用户自定义主题且不修改内置文件。
+- 处理：
+  - 主题加载改为双层：`themes.json`（内置）+ `themes.local.json`（用户本地，可选）。
+  - `themes.local.json` 与内置同名主题时做深合并覆盖；不存在同名时追加为新主题。
+  - 选择规则保持：`editor_meta.local.json` 指定名称优先；未指定时回退到 `themes.json` 第一个主题。
+  - `themes.local.json` 不存在时静默忽略，不影响启动。
+  - 说明：仓库已包含 `config/*.local.json` ignore 规则，`themes.local.json` 会自动被忽略。
+- 修改文件：`src/theme/themeConfig.ts`。
+
+### 2026-04-08 主题选择自动修正 + baseTheme 继承支持
+
+- 背景：用户要求在 `editor_meta.local.json` 缺失/错误主题名时自动写回有效主题，且主题支持继承基础主题以减少重复配置。
+- 处理：
+  - `themeConfig` 新增 `baseTheme` 解析与递归合并：
+    - 主题可通过 `baseTheme` 继承另一个主题；
+    - 再叠加自身 `theme` 覆盖；
+    - 保留循环继承检测（发现循环时告警并中断递归）。
+  - 启动主题初始化后自动修正 `editor_meta.local.json`：
+    - 若 `currentTheme` 未配置或无效，写回最终选中的有效主题（通常为 `themes.json` 第一个）；
+    - 同步写入根级 `currentTheme` 与 `uiMeta.currentTheme`，便于后续人工修改。
+  - `themes.json` 示例补充 `baseTheme` 说明，示例主题 `high-contrast-debug` 改为继承 `default`。
+- 修改文件：`src/theme/themeConfig.ts`、`config/themes.json`。
+
 ### 2026-04-07 分隔线补全与弱化
 
 - 背景：用户反馈 Node Properties 中 `Input2` 与 `Output` 之间缺少分隔线，且分隔线希望更淡。

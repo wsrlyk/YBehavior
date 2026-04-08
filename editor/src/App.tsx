@@ -5,10 +5,11 @@ import { TerminalWindow } from "./windows/TerminalWindow";
 import { NotificationBubble } from "./components/NotificationBubble";
 import { useDebugStore } from "./stores/debugStore";
 import { useGlobalKeyboard } from "./hooks/useGlobalKeyboard";
-import { applyThemeCssVariables, getTheme } from "./theme/theme";
+import { initializeThemeFromConfig } from "./theme/themeConfig";
 
 function App() {
   const [route, setRoute] = useState(window.location.hash);
+  const [themeReady, setThemeReady] = useState(false);
   const debugInit = useDebugStore((state) => state.init);
   const debugCleanup = useDebugStore((state) => state.cleanup);
 
@@ -22,7 +23,20 @@ function App() {
   useGlobalKeyboard();
 
   useEffect(() => {
-    applyThemeCssVariables(getTheme());
+    let disposed = false;
+
+    const initTheme = async () => {
+      await initializeThemeFromConfig();
+      if (!disposed) {
+        setThemeReady(true);
+      }
+    };
+
+    initTheme();
+
+    return () => {
+      disposed = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -38,6 +52,10 @@ function App() {
       window.removeEventListener("contextmenu", handleContext);
     };
   }, []);
+
+  if (!themeReady) {
+    return null;
+  }
 
   return (
     <>

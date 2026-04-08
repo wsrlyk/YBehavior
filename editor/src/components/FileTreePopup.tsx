@@ -164,24 +164,28 @@ export function FileTreePopup({ isOpen, onClose }: FileTreePopupProps) {
     if (isOpen) {
       setFilter('');
       setTimeout(() => inputRef.current?.focus(), 0);
+    } else {
+      setTooltip(null);
     }
-  }, [isOpen]);
+  }, [isOpen, setTooltip]);
 
   useEffect(() => {
     if (!isOpen) return;
 
     const handleClickOutside = (e: MouseEvent) => {
       if (popupRef.current && !popupRef.current.contains(e.target as unknown as Node)) {
+        setTooltip(null);
         onClose();
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, setTooltip]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
+      setTooltip(null);
       onClose();
     }
   };
@@ -199,6 +203,7 @@ export function FileTreePopup({ isOpen, onClose }: FileTreePopupProps) {
   };
 
   const handleFileClick = async (path: string) => {
+    setTooltip(null);
     if (path.endsWith('.fsm')) {
       const { editorTreeDir } = useEditorStore.getState();
       if (editorTreeDir) {

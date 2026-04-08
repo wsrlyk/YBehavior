@@ -9,6 +9,7 @@ import type { Variable } from '../types';
 import type { FSM, FSMMachine, FSMState, FSMStateType } from '../types/fsm';
 import {
     createFSMState,
+    createFSMMachine,
     createFSMTransition,
     createEmptyFSM,
     isSpecialStateType,
@@ -268,9 +269,15 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
                     states: new Map([...machine.states, [newState.id, newState]]),
                 };
 
+                const nextMachines = new Map([...fsm.machines, [machine.id, newMachine]]);
+                if (type === 'Meta') {
+                    const subMachine = createFSMMachine(machine.level + 1, newState.id);
+                    nextMachines.set(subMachine.id, subMachine);
+                }
+
                 return recalculateFSMUIDs({
                     ...fsm,
-                    machines: new Map([...fsm.machines, [machine.id, newMachine]]),
+                    machines: nextMachines,
                 });
             });
             return result || state;
@@ -290,24 +297,67 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
                 const stateToRemove = machine.states.get(stateId);
                 if (!stateToRemove || isSpecialStateType(stateToRemove.type)) return fsm;
 
-                const newStates = new Map(machine.states);
-                newStates.delete(stateId);
+                const removedStateIds = new Set<string>([stateId]);
+                const removedMachineIds = new Set<string>();
 
-                // Remove related transitions
-                const newTransitions = machine.transitions.filter(
-                    t => t.fromStateId !== stateId && t.toStateId !== stateId
-                );
+                if (stateToRemove.type === 'Meta') {
+                    const queue: string[] = [];
+                    for (const [candidateMachineId, candidateMachine] of fsm.machines) {
+                        if (candidateMachine.parentMetaStateId === stateId) {
+                            queue.push(candidateMachineId);
+                        }
+                    }
 
-                const newMachine: FSMMachine = {
-                    ...machine,
-                    states: newStates,
-                    transitions: newTransitions,
-                    defaultStateId: machine.defaultStateId === stateId ? null : machine.defaultStateId,
-                };
+                    while (queue.length > 0) {
+                        const machineIdToRemove = queue.pop()!;
+                        if (removedMachineIds.has(machineIdToRemove)) continue;
+
+                        removedMachineIds.add(machineIdToRemove);
+                        const machineToRemove = fsm.machines.get(machineIdToRemove);
+                        if (!machineToRemove) continue;
+
+                        for (const subState of machineToRemove.states.values()) {
+                            removedStateIds.add(subState.id);
+                        }
+
+                        for (const [nestedMachineId, nestedMachine] of fsm.machines) {
+                            if (nestedMachine.parentMetaStateId && machineToRemove.states.has(nestedMachine.parentMetaStateId)) {
+                                queue.push(nestedMachineId);
+                            }
+                        }
+                    }
+                }
+
+                const nextMachines = new Map<string, FSMMachine>();
+                for (const [existingMachineId, existingMachine] of fsm.machines) {
+                    if (removedMachineIds.has(existingMachineId)) continue;
+
+                    const nextStates = new Map(existingMachine.states);
+                    for (const removedId of removedStateIds) {
+                        nextStates.delete(removedId);
+                    }
+
+                    const nextTransitions = existingMachine.transitions.filter((t) => {
+                        const fromRemoved = t.fromStateId !== null && removedStateIds.has(t.fromStateId);
+                        const toRemoved = removedStateIds.has(t.toStateId);
+                        return !fromRemoved && !toRemoved;
+                    });
+
+                    const nextDefaultStateId = existingMachine.defaultStateId && removedStateIds.has(existingMachine.defaultStateId)
+                        ? null
+                        : existingMachine.defaultStateId;
+
+                    nextMachines.set(existingMachineId, {
+                        ...existingMachine,
+                        states: nextStates,
+                        transitions: nextTransitions,
+                        defaultStateId: nextDefaultStateId,
+                    });
+                }
 
                 return recalculateFSMUIDs({
                     ...fsm,
-                    machines: new Map([...fsm.machines, [machine.id, newMachine]]),
+                    machines: nextMachines,
                 });
             });
             return result || state;

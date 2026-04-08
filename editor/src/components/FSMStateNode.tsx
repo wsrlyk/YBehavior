@@ -173,7 +173,7 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
                     className="flex items-center justify-between px-3 py-1 text-xs filename-ellipsis max-w-[200px] border-t group/tree"
                     style={{
                         color: theme.ui.textMain,
-                        backgroundColor: theme.ui.background,
+                        backgroundColor: theme.ui.panelBg,
                         borderColor: theme.ui.border,
                     }}
                     onMouseEnter={() => setTooltip(state.tree || null)}
@@ -201,7 +201,8 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
                     className="px-3 py-1 text-xs cursor-pointer"
                     style={{
                         color: theme.ui.textMain,
-                        backgroundColor: theme.ui.border,
+                        backgroundColor: theme.ui.panelBg,
+                        borderTop: `1px solid ${theme.ui.border}`,
                     }}
                 >
                     ◇ Double-click to enter

@@ -28,6 +28,7 @@ export interface GraphTheme {
         tree: { default: string; selected: string };
         data: { default: string; selected: string };
         fsmTransition: { default: string; selected: string };
+        defaultState: string;
         label: { bg: string; border: string; text: string };
     };
 
@@ -152,9 +153,10 @@ export const DefaultTheme: GraphTheme = {
             selected: '#1D1D1D',
         },
         fsmTransition: {
-            default: '#8B8B8B',
-            selected: '#6A6A6A',
+            default: '#B8B8B8',
+            selected: '#D5A15A',
         },
+        defaultState: '#B57A3C',
         label: {
             bg: '#D6D6D6',
             border: '#9A9A9A',
@@ -164,12 +166,12 @@ export const DefaultTheme: GraphTheme = {
 
     // --- FSM State Colors ---
     fsmState: {
-        Normal: { bg: '#B9B9B9', border: '#888888' },
-        Meta: { bg: '#B2A9B6', border: '#7F6D86' },
-        Entry: { bg: '#B6B7A9', border: '#7E7F6F' },
-        Exit: { bg: '#C4A4A4', border: '#8F6666' },
-        Any: { bg: '#C1B59D', border: '#8D7B5C' },
-        Upper: { bg: '#B7B0A6', border: '#857A6F' },
+        Normal: { bg: '#BFBFBF', border: '#888888' },
+        Meta: { bg: '#BBA8BE', border: '#7F6D86' },
+        Entry: { bg: '#AFC2B3', border: '#6F8A79' },
+        Exit: { bg: '#CDA7A7', border: '#8F6666' },
+        Any: { bg: '#C8BE9F', border: '#8B7A58' },
+        Upper: { bg: '#AEB8C8', border: '#6D7B90' },
     },
 
     // --- Debug Colors ---
@@ -262,16 +264,49 @@ export const DefaultTheme: GraphTheme = {
 };
 
 // ==================== Active Theme ====================
-// Currently just the default. Future: load from settings / allow runtime switch.
+// Keep object identity stable so module-level cached refs (theme/node/debug/etc.)
+// can still observe runtime theme updates.
 
-let activeTheme: GraphTheme = DefaultTheme;
+function isObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function cloneTheme(theme: GraphTheme): GraphTheme {
+    return JSON.parse(JSON.stringify(theme)) as GraphTheme;
+}
+
+function syncObjectInPlace(target: Record<string, unknown>, source: Record<string, unknown>) {
+    for (const key of Object.keys(target)) {
+        if (!(key in source)) {
+            delete target[key];
+        }
+    }
+
+    for (const [key, sourceValue] of Object.entries(source)) {
+        const targetValue = target[key];
+
+        if (isObject(sourceValue) && isObject(targetValue)) {
+            syncObjectInPlace(targetValue, sourceValue);
+            continue;
+        }
+
+        if (isObject(sourceValue)) {
+            target[key] = JSON.parse(JSON.stringify(sourceValue));
+            continue;
+        }
+
+        target[key] = sourceValue;
+    }
+}
+
+let activeTheme: GraphTheme = cloneTheme(DefaultTheme);
 
 export function getTheme(): GraphTheme {
     return activeTheme;
 }
 
 export function setTheme(theme: GraphTheme) {
-    activeTheme = theme;
+    syncObjectInPlace(activeTheme as unknown as Record<string, unknown>, theme as unknown as Record<string, unknown>);
 }
 
 export function applyThemeCssVariables(theme: GraphTheme = activeTheme) {

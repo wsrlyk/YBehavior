@@ -25,6 +25,7 @@ interface EditorMetaState {
     uiMeta: {
         sidebarWidth: number;
         propertiesPanelWidth: number;
+        currentTheme?: string;
         isSearchOpen: boolean;
         activePropertiesTab: 'variables' | 'io' | 'properties';
         focusTarget?: { type: 'node' | 'variable' | 'io' | 'state' | 'transition', id: string };
@@ -64,6 +65,7 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
     uiMeta: {
         sidebarWidth: 160,
         propertiesPanelWidth: 300,
+        currentTheme: undefined,
         isSearchOpen: false,
         activePropertiesTab: 'properties'
     },

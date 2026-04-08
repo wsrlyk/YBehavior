@@ -101,7 +101,7 @@ function convertTransitionsToEdges(machine: FSMMachine, fsm: { machines: Map<str
                 target: machine.defaultStateId,
                 type: 'straight',
                 animated: false,
-                style: { stroke: theme.ui.warning, strokeWidth: 2 },
+                style: { stroke: theme.edge.defaultState, strokeWidth: 2.5 },
                 selectable: false,
                 focusable: false,
                 deletable: false,
@@ -549,18 +549,17 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
     // Handle node double-click (for entering Meta states)
     const onNodeDoubleClick = useCallback(
         (_: React.MouseEvent, node: Node) => {
-            const state = machine?.states.get(node.id);
-            if (state?.type === 'Meta') {
-                // Find the sub-machine
-                const fsmStore = useFSMStore.getState();
-                const fsm = fsmStore.getCurrentFSM();
-                if (fsm) {
-                    for (const [subMachineId, subMachine] of fsm.machines) {
-                        if (subMachine.parentMetaStateId === node.id) {
-                            navigateToMachine(subMachineId);
-                            break;
-                        }
-                    }
+            const nodeData = node.data as FSMStateNodeData | undefined;
+            const clickedState = nodeData?.state ?? machine?.states.get(node.id);
+            if (clickedState?.type !== 'Meta') return;
+
+            const fsm = useFSMStore.getState().getCurrentFSM();
+            if (!fsm) return;
+
+            for (const [subMachineId, subMachine] of fsm.machines) {
+                if (subMachine.parentMetaStateId === clickedState.id) {
+                    navigateToMachine(subMachineId);
+                    break;
                 }
             }
         },
@@ -630,11 +629,16 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                 fitView={!activeFile?.viewport}
                 snapToGrid
                 snapGrid={[20, 20]}
+                proOptions={{ hideAttribution: true }}
                 style={{ backgroundColor: theme.ui.background }}
             >
                 <Background color={theme.ui.gridDots} gap={20} />
                 <MiniMap
-                    style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}
+                    nodeStrokeWidth={3}
+                    zoomable
+                    pannable
+                    style={{ width: 140, height: 90, backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}
+                    maskColor={`${theme.ui.background}99`}
                     nodeColor={(node) => {
                         const data = node.data as FSMStateNodeData;
                         const colors: Record<string, string> = {
@@ -725,7 +729,7 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                     <button
                         onClick={() => handleAddState('Meta')}
                         className="px-3 py-1 text-sm rounded"
-                        style={{ backgroundColor: theme.ui.accent, color: theme.ui.textMain }}
+                        style={{ backgroundColor: theme.fsmState.Meta?.bg || theme.ui.accent, color: theme.ui.textMain }}
                     >
                         + Meta
                     </button>
