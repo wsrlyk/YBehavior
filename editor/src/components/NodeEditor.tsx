@@ -880,6 +880,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       <NodeContextMenu
         isOpen={contextMenu.isOpen}
         position={contextMenu.position}
+        screenPosition={contextMenu.screenPosition}
         nodeId={contextMenu.nodeId}
         onClose={() => setContextMenu(prev => ({ ...prev, isOpen: false }))}
         onAddNode={handleAddNode}

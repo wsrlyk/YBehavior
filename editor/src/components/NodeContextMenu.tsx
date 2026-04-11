@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import { useEditorStore } from '../stores/editorStore';
 import { useTooltipStore } from '../stores/tooltipStore';
@@ -12,6 +12,7 @@ const theme = getTheme();
 interface NodeContextMenuProps {
   isOpen: boolean;
   position: { x: number; y: number };
+  screenPosition?: { x: number; y: number };
   onClose: () => void;
   onAddNode: (nodeClass: string, position: { x: number; y: number }) => void;
   nodeId?: string | null;
@@ -19,7 +20,7 @@ interface NodeContextMenuProps {
 
 const CATEGORY_ORDER: NodeCategory[] = ['composite', 'decorator', 'action', 'condition'];
 
-export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }: NodeContextMenuProps) {
+export function NodeContextMenu({ isOpen, position, screenPosition, onClose, onAddNode, nodeId }: NodeContextMenuProps) {
   const { getByCategory, isLoaded } = useNodeDefinitionStore();
   const currentTree = useEditorStore((state) => state.getCurrentTree());
   const toggleNodeFold = useEditorStore((state) => state.toggleNodeFold);
@@ -110,20 +111,70 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
     onClose();
   };
 
+  const [adjustedPosition, setAdjustedPosition] = useState({ x: position.x, y: position.y });
+  const [isVisible, setIsVisible] = useState(false);
+
+  // When menu is opened at a new position, reset internal state
+  useLayoutEffect(() => {
+    if (isOpen) {
+      setIsVisible(false);
+      setAdjustedPosition(position);
+    }
+  }, [isOpen, position]);
+
+  useLayoutEffect(() => {
+    if (isOpen && menuRef.current) {
+      const rect = menuRef.current.getBoundingClientRect();
+      const parent = menuRef.current.parentElement;
+      if (!parent) return;
+
+      const parentRect = parent.getBoundingClientRect();
+      const safeRight = parentRect.right;
+      const safeBottom = parentRect.bottom;
+
+      // Use absolute mouse coordinates to check against safe boundaries
+      const mouseX = screenPosition?.x ?? (rect.left - adjustedPosition.x + position.x);
+      const mouseY = screenPosition?.y ?? (rect.top - adjustedPosition.y + position.y);
+
+      let newX = position.x;
+      let newY = position.y;
+
+      // Check overflow relative to the editor canvas (parent) boundaries
+      if (mouseX + rect.width > safeRight) {
+        newX = position.x - rect.width;
+      }
+
+      if (mouseY + rect.height > safeBottom) {
+        newY = position.y - rect.height;
+      }
+
+      if (newX !== adjustedPosition.x || newY !== adjustedPosition.y) {
+        setAdjustedPosition({ x: newX, y: newY });
+      }
+      setIsVisible(true);
+    }
+  }, [isOpen, isVisible, position, screenPosition, filter, filteredNodes.length, nodeId, !!node]);
+
   if (!isOpen || !isLoaded) return null;
 
   const CATEGORY_COLORS = theme.contextMenu.categoryDots;
-  const sectionBg = theme.ui.background;
-  const itemHoverBg = theme.ui.border;
+  const sectionBg = theme.ui.panelBg;
+  const itemHoverBg = theme.ui.accentSoft;
   const itemText = theme.ui.textMain;
   const mutedText = theme.ui.textDim;
-  const activeAccent = theme.text.variable;
 
   return (
     <div
       ref={menuRef}
-      style={{ left: position.x, top: position.y, backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}
-      className="absolute z-50 w-72 border rounded-lg shadow-xl overflow-hidden"
+      style={{
+        left: adjustedPosition.x,
+        top: adjustedPosition.y,
+        backgroundColor: theme.ui.panelBg,
+        borderColor: theme.ui.border,
+        opacity: isVisible ? 1 : 0,
+        pointerEvents: isVisible ? 'auto' : 'none',
+      }}
+      className="absolute z-50 w-72 border rounded-lg shadow-xl overflow-hidden transition-opacity duration-75"
       onKeyDown={handleKeyDown}
     >
       {node && (
@@ -178,7 +229,7 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
               <span
                 className="text-[10px] px-1.5 rounded"
                 style={node.isFolded
-                  ? { backgroundColor: activeAccent, color: theme.ui.textMain }
+                  ? { backgroundColor: theme.ui.accentSoft, color: theme.ui.textMain }
                   : { backgroundColor: theme.ui.border, color: mutedText }}
               >
                 {node.isFolded ? 'FOLDED' : 'NORMAL'}
@@ -297,7 +348,7 @@ export function NodeContextMenu({ isOpen, position, onClose, onAddNode, nodeId }
                   onMouseLeave={() => setTooltip(null)}
                   className="px-3 py-2 text-sm cursor-pointer flex items-center gap-2"
                   style={{
-                    backgroundColor: index === selectedIndex ? activeAccent : 'transparent',
+                    backgroundColor: index === selectedIndex ? theme.ui.accentSoft : 'transparent',
                     color: itemText,
                   }}
                 >

@@ -45,7 +45,7 @@
         },
         "edge": {
           "tree": {
-            "default": "#8B8B8B",
+            "default": "#BFBFBF",
             "selected": "#1D1D1D"
           },
           "data": {
