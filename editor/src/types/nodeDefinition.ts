@@ -26,9 +26,9 @@ export interface PinDefinition {
 }
 
 export interface TypeMapRule {
-  srcVariable: string;
+  srcPin: string;
   srcValue: string;
-  desVariable: string;
+  desPin: string;
   desType: string;
 }
 

@@ -1,4 +1,4 @@
-﻿import { create } from 'zustand';
+import { create } from 'zustand';
 import type { Tree, TreeNode, TreeConnection, DataConnection, Variable, Pin } from '../types';
 import { loadTree, listFiles, saveFile } from '../utils/fileService';
 import { loadSettings, type Settings } from '../utils/settings';
@@ -1749,12 +1749,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         if (updates.binding?.type === 'const' && nodeDef?.typeMaps) {
           const srcValue = updates.binding.value;
           const matchedRules = nodeDef.typeMaps.filter(
-            rule => rule.srcVariable === pinName && rule.srcValue === srcValue
+            rule => rule.srcPin === pinName && rule.srcValue === srcValue
           );
 
           if (matchedRules.length > 0) {
             newPins = newPins.map(pin => {
-              const rule = matchedRules.find(r => r.desVariable === pin.name);
+              const rule = matchedRules.find(r => r.desPin === pin.name);
               if (!rule) return pin;
 
               const typeStr = rule.desType;

@@ -375,10 +375,6 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
     }, [setMenu, onPaneClickProp]);
 
     // Handle connection events for handle visibility
-    const onConnectStart = useCallback(() => {
-        setIsConnecting(true);
-    }, [setIsConnecting]);
-
     const onConnectEnd = useCallback(() => {
         setIsConnecting(false);
     }, [setIsConnecting]);

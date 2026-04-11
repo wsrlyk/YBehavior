@@ -11,7 +11,6 @@ export default function Tooltip() {
     const [adjusted, setAdjusted] = useState({ x: 0, y: 0 });
     const [isMeasuring, setIsMeasuring] = useState(false);
     const tooltipRef = useRef<HTMLDivElement | null>(null);
-    const lastContentRef = useRef<string | null>(null);
 
     // Always track mouse position so it's ready when a tooltip appears
     useEffect(() => {

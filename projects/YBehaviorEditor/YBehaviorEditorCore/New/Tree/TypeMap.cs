@@ -47,7 +47,10 @@ namespace YBehavior.Editor.Core.New
 
             attr = data.Attributes["SrcVariable"];
             if (attr == null)
+                attr = data.Attributes["SrcPin"];
+            if (attr == null)
                 return false;
+
             item.SrcVariable = attr.Value;
 
             attr = data.Attributes["SrcValue"];
@@ -56,6 +59,8 @@ namespace YBehavior.Editor.Core.New
             item.SrcValue = attr.Value;
 
             attr = data.Attributes["DesVariable"];
+            if (attr == null)
+                attr = data.Attributes["DesPin"];
             if (attr == null)
                 return false;
             item.DesVariable = attr.Value;

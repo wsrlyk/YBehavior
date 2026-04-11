@@ -61,9 +61,9 @@ interface XmlPin {
 }
 
 interface XmlTypeMap {
-  '@_SrcVariable': string;
+  '@_SrcPin': string;
   '@_SrcValue': string;
-  '@_DesVariable': string;
+  '@_DesPin': string;
   '@_DesType': string;
 }
 
@@ -117,9 +117,9 @@ function parseVariable(v: XmlPin): PinDefinition {
 
 function parseTypeMap(tm: XmlTypeMap): TypeMapRule {
   return {
-    srcVariable: tm['@_SrcVariable'],
+    srcPin: tm['@_SrcPin'],
     srcValue: tm['@_SrcValue'],
-    desVariable: tm['@_DesVariable'],
+    desPin: tm['@_DesPin'],
     desType: tm['@_DesType'],
   };
 }
