@@ -81,6 +81,25 @@ namespace YBehavior.Editor.Core.New
             }
             return string.Empty;
         }
+        public void SetNodeDescription(string nodeName, string content)
+        {
+            if (!m_DescriptionDic.TryGetValue(nodeName, out var desc))
+            {
+                desc = new NodeDescription();
+                m_DescriptionDic[nodeName] = desc;
+            }
+            desc.node = content;
+        }
+        public void SetNodeVariableDescription(string nodeName, string variable, string content)
+        {
+            if (!m_DescriptionDic.TryGetValue(nodeName, out var desc))
+            {
+                desc = new NodeDescription();
+                m_DescriptionDic[nodeName] = desc;
+            }
+            desc.SetVariable(variable, content);
+        }
+
         /// <summary>
         /// Load from configuration
         /// </summary>
@@ -106,7 +125,11 @@ namespace YBehavior.Editor.Core.New
                     foreach (XmlNode node in rootchild.ChildNodes)
                     {
                         sb.Length = 0;
-                        NodeDescription desc = new NodeDescription();
+                        if (!m_DescriptionDic.TryGetValue(node.Name, out var desc))
+                        { 
+                            desc = new NodeDescription();
+                            m_DescriptionDic[node.Name] = desc;
+                        }
                         var attr = node.Attributes["Content"];
                         if (attr != null)
                             sb.Append(attr.Value).Append("\n");
@@ -140,7 +163,6 @@ namespace YBehavior.Editor.Core.New
                                 desc.SetVariable(chi.Name, chiattr.Value);
                         }
 
-                        m_DescriptionDic[node.Name] = desc;
                     }
                 }
                 else if (rootchild.Name == "Hierachies")

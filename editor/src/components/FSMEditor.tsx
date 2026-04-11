@@ -27,6 +27,7 @@ import FSMTransitionEdge from './FSMTransitionEdge';
 import { useFSMStore } from '../stores/fsmStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useDebugStore } from '../stores/debugStore';
+import { useTooltipStore } from '../stores/tooltipStore';
 import { useShallow } from 'zustand/react/shallow';
 import type { FSMMachine, FSMTransition, FSMState } from '../types/fsm';
 import { getTheme } from '../theme/theme';
@@ -276,6 +277,8 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
     const { screenToFlowPosition, setCenter } = useReactFlow();
     const pendingCenterTarget = useEditorMetaStore(state => state.uiMeta.pendingCenterTarget);
     const setPendingCenterTarget = useEditorMetaStore(state => state.setPendingCenterTarget);
+    const setTooltip = useTooltipStore((state) => state.setTooltip);
+    const setTooltipDisabled = useTooltipStore((state) => state.setDisabled);
 
     useEffect(() => {
         if (pendingCenterTarget) {
@@ -539,11 +542,17 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
     );
 
     // Handle node position changes
+    const onNodeDragStart = useCallback(() => {
+        setTooltipDisabled(true);
+        setTooltip(null);
+    }, [setTooltip, setTooltipDisabled]);
+
     const onNodeDragStop = useCallback(
         (_: React.MouseEvent, node: Node) => {
             updateState(node.id, { position: node.position });
+            setTooltipDisabled(false);
         },
-        [updateState]
+        [updateState, setTooltipDisabled]
     );
 
     // Handle node double-click (for entering Meta states)
@@ -615,8 +624,8 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
-                onConnectStart={onConnectStart}
                 onConnectEnd={onConnectEnd}
+                onNodeDragStart={onNodeDragStart}
                 onNodeDragStop={onNodeDragStop}
                 onMoveEnd={onMoveEnd}
                 onSelectionChange={onSelectionChange}

@@ -155,6 +155,14 @@ export function NodeContextMenu({ isOpen, position, screenPosition, onClose, onA
     }
   }, [isOpen, isVisible, position, screenPosition, filter, filteredNodes.length, nodeId, !!node]);
 
+  useEffect(() => {
+    // Clear tooltip when menu is closed
+    if (!isOpen) {
+      setTooltip(null);
+    }
+    return () => setTooltip(null);
+  }, [isOpen, setTooltip]);
+
   if (!isOpen || !isLoaded) return null;
 
   const CATEGORY_COLORS = theme.contextMenu.categoryDots;

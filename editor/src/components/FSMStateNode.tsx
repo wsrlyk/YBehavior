@@ -40,7 +40,7 @@ export type FSMStateNodeType = Node<FSMStateNodeData, 'fsmState'>;
 
 // ==================== Component ====================
 
-function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
+function FSMStateNode({ data, selected, dragging }: NodeProps<FSMStateNodeType>) {
     const { state, isDefault } = data;
     const [isHovered, setIsHovered] = useState(false);
     const setTooltip = useTooltipStore((state) => state.setTooltip);
@@ -176,7 +176,7 @@ function FSMStateNode({ data, selected }: NodeProps<FSMStateNodeType>) {
                         backgroundColor: theme.ui.panelBg,
                         borderColor: theme.ui.border,
                     }}
-                    onMouseEnter={() => setTooltip(state.tree || null)}
+                    onMouseEnter={() => !dragging && setTooltip(state.tree || null)}
                     onMouseLeave={() => setTooltip(null)}
                 >
                     <span className="truncate">🌲 {stripExtension(state.tree)}</span>

@@ -1345,7 +1345,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
 
   return (
     <div
-      className={`text-xs rounded p-1 ${!isEnabled ? 'opacity-90' : ''}`}
+      className={`text-xs rounded p-1 ${!isEnabled ? 'opacity-50' : ''}`}
       style={{ backgroundColor: theme.ui.panelBg }}
       onMouseEnter={() => pin.desc && setTooltip(pin.desc)}
       onMouseLeave={() => setTooltip(null)}

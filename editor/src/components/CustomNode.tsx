@@ -54,7 +54,7 @@ function getPinNoteValue(pin: Pin): string {
   return `${base}${localSuffix}${getVectorIndexDisplay(pin)}`;
 }
 
-function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
+function PinRow({ pin, isInput, dragging }: { pin: Pin; isInput: boolean; dragging?: boolean }) {
   const setTooltip = useTooltipStore((state) => state.setTooltip);
   const pinColor = PIN_COLORS[pin.valueType] || PIN_COLORS.default || theme.ui.border;
   const binding = pin.binding;
@@ -90,7 +90,7 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
       <span
         className="truncate max-w-32 cursor-help"
         style={{ color: theme.text.pinName }}
-        onMouseEnter={() => setTooltip(pin.desc || null)}
+        onMouseEnter={() => !dragging && setTooltip(pin.desc || null)}
       >{pin.name}</span>
       {binding.type === 'const' && (
         <span
@@ -99,7 +99,7 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
             : 'truncate'           // 普通值（enum/数字等）不能用 RTL
             }`}
           style={{ color: theme.text.constant }}
-          onMouseEnter={() => setTooltip(binding.value || '-')}
+          onMouseEnter={() => !dragging && setTooltip(binding.value || '-')}
         >
           {['Tree', 'Reference', 'treeNode.Reference'].includes(pin.name) ? stripExtension(binding.value || '-') : (binding.value || '-')}
         </span>
@@ -108,14 +108,14 @@ function PinRow({ pin, isInput }: { pin: Pin; isInput: boolean }) {
         <span
           className="text-[10px] truncate max-w-40 cursor-help"
           style={{ color: theme.text.variable }}
-          onMouseEnter={() => setTooltip(variableName)}
+          onMouseEnter={() => !dragging && setTooltip(variableName)}
         >{variableName}{binding.type === 'pointer' && binding.isLocal ? "'" : ""}{getVectorIndexDisplay()}</span>
       )}
     </div>
   );
 }
 
-function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
+function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
   const setTooltip = useTooltipStore((state) => state.setTooltip);
   const getDefinition = useNodeDefinitionStore((state) => state.getDefinition);
   const { label, treeNode } = data;
@@ -252,7 +252,7 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
           <div
             className="px-2 py-1 text-xs font-medium rounded-t flex items-center gap-1"
             style={{ backgroundColor: bgColor, color: theme.ui.textMain }}
-            onMouseEnter={() => nodeDefinition?.desc && setTooltip(nodeDefinition.desc)}
+            onMouseEnter={() => !dragging && nodeDefinition?.desc && setTooltip(nodeDefinition.desc)}
             onMouseLeave={() => setTooltip(null)}
           >
             <span className="text-[10px]" style={{ color: theme.ui.textMain }}>{treeNode.uid ?? '?'}</span>
@@ -277,10 +277,10 @@ function CustomNode({ data, selected }: NodeProps<CustomNodeType>) {
           {(treeNode.pins.filter(p => (p.isInput || !p.isInput) && p.enableType !== 'disable').length > 0) && (
             <div className="flex justify-between px-2 py-1 gap-4">
               <div className="flex flex-col">
-                {treeNode.pins.filter(p => p.isInput && p.enableType !== 'disable').map((pin, i) => <PinRow key={`in-${i}`} pin={pin} isInput={true} />)}
+                {treeNode.pins.filter(p => p.isInput && p.enableType !== 'disable').map((pin, i) => <PinRow key={`in-${i}`} pin={pin} isInput={true} dragging={dragging} />)}
               </div>
               <div className="flex flex-col items-end">
-                {treeNode.pins.filter(p => !p.isInput && p.enableType !== 'disable').map((pin, i) => <PinRow key={`out-${i}`} pin={pin} isInput={false} />)}
+                {treeNode.pins.filter(p => !p.isInput && p.enableType !== 'disable').map((pin, i) => <PinRow key={`out-${i}`} pin={pin} isInput={false} dragging={dragging} />)}
               </div>
             </div>
           )}

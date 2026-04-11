@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Actions>
-	<Action Class="GetNameAction" Note="{0} has {1} in {2}" Hierachy="21" Icon="🎀">
+	<Action Class="GetNameAction" Note="{0} has {1} in {2}" Hierachy="21" Icon="🎀" Desc="GetNameAction desc">
 		<Pin Name="Var0" ValueType="IF" IsConst="False" Value="" vTypeGroup="1" cTypeGroup="1" />
 		<Pin Name="Var1" ValueType="E" IsArray="False" Value="" Param="Enum0|Enum1|Enum2"/>
 		<Pin Name="Var2" ValueType="S" IsArray="True" Value="1|2|3|4" />
@@ -10,7 +10,7 @@
 		<TypeMap SrcVariable="Var1" SrcValue="Enum2" DesVariable="Var0" DesType="FF" />
 	</Action>
 	<Action Class="GetTargetNameAction" Note="{0}" Hierachy="21">
-		<Pin Name="Target" ValueType="A" IsArray="False" IsConst="False" IsEnable="False" Value=""/>
+		<Pin Name="Target" ValueType="A" IsArray="False" IsConst="False" IsEnable="False" Value="" Desc="GetTargetNameAction Target desc"/>
 	</Action>
 	<Action Class="SelectTargetAction" Note="{0}" Hierachy="121">
 		<Pin Name="Target" ValueType="A" IsArray="False" IsConst="False" IsInput="False" Value=""/>

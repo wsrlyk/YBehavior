@@ -86,6 +86,7 @@ namespace YBehavior.Editor.Core.New
                 switch (chi.Name)
                 {
                     case "Variable":
+                    case "Pin":
                         {
                             _LoadVariable(action, chi);
                         }
@@ -99,6 +100,10 @@ namespace YBehavior.Editor.Core.New
                         break;
                 }
             }
+
+            attr = xml.Attributes["Desc"];
+            if (attr != null)
+                DescriptionMgr.Instance.SetNodeDescription(classname, attr.Value);
 
             return true;
         }
@@ -184,6 +189,10 @@ namespace YBehavior.Editor.Core.New
             {
                 int.TryParse(attr.Value, out cTypeGroup);
             }
+
+            attr = xml.Attributes["Desc"];
+            if (attr != null)
+                DescriptionMgr.Instance.SetNodeVariableDescription(action.ClassName, name, attr.Value);
 
             Variable v = action.NodeMemory.CreateVariable(
                 name,

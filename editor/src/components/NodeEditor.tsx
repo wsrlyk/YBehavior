@@ -16,6 +16,7 @@ import { useEditorStore, getDescendantIds } from '../stores/editorStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import { useDebugStore } from '../stores/debugStore';
+import { useTooltipStore } from '../stores/tooltipStore';
 import { useShallow } from 'zustand/react/shallow';
 import { getTheme } from '../theme/theme';
 import { NodeContextMenu } from './NodeContextMenu';
@@ -453,7 +454,11 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     startPos: { x: number; y: number };
   } | null>(null);
 
+  const setTooltip = useTooltipStore((state) => state.setTooltip);
+  const setTooltipDisabled = useTooltipStore((state) => state.setDisabled);
   const onNodeDragStart = useCallback((event: any, draggedNode: Node) => {
+    setTooltipDisabled(true);
+    setTooltip(null);
     recordHistoryStart();
 
     if (event.shiftKey) {
@@ -480,7 +485,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     } else {
       dragSession.current = null;
     }
-  }, [recordHistoryStart, getNodes]);
+  }, [recordHistoryStart, getNodes, setTooltip, setTooltipDisabled]);
 
   const onNodeDrag = useCallback((_event: any, node: Node) => {
     if (dragSession.current?.isShiftDrag) {
@@ -556,10 +561,10 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     if (updates.length > 0) {
       updateNodesPositions(updates);
     }
-
+    setTooltipDisabled(false);
     finalizeContinuousAction();
     dragSession.current = null;
-  }, [updateNodesPositions, finalizeContinuousAction, getNodes]);
+  }, [updateNodesPositions, finalizeContinuousAction, getNodes, setTooltipDisabled]);
 
   // 自定义 onEdgesChange：处理连接的删除
   const onEdgesChange = useCallback((changes: import('@xyflow/react').EdgeChange<Edge>[]) => {
