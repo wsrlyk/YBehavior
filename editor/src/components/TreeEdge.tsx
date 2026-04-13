@@ -88,6 +88,11 @@ function TreeEdge({
 
     // 3. 计算水平线高度
     // Add baseOffset to the calculation to separate lines
+    // If it's a condition handle (at the top), the horizontal line should be near the sourceY
+    if (sourceHandleId === 'condition') {
+      return sourceY + 15;
+    }
+
     return Math.max(
       parentBottomY + 10 + baseOffset,
       ((parentBottomY + minChildY) / 2) + baseOffset

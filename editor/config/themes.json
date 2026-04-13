@@ -11,11 +11,11 @@
       "description": "Built-in full default theme template. Copy this object to create a new theme.",
       "theme": {
         "node": {
-          "composite": "#BFBFBF",
-          "decorator": "#BFBFBF",
+          "composite": "#CFCFCF",
+          "decorator": "#CFCFCF",
           "action": "#CDB79A",
           "condition": "#BBA8BE",
-          "default": "#BFBFBF"
+          "default": "#CFCFCF"
         },
         "pin": {
           "int": "#A35F1E",
@@ -45,11 +45,11 @@
         },
         "edge": {
           "tree": {
-            "default": "#BFBFBF",
+            "default": "#CFCFCF",
             "selected": "#1D1D1D"
           },
           "data": {
-            "default": "#7A7A7A",
+            "default": "#CFCFCF",
             "selected": "#1D1D1D"
           },
           "fsmTransition": {
@@ -65,7 +65,7 @@
         },
         "fsmState": {
           "Normal": {
-            "bg": "#BFBFBF",
+            "bg": "#CFCFCF",
             "border": "#888888"
           },
           "Meta": {
@@ -128,6 +128,10 @@
           "bg": "#D8D2C2",
           "border": "#9F9481",
           "text": "#2B2B2B"
+        },
+        "handle": {
+          "bg": "#CFCFCF",
+          "hoverBg": "#B8B8B8"
         },
         "ui": {
           "background": "#747474",
@@ -236,6 +240,10 @@
           "bg": "#2B303A",
           "border": "#4A5568",
           "text": "#E5E7EB"
+        },
+        "handle": {
+          "bg": "#8B949E",
+          "hoverBg": "#F3F4F6"
         },
         "ui": {
           "background": "#1D2128",

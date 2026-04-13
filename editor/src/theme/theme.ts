@@ -58,6 +58,12 @@ export interface GraphTheme {
         text: string;
     };
 
+    /** Node handles (Source/Target connectors) */
+    handle: {
+        bg: string;
+        hoverBg: string;
+    };
+
     /** UI Chrome colors */
     ui: {
         background: string;   // Main window/canvas background
@@ -220,6 +226,11 @@ export const DefaultTheme: GraphTheme = {
         bg: '#D8D2C2',
         border: '#9F9481',
         text: '#2B2B2B',
+    },
+
+    handle: {
+        bg: '#6E6E6E',
+        hoverBg: '#1D1D1D',
     },
 
     // --- UI Chrome ---

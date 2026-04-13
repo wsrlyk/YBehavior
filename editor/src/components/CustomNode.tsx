@@ -299,7 +299,7 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
             id="tree-target"
             className="!w-3 !h-2 !rounded-sm !border-0 hover:[--handle-scale:1.5] hover:!opacity-100 !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20"
             style={{
-              backgroundColor: theme.ui.border,
+              backgroundColor: theme.handle.bg,
               top: 0,
               left: '50%',
               transform: 'translate(-50%, -50%) scale(var(--handle-scale, 1))'
@@ -314,7 +314,7 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
             id={nodeDefinition.childConnectors[0].name}
             className="!w-3 !h-2 !rounded-sm !border-0 hover:[--handle-scale:1.5] hover:!opacity-100 !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20"
             style={{
-              backgroundColor: theme.ui.border,
+              backgroundColor: theme.handle.bg,
               bottom: 0,
               left: '50%',
               transform: 'translate(-50%, 50%) scale(var(--handle-scale, 1))'
@@ -330,7 +330,7 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
             id={conn.name}
             className="!w-3 !h-2 !rounded-sm !border-0 hover:[--handle-scale:1.5] hover:!opacity-100 !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20"
             style={{
-              backgroundColor: theme.ui.border,
+              backgroundColor: theme.handle.bg,
               bottom: 0,
               left: `${((i + 1) / ((nodeDefinition?.childConnectors?.length || 0) + 1)) * 100}%`,
               transform: 'translate(-50%, 50%) scale(var(--handle-scale, 1))'
@@ -340,24 +340,23 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
 
         {treeNode.hasConditionConnector && (
           <div
-            className="w-3 h-3 rounded-sm border flex items-center justify-center"
+            className="absolute top-0 -left-6 w-6 h-5 flex items-center justify-center z-[60] shadow-sm border"
             style={{
-              backgroundColor: theme.ui.background,
+              backgroundColor: theme.handle.bg,
               borderColor: theme.ui.border,
-              boxShadow: `-1px 0 1px ${theme.ui.border}`,
+              borderRight: 'none',
+              borderRadius: '4px 0 0 4px',
             }}
           >
-            <span className="text-[9px] font-black select-none leading-none" style={{ color: theme.ui.textMain }}>IF</span>
+            <span className="text-[10px] font-black select-none" style={{ color: theme.ui.textMain }}>IF</span>
             <Handle
               type="source"
               position={Position.Bottom}
               id="condition"
-              className="!w-3 !h-2 !rounded-none !border-0 !absolute !bottom-0 !left-1/2 !cursor-crosshair hover:[--handle-scale:1.5] hover:!opacity-100 !transition-[transform,background-color,opacity] duration-200 !origin-center z-20"
+              className="!w-2 !h-1 !rounded-none !border-0 !absolute !bottom-0 !left-1/2 !cursor-crosshair z-20"
               style={{
-                backgroundColor: theme.ui.border,
-                bottom: 0,
-                left: '50%',
-                transform: 'translate(-50%, 50%) scale(var(--handle-scale, 1))'
+                backgroundColor: theme.handle.bg,
+                transform: 'translate(-50%, 50%)'
               }}
             />
           </div>
