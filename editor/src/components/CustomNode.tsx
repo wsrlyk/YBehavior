@@ -94,7 +94,7 @@ function PinRow({ pin, isInput, dragging }: { pin: Pin; isInput: boolean; draggi
       >{pin.name}</span>
       {binding.type === 'const' && (
         <span
-          className={`text-[10px] max-w-40 cursor-help ${['Tree', 'Reference', 'treeNode.Reference'].includes(pin.name)
+          className={`text-[11px] max-w-40 cursor-help ${['Tree', 'Reference', 'treeNode.Reference'].includes(pin.name)
             ? 'filename-ellipsis'  // 文件路径需要 RTL 末尾省略
             : 'truncate'           // 普通值（enum/数字等）不能用 RTL
             }`}
@@ -106,7 +106,7 @@ function PinRow({ pin, isInput, dragging }: { pin: Pin; isInput: boolean; draggi
       )}
       {variableName && (
         <span
-          className="text-[10px] truncate max-w-40 cursor-help"
+          className="text-[11px] truncate max-w-40 cursor-help"
           style={{ color: theme.text.variable }}
           onMouseEnter={() => !dragging && setTooltip(variableName)}
         >{variableName}{binding.type === 'pointer' && binding.isLocal ? "'" : ""}{getVectorIndexDisplay()}</span>
@@ -219,7 +219,7 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
 
       {treeNode.comment && (
         <div
-          className={`absolute p-1 rounded text-[10px] break-words whitespace-pre-wrap w-full ${hasChildren ? 'left-[calc(100%+8px)] top-0' : 'top-[calc(100%+8px)] left-0'}`}
+          className={`absolute p-1 rounded text-[11px] break-words whitespace-pre-wrap w-full ${hasChildren ? 'left-[calc(100%+8px)] top-0' : 'top-[calc(100%+8px)] left-0'}`}
           style={{
             backgroundColor: theme.comment.bg,
             border: `1px solid ${theme.comment.border}`,
@@ -255,19 +255,19 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
             onMouseEnter={() => !dragging && nodeDefinition?.desc && setTooltip(nodeDefinition.desc)}
             onMouseLeave={() => setTooltip(null)}
           >
-            <span className="text-[10px]" style={{ color: theme.ui.textMain }}>{treeNode.uid ?? '?'}</span>
+            <span className="text-[11px]" style={{ color: theme.ui.textMain }}>{treeNode.uid ?? '?'}</span>
             <span className="flex-1 truncate">{treeNode.nickname || label}</span>
             {treeNode.isFolded && (
-              <span className="text-[10px] px-1 rounded" style={{ backgroundColor: theme.ui.border, color: theme.ui.textMain }}>
+              <span className="text-[11px] px-1 rounded" style={{ backgroundColor: theme.ui.border, color: theme.ui.textMain }}>
                 Folded
               </span>
             )}
-            {treeNode.disabled && <span className="text-[10px]" style={{ color: theme.debug.break.border }}>Disabled</span>}
+            {treeNode.disabled && <span className="text-[11px]" style={{ color: theme.debug.break.border }}>Disabled</span>}
           </div>
 
           {nodeNote && (
             <div
-              className="px-2 py-1 text-[10px] leading-snug border-b break-words whitespace-pre-wrap"
+              className="px-2 py-1 text-[11px] leading-snug border-b break-words whitespace-pre-wrap"
               style={{ borderColor: theme.ui.border, color: theme.ui.textMain }}
             >
               {nodeNote}
@@ -348,7 +348,7 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
               borderRadius: '4px 0 0 4px',
             }}
           >
-            <span className="text-[10px] font-black select-none" style={{ color: theme.ui.textMain }}>IF</span>
+            <span className="text-[11px] font-black select-none" style={{ color: theme.ui.textMain }}>IF</span>
             <Handle
               type="source"
               position={Position.Bottom}

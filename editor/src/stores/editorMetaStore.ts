@@ -30,6 +30,10 @@ interface EditorMetaState {
         activePropertiesTab: 'variables' | 'io' | 'properties';
         focusTarget?: { type: 'node' | 'variable' | 'io' | 'state' | 'transition', id: string };
         pendingCenterTarget?: { x: number, y: number, zoom?: number };
+        searchConfig: {
+            isCaseSensitive: boolean;
+            isWholeWord: boolean;
+        };
     };
     debugMeta: {
         ip: string;
@@ -48,6 +52,7 @@ interface EditorMetaState {
     setDebugPort: (port: number) => void;
     setNodeBreakpoint: (filePath: string, nodeId: string, type: number) => void;
     setTreeViewport: (filePath: string, viewport: Viewport) => void;
+    setSearchConfig: (config: { isCaseSensitive?: boolean; isWholeWord?: boolean }) => void;
     getTreeMeta: (filePath: string) => TreeMeta | undefined;
 
     // Cleanup
@@ -67,7 +72,11 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
         propertiesPanelWidth: 300,
         currentTheme: undefined,
         isSearchOpen: false,
-        activePropertiesTab: 'properties'
+        activePropertiesTab: 'properties',
+        searchConfig: {
+            isCaseSensitive: false,
+            isWholeWord: false,
+        }
     },
     debugMeta: {
         ip: '127.0.0.1',
@@ -194,6 +203,19 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
         get().saveAllMeta();
     },
 
+    setSearchConfig: (config) => {
+        set((state) => ({
+            uiMeta: {
+                ...state.uiMeta,
+                searchConfig: {
+                    ...state.uiMeta.searchConfig,
+                    ...config
+                }
+            }
+        }));
+        get().saveAllMeta();
+    },
+
     getTreeMeta: (filePath) => {
         return get().treeMetas[filePath];
     },
@@ -263,7 +285,8 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
                             ...(data.uiMeta || { sidebarWidth: 160, propertiesPanelWidth: 300 }),
                             isSearchOpen: false,
                             activePropertiesTab: 'properties',
-                            focusTarget: undefined
+                            focusTarget: undefined,
+                            searchConfig: data.uiMeta?.searchConfig || { isCaseSensitive: false, isWholeWord: false }
                         },
                         debugMeta: data.debugMeta || { ip: '127.0.0.1', port: 8888 }
                     });

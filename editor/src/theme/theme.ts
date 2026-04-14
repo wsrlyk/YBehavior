@@ -43,9 +43,13 @@ export interface GraphTheme {
         break: { border: string; glow: string; edge: string };
     };
 
-    /** Context menu category dot colors */
+
+    /** Context menu colors */
     contextMenu: {
-        categoryDots: Record<string, string>;
+        bg: string;
+        border: string;
+        text: string;
+        itemHover: string;
     };
 
     /** ReturnType label colors */
@@ -111,11 +115,11 @@ export const DefaultTheme: GraphTheme = {
     // --- BT Node Categories ---
     // --- BT Node Categories ---
     node: {
-        composite: '#BFBFBF',
-        decorator: '#BFBFBF',
-        action: '#CDB79A',
-        condition: '#BBA8BE',
-        default: '#BFBFBF',
+        composite: '#94A3B8',
+        decorator: '#8BA893',
+        action: '#B09E83',
+        condition: '#938BA8',
+        default: '#94A3B8',
     },
 
     // --- Pin Dot Colors ---
@@ -206,12 +210,10 @@ export const DefaultTheme: GraphTheme = {
 
     // --- Context Menu ---
     contextMenu: {
-        categoryDots: {
-            composite: '#8A9A7A',
-            decorator: '#8F8F8F',
-            action: '#A98663',
-            condition: '#9676A1',
-        },
+        bg: '#FFFFFF', // This will be overridden by panelBg anyway usually
+        border: '#6E6E6E',
+        text: '#0A0A0A',
+        itemHover: '#DADADA'
     },
 
     // --- ReturnType Colors ---
@@ -381,16 +383,16 @@ export function applyThemeCssVariables(theme: GraphTheme = activeTheme) {
         '--tb-color-yellow-500': theme.ui.warning,
         '--tb-color-yellow-600': theme.ui.warning,
         '--tb-color-yellow-700': theme.ui.warning,
-        '--tb-color-purple-300': '#9676A1',
-        '--tb-color-purple-500': '#9676A1',
-        '--tb-color-purple-600': '#9676A1',
-        '--tb-color-purple-700': '#9676A1',
-        '--tb-color-purple-900': '#9676A1',
-        '--tb-color-orange-500': '#A98663',
-        '--tb-color-orange-600': '#A98663',
-        '--tb-color-orange-700': '#A98663',
-        '--tb-color-orange-900': '#A98663',
-        '--tb-color-orange-300': '#A98663',
+        '--tb-color-purple-300': '#9F8BAB',
+        '--tb-color-purple-500': '#9F8BAB',
+        '--tb-color-purple-600': '#9F8BAB',
+        '--tb-color-purple-700': '#9F8BAB',
+        '--tb-color-purple-900': '#9F8BAB',
+        '--tb-color-orange-500': '#B09A7A',
+        '--tb-color-orange-600': '#B09A7A',
+        '--tb-color-orange-700': '#B09A7A',
+        '--tb-color-orange-900': '#B09A7A',
+        '--tb-color-orange-300': '#B09A7A',
         '--tb-color-pink-300': '#A58DA8',
         '--tb-color-pink-500': '#A58DA8',
         '--tb-color-cyan-500': theme.ui.accent,

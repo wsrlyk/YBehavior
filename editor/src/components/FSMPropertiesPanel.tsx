@@ -243,7 +243,7 @@ export function FSMPropertiesPanel() {
                     <div className="text-xs uppercase tracking-wider font-bold border-b pb-2" style={{ color: theme.ui.textDim, borderColor: theme.ui.border }}>State Properties</div>
 
                     <div>
-                        <label className="text-[10px] block mb-1" style={{ color: theme.ui.textDim }}>Type</label>
+                        <label className="text-[11px] block mb-1" style={{ color: theme.ui.textDim }}>Type</label>
                         <div className="text-xs font-medium px-2 py-1 rounded inline-block" style={{ color: theme.ui.textMain, backgroundColor: theme.ui.accentSoft }}>
                             {selectedState.type}
                         </div>
@@ -254,7 +254,7 @@ export function FSMPropertiesPanel() {
                         const isValid = localName.length === 0 || nameValidation.isValid;
                         return (
                             <div>
-                                <label className="text-[10px] block mb-1" style={{ color: theme.ui.textDim }}>Name</label>
+                                <label className="text-[11px] block mb-1" style={{ color: theme.ui.textDim }}>Name</label>
                                 <input
                                     className="w-full text-sm px-2 py-1.5 rounded border outline-none transition-colors"
                                     style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: !isValid ? theme.ui.danger : theme.ui.border }}
@@ -268,7 +268,7 @@ export function FSMPropertiesPanel() {
                                     placeholder="State name..."
                                 />
                                 {!isValid && (
-                                    <div className="text-[10px] mt-1" style={{ color: theme.ui.danger }}>{nameValidation.error}</div>
+                                    <div className="text-[11px] mt-1" style={{ color: theme.ui.danger }}>{nameValidation.error}</div>
                                 )}
                             </div>
                         );
@@ -276,7 +276,7 @@ export function FSMPropertiesPanel() {
 
                     {(selectedState.type === 'Normal' || selectedState.type === 'Entry' || selectedState.type === 'Exit') && (
                         <div>
-                            <label className="text-[10px] block mb-1" style={{ color: theme.ui.textDim }}>Linked Tree</label>
+                            <label className="text-[11px] block mb-1" style={{ color: theme.ui.textDim }}>Linked Tree</label>
                             <TreeFilePicker
                                 value={selectedState.tree || ''}
                                 options={treeFiles}
@@ -286,7 +286,7 @@ export function FSMPropertiesPanel() {
                     )}
 
                     <div>
-                        <label className="text-[10px] block mb-1" style={{ color: theme.ui.textDim }}>Comment</label>
+                        <label className="text-[11px] block mb-1" style={{ color: theme.ui.textDim }}>Comment</label>
                         <textarea
                             className="w-full text-sm px-2 py-1.5 rounded border outline-none resize-none transition-colors"
                             style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
@@ -316,7 +316,7 @@ export function FSMPropertiesPanel() {
                                 }}
                             >
                                 <div className="flex justify-between items-center">
-                                    <span className="text-[10px] font-mono" style={{ color: theme.ui.textDim }}>
+                                    <span className="text-[11px] font-mono" style={{ color: theme.ui.textDim }}>
                                         {trans.fromStateId ? (() => {
                                             for (const m of fsm!.machines.values()) {
                                                 const s = m.states.get(trans.fromStateId!);
@@ -341,7 +341,7 @@ export function FSMPropertiesPanel() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] block uppercase tracking-tighter" style={{ color: theme.ui.textDim }}>Conditions</label>
+                                    <label className="text-[11px] block uppercase tracking-tighter" style={{ color: theme.ui.textDim }}>Conditions</label>
                                     <div className="flex flex-wrap gap-1.5">
                                         {trans.conditions.map(c => (
                                             <span key={c} className="text-[11px] px-2 py-0.5 rounded-full border flex items-center gap-1.5 group/ev" style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}>
@@ -416,7 +416,7 @@ export function FSMPropertiesPanel() {
                         ))}
                     </div>
 
-                    <div className="text-[10px] italic leading-tight mt-4" style={{ color: theme.ui.textDim }}>
+                    <div className="text-[11px] italic leading-tight mt-4" style={{ color: theme.ui.textDim }}>
                         * Multiple transitions in the same direction are collapsed into a single edge.
                     </div>
                 </div>

@@ -24,6 +24,8 @@ export function GlobalSearch() {
     const setActivePropertiesTab = useEditorMetaStore(state => state.setActivePropertiesTab);
     const setFocusTarget = useEditorMetaStore(state => state.setFocusTarget);
     const setPendingCenterTarget = useEditorMetaStore(state => state.setPendingCenterTarget);
+    const searchConfig = useEditorMetaStore(state => state.uiMeta.searchConfig);
+    const setSearchConfig = useEditorMetaStore(state => state.setSearchConfig);
 
     const currentTree = useEditorStore(state => state.getCurrentTree());
     const selectNodes = useEditorStore(state => state.selectNodes);
@@ -88,8 +90,22 @@ export function GlobalSearch() {
     const results = useMemo(() => {
         if (query.length < 1) return [];
 
-        const q = query.toLowerCase();
+        const q = query;
         const res: SearchResult[] = [];
+
+        const testMatch = (text: string | null | undefined) => {
+            if (!text) return false;
+            if (searchConfig.isWholeWord) {
+                const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                // Regex word boundary matching
+                const regex = new RegExp(`\\b${escaped}\\b`, searchConfig.isCaseSensitive ? '' : 'i');
+                return regex.test(text);
+            }
+            if (searchConfig.isCaseSensitive) {
+                return text.includes(q);
+            }
+            return text.toLowerCase().includes(q.toLowerCase());
+        };
 
         // 1. Search Nodes
         if (scopes.node && currentTree) {
@@ -98,11 +114,11 @@ export function GlobalSearch() {
                 const uidStr = node.uid?.toString() || '';
                 const nodeDef = getDefinition(node.type);
 
-                if (node.type.toLowerCase().includes(q) ||
-                    (node.nickname && node.nickname.toLowerCase().includes(q)) ||
-                    (node.comment && node.comment.toLowerCase().includes(q)) ||
-                    (nodeDef?.desc && nodeDef.desc.toLowerCase().includes(q)) ||
-                    uidStr.includes(q)) {
+                if (testMatch(node.type) ||
+                    testMatch(node.nickname) ||
+                    testMatch(node.comment) ||
+                    testMatch(nodeDef?.desc) ||
+                    testMatch(uidStr)) {
                     res.push({
                         type: 'node',
                         id: node.id,
@@ -119,15 +135,15 @@ export function GlobalSearch() {
             currentTree.nodes.forEach(node => {
                 node.pins.forEach(pin => {
                     const pinValue = pin.binding.type === 'const' ? pin.binding.value : pin.binding.variableName;
-                    if (pin.name.toLowerCase().includes(q) ||
-                        (pin.desc && pin.desc.toLowerCase().includes(q)) ||
-                        (pinValue && pinValue.toLowerCase().includes(q))) {
+                    if (testMatch(pin.name) ||
+                        testMatch(pin.desc) ||
+                        testMatch(pinValue)) {
                         res.push({
                             type: 'pin',
                             id: `${node.id}-${pin.name}`,
                             nodeId: node.id,
                             title: pin.name,
-                            subtitle: `Pin on ${node.nickname || node.type}`,
+                            subtitle: `Pin on ${node.nickname || node.type}${node.uid ? ` (UID: ${node.uid})` : ''}`,
                             value: pin.binding.type === 'const' ? pin.binding.value : `-> ${pin.binding.variableName}`,
                         });
                     }
@@ -136,7 +152,7 @@ export function GlobalSearch() {
 
             // Tree I/O
             currentTree.inputs.forEach(pin => {
-                if (pin.name.toLowerCase().includes(q)) {
+                if (testMatch(pin.name)) {
                     res.push({
                         type: 'io',
                         id: pin.id,
@@ -147,7 +163,7 @@ export function GlobalSearch() {
                 }
             });
             currentTree.outputs.forEach(pin => {
-                if (pin.name.toLowerCase().includes(q)) {
+                if (testMatch(pin.name)) {
                     res.push({
                         type: 'io',
                         id: pin.id,
@@ -162,7 +178,7 @@ export function GlobalSearch() {
         // 3. Search Variables
         if (scopes.variable && currentTree) {
             currentTree.sharedVariables.forEach(v => {
-                if (v.name.toLowerCase().includes(q)) {
+                if (testMatch(v.name)) {
                     res.push({
                         type: 'variable',
                         id: v.name,
@@ -173,7 +189,7 @@ export function GlobalSearch() {
                 }
             });
             currentTree.localVariables.forEach(v => {
-                if (v.name.toLowerCase().includes(q)) {
+                if (testMatch(v.name)) {
                     res.push({
                         type: 'variable',
                         id: v.name,
@@ -206,9 +222,9 @@ export function GlobalSearch() {
                 machine.states.forEach(state => {
                     if (isSpecialStateType(state.type)) return; // 剔除 Entry/Any 等通用状态
 
-                    if (state.name.toLowerCase().includes(q) ||
-                        (state.comment && state.comment.toLowerCase().includes(q)) ||
-                        (state.tree && state.tree.toLowerCase().includes(q))) {
+                    if (testMatch(state.name) ||
+                        testMatch(state.comment) ||
+                        testMatch(state.tree)) {
                         res.push({
                             type: 'fsm-state',
                             id: state.id,
@@ -222,7 +238,7 @@ export function GlobalSearch() {
 
                 // Transitions (Conditions)
                 machine.transitions.forEach(trans => {
-                    const matchingConditions = trans.conditions.filter(c => c.toLowerCase().includes(q));
+                    const matchingConditions = trans.conditions.filter(c => testMatch(c));
 
                     if (matchingConditions.length > 0) {
                         const getStateInfo = (id: string | null) => {
@@ -259,7 +275,7 @@ export function GlobalSearch() {
 
         return res;
 
-    }, [currentTree, activeFSM, query, scopes, getDefinition]);
+    }, [currentTree, activeFSM, query, scopes, getDefinition, searchConfig]);
 
     const handleJump = (result: SearchResult) => {
         // setSearchOpen(false);
@@ -381,12 +397,12 @@ export function GlobalSearch() {
             {/* Draggable Title Bar */}
             <div
                 className="flex items-center justify-between px-4 py-2 border-b cursor-move select-none"
-                style={{ backgroundColor: theme.ui.background, borderColor: theme.ui.border }}
+                style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}
                 onMouseDown={handleMouseDown}
             >
                 <div className="flex items-center gap-2">
                     <span className="text-sm" style={{ color: theme.ui.textMain }}>🔍</span>
-                    <span className="text-[10px] uppercase font-bold tracking-[0.2em]" style={{ color: theme.ui.textDim }}>Global Search</span>
+                    <span className="text-[11px] uppercase font-bold tracking-[0.2em]" style={{ color: theme.ui.textDim }}>Global Search</span>
                 </div>
                 <button
                     className="w-6 h-6 flex items-center justify-center rounded-full transition-all duration-200"
@@ -414,9 +430,40 @@ export function GlobalSearch() {
                         value={query}
                         onChange={e => setQuery(e.target.value)}
                         placeholder="Search nodes, UIDs, pins, values, variables..."
-                        className="w-full pl-4 pr-10 py-2.5 border rounded-lg text-sm outline-none transition-all"
-                        style={{ backgroundColor: theme.ui.inputBg, borderColor: theme.ui.border, color: theme.ui.textMain }}
+                        className="w-full pl-4 pr-24 py-2.5 border rounded-lg text-sm outline-none transition-all focus:ring-1 focus:ring-opacity-50"
+                        style={{
+                            backgroundColor: theme.ui.inputBg,
+                            borderColor: theme.ui.border,
+                            color: theme.ui.textMain,
+                            boxShadow: `inset 0 1px 2px rgba(0,0,0,0.05)`
+                        }}
                     />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 items-center">
+                        <button
+                            onClick={() => setSearchConfig({ isCaseSensitive: !searchConfig.isCaseSensitive })}
+                            title="Match Case (Aa)"
+                            className="p-1 px-1.5 rounded transition-all hover:bg-black/5 flex items-center justify-center font-bold text-[10px] border"
+                            style={{
+                                backgroundColor: searchConfig.isCaseSensitive ? theme.ui.accentSoft : 'transparent',
+                                borderColor: searchConfig.isCaseSensitive ? theme.ui.accent : 'transparent',
+                                color: searchConfig.isCaseSensitive ? theme.ui.textMain : theme.ui.textDim
+                            }}
+                        >
+                            Aa
+                        </button>
+                        <button
+                            onClick={() => setSearchConfig({ isWholeWord: !searchConfig.isWholeWord })}
+                            title="Match Whole Word ([ab])"
+                            className="p-1 px-1.5 rounded transition-all hover:bg-black/5 flex items-center justify-center font-bold text-[10px] border"
+                            style={{
+                                backgroundColor: searchConfig.isWholeWord ? theme.ui.accentSoft : 'transparent',
+                                borderColor: searchConfig.isWholeWord ? theme.ui.accent : 'transparent',
+                                color: searchConfig.isWholeWord ? theme.ui.textMain : theme.ui.textDim
+                            }}
+                        >
+                            [ab]
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex gap-4 px-1">
@@ -462,7 +509,7 @@ export function GlobalSearch() {
                             >
                                 <div className="flex flex-col gap-0.5 min-w-0">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase" style={{ backgroundColor: theme.ui.buttonBg, color: theme.ui.textMain }}>
+                                        <span className="text-[11px] px-1.5 py-0.5 rounded font-bold uppercase" style={{ backgroundColor: theme.ui.buttonBg, color: theme.ui.textMain }}>
                                             {res.type}
                                         </span>
                                         <span className="text-sm font-medium truncate" style={{ color: theme.ui.textMain }}>{res.title}</span>
@@ -481,7 +528,7 @@ export function GlobalSearch() {
             </div>
 
             {/* Footer */}
-            <div className="px-4 py-2 border-t flex justify-between items-center text-[10px]" style={{ backgroundColor: theme.ui.background, borderColor: theme.ui.border, color: theme.ui.textDim }}>
+            <div className="px-4 py-2 border-t flex justify-between items-center text-[11px]" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border, color: theme.ui.textDim }}>
                 <div>
                     ↑↓ to navigate · Enter to jump · Esc to close
                 </div>

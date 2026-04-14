@@ -60,7 +60,7 @@ export function Sidebar() {
     >
       {/* 已打开文件列表 */}
       <div className="flex-1 overflow-auto custom-scrollbar">
-        <div className="p-2 text-[10px] uppercase tracking-wider font-semibold" style={{ color: theme.ui.textMain }}>
+        <div className="p-2 text-[11px] uppercase tracking-wider font-semibold" style={{ color: theme.ui.textMain }}>
           Open Files
         </div>
         {isLoading ? (
@@ -204,7 +204,7 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
   return (
     <div
       onClick={onClick}
-      className="group relative flex items-center px-1.5 py-1 text-[11px] cursor-pointer"
+      className="group relative flex items-center px-1.5 py-0.5 text-xs cursor-pointer"
       style={{
         backgroundColor: isActive ? theme.ui.border : 'transparent',
         color: isActive ? theme.ui.textMain : theme.ui.textMain,

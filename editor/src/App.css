@@ -60,6 +60,8 @@
 
   --color-black: var(--tb-color-black);
   --color-white: var(--tb-color-white);
+
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 /* React Flow 样式 */
@@ -85,7 +87,7 @@
   --tb-ui-danger: var(--color-red-500);
   --tb-ui-warning: var(--color-yellow-500);
 
-  font-family: Tahoma, Verdana, Segoe UI, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   font-size: 14px;
   line-height: 1.5;
 

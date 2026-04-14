@@ -92,7 +92,7 @@ export const RunningList = () => {
                     <span className="text-xs font-semibold" style={{ color: theme.ui.textMain }}>
                         Debug List ({totalCount})
                     </span>
-                    <span className="text-[10px] ml-1" style={{ color: theme.ui.textDim }}>
+                    <span className="text-[11px] ml-1" style={{ color: theme.ui.textDim }}>
                         {isOpen ? '▼' : '▶'}
                     </span>
                 </div>

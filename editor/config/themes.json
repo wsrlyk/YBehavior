@@ -11,11 +11,11 @@
       "description": "Built-in full default theme template. Copy this object to create a new theme.",
       "theme": {
         "node": {
-          "composite": "#CFCFCF",
-          "decorator": "#CFCFCF",
-          "action": "#CDB79A",
-          "condition": "#BBA8BE",
-          "default": "#CFCFCF"
+          "composite": "#94A3B8",
+          "decorator": "#8BA893",
+          "action": "#B09E83",
+          "condition": "#938BA8",
+          "default": "#94A3B8"
         },
         "pin": {
           "int": "#A35F1E",
@@ -112,12 +112,10 @@
           }
         },
         "contextMenu": {
-          "categoryDots": {
-            "composite": "#8A9A7A",
-            "decorator": "#8F8F8F",
-            "action": "#A98663",
-            "condition": "#9676A1"
-          }
+          "bg": "#FFFFFF",
+          "border": "#6E6E6E",
+          "text": "#0A0A0A",
+          "itemHover": "#DADADA"
         },
         "returnType": {
           "Invert": "#8F6A3F",

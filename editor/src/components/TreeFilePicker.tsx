@@ -64,7 +64,7 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                 <div className="flex items-center gap-1">
                     {allowJump && value && (
                         <button
-                            className="text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="text-[11px] opacity-0 group-hover:opacity-100 transition-opacity"
                             style={{ color: theme.ui.textDim }}
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -76,7 +76,7 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                     )}
                     {value && (
                         <button
-                            className="text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="text-[11px] opacity-0 group-hover:opacity-100 transition-opacity"
                             style={{ color: theme.ui.textDim }}
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -87,7 +87,7 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                             ✕
                         </button>
                     )}
-                    <span className="text-[10px]" style={{ color: theme.ui.textDim }}>▼</span>
+                    <span className="text-[11px]" style={{ color: theme.ui.textDim }}>▼</span>
                 </div>
             </div>
 
@@ -95,7 +95,7 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                 <div className="absolute z-50 mt-1 w-full border rounded shadow-xl max-h-48 overflow-hidden flex flex-col" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
                     <div className="p-1 border-b" style={{ borderColor: theme.ui.border }}>
                         <input
-                            className="w-full text-[10px] px-2 py-1 rounded outline-none border"
+                            className="w-full text-[11px] px-2 py-1 rounded outline-none border"
                             style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
                             placeholder="Search trees..."
                             value={search}
@@ -105,7 +105,7 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                     </div>
                     <div className="overflow-y-auto flex-1 custom-scrollbar">
                         <div
-                            className={`px-2 py-1.5 text-[10px] cursor-pointer transition-colors truncate ${!value ? '' : 'italic'}`}
+                            className={`px-2 py-1.5 text-[11px] cursor-pointer transition-colors truncate ${!value ? '' : 'italic'}`}
                             style={{
                                 backgroundColor: !value ? theme.ui.accentSoft : 'transparent',
                                 color: !value ? theme.ui.textMain : theme.ui.textDim
@@ -123,7 +123,7 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                             filteredOptions.map(opt => (
                                 <div
                                     key={opt}
-                                    className="px-2 py-1.5 text-[10px] cursor-pointer transition-colors filename-ellipsis"
+                                    className="px-2 py-1.5 text-[11px] cursor-pointer transition-colors filename-ellipsis"
                                     style={{
                                         color: value === opt || stripExtension(value) === stripExtension(opt) ? theme.ui.textMain : theme.ui.textDim,
                                         backgroundColor: value === opt || stripExtension(value) === stripExtension(opt) ? theme.ui.accentSoft : 'transparent'
@@ -147,7 +147,7 @@ export function TreeFilePicker({ value, onChange, options, placeholder = 'Select
                                 </div>
                             ))
                         ) : (
-                            <div className="px-2 py-2 text-[10px] italic" style={{ color: theme.ui.textDim }}>No trees found</div>
+                            <div className="px-2 py-2 text-[11px] italic" style={{ color: theme.ui.textDim }}>No trees found</div>
                         )}
                     </div>
                 </div>

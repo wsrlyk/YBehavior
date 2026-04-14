@@ -165,7 +165,6 @@ export function NodeContextMenu({ isOpen, position, screenPosition, onClose, onA
 
   if (!isOpen || !isLoaded) return null;
 
-  const CATEGORY_COLORS = theme.contextMenu.categoryDots;
   const sectionBg = theme.ui.panelBg;
   const itemHoverBg = theme.ui.accentSoft;
   const itemText = theme.ui.textMain;
@@ -188,7 +187,7 @@ export function NodeContextMenu({ isOpen, position, screenPosition, onClose, onA
       {node && (
         <>
           <div className="p-1 border-b" style={{ borderColor: theme.ui.border, backgroundColor: sectionBg }}>
-            <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: mutedText }}>Node Actions</div>
+            <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider" style={{ color: mutedText }}>Node Actions</div>
 
             <div
               className="px-3 py-2 text-sm cursor-pointer flex items-center justify-between group"
@@ -199,7 +198,7 @@ export function NodeContextMenu({ isOpen, position, screenPosition, onClose, onA
             >
               <span>Condition Connector</span>
               <span
-                className="text-[10px] px-1.5 rounded"
+                className="text-[11px] px-1.5 rounded"
                 style={node.hasConditionConnector
                   ? { backgroundColor: theme.returnType.Invert, color: theme.ui.textMain }
                   : { backgroundColor: theme.ui.border, color: mutedText }}
@@ -217,7 +216,7 @@ export function NodeContextMenu({ isOpen, position, screenPosition, onClose, onA
             >
               <span>Node State</span>
               <span
-                className="text-[10px] px-1.5 rounded"
+                className="text-[11px] px-1.5 rounded"
                 style={node.disabled
                   ? { backgroundColor: theme.debug.break.border, color: theme.ui.textMain }
                   : { backgroundColor: theme.ui.border, color: mutedText }}
@@ -235,7 +234,7 @@ export function NodeContextMenu({ isOpen, position, screenPosition, onClose, onA
             >
               <span>Folding</span>
               <span
-                className="text-[10px] px-1.5 rounded"
+                className="text-[11px] px-1.5 rounded"
                 style={node.isFolded
                   ? { backgroundColor: theme.ui.accentSoft, color: theme.ui.textMain }
                   : { backgroundColor: theme.ui.border, color: mutedText }}
@@ -246,7 +245,7 @@ export function NodeContextMenu({ isOpen, position, screenPosition, onClose, onA
           </div>
 
           <div className="p-1 border-b" style={{ borderColor: theme.ui.border, backgroundColor: sectionBg }}>
-            <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: mutedText }}>Debug</div>
+            <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider" style={{ color: mutedText }}>Debug</div>
 
             <div
               className="px-3 py-2 text-sm cursor-pointer flex items-center justify-between group"
@@ -265,14 +264,14 @@ export function NodeContextMenu({ isOpen, position, screenPosition, onClose, onA
             >
               <span>Breakpoint</span>
               <div className="flex items-center gap-2">
-                <span className="text-[10px]" style={{ color: mutedText }}>F9</span>
+                <span className="text-[11px]" style={{ color: mutedText }}>F9</span>
                 {(() => {
                   const { activeFilePath } = useEditorStore.getState();
                   const bpType = activeFilePath && node && node.uid !== undefined ? useDebugStore.getState().getBreakpoint(activeFilePath, node.uid) : BreakpointType.None;
                   const isBp = bpType === BreakpointType.Breakpoint;
                   return (
                     <span
-                      className="text-[10px] px-1.5 rounded"
+                      className="text-[11px] px-1.5 rounded"
                       style={isBp
                         ? { backgroundColor: theme.debug.break.border, color: theme.ui.textMain }
                         : { backgroundColor: theme.ui.border, color: mutedText }}
@@ -299,14 +298,14 @@ export function NodeContextMenu({ isOpen, position, screenPosition, onClose, onA
             >
               <span>Logpoint</span>
               <div className="flex items-center gap-2">
-                <span className="text-[10px]" style={{ color: mutedText }}>F8</span>
+                <span className="text-[11px]" style={{ color: mutedText }}>F8</span>
                 {(() => {
                   const { activeFilePath } = useEditorStore.getState();
                   const bpType = activeFilePath && node && node.uid !== undefined ? useDebugStore.getState().getBreakpoint(activeFilePath, node.uid) : BreakpointType.None;
                   const isLp = bpType === BreakpointType.Logpoint;
                   return (
                     <span
-                      className="text-[10px] px-1.5 rounded"
+                      className="text-[11px] px-1.5 rounded"
                       style={isLp
                         ? { backgroundColor: theme.debug.running.border, color: theme.ui.textMain }
                         : { backgroundColor: theme.ui.border, color: mutedText }}
@@ -325,7 +324,7 @@ export function NodeContextMenu({ isOpen, position, screenPosition, onClose, onA
       {!node && (
         <>
           <div className="p-2 border-b" style={{ borderColor: theme.ui.border }}>
-            <div className="px-1 mb-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: mutedText }}>Add Node</div>
+            <div className="px-1 mb-1 text-[11px] font-bold uppercase tracking-wider" style={{ color: mutedText }}>Add Node</div>
             <input
               ref={inputRef}
               type="text"
@@ -360,7 +359,7 @@ export function NodeContextMenu({ isOpen, position, screenPosition, onClose, onA
                     color: itemText,
                   }}
                 >
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[node.category] || theme.ui.border }} />
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: (theme.node as any)[node.category] || theme.ui.border }} />
                   <span className="flex-1">{node.className}</span>
                   <span className="text-xs capitalize" style={{ color: mutedText }}>{node.category}</span>
                 </div>

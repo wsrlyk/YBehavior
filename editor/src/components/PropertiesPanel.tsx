@@ -225,15 +225,15 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
     if (action === 'toggling') {
       return (
         <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center rounded px-1 gap-1 z-10 shadow-md border" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
-          <span className="text-[10px] font-bold" style={{ color: theme.ui.warning }}>Move?</span>
+          <span className="text-[11px] font-bold" style={{ color: theme.ui.warning }}>Move?</span>
           <button
             onClick={() => { onToggleScope(variable.name); setAction('none'); }}
-            className="px-1 py-0.5 text-[10px]"
+            className="px-1 py-0.5 text-[11px]"
             style={{ color: theme.ui.success }}
           >✓</button>
           <button
             onClick={() => setAction('none')}
-            className="px-1 py-0.5 text-[10px]"
+            className="px-1 py-0.5 text-[11px]"
             style={{ color: theme.ui.textDim }}
           >✕</button>
         </div>
@@ -242,15 +242,15 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
     if (action === 'deleting') {
       return (
         <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center rounded px-1 gap-1 z-10 shadow-md border" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
-          <span className="text-[10px] font-bold" style={{ color: theme.ui.danger }}>Del?</span>
+          <span className="text-[11px] font-bold" style={{ color: theme.ui.danger }}>Del?</span>
           <button
             onClick={() => onDelete(variable.name)}
-            className="px-1 py-0.5 text-[10px]"
+            className="px-1 py-0.5 text-[11px]"
             style={{ color: theme.ui.success }}
           >✓</button>
           <button
             onClick={() => setAction('none')}
-            className="px-1 py-0.5 text-[10px]"
+            className="px-1 py-0.5 text-[11px]"
             style={{ color: theme.ui.textDim }}
           >✕</button>
         </div>
@@ -263,17 +263,17 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
         style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}
       >
         <button
-          className="text-[10px] px-1 transition-colors"
+          className="text-[11px] px-1 transition-colors"
           style={{ color: theme.ui.textDim }}
           onClick={(e) => { e.stopPropagation(); handleStartRename(); }}
         >✎</button>
         <button
-          className="text-[10px] px-1 transition-colors border-l ml-1 pl-1"
+          className="text-[11px] px-1 transition-colors border-l ml-1 pl-1"
           style={{ color: theme.ui.textDim, borderColor: theme.ui.border }}
           onClick={(e) => { e.stopPropagation(); setAction('toggling'); }}
         >{variable.isLocal ? '↑' : '↓'}</button>
         <button
-          className="text-[10px] px-1 transition-colors border-l ml-1 pl-1"
+          className="text-[11px] px-1 transition-colors border-l ml-1 pl-1"
           style={{ color: theme.ui.textDim, borderColor: theme.ui.border }}
           onClick={(e) => { e.stopPropagation(); setAction('deleting'); }}
         >✕</button>
@@ -328,8 +328,8 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
               onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmRename(); if (e.key === 'Escape') setAction('none'); }}
               autoFocus
             />
-            <button onClick={handleConfirmRename} className="text-[10px] px-0.5 flex-shrink-0" style={{ color: theme.ui.success }}>✓</button>
-            <button onClick={() => setAction('none')} className="text-[10px] px-0.5 flex-shrink-0" style={{ color: theme.ui.textDim }}>✕</button>
+            <button onClick={handleConfirmRename} className="text-[11px] px-0.5 flex-shrink-0" style={{ color: theme.ui.success }}>✓</button>
+            <button onClick={() => setAction('none')} className="text-[11px] px-0.5 flex-shrink-0" style={{ color: theme.ui.textDim }}>✕</button>
           </div>
         ) : (
           <div className="flex-1 min-w-0 flex items-center gap-1">
@@ -422,7 +422,7 @@ function AddVariableButton({ isLocal, onAdd }: { isLocal: boolean; onAdd: (v: Va
     return (
       <div className="flex items-center gap-1 rounded px-1 py-0.5 border" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
         <input
-          className="w-24 text-[10px] bg-transparent outline-none"
+          className="w-24 text-[11px] bg-transparent outline-none"
           style={{ color: !validation.isValid && name.length > 0 ? theme.ui.danger : theme.ui.textMain }}
           placeholder="Name..."
           value={name}
@@ -431,8 +431,8 @@ function AddVariableButton({ isLocal, onAdd }: { isLocal: boolean; onAdd: (v: Va
           onBlur={() => !name && setIsAdding(false)}
           autoFocus
         />
-        <button className="text-[10px] font-bold" style={{ color: theme.ui.textMain }} onClick={handleAdd}>OK</button>
-        <button className="text-[10px]" style={{ color: theme.ui.textDim }} onClick={() => setIsAdding(false)}>✕</button>
+        <button className="text-[11px] font-bold" style={{ color: theme.ui.textMain }} onClick={handleAdd}>OK</button>
+        <button className="text-[11px]" style={{ color: theme.ui.textDim }} onClick={() => setIsAdding(false)}>✕</button>
       </div>
     );
   }
@@ -444,7 +444,7 @@ function AddVariableButton({ isLocal, onAdd }: { isLocal: boolean; onAdd: (v: Va
       onClick={() => setIsAdding(true)}
     >
       <span className="text-xs">+</span>
-      <span className="text-[10px] uppercase font-bold tracking-tighter">Add</span>
+      <span className="text-[11px] uppercase font-bold tracking-tighter">Add</span>
     </button>
   );
 }
@@ -557,17 +557,17 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
 
         {isDeleting ? (
           <div className="flex items-center rounded px-1 gap-1" style={{ backgroundColor: theme.ui.background }}>
-            <span className="text-[10px] font-bold" style={{ color: theme.ui.danger }}>Del?</span>
+            <span className="text-[11px] font-bold" style={{ color: theme.ui.danger }}>Del?</span>
             <button
               onClick={() => onDelete(pin.id)}
-              className="px-1 py-0.5 text-[10px]"
+              className="px-1 py-0.5 text-[11px]"
               style={{ color: theme.ui.success }}
             >
               ✓
             </button>
             <button
               onClick={() => setIsDeleting(false)}
-              className="px-1 py-0.5 text-[10px]"
+              className="px-1 py-0.5 text-[11px]"
               style={{ color: theme.ui.textDim }}
             >
               ✕
@@ -586,11 +586,11 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
 
       <div className="flex flex-col gap-1 mt-1 pb-0.5">
         <div className="flex items-center gap-1">
-          <span className="text-[10px] w-12" style={{ color: theme.ui.textDim }}>{isInput ? 'Inner Var:' : 'Source:'}</span>
+          <span className="text-[11px] w-12" style={{ color: theme.ui.textDim }}>{isInput ? 'Inner Var:' : 'Source:'}</span>
 
           {isInput || pin.binding.type === 'variable' ? (
             <select
-              className="flex-1 text-[10px] px-1 py-0.5 rounded outline-none border"
+              className="flex-1 text-[11px] px-1 py-0.5 rounded outline-none border"
               style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
               value={pin.binding.value ? `${pin.binding.isLocal ? 'local' : 'shared'}:${pin.binding.value}` : ''}
               onChange={(e) => {
@@ -616,7 +616,7 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
             </select>
           ) : (
             <input
-              className="flex-1 text-[10px] px-1 py-0.5 rounded outline-none border"
+              className="flex-1 text-[11px] px-1 py-0.5 rounded outline-none border"
               style={{
                 backgroundColor: theme.ui.inputBg,
                 color: theme.ui.textMain,
@@ -630,7 +630,7 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
 
           {!isInput && (
             <button
-              className="text-[10px] px-1 py-0.5 rounded leading-tight transition-colors"
+              className="text-[11px] px-1 py-0.5 rounded leading-tight transition-colors"
               style={{
                 backgroundColor: pin.binding.type === 'const' ? theme.ui.buttonBg : theme.ui.buttonHoverBg,
                 color: pin.binding.type === 'const' ? theme.ui.textMain : theme.ui.tabActiveText
@@ -644,9 +644,9 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
 
         {(needsVectorIndex || hasVectorIndex) && (
           <div className="flex items-center gap-1 pl-12">
-            <span className="text-[10px]" style={{ color: theme.ui.textDim }}>Index:</span>
+            <span className="text-[11px]" style={{ color: theme.ui.textDim }}>Index:</span>
             <button
-              className="text-[10px] px-1 rounded"
+              className="text-[11px] px-1 rounded"
               style={{
                 backgroundColor: pin.vectorIndex?.type === 'const' ? theme.ui.buttonBg : theme.ui.buttonHoverBg,
                 color: pin.vectorIndex?.type === 'const' ? theme.ui.textMain : theme.ui.tabActiveText
@@ -657,14 +657,14 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
             </button>
             {pin.vectorIndex?.type === 'const' ? (
               <input
-                className="flex-1 text-[10px] px-1 py-0.5 rounded outline-none border"
+                className="flex-1 text-[11px] px-1 py-0.5 rounded outline-none border"
                 style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
                 value={pin.vectorIndex.value}
                 onChange={(e) => onUpdate(pin.id, { vectorIndex: { type: 'const', value: e.target.value } })}
               />
             ) : (
               <select
-                className="flex-1 text-[10px] px-1 py-0.5 rounded outline-none border"
+                className="flex-1 text-[11px] px-1 py-0.5 rounded outline-none border"
                 style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
                 value={pin.vectorIndex ? `${pin.vectorIndex.isLocal ? 'local' : 'shared'}:${pin.vectorIndex.variableName}` : ''}
                 onChange={(e) => {
@@ -873,7 +873,7 @@ export function PropertiesPanel() {
               {/* Shared Variables */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-1 px-1">
-                  <div className="text-[10px] font-bold uppercase tracking-tight" style={{ color: theme.ui.textDim }}>Shared</div>
+                  <div className="text-[11px] font-bold uppercase tracking-tight" style={{ color: theme.ui.textDim }}>Shared</div>
                   <AddVariableButton isLocal={false} onAdd={handleAddShared} />
                 </div>
                 <div className="flex flex-col">
@@ -898,7 +898,7 @@ export function PropertiesPanel() {
               {/* Local Variables */}
               <div>
                 <div className="flex items-center justify-between mb-1 px-1">
-                  <div className="text-[10px] font-bold uppercase tracking-tight" style={{ color: theme.ui.textDim }}>Local</div>
+                  <div className="text-[11px] font-bold uppercase tracking-tight" style={{ color: theme.ui.textDim }}>Local</div>
                   <AddVariableButton isLocal={true} onAdd={handleAddLocal} />
                 </div>
                 <div className="flex flex-col">
@@ -925,7 +925,7 @@ export function PropertiesPanel() {
               {/* Inputs */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-1 px-1">
-                  <div className="text-[10px] font-bold uppercase tracking-tight" style={{ color: theme.ui.textDim }}>Inputs</div>
+                  <div className="text-[11px] font-bold uppercase tracking-tight" style={{ color: theme.ui.textDim }}>Inputs</div>
                   <AddInterfacePinButton isInput={true} onAdd={(name) => handleAddInterfacePin(true, name)} />
                 </div>
                 <div className="flex flex-col">
@@ -948,7 +948,7 @@ export function PropertiesPanel() {
               {/* Outputs */}
               <div>
                 <div className="flex items-center justify-between mb-1 px-1">
-                  <div className="text-[10px] font-bold uppercase tracking-tight" style={{ color: theme.ui.textDim }}>Outputs</div>
+                  <div className="text-[11px] font-bold uppercase tracking-tight" style={{ color: theme.ui.textDim }}>Outputs</div>
                   <AddInterfacePinButton isInput={false} onAdd={(name) => handleAddInterfacePin(false, name)} />
                 </div>
                 <div className="flex flex-col">
@@ -979,14 +979,14 @@ export function PropertiesPanel() {
         </div>
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 scrollbar-thin">
           {selectedNodeIds.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-[10px] text-center px-4 space-y-2" style={{ color: theme.ui.textDim }}>
+            <div className="h-full flex flex-col items-center justify-center text-[11px] text-center px-4 space-y-2" style={{ color: theme.ui.textDim }}>
               <span className="text-2xl opacity-20">🖱️</span>
               <span>Select a node to edit properties</span>
             </div>
           ) : selectedNodeIds.length === 1 ? (
             <NodePropertiesEditor nodeId={selectedNodeIds[0]} />
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-[10px] text-center px-4 space-y-2" style={{ color: theme.ui.textDim }}>
+            <div className="h-full flex flex-col items-center justify-center text-[11px] text-center px-4 space-y-2" style={{ color: theme.ui.textDim }}>
               <span className="text-2xl opacity-20">🔲</span>
               <span>{selectedNodeIds.length} nodes selected</span>
             </div>
@@ -1076,7 +1076,7 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
         </div>
         {node.type === 'SubTree' && (
           <button
-            className="text-[10px] px-2 py-0.5 rounded transition-colors"
+            className="text-[11px] px-2 py-0.5 rounded transition-colors"
             style={{ backgroundColor: theme.ui.buttonBg, color: theme.ui.tabActiveText }}
             onClick={handleReloadSubTree}
           >
@@ -1087,7 +1087,7 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
 
       {/* Return 属性 */}
       <div className="flex items-center gap-1">
-        <div className="text-[10px] w-12 shrink-0" style={{ color: theme.ui.textDim }}>Return</div>
+        <div className="text-[11px] w-12 shrink-0" style={{ color: theme.ui.textDim }}>Return</div>
         <div className="flex-1 h-5 rounded px-1 border flex items-center" style={{ backgroundColor: theme.ui.inputBg, borderColor: theme.ui.border }}>
           <AdaptiveSelect
             value={node.returnType || 'Default'}
@@ -1371,7 +1371,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
           >
             {pin.name}
           </span>
-          <span className="text-[10px] font-semibold" style={{ color: theme.ui.textDim }}>{pin.isInput ? 'in' : 'out'}</span>
+          <span className="text-[11px] font-semibold" style={{ color: theme.ui.textDim }}>{pin.isInput ? 'in' : 'out'}</span>
         </div>
 
         <AdaptiveSelect
@@ -1394,7 +1394,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
 
         {!pin.isCountTypeFixed && (
           <button
-            className="text-[10px] text-center px-0.5 rounded transition-colors min-w-[12px] font-bold"
+            className="text-[11px] text-center px-0.5 rounded transition-colors min-w-[12px] font-bold"
             style={{ color: colorClass, backgroundColor: 'transparent' }}
             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.ui.accentSoft; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
