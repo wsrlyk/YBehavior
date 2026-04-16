@@ -12,6 +12,7 @@ export interface DataEdgeData extends Record<string, unknown> {
   toNodeId: string;
   fromPinName: string;
   toPinName: string;
+  isEffectivelyDisabled?: boolean;
 }
 
 export type DataEdgeType = Edge<DataEdgeData, 'data'>;
@@ -65,6 +66,7 @@ function DataEdge({
         stroke: strokeColor,
         strokeWidth: (selected || isConnectedToSelected) ? 3 : 2,
         strokeDasharray: '5,5',  // 虚线
+        opacity: edgeData?.isEffectivelyDisabled ? 0.35 : 1,
       }}
       markerEnd={markerEnd}
     />

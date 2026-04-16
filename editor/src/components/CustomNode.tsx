@@ -54,7 +54,7 @@ function getPinNoteValue(pin: Pin): string {
   return `${base}${localSuffix}${getVectorIndexDisplay(pin)}`;
 }
 
-function PinRow({ pin, isInput, dragging }: { pin: Pin; isInput: boolean; dragging?: boolean }) {
+function PinRow({ pin, isInput, dragging, isDisabled }: { pin: Pin; isInput: boolean; dragging?: boolean; isDisabled?: boolean }) {
   const setTooltip = useTooltipStore((state) => state.setTooltip);
   const pinColor = PIN_COLORS[pin.valueType] || PIN_COLORS.default || theme.ui.border;
   const binding = pin.binding;
@@ -71,7 +71,7 @@ function PinRow({ pin, isInput, dragging }: { pin: Pin; isInput: boolean; draggi
 
   return (
     <div
-      className={`relative flex items-center gap-1 text-xs py-0.5 ${isInput ? 'pl-2.5' : 'pr-2.5 flex-row-reverse'}`}
+      className={`relative flex items-center gap-1 text-xs py-0.5 ${isInput ? 'pl-2.5' : 'pr-2.5 flex-row-reverse'} ${isDisabled ? 'grayscale opacity-60' : ''}`}
       onMouseLeave={() => setTooltip(null)}
     >
       <Handle
@@ -277,10 +277,10 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
           {(treeNode.pins.filter(p => (p.isInput || !p.isInput) && p.enableType !== 'disable').length > 0) && (
             <div className="flex justify-between px-2 py-1 gap-4">
               <div className="flex flex-col">
-                {treeNode.pins.filter(p => p.isInput && p.enableType !== 'disable').map((pin, i) => <PinRow key={`in-${i}`} pin={pin} isInput={true} dragging={dragging} />)}
+                {treeNode.pins.filter(p => p.isInput && p.enableType !== 'disable').map((pin, i) => <PinRow key={`in-${i}`} pin={pin} isInput={true} dragging={dragging} isDisabled={data.isEffectivelyDisabled} />)}
               </div>
               <div className="flex flex-col items-end">
-                {treeNode.pins.filter(p => !p.isInput && p.enableType !== 'disable').map((pin, i) => <PinRow key={`out-${i}`} pin={pin} isInput={false} dragging={dragging} />)}
+                {treeNode.pins.filter(p => !p.isInput && p.enableType !== 'disable').map((pin, i) => <PinRow key={`out-${i}`} pin={pin} isInput={false} dragging={dragging} isDisabled={data.isEffectivelyDisabled} />)}
               </div>
             </div>
           )}
@@ -297,14 +297,25 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
             type="target"
             position={Position.Top}
             id="tree-target"
-            className="!w-3 !h-2 !rounded-sm !border-0 hover:[--handle-scale:1.5] hover:!opacity-100 !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20"
-            style={{
-              backgroundColor: theme.handle.bg,
+            className={`!h-4 !rounded-sm !border-0 hover:[--handle-scale:1.1] hover:!opacity-100 !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20 flex items-center justify-center px-1 ${isEffectivelyDisabled ? 'grayscale opacity-60' : ''}`}
+            style={{ 
+              backgroundColor: theme.handle.bg, 
               top: 0,
               left: '50%',
-              transform: 'translate(-50%, -50%) scale(var(--handle-scale, 1))'
-            }}
-          />
+              transform: 'translate(-50%, -50%) scale(var(--handle-scale, 1))',
+              width: nodeDefinition?.icon ? 'auto' : '12px',
+              minWidth: nodeDefinition?.icon ? '16px' : '12px'
+             }}
+          >
+            {(nodeDefinition?.icon || nodeDefinition?.category === 'action') && (
+              <span 
+                className="text-[10px] pointer-events-none font-bold leading-none select-none px-0.5"
+                style={{ color: theme.ui.textMain }}
+              >
+                {nodeDefinition?.icon || '▶'}
+              </span>
+            )}
+          </Handle>
         )}
 
         {hasChildren && nodeDefinition?.childConnectors?.length === 1 && (
@@ -312,7 +323,7 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
             type="source"
             position={Position.Bottom}
             id={nodeDefinition.childConnectors[0].name}
-            className="!w-3 !h-2 !rounded-sm !border-0 hover:[--handle-scale:1.5] hover:!opacity-100 !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20"
+            className={`!w-3 !h-2 !rounded-sm !border-0 hover:[--handle-scale:1.5] hover:!opacity-100 !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20 ${isEffectivelyDisabled ? 'grayscale opacity-60' : ''}`}
             style={{
               backgroundColor: theme.handle.bg,
               bottom: 0,
@@ -328,7 +339,7 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
             type="source"
             position={Position.Bottom}
             id={conn.name}
-            className="!w-3 !h-2 !rounded-sm !border-0 hover:[--handle-scale:1.5] hover:!opacity-100 !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20"
+            className={`!w-3 !h-2 !rounded-sm !border-0 hover:[--handle-scale:1.5] hover:!opacity-100 !cursor-crosshair !transition-[transform,background-color,opacity] duration-200 !origin-center z-20 ${isEffectivelyDisabled ? 'grayscale opacity-60' : ''}`}
             style={{
               backgroundColor: theme.handle.bg,
               bottom: 0,
@@ -340,7 +351,7 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
 
         {treeNode.hasConditionConnector && (
           <div
-            className="absolute top-0 -left-6 w-6 h-5 flex items-center justify-center z-[60] shadow-sm border"
+            className={`absolute top-0 -left-6 w-6 h-5 flex items-center justify-center z-[60] shadow-sm border ${isEffectivelyDisabled ? 'grayscale opacity-60' : ''}`}
             style={{
               backgroundColor: theme.handle.bg,
               borderColor: theme.ui.border,

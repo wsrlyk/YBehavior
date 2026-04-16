@@ -115,11 +115,11 @@ export const DefaultTheme: GraphTheme = {
     // --- BT Node Categories ---
     // --- BT Node Categories ---
     node: {
-        composite: '#94A3B8',
-        decorator: '#8BA893',
-        action: '#B09E83',
-        condition: '#938BA8',
-        default: '#94A3B8',
+        composite: '#9DB0C5',
+        decorator: '#A1B9A8',
+        action: '#C7B89F',
+        condition: '#A9A1B8',
+        default: '#9DB0C5',
     },
 
     // --- Pin Dot Colors ---

@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Nodes>
   <!-- Composite 节点：可以有多个子节点 -->
-  <Node Class="Sequence" Category="composite" Note="" Desc="从左到右运行子节点，一旦有子节点返回失败则终止&#10;● 返回成功：所有子节点均返回成功&#10;● 返回失败：无子节点 或 有节点返回失败">
+  <Node Class="Sequence" Category="composite" Icon="➜➜➜" Note="" Desc="从左到右运行子节点，一旦有子节点返回失败则终止&#10;● 返回成功：所有子节点均返回成功&#10;● 返回失败：无子节点 或 有节点返回失败">
     <Connector Name="children" />
   </Node>
-  <Node Class="Selector" Category="composite" Note="" Desc="从左到右运行子节点，一旦有子节点返回成功则终止&#10;● 返回成功：有节点返回成功&#10;● 返回失败：无子节点 或 所有节点返回失败">
+  <Node Class="Selector" Category="composite" Icon="？？？" Note="" Desc="从左到右运行子节点，一旦有子节点返回成功则终止&#10;● 返回成功：有节点返回成功&#10;● 返回失败：无子节点 或 所有节点返回失败">
     <Connector Name="children" />
   </Node>
-  <Node Class="RandomSequence" Category="composite" Note="" Desc="随机运行子节点，一旦有子节点返回失败则终止&#10;● 返回成功：所有子节点均返回成功&#10;● 返回失败：无子节点 或 有节点返回失败">
+  <Node Class="RandomSequence" Category="composite" Icon="～➜➜➜" Note="" Desc="随机运行子节点，一旦有子节点返回失败则终止&#10;● 返回成功：所有子节点均返回成功&#10;● 返回失败：无子节点 或 有节点返回失败">
     <Connector Name="children" />
   </Node>
-  <Node Class="RandomSelector" Category="composite" Note="" Desc="随机运行子节点，一旦有子节点返回成功则终止&#10;● 返回成功：有节点返回成功&#10;● 返回失败：无子节点 或 所有节点返回失败">
+  <Node Class="RandomSelector" Category="composite" Icon="～？？？" Note="" Desc="随机运行子节点，一旦有子节点返回成功则终止&#10;● 返回成功：有节点返回成功&#10;● 返回失败：无子节点 或 所有节点返回失败">
     <Connector Name="children" />
   </Node>
-  <Node Class="SwitchCase" Category="composite" Note="" Desc="找到Cases中与Switch相等的值，并运行和返回对应的子节点。没有则运行和返回Default子节点&#10;● 返回成功：对应Case返回成功&#10;● 返回失败：Case和子节点数量不一致 或 对应Case返回失败 或 想运行却没有Default">
+  <Node Class="SwitchCase" Category="composite" Icon="↙↓↘" Note="" Desc="找到Cases中与Switch相等的值，并运行和返回对应的子节点。没有则运行和返回Default子节点&#10;● 返回成功：对应Case返回成功&#10;● 返回失败：Case和子节点数量不一致 或 对应Case返回失败 或 想运行却没有Default">
     <Pin Name="Switch" ValueType="IFSB" IsArray="False" IsConst="False" Desc="比较值" />
     <Pin Name="Cases" ValueType="IFSB" IsArray="True" Desc="候选值。与子节点数量一致，并一一对应" />
     <Connector Name="children" />
     <Connector Name="default" Label="Default" MaxChildren="1" />
   </Node>
-  <Node Class="IfThenElse" Category="composite" Note="" Desc="如果If节点返回成功，则运行并返回Then节点，否则运行并返回Else节点&#10;● 返回成功：Then/Else返回成功&#10;● 返回失败：没有If 或 没有Then/Else 或 Then/Else返回失败">
+  <Node Class="IfThenElse" Category="composite" Icon="↙ ？↘" Note="" Desc="如果If节点返回成功，则运行并返回Then节点，否则运行并返回Else节点&#10;● 返回成功：Then/Else返回成功&#10;● 返回失败：没有If 或 没有Then/Else 或 Then/Else返回失败">
     <Connector Name="if" Label="If" MaxChildren="1" />
     <Connector Name="then" Label="Then" MaxChildren="1" />
     <Connector Name="else" Label="Else" MaxChildren="1" />
@@ -39,120 +39,120 @@
   </Node>
 
   <!-- Decorator 节点：只能有一个子节点 -->
-  <Node Class="Root" Category="decorator" Note="" HasParent="False">
+  <Node Class="Root" Category="decorator" Icon="🏠" Note="" HasParent="False">
     <Connector Name="children" MaxChildren="1" />
   </Node>
-  <Node Class="Loop" Category="decorator" Note="" Desc="运行子节点若干次。For的简化版&#10;● 返回成功：BreakValue启用：Break生效提前退出循环；BreakValue未启用：正常结束循环&#10;● 返回失败：BreakValue启用：Break未生效；BreakValue未启用：无子节点">
+  <Node Class="Loop" Category="decorator" Icon="↺" Note="" Desc="运行子节点若干次。For的简化版&#10;● 返回成功：BreakValue启用：Break生效提前退出循环；BreakValue未启用：正常结束循环&#10;● 返回失败：BreakValue启用：Break未生效；BreakValue未启用：无子节点">
     <Pin Name="Count" ValueType="I"  IsArray="False" IsConst="False" Desc="次数" />
     <Pin Name="Current" ValueType="I"  IsArray="False" IsInput="False" IsConst="False" IsEnable="True" Desc="当前次数，从0开始" />
     <Pin Name="BreakValue" ValueType="B"  IsArray="False" IsConst="False" IsEnable="False" Desc="子节点返回值和这个相同，则退出循环" />
     <Connector Name="children" MaxChildren="1" />
   </Node>
-  <Node Class="ForEach" Category="decorator" Note="" Desc="遍历数组，每取出一个值，调用一次子节点。&#10;● 返回成功：BreakValue启用：Break生效提前退出循环；BreakValue未启用：正常结束循环&#10;● 返回失败：BreakValue启用：Break未生效；BreakValue未启用：无子节点">
-    <Pin Name="Collection" ValueType="I" IsArray="True" IsConst="False" Desc="数组" />
-    <Pin Name="Current" ValueType="I" IsArray="False" IsInput="False" IsConst="False"  IsEnable="True" Desc="当前遍历取出的值" />
+  <Node Class="ForEach" Category="decorator" Icon="↺" Note="" Desc="遍历数组，每取出一个值，调用一次子节点。&#10;● 返回成功：BreakValue启用：Break生效提前退出循环；BreakValue未启用：正常结束循环&#10;● 返回失败：BreakValue启用：Break未生效；BreakValue未启用：无子节点">
+    <Pin Name="Collection" ValueType="IFBSVAU" IsArray="True" vTypeGroup="1" IsConst="False" Desc="数组" />
+    <Pin Name="Current" ValueType="IFBSVAU" IsArray="False" IsInput="False" vTypeGroup="1" IsConst="False"  IsEnable="True" Desc="当前遍历取出的值" />
     <Pin Name="BreakValue" ValueType="B" IsArray="False" IsConst="False" IsEnable="False" Desc="子节点返回值和这个相同，则退出循环" />
     <Connector Name="children" MaxChildren="1" />
   </Node>
-  <Node Class="For" Category="decorator" Note="" Desc="循环运行Children节点，注意不要死循环。&#13;Init，整个循环刚开始时的初始化节点。&#13;Cond，每次循环前的判断节点，如失败则结束循环。&#13;Inc，每次循环后的操作节点&#10;● 返回成功：BreakValue启用：Break生效提前退出循环；BreakValue未启用：Cond不满足时结束循环&#10;● 返回失败：BreakValue启用：Break未生效；BreakValue未启用：Cond和Children节点均没有（无法结束循环。此时For的任何子节点都不会跑）">
+  <Node Class="For" Category="decorator" Icon="↺" Note="" Desc="循环运行Children节点，注意不要死循环。&#13;Init，整个循环刚开始时的初始化节点。&#13;Cond，每次循环前的判断节点，如失败则结束循环。&#13;Inc，每次循环后的操作节点&#10;● 返回成功：BreakValue启用：Break生效提前退出循环；BreakValue未启用：Cond不满足时结束循环&#10;● 返回失败：BreakValue启用：Break未生效；BreakValue未启用：Cond and Children节点均没有（无法结束循环。此时For的任何子节点都不会跑）">
     <Pin Name="BreakValue" ValueType="B" IsArray="False" IsConst="False" IsEnable="False" Desc="子节点返回值和这个相同，则退出循环" />
     <Connector Name="init" Label="Init" MaxChildren="1" />
     <Connector Name="cond" Label="Cond" MaxChildren="1" />
     <Connector Name="inc" Label="Incr" MaxChildren="1" />
     <Connector Name="children" MaxChildren="1" />
   </Node>
-  <Node Class="Not" Category="decorator" Note="">
+  <Node Class="Not" Category="decorator" Icon="!" Note="">
     <Connector Name="children" MaxChildren="1" />
   </Node>
-  <Node Class="AlwaysSuccess" Category="decorator" Note="" Desc="总是返回成功" />
-  <Node Class="AlwaysFailed" Category="decorator" Note="" Desc="总是返回失败" />
-  <Node Class="ConvertToBool" Category="decorator" Note="" Desc="根据子节点的成功失败，设置Output值&#10;● 返回成功：子节点返回成功&#10;● 返回失败：子节点返回失败">
+  <Node Class="AlwaysSuccess" Category="decorator" Icon="T" Note="" Desc="总是返回成功" />
+  <Node Class="AlwaysFailed" Category="decorator" Icon="F" Note="" Desc="总是返回失败" />
+  <Node Class="ConvertToBool" Category="decorator" Icon="B" Note="" Desc="根据子节点的成功失败，设置Output值&#10;● 返回成功：子节点返回成功&#10;● 返回失败：子节点返回失败">
     <Pin Name="Output" ValueType="B" IsArray="False" IsInput="False" IsConst="False" Desc="子节点的返回值，成功为True，失败为False" />
     <Connector Name="children" MaxChildren="1" />
   </Node>
 
   <!-- Action 节点：没有子连接器 -->
-  <Node Class="Calculator" Category="action" Note="{1} {0} {2} >> {3}" Desc="计算器&#10;● 返回成功：始终成功">
+  <Node Class="Calculator" Category="action" Icon="+-×÷" Note="{1} {0} {2} >> {3}" Desc="计算器&#10;● 返回成功：始终成功">
     <Pin Name="Operator" ValueType="E" IsArray="False" IsConst="True" Value="+" Param="+|-|*|/" Desc="操作符号" />
     <Pin Name="Output" ValueType="IFV" IsInput="False" IsConst="False" IsArray="False" vTypeGroup="1" Desc="保存计算结果" />
     <Pin Name="Input1" ValueType="IFV" IsArray="False" Value="0" vTypeGroup="1" Desc="操作数1" />
     <Pin Name="Input2" ValueType="IFV" IsArray="False" Value="0" vTypeGroup="1" Desc="操作数2" />
   </Node>
-  <Node Class="UnaryOperation" Category="action" Note="{0}({1}) >> {2}" Desc="一元运算&#10;● 返回成功：始终成功">
+  <Node Class="UnaryOperation" Category="action" Icon="y=f(x)" Note="{0}({1}) >> {2}" Desc="一元运算&#10;● 返回成功：始终成功">
     <Pin Name="Operator" ValueType="E" IsArray="False" IsConst="True" Value="ABS" Param="ABS" Desc="操作：&#10;● ABS 绝对值" />
     <Pin Name="Output" ValueType="IF" IsInput="False" IsConst="False" IsArray="False" vTypeGroup="1" Desc="保存计算结果" />
     <Pin Name="Input" ValueType="IF" IsArray="False" vTypeGroup="1" Desc="操作数" />
   </Node>
-  <Node Class="SetData" Category="action" Note="{1} >> {0}" Desc="赋值器&#10;● 返回成功：始终成功">
+  <Node Class="SetData" Category="action" Icon="y >> x" Note="{1} >> {0}" Desc="赋值器&#10;● 返回成功：始终成功">
     <Pin Name="Target" ValueType="IFBSVAU" IsConst="False" vTypeGroup="1" cTypeGroup="1" Desc="目标" />
     <Pin Name="Source" ValueType="IFBSVAU" vTypeGroup="1" cTypeGroup="1" Desc="源" />
   </Node>
-  <Node Class="Convert" Category="action" Note="({2}){1} >> ({3}){0}" Desc="类型转换&#10;● 返回失败：类型不支持">
+  <Node Class="Convert" Category="action" Icon="y >> x" Note="({2}){1} >> ({3}){0}" Desc="类型转换&#10;● 返回失败：类型不支持">
     <Pin Name="Target" ValueType="IFBS" IsInput="False" IsConst="False" IsArray="False" Desc="目标" />
     <Pin Name="Source" ValueType="IFBS" IsArray="False" Desc="源" />
   </Node>
-  <Node Class="SubTree" Category="action" Note="{0}" Desc="运行并返回子树&#10;● 返回成功：子树返回成功&#10;● 返回失败：没有子树 或 子树返回失败">
+  <Node Class="SubTree" Category="action" Icon="🌳" Note="{0}" Desc="运行并返回子树&#10;● 返回成功：子树返回成功&#10;● 返回失败：没有子树 或 子树返回失败">
     <Pin Name="Tree" ValueType="S" IsArray="False" IsConst="True" Desc="子树名，如在子文件夹需包含相对路径" />
     <Pin Name="Identification" ValueType="S" IsArray="False" IsConst="True" Desc="唯一ID名，用于通过配表来替换此子树" />
   </Node>
-  <Node Class="Random" Category="action" Note="[{1} ~ {2}) >> {0}" Desc="随机器&#10;● 返回成功：始终成功">
+  <Node Class="Random" Category="action" Icon="~" Note="[{1} ~ {2}) >> {0}" Desc="随机器&#10;● 返回成功：始终成功">
     <Pin Name="Target" ValueType="IF" IsInput="False" IsConst="False" IsArray="False" vTypeGroup="1" Desc="保存计算结果" />
     <Pin Name="Bound1" ValueType="IF" IsArray="False" vTypeGroup="1" Desc="最小值，闭区间" />
     <Pin Name="Bound2" ValueType="IF" IsArray="False" vTypeGroup="1" Desc="最大值，开区间" />
   </Node>
-  <Node Class="RandomSelect" Category="action" Note="{0} ~=> {1}" Desc="随机选一个&#10;● 返回失败：数组为空">
+  <Node Class="RandomSelect" Category="action" Icon="~" Note="{0} ~=> {1}" Desc="随机选一个&#10;● 返回失败：数组为空">
     <Pin Name="Input" ValueType="IFBSVAU" IsArray="True" vTypeGroup="1" Desc="输入" />
     <Pin Name="Output" ValueType="IFBSVAU" IsInput="False" IsConst="False" IsArray="False" vTypeGroup="1" Desc="输出" />
   </Node>
-  <Node Class="PiecewiseFunction" Category="action" Note="f({2}) >> {0}" Desc="分段函数。函数描述为一系列的坐标关键点，点之间的值为线性插值&#10;● 返回失败：关键点长度不匹配 或 为空">
+  <Node Class="PiecewiseFunction" Category="action" Icon="_|￣" Note="f({2}) >> {0}" Desc="分段函数。函数描述为一系列的坐标关键点，点之间的值为线性插值&#10;● 返回失败：关键点长度不匹配 或 为空">
     <Pin Name="KeyPointX" ValueType="IF" IsArray="True" vTypeGroup="1" Desc="关键点的X坐标数组" />
     <Pin Name="KeyPointY" ValueType="IF" IsArray="True" vTypeGroup="2" Desc="关键点的Y坐标数组" />
     <Pin Name="Input" ValueType="IF" IsArray="False" vTypeGroup="1" Desc="输入的X坐标" />
     <Pin Name="Output" ValueType="IF" IsInput="False" IsConst="False" IsArray="False" vTypeGroup="2" Desc="输出的Y坐标" />
   </Node>
-  <Node Class="ArrayOperation" Category="action" Note="{1} {0} {2} >> {3}" Desc="数组运算操作&#10;● 返回成功：始终成功">
+  <Node Class="ArrayOperation" Category="action" Icon="[x]+-*/[y]" Note="{1} {0} {2} >> {3}" Desc="数组运算操作&#10;● 返回成功：始终成功">
     <Pin Name="Operator" ValueType="E" IsArray="False" IsConst="True" Value="APPEND" Param="APPEND|MERGE|EXCLUDE" Desc="数组操作：&#10;● APPEND 直接拼接，不改变顺序&#10;● MERGE 按集合方式合并，每个元素唯一并排序&#10;● EXCLUDE 从 Input1 剔除 Input2 的内容" />
     <Pin Name="Output" ValueType="IFBSVAU" IsArray="True" IsInput="False" IsConst="False" vTypeGroup="1" />
     <Pin Name="Input1" ValueType="IFBSVAU" IsArray="True" vTypeGroup="1" />
     <Pin Name="Input2" ValueType="IFBSVAU" IsArray="True" vTypeGroup="1" />
   </Node>
 
-  <Node Class="Dice" Category="action" Note="" Desc="骰子。可自定义面数，每个面的值，和概率。&#10;● 返回失败：Distribution和Values长度不匹配 或 Input不在范围[0, Distribution的所有数值的和)">
+  <Node Class="Dice" Category="action" Icon="🎲" Note="" Desc="骰子。可自定义面数，每个面的值，和概率。&#10;● 返回失败：Distribution和Values长度不匹配 或 Input不在范围[0, Distribution的所有数值的和)">
     <Pin Name="Distribution" ValueType="IF" IsArray="True" vTypeGroup="1" Desc="每个面的概率，可以是任意大的正数值" />
     <Pin Name="Values" ValueType="IFBSVAU" IsArray="True" IsEnable="False" vTypeGroup="2" Desc="每个面的值，和概率一一对应；禁用时，为每个面的序号，从0开始" />
     <Pin Name="Input" ValueType="IF" IsArray="False" IsEnable="False" Value="0" vTypeGroup="1" Desc="手动扔骰子的随机值，须落在 [0, Distribution的所有数值的和) 之间" />
     <Pin Name="Output" ValueType="IFBSVAU" IsInput="False" IsConst="False" IsArray="False" vTypeGroup="2" Desc="输出值。Values禁用时，必须为Int" />
   </Node>
-  <Node Class="Wait" Category="action" Note="{0}" Desc="等待若干次心跳后继续&#10;● 返回成功：始终成功">
+  <Node Class="Wait" Category="action" Icon="⏰" Note="{0}" Desc="等待若干次心跳后继续&#10;● 返回成功：始终成功">
     <Pin Name="TickCount" ValueType="I" IsArray="False" Value="1" Desc="等待心跳次数" />
   </Node>
-  <Node Class="ClearArray" Category="action" Note="{0}" Desc="清空数组&#10;● 返回成功：始终成功">
+  <Node Class="ClearArray" Category="action" Icon="[ ]" Note="{0}" Desc="清空数组&#10;● 返回成功：始终成功">
     <Pin Name="Array" ValueType="IFBSVAU" IsArray="True" IsConst="False" Desc="目标数组" />
   </Node>
-  <Node Class="GetArrayLength" Category="action" Note="[{0}].Length >> {1}" Desc="获取数组长度&#10;● 返回成功：始终成功">
+  <Node Class="GetArrayLength" Category="action" Icon="[].Length" Note="[{0}].Length >> {1}" Desc="获取数组长度&#10;● 返回成功：始终成功">
     <Pin Name="Array" ValueType="IFBSVAU" IsArray="True" Desc="目标数组" />
     <Pin Name="Length" ValueType="I" IsInput="False" IsConst="False" IsArray="False" Desc="存储数组的长度" />
   </Node>
-  <Node Class="ArrayPushElement" Category="action" Note="[{0}] <= {1}" Desc="数组尾部添加元素&#10;● 返回成功：始终成功">
+  <Node Class="ArrayPushElement" Category="action" Icon="[x] <-- y" Note="[{0}] <= {1}" Desc="数组尾部添加元素&#10;● 返回成功：始终成功">
     <Pin Name="Array" ValueType="IFBSVAU" IsArray="True" IsConst="False" vTypeGroup="1" Desc="目标数组" />
     <Pin Name="Element" ValueType="IFBSVAU" IsArray="False" vTypeGroup="1" Desc="新元素" />
   </Node>
-  <Node Class="ArrayRemoveElement" Category="action" Note="[{0}] remove {1}" Desc="数组删除元素&#10;● 返回成功：删除成功">
+  <Node Class="ArrayRemoveElement" Category="action" Icon="[x] rm y" Note="[{0}] remove {1}" Desc="数组删除元素&#10;● 返回成功：删除成功">
     <Pin Name="Array" ValueType="IFBSVAU" IsArray="True" IsConst="False" vTypeGroup="1" Desc="目标数组" />
     <Pin Name="Element" ValueType="IFBSVAU" IsArray="False" vTypeGroup="1" Desc="目标元素" />
     <Pin Name="IsAll" ValueType="B" IsArray="False" Value="F" Desc="是否删除全部" />
   </Node>
-  <Node Class="ArrayHasElement" Category="condition" Note="[{0}] has {1}?" Desc="数组是否有该元素">
+  <Node Class="ArrayHasElement" Category="condition" Icon="[x] has y?" Note="[{0}] has {1}?" Desc="数组是否有该元素">
     <Pin Name="Array" ValueType="IFBSVAU" IsArray="True" vTypeGroup="1" Desc="目标数组" />
     <Pin Name="Element" ValueType="IFBSVAU" IsArray="False" vTypeGroup="1" Desc="目标元素" />
     <Pin Name="Count" ValueType="I" IsInput="False" IsConst="False" IsArray="False" IsEnable="False" Desc="数量" />
     <Pin Name="Index" ValueType="I" IsInput="False" IsConst="False" IsArray="False" IsEnable="False" Desc="第一个匹配的下标。只在找到时赋值" />
   </Node>
-  <Node Class="GenIndexArray" Category="action" Note="{0} >> {1}" Desc="生成一个自然数序列&#10;● 返回成功：正常情况下始终成功">
+  <Node Class="GenIndexArray" Category="action" Icon="[012..]" Note="{0} >> {1}" Desc="生成一个自然数序列&#10;● 返回成功：正常情况下始终成功">
     <Pin Name="Input" ValueType="IFBSVAU" IsArray="False" Desc="参照数组或者长度，只能是数组类型或者整型" />
     <Pin Name="Output" ValueType="I" IsArray="True" IsInput="False" IsConst="False" Desc="从0开始，长度等于Input数组长度，或Input" />
   </Node>
-  <Node Class="Shuffle" Category="action" Note="[{0}] >??> [{1}]" Desc="乱序&#10;● 返回成功：始终成功">
+  <Node Class="Shuffle" Category="action" Icon="[x]<??<[y]" Note="[{0}] >??> [{1}]" Desc="乱序&#10;● 返回成功：始终成功">
     <Pin Name="Input" ValueType="IFBSVAU" IsArray="True" vTypeGroup="1" Desc="输入" />
     <Pin Name="Output" ValueType="IFBSVAU" IsArray="True" IsInput="False" IsConst="False" vTypeGroup="1" Desc="输出" />
   </Node>
@@ -163,7 +163,7 @@
   <Node Class="FSMClearConditions" Category="action" Note="Clear all FSM conditions" Desc="清空所有状态机转换条件&#13;&#10;● 返回成功：始终成功" />
 
   <!-- Condition 节点：没有子连接器 -->
-  <Node Class="Comparer" Category="condition" Note="{1} {0} {2} ?" Desc="比较器。返回比较结果一致与否&#10;● 返回成功：结果与期望一致">
+  <Node Class="Comparer" Category="condition" Icon="x ？y" Note="{1} {0} {2} ?" Desc="比较器。返回比较结果一致与否&#10;● 返回成功：结果与期望一致">
     <Pin Name="Operator" ValueType="E" IsArray="False" IsConst="True" Value="==" Param="==|!=|&gt;|&lt;|&gt;=|&lt;=" Desc="操作符号" />
     <Pin Name="Opl" ValueType="IFBSVAU" IsConst="False" IsArray="False" vTypeGroup="1" Desc="左边的操作数" />
     <Pin Name="Opr" ValueType="IFBSVAU" IsArray="False" vTypeGroup="1" Desc="右边的操作数" />

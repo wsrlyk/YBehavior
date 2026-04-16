@@ -264,7 +264,11 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
           target: conn.childNodeId,
           targetHandle: 'tree-target',
           type: 'tree',
-          data: { siblingTargetIds, label: conn.label },
+          data: { 
+            siblingTargetIds, 
+            label: conn.label,
+            isEffectivelyDisabled: effectiveDisabledIds.has(conn.childNodeId) || effectiveDisabledIds.has(conn.parentNodeId)
+          },
         });
       });
     });
@@ -282,6 +286,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
           data: {
             fromPinName: dataConn.fromPinName,
             toPinName: dataConn.toPinName,
+            isEffectivelyDisabled: effectiveDisabledIds.has(dataConn.fromNodeId) || effectiveDisabledIds.has(dataConn.toNodeId)
           },
         });
       }

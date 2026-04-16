@@ -1744,7 +1744,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
           });
         }
 
-        // 3. 处理 TypeMap 规则 (仅当 Enum 值变化且是常量绑定时)
+        // 3. 处理 TypeMap 规则 (当 Enum 值变化导致其他 Pin 的类型或数量类型变化时)
         const nodeDef = useNodeDefinitionStore.getState().getDefinition(node.type);
         if (updates.binding?.type === 'const' && nodeDef?.typeMaps) {
           const srcValue = updates.binding.value;
@@ -1757,6 +1757,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
               const rule = matchedRules.find(r => r.desPin === pin.name);
               if (!rule) return pin;
 
+              // 解析 TypeMap 定义的目标类型
               const typeStr = rule.desType;
               const char = typeStr.charAt(0).toUpperCase();
               const valueMapping: Record<string, import('../types').ValueType> = {
@@ -1766,14 +1767,35 @@ export const useEditorStore = create<EditorState>((set, get) => ({
               let newValueType = valueMapping[char] || pin.valueType;
               let newCountType: import('../types').CountType = (typeStr.length >= 2 && typeStr[0] === typeStr[1]) ? 'list' : 'scalar';
 
+              // 如果元数据（类型和数量类型）没有变化，不执行任何重置
               if (pin.valueType === newValueType && pin.countType === newCountType) return pin;
 
               changedPinNames.add(pin.name);
+              
+              // 更新元数据
               const updatedPin = { ...pin, valueType: newValueType, countType: newCountType };
+              
+              // 关键：保持原有的绑定模式 (常量或引用)，只重置其内容
+              const oldBinding = pin.binding;
+              let newBinding: import('../types').PinBinding;
+              
+              if (oldBinding.type === 'const') {
+                newBinding = {
+                  type: 'const',
+                  value: getDefaultValue(newValueType, newCountType === 'list')
+                };
+              } else {
+                newBinding = {
+                  type: 'pointer',
+                  variableName: '',
+                  isLocal: false
+                };
+              }
+
               return {
                 ...updatedPin,
-                binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
-                vectorIndex: undefined
+                binding: newBinding,
+                vectorIndex: undefined // 清除可能存在的数组索引
               } as Pin;
             });
           }

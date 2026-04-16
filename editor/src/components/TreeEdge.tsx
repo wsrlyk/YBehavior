@@ -13,6 +13,7 @@ const theme = getTheme();
 export interface TreeEdgeData extends Record<string, unknown> {
   siblingTargetIds?: string[];  // 兄弟边的目标节点 ID 列表
   label?: string;               // 连线标签
+  isEffectivelyDisabled?: boolean;
 }
 
 export type TreeEdgeType = Edge<TreeEdgeData, 'tree'>;
@@ -127,6 +128,9 @@ function TreeEdge({
   ));
 
   const getEdgeColor = (state: NodeState) => {
+    if (edgeData?.isEffectivelyDisabled) {
+      return theme.edge.tree.default;
+    }
     switch (state) {
       case NodeState.Success: return theme.debug.success.edge;
       case NodeState.Failure: return theme.debug.failure.edge;
@@ -156,7 +160,7 @@ function TreeEdge({
           stroke: edgeColor,
           strokeWidth: edgeWidth,
           transition: 'stroke 0.2s, stroke-width 0.2s',
-          opacity: (debugState !== NodeState.Invalid && isPaused) ? 0.6 : 1
+          opacity: edgeData?.isEffectivelyDisabled ? 0.35 : ((debugState !== NodeState.Invalid && isPaused) ? 0.6 : 1)
         }}
         markerEnd={markerEnd}
       />
