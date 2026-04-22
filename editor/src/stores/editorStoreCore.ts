@@ -63,9 +63,9 @@ export function getDescendantIds(tree: Tree, nodeId: string): string[] {
 }
 
 /**
- * Recalculate UIDs for all nodes (depth-first traversal)
- * NOTE: This function MUTATES tree.nodes directly.
- * Caller must ensure tree.nodes is a fresh clone.
+ * Recalculate UIDs for all nodes (depth-first pre-order traversal)
+ * IMPORTANT: This function clones all affected nodes to ensure Zustand detects the state change.
+ * Returns a new nodes Map with updated UIDs.
  */
 export function recalculateUIDs(tree: Tree): void {
     const nodeDefStore = useNodeDefinitionStore.getState();
@@ -142,7 +142,9 @@ export function recalculateUIDs(tree: Tree): void {
     tree.nodes.forEach(node => { node.uid = undefined; });
 
     // Process main tree from root
-    if (tree.rootId) dfs(tree.rootId, false);
+    if (tree.rootId) {
+        dfs(tree.rootId, false);
+    }
 
     // Process forest (orphan trees)
     let forestIndex = 1;
@@ -174,14 +176,20 @@ export function updateOpenedFileTree(
 
     const file = openedFiles[fileIndex];
     const oldTree = file.tree;
-    const newTree = updater(oldTree);
+    let newTree = updater(oldTree);
 
     // No changes
     if (newTree === oldTree) return null;
 
-    // Recalculate UIDs
+    // Recalculate UIDs and create a new nodes Map to trigger React re-render
     if (!options.skipUID) {
         recalculateUIDs(newTree);
+        // Create a new Map to ensure Zustand detects the change
+        const newNodes = new Map<string, any>();
+        newTree.nodes.forEach((node, id) => {
+            newNodes.set(id, { ...node });
+        });
+        newTree = { ...newTree, nodes: newNodes };
     }
 
     // Calculate dirty state

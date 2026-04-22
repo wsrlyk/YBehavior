@@ -98,7 +98,12 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   const { getDefinition } = useNodeDefinitionStore();
 
   // 修正：使用 selector 订阅 currentTree，确保 store 更新时组件重渲染
-  const currentTree = useEditorStore((state) => state.getCurrentTree());
+  // 使用 useShallow 避免在 tree.nodes Map 变化时产生新的引用
+  const currentTree = useEditorStore(useShallow((state) => {
+    if (!state.activeFilePath) return null;
+    const file = state.openedFiles.find(f => f.path === state.activeFilePath);
+    return file?.tree || null;
+  }));
 
   const { screenToFlowPosition, getNodes, getEdges, setCenter, fitView, getViewport } = useReactFlow();
   const pendingCenterTarget = useEditorMetaStore(state => state.uiMeta.pendingCenterTarget);
@@ -227,7 +232,11 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         cached.selected === isSelected &&
         cached.data.isEffectivelyDisabled === isEffectivelyDisabled &&
         cached.data.treeNode.isFolded === node.isFolded &&
-        cached.data.treeNode.disabled === node.disabled;
+        cached.data.treeNode.disabled === node.disabled &&
+        cached.data.treeNode.uid === node.uid &&
+        cached.data.treeNode.hasConditionConnector === node.hasConditionConnector &&
+        cached.data.treeNode.nickname === node.nickname &&
+        cached.data.treeNode.pins === node.pins;
 
       if (isSameContent && cached) {
         newNodes.push(cached);

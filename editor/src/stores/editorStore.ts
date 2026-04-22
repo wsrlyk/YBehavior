@@ -1362,7 +1362,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   // 用于连续操作结束后，同步 UID 和 Dirty 状态，但不再次推送 history
   finalizeContinuousAction: () => set(state => {
-    // This is called at the end of drag, etc. 
+    // This is called at the end of drag, etc.
     // If we blocked drag, we shouldn't be here?
     // But if we are here, we should probably check.
     if (useDebugStore.getState().isConnected) return state;
@@ -1383,6 +1383,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     let newTree = { ...file.tree, nodes: newNodes };
 
     recalculateUIDs(newTree);
+    // Ensure nodes Map is new so Zustand detects the change
+    const finalNodes = new Map<string, TreeNode>();
+    newTree.nodes.forEach((node, id) => {
+      finalNodes.set(id, { ...node });
+    });
+    newTree = { ...newTree, nodes: finalNodes };
+
     newTree = applyLabelUpdatesToTree(newTree, Array.from(newTree.nodes.keys())); // Apply label updates after UID recalculation
 
     const currentSnapshot = serializeTreeForEditor(newTree);
