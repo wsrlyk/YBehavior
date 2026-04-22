@@ -670,6 +670,7 @@ function calculateUIDs(
   getNodeDefinition?: (className: string) => NodeDefinition | undefined
 ): void {
   let uid = 1;
+  const visited = new Set<string>();
 
   // Build parent->children index for performance
   const connectionsByParent = new Map<string, TreeConnection[]>();
@@ -680,29 +681,37 @@ function calculateUIDs(
   }
 
   // 深度优先先序遍历（父节点优先）
-  function dfs(nodeId: string) {
+  function dfs(nodeId: string, isAncestorDisabled: boolean) {
+    if (visited.has(nodeId)) return;
+    visited.add(nodeId);
+
     const node = nodes.get(nodeId);
     if (!node) return;
 
-    node.uid = uid++;
+    const effectivelyDisabled = isAncestorDisabled || node.disabled;
+    node.uid = effectivelyDisabled ? undefined : uid++;
 
     // 子节点：先按 connection 顺序，再在同 connection 内按 x 坐标
     const sortedConns = sortChildConnections(nodeId, node.type, nodes, connectionsByParent, getNodeDefinition);
     for (const conn of sortedConns) {
-      dfs(conn.childNodeId);
+      dfs(conn.childNodeId, effectivelyDisabled);
     }
   }
 
   // 从主根节点开始
-  dfs(rootId);
+  if (rootId) {
+    dfs(rootId, false);
+  }
 
   // 处理森林中的其他树（从 1001、2001 等开始）
   let forestIndex = 1;
-  for (const [nodeId, node] of nodes) {
-    if (node.uid === undefined) {
+  const childIds = new Set(connections.map(c => c.childNodeId));
+  
+  for (const nodeId of nodes.keys()) {
+    if (!childIds.has(nodeId) && !visited.has(nodeId)) {
       // 这是一个未被遍历到的根节点（森林中的其他树）
       uid = forestIndex * 1000 + 1;
-      dfs(nodeId);
+      dfs(nodeId, false);
       forestIndex++;
     }
   }

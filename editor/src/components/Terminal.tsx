@@ -9,8 +9,10 @@ interface TerminalProps {
 
 export function Terminal({ isDocked, onToggleMode }: TerminalProps) {
     const theme = getTheme();
+    const logBufferRef = useRef<LogMessage[]>([]);
     const [logs, setLogs] = useState<LogMessage[]>([]);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const MAX_LOGS = 1000;
 
     useEffect(() => {
         // Initial log
@@ -19,13 +21,38 @@ export function Terminal({ isDocked, onToggleMode }: TerminalProps) {
         }
 
         const channel = new BroadcastChannel(LOG_CHANNEL_NAME);
+        
+        let updateTimer: ReturnType<typeof setTimeout> | null = null;
+        
+        const processBuffer = () => {
+            if (logBufferRef.current.length === 0) return;
+            
+            const newLogs = [...logBufferRef.current];
+            logBufferRef.current = [];
+            
+            setLogs(prev => {
+                const combined = [...prev, ...newLogs];
+                if (combined.length > MAX_LOGS) {
+                    return combined.slice(combined.length - MAX_LOGS);
+                }
+                return combined;
+            });
+            updateTimer = null;
+        };
+
         channel.onmessage = (event) => {
             const msg = event.data as LogMessage;
-            setLogs(prev => [...prev, msg]);
+            logBufferRef.current.push(msg);
+            
+            if (!updateTimer) {
+                // Batch updates every 50ms for performance, or immediate-ish feel
+                updateTimer = setTimeout(processBuffer, 50);
+            }
         };
 
         return () => {
             channel.close();
+            if (updateTimer) clearTimeout(updateTimer);
         };
     }, []);
 

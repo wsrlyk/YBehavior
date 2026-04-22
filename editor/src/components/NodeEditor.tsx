@@ -11,6 +11,7 @@ import {
   type OnConnect,
   BackgroundVariant,
   ReactFlowProvider,
+  useOnSelectionChange,
 } from '@xyflow/react';
 import { useEditorStore, getDescendantIds } from '../stores/editorStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
@@ -115,20 +116,29 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   // Restore viewport on mount
   const { setViewport: flowSetViewport } = useReactFlow();
   const activeFile = useMemo(() => openedFiles.find(f => f.path === activeFilePath), [openedFiles, activeFilePath]);
+  const lastRestoredPathRef = useRef<string | null>(null);
+
+  const isDraggingRef = useRef(false);
 
   useEffect(() => {
     if (!activeFilePath) return;
 
+    // Only restore if we haven't restored for this path or if we are switching files
+    if (lastRestoredPathRef.current === activeFilePath) return;
+
     if (activeFile?.viewport) {
       flowSetViewport(activeFile.viewport);
+      lastRestoredPathRef.current = activeFilePath;
       return;
     }
 
     requestAnimationFrame(() => {
       fitView({ duration: 0, padding: 0.2 });
-      setViewport(activeFilePath, getViewport());
+      const vp = getViewport();
+      setViewport(activeFilePath, vp);
+      lastRestoredPathRef.current = activeFilePath;
     });
-  }, [flowSetViewport, fitView, getViewport, activeFile, activeFilePath, setViewport]);
+  }, [flowSetViewport, fitView, getViewport, activeFile?.viewport, activeFilePath, setViewport]);
 
   const onMoveEnd = useCallback((_: any, viewport: any) => {
     if (activeFilePath) {
@@ -210,12 +220,16 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
       // 检查缓存
       const cached = nodeCache.get(node.id);
-      if (cached &&
-        cached.data.treeNode === node &&
+      const isSameContent = cached &&
+        cached.data.treeNode.id === node.id &&
+        cached.position.x === node.position.x &&
+        cached.position.y === node.position.y &&
         cached.selected === isSelected &&
         cached.data.isEffectivelyDisabled === isEffectivelyDisabled &&
-        cached.position.x === node.position.x &&
-        cached.position.y === node.position.y) {
+        cached.data.treeNode.isFolded === node.isFolded &&
+        cached.data.treeNode.disabled === node.disabled;
+
+      if (isSameContent && cached) {
         newNodes.push(cached);
       } else {
         const flowNode = treeNodeToFlowNode(node, getDefinition);
@@ -300,6 +314,10 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
   // 当树变化时更新节点和边
   useEffect(() => {
+    // If we are currently dragging, don't overwrite the nodes with store data
+    // to avoid interrupting the React Flow drag interaction with new object references.
+    if (isDraggingRef.current) return;
+
     setNodes(flowNodes);
     setEdges(flowEdges);
   }, [flowNodes, flowEdges, setNodes, setEdges]);
@@ -379,57 +397,41 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   }, [duplicateSelectedNodes, removeNodes]);
 
 
-  // 自定义 onNodesChange：处理删除和选择
   const isDebugConnected = useDebugStore((s) => s.isConnected);
   const onNodesChange = useCallback((changes: import('@xyflow/react').NodeChange<Node>[]) => {
-    // Filter out modification changes when in read-only debug mode
+    // Filter out deletion and other fundamental structure changes when in read-only debug mode
     const filteredChanges = isDebugConnected
-      ? changes.filter(c => c.type === 'select' || c.type === 'dimensions') // Allow selection and dimension updates
+      ? changes.filter(c => c.type === 'select' || c.type === 'dimensions')
       : changes;
 
     onNodesChangeBase(filteredChanges);
 
-    let selectionChanged = false;
-    const currentSelected = useEditorStore.getState().selectedNodeIds;
-    const newSelected = new Set(currentSelected);
-
-    const idsToRemove: string[] = [];
-    changes.forEach((change) => {
-      // 处理删除
-      if (change.type === 'remove') {
-        idsToRemove.push(change.id);
-      }
-      // 处理选择
-      if (change.type === 'select') {
-        if (change.selected) {
-          newSelected.add(change.id);
-        } else {
-          newSelected.delete(change.id);
-        }
-        selectionChanged = true;
-      }
-    });
-
-    if (idsToRemove.length > 0) {
-      removeNodes(idsToRemove);
-    }
-
-    if (selectionChanged && !isSelecting.current) {
-      const newNodeIds = Array.from(newSelected).sort();
-      const currentSelectedSorted = [...currentSelected].sort();
-      const isSame = newNodeIds.length === currentSelectedSorted.length &&
-        newNodeIds.every((id, idx) => id === currentSelectedSorted[idx]);
-
-      const lastSelectedSorted = [...lastSelectNodesIdsRef.current].sort();
-      const isLastSame = newNodeIds.length === lastSelectedSorted.length &&
-        newNodeIds.every((id, idx) => id === lastSelectedSorted[idx]);
-
-      if (!isSame && !isLastSame) {
-        lastSelectNodesIdsRef.current = newNodeIds;
-        selectNodes(newNodeIds);
+    // Process deletions if not in debug mode
+    if (!isDebugConnected) {
+      const idsToRemove = changes
+        .filter(c => c.type === 'remove')
+        .map(c => (c as any).id);
+      if (idsToRemove.length > 0) {
+        removeNodes(idsToRemove);
       }
     }
-  }, [onNodesChangeBase, removeNodes, selectNodes, isDebugConnected]);
+  }, [onNodesChangeBase, removeNodes, isDebugConnected]);
+
+  // Use React Flow's native selection change hook for store synchronization
+  useOnSelectionChange({
+    onChange: ({ nodes: selectedNodes }) => {
+      const selectedIds = selectedNodes.map(n => n.id).sort();
+      const currentSelected = [...useEditorStore.getState().selectedNodeIds].sort();
+
+      const isSame = selectedIds.length === currentSelected.length &&
+        selectedIds.every((id, idx) => id === currentSelected[idx]);
+
+      if (!isSame) {
+        lastSelectNodesIdsRef.current = selectedIds;
+        selectNodes(selectedIds);
+      }
+    },
+  });
 
   const onSelectionStart = useCallback(() => {
     isSelecting.current = true;
@@ -437,17 +439,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
   const onSelectionEnd = useCallback(() => {
     isSelecting.current = false;
-    // 获取当前所有选中的节点 ID
-    const selectedIds = nodes.filter(n => n.selected).map(n => n.id);
-    const currentSelected = useEditorStore.getState().selectedNodeIds;
-    const isSame = selectedIds.length === currentSelected.length &&
-      selectedIds.every(id => currentSelected.includes(id));
-
-    if (!isSame) {
-      lastSelectNodesIdsRef.current = selectedIds;
-      selectNodes(selectedIds);
-    }
-  }, [nodes, selectNodes]);
+  }, []);
 
   const updateNodesPositions = useEditorStore((state) => state.updateNodesPositions);
 
@@ -462,6 +454,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
   const setTooltip = useTooltipStore((state) => state.setTooltip);
   const setTooltipDisabled = useTooltipStore((state) => state.setDisabled);
   const onNodeDragStart = useCallback((event: any, draggedNode: Node) => {
+    isDraggingRef.current = true;
     setTooltipDisabled(true);
     setTooltip(null);
     recordHistoryStart();
@@ -566,6 +559,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     if (updates.length > 0) {
       updateNodesPositions(updates);
     }
+    isDraggingRef.current = false;
     setTooltipDisabled(false);
     finalizeContinuousAction();
     dragSession.current = null;
@@ -851,7 +845,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         onNodeDragStop={onNodeDragStop}
         onMoveEnd={onMoveEnd}
         isValidConnection={isValidConnection}
-        selectNodesOnDrag={false}
+        selectNodesOnDrag={true}
         onPaneClick={() => {
           setContextMenu(prev => ({ ...prev, isOpen: false }));
           onPaneClick?.();
@@ -866,7 +860,6 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         snapGrid={[15, 15]}
         panOnDrag={[1, 2]}
         selectionOnDrag
-        selectionKeyCode={null}
         onlyRenderVisibleElements
         proOptions={{ hideAttribution: true }}
         style={{ backgroundColor: theme.ui.background }}
