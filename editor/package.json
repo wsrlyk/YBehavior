@@ -13,7 +13,7 @@
     "tauri:build": "tauri build && node scripts/post-build.mjs"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.18",
+    "@tailwindcss/vite": "^4.3.1",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-opener": "^2",
@@ -31,9 +31,9 @@
     "@tauri-apps/cli": "^2",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.6.0",
+    "@vitejs/plugin-react": "^6.0.2",
     "sharp": "^0.34.5",
     "typescript": "~5.8.3",
-    "vite": "^7.0.4"
+    "vite": "^8.0.16"
   }
 }
