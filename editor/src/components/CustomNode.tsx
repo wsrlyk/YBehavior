@@ -197,15 +197,6 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
 
   return (
     <div className="relative">
-      {hasReturnType && (
-        <div
-          className="absolute -top-4 left-0 px-2 py-0.5 rounded-t-sm text-[8px] font-bold uppercase tracking-tighter"
-          style={{ backgroundColor: returnTypeColor, color: theme.ui.textMain }}
-        >
-          {returnType}
-        </div>
-      )}
-
       {/* Breakpoint/Logpoint Indicator */}
       {bpType !== BreakpointType.None && (
         <div
@@ -231,6 +222,15 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
       )}
 
       <div className="relative">
+        {hasReturnType && (
+          <div
+            className="absolute -top-6 left-1/2 z-[70] -translate-x-1/2 whitespace-nowrap rounded-sm px-1.5 py-0.5 text-[8px] font-bold uppercase leading-none pointer-events-none"
+            style={{ backgroundColor: returnTypeColor, color: theme.ui.textMain }}
+          >
+            {returnType}
+          </div>
+        )}
+
         <div
           className={`rounded shadow-lg min-w-32 cursor-grab resize-none hover:brightness-110 transition-[filter,border-color,box-shadow] duration-200 ${isEffectivelyDisabled ? 'grayscale opacity-60' : ''}`}
           style={{

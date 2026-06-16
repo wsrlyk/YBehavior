@@ -375,6 +375,10 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
     }, [setMenu, onPaneClickProp]);
 
     // Handle connection events for handle visibility
+    const onConnectStart = useCallback(() => {
+        setIsConnecting(true);
+    }, [setIsConnecting]);
+
     const onConnectEnd = useCallback(() => {
         setIsConnecting(false);
     }, [setIsConnecting]);
@@ -619,6 +623,7 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
+                onConnectStart={onConnectStart}
                 onConnect={onConnect}
                 onConnectEnd={onConnectEnd}
                 onNodeDragStart={onNodeDragStart}
