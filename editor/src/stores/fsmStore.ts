@@ -21,6 +21,8 @@ import { writeFile, readFile } from '../utils/fileService';
 import { useEditorStore } from './editorStore';
 import { useNotificationStore } from './notificationStore';
 import { useDebugStore } from './debugStore';
+import { VARIABLE_NAME_MAX_LENGTH } from '../utils/validation';
+import { logger } from '../utils/logger';
 
 // ==================== Types ====================
 
@@ -167,6 +169,18 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
 
         const fileName = path.split(/[\\/]/).pop() || 'Unnamed';
         let fsm = parseFSMXml(content, fileName);
+        const logLongVariableNames = (scope: 'Shared' | 'Local', variables: Variable[]) => {
+            variables.forEach((variable) => {
+                if (variable.name.length > VARIABLE_NAME_MAX_LENGTH) {
+                    logger.error(
+                        `[Load] ${fileName}: ${scope} Variable [${variable.name}] name too long (${variable.name.length}/${VARIABLE_NAME_MAX_LENGTH})`
+                    );
+                }
+            });
+        };
+        logLongVariableNames('Shared', fsm.sharedVariables);
+        logLongVariableNames('Local', fsm.localVariables);
+
         fsm = recalculateFSMUIDs(fsm); // Calculate UIDs matching runtime
 
         const snapshot = serializeFSMForEditor(fsm);

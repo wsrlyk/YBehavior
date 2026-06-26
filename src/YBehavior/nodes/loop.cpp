@@ -68,7 +68,7 @@ namespace YBehavior
 	bool ForEach::OnLoaded(const pugi::xml_node& data)
 	{
 		TYPEID collectionType = PinCreation::CreatePin(this, m_Collection, "Collection", data);
-		TYPEID currentType = PinCreation::CreatePin(this, m_Current, "Current", data);
+		TYPEID currentType = PinCreation::CreatePin(this, m_Current, "Current", data, YBehavior::PinCreation::Flag::IsOutput);
 		if (!Utility::IsElement(currentType, collectionType))
 		{
 			ERROR_BEGIN_NODE_HEAD << "Types not match: " << currentType << " and " << collectionType << ERROR_END;
@@ -86,11 +86,8 @@ namespace YBehavior
 
 	bool Loop::OnLoaded(const pugi::xml_node& data)
 	{
-		PinCreation::CreatePin(this, m_Current, "Current", data);
-		if (!m_Current)
-		{
-			return false;
-		}
+		PinCreation::CreatePinIfExist(this, m_Current, "Current", data, YBehavior::PinCreation::Flag::IsOutput);
+
 		PinCreation::CreatePin(this, m_Count, "Count", data);
 		if (!m_Count)
 		{
@@ -272,7 +269,10 @@ namespace YBehavior
 		}
 		if (m_Stage < size)
 		{
-			pNode->m_Current->SetValue(pAgent->GetMemory(), &m_Stage);
+			if (pNode->m_Current)
+			{
+				pNode->m_Current->SetValue(pAgent->GetMemory(), &m_Stage);
+			}
 
 			++m_Stage;
 			//if (pNode->m_Child)

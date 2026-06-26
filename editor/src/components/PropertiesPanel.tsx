@@ -402,11 +402,19 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
 function AddVariableButton({ isLocal, onAdd }: { isLocal: boolean; onAdd: (v: Variable) => void }) {
   const [isAdding, setIsAdding] = useState(false);
   const [name, setName] = useState('');
+  const notify = useNotificationStore(state => state.notify);
 
   const handleAdd = () => {
-    if (name.trim()) {
+    const trimmed = name.trim();
+    const validation = validateVariableName(trimmed);
+    if (!validation.isValid) {
+      notify(validation.error || 'Invalid variable name', 'error');
+      return;
+    }
+
+    if (trimmed) {
       onAdd({
-        name: name.trim(),
+        name: trimmed,
         valueType: 'int',
         countType: 'scalar',
         isLocal,
@@ -418,12 +426,14 @@ function AddVariableButton({ isLocal, onAdd }: { isLocal: boolean; onAdd: (v: Va
   };
 
   if (isAdding) {
-    const validation = validateVariableName(name);
+    const trimmed = name.trim();
+    const validation = validateVariableName(trimmed);
+    const showInvalid = name.length > 0 && !validation.isValid;
     return (
       <div className="flex items-center gap-1 rounded px-1 py-0.5 border" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
         <input
           className="w-24 text-[11px] bg-transparent outline-none"
-          style={{ color: !validation.isValid && name.length > 0 ? theme.ui.danger : theme.ui.textMain }}
+          style={{ color: showInvalid ? theme.ui.danger : theme.ui.textMain }}
           placeholder="Name..."
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -431,7 +441,12 @@ function AddVariableButton({ isLocal, onAdd }: { isLocal: boolean; onAdd: (v: Va
           onBlur={() => !name && setIsAdding(false)}
           autoFocus
         />
-        <button className="text-[11px] font-bold" style={{ color: theme.ui.textMain }} onClick={handleAdd}>OK</button>
+        <button
+          className={`text-[11px] font-bold ${validation.isValid ? '' : 'cursor-not-allowed'}`}
+          style={{ color: validation.isValid ? theme.ui.textMain : theme.ui.textDim }}
+          onClick={handleAdd}
+          disabled={!validation.isValid}
+        >OK</button>
         <button className="text-[11px]" style={{ color: theme.ui.textDim }} onClick={() => setIsAdding(false)}>✕</button>
       </div>
     );

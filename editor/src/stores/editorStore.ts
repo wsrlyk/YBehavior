@@ -5,7 +5,7 @@ import { loadSettings, type Settings } from '../utils/settings';
 import { generateGUID } from '../utils/guidUtils';
 import { useNodeDefinitionStore } from './nodeDefinitionStore';
 import { serializeTreeForEditor, serializeTreeForRuntime } from '../utils/xmlSerializer';
-import { validateValue, getDefaultValue } from '../utils/validation';
+import { validateValue, getDefaultValue, VARIABLE_NAME_MAX_LENGTH } from '../utils/validation';
 import { useNotificationStore } from './notificationStore';
 import { logger } from '../utils/logger';
 import { stripExtension } from '../utils/fileUtils';
@@ -270,6 +270,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const { getDefinition } = useNodeDefinitionStore.getState();
       const tree = await loadTree(fullPathForLoad, getDefinition);
       const fileName = normalizedFinal.split('/').pop() || normalizedFinal;
+
+      const logLongVariableNames = (scope: 'Shared' | 'Local', variables: Variable[]) => {
+        variables.forEach((variable) => {
+          if (variable.name.length > VARIABLE_NAME_MAX_LENGTH) {
+            logger.error(
+              `[Load] ${fileName}: ${scope} Variable [${variable.name}] name too long (${variable.name.length}/${VARIABLE_NAME_MAX_LENGTH})`
+            );
+          }
+        });
+      };
+      logLongVariableNames('Shared', tree.sharedVariables);
+      logLongVariableNames('Local', tree.localVariables);
 
       // 加载本地元数据（如折叠状态）
       const meta = useEditorMetaStore.getState().getTreeMeta(normalizedFinal);

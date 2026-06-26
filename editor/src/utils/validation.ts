@@ -5,6 +5,8 @@ export interface ValidationResult {
     error?: string;
 }
 
+export const VARIABLE_NAME_MAX_LENGTH = 20;
+
 export function validateValue(value: string, type: ValueType, countType: CountType): ValidationResult {
     // Handle array types (list)
     if (countType === 'list') {
@@ -95,7 +97,7 @@ export function getDefaultValue(type: ValueType, isList: boolean): string {
 
 export function validateVariableName(name: string): ValidationResult {
     if (name.length === 0) return { isValid: false, error: 'Name cannot be empty' };
-    if (name.length > 30) return { isValid: false, error: 'Name too long (max 30)' };
+    if (name.length > VARIABLE_NAME_MAX_LENGTH) return { isValid: false, error: `Name too long (max ${VARIABLE_NAME_MAX_LENGTH})` };
     if (!/^[a-zA-Z]/.test(name)) return { isValid: false, error: 'Name must start with a letter' };
     if (!/^[a-zA-Z0-9_]*$/.test(name)) return { isValid: false, error: 'Name contains invalid characters (only letters, numbers, and underscores allowed)' };
     return { isValid: true };
