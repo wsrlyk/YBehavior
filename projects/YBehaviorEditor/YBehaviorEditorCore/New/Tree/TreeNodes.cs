@@ -1350,7 +1350,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_AllTypes,
                 Variable.CountType.CT_SCALAR,
                 Variable.VariableType.VBT_Pointer,
-                Variable.EnableType.ET_ENABLED,
+                Variable.EnableType.ET_Enable,
                 1
             );
             v.IsInput = false;
@@ -1403,7 +1403,7 @@ namespace YBehavior.Editor.Core.New
                 Variable.CreateParams_Int,
                 Variable.CountType.CT_SCALAR,
                 Variable.VariableType.VBT_Pointer,
-                Variable.EnableType.ET_ENABLED,
+                Variable.EnableType.ET_Enable,
                 1
             );
             v.IsInput = false;
