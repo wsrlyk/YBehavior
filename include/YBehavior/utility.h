@@ -146,6 +146,7 @@ namespace YBehavior
 
 		static void SetGetFilePathDelegate(GetFilePathDelegate delegate) { getFilePathDelegate = delegate; }
 		static STRING GetFilePath(const STRING& fileName) { return getFilePathDelegate ? getFilePathDelegate(fileName) : fileName; }
+		static bool ReadFileContent(const STRING& filePath, STRING& content);
 	private:
 		static std::random_device rd;
 		static std::default_random_engine mt;

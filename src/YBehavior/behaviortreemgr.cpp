@@ -1,5 +1,6 @@
 #include "YBehavior/behaviortreemgr.h"
 #include "YBehavior/3rd/pugixml/pugixml.hpp"
+#include <algorithm>
 #include <iostream>
 #include "YBehavior/behaviortree.h"
 #include "YBehavior/logger.h"
@@ -20,13 +21,25 @@ namespace YBehavior
 #endif
 	BehaviorTree * TreeMgr::_LoadTree(const STRING& name)
 	{
-		pugi::xml_document doc;
-
 #ifdef YSHARP
-		pugi::xml_parse_result result = doc.load_file(SharpUtility::GetFilePath(name + TREE_EXT).c_str());
+		const STRING filePath = SharpUtility::GetFilePath(name + TREE_EXT);
 #else
-		pugi::xml_parse_result result = doc.load_file((Utility::GetFilePath(name + TREE_EXT)).c_str());
+		const STRING filePath = Utility::GetFilePath(name + TREE_EXT);
 #endif
+		STRING content;
+		if (!Utility::ReadFileContent(filePath, content))
+		{
+			ERROR_BEGIN << "Loading " << name << TREE_EXT << ": failed to read file " << filePath << ERROR_END;
+			return nullptr;
+		}
+
+		return _ParseTree(name, content);
+	}
+
+	BehaviorTree * TreeMgr::_ParseTree(const STRING& name, STRING& content)
+	{
+		pugi::xml_document doc;
+		pugi::xml_parse_result result = doc.load_buffer_inplace(content.empty() ? nullptr : &content[0], content.size());
 		if (result.status)
 		{
 			ERROR_BEGIN << "Loading " << name << TREE_EXT ": " << result.description() << ERROR_END;

@@ -78,12 +78,25 @@ namespace YBehavior
 #endif
 	FSM * MachineMgr::_LoadFSM(const STRING& name)
 	{
-		pugi::xml_document doc;
 #ifdef YSHARP
-		pugi::xml_parse_result result = doc.load_file(SharpUtility::GetFilePath(name + FSM_EXT).c_str());
+		const STRING filePath = SharpUtility::GetFilePath(name + FSM_EXT);
 #else
-		pugi::xml_parse_result result = doc.load_file((Utility::GetFilePath(name + FSM_EXT)).c_str());
+		const STRING filePath = Utility::GetFilePath(name + FSM_EXT);
 #endif
+		STRING content;
+		if (!Utility::ReadFileContent(filePath, content))
+		{
+			ERROR_BEGIN << "Loading " << name << FSM_EXT << ": failed to read file " << filePath << ERROR_END;
+			return nullptr;
+		}
+
+		return _ParseFSM(name, content);
+	}
+
+	FSM * MachineMgr::_ParseFSM(const STRING& name, STRING& content)
+	{
+		pugi::xml_document doc;
+		pugi::xml_parse_result result = doc.load_buffer_inplace(content.empty() ? nullptr : &content[0], content.size());
 		LOG_BEGIN << "Loading: " << name << FSM_EXT << LOG_END;
 		if (result.status)
 		{

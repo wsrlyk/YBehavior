@@ -43,6 +43,7 @@ namespace YBehavior
 		void Clear();
 	protected:
 		FSM * _LoadFSM(const STRING& name);
+		FSM * _ParseFSM(const STRING& name, STRING& content);
 		bool _CreateSpecialStates(StateMachine* pMachine, UINT uid);
 		bool _LoadMachine(StateMachine* pMachine, const pugi::xml_node& data, UINT& uid);
 	};

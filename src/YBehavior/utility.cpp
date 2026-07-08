@@ -1,4 +1,6 @@
 #include "YBehavior/utility.h"
+#include <fstream>
+#include <limits>
 #include <vector>
 #include "YBehavior/types/types.h"
 #include "YBehavior/variable.h"
@@ -35,6 +37,44 @@ namespace YBehavior
 	std::default_random_engine Utility::mt(rd());
 
 	YBehavior::GetFilePathDelegate Utility::getFilePathDelegate = nullptr;
+
+	bool Utility::ReadFileContent(const STRING& filePath, STRING& content)
+	{
+		content.clear();
+
+		std::ifstream file(filePath.c_str(), std::ios::binary | std::ios::ate);
+		if (!file.is_open())
+			return false;
+
+		const std::ifstream::pos_type endPos = file.tellg();
+		if (endPos == std::ifstream::pos_type(-1))
+			return false;
+
+		const std::streamoff fileSize = static_cast<std::streamoff>(endPos);
+		if (fileSize < 0)
+			return false;
+
+		const size_t size = static_cast<size_t>(fileSize);
+		if (size > static_cast<size_t>(std::numeric_limits<std::streamsize>::max()))
+			return false;
+
+		STRING buffer;
+		buffer.resize(size);
+
+		file.seekg(0, std::ios::beg);
+		if (!file.good())
+			return false;
+
+		if (size > 0)
+		{
+			file.read(&buffer[0], static_cast<std::streamsize>(size));
+			if (!file)
+				return false;
+		}
+
+		content.swap(buffer);
+		return true;
+	}
 
 	void Utility::SplitString(const STRING& s, StdVector<STRING>& output, CHAR c, bool RemoveEmptyEntries, int count)
 	{
