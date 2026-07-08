@@ -40,6 +40,8 @@ namespace YBehavior
     func(VecEntityWrapper);\
     func(VecVector3);
 
+	typedef const std::string(*GetFilePathDelegate)(const std::string& fileName);
+
 	class Utility
 	{
 	public:
@@ -142,9 +144,12 @@ namespace YBehavior
 		static const STRING TIME_FORMAT_SECOND;
 		static STRING GetTime(const STRING& format);
 
+		static void SetGetFilePathDelegate(GetFilePathDelegate delegate) { getFilePathDelegate = delegate; }
+		static STRING GetFilePath(const STRING& fileName) { return getFilePathDelegate ? getFilePathDelegate(fileName) : fileName; }
 	private:
 		static std::random_device rd;
 		static std::default_random_engine mt;
+		static GetFilePathDelegate getFilePathDelegate;
 	};
 
 	template<typename T>

@@ -25,7 +25,7 @@ namespace YBehavior
 #ifdef YSHARP
 		pugi::xml_parse_result result = doc.load_file(SharpUtility::GetFilePath(name + TREE_EXT).c_str());
 #else
-		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + TREE_EXT).c_str());
+		pugi::xml_parse_result result = doc.load_file((Utility::GetFilePath(name + TREE_EXT)).c_str());
 #endif
 		if (result.status)
 		{
@@ -203,21 +203,6 @@ namespace YBehavior
 		std::cout << "Print all trees end." << std::endl;
 	}
 
-#ifndef YSHARP
-	void TreeMgr::SetWorkingDir(const STRING& dir)
-	{
-		m_WorkingDir = dir;
-
-		if (m_WorkingDir == "")
-			return;
-
-		size_t len = m_WorkingDir.length();
-		if (m_WorkingDir[len - 1] != '\\' && m_WorkingDir[len - 1] != '/')
-		{
-			m_WorkingDir.append(1, '/');
-		}
-	}
-#endif
 	void TreeMgr::Clear()
 	{
 		m_VersionMgr.Clear();

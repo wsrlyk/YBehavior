@@ -18,22 +18,6 @@ namespace YBehavior
 	{
 	}
 
-#ifndef YSHARP
-	void MachineMgr::SetWorkingDir(const STRING& dir)
-	{
-		m_WorkingDir = dir;
-
-		if (m_WorkingDir == "")
-			return;
-
-		size_t len = m_WorkingDir.length();
-		if (m_WorkingDir[len - 1] != '\\' && m_WorkingDir[len - 1] != '/')
-		{
-			m_WorkingDir.append(1, '/');
-		}
-	}
-#endif
-
 	void MachineMgr::ReturnFSM(FSM* pFSM)
 	{
 		m_VersionMgr.Return(pFSM);
@@ -98,7 +82,7 @@ namespace YBehavior
 #ifdef YSHARP
 		pugi::xml_parse_result result = doc.load_file(SharpUtility::GetFilePath(name + FSM_EXT).c_str());
 #else
-		pugi::xml_parse_result result = doc.load_file((m_WorkingDir + name + FSM_EXT).c_str());
+		pugi::xml_parse_result result = doc.load_file((Utility::GetFilePath(name + FSM_EXT)).c_str());
 #endif
 		LOG_BEGIN << "Loading: " << name << FSM_EXT << LOG_END;
 		if (result.status)

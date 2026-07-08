@@ -2,6 +2,8 @@
 #define _YBEHAVIOR_LAUNCHER_H_
 
 #include "YBehavior/nodefactory.h"
+#include "YBehavior/utility.h"
+
 namespace YBehavior
 {
 	class LaunchCore
@@ -9,11 +11,9 @@ namespace YBehavior
 	public:
 		virtual void RegisterActions() const;
 		virtual int StartWithDebugListeningPort() const { return 0; }
-#ifndef YSHARP
-		virtual STRING WorkingDir() const { return ""; }
-#endif
 		virtual void GetLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const { return; }
 		virtual void GetThreadLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const { return; }
+		virtual GetFilePathDelegate GetFilePath() const { return nullptr; }
 	protected:
 		template<typename T>
 		void _Register() const;

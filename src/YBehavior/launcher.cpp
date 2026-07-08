@@ -21,12 +21,11 @@ namespace YBehavior
 		core.GetThreadLogProcessor(pLog, pError);
 		LogMgr::Instance()->SetProcessorThread(pLog, pError);
 
+		auto getFilePathDelegate = core.GetFilePath();
+		Utility::SetGetFilePathDelegate(getFilePathDelegate);
 
 		core.RegisterActions();
-#ifndef YSHARP
-		Mgrs::Instance()->GetTreeMgr()->SetWorkingDir(core.WorkingDir());
-		Mgrs::Instance()->GetMachineMgr()->SetWorkingDir(core.WorkingDir());
-#endif
+
 #ifdef YDEBUGGER
 		if (core.StartWithDebugListeningPort())
 			Network::Instance()->InitAndCreateThread(core.StartWithDebugListeningPort());

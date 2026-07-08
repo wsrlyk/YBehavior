@@ -34,6 +34,8 @@ namespace YBehavior
 	std::random_device Utility::rd;
 	std::default_random_engine Utility::mt(rd());
 
+	YBehavior::GetFilePathDelegate Utility::getFilePathDelegate = nullptr;
+
 	void Utility::SplitString(const STRING& s, StdVector<STRING>& output, CHAR c, bool RemoveEmptyEntries, int count)
 	{
 		int counter = 0;

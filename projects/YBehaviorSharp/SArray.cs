@@ -187,18 +187,18 @@ namespace YBehaviorSharp
         public override void PushBack(int data)
         {
             SUtility.SetToBufferInt(data);
-            SUtility.ArrayPushBack(m_Core, m_ElementID);
+            SUtility.ArrayPushBack(m_Core, m_ScalarType);
         }
 
         public override void Set(int data, int idx)
         {
             SUtility.SetToBufferInt(data);
-            SUtility.ArraySet(m_Core, idx, m_ElementID);
+            SUtility.ArraySet(m_Core, idx, m_ScalarType);
         }
 
         public override int Get(int idx)
         {
-            SUtility.ArrayGet(m_Core, idx, m_ElementID);
+            SUtility.ArrayGet(m_Core, idx, m_ScalarType);
             return SUtility.GetFromBufferInt();
         }
     }
@@ -211,18 +211,18 @@ namespace YBehaviorSharp
         public override void PushBack(float data)
         {
             SUtility.SetToBufferFloat(data);
-            SUtility.ArrayPushBack(m_Core, m_ElementID);
+            SUtility.ArrayPushBack(m_Core, m_ScalarType);
         }
 
         public override void Set(float data, int idx)
         {
             SUtility.SetToBufferFloat(data);
-            SUtility.ArraySet(m_Core, idx, m_ElementID);
+            SUtility.ArraySet(m_Core, idx, m_ScalarType);
         }
 
         public override float Get(int idx)
         {
-            SUtility.ArrayGet(m_Core, idx, m_ElementID);
+            SUtility.ArrayGet(m_Core, idx, m_ScalarType);
             return SUtility.GetFromBufferFloat();
         }
     }
@@ -235,18 +235,18 @@ namespace YBehaviorSharp
         public override void PushBack(ulong data)
         {
             SUtility.SetToBufferUlong(data);
-            SUtility.ArrayPushBack(m_Core, m_ElementID);
+            SUtility.ArrayPushBack(m_Core, m_ScalarType);
         }
 
         public override void Set(ulong data, int idx)
         {
             SUtility.SetToBufferUlong(data);
-            SUtility.ArraySet(m_Core, idx, m_ElementID);
+            SUtility.ArraySet(m_Core, idx, m_ScalarType);
         }
 
         public override ulong Get(int idx)
         {
-            SUtility.ArrayGet(m_Core, idx, m_ElementID);
+            SUtility.ArrayGet(m_Core, idx, m_ScalarType);
             return SUtility.GetFromBufferUlong();
         }
     }
@@ -259,18 +259,18 @@ namespace YBehaviorSharp
         public override void PushBack(bool data)
         {
             SUtility.SetToBufferBool(SharpHelper.ConvertBool(data));
-            SUtility.ArrayPushBack(m_Core, m_ElementID);
+            SUtility.ArrayPushBack(m_Core, m_ScalarType);
         }
 
         public override void Set(bool data, int idx)
         {
             SUtility.SetToBufferBool(SharpHelper.ConvertBool(data));
-            SUtility.ArraySet(m_Core, idx, m_ElementID);
+            SUtility.ArraySet(m_Core, idx, m_ScalarType);
         }
 
         public override bool Get(int idx)
         {
-            SUtility.ArrayGet(m_Core, idx, m_ElementID);
+            SUtility.ArrayGet(m_Core, idx, m_ScalarType);
             return SharpHelper.ConvertBool(SUtility.GetFromBufferBool());
         }
     }
@@ -283,18 +283,18 @@ namespace YBehaviorSharp
         public override void PushBack(Vector3 data)
         {
             SUtility.SetToBufferVector3(data);
-            SUtility.ArrayPushBack(m_Core, m_ElementID);
+            SUtility.ArrayPushBack(m_Core, m_ScalarType);
         }
 
         public override void Set(Vector3 data, int idx)
         {
             SUtility.SetToBufferVector3(data);
-            SUtility.ArraySet(m_Core, idx, m_ElementID);
+            SUtility.ArraySet(m_Core, idx, m_ScalarType);
         }
 
         public override Vector3 Get(int idx)
         {
-            SUtility.ArrayGet(m_Core, idx, m_ElementID);
+            SUtility.ArrayGet(m_Core, idx, m_ScalarType);
             return SUtility.GetFromBufferVector3();
         }
     }
@@ -307,13 +307,13 @@ namespace YBehaviorSharp
         public override void PushBack(IEntity? data)
         {
             SUtility.SetToBufferEntity(data == null ? IntPtr.Zero : data.Ptr);
-            SUtility.ArrayPushBack(m_Core, m_ElementID);
+            SUtility.ArrayPushBack(m_Core, m_ScalarType);
         }
 
         public override void Set(IEntity? data, int idx)
         {
             SUtility.SetToBufferEntity(data == null ? IntPtr.Zero : data.Ptr);
-            SUtility.ArraySet(m_Core, idx, m_ElementID);
+            SUtility.ArraySet(m_Core, idx, m_ScalarType);
         }
 
         public override IEntity? Get(int idx)
@@ -331,18 +331,18 @@ namespace YBehaviorSharp
         public override void PushBack(string? data)
         {
             SharpHelper.SetToBufferString(data);
-            SUtility.ArrayPushBack(m_Core, m_ElementID);
+            SUtility.ArrayPushBack(m_Core, m_ScalarType);
         }
 
         public override void Set(string? data, int idx)
         {
             SharpHelper.SetToBufferString(data);
-            SUtility.ArraySet(m_Core, idx, m_ElementID);
+            SUtility.ArraySet(m_Core, idx, m_ScalarType);
         }
 
         public override string Get(int idx)
         {
-            SUtility.ArrayGet(m_Core, idx, m_ElementID);
+            SUtility.ArrayGet(m_Core, idx, m_ScalarType);
             SUtility.GetFromBufferString(SUtility.CharBuffer, SUtility.CharBuffer.Length);
             return SUtility.BuildStringFromCharBuffer();
         }

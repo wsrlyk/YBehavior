@@ -35,9 +35,6 @@ namespace YBehavior
 		void ReturnTree(BehaviorTree* tree);
 		//static TreeMgr* Instance();
 		void Print();
-#ifndef YSHARP
-		void SetWorkingDir(const STRING& dir);
-#endif
 		void Clear();
 	protected:
 		bool _GetTree(const STRING& name, BehaviorTree * &tree, bool bToAgent);
@@ -47,9 +44,6 @@ namespace YBehavior
 		//static TreeMgr* s_Instance;
 
 		VersionMgr<BehaviorTree, STRING> m_VersionMgr;
-#ifndef YSHARP
-		STRING m_WorkingDir;
-#endif
 	};
 }
 
