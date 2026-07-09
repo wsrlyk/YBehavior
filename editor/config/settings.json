@@ -1,5 +1,6 @@
 {
   "editorTreeDir": "../../../../bin",
   "runtimeTreeDir": "../../../../projects/YBehaviorEditor/bin/exported",
+  "encryptConfig": false,
   "sourceExePath": "aieditor.exe"
 }

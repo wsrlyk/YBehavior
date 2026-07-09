@@ -7,8 +7,16 @@ export async function readFile(path: string): Promise<string> {
   return invoke<string>('read_file', { path });
 }
 
+export async function readBinaryFile(path: string): Promise<number[]> {
+  return invoke<number[]>('read_binary_file', { path });
+}
+
 export async function writeFile(path: string, content: string): Promise<void> {
   return invoke('write_file', { path, content });
+}
+
+export async function writeBinaryFile(path: string, content: number[] | Uint8Array): Promise<void> {
+  return invoke('write_binary_file', { path, content: Array.from(content) });
 }
 
 export async function listFiles(dir: string, extensions: string[]): Promise<string[]> {

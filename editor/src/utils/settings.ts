@@ -6,6 +6,7 @@ import { readFile } from './fileService';
 export interface Settings {
   editorTreeDir: string;
   runtimeTreeDir: string;
+  encryptConfig: boolean;
 }
 
 let cachedSettings: Settings | null = null;
@@ -43,6 +44,7 @@ export async function loadSettings(): Promise<Settings> {
       cachedSettings = {
         editorTreeDir: resolvePath(baseDir, raw.editorTreeDir || ''),
         runtimeTreeDir: resolvePath(baseDir, raw.runtimeTreeDir || ''),
+        encryptConfig: parseBool(raw.encryptConfig),
       };
 
       console.log('Settings loaded:', cachedSettings);
@@ -67,6 +69,10 @@ export async function loadSettings(): Promise<Settings> {
   })();
 
   return loadingPromise;
+}
+
+function parseBool(value: unknown): boolean {
+  return value === true || value === 1 || value === '1' || value === 'true';
 }
 
 /**

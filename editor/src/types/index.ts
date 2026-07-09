@@ -37,7 +37,7 @@ export type EnableType = 'fixed' | 'enable' | 'disable';
 
 // pointer 类型 + 空 variableName = 数据连接状态（等待连接或已连接）
 export type PinBinding =
-  | { type: 'const'; value: string }
+  | { type: 'const'; value: string; isLocal?: boolean }
   | { type: 'pointer'; variableName: string; isLocal: boolean };
 
 export interface Pin {

@@ -183,6 +183,10 @@ namespace YBehaviorSharp
         /// </summary>
         int DebugPort { get; }
         /// <summary>
+        /// Whether runtime config files should be decrypted after reading.
+        /// </summary>
+        bool NeedDecryptConfig { get; }
+        /// <summary>
         /// Log callback
         /// The string can be fetched by SharpHelper.GetFromBufferString;
         /// </summary>
@@ -214,7 +218,7 @@ namespace YBehaviorSharp
         /// <param name="launcher"></param>
         public static void Init(ISharpLauncher launcher)
         {
-            SUtility.InitSharp(launcher.DebugPort);
+            SUtility.InitSharp(launcher.DebugPort, launcher.NeedDecryptConfig ? 1 : 0);
 
             s_onLog = launcher.OnLog;
             s_onError = launcher.OnError;
@@ -428,7 +432,7 @@ namespace YBehaviorSharp
 
 
         [DllImport(VERSION.dll)]
-        static public extern void InitSharp(int debugPort);
+        static public extern void InitSharp(int debugPort, int needDecryptConfig);
 
         [DllImport(VERSION.dll)]
         static public extern void RegisterGetFilePathCallback(GetFilePathCallback callback);

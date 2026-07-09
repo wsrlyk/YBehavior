@@ -23,6 +23,7 @@ namespace YBehavior
 
 		auto getFilePathDelegate = core.GetFilePath();
 		Utility::SetGetFilePathDelegate(getFilePathDelegate);
+		Utility::SetConfigDecryptEnabled(core.NeedDecryptConfig());
 
 		core.RegisterActions();
 

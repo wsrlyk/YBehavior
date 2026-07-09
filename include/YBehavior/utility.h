@@ -146,11 +146,15 @@ namespace YBehavior
 
 		static void SetGetFilePathDelegate(GetFilePathDelegate delegate) { getFilePathDelegate = delegate; }
 		static STRING GetFilePath(const STRING& fileName) { return getFilePathDelegate ? getFilePathDelegate(fileName) : fileName; }
+		static void SetConfigDecryptEnabled(bool enabled) { s_ConfigDecryptEnabled = enabled; }
+		static bool IsConfigDecryptEnabled() { return s_ConfigDecryptEnabled; }
 		static bool ReadFileContent(const STRING& filePath, STRING& content);
+		static void DecryptConfigContent(STRING& content);
 	private:
 		static std::random_device rd;
 		static std::default_random_engine mt;
 		static GetFilePathDelegate getFilePathDelegate;
+		static bool s_ConfigDecryptEnabled;
 	};
 
 	template<typename T>

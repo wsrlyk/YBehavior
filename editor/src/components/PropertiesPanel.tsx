@@ -495,7 +495,7 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
     }
 
     onUpdate(pin.id, {
-      binding: { type, value: val, isLocal },
+      binding: { type, value: val, isLocal: type === 'const' ? (isLocal ?? pin.binding.isLocal) : isLocal },
       vectorIndex
     });
   };
@@ -1207,6 +1207,11 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
   const bindingType = pin.binding.type;  // 'const' | 'pointer'
   const isEnabled = pin.enableType !== 'disable';
   const canToggleEnable = pin.enableType !== 'fixed';
+  const makeConstBinding = (value: string) => ({
+    type: 'const' as const,
+    value,
+    isLocal: pin.binding.type === 'const' ? pin.binding.isLocal : undefined
+  });
 
   // 判断是否为数据连接状态（pointer + 空变量名）
   const isDataConnection = bindingType === 'pointer' &&
@@ -1250,7 +1255,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
   const handleValueChange = (value: string) => {
     setEditValue(value);
     if (bindingType === 'const') {
-      onUpdate({ binding: { type: 'const', value } });
+      onUpdate({ binding: makeConstBinding(value) });
     }
   };
 
@@ -1270,7 +1275,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
       } else {
         // Sync the value if it was modified (stripped extension)
         if (valueToSubmit !== (manualValue !== undefined ? manualValue : editValue)) {
-          onUpdate({ binding: { type: 'const', value: valueToSubmit } });
+          onUpdate({ binding: makeConstBinding(valueToSubmit) });
         }
 
         if (nodeType === 'SubTree' && pin.name === 'Tree') {
@@ -1397,7 +1402,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
             onUpdate({
               valueType: nextType,
               binding: pin.binding.type === 'const'
-                ? { type: 'const', value: getDefaultValue(nextType, pin.countType === 'list') }
+                ? makeConstBinding(getDefaultValue(nextType, pin.countType === 'list'))
                 : pin.binding
             });
           }}
@@ -1497,7 +1502,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
               onClick={() => {
                 const currentVal = pin.binding.type === 'const' ? pin.binding.value : 'F';
                 const newValue = currentVal === 'T' ? 'F' : 'T';
-                onUpdate({ binding: { type: 'const', value: newValue } });
+                onUpdate({ binding: makeConstBinding(newValue) });
                 setEditValue(newValue);
               }}
             >

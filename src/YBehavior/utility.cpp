@@ -37,6 +37,7 @@ namespace YBehavior
 	std::default_random_engine Utility::mt(rd());
 
 	YBehavior::GetFilePathDelegate Utility::getFilePathDelegate = nullptr;
+	bool Utility::s_ConfigDecryptEnabled = false;
 
 	bool Utility::ReadFileContent(const STRING& filePath, STRING& content)
 	{
@@ -73,7 +74,24 @@ namespace YBehavior
 		}
 
 		content.swap(buffer);
+		if (IsConfigDecryptEnabled())
+			DecryptConfigContent(content);
+
 		return true;
+	}
+
+	void Utility::DecryptConfigContent(STRING& content)
+	{
+		const size_t size = content.size();
+		if (size == 0)
+			return;
+
+		unsigned char* data = reinterpret_cast<unsigned char*>(&content[0]);
+		data[0] ^= data[size - 1];
+		for (size_t i = size - 1; i > 0; --i)
+		{
+			data[i] ^= data[i - 1];
+		}
 	}
 
 	void Utility::SplitString(const STRING& s, StdVector<STRING>& output, CHAR c, bool RemoveEmptyEntries, int count)

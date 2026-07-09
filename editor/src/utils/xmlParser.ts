@@ -83,6 +83,7 @@ function parsePinValue(raw: string): ParsedPinValue {
     const bindChar = code[idx];
     if (bindChar === 'C' || bindChar === 'c') {
       result.isPointer = false;
+      result.isLocal = bindChar === 'c';
       // 值可能包含 Vector Index 信息，格式: "value VI c index"
       // 只取第一部分作为值
       const parts = value.split(' VI ');
@@ -157,7 +158,7 @@ function createPin(name: string, raw: string, pinDef?: PinDefinition): Pin {
 
   const binding: PinBinding = parsed.isPointer
     ? { type: 'pointer', variableName: parsed.variableName, isLocal: parsed.isLocal }
-    : { type: 'const', value: parsed.value };
+    : { type: 'const', value: parsed.value, isLocal: parsed.isLocal };
 
   // 使用节点定义中的参数，如果没有则使用解析出的值
   const isInput = pinDef?.isInput ?? true;
@@ -495,7 +496,7 @@ export function parseTreeXml(
                   binding: {
                     type: parsed.isPointer ? 'variable' : 'const',
                     value: parsed.isPointer ? parsed.variableName : parsed.value,
-                    isLocal: parsed.isPointer ? parsed.isLocal : undefined,
+                    isLocal: parsed.isLocal,
                   },
                   vectorIndex: parsed.vectorIndex,
                 };

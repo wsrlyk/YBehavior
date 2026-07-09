@@ -8,6 +8,7 @@ namespace TestSharp
         class SharpLauncher : YBehaviorSharp.ISharpLauncher
         {
             public int DebugPort => 444;
+            public bool NeedDecryptConfig => false;
             public void OnLog()
             {
                 string data = SharpHelper.GetFromBufferString();

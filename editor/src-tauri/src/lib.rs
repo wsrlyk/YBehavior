@@ -21,7 +21,21 @@ fn read_file(path: String) -> Result<String, String> {
 }
 
 #[tauri::command]
+fn read_binary_file(path: String) -> Result<Vec<u8>, String> {
+    fs::read(&path).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 fn write_file(path: String, content: String) -> Result<(), String> {
+    let path = std::path::Path::new(&path);
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    fs::write(path, content).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn write_binary_file(path: String, content: Vec<u8>) -> Result<(), String> {
     let path = std::path::Path::new(&path);
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).map_err(|e| e.to_string())?;
@@ -101,7 +115,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_exe_dir, 
             read_file, 
+            read_binary_file,
             write_file, 
+            write_binary_file,
             list_files,
             debug_connect,
             debug_disconnect,

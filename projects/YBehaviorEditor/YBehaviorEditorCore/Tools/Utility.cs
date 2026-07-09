@@ -63,6 +63,50 @@ namespace YBehavior.Editor.Core.New
             return hash;
         }
 
+        public static byte[] EncryptConfigContent(byte[] data)
+        {
+            byte[] output = new byte[data.Length];
+            Array.Copy(data, output, data.Length);
+            EncryptConfigContentInPlace(output);
+            return output;
+        }
+
+        public static void EncryptConfigContentInPlace(byte[] data)
+        {
+            int size = data.Length;
+            if (size == 0)
+                return;
+
+            if (size == 1)
+            {
+                data[0] = 0;
+                return;
+            }
+
+            byte prevEncoded = (byte)(data[1] ^ data[0]);
+            data[1] = prevEncoded;
+            for (int i = 2; i < size; ++i)
+            {
+                prevEncoded = (byte)(data[i] ^ prevEncoded);
+                data[i] = prevEncoded;
+            }
+
+            data[0] = (byte)(data[0] ^ data[size - 1]);
+        }
+
+        public static void DecryptConfigContentInPlace(byte[] data)
+        {
+            int size = data.Length;
+            if (size == 0)
+                return;
+
+            data[0] = (byte)(data[0] ^ data[size - 1]);
+            for (int i = size - 1; i > 0; --i)
+            {
+                data[i] = (byte)(data[i] ^ data[i - 1]);
+            }
+        }
+
         static List<NodeBase> toCloneList = new List<NodeBase>();
         public static NodeBase CloneNode(NodeBase template, bool bIncludeChildren)
         {

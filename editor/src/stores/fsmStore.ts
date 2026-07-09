@@ -17,7 +17,8 @@ import {
 import { parseFSMXml } from '../utils/fsmParser';
 import { serializeFSMForEditor, serializeFSMForRuntime } from '../utils/fsmSerializer';
 import { recalculateFSMUIDs } from '../utils/fsmUtils';
-import { writeFile, readFile } from '../utils/fileService';
+import { writeFile, writeBinaryFile, readFile } from '../utils/fileService';
+import { encryptConfigContent } from '../utils/configCrypto';
 import { useEditorStore } from './editorStore';
 import { useNotificationStore } from './notificationStore';
 import { useDebugStore } from './debugStore';
@@ -674,7 +675,7 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
             return serializeFSMForEditor(file.fsm);
         }
 
-        const { editorTreeDir, runtimeTreeDir } = useEditorStore.getState();
+        const { editorTreeDir, runtimeTreeDir, settings } = useEditorStore.getState();
         if (!editorTreeDir || !runtimeTreeDir) throw new Error('Tree directories not set');
 
         const content = serializeFSMForEditor(file.fsm);
@@ -725,7 +726,11 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
 
         try {
             await writeFile(fullPath, content);
-            await writeFile(runtimePath, runtimeContent);
+            if (settings?.encryptConfig) {
+                await writeBinaryFile(runtimePath, encryptConfigContent(runtimeContent));
+            } else {
+                await writeFile(runtimePath, runtimeContent);
+            }
 
             set({
                 openedFSMFiles: openedFSMFiles.map(f =>
@@ -773,7 +778,7 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
                 return;
             }
 
-            const { runtimeTreeDir } = useEditorStore.getState();
+            const { runtimeTreeDir, settings } = useEditorStore.getState();
             if (!runtimeTreeDir) return;
 
             let relativePath = newPath;
@@ -791,7 +796,11 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
             const runtimePath = `${runtimeTreeDir}/${relativePath}`;
 
             await writeFile(newPath, content);
-            await writeFile(runtimePath, runtimeContent);
+            if (settings?.encryptConfig) {
+                await writeBinaryFile(runtimePath, encryptConfigContent(runtimeContent));
+            } else {
+                await writeFile(runtimePath, runtimeContent);
+            }
 
             set(state => ({
                 openedFSMFiles: state.openedFSMFiles.map(f =>

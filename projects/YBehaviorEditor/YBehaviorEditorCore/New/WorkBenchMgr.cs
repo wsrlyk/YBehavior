@@ -480,9 +480,26 @@ namespace YBehavior.Editor.Core.New
 
             bench.Export(el, xmlDoc);
             new System.IO.FileInfo(bench.FileInfo.ExportingPath).Directory.Create();
-            xmlDoc.Save(bench.FileInfo.ExportingPath);
+            _SaveExportXml(xmlDoc, bench.FileInfo.ExportingPath);
 
             return true;
+        }
+
+        void _SaveExportXml(XmlDocument xmlDoc, string path)
+        {
+            if (!Config.Instance.EncryptConfig)
+            {
+                xmlDoc.Save(path);
+                return;
+            }
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                xmlDoc.Save(stream);
+                byte[] data = stream.ToArray();
+                Utility.EncryptConfigContentInPlace(data);
+                File.WriteAllBytes(path, data);
+            }
         }
         /// <summary>
         /// Create a node at a position

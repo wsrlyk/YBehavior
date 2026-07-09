@@ -87,7 +87,7 @@ function serializePinValue(pin: Pin, forEditor: boolean): string {
 
   // 绑定类型
   if (pin.binding.type === 'const') {
-    code += 'C'; // 或小写 c
+    code += pin.binding.isLocal ? 'c' : 'C';
   } else {
     // 指针: P = 全局, p = 本地（空变量名表示数据连接状态）
     code += pin.binding.isLocal ? 'p' : 'P';
@@ -245,7 +245,7 @@ function serializeNodeForEditor(
         bindingType: pin.binding.type === 'variable' ? 'pointer' : 'const',
         binding: pin.binding.type === 'variable'
           ? { type: 'pointer', variableName: pin.binding.value, isLocal: pin.binding.isLocal || false }
-          : { type: 'const', value: pin.binding.value },
+          : { type: 'const', value: pin.binding.value, isLocal: pin.binding.isLocal },
         enableType: 'fixed', // Root Interface Pin 不支持禁用启用
         isInput: true,
         allowedValueTypes: [pin.valueType],
@@ -265,7 +265,7 @@ function serializeNodeForEditor(
         bindingType: pin.binding.type === 'variable' ? 'pointer' : 'const',
         binding: pin.binding.type === 'variable'
           ? { type: 'pointer', variableName: pin.binding.value, isLocal: pin.binding.isLocal || false }
-          : { type: 'const', value: pin.binding.value },
+          : { type: 'const', value: pin.binding.value, isLocal: pin.binding.isLocal },
         enableType: 'fixed', // Root Interface Pin 不支持禁用启用
         isInput: false,
         allowedValueTypes: [pin.valueType],
@@ -456,10 +456,19 @@ function collectMainTreeNodeIds(
  */
 function collectReferencedVariables(
   mainTreeNodeIds: Set<string>,
-  nodeMap: Map<string, TreeNode>
+  nodeMap: Map<string, TreeNode>,
+  treeInterface?: { inputs: TreeInterfacePin[], outputs: TreeInterfacePin[] }
 ): { sharedRefs: Set<string>; localRefs: Set<string> } {
   const sharedRefs = new Set<string>();
   const localRefs = new Set<string>();
+  const addPointerRef = (variableName: string | undefined, isLocal?: boolean) => {
+    if (!variableName) return;
+    if (isLocal) {
+      localRefs.add(variableName);
+    } else {
+      sharedRefs.add(variableName);
+    }
+  };
 
   for (const nodeId of mainTreeNodeIds) {
     const node = nodeMap.get(nodeId);
@@ -470,22 +479,26 @@ function collectReferencedVariables(
       if (pin.enableType === 'disable') continue;
 
       if (pin.binding.type === 'pointer') {
-        if (pin.binding.isLocal) {
-          localRefs.add(pin.binding.variableName);
-        } else {
-          sharedRefs.add(pin.binding.variableName);
-        }
+        addPointerRef(pin.binding.variableName, pin.binding.isLocal);
       }
 
       // 检查 Vector Index 引用
       if (pin.vectorIndex && pin.vectorIndex.type === 'pointer') {
-        if (pin.vectorIndex.isLocal) {
-          localRefs.add(pin.vectorIndex.variableName);
-        } else {
-          sharedRefs.add(pin.vectorIndex.variableName);
-        }
+        addPointerRef(pin.vectorIndex.variableName, pin.vectorIndex.isLocal);
       }
     }
+  }
+
+  if (treeInterface) {
+    [...treeInterface.inputs, ...treeInterface.outputs].forEach(pin => {
+      if (pin.binding.type === 'variable') {
+        addPointerRef(pin.binding.value, pin.binding.isLocal);
+      }
+
+      if (pin.vectorIndex && pin.vectorIndex.type === 'pointer') {
+        addPointerRef(pin.vectorIndex.variableName, pin.vectorIndex.isLocal);
+      }
+    });
   }
 
   return { sharedRefs, localRefs };
@@ -624,7 +637,7 @@ function serializeNodeForRuntimeWithUID(
         bindingType: pin.binding.type === 'variable' ? 'pointer' : 'const',
         binding: pin.binding.type === 'variable'
           ? { type: 'pointer', variableName: pin.binding.value, isLocal: pin.binding.isLocal || false }
-          : { type: 'const', value: pin.binding.value },
+          : { type: 'const', value: pin.binding.value, isLocal: pin.binding.isLocal },
         enableType: 'fixed',
         isInput: true,
         allowedValueTypes: [pin.valueType],
@@ -646,7 +659,7 @@ function serializeNodeForRuntimeWithUID(
         bindingType: pin.binding.type === 'variable' ? 'pointer' : 'const',
         binding: pin.binding.type === 'variable'
           ? { type: 'pointer', variableName: pin.binding.value, isLocal: pin.binding.isLocal || false }
-          : { type: 'const', value: pin.binding.value },
+          : { type: 'const', value: pin.binding.value, isLocal: pin.binding.isLocal },
         enableType: 'fixed',
         isInput: false,
         allowedValueTypes: [pin.valueType],
@@ -723,7 +736,11 @@ export function serializeTreeForRuntime(tree: Tree): string {
   const mainTreeNodeIds = collectMainTreeNodeIds(rootId, tree.nodes, tree.connections);
 
   // 2. 计算被引用的变量
-  const { sharedRefs, localRefs } = collectReferencedVariables(mainTreeNodeIds, tree.nodes);
+  const { sharedRefs, localRefs } = collectReferencedVariables(
+    mainTreeNodeIds,
+    tree.nodes,
+    { inputs: tree.inputs, outputs: tree.outputs }
+  );
   const referencedSharedVars = tree.sharedVariables.filter(v => sharedRefs.has(v.name));
   const referencedLocalVars = tree.localVariables.filter(v => localRefs.has(v.name));
 

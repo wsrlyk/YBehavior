@@ -21,6 +21,7 @@ namespace YBehavior.Editor.Core.New
         /// Output Directory
         /// </summary>
         public string ExportingDir { get; set; }
+        public bool EncryptConfig { get; set; }
 
         //public bool PrintIntermediateInfo { get; set; }
 
@@ -97,6 +98,7 @@ namespace YBehavior.Editor.Core.New
             IniFile configFile = new IniFile(Environment.CurrentDirectory + "\\config.ini");
             WorkingDirWin = configFile.ReadString("Config", "WorkingDir", "");
             ExportingDir = configFile.ReadString("Config", "ExportingDir", "");
+            EncryptConfig = configFile.ReadInt("Config", "EncryptConfig", 0) != 0;
             DescriptionMgr.Instance.Load(Environment.CurrentDirectory + "\\description.xml");
 
             New.ExternalActionMgr.Instance.Load(configFile.ReadString("Config", "ExternalAction", "actions.xml"));

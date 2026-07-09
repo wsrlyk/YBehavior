@@ -10,8 +10,9 @@ namespace YBehavior
 	YBehavior::SharpLogDelegate SharpLaunchCore::s_ThreadLogCallback{};
 	YBehavior::SharpLogDelegate SharpLaunchCore::s_ThreadErrorCallback{};
 
-	SharpLaunchCore::SharpLaunchCore(int debugport)
+	SharpLaunchCore::SharpLaunchCore(int debugport, bool needDecryptConfig)
 		: m_Port(debugport)
+		, m_NeedDecryptConfig(needDecryptConfig)
 	{
 		s_LogCallback = nullptr;
 		s_ErrorCallback = nullptr;
@@ -22,6 +23,11 @@ namespace YBehavior
 	int SharpLaunchCore::StartWithDebugListeningPort() const
 	{
 		return m_Port;
+	}
+
+	bool SharpLaunchCore::NeedDecryptConfig() const
+	{
+		return m_NeedDecryptConfig;
 	}
 
 	void SharpLaunchCore::GetLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const

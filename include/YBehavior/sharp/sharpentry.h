@@ -36,9 +36,9 @@ extern "C" YBEHAVIOR_API void DeleteAgent(YBehavior::SharpAgent* pObject)
 	YBehavior::SharpUnitMgr::Instance()->Destroy(pObject);
 }
 
-extern "C" YBEHAVIOR_API void InitSharp(int debugPort)
+extern "C" YBEHAVIOR_API void InitSharp(int debugPort, int needDecryptConfig)
 {
-	YBehavior::SharpLaunchCore core(debugPort);
+	YBehavior::SharpLaunchCore core(debugPort, needDecryptConfig != 0);
 	YBehavior::Launcher::Launch(core);
 }
 

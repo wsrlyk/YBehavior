@@ -271,7 +271,19 @@ namespace YBehavior.Editor.Core.New
                 if (m_ExportFileHash == 0)
                 {
                     XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.Load(FileInfo.ExportingPath);
+                    if (Config.Instance.EncryptConfig)
+                    {
+                        byte[] data = File.ReadAllBytes(FileInfo.ExportingPath);
+                        Utility.DecryptConfigContentInPlace(data);
+                        string xml = Encoding.UTF8.GetString(data);
+                        if (xml.Length > 0 && xml[0] == '\uFEFF')
+                            xml = xml.Substring(1);
+                        xmlDoc.LoadXml(xml);
+                    }
+                    else
+                    {
+                        xmlDoc.Load(FileInfo.ExportingPath);
+                    }
                     return _GenerateHash(xmlDoc.DocumentElement.OuterXml.Replace(" ", string.Empty));
                 }
                 return m_ExportFileHash;

@@ -16,7 +16,8 @@ import { listen, emit, UnlistenFn } from '@tauri-apps/api/event';
 import { useEditorMetaStore } from './editorMetaStore';
 import { useEditorStore } from './editorStore';
 import { useNotificationStore } from './notificationStore';
-import { readFile } from '../utils/fileService';
+import { readBinaryFile, readFile } from '../utils/fileService';
+import { decryptConfigContent } from '../utils/configCrypto';
 import { bkdrHash } from '../utils/hashUtils';
 import {
     NodeState,
@@ -814,12 +815,18 @@ export const useDebugStore = create<DebugState>((set, get) => ({
                 return;
             }
             // Verify hashes
-            const { editorTreeDir, runtimeTreeDir } = useEditorStore.getState();
+            const { editorTreeDir, runtimeTreeDir, settings } = useEditorStore.getState();
             const checkDir = runtimeTreeDir || editorTreeDir;
             if (checkDir) {
                 // Verify async but don't block
                 (async () => {
                     const mismatches: string[] = [];
+                    const readRuntimeFile = async (path: string): Promise<string> => {
+                        if (settings?.encryptConfig) {
+                            return decryptConfigContent(await readBinaryFile(path));
+                        }
+                        return readFile(path);
+                    };
                     for (const file of fileHashes) {
                         try {
                             // Try tree file first
@@ -835,13 +842,13 @@ export const useDebugStore = create<DebugState>((set, get) => ({
                             // Using trial:
                             let content = '';
                             try {
-                                content = await readFile(treePath);
+                                content = await readRuntimeFile(treePath);
                             } catch {
                                 try {
-                                    content = await readFile(`${checkDir}/${file.name}.fsm`);
+                                    content = await readRuntimeFile(`${checkDir}/${file.name}.fsm`);
                                 } catch {
                                     try {
-                                        content = await readFile(`${checkDir}/${file.name}`);
+                                        content = await readRuntimeFile(`${checkDir}/${file.name}`);
                                     } catch {
                                         console.warn(`Could not find file for hash check: ${file.name} in ${checkDir}`);
                                         continue;

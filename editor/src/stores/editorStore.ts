@@ -1,10 +1,11 @@
 import { create } from 'zustand';
 import type { Tree, TreeNode, TreeConnection, DataConnection, Variable, Pin } from '../types';
-import { loadTree, listFiles, saveFile } from '../utils/fileService';
+import { loadTree, listFiles, saveFile, writeBinaryFile } from '../utils/fileService';
 import { loadSettings, type Settings } from '../utils/settings';
 import { generateGUID } from '../utils/guidUtils';
 import { useNodeDefinitionStore } from './nodeDefinitionStore';
 import { serializeTreeForEditor, serializeTreeForRuntime } from '../utils/xmlSerializer';
+import { encryptConfigContent } from '../utils/configCrypto';
 import { validateValue, getDefaultValue, VARIABLE_NAME_MAX_LENGTH } from '../utils/validation';
 import { useNotificationStore } from './notificationStore';
 import { logger } from '../utils/logger';
@@ -1037,7 +1038,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       return get().saveFileAs();
     }
 
-    const { editorTreeDir, runtimeTreeDir } = get();
+    const { editorTreeDir, runtimeTreeDir, settings } = get();
     if (!editorTreeDir || !runtimeTreeDir) {
       useNotificationStore.getState().notify('Save failed: Tree directories not initialized in settings', 'error');
       return;
@@ -1182,7 +1183,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
       // 保存运行时版
       const runtimePath = `${runtimeTreeDir}/${activeFilePath}`;
-      await saveFile(runtimePath, runtimeXml);
+      if (settings?.encryptConfig) {
+        await writeBinaryFile(runtimePath, encryptConfigContent(runtimeXml));
+      } else {
+        await saveFile(runtimePath, runtimeXml);
+      }
 
       // 标记为已保存
       set((state) => ({
@@ -1702,7 +1707,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
                 // const binding: update to new default value
                 return {
                   ...updatedPin,
-                  binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
+                  binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list'), isLocal: pin.binding.isLocal },
                   vectorIndex: undefined
                 } as Pin;
               } else {
@@ -1745,7 +1750,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
                   // const binding: update to new default value
                   return {
                     ...updatedPin,
-                    binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list') },
+                    binding: { type: 'const' as const, value: getDefaultValue(updatedPin.valueType, updatedPin.countType === 'list'), isLocal: pin.binding.isLocal },
                     vectorIndex: undefined
                   } as Pin;
                 } else {

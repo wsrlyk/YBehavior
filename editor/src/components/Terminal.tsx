@@ -1,6 +1,16 @@
 import { useEffect, useState, useRef } from "react";
 import { LogMessage, LOG_CHANNEL_NAME } from "../utils/logger";
 import { getTheme } from "../theme/theme";
+import { readFile, saveFile, writeBinaryFile } from "../utils/fileService";
+import { parseTreeXml } from "../utils/xmlParser";
+import { serializeTreeForEditor, serializeTreeForRuntime } from "../utils/xmlSerializer";
+import { parseFSMXml } from "../utils/fsmParser";
+import { serializeFSMForEditor, serializeFSMForRuntime } from "../utils/fsmSerializer";
+import { recalculateUIDs } from "../stores/editorStoreCore";
+import { recalculateFSMUIDs } from "../utils/fsmUtils";
+import { useNodeDefinitionStore } from "../stores/nodeDefinitionStore";
+import { useEditorStore } from "../stores/editorStore";
+import { encryptConfigContent } from "../utils/configCrypto";
 
 interface TerminalProps {
     isDocked: boolean;
@@ -13,6 +23,101 @@ export function Terminal({ isDocked, onToggleMode }: TerminalProps) {
     const [logs, setLogs] = useState<LogMessage[]>([]);
     const scrollRef = useRef<HTMLDivElement>(null);
     const MAX_LOGS = 1000;
+
+    const appendLog = (level: LogMessage['level'], message: LogMessage['message']) => {
+        setLogs(prev => [...prev, { level, message, timestamp: Date.now() }]);
+    };
+
+    const saveRuntimeFile = async (path: string, content: string, encryptConfig: boolean) => {
+        if (encryptConfig) {
+            await writeBinaryFile(path, encryptConfigContent(content));
+        } else {
+            await saveFile(path, content);
+        }
+    };
+
+    const loadAndSaveAllTrees = async () => {
+        appendLog('info', 'loadandsavealltrees started...');
+
+        const editorStore = useEditorStore.getState();
+        if (!editorStore.settings || !editorStore.editorTreeDir || !editorStore.runtimeTreeDir) {
+            await editorStore.initSettings();
+        }
+
+        let latestEditorStore = useEditorStore.getState();
+        const settings = latestEditorStore.settings;
+        const editorTreeDir = latestEditorStore.editorTreeDir;
+        const runtimeTreeDir = latestEditorStore.runtimeTreeDir;
+        if (!settings || !editorTreeDir || !runtimeTreeDir) {
+            throw new Error('Editor settings are not initialized.');
+        }
+
+        const nodeDefStore = useNodeDefinitionStore.getState();
+        if (!nodeDefStore.isLoaded) {
+            await nodeDefStore.loadDefinitions();
+        }
+
+        let files = latestEditorStore.treeFiles
+            .map(f => f.replace(/\\/g, '/'))
+            .sort();
+        if (files.length === 0) {
+            await latestEditorStore.refreshFiles();
+            latestEditorStore = useEditorStore.getState();
+            files = latestEditorStore.treeFiles
+                .map(f => f.replace(/\\/g, '/'))
+                .sort();
+        }
+
+        let saved = 0;
+        let failed = 0;
+
+        for (const file of files) {
+            const editorPath = `${editorTreeDir}/${file}`;
+            const runtimePath = `${runtimeTreeDir}/${file}`;
+            const fileName = file.split('/').pop() || file;
+
+            try {
+                const content = await readFile(editorPath);
+
+                if (file.toLowerCase().endsWith('.fsm')) {
+                    const fsm = recalculateFSMUIDs(parseFSMXml(content, fileName));
+                    const editorXml = serializeFSMForEditor(fsm);
+                    const runtimeXml = serializeFSMForRuntime(fsm);
+                    await saveFile(editorPath, editorXml);
+                    await saveRuntimeFile(runtimePath, runtimeXml, settings.encryptConfig);
+                } else {
+                    const tree = parseTreeXml(content, fileName, useNodeDefinitionStore.getState().getDefinition);
+                    recalculateUIDs(tree);
+                    const editorXml = serializeTreeForEditor(tree);
+                    const runtimeXml = serializeTreeForRuntime(tree);
+                    await saveFile(editorPath, editorXml);
+                    await saveRuntimeFile(runtimePath, runtimeXml, settings.encryptConfig);
+                }
+
+                saved++;
+                appendLog('success', `${file} saved and exported.`);
+            } catch (e) {
+                failed++;
+                appendLog('error', `${file} failed: ${e instanceof Error ? e.message : String(e)}`);
+            }
+        }
+
+        appendLog(failed === 0 ? 'success' : 'warn', `loadandsavealltrees finished. saved=${saved}, failed=${failed}`);
+    };
+
+    const handleCommand = async (cmd: string) => {
+        if (cmd === 'clear') {
+            setLogs([]);
+        } else if (cmd === 'help') {
+            appendLog('success', 'Available commands: clear, echo [msg], help, loadandsavealltrees');
+        } else if (cmd.startsWith('echo ')) {
+            appendLog('info', cmd.slice(5));
+        } else if (cmd === 'loadandsavealltrees') {
+            await loadAndSaveAllTrees();
+        } else {
+            appendLog('warn', `Command not found: ${cmd}`);
+        }
+    };
 
     useEffect(() => {
         // Initial log
@@ -147,20 +252,8 @@ export function Terminal({ isDocked, onToggleMode }: TerminalProps) {
                             if (!cmd) return;
 
                             // Echo command
-                            setLogs(prev => [...prev, { level: 'info', message: `$ ${cmd}`, timestamp: Date.now() }]);
-
-                            // Handle command
-                            if (cmd === 'clear') {
-                                setLogs([]);
-                            } else if (cmd === 'help') {
-                                const helpMsg = "Available commands: clear, echo [msg], help";
-                                setLogs(prev => [...prev, { level: 'success', message: helpMsg, timestamp: Date.now() }]);
-                            } else if (cmd.startsWith('echo ')) {
-                                setLogs(prev => [...prev, { level: 'info', message: cmd.slice(5), timestamp: Date.now() }]);
-                            } else {
-                                setLogs(prev => [...prev, { level: 'warn', message: `Command not found: ${cmd}`, timestamp: Date.now() }]);
-                            }
-
+                            appendLog('info', `$ ${cmd}`);
+                            void handleCommand(cmd);
                             e.currentTarget.value = '';
                         }
                     }}

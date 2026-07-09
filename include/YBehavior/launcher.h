@@ -14,6 +14,7 @@ namespace YBehavior
 		virtual void GetLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const { return; }
 		virtual void GetThreadLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const { return; }
 		virtual GetFilePathDelegate GetFilePath() const { return nullptr; }
+		virtual bool NeedDecryptConfig() const { return false; }
 	protected:
 		template<typename T>
 		void _Register() const;

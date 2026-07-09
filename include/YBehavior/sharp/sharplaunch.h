@@ -12,9 +12,11 @@ namespace YBehavior
 	{
 	private:
 		int m_Port{};
+		bool m_NeedDecryptConfig{};
 	public:
-		SharpLaunchCore(int debugport);
+		SharpLaunchCore(int debugport, bool needDecryptConfig);
 		int StartWithDebugListeningPort() const override;
+		bool NeedDecryptConfig() const override;
 
 		void GetLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const override;
 		void GetThreadLogProcessor(LogProcessDelegate &pLog, ErrorProcessDelegate & pError) const override;
