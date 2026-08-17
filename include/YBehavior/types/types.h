@@ -1,6 +1,7 @@
 #ifndef _YBEHAVIOR_TYPES_H_
 #define _YBEHAVIOR_TYPES_H_
 
+#include <stdint.h>
 #include <string>
 #include <vector>
 #include "YBehavior/define.h"
@@ -247,14 +248,12 @@ namespace YBehavior
 	typedef std::string			STRING;
 	typedef const char*			CSTRING_CONST;
 	typedef char*				CSTRING;
-	typedef int					INT;
-	typedef unsigned int		UINT;
-	typedef unsigned long long	UINT64;
-	typedef unsigned long long	ULONG;
-	typedef unsigned char       BYTE;
+	typedef int32_t				INT;
+	typedef uint32_t			UINT;
+	typedef uint64_t			UINT64;
+	typedef UINT64				ULONG;
 	typedef bool				BOOL_REAL;
 	typedef unsigned char		BOOL;	///> WARNING: bool is defined by short. Cause bool in vector is specialized and has quite different behaviors with others.
-	typedef unsigned short		USHORT;
 	typedef float				FLOAT;
 	typedef char				CHAR;
 
@@ -265,16 +264,13 @@ namespace YBehavior
 	typedef UINT				Uint;
 	typedef UINT64				Uint64;
 	typedef UINT64				Ulong;
-	typedef BYTE				Byte;
 	typedef BOOL				Bool;
-	typedef USHORT				Ushort;
 	typedef FLOAT				Float;
 	typedef StdVector<STRING>	VecString;
 	typedef StdVector<INT>	VecInt;
 	typedef StdVector<UINT>	VecUint;
 	typedef StdVector<UINT64>	VecUint64;
 	typedef StdVector<ULONG>	VecUlong;
-	typedef StdVector<BYTE>	VecByte;
 	typedef StdVector<BOOL>	VecBool;
 	typedef StdVector<FLOAT>	VecFloat;
 	typedef StdVector<EntityWrapper>	VecEntityWrapper;
