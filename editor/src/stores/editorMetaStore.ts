@@ -64,6 +64,16 @@ interface EditorMetaState {
 }
 
 const META_FILE_NAME = 'editor_meta.local.json';
+let metaSaveTimer: ReturnType<typeof setTimeout> | null = null;
+let metaSaveQueue: Promise<void> = Promise.resolve();
+
+function scheduleMetaSave(save: () => Promise<void>) {
+    if (metaSaveTimer) clearTimeout(metaSaveTimer);
+    metaSaveTimer = setTimeout(() => {
+        metaSaveTimer = null;
+        void save();
+    }, 250);
+}
 
 export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
     treeMetas: {},
@@ -105,22 +115,21 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
             return { treeMetas: newTreeMetas };
         });
 
-        // 异步保存
-        get().saveAllMeta();
+        scheduleMetaSave(get().saveAllMeta);
     },
 
     setSidebarWidth: (width) => {
         set((state) => ({
             uiMeta: { ...state.uiMeta, sidebarWidth: width }
         }));
-        get().saveAllMeta();
+        scheduleMetaSave(get().saveAllMeta);
     },
 
     setPropertiesPanelWidth: (width) => {
         set((state) => ({
             uiMeta: { ...state.uiMeta, propertiesPanelWidth: width }
         }));
-        get().saveAllMeta();
+        scheduleMetaSave(get().saveAllMeta);
     },
 
     setSearchOpen: (open) => {
@@ -151,14 +160,14 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
         set((state) => ({
             debugMeta: { ...state.debugMeta, ip }
         }));
-        get().saveAllMeta();
+        scheduleMetaSave(get().saveAllMeta);
     },
 
     setDebugPort: (port) => {
         set((state) => ({
             debugMeta: { ...state.debugMeta, port }
         }));
-        get().saveAllMeta();
+        scheduleMetaSave(get().saveAllMeta);
     },
 
     setNodeBreakpoint: (filePath, nodeId, type) => {
@@ -182,7 +191,7 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
 
             return { treeMetas: newTreeMetas };
         });
-        get().saveAllMeta();
+        scheduleMetaSave(get().saveAllMeta);
     },
 
     setTreeViewport: (filePath, viewport) => {
@@ -200,7 +209,7 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
                 }
             };
         });
-        get().saveAllMeta();
+        scheduleMetaSave(get().saveAllMeta);
     },
 
     setSearchConfig: (config) => {
@@ -213,7 +222,7 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
                 }
             }
         }));
-        get().saveAllMeta();
+        scheduleMetaSave(get().saveAllMeta);
     },
 
     getTreeMeta: (filePath) => {
@@ -246,7 +255,7 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
                 }
             };
         });
-        get().saveAllMeta();
+        scheduleMetaSave(get().saveAllMeta);
     },
 
     cleanOrphanedMeta: (existingFiles) => {
@@ -262,7 +271,7 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
 
             return { treeMetas: newTreeMetas };
         });
-        get().saveAllMeta();
+        scheduleMetaSave(get().saveAllMeta);
     },
 
     loadAllMeta: async () => {
@@ -299,17 +308,19 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
         }
     },
 
-    saveAllMeta: async () => {
-        try {
+    saveAllMeta: () => {
+        const content = JSON.stringify({
+            treeMetas: get().treeMetas,
+            uiMeta: get().uiMeta,
+            debugMeta: get().debugMeta
+        }, null, 2);
+
+        metaSaveQueue = metaSaveQueue.then(async () => {
             const path = await getConfigPath(META_FILE_NAME);
-            const content = JSON.stringify({
-                treeMetas: get().treeMetas,
-                uiMeta: get().uiMeta,
-                debugMeta: get().debugMeta
-            }, null, 2);
             await writeFile(path, content);
-        } catch (e) {
+        }).catch((e) => {
             console.error('Failed to save editor metadata:', e);
-        }
+        });
+        return metaSaveQueue;
     }
 }));

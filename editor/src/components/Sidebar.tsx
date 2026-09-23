@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useEditorStore } from '../stores/editorStore';
 import { useFSMStore } from '../stores/fsmStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
@@ -13,8 +14,19 @@ import { getTheme } from '../theme/theme';
 const theme = getTheme();
 
 export function Sidebar() {
-  const { openedFiles, activeFilePath, setActiveFile, closeFile, isLoading } = useEditorStore();
-  const { openedFSMFiles, activeFSMPath, setActiveFSM, closeFSM } = useFSMStore();
+  const { openedFiles, activeFilePath, setActiveFile, closeFile, isLoading } = useEditorStore(useShallow(state => ({
+    openedFiles: state.openedFiles,
+    activeFilePath: state.activeFilePath,
+    setActiveFile: state.setActiveFile,
+    closeFile: state.closeFile,
+    isLoading: state.isLoading,
+  })));
+  const { openedFSMFiles, activeFSMPath, setActiveFSM, closeFSM } = useFSMStore(useShallow(state => ({
+    openedFSMFiles: state.openedFSMFiles,
+    activeFSMPath: state.activeFSMPath,
+    setActiveFSM: state.setActiveFSM,
+    closeFSM: state.closeFSM,
+  })));
   const sidebarWidth = useEditorMetaStore(state => state.uiMeta.sidebarWidth);
   // const { isConnected, isFileRunning, treeRunInfos } = useDebugStore();
 
@@ -84,7 +96,13 @@ export function Sidebar() {
 }
 
 function SidebarItem({ file, isActive, onClick, onClose }: any) {
-  const { isConnected, getFileRunState, treeRunInfos, keyframe } = useDebugStore();
+  const { isConnected, getFileRunState, treeRunInfos, fsmRunInfo, keyframe } = useDebugStore(useShallow(state => ({
+    isConnected: state.isConnected,
+    getFileRunState: state.getFileRunState,
+    treeRunInfos: state.treeRunInfos,
+    fsmRunInfo: state.fsmRunInfo,
+    keyframe: state.keyframe,
+  })));
   const setTooltip = useTooltipStore((state) => state.setTooltip);
   const { icon, name } = getFileDisplay(file.name, file.isFSM);
 
@@ -103,7 +121,7 @@ function SidebarItem({ file, isActive, onClick, onClose }: any) {
 
   // Compute current data state
   const fileRunState = isConnected ? getFileRunState(name) : undefined;
-  const fsmInfo = isConnected && file.isFSM ? useDebugStore.getState().fsmRunInfo : undefined;
+  const fsmInfo = isConnected && file.isFSM ? fsmRunInfo : undefined;
 
   // Resolve root/final state
   let rootFinal: number | undefined;

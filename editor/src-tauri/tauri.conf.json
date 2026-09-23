@@ -6,7 +6,7 @@
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run rebuild && node scripts/post-build.mjs",
+    "beforeBuildCommand": "npm run rebuild",
     "frontendDist": "../dist"
   },
   "app": {

@@ -23,13 +23,14 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import FSMStateNode, { type FSMStateNodeData, type FSMStateNodeType } from './FSMStateNode';
-import FSMTransitionEdge from './FSMTransitionEdge';
+import FSMTransitionEdge, { type FSMTransitionEdgeData } from './FSMTransitionEdge';
 import { useFSMStore } from '../stores/fsmStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useDebugStore } from '../stores/debugStore';
 import { useTooltipStore } from '../stores/tooltipStore';
 import { useShallow } from 'zustand/react/shallow';
 import type { FSMMachine, FSMTransition, FSMState } from '../types/fsm';
+import { isSpecialStateType } from '../types/fsm';
 import { getTheme } from '../theme/theme';
 
 const theme = getTheme();
@@ -331,10 +332,11 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
 
     const { setViewport: flowSetViewport } = useReactFlow();
     useEffect(() => {
-        if (activeFile?.viewport) {
-            flowSetViewport(activeFile.viewport);
+        const viewport = useFSMStore.getState().openedFSMFiles.find(f => f.path === activeFSMPath)?.viewport;
+        if (viewport) {
+            flowSetViewport(viewport);
         }
-    }, [flowSetViewport, activeFile]);
+    }, [flowSetViewport, activeFSMPath]);
 
     const onMoveEnd = useCallback((_: any, viewport: any) => {
         if (activeFSMPath) {
@@ -581,7 +583,10 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
             if (event.key === 'Delete' || event.key === 'Backspace') {
                 // Remove selected nodes/edges
                 nodes.filter(n => n.selected).forEach(n => removeState(n.id));
-                edges.filter(e => e.selected && e.id !== 'edge-default').forEach(e => removeTransition(e.id));
+                edges.filter(e => e.selected && e.id !== 'edge-default').forEach(e => {
+                    const transitions = (e.data as FSMTransitionEdgeData | undefined)?.transitions || [];
+                    transitions.forEach(transition => removeTransition(transition.id));
+                });
             }
         },
         [nodes, edges, removeState, removeTransition]
@@ -745,7 +750,7 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                     </button>
                 </Panel>
                 {/* Context Menu */}
-                {menu && (
+                {menu && machine.states.get(menu.id) && !isSpecialStateType(machine.states.get(menu.id)!.type) && (
                     <div
                         style={{ top: menu.top, left: menu.left, backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}
                         className="absolute z-50 border rounded shadow-xl py-1 min-w-[120px]"

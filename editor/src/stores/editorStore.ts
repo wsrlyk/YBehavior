@@ -307,12 +307,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         viewport: meta?.viewport
       };
 
-      set({
-        openedFiles: [...openedFiles, newFile],
+      set((state) => ({
+        openedFiles: state.openedFiles.some(f => f.path.replace(/\\/g, '/') === normalizedFinal)
+          ? state.openedFiles
+          : [...state.openedFiles, newFile],
         activeFilePath: normalizedFinal,
         isLoading: false,
         selectedNodeIds: [],
-      });
+      }));
       useFSMStore.getState().setActiveFSM(null as any);
     } catch (e: any) {
       console.error(`Failed to load tree "${normalizedFinal}": ${e}`);
@@ -1239,21 +1241,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         return;
       }
 
-      // 处理新路径，确保它是相对于 editorTreeDir 的相对路径
-      let relativePath = newPath;
+      // Store paths are relative to editorTreeDir so editor/runtime files stay paired.
       const normalizedDir = editorTreeDir.replace(/\\/g, '/');
       const normalizedNewPath = newPath.replace(/\\/g, '/');
-
-      if (normalizedNewPath.startsWith(normalizedDir)) {
-        relativePath = normalizedNewPath.slice(normalizedDir.length).replace(/^\//, '');
-      } else {
-        // 如果保存在目录外，给出提示（虽然最好能支持任意路径，但目前系统架构依赖 root dir）
-        useNotificationStore.getState().notify('Warning: Saving outside the predefined tree directory.', 'warning');
-        // 提取文件名作为相对路径名
-        relativePath = newPath.split(/[/\\]/).pop() || relativePath;
+      const normalizedDirPrefix = `${normalizedDir.replace(/\/$/, '')}/`;
+      if (!normalizedNewPath.startsWith(normalizedDirPrefix)) {
+        useNotificationStore.getState().notify('Save As location must be inside the configured tree directory', 'error');
+        return;
       }
 
-      const normalizedRelativePath = relativePath.replace(/\\/g, '/');
+      const normalizedRelativePath = normalizedNewPath.slice(normalizedDirPrefix.length);
       const hasOpenedPathConflict = openedFiles.some(
         f => f.path === normalizedRelativePath && f.path !== activeFilePath
       );
@@ -1265,7 +1262,23 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         return;
       }
 
-      // 更新文件信息并执行保存逻辑（这里我们复用 saveCurrentFile 的保存部分，但先更新 store 状态）
+      const renamedTree = {
+        ...file.tree,
+        path: normalizedRelativePath,
+        name: fileName.replace(/\.tree$/, '')
+      };
+      const editorXml = serializeTreeForEditor(renamedTree);
+      const runtimeXml = serializeTreeForRuntime(renamedTree);
+      const runtimePath = `${runtimeTreeDir}/${normalizedRelativePath}`;
+
+      // Only switch the tab path after both files have been written successfully.
+      await saveFile(normalizedNewPath, editorXml);
+      if (get().settings?.encryptConfig) {
+        await writeBinaryFile(runtimePath, encryptConfigContent(runtimeXml));
+      } else {
+        await saveFile(runtimePath, runtimeXml);
+      }
+
       set(state => ({
         openedFiles: state.openedFiles.map(f =>
           f.path === activeFilePath
@@ -1274,17 +1287,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
               path: normalizedRelativePath,
               name: fileName,
               isNew: false,
-              lastSavedTreeSnapshot: serializeTreeForEditor(f.tree), // 预更新快照，虽然 saveCurrentFile 也会更新
-              tree: { ...f.tree, path: normalizedRelativePath, name: fileName.replace(/\.tree$/, '') }
+              isDirty: false,
+              lastSavedTreeSnapshot: editorXml,
+              tree: renamedTree
             }
             : f
         ),
         activeFilePath: normalizedRelativePath,
         treeFiles: state.treeFiles.includes(normalizedRelativePath) ? state.treeFiles : [...state.treeFiles, normalizedRelativePath]
       }));
-
-      // 执行实际保存
-      await get().saveCurrentFile();
+      useNotificationStore.getState().notify('Save successful', 'success');
 
     } catch (e) {
       console.error('Save As failed:', e);

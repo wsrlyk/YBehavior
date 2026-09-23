@@ -288,12 +288,16 @@ export function parseFSMXml(xmlContent: string, fileName: string): FSM {
 
     if (xmlRoot.Shared) {
         for (const [name, value] of Object.entries(xmlRoot.Shared)) {
-            if (typeof value === 'string') sharedVariables.push(parseVariableFromXml(name, value, false));
+            if (name.startsWith('@_') && typeof value === 'string') {
+                sharedVariables.push(parseVariableFromXml(name.slice(2), value, false));
+            }
         }
     }
     if (xmlRoot.Local) {
         for (const [name, value] of Object.entries(xmlRoot.Local)) {
-            if (typeof value === 'string') localVariables.push(parseVariableFromXml(name, value, true));
+            if (name.startsWith('@_') && typeof value === 'string') {
+                localVariables.push(parseVariableFromXml(name.slice(2), value, true));
+            }
         }
     }
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useEditorStore } from '../stores/editorStore';
 import { useFSMStore } from '../stores/fsmStore';
 import { useTooltipStore } from '../stores/tooltipStore';
@@ -150,8 +151,15 @@ function hasMatchingDescendants(node: TreeNode, filter: string): boolean {
 
 export function FileTreePopup({ isOpen, onClose }: FileTreePopupProps) {
   const theme = getTheme();
-  const { treeFiles, openTree, setActiveFile } = useEditorStore();
-  const { openFSM, setActiveFSM } = useFSMStore();
+  const { treeFiles, openTree, setActiveFile } = useEditorStore(useShallow(state => ({
+    treeFiles: state.treeFiles,
+    openTree: state.openTree,
+    setActiveFile: state.setActiveFile,
+  })));
+  const { openFSM, setActiveFSM } = useFSMStore(useShallow(state => ({
+    openFSM: state.openFSM,
+    setActiveFSM: state.setActiveFSM,
+  })));
   const [filter, setFilter] = useState('');
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set());
   const setTooltip = useTooltipStore(state => state.setTooltip);

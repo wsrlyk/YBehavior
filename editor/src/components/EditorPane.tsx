@@ -7,6 +7,7 @@
 
 import { useEditorStore } from '../stores/editorStore';
 import { useFSMStore } from '../stores/fsmStore';
+import { useShallow } from 'zustand/react/shallow';
 import { NodeEditor } from './NodeEditor';
 import FSMEditor from './FSMEditor';
 import { getTheme } from '../theme/theme';
@@ -19,8 +20,14 @@ interface EditorPaneProps {
 
 export function EditorPane({ onPaneClick }: EditorPaneProps) {
     const theme = getTheme();
-    const { openedFiles, activeFilePath } = useEditorStore();
-    const { openedFSMFiles, activeFSMPath } = useFSMStore();
+    const { openedFiles, activeFilePath } = useEditorStore(useShallow(state => ({
+        openedFiles: state.openedFiles,
+        activeFilePath: state.activeFilePath,
+    })));
+    const { openedFSMFiles, activeFSMPath } = useFSMStore(useShallow(state => ({
+        openedFSMFiles: state.openedFSMFiles,
+        activeFSMPath: state.activeFSMPath,
+    })));
 
     const activeTreeFile = openedFiles.find(f => f.path === activeFilePath);
     const activeFSMFile = openedFSMFiles.find(f => f.path === activeFSMPath);

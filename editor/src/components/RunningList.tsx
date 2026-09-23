@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useDebugStore } from '../stores/debugStore';
 import { useEditorStore } from '../stores/editorStore';
 import { useFSMStore } from '../stores/fsmStore';
@@ -10,9 +11,20 @@ import { getTheme } from '../theme/theme';
 
 export const RunningList = () => {
     const theme = getTheme();
-    const { treeRunInfos, fsmRunInfo, isConnected } = useDebugStore();
-    const { treeFiles, openTree, setActiveFile } = useEditorStore();
-    const { openFSMFile, setActiveFSM } = useFSMStore();
+    const { treeRunInfos, fsmRunInfo, isConnected } = useDebugStore(useShallow(state => ({
+        treeRunInfos: state.treeRunInfos,
+        fsmRunInfo: state.fsmRunInfo,
+        isConnected: state.isConnected,
+    })));
+    const { treeFiles, openTree, setActiveFile } = useEditorStore(useShallow(state => ({
+        treeFiles: state.treeFiles,
+        openTree: state.openTree,
+        setActiveFile: state.setActiveFile,
+    })));
+    const { openFSMFile, setActiveFSM } = useFSMStore(useShallow(state => ({
+        openFSMFile: state.openFSMFile,
+        setActiveFSM: state.setActiveFSM,
+    })));
     const [isOpen, setIsOpen] = useState(true);
 
     if (!isConnected || (!fsmRunInfo && treeRunInfos.size === 0)) return null;
@@ -126,7 +138,13 @@ export const RunningList = () => {
 
 function RunningListItem({ fileName, isFsm, onClick }: { fileName: string; isFsm: boolean; onClick: () => void }) {
     const theme = getTheme();
-    const { isConnected, getFileRunState, treeRunInfos, fsmRunInfo, keyframe } = useDebugStore();
+    const { isConnected, getFileRunState, treeRunInfos, fsmRunInfo, keyframe } = useDebugStore(useShallow(state => ({
+        isConnected: state.isConnected,
+        getFileRunState: state.getFileRunState,
+        treeRunInfos: state.treeRunInfos,
+        fsmRunInfo: state.fsmRunInfo,
+        keyframe: state.keyframe,
+    })));
     const setTooltip = useTooltipStore((state) => state.setTooltip);
 
     const getDebugColor = (state: NodeState): string => {

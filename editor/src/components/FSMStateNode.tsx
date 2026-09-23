@@ -1,4 +1,5 @@
 import { memo, useState, useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
 import { NodeState } from '../types/debug';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
@@ -47,8 +48,10 @@ function FSMStateNode({ data, selected, dragging }: NodeProps<FSMStateNodeType>)
     const isGlobalConnecting = useFSMStore(state => state.isConnecting);
 
     // Debug info
-    const { fsmRunInfo, isConnected, keyframe } = useDebugStore();
-    const runState = (isConnected && state.uid !== undefined) ? fsmRunInfo?.stateInfos?.get(state.uid) : undefined;
+    const { runState, keyframe } = useDebugStore(useShallow(debugState => ({
+        runState: debugState.isConnected && state.uid !== undefined ? debugState.fsmRunInfo?.stateInfos?.get(state.uid) : undefined,
+        keyframe: debugState.keyframe,
+    })));
     const isRunning = runState !== undefined;
 
     const [isTransientVisible, setIsTransientVisible] = useState(false);

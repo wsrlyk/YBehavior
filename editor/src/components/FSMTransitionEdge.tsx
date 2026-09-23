@@ -1,7 +1,7 @@
 import { BaseEdge, EdgeLabelRenderer, getStraightPath, useInternalNode, type EdgeProps, type Edge } from '@xyflow/react';
 import { getTheme } from '../theme/theme';
 
-import { useEditorStore } from '../stores/editorStore';
+import { useFSMStore } from '../stores/fsmStore';
 import { useShallow } from 'zustand/react/shallow';
 
 const theme = getTheme();
@@ -24,7 +24,7 @@ export default function FSMTransitionEdge({
     const sourceNode = useInternalNode(source);
     const targetNode = useInternalNode(target);
 
-    const isConnectedToSelected = useEditorStore(useShallow((s) =>
+    const isConnectedToSelected = useFSMStore(useShallow((s) =>
         s.selectedNodeIds.includes(source) || s.selectedNodeIds.includes(target)
     ));
 

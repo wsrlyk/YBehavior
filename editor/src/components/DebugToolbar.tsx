@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useDebugStore } from '../stores/debugStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useEditorStore } from '../stores/editorStore';
@@ -56,9 +57,23 @@ const DisconnectIcon = () => (
 
 export function DebugToolbar() {
     const theme = getTheme();
-    const { isConnected, isPaused, isDebugging, connect, disconnect, startDebug, continueDebug, stepInto, stepOver } = useDebugStore();
-    const { debugMeta, setDebugIP, setDebugPort } = useEditorMetaStore();
-    const { notify } = useNotificationStore();
+    const { isConnected, isPaused, isDebugging, connect, disconnect, startDebug, continueDebug, stepInto, stepOver } = useDebugStore(useShallow(state => ({
+        isConnected: state.isConnected,
+        isPaused: state.isPaused,
+        isDebugging: state.isDebugging,
+        connect: state.connect,
+        disconnect: state.disconnect,
+        startDebug: state.startDebug,
+        continueDebug: state.continueDebug,
+        stepInto: state.stepInto,
+        stepOver: state.stepOver,
+    })));
+    const { debugMeta, setDebugIP, setDebugPort } = useEditorMetaStore(useShallow(state => ({
+        debugMeta: state.debugMeta,
+        setDebugIP: state.setDebugIP,
+        setDebugPort: state.setDebugPort,
+    })));
+    const notify = useNotificationStore(state => state.notify);
 
     // Get active file info from editor stores
     const activeFilePath = useEditorStore(s => s.activeFilePath);

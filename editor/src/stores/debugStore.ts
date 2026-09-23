@@ -506,6 +506,11 @@ export const useDebugStore = create<DebugState>((set, get) => ({
     // Handle connection state change
     handleConnectionEvent: (connected) => {
         if (connected) {
+            const { displayTimer } = get().keyframeState;
+            if (displayTimer) {
+                clearInterval(displayTimer);
+            }
+
             // Start keyframe timer
             const timer = setInterval(() => {
                 get().displayKeyframe();

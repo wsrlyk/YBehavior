@@ -263,6 +263,9 @@ export function FSMPropertiesPanel() {
                                     onBlur={() => {
                                         if (nameValidation.isValid) {
                                             updateState(selectedState.id, { name: localName });
+                                            const currentState = useFSMStore.getState().getCurrentFSM()?.machines
+                                                .get(machine!.id)?.states.get(selectedState.id);
+                                            if (currentState && currentState.name !== localName) setLocalName(currentState.name);
                                         }
                                     }}
                                     placeholder="State name..."

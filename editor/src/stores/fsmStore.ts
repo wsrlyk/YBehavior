@@ -56,7 +56,7 @@ interface FSMStoreState {
     openFSM: (path: string, content: string) => void;
     openFSMFile: (path: string) => Promise<void>;
 
-    closeFSM: (path: string) => void;
+    closeFSM: (path: string) => Promise<void>;
     setActiveFSM: (path: string) => void;
     getCurrentFSM: () => FSM | null;
     getCurrentMachine: () => FSMMachine | null;
@@ -140,6 +140,32 @@ function updateFSMFile(
     return { openedFSMFiles: newFiles };
 }
 
+function findDuplicateStateName(fsm: FSM): string | null {
+    const names = new Set<string>();
+    for (const machine of fsm.machines.values()) {
+        for (const state of machine.states.values()) {
+            if (isSpecialStateType(state.type)) continue;
+            if (names.has(state.name)) return state.name;
+            names.add(state.name);
+        }
+    }
+    return null;
+}
+
+function getUniqueStateName(fsm: FSM, baseName: string): string {
+    const names = new Set<string>();
+    for (const machine of fsm.machines.values()) {
+        for (const state of machine.states.values()) {
+            if (!isSpecialStateType(state.type)) names.add(state.name);
+        }
+    }
+
+    let name = baseName;
+    let suffix = 1;
+    while (names.has(name)) name = `${baseName}${suffix++}`;
+    return name;
+}
+
 // ==================== Store ====================
 
 export const useFSMStore = create<FSMStoreState>((set, get) => ({
@@ -196,10 +222,12 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
             currentMachineId: fsm.rootMachineId,
         };
 
-        set({
-            openedFSMFiles: [...openedFSMFiles, newFile],
+        set((state) => ({
+            openedFSMFiles: state.openedFSMFiles.some(f => f.path.replace(/\\/g, '/') === normalizedPath)
+                ? state.openedFSMFiles
+                : [...state.openedFSMFiles, newFile],
             activeFSMPath: normalizedPath,
-        });
+        }));
         useEditorStore.getState().setActiveFile(null as any);
     },
 
@@ -217,8 +245,23 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
         }
     },
 
-    closeFSM: (path) => {
+    closeFSM: async (path) => {
         const { openedFSMFiles, activeFSMPath } = get();
+        const file = openedFSMFiles.find(f => f.path === path);
+
+        if (file?.isDirty) {
+            try {
+                const { ask } = await import('@tauri-apps/plugin-dialog');
+                const answer = await ask(
+                    `The file "${file.name}" has unsaved changes. Do you want to close it?`,
+                    { title: 'Confirm Close', kind: 'warning', okLabel: 'Close Without Saving', cancelLabel: 'Cancel' }
+                );
+                if (!answer) return;
+            } catch (e) {
+                console.error('Dialog failed:', e);
+            }
+        }
+
         const newFiles = openedFSMFiles.filter(f => f.path !== path);
         let newActive = activeFSMPath;
 
@@ -278,7 +321,8 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
                 const machine = fsm.machines.get(file.currentMachineId);
                 if (!machine) return fsm;
 
-                const newState = createFSMState(type, '', position);
+                const name = isSpecialStateType(type) ? '' : getUniqueStateName(fsm, type === 'Meta' ? 'Meta' : 'State');
+                const newState = createFSMState(type, name, position);
                 const newMachine: FSMMachine = {
                     ...machine,
                     states: new Map([...machine.states, [newState.id, newState]]),
@@ -392,6 +436,20 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
                 const existingState = machine.states.get(stateId);
                 if (!existingState) return fsm;
 
+                if (updates.name !== undefined && !isSpecialStateType(existingState.type)) {
+                    const duplicate = Array.from(fsm.machines.values()).some(candidateMachine =>
+                        Array.from(candidateMachine.states.values()).some(candidateState =>
+                            candidateState.id !== stateId &&
+                            !isSpecialStateType(candidateState.type) &&
+                            candidateState.name === updates.name
+                        )
+                    );
+                    if (duplicate) {
+                        useNotificationStore.getState().notify(`State name "${updates.name}" already exists`, 'error');
+                        return fsm;
+                    }
+                }
+
                 const newStates = new Map(machine.states);
                 newStates.set(stateId, { ...existingState, ...updates });
 
@@ -415,6 +473,11 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
 
                 const machine = fsm.machines.get(file.currentMachineId);
                 if (!machine) return fsm;
+
+                if (stateId !== null) {
+                    const defaultState = machine.states.get(stateId);
+                    if (!defaultState || isSpecialStateType(defaultState.type)) return fsm;
+                }
 
                 const newMachine: FSMMachine = { ...machine, defaultStateId: stateId };
 
@@ -668,10 +731,16 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
         const file = openedFSMFiles.find(f => f.path === activeFSMPath);
         if (!file || !activeFSMPath) throw new Error('No active FSM file');
 
+        const duplicateStateName = findDuplicateStateName(file.fsm);
+        if (duplicateStateName) {
+            const message = `State name "${duplicateStateName}" already exists`;
+            useNotificationStore.getState().notify(message, 'error');
+            throw new Error(message);
+        }
+
         // Handle new files (no path or new://)
         if (file.isNew || activeFSMPath.startsWith('new://')) {
-            // We should probably redirect to saveAs or handle it in MainWindow
-            // For now, let's just serialize and expect MainWindow to handle the path
+            await get().saveFSMAs();
             return serializeFSMForEditor(file.fsm);
         }
 
@@ -761,6 +830,12 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
         const file = openedFSMFiles.find(f => f.path === activeFSMPath);
         if (!file) return;
 
+        const duplicateStateName = findDuplicateStateName(file.fsm);
+        if (duplicateStateName) {
+            useNotificationStore.getState().notify(`State name "${duplicateStateName}" already exists`, 'error');
+            return;
+        }
+
         try {
             const { save } = await import('@tauri-apps/plugin-dialog');
             const newPath = await save({
@@ -781,15 +856,14 @@ export const useFSMStore = create<FSMStoreState>((set, get) => ({
             const { runtimeTreeDir, settings } = useEditorStore.getState();
             if (!runtimeTreeDir) return;
 
-            let relativePath = newPath;
             const normalizedDir = editorTreeDir.replace(/\\/g, '/');
             const normalizedNewPath = newPath.replace(/\\/g, '/');
-
-            if (normalizedNewPath.startsWith(normalizedDir)) {
-                relativePath = normalizedNewPath.slice(normalizedDir.length).replace(/^\//, '');
-            } else {
-                relativePath = newPath.split(/[/\\]/).pop() || relativePath;
+            const normalizedDirPrefix = `${normalizedDir.replace(/\/$/, '')}/`;
+            if (!normalizedNewPath.startsWith(normalizedDirPrefix)) {
+                useNotificationStore.getState().notify('Save As location must be inside the configured tree directory', 'error');
+                return;
             }
+            const relativePath = normalizedNewPath.slice(normalizedDirPrefix.length);
 
             const content = serializeFSMForEditor({ ...file.fsm, name: fsmName });
             const runtimeContent = serializeFSMForRuntime({ ...file.fsm, name: fsmName });

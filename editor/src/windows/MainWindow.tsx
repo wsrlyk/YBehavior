@@ -18,14 +18,29 @@ import Tooltip from "../components/Tooltip";
 import { GlobalSearch } from "../components/GlobalSearch";
 import { ReactFlowProvider } from '@xyflow/react';
 import { getTheme } from '../theme/theme';
+import { useShallow } from 'zustand/react/shallow';
 
 export function MainWindow() {
     const theme = getTheme();
-    const { initSettings, settings, openedFiles, activeFilePath, saveCurrentFile, saveFileAs, undo, redo, createNewTree } = useEditorStore();
-    const { openedFSMFiles, activeFSMPath, saveFSM, saveFSMAs, undo: undoFSM, redo: redoFSM, createNewFSM } = useFSMStore();
+    const { openedFiles, activeFilePath, saveCurrentFile, saveFileAs, undo, redo, createNewTree } = useEditorStore(useShallow(state => ({
+        openedFiles: state.openedFiles,
+        activeFilePath: state.activeFilePath,
+        saveCurrentFile: state.saveCurrentFile,
+        saveFileAs: state.saveFileAs,
+        undo: state.undo,
+        redo: state.redo,
+        createNewTree: state.createNewTree,
+    })));
+    const { openedFSMFiles, activeFSMPath, saveFSM, saveFSMAs, undoFSM, redoFSM, createNewFSM } = useFSMStore(useShallow(state => ({
+        openedFSMFiles: state.openedFSMFiles,
+        activeFSMPath: state.activeFSMPath,
+        saveFSM: state.saveFSM,
+        saveFSMAs: state.saveFSMAs,
+        undoFSM: state.undo,
+        redoFSM: state.redo,
+        createNewFSM: state.createNewFSM,
+    })));
 
-    const { loadDefinitions, isLoaded } = useNodeDefinitionStore();
-    const loadAllMeta = useEditorMetaStore(state => state.loadAllMeta);
     const isSearchOpen = useEditorMetaStore(state => state.uiMeta.isSearchOpen);
     const setSearchOpen = useEditorMetaStore(state => state.setSearchOpen);
 
@@ -62,18 +77,23 @@ export function MainWindow() {
 
     useEffect(() => {
         // 加载设置和节点定义
-        if (!settings) {
-            initSettings();
+        const editorState = useEditorStore.getState();
+        if (!editorState.settings) {
+            editorState.initSettings();
         }
-        if (!isLoaded) {
-            loadDefinitions();
+
+        const definitionState = useNodeDefinitionStore.getState();
+        if (!definitionState.isLoaded) {
+            definitionState.loadDefinitions();
         }
+    }, []);
+
+    useEffect(() => {
         // 加载编辑器元数据
-        // 加载编辑器元数据
-        loadAllMeta().then(() => {
+        useEditorMetaStore.getState().loadAllMeta().then(() => {
             useDebugStore.getState().syncBreakpointsFromMeta();
         });
-    }, [settings, initSettings, isLoaded, loadDefinitions, loadAllMeta]);
+    }, []);
 
     // Ctrl+S / Ctrl+Z / Ctrl+Y / Ctrl+F 快捷键
     useEffect(() => {

@@ -45,6 +45,7 @@ function App() {
     };
 
     const handleContext = (e: MouseEvent) => e.preventDefault();
+    window.addEventListener("hashchange", handleHashChange);
     window.addEventListener("contextmenu", handleContext);
 
     return () => {

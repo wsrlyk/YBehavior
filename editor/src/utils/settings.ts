@@ -61,14 +61,15 @@ export async function loadSettings(): Promise<Settings> {
 
       await invoke('exit_app');
 
-      // Return a never-resolving promise to prevent app from continuing while exiting
-      return new Promise<Settings>(() => { });
-    } finally {
-      // loadingPromise = null; // Don't clear promise if we are exiting
+      throw e;
     }
   })();
 
-  return loadingPromise;
+  try {
+    return await loadingPromise;
+  } finally {
+    loadingPromise = null;
+  }
 }
 
 function parseBool(value: unknown): boolean {
@@ -110,4 +111,5 @@ function resolvePath(base: string, relative: string): string {
  */
 export function clearSettingsCache(): void {
   cachedSettings = null;
+  loadingPromise = null;
 }
