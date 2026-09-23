@@ -32,6 +32,7 @@ import { useShallow } from 'zustand/react/shallow';
 import type { FSMMachine, FSMTransition, FSMState } from '../types/fsm';
 import { isSpecialStateType } from '../types/fsm';
 import { getTheme } from '../theme/theme';
+import { useCenterNodeSelection } from '../hooks/useCenterNodeSelection';
 
 const theme = getTheme();
 
@@ -275,7 +276,7 @@ export default function FSMEditor(props: FSMEditorProps) {
 }
 
 function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
-    const { screenToFlowPosition, setCenter } = useReactFlow();
+    const { screenToFlowPosition, setCenter, getNodes } = useReactFlow();
     const pendingCenterTarget = useEditorMetaStore(state => state.uiMeta.pendingCenterTarget);
     const setPendingCenterTarget = useEditorMetaStore(state => state.setPendingCenterTarget);
     const setTooltip = useTooltipStore((state) => state.setTooltip);
@@ -398,20 +399,44 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
     }, [machine, fsm, selectedEdgeIds]);
 
     const [nodes, setNodes, onNodesChangeBase] = useNodesState(initialNodes);
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const [edges, setEdges, onEdgesChangeBase] = useEdgesState(initialEdges);
+    const { isSelectingRef, onSelectionStart, onSelectionEnd } = useCenterNodeSelection({
+        getNodes,
+        screenToFlowPosition,
+        setNodes,
+        onSelectionComplete: setSelectedNodes,
+    });
 
     // Read-only mode during debugging
     const isDebugConnected = useDebugStore((s) => s.isConnected);
     const onNodesChange = useCallback(
         (changes: import('@xyflow/react').NodeChange<FSMStateNodeType>[]) => {
             // Filter out modification changes when in read-only debug mode
-            const filteredChanges = isDebugConnected
+            let filteredChanges = isDebugConnected
                 ? changes.filter(c => c.type === 'select' || c.type === 'dimensions')
                 : changes;
+            if (isSelectingRef.current) {
+                filteredChanges = filteredChanges.filter(change => change.type !== 'select');
+            }
             onNodesChangeBase(filteredChanges);
         },
-        [onNodesChangeBase, isDebugConnected]
+        [onNodesChangeBase, isDebugConnected, isSelectingRef]
     );
+
+    const onEdgesChange = useCallback((changes: import('@xyflow/react').EdgeChange<Edge>[]) => {
+        const filteredChanges = isSelectingRef.current
+            ? changes.filter(change => change.type !== 'select')
+            : changes;
+        onEdgesChangeBase(filteredChanges);
+    }, [isSelectingRef, onEdgesChangeBase]);
+
+    const handleSelectionStart = useCallback((event: React.MouseEvent) => {
+        onSelectionStart(event);
+        setEdges(currentEdges => currentEdges.map(edge =>
+            edge.selected ? { ...edge, selected: false } : edge
+        ));
+        setSelectedEdges([]);
+    }, [onSelectionStart, setEdges, setSelectedEdges]);
 
     // Sync store changes to React Flow
     useEffect(() => {
@@ -531,16 +556,16 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
             const isLastEdgesSame = newEdgeIds.length === lastEdgesSorted.length &&
                 newEdgeIds.every((id, idx) => id === lastEdgesSorted[idx]);
 
-            if (!isNodesSame && !isLastNodesSame) {
+            if (!isSelectingRef.current && !isNodesSame && !isLastNodesSame) {
                 lastSelectedNodesRef.current = newNodeIds;
                 setSelectedNodes(newNodeIds);
             }
-            if (!isEdgesSame && !isLastEdgesSame) {
+            if (!isSelectingRef.current && !isEdgesSame && !isLastEdgesSame) {
                 lastSelectedEdgesRef.current = newEdgeIds;
                 setSelectedEdges(newEdgeIds);
             }
         },
-        [setSelectedNodes, setSelectedEdges, selectedNodeIds, selectedEdgeIds]
+        [setSelectedNodes, setSelectedEdges, selectedNodeIds, selectedEdgeIds, isSelectingRef]
     );
 
     // Handle node position changes
@@ -581,15 +606,20 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
     const onKeyDown = useCallback(
         (event: React.KeyboardEvent) => {
             if (event.key === 'Delete' || event.key === 'Backspace') {
-                // Remove selected nodes/edges
-                nodes.filter(n => n.selected).forEach(n => removeState(n.id));
-                edges.filter(e => e.selected && e.id !== 'edge-default').forEach(e => {
+                const selectedIds = getNodes().filter(node => node.selected).map(node => node.id);
+                const selectedEdges = edges.filter(edge => edge.selected && edge.id !== 'edge-default');
+                if (selectedIds.length === 0 && selectedEdges.length === 0) return;
+
+                event.preventDefault();
+                event.stopPropagation();
+                selectedIds.forEach(id => removeState(id));
+                selectedEdges.forEach(e => {
                     const transitions = (e.data as FSMTransitionEdgeData | undefined)?.transitions || [];
                     transitions.forEach(transition => removeTransition(transition.id));
                 });
             }
         },
-        [nodes, edges, removeState, removeTransition]
+        [edges, getNodes, removeState, removeTransition]
     );
 
     // Handle new state with better placement
@@ -635,6 +665,8 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                 onNodeDragStop={onNodeDragStop}
                 onMoveEnd={onMoveEnd}
                 onSelectionChange={onSelectionChange}
+                onSelectionStart={handleSelectionStart}
+                onSelectionEnd={onSelectionEnd}
                 onNodeContextMenu={onNodeContextMenu}
                 onPaneClick={onPaneClick}
 

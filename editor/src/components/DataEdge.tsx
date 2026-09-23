@@ -1,9 +1,7 @@
 import { memo } from 'react';
-import { BaseEdge, type EdgeProps, type Edge, getBezierPath } from '@xyflow/react';
+import { BaseEdge, type EdgeProps, type Edge, getBezierPath, useStore } from '@xyflow/react';
 import { getTheme } from '../theme/theme';
-
-import { useEditorStore } from '../stores/editorStore';
-import { useShallow } from 'zustand/react/shallow';
+import { useSelectionPreviewStore } from '../stores/selectionPreviewStore';
 
 const theme = getTheme();
 
@@ -23,6 +21,8 @@ export type DataEdgeType = Edge<DataEdgeData, 'data'>;
  */
 function DataEdge({
   id,
+  source,
+  target,
   sourceX,
   sourceY,
   targetX,
@@ -44,10 +44,13 @@ function DataEdge({
     targetPosition,
   });
 
-  const isConnectedToSelected = useEditorStore(useShallow((s) =>
-    (edgeData?.fromNodeId && s.selectedNodeIds.includes(edgeData.fromNodeId)) ||
-    (edgeData?.toNodeId && s.selectedNodeIds.includes(edgeData.toNodeId))
-  ));
+  const isConnectedToFlowSelection = useStore((state) =>
+    !!state.nodeLookup.get(source)?.selected || !!state.nodeLookup.get(target)?.selected
+  );
+  const previewSelection = useSelectionPreviewStore((state) =>
+    state.active ? state.nodeIds.has(source) || state.nodeIds.has(target) : null
+  );
+  const isConnectedToSelected = previewSelection ?? isConnectedToFlowSelection;
 
   // Determine stroke color
   let strokeColor = theme.edge.data.default;

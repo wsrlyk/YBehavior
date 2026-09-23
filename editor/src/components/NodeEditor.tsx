@@ -27,6 +27,7 @@ import CustomNode, { type CustomNodeType } from './CustomNode';
 import TreeEdge from './TreeEdge';
 import DataEdge from './DataEdge';
 import type { TreeNode, NodeCategory, Pin } from '../types';
+import { useCenterNodeSelection } from '../hooks/useCenterNodeSelection';
 
 // 注册自定义节点类型
 const nodeTypes = {
@@ -164,7 +165,6 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     nodeId: null,
   });
 
-  const isSelecting = useRef(false);
   const lastSelectNodesIdsRef = useRef<string[]>([]);
 
   // 同步 lastSelectNodesIdsRef 与 store 中的选中状态
@@ -375,7 +375,9 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
 
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        const selectedIds = useEditorStore.getState().selectedNodeIds;
+        // Use the visible React Flow selection directly. This avoids a stale
+        // editor-store selection making a visibly selected node undeletable.
+        const selectedIds = getNodes().filter(node => node.selected).map(node => node.id);
         const selectedEdges = getEdges().filter(edge => edge.selected);
         if (selectedIds.length === 0 && selectedEdges.length === 0) return;
 
@@ -403,15 +405,25 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [duplicateSelectedNodes, removeNodes]);
+  }, [duplicateSelectedNodes, getEdges, getNodes, removeElements, screenToFlowPosition]);
 
 
   const isDebugConnected = useDebugStore((s) => s.isConnected);
+  const { isSelectingRef, onSelectionStart, onSelectionEnd } = useCenterNodeSelection({
+    getNodes,
+    screenToFlowPosition,
+    setNodes,
+    onSelectionComplete: selectNodes,
+  });
+
   const onNodesChange = useCallback((changes: import('@xyflow/react').NodeChange<Node>[]) => {
     // Filter out deletion and other fundamental structure changes when in read-only debug mode
-    const filteredChanges = isDebugConnected
+    let filteredChanges = isDebugConnected
       ? changes.filter(c => c.type === 'select' || c.type === 'dimensions')
       : changes;
+    if (isSelectingRef.current) {
+      filteredChanges = filteredChanges.filter(change => change.type !== 'select');
+    }
 
     onNodesChangeBase(filteredChanges);
 
@@ -424,11 +436,12 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         removeNodes(idsToRemove);
       }
     }
-  }, [onNodesChangeBase, removeNodes, isDebugConnected]);
+  }, [onNodesChangeBase, removeNodes, isDebugConnected, isSelectingRef]);
 
   // Use React Flow's native selection change hook for store synchronization
   useOnSelectionChange({
     onChange: ({ nodes: selectedNodes }) => {
+      if (isSelectingRef.current) return;
       const selectedIds = selectedNodes.map(n => n.id).sort();
       const currentSelected = [...useEditorStore.getState().selectedNodeIds].sort();
 
@@ -441,14 +454,6 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
       }
     },
   });
-
-  const onSelectionStart = useCallback(() => {
-    isSelecting.current = true;
-  }, []);
-
-  const onSelectionEnd = useCallback(() => {
-    isSelecting.current = false;
-  }, []);
 
   const updateNodesPositions = useEditorStore((state) => state.updateNodesPositions);
 
@@ -576,7 +581,10 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
 
   // 自定义 onEdgesChange：处理连接的删除
   const onEdgesChange = useCallback((changes: import('@xyflow/react').EdgeChange<Edge>[]) => {
-    onEdgesChangeBase(changes);
+    const filteredChanges = isSelectingRef.current
+      ? changes.filter(change => change.type !== 'select')
+      : changes;
+    onEdgesChangeBase(filteredChanges);
 
     const connsToRemove: string[] = [];
     const dataConnsToRemove: string[] = [];
@@ -597,7 +605,14 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
     if (dataConnsToRemove.length > 0) {
       removeDataConnections(dataConnsToRemove);
     }
-  }, [onEdgesChangeBase, removeDataConnections, removeConnections]);
+  }, [onEdgesChangeBase, removeDataConnections, removeConnections, isSelectingRef]);
+
+  const handleSelectionStart = useCallback((event: React.MouseEvent) => {
+    onSelectionStart(event);
+    setEdges(currentEdges => currentEdges.map(edge =>
+      edge.selected ? { ...edge, selected: false } : edge
+    ));
+  }, [onSelectionStart, setEdges]);
 
   const onConnect: OnConnect = useCallback(
     async (params) => {
@@ -860,7 +875,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
           onPaneClick?.();
         }}
         onNodeContextMenu={onNodeContextMenu}
-        onSelectionStart={onSelectionStart}
+        onSelectionStart={handleSelectionStart}
         onSelectionEnd={onSelectionEnd}
         fitView={!activeFile?.viewport}
         minZoom={0.08}

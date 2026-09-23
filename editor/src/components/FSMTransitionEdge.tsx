@@ -1,8 +1,6 @@
 import { BaseEdge, EdgeLabelRenderer, getStraightPath, useInternalNode, type EdgeProps, type Edge } from '@xyflow/react';
 import { getTheme } from '../theme/theme';
-
-import { useFSMStore } from '../stores/fsmStore';
-import { useShallow } from 'zustand/react/shallow';
+import { useSelectionPreviewStore } from '../stores/selectionPreviewStore';
 
 const theme = getTheme();
 
@@ -24,11 +22,11 @@ export default function FSMTransitionEdge({
     const sourceNode = useInternalNode(source);
     const targetNode = useInternalNode(target);
 
-    const isConnectedToSelected = useFSMStore(useShallow((s) =>
-        s.selectedNodeIds.includes(source) || s.selectedNodeIds.includes(target)
-    ));
-
     if (!sourceNode || !targetNode) return null;
+    const previewSelection = useSelectionPreviewStore((state) =>
+        state.active ? state.nodeIds.has(source) || state.nodeIds.has(target) : null
+    );
+    const isConnectedToSelected = previewSelection ?? (!!sourceNode.selected || !!targetNode.selected);
 
     // Calculate true centers from node dimensions and position
     const sx_center = sourceNode.internals.positionAbsolute.x + (sourceNode.measured.width ?? 0) / 2;
@@ -91,7 +89,7 @@ export default function FSMTransitionEdge({
                 path={edgePath}
                 style={{
                     ...style,
-                    strokeWidth: selected ? 3 : 2,
+                    strokeWidth: (selected || isConnectedToSelected) ? 3 : 2,
                     stroke: color,
                 }}
             />

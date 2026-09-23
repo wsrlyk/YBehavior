@@ -7,6 +7,7 @@ import { NodeState } from '../types/debug';
 import { getTheme } from '../theme/theme';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import type { TreeNode } from '../types';
+import { useSelectionPreviewStore } from '../stores/selectionPreviewStore';
 
 const theme = getTheme();
 
@@ -123,9 +124,14 @@ function TreeEdge({
     })
   );
 
-  const isConnectedToSelected = useEditorStore(useShallow((s) =>
-    s.selectedNodeIds.includes(source) || s.selectedNodeIds.includes(target)
-  ));
+  // Read endpoint selection from React Flow so marquee feedback updates immediately.
+  const isConnectedToFlowSelection = useStore((state) =>
+    !!state.nodeLookup.get(source)?.selected || !!state.nodeLookup.get(target)?.selected
+  );
+  const previewSelection = useSelectionPreviewStore((state) =>
+    state.active ? state.nodeIds.has(source) || state.nodeIds.has(target) : null
+  );
+  const isConnectedToSelected = previewSelection ?? isConnectedToFlowSelection;
 
   const getEdgeColor = (state: NodeState) => {
     if (edgeData?.isEffectivelyDisabled) {
