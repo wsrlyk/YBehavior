@@ -1,3 +1,5 @@
+import { useSyncExternalStore } from 'react';
+
 /**
  * Centralized Theme System
  * 
@@ -25,9 +27,9 @@ export interface GraphTheme {
 
     /** Edge colors */
     edge: {
-        tree: { default: string; selected: string };
-        data: { default: string; selected: string };
-        fsmTransition: { default: string; selected: string };
+        tree: { default: string; related: string; hover: string; selected: string };
+        data: { default: string; related: string; hover: string; selected: string };
+        fsmTransition: { default: string; related: string; hover: string; selected: string };
         defaultState: string;
         label: { bg: string; border: string; text: string };
     };
@@ -79,8 +81,18 @@ export interface GraphTheme {
         gridDots: string;     // Canvas dot pattern
         accent: string;       // Primary interactive accent
         accentSoft: string;   // Soft accent background
+        nodeSelection: string;
+        nodeSelectionGap: string;
         buttonBg: string;     // Neutral button background
         buttonHoverBg: string;
+        inspectorRootBg: string;
+        inspectorContentBg: string;
+        inspectorHeaderBg: string;
+        inspectorHeaderBorder: string;
+        inspectorRowAltBg: string;
+        inspectorRowHoverBg: string;
+        inspectorSeparator: string;
+        inspectorInputBorder: string;
         tabBarBg: string;
         tabActiveBg: string;
         tabInactiveBg: string;
@@ -115,11 +127,11 @@ export const DefaultTheme: GraphTheme = {
     // --- BT Node Categories ---
     // --- BT Node Categories ---
     node: {
-        composite: '#9DB0C5',
-        decorator: '#A1B9A8',
-        action: '#C7B89F',
-        condition: '#A9A1B8',
-        default: '#9DB0C5',
+        composite: '#91AAC1',
+        decorator: '#98B5A2',
+        action: '#C5AE89',
+        condition: '#B09BB9',
+        default: '#A5ACB2',
     },
 
     // --- Pin Dot Colors ---
@@ -155,18 +167,24 @@ export const DefaultTheme: GraphTheme = {
     // --- Edge Colors ---
     edge: {
         tree: {
-            default: '#8B8B8B',
-            selected: '#1D1D1D',
+            default: '#AEB4B8',
+            related: '#3F647A',
+            hover: '#2C536B',
+            selected: '#172F3F',
         },
         data: {
-            default: '#7A7A7A',
-            selected: '#1D1D1D',
+            default: '#879EAD',
+            related: '#2E6F91',
+            hover: '#1F5B7B',
+            selected: '#174762',
         },
         fsmTransition: {
-            default: '#B8B8B8',
-            selected: '#D5A15A',
+            default: '#9CA4AA',
+            related: '#C47A2A',
+            hover: '#A95F17',
+            selected: '#8E4C0E',
         },
-        defaultState: '#B57A3C',
+        defaultState: '#A96122',
         label: {
             bg: '#D6D6D6',
             border: '#9A9A9A',
@@ -176,12 +194,12 @@ export const DefaultTheme: GraphTheme = {
 
     // --- FSM State Colors ---
     fsmState: {
-        Normal: { bg: '#BFBFBF', border: '#888888' },
-        Meta: { bg: '#BBA8BE', border: '#7F6D86' },
-        Entry: { bg: '#AFC2B3', border: '#6F8A79' },
-        Exit: { bg: '#CDA7A7', border: '#8F6666' },
-        Any: { bg: '#C8BE9F', border: '#8B7A58' },
-        Upper: { bg: '#AEB8C8', border: '#6D7B90' },
+        Normal: { bg: '#BFC3C6', border: '#737A80' },
+        Meta: { bg: '#B9A5BE', border: '#77637E' },
+        Entry: { bg: '#A7BEAC', border: '#607B68' },
+        Exit: { bg: '#C6A0A0', border: '#855D5D' },
+        Any: { bg: '#C3B992', border: '#81734D' },
+        Upper: { bg: '#A7B3C3', border: '#63738A' },
     },
 
     // --- Debug Colors ---
@@ -231,30 +249,40 @@ export const DefaultTheme: GraphTheme = {
     },
 
     handle: {
-        bg: '#6E6E6E',
-        hoverBg: '#1D1D1D',
+        bg: '#9DA5AA',
+        hoverBg: '#314B5C',
     },
 
     // --- UI Chrome ---
     ui: {
         background: '#747474',
         panelBg: '#C8C8C8',
-        border: '#6E6E6E',
+        border: '#74797D',
         textMain: '#0A0A0A',
         textDim: '#2F2F2F',
-        inputBg: '#FFFFFF',
+        inputBg: '#FAFAFA',
         gridDots: '#8A8A8A',
-        accent: '#696969',
-        accentSoft: '#DADADA',
-        buttonBg: '#E3E3E3',
-        buttonHoverBg: '#EFEFEF',
+        accent: '#4F6675',
+        accentSoft: '#B7C2C9',
+        nodeSelection: '#183F56',
+        nodeSelectionGap: '#E8ECEE',
+        buttonBg: '#DEDEDE',
+        buttonHoverBg: '#F0F0F0',
+        inspectorRootBg: '#AEB4B7',
+        inspectorContentBg: '#C8CCCE',
+        inspectorHeaderBg: '#AAB1B5',
+        inspectorHeaderBorder: '#7E878C',
+        inspectorRowAltBg: '#CED2D4',
+        inspectorRowHoverBg: '#D8E0E4',
+        inspectorSeparator: '#ABB1B4',
+        inspectorInputBorder: '#858D92',
         tabBarBg: '#7F7F7F',
         tabActiveBg: '#ACACAC',
         tabInactiveBg: '#7F7F7F',
         tabActiveText: '#111111',
         tabInactiveText: '#F2F2F2',
         tabBorder: '#8A8A8A',
-        splitterHover: '#696969',
+        splitterHover: '#4F6675',
         terminalBg: '#121212',
         terminalText: '#F5F5F5',
         terminalHeaderBg: '#2A2A2A',
@@ -313,6 +341,8 @@ function syncObjectInPlace(target: Record<string, unknown>, source: Record<strin
 }
 
 let activeTheme: GraphTheme = cloneTheme(DefaultTheme);
+let themeVersion = 0;
+const themeListeners = new Set<() => void>();
 
 export function getTheme(): GraphTheme {
     return activeTheme;
@@ -320,6 +350,19 @@ export function getTheme(): GraphTheme {
 
 export function setTheme(theme: GraphTheme) {
     syncObjectInPlace(activeTheme as unknown as Record<string, unknown>, theme as unknown as Record<string, unknown>);
+    applyThemeCssVariables(activeTheme);
+    themeVersion++;
+    themeListeners.forEach((listener) => listener());
+}
+
+function subscribeTheme(listener: () => void) {
+    themeListeners.add(listener);
+    return () => themeListeners.delete(listener);
+}
+
+export function useTheme(): GraphTheme {
+    useSyncExternalStore(subscribeTheme, () => themeVersion, () => themeVersion);
+    return activeTheme;
 }
 
 export function applyThemeCssVariables(theme: GraphTheme = activeTheme) {

@@ -160,11 +160,6 @@ textarea {
   text-align: left;
 }
 
-/* 连线悬停效果 */
-.react-flow__edge:hover path {
-  stroke: var(--tb-ui-accent) !important;
-}
-
 /* 搜索跳转高亮动画 */
 @keyframes pulse-subtle {
 

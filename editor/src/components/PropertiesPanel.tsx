@@ -9,15 +9,13 @@ import { useTooltipStore } from '../stores/tooltipStore';
 import { logger } from '../utils/logger';
 import { useDebugStore } from '../stores/debugStore';
 import { useShallow } from 'zustand/react/shallow';
-import { getTheme } from '../theme/theme';
+import { useTheme, type GraphTheme } from '../theme/theme';
 import { stripExtension } from '../utils/fileUtils';
 import { TreeFilePicker } from './TreeFilePicker';
 
-const theme = getTheme();
-
-const TYPE_COLORS: Record<ValueType, string> = (() => {
+function resolveTypeColor(theme: GraphTheme, valueType: string): string {
   const tc = theme.text.typeColors;
-  return {
+  const typeColors: Record<ValueType, string> = {
     int: tc.int || theme.ui.accent,
     float: tc.float || theme.ui.success,
     bool: tc.bool || theme.ui.danger,
@@ -27,21 +25,18 @@ const TYPE_COLORS: Record<ValueType, string> = (() => {
     ulong: tc.ulong || theme.ui.textDim,
     enum: tc.enum || theme.ui.warning,
   };
-})();
-
-function resolveTypeColor(valueType: string): string {
   const normalized = valueType.toLowerCase();
 
-  if (normalized.includes('enum')) return TYPE_COLORS.enum;
-  if (normalized.includes('int')) return TYPE_COLORS.int;
-  if (normalized.includes('float')) return TYPE_COLORS.float;
-  if (normalized.includes('bool')) return TYPE_COLORS.bool;
-  if (normalized.includes('string')) return TYPE_COLORS.string;
-  if (normalized.includes('vector3')) return TYPE_COLORS.vector3;
-  if (normalized.includes('entity')) return TYPE_COLORS.entity;
-  if (normalized.includes('ulong')) return TYPE_COLORS.ulong;
+  if (normalized.includes('enum')) return typeColors.enum;
+  if (normalized.includes('int')) return typeColors.int;
+  if (normalized.includes('float')) return typeColors.float;
+  if (normalized.includes('bool')) return typeColors.bool;
+  if (normalized.includes('string')) return typeColors.string;
+  if (normalized.includes('vector3')) return typeColors.vector3;
+  if (normalized.includes('entity')) return typeColors.entity;
+  if (normalized.includes('ulong')) return typeColors.ulong;
 
-  return TYPE_COLORS[normalized as ValueType] || TYPE_COLORS[valueType as ValueType] || theme.ui.textDim;
+  return typeColors[normalized as ValueType] || typeColors[valueType as ValueType] || theme.ui.textDim;
 }
 
 const VALUE_TYPES: ValueType[] = ['int', 'float', 'bool', 'string', 'vector3', 'entity', 'ulong'];
@@ -69,6 +64,7 @@ function AdaptiveSelect({ value, options, onChange, renderLabel, getOptionColor,
   containerClassName?: string;
   disabled?: boolean;
 }) {
+  const theme = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -145,9 +141,10 @@ function AdaptiveSelect({ value, options, onChange, renderLabel, getOptionColor,
 type VarAction = 'none' | 'renaming' | 'toggling' | 'deleting';
 
 function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingNames, debugValue, isChanged, isPaused }: VariableItemProps) {
+  const theme = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(variable.defaultValue);
-  const colorClass = resolveTypeColor(variable.valueType);
+  const colorClass = resolveTypeColor(theme, variable.valueType);
   const isArray = variable.countType === 'list';
   const notify = useNotificationStore(state => state.notify);
 
@@ -295,7 +292,7 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
         <div
           key={isPaused ? 'paused' : debugValue} // Restart animation on value change
           className={`absolute inset-0 rounded pointer-events-none ${!isPaused ? 'animate-debug-flash' : ''}`}
-          style={{ backgroundColor: `${theme.ui.success}33` }}
+          style={{ backgroundColor: `color-mix(in srgb, ${theme.ui.success} 20%, transparent)` }}
         />
       )}
       <div className="flex items-center gap-1 min-w-0">
@@ -305,7 +302,7 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
           onChange={(val) => handleTypeChange(val as ValueType)}
           baseClassName="text-xs"
           triggerColor={colorClass}
-          getOptionColor={(opt: string) => resolveTypeColor(opt)}
+          getOptionColor={(opt: string) => resolveTypeColor(theme, opt)}
         />
 
         <button
@@ -322,7 +319,7 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
           <div className="flex items-center flex-1 min-w-0 gap-1">
             <input
               className="flex-1 min-w-0 text-xs px-1 py-0.5 rounded outline-none border"
-              style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
+               style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }}
               value={renameName}
               onChange={(e) => setRenameName(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmRename(); if (e.key === 'Escape') setAction('none'); }}
@@ -365,7 +362,7 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
                 <input
                   className="w-full text-xs px-1 py-0.5 rounded border outline-none"
                   style={validateValue(editValue, variable.valueType, variable.countType).isValid
-                    ? { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }
+                    ? { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }
                     : { backgroundColor: theme.ui.danger, color: theme.ui.terminalButtonText, borderColor: theme.ui.danger }}
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
@@ -384,7 +381,7 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
                 <span
                   className="block w-full text-xs truncate cursor-pointer px-1 py-0.5 rounded border"
                   style={isValid
-                    ? { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }
+                    ? { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }
                     : { backgroundColor: theme.ui.danger, color: theme.ui.terminalButtonText, borderColor: theme.ui.danger }}
                   onClick={() => { setEditValue(variable.defaultValue); setIsEditing(true); }}
                 >
@@ -400,6 +397,7 @@ function VariableItem({ variable, onUpdate, onDelete, onToggleScope, siblingName
 }
 
 function AddVariableButton({ isLocal, onAdd }: { isLocal: boolean; onAdd: (v: Variable) => void }) {
+  const theme = useTheme();
   const [isAdding, setIsAdding] = useState(false);
   const [name, setName] = useState('');
   const notify = useNotificationStore(state => state.notify);
@@ -476,7 +474,8 @@ interface InterfacePinItemProps {
 }
 
 function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localVars }: InterfacePinItemProps) {
-  const colorClass = resolveTypeColor(pin.valueType);
+  const theme = useTheme();
+  const colorClass = resolveTypeColor(theme, pin.valueType);
   const isArray = pin.countType === 'list';
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -555,7 +554,7 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
           })}
           baseClassName="text-xs"
           triggerColor={colorClass}
-          getOptionColor={(opt: string) => resolveTypeColor(opt)}
+          getOptionColor={(opt: string) => resolveTypeColor(theme, opt)}
         />
 
         <button
@@ -606,7 +605,7 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
           {isInput || pin.binding.type === 'variable' ? (
             <select
               className="flex-1 text-[11px] px-1 py-0.5 rounded outline-none border"
-              style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
+              style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }}
               value={pin.binding.value ? `${pin.binding.isLocal ? 'local' : 'shared'}:${pin.binding.value}` : ''}
               onChange={(e) => {
                 const [scope, name] = e.target.value.split(':');
@@ -673,14 +672,14 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
             {pin.vectorIndex?.type === 'const' ? (
               <input
                 className="flex-1 text-[11px] px-1 py-0.5 rounded outline-none border"
-                style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
+                style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }}
                 value={pin.vectorIndex.value}
                 onChange={(e) => onUpdate(pin.id, { vectorIndex: { type: 'const', value: e.target.value } })}
               />
             ) : (
               <select
                 className="flex-1 text-[11px] px-1 py-0.5 rounded outline-none border"
-                style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
+                style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }}
                 value={pin.vectorIndex ? `${pin.vectorIndex.isLocal ? 'local' : 'shared'}:${pin.vectorIndex.variableName}` : ''}
                 onChange={(e) => {
                   const [scope, name] = e.target.value.split(':');
@@ -699,6 +698,7 @@ function InterfacePinItem({ pin, isInput, onUpdate, onDelete, sharedVars, localV
 }
 
 function AddInterfacePinButton({ isInput, onAdd }: { isInput: boolean; onAdd: (name: string) => void }) {
+  const theme = useTheme();
   const [isAdding, setIsAdding] = useState(false);
   const [name, setName] = useState('');
 
@@ -715,7 +715,7 @@ function AddInterfacePinButton({ isInput, onAdd }: { isInput: boolean; onAdd: (n
       <div className="flex items-center gap-1 mt-2 p-1.5 rounded border" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
         <input
           className="flex-1 text-xs px-2 py-1 rounded outline-none border"
-          style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
+          style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }}
           placeholder="Pin name"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -741,6 +741,7 @@ function AddInterfacePinButton({ isInput, onAdd }: { isInput: boolean; onAdd: (n
 }
 
 export function PropertiesPanel() {
+  const theme = useTheme();
   const activeTab = useEditorMetaStore(state => state.uiMeta.activePropertiesTab);
   const setActiveTab = useEditorMetaStore(state => state.setActivePropertiesTab);
   const focusTarget = useEditorMetaStore(state => state.uiMeta.focusTarget);
@@ -854,16 +855,18 @@ export function PropertiesPanel() {
   }, [focusTarget, setFocusTarget]);
 
   return (
-    <div className="h-full border-l flex flex-col" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
+    <div className="h-full border-l flex flex-col" style={{ backgroundColor: theme.ui.inspectorRootBg, borderColor: theme.ui.inspectorHeaderBorder }}>
       {/* Top Section: Data (Vars/IO) */}
-      <div className="flex-1 flex flex-col min-h-0 border-b" style={{ borderColor: theme.ui.border }}>
-        <div className="flex shrink-0" style={{ backgroundColor: theme.ui.tabBarBg }}>
+      <div className="flex-1 flex flex-col min-h-0 border-b" style={{ borderColor: theme.ui.inspectorHeaderBorder, backgroundColor: theme.ui.inspectorContentBg }}>
+        <div className="flex shrink-0 border-b" style={{ backgroundColor: theme.ui.inspectorHeaderBg, borderColor: theme.ui.inspectorHeaderBorder }}>
           <button
             className="flex-1 py-1.5 text-[9px] uppercase tracking-wider font-bold transition-all"
             style={{
               color: activeTab === 'variables' ? theme.ui.tabActiveText : theme.ui.tabInactiveText,
-              backgroundColor: activeTab === 'variables' ? theme.ui.panelBg : theme.ui.tabInactiveBg,
-              border: 'none'
+              backgroundColor: activeTab === 'variables' ? theme.ui.inspectorContentBg : theme.ui.inspectorHeaderBg,
+              border: 'none',
+              borderTop: `2px solid ${activeTab === 'variables' ? theme.ui.accent : 'transparent'}`,
+              borderRight: `1px solid ${theme.ui.inspectorSeparator}`
             }}
             onClick={() => setActiveTab('variables')}
           >
@@ -873,8 +876,9 @@ export function PropertiesPanel() {
             className="flex-1 py-1.5 text-[9px] uppercase tracking-wider font-bold transition-all"
             style={{
               color: activeTab === 'io' ? theme.ui.tabActiveText : theme.ui.tabInactiveText,
-              backgroundColor: activeTab === 'io' ? theme.ui.panelBg : theme.ui.tabInactiveBg,
-              border: 'none'
+              backgroundColor: activeTab === 'io' ? theme.ui.inspectorContentBg : theme.ui.inspectorHeaderBg,
+              border: 'none',
+              borderTop: `2px solid ${activeTab === 'io' ? theme.ui.accent : 'transparent'}`
             }}
             onClick={() => setActiveTab('io')}
           >
@@ -882,19 +886,19 @@ export function PropertiesPanel() {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 scrollbar-thin" style={{ backgroundColor: theme.ui.inspectorContentBg }}>
           {activeTab === 'variables' ? (
             <>
               {/* Shared Variables */}
               <div className="mb-4">
-                <div className="flex items-center justify-between mb-1 px-1">
-                  <div className="text-[11px] font-bold uppercase tracking-tight" style={{ color: theme.ui.textDim }}>Shared</div>
+                <div className="flex items-center justify-between px-2 h-6 border-y" style={{ backgroundColor: theme.ui.inspectorHeaderBg, borderColor: theme.ui.inspectorHeaderBorder }}>
+                  <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: theme.ui.textMain }}>Shared Variables</div>
                   <AddVariableButton isLocal={false} onAdd={handleAddShared} />
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col border-b" style={{ borderColor: theme.ui.inspectorSeparator }}>
                   {sharedVariables.map((v, index) => (
-                    <div key={v.name}>
-                      {index > 0 && <div className="h-px" style={{ backgroundColor: theme.ui.border, opacity: 0.45 }} />}
+                    <div key={v.name} style={{ backgroundColor: index % 2 ? theme.ui.inspectorRowAltBg : theme.ui.inspectorContentBg }}>
+                      {index > 0 && <div className="h-px" style={{ backgroundColor: theme.ui.inspectorSeparator }} />}
                       <VariableItem
                         variable={v}
                         onUpdate={handleUpdateShared}
@@ -912,14 +916,14 @@ export function PropertiesPanel() {
 
               {/* Local Variables */}
               <div>
-                <div className="flex items-center justify-between mb-1 px-1">
-                  <div className="text-[11px] font-bold uppercase tracking-tight" style={{ color: theme.ui.textDim }}>Local</div>
+                <div className="flex items-center justify-between px-2 h-6 border-y" style={{ backgroundColor: theme.ui.inspectorHeaderBg, borderColor: theme.ui.inspectorHeaderBorder }}>
+                  <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: theme.ui.textMain }}>Local Variables</div>
                   <AddVariableButton isLocal={true} onAdd={handleAddLocal} />
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col border-b" style={{ borderColor: theme.ui.inspectorSeparator }}>
                   {localVariables.map((v, index) => (
-                    <div key={v.name}>
-                      {index > 0 && <div className="h-px" style={{ backgroundColor: theme.ui.border, opacity: 0.45 }} />}
+                    <div key={v.name} style={{ backgroundColor: index % 2 ? theme.ui.inspectorRowAltBg : theme.ui.inspectorContentBg }}>
+                      {index > 0 && <div className="h-px" style={{ backgroundColor: theme.ui.inspectorSeparator }} />}
                       <VariableItem
                         variable={v}
                         onUpdate={handleUpdateLocal}
@@ -939,14 +943,14 @@ export function PropertiesPanel() {
             <>
               {/* Inputs */}
               <div className="mb-4">
-                <div className="flex items-center justify-between mb-1 px-1">
-                  <div className="text-[11px] font-bold uppercase tracking-tight" style={{ color: theme.ui.textDim }}>Inputs</div>
+                <div className="flex items-center justify-between px-2 h-6 border-y" style={{ backgroundColor: theme.ui.inspectorHeaderBg, borderColor: theme.ui.inspectorHeaderBorder }}>
+                  <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: theme.ui.textMain }}>Inputs</div>
                   <AddInterfacePinButton isInput={true} onAdd={(name) => handleAddInterfacePin(true, name)} />
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col border-b" style={{ borderColor: theme.ui.inspectorSeparator }}>
                   {inputs.map((pin, index) => (
-                    <div key={pin.id}>
-                      {index > 0 && <div className="h-px" style={{ backgroundColor: theme.ui.border, opacity: 0.45 }} />}
+                    <div key={pin.id} style={{ backgroundColor: index % 2 ? theme.ui.inspectorRowAltBg : theme.ui.inspectorContentBg }}>
+                      {index > 0 && <div className="h-px" style={{ backgroundColor: theme.ui.inspectorSeparator }} />}
                       <InterfacePinItem
                         pin={pin}
                         isInput={true}
@@ -962,14 +966,14 @@ export function PropertiesPanel() {
 
               {/* Outputs */}
               <div>
-                <div className="flex items-center justify-between mb-1 px-1">
-                  <div className="text-[11px] font-bold uppercase tracking-tight" style={{ color: theme.ui.textDim }}>Outputs</div>
+                <div className="flex items-center justify-between px-2 h-6 border-y" style={{ backgroundColor: theme.ui.inspectorHeaderBg, borderColor: theme.ui.inspectorHeaderBorder }}>
+                  <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: theme.ui.textMain }}>Outputs</div>
                   <AddInterfacePinButton isInput={false} onAdd={(name) => handleAddInterfacePin(false, name)} />
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col border-b" style={{ borderColor: theme.ui.inspectorSeparator }}>
                   {outputs.map((pin, index) => (
-                    <div key={pin.id}>
-                      {index > 0 && <div className="h-px" style={{ backgroundColor: theme.ui.border, opacity: 0.45 }} />}
+                    <div key={pin.id} style={{ backgroundColor: index % 2 ? theme.ui.inspectorRowAltBg : theme.ui.inspectorContentBg }}>
+                      {index > 0 && <div className="h-px" style={{ backgroundColor: theme.ui.inspectorSeparator }} />}
                       <InterfacePinItem
                         pin={pin}
                         isInput={false}
@@ -988,11 +992,11 @@ export function PropertiesPanel() {
       </div>
 
       {/* Bottom Section: Node Properties */}
-      <div className="flex-1 flex flex-col min-h-0">
-        <div className="px-3 py-1.5 text-[9px] uppercase tracking-widest font-black border-b shrink-0" style={{ backgroundColor: theme.ui.panelBg, color: theme.ui.textDim, borderColor: theme.ui.border }}>
+      <div className="flex-1 flex flex-col min-h-0" style={{ backgroundColor: theme.ui.inspectorContentBg }}>
+        <div className="px-3 h-7 flex items-center text-[10px] uppercase tracking-widest font-black border-y shrink-0" style={{ backgroundColor: theme.ui.inspectorHeaderBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorHeaderBorder }}>
           Node Properties
         </div>
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 scrollbar-thin" style={{ backgroundColor: theme.ui.inspectorContentBg }}>
           {selectedNodeIds.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-[11px] text-center px-4 space-y-2" style={{ color: theme.ui.textDim }}>
               <span className="text-2xl opacity-20">🖱️</span>
@@ -1014,6 +1018,7 @@ export function PropertiesPanel() {
 
 // 节点属性编辑器
 function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
+  const theme = useTheme();
   // 优化：直接订阅
   const currentTree = useEditorStore((state) => state.getCurrentTree());
   const updatePin = useEditorStore((state) => state.updatePin);
@@ -1080,7 +1085,7 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
   return (
     <div className="space-y-2">
       {/* 节点类型 */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between px-2 h-7 border-y" style={{ backgroundColor: theme.ui.inspectorHeaderBg, borderColor: theme.ui.inspectorHeaderBorder }}>
         <div
           className="text-sm font-medium"
           style={{ color: theme.ui.textMain }}
@@ -1101,9 +1106,9 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
       </div>
 
       {/* Return 属性 */}
-      <div className="flex items-center gap-1">
-        <div className="text-[11px] w-12 shrink-0" style={{ color: theme.ui.textDim }}>Return</div>
-        <div className="flex-1 h-5 rounded px-1 border flex items-center" style={{ backgroundColor: theme.ui.inputBg, borderColor: theme.ui.border }}>
+      <div className="flex items-center gap-1 min-h-6 border-b" style={{ borderColor: theme.ui.inspectorSeparator }}>
+        <div className="text-[11px] w-16 shrink-0 px-1" style={{ color: theme.ui.textDim }}>Return</div>
+        <div className="flex-1 h-5 rounded-sm px-1 border flex items-center" style={{ backgroundColor: theme.ui.inputBg, borderColor: theme.ui.inspectorInputBorder }}>
           <AdaptiveSelect
             value={node.returnType || 'Default'}
             options={['Default', 'Invert', 'Success', 'Failure']}
@@ -1117,10 +1122,11 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
       </div>
 
       {/* Nickname */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 min-h-6 border-b" style={{ borderColor: theme.ui.inspectorSeparator }}>
+        <div className="text-[11px] w-16 shrink-0 px-1" style={{ color: theme.ui.textDim }}>Nickname</div>
         <input
-          className="flex-1 h-5 leading-5 text-xs px-1 rounded outline-none border"
-          style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
+          className="flex-1 h-5 leading-5 text-xs px-1 rounded-sm outline-none border"
+          style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }}
           value={node.nickname || ''}
           onChange={(e) => updateNodeProperty(nodeId, { nickname: e.target.value })}
           placeholder="Nickname..."
@@ -1128,10 +1134,11 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
       </div>
 
       {/* 注释 */}
-      <div>
+      <div className="flex items-start gap-1 border-b pb-1" style={{ borderColor: theme.ui.inspectorSeparator }}>
+        <div className="text-[11px] w-16 shrink-0 px-1 pt-0.5" style={{ color: theme.ui.textDim }}>Comment</div>
         <textarea
-          className="w-full text-xs px-1 py-0.5 rounded outline-none resize-none overflow-hidden"
-          style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain }}
+          className="flex-1 text-xs px-1 py-0.5 rounded-sm outline-none resize-none overflow-hidden border"
+          style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }}
           value={node.comment || ''}
           onChange={(e) => {
             updateNodeProperty(nodeId, { comment: e.target.value });
@@ -1154,7 +1161,7 @@ function NodePropertiesEditor({ nodeId }: { nodeId: string }) {
       <div className="pt-1">
         {renderPinList(inputPins)}
         {inputPins.length > 0 && outputPins.length > 0 && (
-          <div className="h-px mb-1" style={{ backgroundColor: theme.ui.border, opacity: 0.45 }} />
+          <div className="h-1.5 border-y mb-1" style={{ backgroundColor: theme.ui.inspectorHeaderBg, borderColor: theme.ui.inspectorHeaderBorder }} />
         )}
         {renderPinList(outputPins)}
       </div>
@@ -1179,6 +1186,7 @@ interface PinEditorProps {
 }
 
 const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, sharedVars, localVars, dataConnection, onUpdate }: PinEditorProps) {
+  const theme = useTheme();
   const treeFiles = useEditorStore(state => state.treeFiles);
   const reloadSubTreePins = useEditorStore(state => state.reloadSubTreePins);
   const removeDataConnection = useEditorStore((state) => state.removeDataConnection);
@@ -1203,7 +1211,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
     setVectorIndexValue(pin.vectorIndex?.type === 'const' ? pin.vectorIndex.value : '');
   }, [pin.name, pin.binding, pin.vectorIndex, isEditing]);
 
-  const colorClass = resolveTypeColor(pin.valueType);
+  const colorClass = resolveTypeColor(theme, pin.valueType);
   const bindingType = pin.binding.type;  // 'const' | 'pointer'
   const isEnabled = pin.enableType !== 'disable';
   const canToggleEnable = pin.enableType !== 'fixed';
@@ -1365,8 +1373,8 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
 
   return (
     <div
-      className={`text-xs rounded p-1 ${!isEnabled ? 'opacity-50' : ''}`}
-      style={{ backgroundColor: theme.ui.panelBg }}
+      className={`text-xs p-1 border-b ${!isEnabled ? 'opacity-50' : ''}`}
+      style={{ backgroundColor: theme.ui.inspectorContentBg, borderColor: theme.ui.inspectorSeparator }}
       onMouseEnter={() => pin.desc && setTooltip(pin.desc)}
       onMouseLeave={() => setTooltip(null)}
     >
@@ -1408,7 +1416,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
           }}
           baseClassName="text-[11px] font-semibold"
           triggerColor={colorClass}
-          getOptionColor={(opt: string) => resolveTypeColor(opt)}
+          getOptionColor={(opt: string) => resolveTypeColor(theme, opt)}
           disabled={pin.allowedValueTypes.length <= 1}
         />
 
@@ -1454,7 +1462,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
             <div className="relative">
               <select
                 className="w-full text-xs px-1 py-0.5 rounded outline-none appearance-none truncate pr-3 border"
-                style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
+                style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }}
                 value={(() => {
                   if (isDataConnection) return 'data';
                   if (pin.binding.type === 'pointer') {
@@ -1513,7 +1521,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
               (Entity: Read-only)
             </span>
           ) : pin.valueType === 'enum' && pin.enumValues && pin.enumValues.length > 0 ? (
-            <div className="w-full rounded px-1 py-0.5 border" style={{ backgroundColor: theme.ui.inputBg, borderColor: theme.ui.border }}>
+            <div className="w-full rounded-sm px-1 py-0.5 border" style={{ backgroundColor: theme.ui.inputBg, borderColor: theme.ui.inspectorInputBorder }}>
               <AdaptiveSelect
                 value={(pin.binding.type === 'const' ? pin.binding.value : editValue) || pin.enumValues[0]}
                 options={pin.enumValues || []}
@@ -1543,7 +1551,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
                   <input
                     className="w-full h-5 leading-5 text-xs px-1 rounded border outline-none"
                     style={validateValue(editValue, pin.valueType, pin.countType).isValid
-                      ? { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }
+                      ? { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }
                       : { backgroundColor: theme.ui.danger, color: theme.ui.terminalButtonText, borderColor: theme.ui.danger }}
                     value={editValue}
                     onChange={(e) => handleValueChange(e.target.value)}
@@ -1558,7 +1566,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
               <span
                 className="block w-full h-5 leading-5 text-xs truncate cursor-pointer transition-opacity px-1 rounded border"
                 style={currentPinValidation.isValid
-                  ? { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }
+                  ? { backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }
                   : { backgroundColor: theme.ui.danger, color: theme.ui.terminalButtonText, borderColor: theme.ui.danger }}
                 onMouseEnter={() => {
                   if (pin.binding.type === 'const') {
@@ -1612,7 +1620,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
           {pin.vectorIndex?.type === 'const' ? (
             <input
               className="flex-1 text-xs px-1 py-0.5 rounded outline-none border"
-              style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
+              style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }}
               value={vectorIndexValue}
               onChange={(e) => handleVectorIndexChange(e.target.value)}
               placeholder="0"
@@ -1620,7 +1628,7 @@ const PinEditor = memo(function PinEditor({ pin, nodeId, nodeUid, nodeType, shar
           ) : (
             <select
               className="flex-1 text-xs px-1 py-0.5 rounded outline-none border"
-              style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.border }}
+              style={{ backgroundColor: theme.ui.inputBg, color: theme.ui.textMain, borderColor: theme.ui.inspectorInputBorder }}
               value={(() => {
                 if (pin.vectorIndex?.type === 'pointer') {
                   return `${pin.vectorIndex.isLocal ? 'local' : 'shared'}:${pin.vectorIndex.variableName}`;

@@ -8,24 +8,10 @@ import { NodeState, BreakpointType } from '../types/debug';
 import { useDebugStore } from '../stores/debugStore';
 import { useEditorStore } from '../stores/editorStore';
 import { useShallow } from 'zustand/react/shallow';
-import { getTheme } from '../theme/theme';
-
-const theme = getTheme();
-
-const NODE_COLORS = theme.node;
-const PIN_COLORS = theme.pin;
+import { useTheme } from '../theme/theme';
 
 import { stripExtension } from '../utils/fileUtils';
 import { TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
-
-// Debug state colors for node visualization
-const DEBUG_STATE_COLORS: Record<NodeState, { border: string; glow: string } | null> = {
-  [NodeState.Invalid]: null,
-  [NodeState.Success]: theme.debug.success,
-  [NodeState.Failure]: theme.debug.failure,
-  [NodeState.Break]: theme.debug.break,
-  [NodeState.Running]: theme.debug.running,
-};
 
 type CustomNodeData = {
   label: string;
@@ -55,8 +41,9 @@ function getPinNoteValue(pin: Pin): string {
 }
 
 function PinRow({ pin, isInput, dragging, isDisabled }: { pin: Pin; isInput: boolean; dragging?: boolean; isDisabled?: boolean }) {
+  const theme = useTheme();
   const setTooltip = useTooltipStore((state) => state.setTooltip);
-  const pinColor = PIN_COLORS[pin.valueType] || PIN_COLORS.default || theme.ui.border;
+  const pinColor = theme.pin[pin.valueType] || theme.pin.default || theme.ui.border;
   const binding = pin.binding;
 
   const getVectorIndexDisplay = () => {
@@ -116,6 +103,7 @@ function PinRow({ pin, isInput, dragging, isDisabled }: { pin: Pin; isInput: boo
 }
 
 function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
+  const theme = useTheme();
   const setTooltip = useTooltipStore((state) => state.setTooltip);
   const getDefinition = useNodeDefinitionStore((state) => state.getDefinition);
   const { label, treeNode } = data;
@@ -150,7 +138,13 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
       };
     })
   );
-  const debugColors = DEBUG_STATE_COLORS[debugState];
+  const debugColors: { border: string; glow: string } | null = {
+    [NodeState.Invalid]: null,
+    [NodeState.Success]: theme.debug.success,
+    [NodeState.Failure]: theme.debug.failure,
+    [NodeState.Break]: theme.debug.break,
+    [NodeState.Running]: theme.debug.running,
+  }[debugState];
 
   // Transient highlight: Break = always on, others fade out after TRANSIENT_HIGHLIGHT_DURATION
   const [isTransientVisible, setIsTransientVisible] = useState(false);
@@ -174,9 +168,10 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
 
   const nodeDefinition = useMemo(() => getDefinition(treeNode.type), [treeNode.type, getDefinition]);
 
-  const bgColor = NODE_COLORS[treeNode.category] || NODE_COLORS.default || theme.ui.border;
-  const selectedColor = theme.text.variable;
-  const selectedGlow = `${selectedColor}55`;
+  const bgColor = theme.node[treeNode.category] || theme.node.default || theme.ui.border;
+  const selectionShadow = selected
+    ? `0 0 0 2px ${theme.ui.nodeSelectionGap}, 0 0 0 5px ${theme.ui.nodeSelection}`
+    : undefined;
   const hasChildren = (nodeDefinition?.childConnectors?.length || 0) > 0;
   const isEffectivelyDisabled = data.isEffectivelyDisabled;
 
@@ -235,8 +230,8 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
           className={`rounded shadow-lg min-w-32 cursor-grab resize-none hover:brightness-110 transition-[filter,border-color,box-shadow] duration-200 ${isEffectivelyDisabled ? 'grayscale opacity-60' : ''}`}
           style={{
             backgroundColor: theme.ui.panelBg,
-            border: `1px solid ${selected ? selectedColor : theme.ui.border}`,
-            boxShadow: selected ? `0 0 0 2px ${selectedGlow}` : undefined,
+            border: `1px solid ${theme.ui.border}`,
+            boxShadow: selectionShadow,
           }}
         >
           {/* Debug Overlay */}
@@ -244,7 +239,7 @@ function CustomNode({ data, selected, dragging }: NodeProps<CustomNodeType>) {
             <div
               className="absolute inset-0 rounded pointer-events-none z-50"
               style={{
-                boxShadow: `inset 0 0 0 4px ${debugColors!.border}, ${debugColors!.glow}`
+                boxShadow: `inset 0 0 0 5px ${debugColors!.border}, inset 0 0 18px color-mix(in srgb, ${debugColors!.border} 55%, transparent), 0 0 16px color-mix(in srgb, ${debugColors!.border} 85%, transparent), ${debugColors!.glow}`
               }}
             />
           )}

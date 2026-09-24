@@ -9,11 +9,10 @@ import { NodeState } from '../types/debug';
 import { getFileDisplay } from '../utils/fileUtils';
 import { TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
 
-import { getTheme } from '../theme/theme';
-
-const theme = getTheme();
+import { useTheme } from '../theme/theme';
 
 export function Sidebar() {
+  const theme = useTheme();
   const { openedFiles, activeFilePath, setActiveFile, closeFile, isLoading } = useEditorStore(useShallow(state => ({
     openedFiles: state.openedFiles,
     activeFilePath: state.activeFilePath,
@@ -96,6 +95,7 @@ export function Sidebar() {
 }
 
 function SidebarItem({ file, isActive, onClick, onClose }: any) {
+  const theme = useTheme();
   const { isConnected, getFileRunState, treeRunInfos, fsmRunInfo, keyframe } = useDebugStore(useShallow(state => ({
     isConnected: state.isConnected,
     getFileRunState: state.getFileRunState,

@@ -1,9 +1,8 @@
 import { useNotificationStore } from '../stores/notificationStore';
-import { getTheme } from '../theme/theme';
-
-const theme = getTheme();
+import { useTheme } from '../theme/theme';
 
 export function NotificationBubble() {
+    const theme = useTheme();
     const notifications = useNotificationStore((state) => state.notifications);
 
     if (notifications.length === 0) return null;

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useEditorStore } from '../stores/editorStore';
 import { useTooltipStore } from '../stores/tooltipStore';
 import { stripExtension } from '../utils/fileUtils';
-import { getTheme } from '../theme/theme';
+import { useTheme } from '../theme/theme';
 
 interface TreeFilePickerProps {
     value: string;
@@ -14,7 +14,7 @@ interface TreeFilePickerProps {
 }
 
 export function TreeFilePicker({ value, onChange, options, placeholder = 'Select a tree...', allowJump = true, defaultOpen = false }: TreeFilePickerProps) {
-    const theme = getTheme();
+    const theme = useTheme();
     const [isOpen, setIsOpen] = useState(defaultOpen);
     const [search, setSearch] = useState('');
     const containerRef = useRef<HTMLDivElement>(null);

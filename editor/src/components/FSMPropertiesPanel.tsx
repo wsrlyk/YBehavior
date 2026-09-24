@@ -4,7 +4,7 @@ import { useEditorStore } from '../stores/editorStore';
 import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { validateVariableName } from '../utils/validation';
 import { TreeFilePicker } from './TreeFilePicker';
-import { getTheme } from '../theme/theme';
+import { useTheme } from '../theme/theme';
 
 
 // TreeFilePicker extracted to separate file
@@ -12,7 +12,7 @@ import { getTheme } from '../theme/theme';
 // ==================== Main Panel ====================
 
 export function FSMPropertiesPanel() {
-    const theme = getTheme();
+    const theme = useTheme();
     const selectedNodeIds = useFSMStore(state => state.selectedNodeIds);
     const selectedEdgeIds = useFSMStore(state => state.selectedEdgeIds);
 

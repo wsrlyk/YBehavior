@@ -5,7 +5,7 @@ import { useFSMStore } from '../stores/fsmStore';
 import { useTooltipStore } from '../stores/tooltipStore';
 import { readFile } from '../utils/fileService';
 import { getFileDisplay } from '../utils/fileUtils';
-import { getTheme } from '../theme/theme';
+import { useTheme } from '../theme/theme';
 
 interface FileTreePopupProps {
   isOpen: boolean;
@@ -78,7 +78,7 @@ function FileTreeNode({
   filter: string;
   setTooltip: (content: string | null) => void;
 }) {
-  const theme = getTheme();
+  const theme = useTheme();
   const isExpanded = expandedDirs.has(node.path);
   const matchesFilter = !filter || node.path.toLowerCase().includes(filter.toLowerCase());
 
@@ -150,7 +150,7 @@ function hasMatchingDescendants(node: TreeNode, filter: string): boolean {
 }
 
 export function FileTreePopup({ isOpen, onClose }: FileTreePopupProps) {
-  const theme = getTheme();
+  const theme = useTheme();
   const { treeFiles, openTree, setActiveFile } = useEditorStore(useShallow(state => ({
     treeFiles: state.treeFiles,
     openTree: state.openTree,

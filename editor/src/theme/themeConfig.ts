@@ -1,14 +1,20 @@
-import { readFile, writeFile } from '../utils/fileService';
+import { readFile } from '../utils/fileService';
 import { getConfigPath } from '../utils/configPath';
-import { DefaultTheme, type GraphTheme, applyThemeCssVariables, setTheme } from './theme';
+import { DefaultTheme, type GraphTheme, setTheme } from './theme';
 
-type ThemeOverride = Partial<GraphTheme>;
+type DeepPartial<T> = {
+    [K in keyof T]?: T[K] extends Record<string, unknown> ? DeepPartial<T[K]> : T[K];
+};
+
+type ThemeOverride = DeepPartial<GraphTheme>;
 
 interface ThemePreset {
     name: string;
     baseTheme?: string;
     theme: ThemeOverride;
 }
+
+let loadedPresets: ThemePreset[] = [];
 
 function isObject(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -33,6 +39,43 @@ function deepMerge<T>(base: T, patch: unknown): T {
         }
     }
     return output as T;
+}
+
+function sanitizeOverride(base: unknown, patch: unknown, path = 'theme'): unknown {
+    if (typeof base === 'string') {
+        if (typeof patch === 'string' && patch.trim()) return patch;
+        console.warn(`Ignoring invalid ${path}: expected a non-empty string.`);
+        return undefined;
+    }
+
+    if (!isObject(base) || !isObject(patch)) {
+        if (patch !== undefined) console.warn(`Ignoring invalid ${path}: expected an object.`);
+        return undefined;
+    }
+
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(patch)) {
+        const baseValue = base[key];
+        if (baseValue !== undefined) {
+            const sanitized = sanitizeOverride(baseValue, value, `${path}.${key}`);
+            if (sanitized !== undefined) result[key] = sanitized;
+            continue;
+        }
+
+        // Record-based theme sections allow custom categories and value types.
+        if (typeof value === 'string' && value.trim()) {
+            result[key] = value;
+        } else if (isObject(value)) {
+            const template = Object.values(base).find(isObject);
+            if (template) {
+                const sanitized = sanitizeOverride(template, value, `${path}.${key}`);
+                if (sanitized !== undefined) result[key] = sanitized;
+            }
+        } else {
+            console.warn(`Ignoring invalid ${path}.${key}.`);
+        }
+    }
+    return result;
 }
 
 function parseThemes(raw: unknown): ThemePreset[] {
@@ -62,7 +105,7 @@ function parseThemes(raw: unknown): ThemePreset[] {
         presets.push({
             name: name.trim(),
             baseTheme,
-            theme: themeCandidate,
+            theme: (sanitizeOverride(DefaultTheme, themeCandidate) || {}) as ThemeOverride,
         });
     }
 
@@ -77,13 +120,14 @@ async function loadCurrentThemeFromMeta(): Promise<string | undefined> {
 
         if (!isObject(parsed)) return undefined;
 
-        if (typeof parsed.currentTheme === 'string' && parsed.currentTheme.trim()) {
-            return parsed.currentTheme.trim();
-        }
-
         const uiMeta = parsed.uiMeta;
         if (isObject(uiMeta) && typeof uiMeta.currentTheme === 'string' && uiMeta.currentTheme.trim()) {
             return uiMeta.currentTheme.trim();
+        }
+
+        // Backward compatibility for metadata written before currentTheme moved under uiMeta.
+        if (typeof parsed.currentTheme === 'string' && parsed.currentTheme.trim()) {
+            return parsed.currentTheme.trim();
         }
 
         return undefined;
@@ -135,16 +179,26 @@ function mergeThemePresets(base: ThemePreset[], local: ThemePreset[]): ThemePres
 }
 
 function resolveThemeOverrideWithBase(presets: ThemePreset[], selectedName: string): ThemeOverride {
-    const map = new Map<string, ThemePreset>(presets.map((p) => [p.name, p]));
+    const map = new Map<string, ThemePreset>();
+    for (const preset of presets) {
+        if (map.has(preset.name)) {
+            console.warn(`Ignoring duplicate theme name "${preset.name}".`);
+            continue;
+        }
+        map.set(preset.name, preset);
+    }
     const visiting = new Set<string>();
 
     const resolveByName = (name: string): ThemeOverride => {
         const preset = map.get(name);
-        if (!preset) return {};
+        if (!preset) {
+            console.warn(`Theme "${selectedName}" references missing base theme "${name}".`);
+            return {};
+        }
 
         if (visiting.has(name)) {
             console.warn(`Theme base inheritance cycle detected at "${name}".`);
-            return preset.theme;
+            return {};
         }
 
         visiting.add(name);
@@ -160,46 +214,30 @@ function resolveThemeOverrideWithBase(presets: ThemePreset[], selectedName: stri
     return resolveByName(selectedName);
 }
 
-async function ensureCurrentThemeInMeta(selectedThemeName: string): Promise<void> {
-    try {
-        const metaPath = await getConfigPath('editor_meta.local.json');
+function resolveTheme(presets: ThemePreset[], name: string): GraphTheme | null {
+    if (!presets.some((preset) => preset.name === name)) return null;
+    return deepMerge(cloneDefaultTheme(), resolveThemeOverrideWithBase(presets, name));
+}
 
-        let parsed: Record<string, unknown> = {};
-        try {
-            const content = await readFile(metaPath);
-            const json = JSON.parse(content) as unknown;
-            if (isObject(json)) {
-                parsed = json;
-            }
-        } catch {
-            parsed = {};
-        }
+export function getAvailableThemeNames(): string[] {
+    return loadedPresets.map((preset) => preset.name);
+}
 
-        const uiMeta = isObject(parsed.uiMeta) ? { ...parsed.uiMeta } : {};
-        const rootTheme = typeof parsed.currentTheme === 'string' ? parsed.currentTheme : undefined;
-        const uiTheme = typeof uiMeta.currentTheme === 'string' ? uiMeta.currentTheme : undefined;
+export async function setCurrentTheme(name: string): Promise<boolean> {
+    const resolvedTheme = resolveTheme(loadedPresets, name);
+    if (!resolvedTheme) return false;
 
-        if (rootTheme === selectedThemeName && uiTheme === selectedThemeName) {
-            return;
-        }
-
-        uiMeta.currentTheme = selectedThemeName;
-        const next = {
-            ...parsed,
-            currentTheme: selectedThemeName,
-            uiMeta,
-        };
-
-        await writeFile(metaPath, JSON.stringify(next, null, 2));
-    } catch (e) {
-        console.warn('Failed to update editor_meta.local.json currentTheme:', e);
-    }
+    setTheme(resolvedTheme);
+    const { useEditorMetaStore } = await import('../stores/editorMetaStore');
+    useEditorMetaStore.getState().setCurrentTheme(name);
+    return true;
 }
 
 export async function initializeThemeFromConfig(): Promise<string> {
     const builtinPresets = await loadThemesFromConfig();
     const localPresets = await loadLocalThemesFromConfig();
     const presets = mergeThemePresets(builtinPresets, localPresets);
+    loadedPresets = presets;
     const currentThemeName = await loadCurrentThemeFromMeta();
 
     let selectedThemeName = 'default';
@@ -217,8 +255,6 @@ export async function initializeThemeFromConfig(): Promise<string> {
 
     const resolvedTheme = deepMerge(cloneDefaultTheme(), selectedOverride);
     setTheme(resolvedTheme);
-    applyThemeCssVariables(resolvedTheme);
-    await ensureCurrentThemeInMeta(selectedThemeName);
 
     return selectedThemeName;
 }

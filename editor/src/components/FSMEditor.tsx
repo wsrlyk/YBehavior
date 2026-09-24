@@ -31,10 +31,8 @@ import { useTooltipStore } from '../stores/tooltipStore';
 import { useShallow } from 'zustand/react/shallow';
 import type { FSMMachine, FSMTransition, FSMState } from '../types/fsm';
 import { isSpecialStateType } from '../types/fsm';
-import { getTheme } from '../theme/theme';
+import { useTheme, type GraphTheme } from '../theme/theme';
 import { useCenterNodeSelection } from '../hooks/useCenterNodeSelection';
-
-const theme = getTheme();
 
 // ==================== Node & Edge Types ====================
 
@@ -68,7 +66,7 @@ function convertStatesToNodes(machine: FSMMachine, selectedNodeIds: string[]): F
     return nodes;
 }
 
-function convertTransitionsToEdges(machine: FSMMachine, fsm: { machines: Map<string, FSMMachine>, rootMachineId: string }, selectedEdgeIds: string[]): Edge[] {
+function convertTransitionsToEdges(machine: FSMMachine, fsm: { machines: Map<string, FSMMachine>, rootMachineId: string }, selectedEdgeIds: string[], theme: GraphTheme): Edge[] {
     const edges: Edge[] = [];
     const rootMachine = fsm.machines.get(fsm.rootMachineId);
     if (!rootMachine) return edges;
@@ -276,6 +274,7 @@ export default function FSMEditor(props: FSMEditorProps) {
 }
 
 function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
+    const theme = useTheme();
     const { screenToFlowPosition, setCenter, getNodes } = useReactFlow();
     const pendingCenterTarget = useEditorMetaStore(state => state.uiMeta.pendingCenterTarget);
     const setPendingCenterTarget = useEditorMetaStore(state => state.setPendingCenterTarget);
@@ -395,8 +394,8 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
 
     const initialEdges = useMemo(() => {
         if (!machine || !fsm) return [];
-        return convertTransitionsToEdges(machine, fsm, selectedEdgeIds);
-    }, [machine, fsm, selectedEdgeIds]);
+        return convertTransitionsToEdges(machine, fsm, selectedEdgeIds, theme);
+    }, [machine, fsm, selectedEdgeIds, theme.edge.defaultState]);
 
     const [nodes, setNodes, onNodesChangeBase] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChangeBase] = useEdgesState(initialEdges);
@@ -685,7 +684,7 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
                     zoomable
                     pannable
                     style={{ width: 140, height: 90, backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}
-                    maskColor={`${theme.ui.background}99`}
+                    maskColor={`color-mix(in srgb, ${theme.ui.background} 60%, transparent)`}
                     nodeColor={(node) => {
                         const data = node.data as FSMStateNodeData;
                         const colors: Record<string, string> = {
@@ -823,7 +822,7 @@ function FSMEditorInner({ onPaneClick: onPaneClickProp }: FSMEditorProps) {
 
                 {/* State Picker Modal */}
                 {pickerData && (
-                    <div className="absolute inset-0 z-[100] flex items-center justify-center backdrop-blur-sm p-8" style={{ backgroundColor: `${theme.ui.background}99` }}>
+                    <div className="absolute inset-0 z-[100] flex items-center justify-center backdrop-blur-sm p-8" style={{ backgroundColor: `color-mix(in srgb, ${theme.ui.background} 60%, transparent)` }}>
                         <div className="border rounded-lg shadow-2xl w-full max-w-md flex flex-col max-h-full" style={{ backgroundColor: theme.ui.panelBg, borderColor: theme.ui.border }}>
                             <div className="p-4 border-b flex justify-between items-center" style={{ borderColor: theme.ui.border }}>
                                 <h3 className="text-lg font-semibold" style={{ color: theme.ui.textMain }}>Select Target State</h3>

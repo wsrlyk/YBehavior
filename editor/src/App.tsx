@@ -6,6 +6,7 @@ import { NotificationBubble } from "./components/NotificationBubble";
 import { useDebugStore } from "./stores/debugStore";
 import { useGlobalKeyboard } from "./hooks/useGlobalKeyboard";
 import { initializeThemeFromConfig } from "./theme/themeConfig";
+import { DefaultTheme, setTheme } from "./theme/theme";
 
 function App() {
   const [route, setRoute] = useState(window.location.hash);
@@ -26,9 +27,13 @@ function App() {
     let disposed = false;
 
     const initTheme = async () => {
-      await initializeThemeFromConfig();
-      if (!disposed) {
-        setThemeReady(true);
+      try {
+        await initializeThemeFromConfig();
+      } catch (error) {
+        console.error('Failed to initialize theme, using DefaultTheme:', error);
+        setTheme(DefaultTheme);
+      } finally {
+        if (!disposed) setThemeReady(true);
       }
     };
 

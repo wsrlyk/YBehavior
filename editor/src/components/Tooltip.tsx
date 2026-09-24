@@ -1,11 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTooltipStore } from '../stores/tooltipStore';
 import { createPortal } from 'react-dom';
-import { getTheme } from '../theme/theme';
-
-const theme = getTheme();
+import { useTheme } from '../theme/theme';
 
 export default function Tooltip() {
+    const theme = useTheme();
     const { content, position } = useTooltipStore();
     const [coords, setCoords] = useState({ x: 0, y: 0 });
     const [adjusted, setAdjusted] = useState({ x: 0, y: 0 });

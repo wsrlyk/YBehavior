@@ -12,13 +12,7 @@ import { useTooltipStore } from '../stores/tooltipStore';
 import { useDebugStore } from '../stores/debugStore';
 import { decodeXmlEntities } from '../utils/stringUtils';
 import { stripExtension } from '../utils/fileUtils';
-import { getTheme } from '../theme/theme';
-
-const theme = getTheme();
-
-// ==================== Colors ====================
-
-const STATE_COLORS: Record<FSMStateType, { bg: string; border: string }> = theme.fsmState as any;
+import { useTheme } from '../theme/theme';
 
 const STATE_ICONS: Record<FSMStateType, string> = {
     Normal: '●',
@@ -42,6 +36,7 @@ export type FSMStateNodeType = Node<FSMStateNodeData, 'fsmState'>;
 // ==================== Component ====================
 
 function FSMStateNode({ data, selected, dragging }: NodeProps<FSMStateNodeType>) {
+    const theme = useTheme();
     const { state, isDefault } = data;
     const [isHovered, setIsHovered] = useState(false);
     const setTooltip = useTooltipStore((state) => state.setTooltip);
@@ -58,10 +53,15 @@ function FSMStateNode({ data, selected, dragging }: NodeProps<FSMStateNodeType>)
 
     let runRingColor = '';
     if (isRunning) {
-        if (runState === NodeState.Break) runRingColor = theme.ui.danger;
-        else if (runState === NodeState.Success) runRingColor = theme.ui.success;
-        else if (runState === NodeState.Failure) runRingColor = theme.ui.warning;
-        else runRingColor = theme.ui.accent;
+        if (runState === NodeState.Break) {
+            runRingColor = theme.debug.break.border;
+        } else if (runState === NodeState.Success) {
+            runRingColor = theme.debug.success.border;
+        } else if (runState === NodeState.Failure) {
+            runRingColor = theme.debug.failure.border;
+        } else {
+            runRingColor = theme.debug.running.border;
+        }
     }
 
     // Handle transient visibility (0.7s flash for non-break states)
@@ -84,7 +84,7 @@ function FSMStateNode({ data, selected, dragging }: NodeProps<FSMStateNodeType>)
         runRingColor = '';
     }
 
-    const colors = STATE_COLORS[state.type];
+    const colors = theme.fsmState[state.type];
     const styleColors = colors;
 
     const icon = STATE_ICONS[state.type];
@@ -96,10 +96,16 @@ function FSMStateNode({ data, selected, dragging }: NodeProps<FSMStateNodeType>)
     // Always render handles so React Flow can find them, but hide via CSS
     const isTargetVisible = hasParentHandle && isGlobalConnecting;
     const isSourceVisible = hasChildHandle && isHovered && !isGlobalConnecting;
-    const highlightBorder = selected && !isRunning ? `0 0 0 2px ${theme.text.variable}` : undefined;
-    const defaultBorder = isDefault && !isRunning ? `0 0 0 2px ${theme.returnType.Invert}` : undefined;
-    const runRing = runRingColor ? `0 0 0 4px ${runRingColor}, 0 0 0 6px ${theme.ui.background}` : undefined;
-    const combinedOuterGlow = [highlightBorder, defaultBorder, runRing].filter(Boolean).join(', ');
+    const selectionRing = selected
+        ? `0 0 0 2px ${theme.ui.nodeSelectionGap}, 0 0 0 5px ${theme.ui.nodeSelection}`
+        : undefined;
+    const defaultRing = isDefault && !selected
+        ? `0 0 0 2px ${theme.returnType.Invert}`
+        : undefined;
+    const debugRing = runRingColor
+        ? `inset 0 0 0 5px ${runRingColor}, inset 0 0 18px color-mix(in srgb, ${runRingColor} 55%, transparent), 0 0 16px color-mix(in srgb, ${runRingColor} 85%, transparent)`
+        : undefined;
+    const combinedOuterGlow = [selectionRing, defaultRing, debugRing].filter(Boolean).join(', ');
 
     return (
         <div

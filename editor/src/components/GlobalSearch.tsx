@@ -4,7 +4,7 @@ import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useFSMStore } from '../stores/fsmStore';
 import { isSpecialStateType } from '../types/fsm';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
-import { getTheme } from '../theme/theme';
+import { useTheme } from '../theme/theme';
 
 interface SearchResult {
     type: 'node' | 'pin' | 'variable' | 'io' | 'fsm-state' | 'fsm-transition';
@@ -18,7 +18,7 @@ interface SearchResult {
 }
 
 export function GlobalSearch() {
-    const theme = getTheme();
+    const theme = useTheme();
     const isSearchOpen = useEditorMetaStore(state => state.uiMeta.isSearchOpen);
     const setSearchOpen = useEditorMetaStore(state => state.setSearchOpen);
     const setActivePropertiesTab = useEditorMetaStore(state => state.setActivePropertiesTab);

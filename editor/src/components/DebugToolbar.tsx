@@ -15,7 +15,7 @@ import { useEditorMetaStore } from '../stores/editorMetaStore';
 import { useEditorStore } from '../stores/editorStore';
 import { useFSMStore } from '../stores/fsmStore';
 import { useNotificationStore } from '../stores/notificationStore';
-import { getTheme } from '../theme/theme';
+import { useTheme } from '../theme/theme';
 
 // Icons as simple SVG components
 const PlayIcon = () => (
@@ -56,7 +56,7 @@ const DisconnectIcon = () => (
 );
 
 export function DebugToolbar() {
-    const theme = getTheme();
+    const theme = useTheme();
     const { isConnected, isPaused, isDebugging, connect, disconnect, startDebug, continueDebug, stepInto, stepOver } = useDebugStore(useShallow(state => ({
         isConnected: state.isConnected,
         isPaused: state.isPaused,

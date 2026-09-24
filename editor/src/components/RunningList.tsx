@@ -7,10 +7,10 @@ import { useTooltipStore } from '../stores/tooltipStore';
 import { getFileDisplay } from '../utils/fileUtils';
 import { NodeState } from '../types/debug';
 import { TRANSIENT_HIGHLIGHT_DURATION } from '../config/constants';
-import { getTheme } from '../theme/theme';
+import { useTheme } from '../theme/theme';
 
 export const RunningList = () => {
-    const theme = getTheme();
+    const theme = useTheme();
     const { treeRunInfos, fsmRunInfo, isConnected } = useDebugStore(useShallow(state => ({
         treeRunInfos: state.treeRunInfos,
         fsmRunInfo: state.fsmRunInfo,
@@ -85,12 +85,12 @@ export const RunningList = () => {
         <div className="absolute top-2 left-2 z-50 flex flex-col items-start font-sans">
             <div
                 className="border rounded shadow-lg backdrop-blur-sm overflow-hidden"
-                style={{ backgroundColor: `${theme.ui.panelBg}E6`, borderColor: theme.ui.border }}
+                style={{ backgroundColor: `color-mix(in srgb, ${theme.ui.panelBg} 90%, transparent)`, borderColor: theme.ui.border }}
             >
                 <div
                     className="px-3 py-1.5 flex items-center gap-2 cursor-pointer transition-colors select-none"
                     style={{ color: theme.ui.textMain }}
-                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${theme.ui.accentSoft}CC`; }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `color-mix(in srgb, ${theme.ui.accentSoft} 80%, transparent)`; }}
                     onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                     onClick={() => setIsOpen(!isOpen)}
                 >
@@ -137,7 +137,7 @@ export const RunningList = () => {
 };
 
 function RunningListItem({ fileName, isFsm, onClick }: { fileName: string; isFsm: boolean; onClick: () => void }) {
-    const theme = getTheme();
+    const theme = useTheme();
     const { isConnected, getFileRunState, treeRunInfos, fsmRunInfo, keyframe } = useDebugStore(useShallow(state => ({
         isConnected: state.isConnected,
         getFileRunState: state.getFileRunState,

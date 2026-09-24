@@ -5,9 +5,7 @@ import { useTooltipStore } from '../stores/tooltipStore';
 import type { NodeCategory } from '../types';
 import { useDebugStore } from '../stores/debugStore';
 import { BreakpointType } from '../types/debug';
-import { getTheme } from '../theme/theme';
-
-const theme = getTheme();
+import { useTheme } from '../theme/theme';
 
 interface NodeContextMenuProps {
   isOpen: boolean;
@@ -21,6 +19,7 @@ interface NodeContextMenuProps {
 const CATEGORY_ORDER: NodeCategory[] = ['composite', 'decorator', 'action', 'condition'];
 
 export function NodeContextMenu({ isOpen, position, screenPosition, onClose, onAddNode, nodeId }: NodeContextMenuProps) {
+  const theme = useTheme();
   const { getByCategory, isLoaded } = useNodeDefinitionStore();
   const currentTree = useEditorStore((state) => state.getCurrentTree());
   const toggleNodeFold = useEditorStore((state) => state.toggleNodeFold);

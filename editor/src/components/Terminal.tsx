@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { LogMessage, LOG_CHANNEL_NAME } from "../utils/logger";
-import { getTheme } from "../theme/theme";
+import { useTheme } from "../theme/theme";
 import { readFile, saveFile, writeBinaryFile } from "../utils/fileService";
 import { parseTreeXml } from "../utils/xmlParser";
 import { serializeTreeForEditor, serializeTreeForRuntime } from "../utils/xmlSerializer";
@@ -18,7 +18,7 @@ interface TerminalProps {
 }
 
 export function Terminal({ isDocked, onToggleMode }: TerminalProps) {
-    const theme = getTheme();
+    const theme = useTheme();
     const logBufferRef = useRef<LogMessage[]>([]);
     const [logs, setLogs] = useState<LogMessage[]>([]);
     const scrollRef = useRef<HTMLDivElement>(null);

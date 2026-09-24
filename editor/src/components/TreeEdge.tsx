@@ -1,15 +1,13 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { BaseEdge, type EdgeProps, type Edge, useStore, EdgeLabelRenderer } from '@xyflow/react';
 import { useEditorStore } from '../stores/editorStore';
 import { useDebugStore } from '../stores/debugStore';
 import { useShallow } from 'zustand/react/shallow';
 import { NodeState } from '../types/debug';
-import { getTheme } from '../theme/theme';
+import { useTheme } from '../theme/theme';
 import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import type { TreeNode } from '../types';
 import { useSelectionPreviewStore } from '../stores/selectionPreviewStore';
-
-const theme = getTheme();
 
 export interface TreeEdgeData extends Record<string, unknown> {
   siblingTargetIds?: string[];  // 兄弟边的目标节点 ID 列表
@@ -38,6 +36,8 @@ function TreeEdge({
   data,
   selected,
 }: EdgeProps) {
+  const theme = useTheme();
+  const [isHovered, setIsHovered] = useState(false);
   const edgeData = data as TreeEdgeData | undefined;
   const siblingTargetIds = edgeData?.siblingTargetIds || [];
   const label = edgeData?.label;
@@ -45,8 +45,9 @@ function TreeEdge({
   // Import definition store
   const { getDefinition } = useNodeDefinitionStore();
 
-  // 从 store 获取水平线高度
-  const horizontalY = useStore((state) => {
+  // Calculate the shared bus once per connector group. Individual edges only
+  // draw their own vertical branch, avoiding stacked strokes on common paths.
+  const busGeometry = useStore((state) => {
     // 1. 获取父节点的位置和尺寸
     const sourceNode = source ? state.nodeLookup.get(source) : null;
     if (!sourceNode) {
@@ -81,7 +82,7 @@ function TreeEdge({
     for (const targetId of siblingTargetIds) {
       const node = state.nodeLookup.get(targetId);
       if (node) {
-        minChildY = Math.min(minChildY, node.position.y);
+        minChildY = Math.min(minChildY, node.internals.positionAbsolute.y);
       }
     }
     if (minChildY === Infinity) {
@@ -100,6 +101,7 @@ function TreeEdge({
       ((parentBottomY + minChildY) / 2) + baseOffset
     );
   });
+  const horizontalY = busGeometry;
 
   // Debug state integration
   const activeFilePath = useEditorStore((s) => s.activeFilePath);
@@ -144,32 +146,66 @@ function TreeEdge({
       case NodeState.Break: return theme.debug.break.edge;
       default:
         if (selected) return theme.edge.tree.selected;
-        if (isConnectedToSelected) return theme.edge.tree.selected + '80'; // Dim highlight (50% opacity)
+        if (isConnectedToSelected) return theme.edge.tree.selected;
         return theme.edge.tree.default;
     }
   };
 
   const edgeColor = (debugState !== NodeState.Invalid) ? getEdgeColor(debugState) : getEdgeColor(NodeState.Invalid);
-  const edgeWidth = (selected || isConnectedToSelected || debugState !== NodeState.Invalid) ? 3 : 2;
+  const isHighlighted = !edgeData?.isEffectivelyDisabled && (selected || isHovered || isConnectedToSelected || debugState !== NodeState.Invalid);
+  const highlightColor = debugState !== NodeState.Invalid
+    ? edgeColor
+    : selected
+      ? theme.edge.tree.selected
+      : isHovered
+        ? theme.edge.tree.hover
+        : theme.edge.tree.related;
+  const highlightOpacity = debugState !== NodeState.Invalid && isPaused ? 0.75 : 1;
 
-  // 绘制路径：直接从连接器位置（sourceX, sourceY）出发
-  // 垂直下降到水平线，然后水平移动到目标 X，再垂直下降到目标
-  const path = `M ${sourceX} ${sourceY} L ${sourceX} ${horizontalY} L ${targetX} ${horizontalY} L ${targetX} ${targetY}`;
+  const branchPath = `M ${targetX} ${horizontalY} L ${targetX} ${targetY}`;
+  const highlightedRoute = `M ${sourceX} ${sourceY} L ${sourceX} ${horizontalY} L ${targetX} ${horizontalY} L ${targetX} ${targetY}`;
 
   return (
     <>
+      {/* Keep the complete route interactive while the shared bus is rendered once in TreeBusLayer. */}
+      <path
+        d={highlightedRoute}
+        fill="none"
+        stroke="transparent"
+        strokeWidth={18}
+        pointerEvents="stroke"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      />
       <BaseEdge
-        id={id}
-        path={path}
+        id={`${id}-base`}
+        path={branchPath}
+        interactionWidth={0}
         style={{
           ...style,
-          stroke: edgeColor,
-          strokeWidth: edgeWidth,
-          transition: 'stroke 0.2s, stroke-width 0.2s',
-          opacity: edgeData?.isEffectivelyDisabled ? 0.35 : ((debugState !== NodeState.Invalid && isPaused) ? 0.6 : 1)
+          stroke: theme.edge.tree.default,
+          strokeWidth: 2,
+          opacity: edgeData?.isEffectivelyDisabled ? 0.35 : 1,
+          pointerEvents: 'none',
         }}
         markerEnd={markerEnd}
       />
+      {isHighlighted && (
+        <BaseEdge
+          id={id}
+          path={highlightedRoute}
+          interactionWidth={0}
+          style={{
+            ...style,
+            stroke: highlightColor,
+            strokeWidth: selected ? 4.5 : isHovered ? 4 : 3.25,
+            strokeOpacity: highlightOpacity,
+            transition: 'stroke 0.15s, stroke-width 0.15s',
+            pointerEvents: 'none',
+          }}
+          markerEnd={markerEnd}
+        />
+      )}
       {label && (
         <EdgeLabelRenderer>
           <div
@@ -187,7 +223,9 @@ function TreeEdge({
               maxWidth: '120px',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              border: `1px solid ${edgeColor !== theme.edge.tree.default && edgeColor !== theme.edge.tree.selected ? edgeColor : theme.edge.label.border}`,
+              border: `1px solid ${isHighlighted
+                ? highlightColor
+                : theme.edge.label.border}`,
             }}
           >
             {label}

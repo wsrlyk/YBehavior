@@ -10,7 +10,7 @@ import { useFSMStore } from '../stores/fsmStore';
 import { useShallow } from 'zustand/react/shallow';
 import { NodeEditor } from './NodeEditor';
 import FSMEditor from './FSMEditor';
-import { getTheme } from '../theme/theme';
+import { useTheme } from '../theme/theme';
 
 import { RunningList } from './RunningList';
 
@@ -19,7 +19,7 @@ interface EditorPaneProps {
 }
 
 export function EditorPane({ onPaneClick }: EditorPaneProps) {
-    const theme = getTheme();
+    const theme = useTheme();
     const { openedFiles, activeFilePath } = useEditorStore(useShallow(state => ({
         openedFiles: state.openedFiles,
         activeFilePath: state.activeFilePath,

@@ -19,13 +19,12 @@ import { useNodeDefinitionStore } from '../stores/nodeDefinitionStore';
 import { useDebugStore } from '../stores/debugStore';
 import { useTooltipStore } from '../stores/tooltipStore';
 import { useShallow } from 'zustand/react/shallow';
-import { getTheme } from '../theme/theme';
+import { useTheme } from '../theme/theme';
 import { NodeContextMenu } from './NodeContextMenu';
-
-const theme = getTheme();
 import CustomNode, { type CustomNodeType } from './CustomNode';
 import TreeEdge from './TreeEdge';
 import DataEdge from './DataEdge';
+import { TreeBusLayer } from './TreeBusLayer';
 import type { TreeNode, NodeCategory, Pin } from '../types';
 import { useCenterNodeSelection } from '../hooks/useCenterNodeSelection';
 
@@ -63,6 +62,7 @@ interface NodeEditorProps {
 }
 
 function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
+  const theme = useTheme();
   const {
     addNode,
     selectNodes,
@@ -307,6 +307,8 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
           targetHandle: `pin-in-${dataConn.toPinName}`,
           type: 'data',
           data: {
+            fromNodeId: dataConn.fromNodeId,
+            toNodeId: dataConn.toNodeId,
             fromPinName: dataConn.fromPinName,
             toPinName: dataConn.toPinName,
             isEffectivelyDisabled: effectiveDisabledIds.has(dataConn.fromNodeId) || effectiveDisabledIds.has(dataConn.toNodeId)
@@ -889,6 +891,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
         style={{ backgroundColor: theme.ui.background }}
         deleteKeyCode={null}
       >
+        <TreeBusLayer />
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color={theme.ui.gridDots} />
         <MiniMap
           nodeStrokeWidth={3}
@@ -900,7 +903,7 @@ function NodeEditorInner({ onPaneClick }: NodeEditorProps) {
             backgroundColor: theme.ui.panelBg,
             borderColor: theme.ui.border,
           }}
-          maskColor={`${theme.ui.background}99`}
+          maskColor={`color-mix(in srgb, ${theme.ui.background} 60%, transparent)`}
         />
       </ReactFlow>
 

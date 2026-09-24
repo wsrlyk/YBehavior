@@ -17,11 +17,11 @@ import { getAllWindows } from "@tauri-apps/api/window";
 import Tooltip from "../components/Tooltip";
 import { GlobalSearch } from "../components/GlobalSearch";
 import { ReactFlowProvider } from '@xyflow/react';
-import { getTheme } from '../theme/theme';
+import { useTheme } from '../theme/theme';
 import { useShallow } from 'zustand/react/shallow';
 
 export function MainWindow() {
-    const theme = getTheme();
+    const theme = useTheme();
     const { openedFiles, activeFilePath, saveCurrentFile, saveFileAs, undo, redo, createNewTree } = useEditorStore(useShallow(state => ({
         openedFiles: state.openedFiles,
         activeFilePath: state.activeFilePath,
@@ -326,7 +326,7 @@ export function MainWindow() {
                             {/* Update watermark */}
                             {updateAvailable && (
                                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[50]">
-                                    <div className="w-full text-center text-3xl font-bold select-none tracking-wide drop-shadow-lg" style={{ color: `${theme.ui.textMain}99` }}>
+                                    <div className="w-full text-center text-3xl font-bold select-none tracking-wide drop-shadow-lg" style={{ color: `color-mix(in srgb, ${theme.ui.textMain} 60%, transparent)` }}>
                                         🔄 新版本已就绪，请关闭本程序后重新启动
                                     </div>
                                 </div>

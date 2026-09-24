@@ -1,8 +1,7 @@
 import { BaseEdge, EdgeLabelRenderer, getStraightPath, useInternalNode, type EdgeProps, type Edge } from '@xyflow/react';
-import { getTheme } from '../theme/theme';
+import { useState } from 'react';
+import { useTheme } from '../theme/theme';
 import { useSelectionPreviewStore } from '../stores/selectionPreviewStore';
-
-const theme = getTheme();
 
 export type FSMTransitionEdgeData = {
     transitions?: any[];
@@ -19,6 +18,8 @@ export default function FSMTransitionEdge({
     label,
     selected,
 }: EdgeProps<FSMTransitionEdgeType>) {
+    const theme = useTheme();
+    const [isHovered, setIsHovered] = useState(false);
     const sourceNode = useInternalNode(source);
     const targetNode = useInternalNode(target);
 
@@ -77,8 +78,10 @@ export default function FSMTransitionEdge({
     let color = theme.edge.fsmTransition.default;
     if (selected) {
         color = theme.edge.fsmTransition.selected;
+    } else if (isHovered) {
+        color = theme.edge.fsmTransition.hover;
     } else if (isConnectedToSelected) {
-        color = theme.edge.fsmTransition.selected + '80'; // Dim highlight
+        color = theme.edge.fsmTransition.related;
     }
 
     const textX = -arrowSize * 0.9;
@@ -87,9 +90,11 @@ export default function FSMTransitionEdge({
         <>
             <BaseEdge
                 path={edgePath}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
                 style={{
                     ...style,
-                    strokeWidth: (selected || isConnectedToSelected) ? 3 : 2,
+                    strokeWidth: selected ? 4.5 : isHovered ? 4 : isConnectedToSelected ? 3.25 : 2,
                     stroke: color,
                 }}
             />

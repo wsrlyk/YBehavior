@@ -44,6 +44,7 @@ interface EditorMetaState {
     setNodeFolded: (filePath: string, nodeId: string, isFolded: boolean) => void;
     setSidebarWidth: (width: number) => void;
     setPropertiesPanelWidth: (width: number) => void;
+    setCurrentTheme: (name: string) => void;
     setSearchOpen: (open: boolean) => void;
     setActivePropertiesTab: (tab: 'variables' | 'io' | 'properties') => void;
     setFocusTarget: (target?: { type: 'node' | 'variable' | 'io' | 'state' | 'transition', id: string }) => void;
@@ -128,6 +129,13 @@ export const useEditorMetaStore = create<EditorMetaState>((set, get) => ({
     setPropertiesPanelWidth: (width) => {
         set((state) => ({
             uiMeta: { ...state.uiMeta, propertiesPanelWidth: width }
+        }));
+        scheduleMetaSave(get().saveAllMeta);
+    },
+
+    setCurrentTheme: (name) => {
+        set((state) => ({
+            uiMeta: { ...state.uiMeta, currentTheme: name }
         }));
         scheduleMetaSave(get().saveAllMeta);
     },
